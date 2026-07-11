@@ -18,10 +18,16 @@ A portable raspi5 AI cam tool
 ## Milestones
 [X] Git
 [X] Python virtual environment
-[ ] SSH keys
+[X] SSH keys
 [X] VNC
 [ ] 64bit OS
 [ ] AI Camera
 [ ] Open CV
+
+## Notes
+Do not install python modules globally. 
+Use this command to install into virtual environment:
+
+source ~/Projects/Cyberdeck/.venv/bin/activate
 
 

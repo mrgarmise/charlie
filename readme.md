@@ -2,7 +2,7 @@
 A portable raspi5 AI cam tool
 
 ## Goals
--portable battery powered
+- portable battery powered
 - AI camera integration
 - Computer Vision
 - Mechanical Eye
@@ -10,10 +10,46 @@ A portable raspi5 AI cam tool
 - Robotics platform
 
 ## Current hardware
-- Raspi5
-- Raspi touchscreen (old version)
-- Battery Pack
+- Raspberry Pi 5
+- Elecfreaks pico:ed (RP2040)
+- Keyestudio micro:bit Sensor Shield V2
+- Four SG90 servos
+- Two pan/tilt mechanisms
 - micro SD card for 32bit OS Trixie
+
+## Current Software
+
+- Python 3
+- Event-driven behavior architecture
+- Stimulus bus
+- Attention manager
+- Idle behavior
+- Scan behavior
+- RP2040 servo controller
+
+## Project Structure
+
+```
+Cyberdeck/
+??? attention/
+??? behaviors/
+??? motion/
+??? stimulus/
+??? main.py
+```
+
+## Project Vision
+
+The robot should eventually:
+
+- Maintain lifelike idle motion
+- React to events
+- Track objects and people
+- Integrate Raspberry Pi AI Camera
+- Learn increasingly sophisticated behaviors
+
+The design emphasizes modularity so that sensors, AI models, and behaviors can evolve independently.
+
 
 ## Milestones
 [X] Git
@@ -23,6 +59,7 @@ A portable raspi5 AI cam tool
 [ ] 64bit OS
 [ ] AI Camera
 [ ] Open CV
+
 
 ## Notes
 Do not install python modules globally. 

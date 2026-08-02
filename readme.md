@@ -67,4 +67,4 @@ Use this command to install into virtual environment:
 
 source ~/Projects/Cyberdeck/.venv/bin/activate
 
-
+using github only

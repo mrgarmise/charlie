@@ -19,12 +19,13 @@ class AttentionManager:
             self.set(IdleBehavior(), None, priority=0)
         elif event == 'track':
             from behaviors.track import TrackBehavior
+
             behavior = TrackBehavior()
-            
+
             if data:
-                behavior.set_target(*data)
-                
-            self.set(TrackBehavior(), data, priority = 80)
+                 behavior.set_target(*data)
+
+            self.set(behavior, None, priority=80)
             
     def update(self, deck):
 

@@ -17,13 +17,12 @@ class AttentionManager:
         elif event == "idle":
             from behaviors.idle import IdleBehavior
             self.set(IdleBehavior(), None, priority=0)
-elif event == 'track':
-    from behaviors.track import TrackBehavior
+        elif event == 'track':
+            from behaviors.track import TrackBehavior
+            behavior = TrackBehavior()
 
-    behavior = TrackBehavior()
-
-    if data:
-        behavior.set_target(*data)
+            if data:
+                behavior.set_target(*data). 
 
     self.set(behavior, None, priority=80)
             

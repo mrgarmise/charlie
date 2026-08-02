@@ -40,7 +40,8 @@ class IdleBehavior(Behavior):
             tilt
         )
 
-    def is_finished(self):
-        return False
+    
     def wants_control(self):
         return 0
+    def is_finished(self):
+        return False

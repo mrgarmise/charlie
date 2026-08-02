@@ -37,12 +37,9 @@ class TrackBehavior(Behavior):
 
         pan, tilt = self.target
 
-        self.deck.move_to(
+        self.deck.track(
             pan,
             tilt,
-            pan,
-            tilt,
-            speed=self.speed
         )
 
     def is_finished(self):

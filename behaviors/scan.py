@@ -38,7 +38,7 @@ class ScanBehavior(Behavior):
 
         pan, tilt = self.points[self.index]
 
-        self.deck.move_to(pan, tilt, pan, tilt, speed=90)
+        self.deck.scan()
 
         self.index += 1
 

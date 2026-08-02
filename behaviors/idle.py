@@ -35,10 +35,9 @@ class IdleBehavior(Behavior):
         if random.random() < 0.15:
             return
 
-        self.deck.move_to(
-            pan, tilt,
-            pan, tilt,
-            speed=70
+        self.deck.look_at(
+            pan,
+            tilt
         )
     def wants_control(self):
             return 0

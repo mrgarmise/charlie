@@ -18,7 +18,7 @@ class ScanBehavior(Behavior):
 
 
     def is_finished(self):
-        return self.done
+        return False
 
 
     def exit(self, deck):

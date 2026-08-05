@@ -126,3 +126,8 @@ class MpRemote:
             return True
         except MpRemoteError:
             return False
+            
+    def exists(self, remote_path: str) -> bool:
+    """
+    Return True if a file exists on the Pico.
+    """

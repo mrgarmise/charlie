@@ -121,8 +121,8 @@ class MpRemote:
         
     def is_connected(self) -> bool:
     """Return True if a Pico is reachable."""
-    try:
-        self.run("fs", "ls")
+        try:
+            self.run("fs", "ls")
             return True
         except MpRemoteError:
             return False

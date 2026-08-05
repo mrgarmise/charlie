@@ -15,8 +15,8 @@ import sys
 from tools.mpremote_helper import MpRemote, MpRemoteError
 
 
-ROOT = Path(__file__).resolve().parents[1]
-RP2040_DIR = ROOT / "rp2040"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+RP2040_DIR = PROJECT_ROOT / "rp2040"
 
 
 class Synchronizer:

@@ -120,7 +120,7 @@ class MpRemote:
         return result.stdout
         
     def is_connected(self) -> bool:
-    """Return True if a Pico is reachable."""
+        """Return True if a Pico is reachable."""
         try:
             self.run("fs", "ls")
             return True
@@ -128,6 +128,6 @@ class MpRemote:
             return False
             
     def exists(self, remote_path: str) -> bool:
-    """
-    Return True if a file exists on the Pico.
-    """
+        """
+        Return True if a file exists on the Pico.
+        """

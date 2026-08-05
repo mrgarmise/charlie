@@ -12,7 +12,7 @@ It may be run manually or by update_charlie.py.
 from pathlib import Path
 import sys
 
-from mpremote_helper import MpRemote, MpRemoteError
+from tools.mpremote_helper import MpRemote, MpRemoteError
 
 
 ROOT = Path(__file__).resolve().parents[1]

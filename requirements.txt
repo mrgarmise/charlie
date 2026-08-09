@@ -1,0 +1,9 @@
+# Charlie Python dependencies
+#
+# This file contains Python packages required by Charlie
+# and its development/deployment tools.
+#
+# Operating-system packages belong in setup scripts.
+# RP2040/MicroPython modules do not belong here.
+pyserial==3.5
+mpremote

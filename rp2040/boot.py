@@ -19,4 +19,4 @@ print()
 
 print("Memory:", gc.mem_free(), "bytes free")
 
-import main
+

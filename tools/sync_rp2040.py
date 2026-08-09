@@ -41,30 +41,16 @@ class Synchronizer:
         print()
         print("Synchronizing RP2040...")
         print()
-        files = sorted(
-            source
-            for source in RP2040_DIR.glob("*.py")
-            if source.name != "boot.py"
-        )
+        files = sorted(RP2040_DIR.glob("*.py"))
         if not files:
             raise RuntimeError(f"No Python files found in: {RP2040_DIR}")
-        # Upload all application files first.
-        # boot.py is deliberately held back so that the Pico cannot
-        # automatically start Charlie while synchronization is still
-        # in progress.
         for source in files:
             destination = f":{source.name}"
             print(f"  Uploading {source.name}...")
             self.mp.copy(source, destination)
-        # Upload boot.py last.
-        # The synchronizer resets the Pico immediately afterward,
-        # allowing the newly installed boot.py to start Charlie.
-        boot = RP2040_DIR / "boot.py"
-        if boot.exists():
-            print("  Uploading boot.py...")
-            self.mp.copy(boot, ":boot.py")
         print()
         print("Synchronization complete.")
+        
     def reboot(self):
 
         print()

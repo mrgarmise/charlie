@@ -75,17 +75,14 @@ class MpRemote:
 
     def copy(self, source: Path, destination: str) -> None:
         """
-        Copy a file or directory to the Pico.
+        Copy a file to the Pico.
 
-        Example:
-
-            copy(Path("rp2040"), ":")
+        The destination should include the desired remote filename.
         """
 
         self.run(
             "fs",
             "cp",
-            "-r",
             str(source),
             destination,
         )

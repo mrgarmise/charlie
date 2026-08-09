@@ -6,11 +6,10 @@
 - initialized git repository
 - installed first packages
 - Created project structure
-
-- next goals 
-
 - SSH keys
 - VS Code
+
+- next goals 
 - Open CV
 
 

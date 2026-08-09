@@ -43,7 +43,17 @@ class Synchronizer:
         print("Synchronizing RP2040...")
         print()
 
-        self.mp.copy(RP2040_DIR, ":")
+        files = sorted(RP2040_DIR.glob("*.py"))
+
+        if not files:
+            raise RuntimeError(f"No Python files found in: {RP2040_DIR}")
+
+        for source in files:
+            destination = f":{source.name}"
+
+            print(f"  Uploading {source.name}...")
+
+            self.mp.copy(source, destination)
 
         print("Synchronization complete.")
 

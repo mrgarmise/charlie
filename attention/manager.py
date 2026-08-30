@@ -22,9 +22,8 @@ class AttentionManager:
             behavior = TrackBehavior()
 
             if data:
-                behavior.set_target(*data). 
-
-    self.set(behavior, None, priority=80)
+                behavior.set_target(*data) 
+            self.set(behavior, None, priority=80)
             
     def update(self, deck):
 

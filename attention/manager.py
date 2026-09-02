@@ -14,6 +14,24 @@ class AttentionManager:
         if event == "scan":
             from behaviors.scan import ScanBehavior
             self.set(ScanBehavior(), None, priority=50)
+        elif event == "vision_target":
+            from behaviors.track import TrackBehavior
+
+            if isinstance(self.active, TrackBehavior):
+                self.active.set_target(*data)
+
+            else:
+                behavior = TrackBehavior()
+                behavior.set_target(*data)
+                self.set(behavior, None, priority=80)
+
+        elif event == "vision_lost":
+            from behaviors.track import TrackBehavior
+
+            if isinstance(self.active, TrackBehavior):
+                self.active.target_lost()
+
+
         elif event == "idle":
             from behaviors.idle import IdleBehavior
             self.set(IdleBehavior(), None, priority=0)

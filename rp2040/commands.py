@@ -143,13 +143,6 @@ class CommandHandler:
                 tilt
             )
 
-
-            print(
-                "OK TRACK",
-                pan,
-                tilt
-            )
-
             return
 
 

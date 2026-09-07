@@ -1,0 +1,5 @@
+# Charlie user autostart additions.
+# The system /etc/xdg/labwc/autostart remains untouched and is merged by labwc -m.
+
+# Configure Charlie's named outputs after compositor startup.
+/home/five/Projects/charlie/display/scripts/start-display-fabric.sh &

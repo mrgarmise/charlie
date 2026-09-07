@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "outputs": [
+    {"name":"CHARLIE-MAIN","width":1920,"height":1080,"x":0,"y":0,"role":"general desktop","vnc_port":5901},
+    {"name":"CHARLIE-OPS","width":1920,"height":1080,"x":1920,"y":0,"role":"vision / telemetry / diagnostics","vnc_port":5902},
+    {"name":"CHARLIE-FACE","width":800,"height":600,"x":3840,"y":0,"role":"RP2040 semantic mirror / embodiment UI","vnc_port":5903}
+  ],
+  "policy": {
+    "owner": "charlie",
+    "remote_resize": false,
+    "client_scaling": true,
+    "system_admin_vnc": "preserve Raspberry Pi OS system-managed WayVNC on port 5900",
+    "display_vnc": "Charlie-owned WayVNC 0.10.1 on ports 5901-5903"
+  }
+}

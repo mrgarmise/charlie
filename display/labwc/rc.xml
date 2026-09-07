@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<labwc_config>
+  <theme>
+    <font place="ActiveWindow"><name>Nunito Sans</name><size>16</size><weight>Light</weight><slant>Normal</slant></font>
+    <font place="InactiveWindow"><name>Nunito Sans</name><size>16</size><weight>Light</weight><slant>Normal</slant></font>
+    <name>PiXtrix_l</name>
+  </theme>
+
+  <!--
+    Charlie virtual outputs are compositor-owned. These actions are retained as
+    manual recovery/test bindings only. Normal operation should create outputs
+    during session startup, before VNC clients attach.
+  -->
+  <keyboard>
+    <keybind key="C-A-v"><action name="VirtualOutputAdd" output_name="CHARLIE-MAIN" /></keybind>
+    <keybind key="C-A-b"><action name="VirtualOutputAdd" output_name="CHARLIE-OPS" /></keybind>
+    <keybind key="C-A-n"><action name="VirtualOutputAdd" output_name="CHARLIE-FACE" /></keybind>
+  </keyboard>
+</labwc_config>

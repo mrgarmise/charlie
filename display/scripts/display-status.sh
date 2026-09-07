@@ -3,7 +3,9 @@ set -u
 
 PREFIX="${CHARLIE_WAYVNC_PREFIX:-$HOME/.local/charlie-wayvnc}"
 WAYVNCCTL="$PREFIX/bin/wayvncctl"
-RUNTIME_BASE="${XDG_RUNTIME_DIR:-/tmp/charlie-$UID}/charlie-display-fabric"
+USER_ID="$(id -u)"
+RUNTIME_BASE="${XDG_RUNTIME_DIR:-/tmp/charlie-$USER_ID}/charlie-display-fabric"
+SYSTEM_PREFIX="/opt/charlie-wayvnc"
 
 LIBDIR="$(find "$PREFIX/lib" -type f -name 'libaml.so.*' -printf '%h\n' 2>/dev/null | head -n 1 || true)"
 if [ -n "$LIBDIR" ]; then
@@ -14,7 +16,14 @@ printf '%s\n' '--- WAYLAND OUTPUTS ---'
 wlr-randr 2>&1 || true
 
 printf '\n%s\n' '--- RASPBERRY PI ADMIN VNC :5900 ---'
-sudo -u vnc wayvncctl --socket=/tmp/wayvnc/wayvncctl.sock output-list 2>&1 || true
+if [ -x "$SYSTEM_PREFIX/bin/wayvncctl" ]; then
+    sudo -u vnc env \
+        PATH="$SYSTEM_PREFIX/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+        LD_LIBRARY_PATH="$SYSTEM_PREFIX/lib" \
+        "$SYSTEM_PREFIX/bin/wayvncctl" --socket=/tmp/wayvnc/wayvncctl.sock output-list 2>&1 || true
+else
+    sudo -u vnc wayvncctl --socket=/tmp/wayvnc/wayvncctl.sock output-list 2>&1 || true
+fi
 
 printf '\n%s\n' '--- CHARLIE DISPLAY ENDPOINTS ---'
 for spec in 'main CHARLIE-MAIN 5901' 'ops CHARLIE-OPS 5902' 'face CHARLIE-FACE 5903'; do

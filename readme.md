@@ -81,3 +81,10 @@ Charlie now has a tested hardware-selected ARM64 rescue environment.
 
 See [`docs/recovery.md`](docs/recovery.md) for the recovery procedure and
 [`hardware/README.md`](hardware/README.md) for reserved GPIO assignments.
+
+### Charlie Network Identities
+
+- Normal system: `charlie.local` (`ssh charlie` from configured MintHP)
+- Recovery system: `charlie-rescue.local` (`ssh charlie-rescue` from configured MintHP)
+- Rescue Wi-Fi autoconnection has been cold-boot tested successfully.
+- Wired Ethernet remains available for SSH fallback and EEPROM NETCONSOLE diagnostics.

@@ -248,3 +248,60 @@ Planned improvements include:
 - integrity verification
 - recovery menu / status command
 - storage-device safety checks before destructive operations
+
+## Network identities and Wi-Fi recovery
+
+Charlie uses stable mDNS hostnames rather than depending on DHCP addresses:
+
+    Normal Charlie:  charlie.local
+    Rescue Charlie:  charlie-rescue.local
+
+The router may assign different or reused IP addresses to Ethernet and Wi-Fi.
+These addresses should not be treated as Charlie's identity.
+
+The rescue OS has been tested successfully with Wi-Fi as its only network
+connection. Its NetworkManager Wi-Fi profile reconnects automatically after
+a cold boot, and Avahi advertises `charlie-rescue.local` over Wi-Fi.
+
+Normal rescue access therefore requires only:
+
+1. Power Charlie off.
+2. Remove the normal SD card if appropriate for the recovery operation.
+3. Insert the recovery USB.
+4. Ground GPIO17 (physical pin 11) to GND (physical pin 9).
+5. Power Charlie on.
+6. From MintHP:
+
+       ssh charlie-rescue
+
+Ethernet is not normally required.
+
+Ethernet remains an important fallback for:
+- SSH when Wi-Fi is unavailable
+- network troubleshooting
+- direct MintHP-to-Charlie EEPROM NETCONSOLE diagnostics before Linux boots
+
+### MintHP SSH aliases
+
+MintHP may use the following `~/.ssh/config` entries:
+
+    Host charlie
+        HostName charlie.local
+        User five
+
+    Host charlie-rescue
+        HostName charlie-rescue.local
+        User five
+
+This allows:
+
+    ssh charlie
+
+for the normal system and:
+
+    ssh charlie-rescue
+
+for the recovery system.
+
+SSH host identity should normally be associated with these stable hostnames,
+not temporary DHCP addresses.

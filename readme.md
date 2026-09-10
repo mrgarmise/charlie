@@ -68,3 +68,16 @@ Use this command to install into virtual environment:
 source ~/Projects/Cyberdeck/.venv/bin/activate
 
 using github only
+
+## Recovery System
+
+Charlie now has a tested hardware-selected ARM64 rescue environment.
+
+- Recovery selector: GPIO17 / physical pin 11 to GND / physical pin 9
+- Rescue USB: shared PNY Ventoy/Charlie recovery drive
+- Rescue hostname: `charlie-rescue`
+- Rescue user: `five`
+- EEPROM NETCONSOLE retained for headless early-boot diagnostics
+
+See [`docs/recovery.md`](docs/recovery.md) for the recovery procedure and
+[`hardware/README.md`](hardware/README.md) for reserved GPIO assignments.

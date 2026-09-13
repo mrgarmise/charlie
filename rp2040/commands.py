@@ -90,6 +90,16 @@ class CommandHandler:
             return
 
         # ----------------------------------
+        if name == "IDLE":
+
+            self.behaviors.set_mode(
+                self.behaviors.IDLE
+            )
+
+            print("OK IDLE")
+            return
+
+        # ----------------------------------
 
         if name == "LOOK":
 

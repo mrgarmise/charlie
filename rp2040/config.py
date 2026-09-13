@@ -59,7 +59,7 @@ UART_BAUD = 115200
 
 COMMAND_BUFFER = 128
 
-HEARTBEAT_TIMEOUT = 5.0
+HEARTBEAT_TIMEOUT = 10.0
 
 # ==========================================================
 # MODES

@@ -9,7 +9,16 @@ class RP2040Controller:
 
     The Pi sends high-level semantic commands.
     The RP2040 handles physical execution and display rendering.
+
+    A background heartbeat keeps the RP2040 informed that the
+    Pi-side Charlie process is alive.
+
+    Any real outgoing command resets the heartbeat timer, so
+    PING is only transmitted after a quiet period.
     """
+
+    HEARTBEAT_INTERVAL = 3.0
+    RECONNECT_INTERVAL = 3.0
 
     def __init__(
         self,
@@ -25,33 +34,81 @@ class RP2040Controller:
 
         self.connected = False
 
+        self.last_tx = 0.0
+        self.running = True
+
         self.connect()
+
+        self.heartbeat_thread = threading.Thread(
+            target=self._heartbeat_loop,
+            daemon=True
+        )
+
+        self.heartbeat_thread.start()
+
+    # --------------------------------------------------
+    # CONNECTION
+    # --------------------------------------------------
 
     def connect(self):
 
         try:
 
-            self.serial = serial.Serial(
-                self.port,
-                self.baud,
-                timeout=1
-            )
+            with self.lock:
 
+                if self.serial:
+
+                    try:
+                        self.serial.close()
+                    except Exception:
+                        pass
+
+                self.serial = serial.Serial(
+                    self.port,
+                    self.baud,
+                    timeout=1
+                )
+
+            # Opening the Pico serial device can reset
+            # MicroPython. Give it time to come online.
             time.sleep(2)
 
             self.connected = True
+            self.last_tx = time.monotonic()
 
             print(
                 "RP2040 connected"
             )
 
+            return True
+
         except Exception as e:
+
+            self.connected = False
 
             print(
                 f"RP2040 connection failed: {e}"
             )
 
-            self.connected = False
+            return False
+
+    def _mark_disconnected(self):
+
+        self.connected = False
+
+        try:
+
+            if self.serial:
+                self.serial.close()
+
+        except Exception:
+            pass
+
+        self.serial = None
+
+    # --------------------------------------------------
+    # SEND
+    # --------------------------------------------------
 
     def send(self, command):
 
@@ -69,6 +126,12 @@ class RP2040Controller:
                     ).encode()
                 )
 
+            # Every real transmission proves the Pi is alive.
+            #
+            # This also means ordinary commands postpone
+            # the next heartbeat automatically.
+            self.last_tx = time.monotonic()
+
             return True
 
         except Exception as e:
@@ -77,10 +140,45 @@ class RP2040Controller:
                 f"RP2040 send error: {e}"
             )
 
+            self._mark_disconnected()
+
             return False
 
     # --------------------------------------------------
-    # CONNECTION
+    # BACKGROUND HEARTBEAT / RECONNECT
+    # --------------------------------------------------
+
+    def _heartbeat_loop(self):
+
+        while self.running:
+
+            if not self.connected:
+
+                self.connect()
+
+                time.sleep(
+                    self.RECONNECT_INTERVAL
+                )
+
+                continue
+
+            quiet_for = (
+                time.monotonic()
+                - self.last_tx
+            )
+
+            if quiet_for >= self.HEARTBEAT_INTERVAL:
+
+                self.send(
+                    "PING"
+                )
+
+            time.sleep(
+                0.25
+            )
+
+    # --------------------------------------------------
+    # CONNECTION COMMANDS
     # --------------------------------------------------
 
     def ping(self):
@@ -132,7 +230,7 @@ class RP2040Controller:
         )
 
     # --------------------------------------------------
-    # PERSISTENT DISPLAY STATE
+    # DISPLAY
     # --------------------------------------------------
 
     def display(self, state):
@@ -140,10 +238,6 @@ class RP2040Controller:
         return self.send(
             str(state).upper()
         )
-
-    # --------------------------------------------------
-    # TRANSIENT FEEDBACK
-    # --------------------------------------------------
 
     def think(self):
 
@@ -188,7 +282,7 @@ class RP2040Controller:
         )
 
     # --------------------------------------------------
-    # MESSAGE / COMM ACTIVITY
+    # MESSAGE / ACTIVITY
     # --------------------------------------------------
 
     def message(self, text):
@@ -214,3 +308,23 @@ class RP2040Controller:
         return self.send(
             "TX"
         )
+
+    # --------------------------------------------------
+    # CLEAN SHUTDOWN
+    # --------------------------------------------------
+
+    def close(self):
+
+        self.running = False
+
+        with self.lock:
+
+            try:
+
+                if self.serial:
+                    self.serial.close()
+
+            except Exception:
+                pass
+
+        self.connected = False

@@ -77,7 +77,7 @@ class Command:
 VALID_COMMANDS = {
 
     "PING",
-
+    "IDLE",
     "LOOK",
     "TRACK",
     "SCAN",

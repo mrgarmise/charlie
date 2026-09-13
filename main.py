@@ -28,6 +28,8 @@ detector = ColorDetector(
 
 vision = VisionStimulus(camera, detector, bus)
 
+print("Sending startup HAPPY...")
+print("HAPPY result:", deck.happy())
 # start idle explicitly
 bus.emit("idle")
 
@@ -36,6 +38,10 @@ try:
         vision.update()
         attention.update(deck)
         time.sleep(0.02)
+
+except Exception:
+    deck.error_feedback()
+    raise
 
 finally:
     camera.close()

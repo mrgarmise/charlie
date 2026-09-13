@@ -90,7 +90,7 @@ print(
 # ==================================================
 
 while True:
-
+    link_lost = False
 
     # --------------------------
     # Check serial commands
@@ -130,12 +130,36 @@ while True:
 
     if not heartbeat.alive():
 
-        if behaviors.mode != behaviors.IDLE:
+        if not link_lost:
 
-            behaviors.set_mode(
-                behaviors.IDLE
+            link_lost = True
+
+            # Safe physical state.
+            if behaviors.mode != behaviors.IDLE:
+
+                behaviors.set_mode(
+                    behaviors.IDLE
+                )
+
+            # Distinct diagnostic display.
+            display.status(
+                display.NO_BRAIN
             )
 
+    else:
+
+        if link_lost:
+
+            link_lost = False
+
+            # Communication has returned.
+            #
+            # We deliberately resume at the current safe
+            # behavior state rather than restoring an old
+            # TRACK/SCAN operation.
+            display.status(
+                behaviors.mode
+            )
 
 
     gc.collect()

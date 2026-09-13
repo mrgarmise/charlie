@@ -49,6 +49,7 @@ class Display:
     ERROR = "ERROR"
     THINK = "THINK"
     HAPPY = "HAPPY"
+    NO_BRAIN = "NO_BRAIN"
 
     FRAME_MS = 100
 
@@ -456,6 +457,79 @@ class Display:
             70
         )
 
+    def _draw_no_brain(self):
+
+        """
+        Brain-shaped warning with a diagonal slash.
+
+        This is intentionally slow/static so the display
+        never interferes with serial handling or recovery.
+        """
+
+        # Slow pulse so it is obviously alive,
+        # but not visually frantic.
+        pulse = (
+            self.frame // 5
+        ) % 2
+
+        brain = 100 if pulse else 55
+        slash = 140 if pulse else 90
+
+        # Brain outline / lobes.
+
+        brain_pixels = (
+            (6, 1),
+            (7, 1),
+            (9, 1),
+            (10, 1),
+
+            (5, 2),
+            (8, 2),
+            (11, 2),
+
+            (5, 3),
+            (8, 3),
+            (11, 3),
+
+            (5, 4),
+            (8, 4),
+            (11, 4),
+
+            (6, 5),
+            (7, 5),
+            (9, 5),
+            (10, 5),
+        )
+
+        for x, y in brain_pixels:
+            self._pixel(
+                x,
+                y,
+                brain
+            )
+
+        # Slash through the brain.
+
+        slash_pixels = (
+            (4, 6),
+            (5, 5),
+            (6, 5),
+            (7, 4),
+            (8, 3),
+            (9, 3),
+            (10, 2),
+            (11, 1),
+            (12, 0),
+        )
+
+        for x, y in slash_pixels:
+            self._pixel(
+                x,
+                y,
+                slash
+            )
+
+
     def _draw_named_state(self, state):
 
         if state == self.SCAN:
@@ -478,6 +552,8 @@ class Display:
 
         elif state == self.HAPPY:
             self._draw_happy()
+        elif state == self.NO_BRAIN:
+            self._draw_no_brain()
 
         else:
             self._draw_idle()

@@ -256,26 +256,40 @@ class Display:
 
     def _draw_scan(self):
 
-        x = self.frame % self.WIDTH
+        # Sweep back and forth across the 17 columns:
+        #
+        # 0 1 2 ... 15 16 15 ... 2 1 0 ...
 
-        previous = (
-            x - 1
-        ) % self.WIDTH
+        span = self.WIDTH - 1
+        cycle = span * 2
+
+        position = self.frame % cycle
+
+        if position <= span:
+            x = position
+            previous = max(0, x - 1)
+        else:
+            x = cycle - position
+            previous = min(
+                self.WIDTH - 1,
+                x + 1
+            )
 
         for y in range(self.HEIGHT):
 
+            # Dim trail behind the scanner.
             self._pixel(
                 previous,
                 y,
                 25
             )
 
+            # Main scanning line.
             self._pixel(
                 x,
                 y,
                 110
             )
-
     def _draw_track(self):
 
         cx = 8

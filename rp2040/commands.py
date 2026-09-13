@@ -114,7 +114,7 @@ class CommandHandler:
             tilt = cmd.arg_int(1,90)
 
 
-            self.behaviors.look(
+            self.behaviors.gaze(
                 pan,
                 tilt
             )

@@ -9,17 +9,15 @@ class ScanBehavior(Behavior):
 
         print("ScanBehavior engaged")
 
+        self.deck.attitude("SCAN")
         self.deck.scan()
 
-
     def update(self, deck):
-        # RP2040 owns scanning now
+        # RP2040 owns scanning now.
         pass
-
 
     def is_finished(self):
         return False
-
 
     def exit(self, deck):
         self.deck.stop()

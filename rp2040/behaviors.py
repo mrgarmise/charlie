@@ -113,6 +113,19 @@ class BehaviorManager:
                 "SLEEP"
             )
 
+    # --------------------------------
+
+                
+    def gaze(self, pan, tilt):
+        """
+        Move gaze without changing behavioral mode.
+        """
+
+        if self.servos:
+            self.servos.look(
+                pan,
+                tilt
+            )
 
     # --------------------------------
 

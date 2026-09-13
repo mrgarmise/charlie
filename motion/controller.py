@@ -11,30 +11,27 @@ class Deck:
     - acceleration
     - PWM
     - hardware safety
+    - local display animation
     """
 
     def __init__(self):
         self.body = RP2040Controller()
 
-
     def center(self):
         """Return Charlie to neutral position."""
         self.body.home()
-
 
     def home(self):
         """Alias for compatibility."""
         self.body.home()
 
-
     def look_at(self, pan, tilt):
         """
-        Move Charlie's gaze position.
+        Move Charlie's gaze without implying tracking.
 
-        pan/tilt are interpreted by the RP2040.
+        Used for idle glances and deliberate gaze changes.
         """
         self.body.look(pan, tilt)
-
 
     def track(self, pan, tilt):
         """
@@ -42,13 +39,11 @@ class Deck:
         """
         self.body.track(pan, tilt)
 
-
     def scan(self):
         """
         Start autonomous scanning behavior.
         """
         self.body.scan()
-
 
     def stop(self):
         """
@@ -56,13 +51,26 @@ class Deck:
         """
         self.body.stop()
 
+    def attitude(self, state):
+        """
+        Set Charlie's visible attitude/state.
+
+        The Pi chooses the semantic state.
+        The RP2040 decides how that state is rendered.
+        """
+        return self.body.display(state)
 
     # Compatibility layer for older behaviors
     # --------------------------------------
-    # These allow existing code to keep working
-    # while we migrate behaviors to the new API.
 
-    def move_to(self, pan_l, tilt_l, pan_r=None, tilt_r=None, speed=60):
+    def move_to(
+        self,
+        pan_l,
+        tilt_l,
+        pan_r=None,
+        tilt_r=None,
+        speed=60
+    ):
         """
         Legacy movement call.
 
@@ -72,8 +80,13 @@ class Deck:
         """
         self.body.look(pan_l, tilt_l)
 
-
-    def set_all(self, pan_l, tilt_l, pan_r=None, tilt_r=None):
+    def set_all(
+        self,
+        pan_l,
+        tilt_l,
+        pan_r=None,
+        tilt_r=None
+    ):
         """
         Legacy position call.
         """

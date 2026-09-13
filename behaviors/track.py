@@ -1,18 +1,25 @@
+import time
+
 from behaviors.base import Behavior
 from vision.mapping import pixel_to_angle
-import time
 
 
 class TrackBehavior(Behavior):
 
     def enter(self, deck):
         self.deck = deck
+
         self.target = None
         self.last_move = time.time()
+
         self.lost_time = None
         self.lost_timeout = 2.0
 
+        self.done = False
+
         print("TrackBehavior engaged")
+
+        self.deck.attitude("TRACK")
 
     def set_target(self, x, y):
         self.target = (x, y)
@@ -22,18 +29,26 @@ class TrackBehavior(Behavior):
         self.target = None
 
     def update(self, deck):
+
         if self.target is None:
+
             if self.lost_time is None:
                 self.lost_time = time.time()
 
-            if time.time() - self.lost_time > self.lost_timeout:
+            if (
+                time.time() - self.lost_time
+                > self.lost_timeout
+            ):
                 self.done = True
 
             return
 
         x, y = self.target
 
-        pan, tilt = pixel_to_angle(x, y)
+        pan, tilt = pixel_to_angle(
+            x,
+            y
+        )
 
         print(
             f"TRACK target=({x},{y}) "
@@ -41,10 +56,13 @@ class TrackBehavior(Behavior):
             flush=True
         )
 
-        self.deck.track(pan, tilt)
+        self.deck.track(
+            pan,
+            tilt
+        )
 
     def is_finished(self):
-        return getattr(self, "done", False)
+        return self.done
 
     def exit(self, deck):
         print("TrackBehavior exiting")

@@ -3,21 +3,27 @@ display.py
 
 Charlie pico:ed attitude / status display.
 
-The Raspberry Pi communicates intent.
-The RP2040 decides how that intent appears on the
-pico:ed 17x7 LED matrix.
+Persistent state:
+    IDLE
+    SCAN
+    TRACK
+    HOME
+    SLEEP
+    ERROR
 
-Hardware driver:
-    /lib/Pico_ed.py
+Transient feedback:
+    THINK
+    HAPPY
+    ERROR
 
-Pico:ed matrix:
-    17 x 7 LEDs
+The Pi sends semantic intent.
+The RP2040 decides how it appears.
+
+Hardware:
+    pico:ed 17x7 matrix
     I2C1
-    SDA = GP18
-    SCL = GP19
-
-Regular rendering is non-blocking. update() draws
-one frame when needed and returns immediately.
+    SDA GP18
+    SCL GP19
 """
 
 import time
@@ -49,6 +55,10 @@ class Display:
     def __init__(self):
 
         self.state = self.IDLE
+
+        self.feedback_state = None
+        self.feedback_until = 0
+
         self.frame = 0
         self.last_frame = time.ticks_ms()
 
@@ -62,16 +72,10 @@ class Display:
         if DISPLAY_AVAILABLE:
             self.clear()
 
-    # --------------------------------------------------
-
     def clear(self):
 
-        if not DISPLAY_AVAILABLE:
-            return
-
-        matrix.fill(0)
-
-    # --------------------------------------------------
+        if DISPLAY_AVAILABLE:
+            matrix.fill(0)
 
     def _pixel(self, x, y, brightness=80):
 
@@ -84,9 +88,12 @@ class Display:
         if not 0 <= y < self.HEIGHT:
             return
 
+        # Charlie's matrix is extremely bright.
+        # All requested values are reduced by half and
+        # capped at half hardware brightness.
         brightness = max(
             0,
-            min(128, int(brightness // 2))
+            min(127, int(brightness // 2))
         )
 
         matrix.pixel(
@@ -96,12 +103,36 @@ class Display:
         )
 
     # --------------------------------------------------
+    # PERSISTENT STATE
+    # --------------------------------------------------
 
     def status(self, state):
 
         self.state = str(state).upper()
         self.frame = 0
 
+    # --------------------------------------------------
+    # TRANSIENT FEEDBACK
+    # --------------------------------------------------
+
+    def feedback(self, state, duration_ms=1500):
+
+        self.feedback_state = str(state).upper()
+
+        self.feedback_until = time.ticks_add(
+            time.ticks_ms(),
+            int(duration_ms)
+        )
+
+        self.frame = 0
+
+    def clear_feedback(self):
+
+        self.feedback_state = None
+        self.feedback_until = 0
+
+    # --------------------------------------------------
+    # TEXT
     # --------------------------------------------------
 
     def show_text(self, text, duration_ms=1800):
@@ -118,36 +149,27 @@ class Display:
         self.message_page = 0
         self.last_message_page = now
 
-    # --------------------------------------------------
-
     def queue_text(self, text):
-
-        # Compatibility with the original interface.
         self.show_text(text)
 
-    # --------------------------------------------------
-
     def rx_activity(self):
-
         self.show_text("RX", 600)
 
-    # --------------------------------------------------
-
     def tx_activity(self):
-
         self.show_text("TX", 600)
 
-    # --------------------------------------------------
-
     def error(self, message):
-
-        self.state = self.ERROR
-
+        self.feedback(
+            self.ERROR,
+            2500
+        )
         self.show_text(
             "ERR " + str(message),
             2500
         )
 
+    # --------------------------------------------------
+    # PROGRESS
     # --------------------------------------------------
 
     def set_progress(self, value):
@@ -157,24 +179,14 @@ class Display:
             min(100, int(value))
         )
 
-    # --------------------------------------------------
-
     def clear_progress(self):
-
         self.progress = None
 
     # --------------------------------------------------
-    # TEXT
+    # MESSAGE RENDERING
     # --------------------------------------------------
 
     def _draw_message(self):
-
-        """
-        Pico_ed.Display.show() is safe for strings under
-        four characters. Longer strings scroll internally
-        and block, so Charlie pages messages three
-        characters at a time instead.
-        """
 
         if not self.message:
             return
@@ -199,13 +211,12 @@ class Display:
 
         try:
             matrix.show(page)
+
         except (KeyError, ValueError):
-            # Unsupported character in the historical
-            # font. Don't let display content crash Charlie.
             self.clear()
 
     # --------------------------------------------------
-    # ATTITUDE ANIMATIONS
+    # ANIMATIONS
     # --------------------------------------------------
 
     def _draw_idle(self):
@@ -243,8 +254,6 @@ class Display:
             self._pixel(cx, cy - 1, side)
             self._pixel(cx, cy + 1, side)
 
-    # --------------------------------------------------
-
     def _draw_scan(self):
 
         x = self.frame % self.WIDTH
@@ -267,8 +276,6 @@ class Display:
                 110
             )
 
-    # --------------------------------------------------
-
     def _draw_track(self):
 
         cx = 8
@@ -286,8 +293,6 @@ class Display:
         self._pixel(cx + 2, cy, edge)
         self._pixel(cx, cy - 2, edge)
         self._pixel(cx, cy + 2, edge)
-
-    # --------------------------------------------------
 
     def _draw_home(self):
 
@@ -314,26 +319,20 @@ class Display:
             25
         )
 
-    # --------------------------------------------------
-
     def _draw_sleep(self):
 
         if self.frame % 16 == 0:
-
             self._pixel(
                 8,
                 3,
                 15
             )
 
-    # --------------------------------------------------
-
     def _draw_error(self):
 
         if (
             self.frame // 3
         ) % 2:
-
             return
 
         for i in range(7):
@@ -351,8 +350,6 @@ class Display:
                 6 - i,
                 140
             )
-
-    # --------------------------------------------------
 
     def _draw_think(self):
 
@@ -387,12 +384,9 @@ class Display:
                 brightness
             )
 
-    # --------------------------------------------------
-
     def _draw_happy(self):
 
         # Eyes
-
         self._pixel(
             6,
             1,
@@ -406,7 +400,6 @@ class Display:
         )
 
         # Smile
-
         self._pixel(
             5,
             4,
@@ -449,35 +442,31 @@ class Display:
             70
         )
 
-    # --------------------------------------------------
+    def _draw_named_state(self, state):
 
-    def _draw_state(self):
-
-        if self.state == self.SCAN:
+        if state == self.SCAN:
             self._draw_scan()
 
-        elif self.state == self.TRACK:
+        elif state == self.TRACK:
             self._draw_track()
 
-        elif self.state == self.HOME:
+        elif state == self.HOME:
             self._draw_home()
 
-        elif self.state == self.SLEEP:
+        elif state == self.SLEEP:
             self._draw_sleep()
 
-        elif self.state == self.ERROR:
+        elif state == self.ERROR:
             self._draw_error()
 
-        elif self.state == self.THINK:
+        elif state == self.THINK:
             self._draw_think()
 
-        elif self.state == self.HAPPY:
+        elif state == self.HAPPY:
             self._draw_happy()
 
         else:
             self._draw_idle()
-
-    # --------------------------------------------------
 
     def _draw_progress(self):
 
@@ -501,6 +490,8 @@ class Display:
             )
 
     # --------------------------------------------------
+    # MAIN UPDATE
+    # --------------------------------------------------
 
     def update(self):
 
@@ -510,7 +501,6 @@ class Display:
             now,
             self.last_frame
         ) < self.FRAME_MS:
-
             return
 
         self.last_frame = now
@@ -518,7 +508,7 @@ class Display:
 
         self.clear()
 
-        # Temporary message overrides attitude.
+        # Temporary text has highest priority.
 
         if self.message:
 
@@ -541,10 +531,30 @@ class Display:
             self.message = None
             self.message_page = 0
 
-        # Normal persistent attitude.
+        # Temporary animated feedback comes next.
 
-        self._draw_state()
+        if self.feedback_state:
 
-        # Progress is an overlay.
+            if time.ticks_diff(
+                self.feedback_until,
+                now
+            ) > 0:
+
+                self._draw_named_state(
+                    self.feedback_state
+                )
+
+                self._draw_progress()
+                return
+
+            self.clear_feedback()
+
+        # Persistent attitude.
+
+        self._draw_named_state(
+            self.state
+        )
+
+        # Optional process overlay.
 
         self._draw_progress()

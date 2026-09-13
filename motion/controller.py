@@ -5,63 +5,111 @@ class Deck:
     """
     Charlie's body abstraction.
 
-    The Raspberry Pi decides what Charlie should do.
-    The RP2040 handles physical execution:
-    - servo timing
-    - acceleration
-    - PWM
-    - hardware safety
-    - local display animation
+    The Pi decides what Charlie should do.
+    The RP2040 handles physical execution and local rendering.
     """
 
     def __init__(self):
+
         self.body = RP2040Controller()
 
+    # --------------------------------------------------
+    # MOTION
+    # --------------------------------------------------
+
     def center(self):
-        """Return Charlie to neutral position."""
         self.body.home()
 
     def home(self):
-        """Alias for compatibility."""
         self.body.home()
 
-    def look_at(self, pan, tilt):
-        """
-        Move Charlie's gaze without implying tracking.
+    def look_at(
+        self,
+        pan,
+        tilt
+    ):
+        self.body.look(
+            pan,
+            tilt
+        )
 
-        Used for idle glances and deliberate gaze changes.
-        """
-        self.body.look(pan, tilt)
-
-    def track(self, pan, tilt):
-        """
-        Track a target position.
-        """
-        self.body.track(pan, tilt)
+    def track(
+        self,
+        pan,
+        tilt
+    ):
+        self.body.track(
+            pan,
+            tilt
+        )
 
     def scan(self):
-        """
-        Start autonomous scanning behavior.
-        """
         self.body.scan()
 
     def stop(self):
-        """
-        Stop active motion.
-        """
         self.body.stop()
 
+    # --------------------------------------------------
+    # DISPLAY STATE
+    # --------------------------------------------------
+
     def attitude(self, state):
-        """
-        Set Charlie's visible attitude/state.
 
-        The Pi chooses the semantic state.
-        The RP2040 decides how that state is rendered.
-        """
-        return self.body.display(state)
+        return self.body.display(
+            state
+        )
 
-    # Compatibility layer for older behaviors
-    # --------------------------------------
+    # --------------------------------------------------
+    # TRANSIENT FEEDBACK
+    # --------------------------------------------------
+
+    def think(self):
+
+        return self.body.think()
+
+    def happy(self):
+
+        return self.body.happy()
+
+    def error_feedback(self):
+
+        return self.body.error_feedback()
+
+    # --------------------------------------------------
+    # PROCESS INFORMATION
+    # --------------------------------------------------
+
+    def progress(self, value):
+
+        return self.body.progress(
+            value
+        )
+
+    def progress_done(self):
+
+        return self.body.progress_clear()
+
+    # --------------------------------------------------
+    # MESSAGE / ACTIVITY
+    # --------------------------------------------------
+
+    def message(self, text):
+
+        return self.body.message(
+            text
+        )
+
+    def rx_activity(self):
+
+        return self.body.rx_activity()
+
+    def tx_activity(self):
+
+        return self.body.tx_activity()
+
+    # --------------------------------------------------
+    # LEGACY COMPATIBILITY
+    # --------------------------------------------------
 
     def move_to(
         self,
@@ -71,14 +119,11 @@ class Deck:
         tilt_r=None,
         speed=60
     ):
-        """
-        Legacy movement call.
 
-        The RP2040 currently handles the actual motion.
-        For now we use the left-side coordinates as the
-        primary gaze target.
-        """
-        self.body.look(pan_l, tilt_l)
+        self.body.look(
+            pan_l,
+            tilt_l
+        )
 
     def set_all(
         self,
@@ -87,7 +132,8 @@ class Deck:
         pan_r=None,
         tilt_r=None
     ):
-        """
-        Legacy position call.
-        """
-        self.body.look(pan_l, tilt_l)
+
+        self.body.look(
+            pan_l,
+            tilt_l
+        )

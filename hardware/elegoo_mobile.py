@@ -14,6 +14,7 @@ class AttentionAlignState:
     last_pan: int = 90
     start_yaw: float = 0.0
     target_rotation: float = 0.0
+    target_pan: int = 90
     yaw_sign: int = 0
     started_at: float = 0.0
     reason: str | None = None
@@ -49,7 +50,7 @@ class ElegooMobileBase:
         host=HOST,
         port=PORT,
         timeout=2.0,
-        turn_speed=75,
+        turn_speed=55,
         max_align_seconds=3.0,
         min_pan_step=2,
     ):
@@ -532,6 +533,7 @@ class ElegooMobileBase:
     def begin_attention_align(
         self,
         current_pan,
+        max_rotation=None,
     ):
         current_pan = int(
             round(current_pan)
@@ -546,17 +548,26 @@ class ElegooMobileBase:
 
         if current_pan < 90:
             direction = "RIGHT"
-            target_rotation = (
-                90 - current_pan
-            )
+            full_rotation = 90 - current_pan
             yaw_sign = +1
 
         else:
             direction = "LEFT"
-            target_rotation = (
-                current_pan - 90
-            )
+            full_rotation = current_pan - 90
             yaw_sign = -1
+
+        target_rotation = full_rotation
+
+        if max_rotation is not None:
+            target_rotation = min(
+                target_rotation,
+                float(max_rotation),
+            )
+
+        target_pan = int(round(
+            current_pan
+            + yaw_sign * target_rotation
+        ))
 
         start_yaw = self.yaw()
 
@@ -570,6 +581,7 @@ class ElegooMobileBase:
                 target_rotation=(
                     target_rotation
                 ),
+                target_pan=target_pan,
                 yaw_sign=yaw_sign,
                 started_at=(
                     time.monotonic()
@@ -724,9 +736,12 @@ class ElegooMobileBase:
             state.reason = "aligned"
             self.stop()
 
+            # Incremental ATTEND: finish at the head angle that
+            # corresponds to the requested body assist, rather than
+            # always forcing the head all the way to 90 degrees.
             try:
-                state.last_pan = (
-                    self.pan(90)
+                state.last_pan = self.pan(
+                    state.target_pan
                 )
             except Exception:
                 pass

@@ -43,11 +43,14 @@ class MobileFaceTrackBehavior:
     COMFORT_LEFT = 120
     COMFORT_RIGHT = 60
 
+    # Body follows in small measured bites, then vision reassesses.
+    ATTEND_ASSIST_DEGREES = 15
+
     LOST_HOLD_SECONDS = 1.5
     LOCAL_SEARCH_START = 2.5
     LOCAL_SEARCH_INTERVAL = 1.2
     LOCAL_SEARCH_OFFSET = 10
-    LOCAL_SEARCH_MAX_OFFSET = 40
+    LOCAL_SEARCH_MAX_OFFSET = 30
 
     HEAD_SETTLE = 0.30
 
@@ -66,6 +69,7 @@ class MobileFaceTrackBehavior:
             self.PAN_CENTER
         )
         self.search_phase = 0
+        self.search_exhausted = False
         self.last_search_move = 0.0
         self.last_seen_side = None
 
@@ -106,40 +110,54 @@ class MobileFaceTrackBehavior:
             pass
 
     def _local_search(self, now):
+        if self.search_exhausted:
+            return
+
         if (
             now - self.last_search_move
             < self.LOCAL_SEARCH_INTERVAL
         ):
             return
 
-        # Progressively widen the search around the last-seen pan:
-        # anchor, +/-10, +/-20, +/-30, +/-40, then repeat.
-        offsets = [0]
+        # Search last-seen direction first, progressively, without
+        # bouncing across the whole servo range.
+        if self.last_seen_side == "LEFT":
+            sign = +1
+        elif self.last_seen_side == "RIGHT":
+            sign = -1
+        else:
+            sign = +1
 
-        for magnitude in range(
-            self.LOCAL_SEARCH_OFFSET,
-            self.LOCAL_SEARCH_MAX_OFFSET + 1,
-            self.LOCAL_SEARCH_OFFSET,
-        ):
-            # Search the last-seen side first when known.
-            if self.last_seen_side == "LEFT":
-                offsets.extend([magnitude, -magnitude])
-            elif self.last_seen_side == "RIGHT":
-                offsets.extend([-magnitude, magnitude])
-            else:
-                offsets.extend([magnitude, -magnitude])
-
-        offset = offsets[
-            self.search_phase
-            % len(offsets)
+        offsets = [
+            0,
+            sign * 10,
+            sign * 20,
+            sign * 30,
+            0,
+            -sign * 10,
+            -sign * 20,
+            0,
         ]
 
-        self.search_phase += 1
-
-        target = self.clamp_pan(
-            self.search_anchor_pan
-            + offset
-        )
+        if self.search_phase >= len(offsets):
+            # One finite search sweep is enough. Return to a safe
+            # neutral-ish position and wait for vision to reacquire.
+            target = self.clamp_pan(
+                max(
+                    self.COMFORT_RIGHT,
+                    min(
+                        self.COMFORT_LEFT,
+                        self.search_anchor_pan,
+                    ),
+                )
+            )
+            self.search_exhausted = True
+        else:
+            target = self.clamp_pan(
+                self.search_anchor_pan
+                + offsets[self.search_phase]
+            )
+            self.search_phase += 1
 
         if target != self.pan:
             print(
@@ -248,6 +266,7 @@ class MobileFaceTrackBehavior:
             self.pan
         )
         self.search_phase = 0
+        self.search_exhausted = False
         self.last_search_move = now
 
         if self.aligning:
@@ -371,7 +390,8 @@ class MobileFaceTrackBehavior:
             started = (
                 self.mobile
                 .begin_attention_align(
-                    self.pan
+                    self.pan,
+                    max_rotation=self.ATTEND_ASSIST_DEGREES,
                 )
             )
 

@@ -4,28 +4,10 @@ from hardware.elegoo_mobile import ElegooMobileBase
 class MobileBase:
     """
     Charlie's independent ELEGOO-car interface.
-
-    This is a separate subsystem from the RP2040-controlled head/body.
-
-    RP2040 / Deck owns:
-      - existing pan/tilt servos
-      - pico display
-      - scan / track behavior
-
-    MobileBase owns:
-      - ELEGOO camera pan servo
-      - chassis motors
-      - MPU6050 yaw
-      - mobile attention alignment
-      - later navigation sensors / mapping
     """
 
     def __init__(self):
         self.car = ElegooMobileBase()
-
-    # --------------------------------------------------
-    # CONNECTION / SAFETY
-    # --------------------------------------------------
 
     def connect(self):
         return self.car.connect()
@@ -36,16 +18,8 @@ class MobileBase:
     def stop(self):
         return self.car.stop()
 
-    # --------------------------------------------------
-    # MOBILE HEAD
-    # --------------------------------------------------
-
     def pan(self, degrees):
         return self.car.pan(degrees)
-
-    # --------------------------------------------------
-    # MOBILE BODY / SENSORS
-    # --------------------------------------------------
 
     def yaw(self):
         return self.car.yaw()
@@ -56,13 +30,14 @@ class MobileBase:
             speed=speed
         )
 
-    # --------------------------------------------------
-    # COORDINATED MOBILE ATTENTION
-    # --------------------------------------------------
-
-    def begin_attention_align(self, current_pan):
+    def begin_attention_align(
+        self,
+        current_pan,
+        max_rotation=None,
+    ):
         return self.car.begin_attention_align(
-            current_pan
+            current_pan,
+            max_rotation=max_rotation,
         )
 
     def update_attention_align(

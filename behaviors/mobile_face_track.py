@@ -37,9 +37,11 @@ class MobileFaceTrackBehavior:
 
     PAN_STEP = 10
 
-    # Head reaches this zone before body assistance is justified.
-    CHASSIS_LEFT_TRIGGER = 140
-    CHASSIS_RIGHT_TRIGGER = 40
+    # Comfortable mobile-head range.
+    # The head leads first. If continued tracking would push beyond
+    # this range, the chassis follows underneath the gaze.
+    COMFORT_LEFT = 120
+    COMFORT_RIGHT = 60
 
     LOST_HOLD_SECONDS = 1.5
     LOCAL_SEARCH_START = 2.5
@@ -314,30 +316,39 @@ class MobileFaceTrackBehavior:
         # ATTEND / BODY COMMIT
         # -----------------------------
 
+        # Determine the head-only move that would normally happen next.
+        if side == "LEFT":
+            new_pan = self.clamp_pan(
+                self.pan
+                + self.PAN_STEP
+            )
+        else:
+            new_pan = self.clamp_pan(
+                self.pan
+                - self.PAN_STEP
+            )
+
+        # Body follows when the face is still pulling in the same
+        # direction and the NEXT head-only move would exceed the
+        # comfortable neck range.
         body_left_needed = (
             side == "LEFT"
-            and normalized_x
-            < self.OUTER_LEFT
-            and self.pan
-            >= self.CHASSIS_LEFT_TRIGGER
+            and normalized_x < self.OUTER_LEFT
+            and new_pan > self.COMFORT_LEFT
         )
 
         body_right_needed = (
             side == "RIGHT"
-            and normalized_x
-            > self.OUTER_RIGHT
-            and self.pan
-            <= self.CHASSIS_RIGHT_TRIGGER
+            and normalized_x > self.OUTER_RIGHT
+            and new_pan < self.COMFORT_RIGHT
         )
 
-        if (
-            body_left_needed
-            or body_right_needed
-        ):
+        if body_left_needed or body_right_needed:
             print(
                 "MOBILE ATTEND commit "
                 f"face={normalized_x:.2f} "
-                f"head={self.pan}",
+                f"head={self.pan} "
+                f"next={new_pan}",
                 flush=True,
             )
 
@@ -360,17 +371,6 @@ class MobileFaceTrackBehavior:
         # -----------------------------
         # HEAD-ONLY LOOK
         # -----------------------------
-
-        if side == "LEFT":
-            new_pan = self.clamp_pan(
-                self.pan
-                + self.PAN_STEP
-            )
-        else:
-            new_pan = self.clamp_pan(
-                self.pan
-                - self.PAN_STEP
-            )
 
         if new_pan != self.pan:
             print(

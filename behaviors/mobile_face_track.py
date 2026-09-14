@@ -29,7 +29,7 @@ class MobileFaceTrackBehavior:
     INNER_LEFT = 0.40
     INNER_RIGHT = 0.60
 
-    PERSISTENCE_FRAMES = 5
+    PERSISTENCE_FRAMES = 3
 
     PAN_CENTER = 90
     PAN_MIN = 20
@@ -47,6 +47,7 @@ class MobileFaceTrackBehavior:
     LOCAL_SEARCH_START = 2.5
     LOCAL_SEARCH_INTERVAL = 1.2
     LOCAL_SEARCH_OFFSET = 10
+    LOCAL_SEARCH_MAX_OFFSET = 40
 
     HEAD_SETTLE = 0.30
 
@@ -66,6 +67,7 @@ class MobileFaceTrackBehavior:
         )
         self.search_phase = 0
         self.last_search_move = 0.0
+        self.last_seen_side = None
 
         self.aligning = False
 
@@ -110,16 +112,26 @@ class MobileFaceTrackBehavior:
         ):
             return
 
-        pattern = [
-            0,
-            self.LOCAL_SEARCH_OFFSET,
-            0,
-            -self.LOCAL_SEARCH_OFFSET,
-        ]
+        # Progressively widen the search around the last-seen pan:
+        # anchor, +/-10, +/-20, +/-30, +/-40, then repeat.
+        offsets = [0]
 
-        offset = pattern[
+        for magnitude in range(
+            self.LOCAL_SEARCH_OFFSET,
+            self.LOCAL_SEARCH_MAX_OFFSET + 1,
+            self.LOCAL_SEARCH_OFFSET,
+        ):
+            # Search the last-seen side first when known.
+            if self.last_seen_side == "LEFT":
+                offsets.extend([magnitude, -magnitude])
+            elif self.last_seen_side == "RIGHT":
+                offsets.extend([-magnitude, magnitude])
+            else:
+                offsets.extend([magnitude, -magnitude])
+
+        offset = offsets[
             self.search_phase
-            % len(pattern)
+            % len(offsets)
         ]
 
         self.search_phase += 1
@@ -167,9 +179,9 @@ class MobileFaceTrackBehavior:
         return status
 
     def face_lost(self):
-        self.left_count = 0
-        self.right_count = 0
-
+        # A brief detector miss should not erase directional intent.
+        # The lost-face timer decides when the old tracking evidence
+        # is stale enough to discard.
         if self.aligning:
             try:
                 self.mobile.cancel_attention_align(
@@ -208,6 +220,10 @@ class MobileFaceTrackBehavior:
                 return {
                     "state": "LOST_HOLD"
                 }
+
+            if lost_for >= self.LOST_HOLD_SECONDS:
+                self.left_count = 0
+                self.right_count = 0
 
             if (
                 lost_for
@@ -280,12 +296,14 @@ class MobileFaceTrackBehavior:
 
         if normalized_x < self.INNER_LEFT:
             side = "LEFT"
+            self.last_seen_side = side
             self.left_count += 1
             self.right_count = 0
             count = self.left_count
 
         elif normalized_x > self.INNER_RIGHT:
             side = "RIGHT"
+            self.last_seen_side = side
             self.right_count += 1
             self.left_count = 0
             count = self.right_count
@@ -333,13 +351,11 @@ class MobileFaceTrackBehavior:
         # comfortable neck range.
         body_left_needed = (
             side == "LEFT"
-            and normalized_x < self.OUTER_LEFT
             and new_pan > self.COMFORT_LEFT
         )
 
         body_right_needed = (
             side == "RIGHT"
-            and normalized_x > self.OUTER_RIGHT
             and new_pan < self.COMFORT_RIGHT
         )
 

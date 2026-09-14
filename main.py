@@ -12,6 +12,7 @@ from vision.camera import Camera
 from vision.detector import ColorDetector
 from vision.stimulus import VisionStimulus
 
+
 deck = Deck()
 
 bus = StimulusBus()
@@ -26,11 +27,13 @@ detector = ColorDetector(
     upper=[125, 255, 160],
 )
 
-vision = VisionStimulus(camera, detector, bus)
+vision = VisionStimulus(
+    camera,
+    detector,
+    bus
+)
 
-print("Sending startup HAPPY...")
-print("HAPPY result:", deck.happy())
-# start idle explicitly
+# Start idle explicitly.
 bus.emit("idle")
 
 try:
@@ -39,9 +42,6 @@ try:
         attention.update(deck)
         time.sleep(0.02)
 
-except Exception:
-    deck.error_feedback()
-    raise
-
 finally:
+    attention.close()
     camera.close()

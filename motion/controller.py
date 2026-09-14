@@ -3,18 +3,14 @@ from hardware.rp2040_controller import RP2040Controller
 
 class Deck:
     """
-    Charlie's body abstraction.
+    Charlie's RP2040-controlled body/head abstraction.
 
-    The Pi decides what Charlie should do.
-    The RP2040 handles physical execution and local rendering.
+    This class intentionally knows nothing about the ELEGOO car.
     """
 
     def __init__(self):
 
         self.body = RP2040Controller()
-
-        # Lazy connection to the ELEGOO mobile base.
-        self._mobile = None
 
     # --------------------------------------------------
     # MOTION
@@ -51,40 +47,6 @@ class Deck:
 
     def stop(self):
         self.body.stop()
-
-    # --------------------------------------------------
-    # ELEGOO MOBILITY / ATTENTION ALIGNMENT
-    # --------------------------------------------------
-
-    def _mobile_base(self):
-        if self._mobile is None:
-            from hardware.elegoo_mobile import ElegooMobileBase
-            self._mobile = ElegooMobileBase()
-        return self._mobile
-
-    def mobile_pan(self, degrees):
-        return self._mobile_base().pan(degrees)
-
-    def mobile_yaw(self):
-        return self._mobile_base().yaw()
-
-    def begin_attention_align(self, current_pan):
-        return self._mobile_base().begin_attention_align(
-            current_pan
-        )
-
-    def update_attention_align(self, face_visible=True):
-        return self._mobile_base().update_attention_align(
-            face_visible=face_visible
-        )
-
-    def cancel_attention_align(self, reason="cancelled"):
-        if self._mobile is not None:
-            self._mobile.cancel_attention_align(reason)
-
-    def stop_mobile(self):
-        if self._mobile is not None:
-            self._mobile.stop()
 
     # --------------------------------------------------
     # DISPLAY STATE

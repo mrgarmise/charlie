@@ -70,6 +70,15 @@ class MobileFaceTrackBehavior:
     SEARCH_END_HOLD = 0.80
     SEARCH_MAX_SWEEPS = 1
 
+    # Global/sentry search. After a complete local head sweep finds
+    # nobody, rotate the chassis into a new sector, center the head,
+    # and run another local sweep. First sector follows the last-seen
+    # direction; subsequent sectors continue around the environment.
+    SENTRY_TURN_DEGREES = 30
+    SENTRY_MAX_SECTORS = 12
+    SENTRY_TURN_TIMEOUT = 2.5
+    SENTRY_SETTLE = 0.35
+
     HEAD_SETTLE = 0.0
 
     # Predictive reacquisition. Track recent successful detections
@@ -113,6 +122,13 @@ class MobileFaceTrackBehavior:
         self.search_other_target = self.PAN_CENTER
         self.search_completed = False
         self.last_seen_side = None
+
+        self.sentry_active = False
+        self.sentry_direction = None
+        self.sentry_sector = 0
+        self.sentry_start_yaw = None
+        self.sentry_last_yaw = None
+        self.sentry_last_turn = 0.0
 
         self.aligning = False
 
@@ -310,6 +326,127 @@ class MobileFaceTrackBehavior:
                 )
             else:
                 self.search_direction *= -1
+
+    def _choose_sentry_direction(self):
+        # Servo geometry:
+        # larger pan angle looks LEFT, smaller looks RIGHT.
+        if self.last_seen_side == "LEFT":
+            return "LEFT"
+        if self.last_seen_side == "RIGHT":
+            return "RIGHT"
+
+        if self.last_face_x is not None:
+            if self.last_face_x < 0.5:
+                return "LEFT"
+            if self.last_face_x > 0.5:
+                return "RIGHT"
+
+        return "LEFT"
+
+    def _sentry_turn(self, now):
+        if self.sentry_direction is None:
+            self.sentry_direction = (
+                self._choose_sentry_direction()
+            )
+
+        if (
+            self.sentry_sector
+            >= self.SENTRY_MAX_SECTORS
+        ):
+            print(
+                "MOBILE SENTRY full search complete",
+                flush=True,
+            )
+            self.sentry_active = False
+            return False
+
+        try:
+            start_yaw = self.mobile.yaw()
+        except Exception:
+            start_yaw = None
+
+        direction = self.sentry_direction
+        yaw_sign = (
+            -1 if direction == "LEFT" else +1
+        )
+
+        print(
+            "MOBILE SENTRY turn "
+            f"sector={self.sentry_sector + 1}/"
+            f"{self.SENTRY_MAX_SECTORS} "
+            f"direction={direction} "
+            f"target={self.SENTRY_TURN_DEGREES}deg",
+            flush=True,
+        )
+
+        self.mobile.pivot(direction)
+
+        started = time.monotonic()
+        yaw_now = start_yaw
+        progress = 0.0
+
+        try:
+            while (
+                time.monotonic() - started
+                < self.SENTRY_TURN_TIMEOUT
+            ):
+                time.sleep(0.04)
+
+                try:
+                    yaw_now = self.mobile.yaw()
+                except Exception:
+                    continue
+
+                if start_yaw is None:
+                    continue
+
+                progress = (
+                    (yaw_now - start_yaw)
+                    * yaw_sign
+                )
+
+                if (
+                    progress
+                    >= self.SENTRY_TURN_DEGREES
+                ):
+                    break
+        finally:
+            self.mobile.stop()
+
+        self.sentry_active = True
+        self.sentry_sector += 1
+        self.sentry_start_yaw = start_yaw
+        self.sentry_last_yaw = yaw_now
+        self.sentry_last_turn = progress
+
+        # Every new world sector starts with the camera looking
+        # straight ahead, then gets a fresh local sweep.
+        if self.pan != self.PAN_CENTER:
+            self.mobile.pan(self.PAN_CENTER)
+            self.pan = self.PAN_CENTER
+
+        self.search_anchor_pan = self.PAN_CENTER
+        self.search_mode = "IDLE"
+        self.search_direction = 0
+        self.search_sweep_count = 0
+        self.search_completed = False
+        self.search_current_phase = -1
+        self.search_current_offset = 0
+        self.search_current_target = self.PAN_CENTER
+        self.last_search_move = (
+            time.monotonic()
+            + self.SENTRY_SETTLE
+        )
+
+        print(
+            "MOBILE SENTRY sector ready "
+            f"sector={self.sentry_sector} "
+            f"actual={progress:.1f}deg "
+            f"yaw={yaw_now}",
+            flush=True,
+        )
+
+        return True
 
     def _update_alignment(self):
         status = (
@@ -526,10 +663,34 @@ class MobileFaceTrackBehavior:
             ):
                 self.face_history.clear()
                 self.face_velocity = 0.0
+
+                # A completed local sweep means the current world
+                # sector is empty. Shift the chassis and search again.
+                if self.search_mode == "DONE":
+                    turned = self._sentry_turn(now)
+
+                    return {
+                        "state": (
+                            "SENTRY_TURN"
+                            if turned
+                            else "SENTRY_DONE"
+                        ),
+                        "pan": self.pan,
+                        "sector": self.sentry_sector,
+                        "direction": self.sentry_direction,
+                        "turn_degrees": self.sentry_last_turn,
+                    }
+
                 self._local_search(now)
 
                 return {
-                    "state": "LOCAL_SEARCH"
+                    "state": (
+                        "SENTRY_LOCAL_SEARCH"
+                        if self.sentry_active
+                        else "LOCAL_SEARCH"
+                    ),
+                    "pan": self.pan,
+                    "sector": self.sentry_sector,
                 }
 
             return {
@@ -556,6 +717,20 @@ class MobileFaceTrackBehavior:
         self.search_sweep_count = 0
         self.search_completed = False
         self.last_search_move = now
+
+        if self.sentry_active or self.sentry_sector:
+            print(
+                "MOBILE SENTRY target acquired "
+                f"sector={self.sentry_sector}",
+                flush=True,
+            )
+
+        self.sentry_active = False
+        self.sentry_direction = None
+        self.sentry_sector = 0
+        self.sentry_start_yaw = None
+        self.sentry_last_yaw = None
+        self.sentry_last_turn = 0.0
 
         if self.aligning:
             self._update_alignment()

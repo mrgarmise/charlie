@@ -49,9 +49,14 @@ class MobileFaceTrackBehavior:
 
     LOST_HOLD_SECONDS = 1.5
     LOCAL_SEARCH_START = 2.5
-    LOCAL_SEARCH_INTERVAL = 0.9
-    LOCAL_SEARCH_OFFSET = 10
-    LOCAL_SEARCH_MAX_OFFSET = 30
+    # Human-like sweep search:
+    # glance toward the last-seen side, then scan across the scene
+    # in small increments, running face detection between every step.
+    SEARCH_HALF_WIDTH = 30
+    SEARCH_STEP = 10
+    SEARCH_STEP_INTERVAL = 0.65
+    SEARCH_END_HOLD = 0.80
+    SEARCH_MAX_SWEEPS = 1
 
     HEAD_SETTLE = 0.0
 
@@ -89,6 +94,12 @@ class MobileFaceTrackBehavior:
         self.search_current_phase = -1
         self.search_current_offset = 0
         self.search_current_target = self.PAN_CENTER
+        self.search_mode = "IDLE"
+        self.search_direction = 0
+        self.search_sweep_count = 0
+        self.search_far_target = self.PAN_CENTER
+        self.search_other_target = self.PAN_CENTER
+        self.search_completed = False
         self.last_seen_side = None
 
         self.aligning = False
@@ -137,63 +148,156 @@ class MobileFaceTrackBehavior:
         except Exception:
             pass
 
+    def _begin_sweep_search(self, now):
+        # Search around a sane center even if the last tracked pan was
+        # close to a mechanical limit.
+        anchor = max(
+            self.PAN_CENTER - 20,
+            min(
+                self.PAN_CENTER + 20,
+                self.search_anchor_pan,
+            ),
+        )
+        self.search_anchor_pan = anchor
+
+        if self.last_seen_side == "LEFT":
+            first_sign = +1
+        elif self.last_seen_side == "RIGHT":
+            first_sign = -1
+        else:
+            first_sign = +1
+
+        self.search_far_target = self.clamp_pan(
+            anchor
+            + first_sign * self.SEARCH_HALF_WIDTH
+        )
+        self.search_other_target = self.clamp_pan(
+            anchor
+            - first_sign * self.SEARCH_HALF_WIDTH
+        )
+
+        self.search_direction = first_sign
+        self.search_sweep_count = 0
+        self.search_completed = False
+        self.search_mode = "GLANCE"
+        self.search_current_phase = 0
+        self.search_current_offset = (
+            self.search_far_target - anchor
+        )
+        self.search_current_target = (
+            self.search_far_target
+        )
+
+        print(
+            "MOBILE SEARCH glance "
+            f"anchor={anchor} "
+            f"pan {self.pan}->{self.search_far_target}",
+            flush=True,
+        )
+
+        if self.pan != self.search_far_target:
+            self.mobile.pan(
+                self.search_far_target
+            )
+            self.pan = self.search_far_target
+
+        self.last_search_move = time.monotonic()
+
     def _local_search(self, now):
-        if (
-            now - self.last_search_move
-            < self.LOCAL_SEARCH_INTERVAL
-        ):
+        if self.search_mode == "IDLE":
+            self._begin_sweep_search(now)
             return
 
-        # True widening arcs around the last reliable pan:
-        # anchor, +10, -10, +20, -20, +30, -30, anchor.
-        # Search the last-seen direction first, then alternate sides.
-        if self.last_seen_side == "LEFT":
-            sign = +1
-        elif self.last_seen_side == "RIGHT":
-            sign = -1
+        if self.search_mode == "DONE":
+            return
+
+        since_move = (
+            now - self.last_search_move
+        )
+
+        if self.search_mode == "GLANCE":
+            if since_move < self.SEARCH_END_HOLD:
+                return
+
+            # Sweep away from the initial glance and across the scene.
+            self.search_mode = "SWEEP"
+            self.search_direction *= -1
+
+        if since_move < self.SEARCH_STEP_INTERVAL:
+            return
+
+        target_limit = (
+            self.search_other_target
+            if self.search_direction < 0
+            else self.search_far_target
+        )
+
+        next_pan = self.pan + (
+            self.search_direction
+            * self.SEARCH_STEP
+        )
+
+        if self.search_direction < 0:
+            next_pan = max(
+                target_limit,
+                next_pan,
+            )
         else:
-            sign = +1
-
-        offsets = [
-            sign * 10,
-            -sign * 10,
-            sign * 20,
-            -sign * 20,
-            sign * 30,
-            -sign * 30,
-            0,
-        ]
-
-        phase = (
-            self.search_phase
-            % len(offsets)
-        )
-        offset = offsets[phase]
-
-        target = self.clamp_pan(
-            self.search_anchor_pan
-            + offset
-        )
-
-        self.search_current_phase = phase
-        self.search_current_offset = offset
-        self.search_current_target = target
-
-        self.search_phase += 1
-
-        if target != self.pan:
-            print(
-                "MOBILE LOCAL_SEARCH "
-                f"phase={phase} "
-                f"offset={offset:+d} "
-                f"pan {self.pan}->{target}",
-                flush=True,
+            next_pan = min(
+                target_limit,
+                next_pan,
             )
 
-            self.mobile.pan(target)
-            self.pan = target
+        self.search_current_phase += 1
+        self.search_current_offset = (
+            next_pan - self.search_anchor_pan
+        )
+        self.search_current_target = next_pan
 
-        self.last_search_move = now
+        print(
+            "MOBILE SEARCH sweep "
+            f"phase={self.search_current_phase} "
+            f"pan {self.pan}->{next_pan}",
+            flush=True,
+        )
+
+        if next_pan != self.pan:
+            self.mobile.pan(next_pan)
+            self.pan = next_pan
+
+        self.last_search_move = time.monotonic()
+
+        if next_pan == target_limit:
+            self.search_sweep_count += 1
+
+            if (
+                self.search_sweep_count
+                >= self.SEARCH_MAX_SWEEPS
+            ):
+                # A complete visual sweep found nobody. Return to a
+                # neutral forward gaze rather than freezing at an edge.
+                print(
+                    "MOBILE SEARCH complete "
+                    f"return {self.pan}->{self.PAN_CENTER}",
+                    flush=True,
+                )
+
+                if self.pan != self.PAN_CENTER:
+                    self.mobile.pan(
+                        self.PAN_CENTER
+                    )
+                    self.pan = self.PAN_CENTER
+
+                self.search_mode = "DONE"
+                self.search_completed = True
+                self.search_current_target = (
+                    self.PAN_CENTER
+                )
+                self.last_search_move = (
+                    time.monotonic()
+                )
+            else:
+                self.search_direction *= -1
 
     def _update_alignment(self):
         status = (
@@ -414,6 +518,10 @@ class MobileFaceTrackBehavior:
             self.pan
         )
         self.search_phase = 0
+        self.search_mode = "IDLE"
+        self.search_direction = 0
+        self.search_sweep_count = 0
+        self.search_completed = False
         self.last_search_move = now
 
         if self.aligning:

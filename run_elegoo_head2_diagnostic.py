@@ -13,9 +13,9 @@ from behaviors.mobile_face_track import MobileFaceTrackBehavior
 
 LOG_DIR = Path("head2_sessions")
 
-# YuNet does not need the full ESP32 camera frame for this job.
-# Use a smaller inference image to reduce the ~200 ms detector bottleneck.
-DETECT_WIDTH = 320
+# Search experiment: preserve the original full camera frame for YuNet.
+# Reliability matters more than inference speed while validating sweep search.
+DETECT_WIDTH = 10000
 LOG_DIR.mkdir(exist_ok=True)
 
 stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -56,6 +56,10 @@ fieldnames = [
     "search_phase",
     "search_offset",
     "search_target",
+    "search_mode",
+    "search_direction",
+    "search_sweep_count",
+    "search_completed",
     "since_search_move_ms",
     "camera_wait_ms",
     "resize_ms",
@@ -377,6 +381,18 @@ with csv_path.open(
                     ),
                     "search_target": (
                         behavior.search_current_target
+                    ),
+                    "search_mode": (
+                        behavior.search_mode
+                    ),
+                    "search_direction": (
+                        behavior.search_direction
+                    ),
+                    "search_sweep_count": (
+                        behavior.search_sweep_count
+                    ),
+                    "search_completed": int(
+                        behavior.search_completed
                     ),
                     "since_search_move_ms": (
                         ""

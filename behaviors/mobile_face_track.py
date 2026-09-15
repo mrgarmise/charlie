@@ -23,13 +23,13 @@ class MobileFaceTrackBehavior:
     """
 
     # Hysteresis copied from the proven Mint tracker.
-    OUTER_LEFT = 0.30
-    OUTER_RIGHT = 0.70
+    OUTER_LEFT = 0.38
+    OUTER_RIGHT = 0.62
 
-    INNER_LEFT = 0.40
-    INNER_RIGHT = 0.60
+    INNER_LEFT = 0.45
+    INNER_RIGHT = 0.55
 
-    PERSISTENCE_FRAMES = 3
+    PERSISTENCE_FRAMES = 2
 
     PAN_CENTER = 90
     PAN_MIN = 20
@@ -52,7 +52,7 @@ class MobileFaceTrackBehavior:
     LOCAL_SEARCH_OFFSET = 10
     LOCAL_SEARCH_MAX_OFFSET = 30
 
-    HEAD_SETTLE = 0.30
+    HEAD_SETTLE = 0.15
 
     def __init__(self):
         self.mobile = MobileBase()

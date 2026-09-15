@@ -74,9 +74,9 @@ class MobileFaceTrackBehavior:
     # nobody, rotate the chassis into a new sector, center the head,
     # and run another local sweep. First sector follows the last-seen
     # direction; subsequent sectors continue around the environment.
-    SENTRY_TURN_DEGREES = 30
-    SENTRY_MAX_SECTORS = 12
-    SENTRY_TURN_TIMEOUT = 2.5
+    SENTRY_SECTOR_DEGREES = 30
+    SENTRY_MAX_OFFSET = 180
+    SENTRY_TURN_TIMEOUT = 3.0
     SENTRY_SETTLE = 0.35
 
     HEAD_SETTLE = 0.0
@@ -124,9 +124,10 @@ class MobileFaceTrackBehavior:
         self.last_seen_side = None
 
         self.sentry_active = False
-        self.sentry_direction = None
+        self.sentry_preferred_direction = None
         self.sentry_sector = 0
-        self.sentry_start_yaw = None
+        self.sentry_origin_yaw = None
+        self.sentry_target_offset = 0.0
         self.sentry_last_yaw = None
         self.sentry_last_turn = 0.0
 
@@ -328,31 +329,55 @@ class MobileFaceTrackBehavior:
                 self.search_direction *= -1
 
     def _choose_sentry_direction(self):
-        # Servo geometry:
-        # larger pan angle looks LEFT, smaller looks RIGHT.
-        if self.last_seen_side == "LEFT":
-            return "LEFT"
-        if self.last_seen_side == "RIGHT":
+        # Use recent motion only as a preference, never as a permanent
+        # commitment. If the guess is wrong, the next sector checks the
+        # opposite side of the original lost heading.
+        if self.face_velocity > 0:
             return "RIGHT"
+        if self.face_velocity < 0:
+            return "LEFT"
 
-        if self.last_face_x is not None:
-            if self.last_face_x < 0.5:
-                return "LEFT"
-            if self.last_face_x > 0.5:
-                return "RIGHT"
+        if self.last_seen_side in ("LEFT", "RIGHT"):
+            return self.last_seen_side
 
         return "LEFT"
 
+    def _sentry_offsets(self):
+        # Expanding search around the yaw where global search began:
+        # preferred +30, opposite -30, preferred +60, opposite -60...
+        sign = (
+            -1
+            if self.sentry_preferred_direction == "LEFT"
+            else +1
+        )
+
+        offsets = []
+        amount = self.SENTRY_SECTOR_DEGREES
+
+        while amount <= self.SENTRY_MAX_OFFSET:
+            offsets.append(sign * amount)
+            offsets.append(-sign * amount)
+            amount += self.SENTRY_SECTOR_DEGREES
+
+        return offsets
+
     def _sentry_turn(self, now):
-        if self.sentry_direction is None:
-            self.sentry_direction = (
+        if self.sentry_origin_yaw is None:
+            self.sentry_origin_yaw = self.mobile.yaw()
+            self.sentry_preferred_direction = (
                 self._choose_sentry_direction()
             )
 
-        if (
-            self.sentry_sector
-            >= self.SENTRY_MAX_SECTORS
-        ):
+            print(
+                "MOBILE SENTRY origin "
+                f"yaw={self.sentry_origin_yaw:.1f} "
+                f"preferred={self.sentry_preferred_direction}",
+                flush=True,
+            )
+
+        offsets = self._sentry_offsets()
+
+        if self.sentry_sector >= len(offsets):
             print(
                 "MOBILE SENTRY full search complete",
                 flush=True,
@@ -360,67 +385,97 @@ class MobileFaceTrackBehavior:
             self.sentry_active = False
             return False
 
-        try:
-            start_yaw = self.mobile.yaw()
-        except Exception:
-            start_yaw = None
+        target_offset = offsets[
+            self.sentry_sector
+        ]
+        self.sentry_target_offset = target_offset
 
-        direction = self.sentry_direction
-        yaw_sign = (
-            -1 if direction == "LEFT" else +1
+        yaw_now = self.mobile.yaw()
+        current_offset = (
+            yaw_now - self.sentry_origin_yaw
         )
 
-        print(
-            "MOBILE SENTRY turn "
-            f"sector={self.sentry_sector + 1}/"
-            f"{self.SENTRY_MAX_SECTORS} "
-            f"direction={direction} "
-            f"target={self.SENTRY_TURN_DEGREES}deg",
-            flush=True,
+        delta_needed = (
+            target_offset - current_offset
         )
 
-        self.mobile.pivot(direction)
+        if abs(delta_needed) < 3.0:
+            direction = (
+                "RIGHT"
+                if delta_needed >= 0
+                else "LEFT"
+            )
+            progress = 0.0
+        else:
+            direction = (
+                "RIGHT"
+                if delta_needed > 0
+                else "LEFT"
+            )
+            yaw_sign = (
+                +1 if direction == "RIGHT" else -1
+            )
 
-        started = time.monotonic()
-        yaw_now = start_yaw
-        progress = 0.0
+            print(
+                "MOBILE SENTRY turn "
+                f"sector={self.sentry_sector + 1}/"
+                f"{len(offsets)} "
+                f"target_offset={target_offset:+.0f} "
+                f"current_offset={current_offset:+.1f} "
+                f"direction={direction}",
+                flush=True,
+            )
 
-        try:
-            while (
-                time.monotonic() - started
-                < self.SENTRY_TURN_TIMEOUT
-            ):
-                time.sleep(0.04)
+            turn_start_yaw = yaw_now
+            self.mobile.pivot(direction)
+            started = time.monotonic()
+            progress = 0.0
 
-                try:
-                    yaw_now = self.mobile.yaw()
-                except Exception:
-                    continue
-
-                if start_yaw is None:
-                    continue
-
-                progress = (
-                    (yaw_now - start_yaw)
-                    * yaw_sign
-                )
-
-                if (
-                    progress
-                    >= self.SENTRY_TURN_DEGREES
+            try:
+                while (
+                    time.monotonic() - started
+                    < self.SENTRY_TURN_TIMEOUT
                 ):
-                    break
-        finally:
-            self.mobile.stop()
+                    time.sleep(0.04)
+
+                    try:
+                        yaw_now = self.mobile.yaw()
+                    except Exception:
+                        continue
+
+                    current_offset = (
+                        yaw_now - self.sentry_origin_yaw
+                    )
+
+                    # Stop on reaching/passing the desired world-space
+                    # offset, rather than blindly adding another 30°.
+                    if direction == "RIGHT":
+                        reached = (
+                            current_offset >= target_offset
+                        )
+                    else:
+                        reached = (
+                            current_offset <= target_offset
+                        )
+
+                    progress = (
+                        (yaw_now - turn_start_yaw)
+                        * yaw_sign
+                    )
+
+                    if reached:
+                        break
+            finally:
+                self.mobile.stop()
 
         self.sentry_active = True
         self.sentry_sector += 1
-        self.sentry_start_yaw = start_yaw
         self.sentry_last_yaw = yaw_now
         self.sentry_last_turn = progress
 
-        # Every new world sector starts with the camera looking
-        # straight ahead, then gets a fresh local sweep.
+        # Every sector gets the SAME proven local sweep. Center first;
+        # the next calls to _local_search() perform the complete glance
+        # and cross-scene sweep before another chassis move is allowed.
         if self.pan != self.PAN_CENTER:
             self.mobile.pan(self.PAN_CENTER)
             self.pan = self.PAN_CENTER
@@ -433,20 +488,19 @@ class MobileFaceTrackBehavior:
         self.search_current_phase = -1
         self.search_current_offset = 0
         self.search_current_target = self.PAN_CENTER
-        self.last_search_move = (
-            time.monotonic()
-            + self.SENTRY_SETTLE
-        )
+        self.last_search_move = time.monotonic()
 
         print(
             "MOBILE SENTRY sector ready "
             f"sector={self.sentry_sector} "
-            f"actual={progress:.1f}deg "
-            f"yaw={yaw_now}",
+            f"target_offset={target_offset:+.0f} "
+            f"actual_offset="
+            f"{(yaw_now - self.sentry_origin_yaw):+.1f}",
             flush=True,
         )
 
         return True
+
 
     def _update_alignment(self):
         status = (
@@ -677,7 +731,12 @@ class MobileFaceTrackBehavior:
                         ),
                         "pan": self.pan,
                         "sector": self.sentry_sector,
-                        "direction": self.sentry_direction,
+                        "preferred_direction": (
+                            self.sentry_preferred_direction
+                        ),
+                        "target_offset": (
+                            self.sentry_target_offset
+                        ),
                         "turn_degrees": self.sentry_last_turn,
                     }
 
@@ -726,9 +785,10 @@ class MobileFaceTrackBehavior:
             )
 
         self.sentry_active = False
-        self.sentry_direction = None
+        self.sentry_preferred_direction = None
         self.sentry_sector = 0
-        self.sentry_start_yaw = None
+        self.sentry_origin_yaw = None
+        self.sentry_target_offset = 0.0
         self.sentry_last_yaw = None
         self.sentry_last_turn = 0.0
 

@@ -36,7 +36,19 @@ class MobileFaceTrackBehavior:
     PAN_MIN = 20
     PAN_MAX = 160
 
+    # Normal tracking is proportional: small corrections near center,
+    # larger decisive looks when the face is far toward an edge.
     PAN_STEP = 10
+    PAN_STEP_MED = 20
+    PAN_STEP_FAST = 30
+
+    # Horizontal face-position thresholds for larger head movements.
+    # The inner/outer hysteresis still decides whether movement is
+    # necessary; these only decide how far to move once it is.
+    LOOK_MED_LEFT = 0.30
+    LOOK_MED_RIGHT = 0.70
+    LOOK_FAST_LEFT = 0.18
+    LOOK_FAST_RIGHT = 0.82
 
     # Comfortable mobile-head range.
     # The head leads first. If continued tracking would push beyond
@@ -428,6 +440,27 @@ class MobileFaceTrackBehavior:
 
         return True
 
+    def _look_step(self, side, normalized_x):
+        """
+        Choose a head step from current face error.
+
+        Near the center: 10 degrees for smooth settling.
+        Moderately displaced: 20 degrees.
+        Near an image edge: 30 degrees for fast acquisition.
+        """
+        if side == "LEFT":
+            if normalized_x <= self.LOOK_FAST_LEFT:
+                return self.PAN_STEP_FAST
+            if normalized_x <= self.LOOK_MED_LEFT:
+                return self.PAN_STEP_MED
+        else:
+            if normalized_x >= self.LOOK_FAST_RIGHT:
+                return self.PAN_STEP_FAST
+            if normalized_x >= self.LOOK_MED_RIGHT:
+                return self.PAN_STEP_MED
+
+        return self.PAN_STEP
+
     def face_lost(self):
         # A brief detector miss should not erase directional intent.
         # The lost-face timer decides when the old tracking evidence
@@ -608,16 +641,23 @@ class MobileFaceTrackBehavior:
         # ATTEND / BODY COMMIT
         # -----------------------------
 
-        # Determine the head-only move that would normally happen next.
+        # Determine a proportional head-only move. Large visual error
+        # gets a decisive look; small error keeps the proven 10-degree
+        # settling behavior.
+        look_step = self._look_step(
+            side,
+            normalized_x,
+        )
+
         if side == "LEFT":
             new_pan = self.clamp_pan(
                 self.pan
-                + self.PAN_STEP
+                + look_step
             )
         else:
             new_pan = self.clamp_pan(
                 self.pan
-                - self.PAN_STEP
+                - look_step
             )
 
         # Body follows when the face is still pulling in the same
@@ -668,6 +708,7 @@ class MobileFaceTrackBehavior:
                 "MOBILE LOOK "
                 f"{side} "
                 f"x={normalized_x:.2f} "
+                f"step={look_step} "
                 f"pan {self.pan}->{new_pan}",
                 flush=True,
             )
@@ -686,4 +727,5 @@ class MobileFaceTrackBehavior:
             "side": side,
             "pan": self.pan,
             "x": normalized_x,
+            "look_step": look_step,
         }

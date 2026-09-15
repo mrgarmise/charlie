@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import csv
 import time
+
+import cv2
 from datetime import datetime
 from pathlib import Path
 
@@ -10,6 +12,10 @@ from behaviors.mobile_face_track import MobileFaceTrackBehavior
 
 
 LOG_DIR = Path("head2_sessions")
+
+# YuNet does not need the full ESP32 camera frame for this job.
+# Use a smaller inference image to reduce the ~200 ms detector bottleneck.
+DETECT_WIDTH = 320
 LOG_DIR.mkdir(exist_ok=True)
 
 stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -52,7 +58,12 @@ fieldnames = [
     "search_target",
     "since_search_move_ms",
     "camera_wait_ms",
+    "resize_ms",
     "detect_ms",
+    "source_width",
+    "source_height",
+    "detect_width",
+    "detect_height",
     "behavior_ms",
     "frame_interval_ms",
     "event",
@@ -165,8 +176,41 @@ with csv_path.open(
 
                 frame_no += 1
 
+                source_height, source_width = frame.shape[:2]
+
+                if source_width > DETECT_WIDTH:
+                    detect_height = max(
+                        1,
+                        int(
+                            source_height
+                            * DETECT_WIDTH
+                            / source_width
+                        ),
+                    )
+
+                    resize_start = time.monotonic()
+                    detect_frame = cv2.resize(
+                        frame,
+                        (
+                            DETECT_WIDTH,
+                            detect_height,
+                        ),
+                        interpolation=cv2.INTER_AREA,
+                    )
+                    resize_end = time.monotonic()
+                    resize_ms = (
+                        resize_end
+                        - resize_start
+                    ) * 1000.0
+                else:
+                    detect_frame = frame
+                    detect_height = source_height
+                    resize_ms = 0.0
+
                 detect_start = time.monotonic()
-                face = detector.detect(frame)
+                face = detector.detect(
+                    detect_frame
+                )
                 detect_end = time.monotonic()
                 detect_ms = (
                     detect_end
@@ -342,8 +386,19 @@ with csv_path.open(
                     "camera_wait_ms": (
                         f"{camera_wait_ms:.1f}"
                     ),
+                    "resize_ms": (
+                        f"{resize_ms:.1f}"
+                    ),
                     "detect_ms": (
                         f"{detect_ms:.1f}"
+                    ),
+                    "source_width": source_width,
+                    "source_height": source_height,
+                    "detect_width": (
+                        detect_frame.shape[1]
+                    ),
+                    "detect_height": (
+                        detect_frame.shape[0]
                     ),
                     "behavior_ms": (
                         f"{behavior_ms:.1f}"
@@ -380,7 +435,7 @@ with csv_path.open(
                         f"pan={behavior.pan:3d} "
                         f"align={behavior.aligning} "
                         f"cam={camera_wait_ms:.0f}ms "
-                        f"det={detect_ms:.0f}ms "
+                        f"det={detect_ms:.0f}ms@{detect_frame.shape[1]}w "
                         f"beh={behavior_ms:.0f}ms",
                         end="",
                         flush=True,
@@ -394,7 +449,7 @@ with csv_path.open(
                         f"pan={behavior.pan:3d} "
                         f"align={behavior.aligning} "
                         f"cam={camera_wait_ms:.0f}ms "
-                        f"det={detect_ms:.0f}ms "
+                        f"det={detect_ms:.0f}ms@{detect_frame.shape[1]}w "
                         f"beh={behavior_ms:.0f}ms",
                         end="",
                         flush=True,

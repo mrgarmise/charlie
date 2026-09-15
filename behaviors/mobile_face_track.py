@@ -30,7 +30,7 @@ class MobileFaceTrackBehavior:
     INNER_LEFT = 0.45
     INNER_RIGHT = 0.55
 
-    PERSISTENCE_FRAMES = 2
+    PERSISTENCE_FRAMES = 1
 
     PAN_CENTER = 90
     PAN_MIN = 20
@@ -49,11 +49,11 @@ class MobileFaceTrackBehavior:
 
     LOST_HOLD_SECONDS = 1.5
     LOCAL_SEARCH_START = 2.5
-    LOCAL_SEARCH_INTERVAL = 1.2
+    LOCAL_SEARCH_INTERVAL = 0.9
     LOCAL_SEARCH_OFFSET = 10
     LOCAL_SEARCH_MAX_OFFSET = 30
 
-    HEAD_SETTLE = 0.15
+    HEAD_SETTLE = 0.0
 
     # Predictive reacquisition. Track recent successful detections
     # and, when a face exits an edge with clear momentum, immediately
@@ -62,9 +62,9 @@ class MobileFaceTrackBehavior:
     VELOCITY_MIN_SAMPLES = 3
     PREDICT_EDGE_LEFT = 0.42
     PREDICT_EDGE_RIGHT = 0.58
-    PREDICT_MIN_SPEED = 0.10
-    PREDICT_MED_SPEED = 0.20
-    PREDICT_FAST_SPEED = 0.35
+    PREDICT_MIN_SPEED = 0.06
+    PREDICT_MED_SPEED = 0.15
+    PREDICT_FAST_SPEED = 0.30
     PREDICT_STEP_SLOW = 10
     PREDICT_STEP_MED = 20
     PREDICT_STEP_FAST = 30
@@ -155,7 +155,6 @@ class MobileFaceTrackBehavior:
             sign = +1
 
         offsets = [
-            0,
             sign * 10,
             -sign * 10,
             sign * 20,

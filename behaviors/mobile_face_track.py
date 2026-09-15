@@ -85,8 +85,10 @@ class MobileFaceTrackBehavior:
             self.PAN_CENTER
         )
         self.search_phase = 0
-        self.search_exhausted = False
         self.last_search_move = 0.0
+        self.search_current_phase = -1
+        self.search_current_offset = 0
+        self.search_current_target = self.PAN_CENTER
         self.last_seen_side = None
 
         self.aligning = False
@@ -136,17 +138,15 @@ class MobileFaceTrackBehavior:
             pass
 
     def _local_search(self, now):
-        if self.search_exhausted:
-            return
-
         if (
             now - self.last_search_move
             < self.LOCAL_SEARCH_INTERVAL
         ):
             return
 
-        # Search last-seen direction first, progressively, without
-        # bouncing across the whole servo range.
+        # True widening arcs around the last reliable pan:
+        # anchor, +10, -10, +20, -20, +30, -30, anchor.
+        # Search the last-seen direction first, then alternate sides.
         if self.last_seen_side == "LEFT":
             sign = +1
         elif self.last_seen_side == "RIGHT":
@@ -157,37 +157,36 @@ class MobileFaceTrackBehavior:
         offsets = [
             0,
             sign * 10,
-            sign * 20,
-            sign * 30,
-            0,
             -sign * 10,
+            sign * 20,
             -sign * 20,
+            sign * 30,
+            -sign * 30,
             0,
         ]
 
-        if self.search_phase >= len(offsets):
-            # One finite search sweep is enough. Return to a safe
-            # neutral-ish position and wait for vision to reacquire.
-            target = self.clamp_pan(
-                max(
-                    self.COMFORT_RIGHT,
-                    min(
-                        self.COMFORT_LEFT,
-                        self.search_anchor_pan,
-                    ),
-                )
-            )
-            self.search_exhausted = True
-        else:
-            target = self.clamp_pan(
-                self.search_anchor_pan
-                + offsets[self.search_phase]
-            )
-            self.search_phase += 1
+        phase = (
+            self.search_phase
+            % len(offsets)
+        )
+        offset = offsets[phase]
+
+        target = self.clamp_pan(
+            self.search_anchor_pan
+            + offset
+        )
+
+        self.search_current_phase = phase
+        self.search_current_offset = offset
+        self.search_current_target = target
+
+        self.search_phase += 1
 
         if target != self.pan:
             print(
                 "MOBILE LOCAL_SEARCH "
+                f"phase={phase} "
+                f"offset={offset:+d} "
                 f"pan {self.pan}->{target}",
                 flush=True,
             )
@@ -416,7 +415,6 @@ class MobileFaceTrackBehavior:
             self.pan
         )
         self.search_phase = 0
-        self.search_exhausted = False
         self.last_search_move = now
 
         if self.aligning:

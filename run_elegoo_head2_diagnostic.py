@@ -46,6 +46,15 @@ fieldnames = [
     "prediction_step",
     "prediction_side",
     "prediction_used",
+    "search_anchor_pan",
+    "search_phase",
+    "search_offset",
+    "search_target",
+    "since_search_move_ms",
+    "camera_wait_ms",
+    "detect_ms",
+    "behavior_ms",
+    "frame_interval_ms",
     "event",
 ]
 
@@ -116,6 +125,7 @@ last_aligning = behavior.aligning
 last_face_visible = False
 last_yaw_sample = 0.0
 cached_yaw = None
+last_loop_start = None
 
 with csv_path.open(
     "w",
@@ -133,14 +143,45 @@ with csv_path.open(
         with camera:
 
             while True:
+                loop_start = time.monotonic()
+
+                frame_interval_ms = (
+                    ""
+                    if last_loop_start is None
+                    else (
+                        loop_start
+                        - last_loop_start
+                    ) * 1000.0
+                )
+                last_loop_start = loop_start
+
+                camera_start = time.monotonic()
                 frame = camera.read()
+                camera_end = time.monotonic()
+                camera_wait_ms = (
+                    camera_end
+                    - camera_start
+                ) * 1000.0
+
                 frame_no += 1
 
+                detect_start = time.monotonic()
                 face = detector.detect(frame)
+                detect_end = time.monotonic()
+                detect_ms = (
+                    detect_end
+                    - detect_start
+                ) * 1000.0
 
+                behavior_start = time.monotonic()
                 status = behavior.update_face(
                     face
                 )
+                behavior_end = time.monotonic()
+                behavior_ms = (
+                    behavior_end
+                    - behavior_start
+                ) * 1000.0
 
                 now = time.monotonic()
                 elapsed = now - started
@@ -281,6 +322,37 @@ with csv_path.open(
                     "prediction_used": int(
                         behavior.prediction_used_for_loss
                     ),
+                    "search_anchor_pan": (
+                        behavior.search_anchor_pan
+                    ),
+                    "search_phase": (
+                        behavior.search_current_phase
+                    ),
+                    "search_offset": (
+                        behavior.search_current_offset
+                    ),
+                    "search_target": (
+                        behavior.search_current_target
+                    ),
+                    "since_search_move_ms": (
+                        ""
+                        if behavior.last_search_move <= 0
+                        else f"{(now - behavior.last_search_move) * 1000.0:.1f}"
+                    ),
+                    "camera_wait_ms": (
+                        f"{camera_wait_ms:.1f}"
+                    ),
+                    "detect_ms": (
+                        f"{detect_ms:.1f}"
+                    ),
+                    "behavior_ms": (
+                        f"{behavior_ms:.1f}"
+                    ),
+                    "frame_interval_ms": (
+                        ""
+                        if frame_interval_ms == ""
+                        else f"{frame_interval_ms:.1f}"
+                    ),
                     "event": " | ".join(
                         event_parts
                     ),
@@ -306,7 +378,10 @@ with csv_path.open(
                         f"score={face['score']:.2f} "
                         f"v={behavior.face_velocity:+.2f} "
                         f"pan={behavior.pan:3d} "
-                        f"align={behavior.aligning}",
+                        f"align={behavior.aligning} "
+                        f"cam={camera_wait_ms:.0f}ms "
+                        f"det={detect_ms:.0f}ms "
+                        f"beh={behavior_ms:.0f}ms",
                         end="",
                         flush=True,
                     )
@@ -317,7 +392,10 @@ with csv_path.open(
                         f"{state_name:12s} "
                         f"face=NONE "
                         f"pan={behavior.pan:3d} "
-                        f"align={behavior.aligning}",
+                        f"align={behavior.aligning} "
+                        f"cam={camera_wait_ms:.0f}ms "
+                        f"det={detect_ms:.0f}ms "
+                        f"beh={behavior_ms:.0f}ms",
                         end="",
                         flush=True,
                     )

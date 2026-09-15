@@ -1,4 +1,5 @@
 import time
+from collections import deque
 
 from motion.mobile_base import MobileBase
 
@@ -54,6 +55,21 @@ class MobileFaceTrackBehavior:
 
     HEAD_SETTLE = 0.15
 
+    # Predictive reacquisition. Track recent successful detections
+    # and, when a face exits an edge with clear momentum, immediately
+    # look ahead once instead of waiting for LOST_HOLD.
+    VELOCITY_HISTORY = 5
+    VELOCITY_MIN_SAMPLES = 3
+    PREDICT_EDGE_LEFT = 0.42
+    PREDICT_EDGE_RIGHT = 0.58
+    PREDICT_MIN_SPEED = 0.10
+    PREDICT_MED_SPEED = 0.20
+    PREDICT_FAST_SPEED = 0.35
+    PREDICT_STEP_SLOW = 10
+    PREDICT_STEP_MED = 20
+    PREDICT_STEP_FAST = 30
+    PREDICT_COOLDOWN = 0.70
+
     def __init__(self):
         self.mobile = MobileBase()
 
@@ -74,6 +90,16 @@ class MobileFaceTrackBehavior:
         self.last_seen_side = None
 
         self.aligning = False
+
+        self.face_history = deque(
+            maxlen=self.VELOCITY_HISTORY
+        )
+        self.face_velocity = 0.0
+        self.last_face_x = None
+        self.prediction_used_for_loss = False
+        self.last_prediction_time = 0.0
+        self.last_prediction_step = 0
+        self.last_prediction_side = None
 
     def clamp_pan(self, value):
         return max(
@@ -196,6 +222,110 @@ class MobileFaceTrackBehavior:
 
         return status
 
+    def _update_face_motion(self, now, normalized_x):
+        self.face_history.append(
+            (now, normalized_x)
+        )
+        self.last_face_x = normalized_x
+
+        if len(self.face_history) < 2:
+            self.face_velocity = 0.0
+            return
+
+        # Estimate velocity across the short history rather than
+        # trusting one noisy YuNet box-to-box jump.
+        t0, x0 = self.face_history[0]
+        t1, x1 = self.face_history[-1]
+        dt = t1 - t0
+
+        if dt <= 0:
+            self.face_velocity = 0.0
+        else:
+            self.face_velocity = (
+                (x1 - x0) / dt
+            )
+
+    def _prediction_step(self):
+        speed = abs(self.face_velocity)
+
+        if speed >= self.PREDICT_FAST_SPEED:
+            return self.PREDICT_STEP_FAST
+        if speed >= self.PREDICT_MED_SPEED:
+            return self.PREDICT_STEP_MED
+        if speed >= self.PREDICT_MIN_SPEED:
+            return self.PREDICT_STEP_SLOW
+
+        return 0
+
+    def _predictive_reacquire(self, now):
+        if self.prediction_used_for_loss:
+            return False
+
+        if (
+            len(self.face_history)
+            < self.VELOCITY_MIN_SAMPLES
+        ):
+            return False
+
+        if (
+            now - self.last_prediction_time
+            < self.PREDICT_COOLDOWN
+        ):
+            return False
+
+        step = self._prediction_step()
+
+        if step <= 0 or self.last_face_x is None:
+            return False
+
+        # Positive image velocity means the face was moving toward
+        # the image RIGHT, which requires a smaller servo angle.
+        if (
+            self.face_velocity > 0
+            and self.last_face_x
+            >= self.PREDICT_EDGE_RIGHT
+        ):
+            side = "RIGHT"
+            target = self.clamp_pan(
+                self.pan - step
+            )
+
+        elif (
+            self.face_velocity < 0
+            and self.last_face_x
+            <= self.PREDICT_EDGE_LEFT
+        ):
+            side = "LEFT"
+            target = self.clamp_pan(
+                self.pan + step
+            )
+
+        else:
+            return False
+
+        self.prediction_used_for_loss = True
+        self.last_prediction_time = now
+        self.last_prediction_step = step
+        self.last_prediction_side = side
+        self.last_seen_side = side
+
+        if target == self.pan:
+            return False
+
+        print(
+            "MOBILE PREDICT "
+            f"{side} "
+            f"x={self.last_face_x:.2f} "
+            f"v={self.face_velocity:+.2f}/s "
+            f"pan {self.pan}->{target}",
+            flush=True,
+        )
+
+        self.mobile.pan(target)
+        self.pan = target
+
+        return True
+
     def face_lost(self):
         # A brief detector miss should not erase directional intent.
         # The lost-face timer decides when the old tracking evidence
@@ -232,6 +362,18 @@ class MobileFaceTrackBehavior:
             )
 
             if (
+                lost_for < self.LOST_HOLD_SECONDS
+                and self._predictive_reacquire(now)
+            ):
+                return {
+                    "state": "PREDICT",
+                    "pan": self.pan,
+                    "velocity": self.face_velocity,
+                    "prediction_step": self.last_prediction_step,
+                    "prediction_side": self.last_prediction_side,
+                }
+
+            if (
                 lost_for
                 < self.LOST_HOLD_SECONDS
             ):
@@ -247,6 +389,8 @@ class MobileFaceTrackBehavior:
                 lost_for
                 >= self.LOCAL_SEARCH_START
             ):
+                self.face_history.clear()
+                self.face_velocity = 0.0
                 self._local_search(now)
 
                 return {
@@ -260,6 +404,12 @@ class MobileFaceTrackBehavior:
         normalized_x = face[
             "normalized_x"
         ]
+
+        self._update_face_motion(
+            now,
+            normalized_x
+        )
+        self.prediction_used_for_loss = False
 
         self.last_seen_time = now
         self.search_anchor_pan = (

@@ -42,6 +42,10 @@ fieldnames = [
     "align_progress",
     "align_target",
     "align_reason",
+    "face_velocity",
+    "prediction_step",
+    "prediction_side",
+    "prediction_used",
     "event",
 ]
 
@@ -156,6 +160,13 @@ with csv_path.open(
                     event_parts.append(
                         f"state:{last_state}->{state_name}"
                     )
+                    if state_name == "PREDICT":
+                        event_parts.append(
+                            "predict:"
+                            f"{behavior.last_prediction_side}"
+                            f"/{behavior.last_prediction_step}"
+                            f"/v={behavior.face_velocity:+.2f}"
+                        )
                     last_state = state_name
 
                 if behavior.pan != last_pan:
@@ -256,6 +267,20 @@ with csv_path.open(
                         if snap["align_reason"] is None
                         else snap["align_reason"]
                     ),
+                    "face_velocity": (
+                        f"{behavior.face_velocity:.4f}"
+                    ),
+                    "prediction_step": (
+                        behavior.last_prediction_step
+                    ),
+                    "prediction_side": (
+                        ""
+                        if behavior.last_prediction_side is None
+                        else behavior.last_prediction_side
+                    ),
+                    "prediction_used": int(
+                        behavior.prediction_used_for_loss
+                    ),
                     "event": " | ".join(
                         event_parts
                     ),
@@ -279,6 +304,7 @@ with csv_path.open(
                         f"{state_name:12s} "
                         f"x={face['normalized_x']:.2f} "
                         f"score={face['score']:.2f} "
+                        f"v={behavior.face_velocity:+.2f} "
                         f"pan={behavior.pan:3d} "
                         f"align={behavior.aligning}",
                         end="",

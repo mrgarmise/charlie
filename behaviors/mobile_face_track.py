@@ -66,8 +66,8 @@ class MobileFaceTrackBehavior:
     # in small increments, running face detection between every step.
     SEARCH_HALF_WIDTH = 30
     SEARCH_STEP = 10
-    SEARCH_STEP_INTERVAL = 0.65
-    SEARCH_END_HOLD = 0.80
+    SEARCH_STEP_INTERVAL = 1.10
+    SEARCH_END_HOLD = 1.10
     SEARCH_MAX_SWEEPS = 1
 
     # Global/sentry search. After a complete local head sweep finds

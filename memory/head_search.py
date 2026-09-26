@@ -7,7 +7,7 @@ from .former import Experience
 from .marm import MarmWriteError
 
 
-def preferred_direction(gateway):
+def preferred_direction(gateway, decision_id=None):
     """Use a preference only after independent evidence favors one side."""
     try:
         memories = gateway.recall("face search reacquired direction", limit=20)
@@ -35,10 +35,16 @@ def preferred_direction(gateway):
         if not evidence or subject not in ("LEFT", "RIGHT"):
             continue
         # A repeated semantic hit or duplicate remote log is one observation.
-        outcomes[evidence] = subject
-    counts = {side: list(outcomes.values()).count(side) for side in ("LEFT", "RIGHT")}
+        outcomes[evidence] = (subject, memory.evaluation_id)
+    counts = {side: sum(value[0] == side for value in outcomes.values()) for side in ("LEFT", "RIGHT")}
     side = max(counts, key=counts.get)
-    return side if counts[side] >= 3 and counts[side] - counts["RIGHT" if side == "LEFT" else "LEFT"] >= 2 else None
+    if counts[side] < 3 or counts[side] - counts["RIGHT" if side == "LEFT" else "LEFT"] < 2:
+        return None
+    used = [identifier for value, identifier in outcomes.values()
+            if value == side and identifier]
+    if decision_id and used and hasattr(gateway, "record_decision"):
+        gateway.record_decision(decision_id, "head:face-search", used)
+    return side
 
 
 class HeadSearchMemory:

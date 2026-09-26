@@ -71,7 +71,7 @@ class MemoryFormer:
         score = min(score, 1.0)
         if score < self.threshold:
             return None
-        key = (event.source, event.kind, event.summary.strip())
+        key = (event.source, event.kind, event.evidence or event.summary.strip())
         if key in self._seen:
             return None
         self._seen.add(key)

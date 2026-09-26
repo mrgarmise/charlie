@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import time
 import sqlite3
+from uuid import uuid4
 
 from hardware.elegoo_camera import ElegooCamera
 from vision.mobile_face import MobileFaceDetector
@@ -16,7 +17,7 @@ detector = MobileFaceDetector(
 )
 
 memory = MemoryGateway()
-behavior = MobileFaceTrackBehavior(search_preference=preferred_direction(memory))
+behavior = MobileFaceTrackBehavior(search_preference=preferred_direction(memory, decision_id=f"head:{uuid4().hex}"))
 search_memory = HeadSearchMemory(memory)
 
 print("Charlie Elegoo Head 2")

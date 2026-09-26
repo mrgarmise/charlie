@@ -168,3 +168,48 @@ one direction by at least two can bias the initial sentry direction, and recent
 face movement/last-seen direction continue to take priority. No actuator limits
 or safety rules change. Other tasks can use the same gateway with their own
 selection and conservative decision policy.
+
+## Teaching the memory evaluator
+
+`MemoryEvaluator` keeps all candidates in a separate local SQLite database at
+`~/.local/share/charlie/memory-evaluation.sqlite3`. A rule-derived importance
+score is the initial estimate. It retains routine observations as provisional
+rather than discarding them. About five percent of low-priority candidates are
+sampled for exploration (deterministically per candidate). No claim is promoted
+merely because MARM recalled it.
+
+When a task **actually uses** a memory, call
+`gateway.record_decision(decision_id, task, [memory.evaluation_id])`. A task
+with a measured comparison may later call
+`gateway.assess_decision(decision_id, "helpful" | "harmful", evidence_id,
+comparison)`. The evidence ID prevents the same result from being counted
+again; multiple memories split one result's credit. Without a comparison,
+the outcome remains an episode and does not prove the memory's usefulness.
+Tasks can also call `gateway.feedback(memory_id, verdict, evidence_id, reason)`
+for independently checked outcomes. These assessments revise category-level
+selection, promote some previously overlooked candidates, and can make an
+active memory dormant when contrary evidence accumulates. Later positive
+evidence can restore it. All evidence is retained.
+
+To inspect and teach Charlie manually:
+
+```bash
+python3 -m memory.evaluate list
+python3 -m memory.evaluate feedback MEMORY_ID harmful \
+  --evidence independent-check-1 --reason "The prediction failed in a comparable situation"
+python3 -m memory.evaluate correct MEMORY_ID "Corrected fact" \
+  --evidence correction-1 --reason "I checked the source"
+```
+
+A correction creates a new sourced memory and supersedes the old claim locally.
+MARM remains an append-only archive, so Charlie filters superseded/dormant
+memories from task recall rather than silently erasing the history. The
+local evaluation database must be backed up alongside the MARM database and
+outbox to retain these judgments. Category scores measure *usefulness*, not
+whether a claim is factually true; a correction applies to that specific claim.
+
+The Elegoo head uses this mechanism to record which memories contributed to a
+chosen search preference. It does not grade the preference automatically: face
+reacquisition alone is not a controlled comparison. A later task evaluator can
+supply that evidence. PPAL-0's scripted transitions similarly cannot validate
+a behavioral lesson; real PPAL outcomes can use the same interface.

@@ -7,6 +7,8 @@ import unittest
 
 from memory.former import Experience, MemoryFormer
 from memory.gateway import MemoryGateway
+from memory.evaluator import MemoryEvaluator
+from memory.former import Experience
 from memory.marm import MarmClient, MarmOutbox, MarmWriteError
 
 
@@ -82,7 +84,8 @@ class MarmTests(unittest.TestCase):
             MarmClient('http://localhost:8001/mcp')
 
     def test_recall_uses_charlie_project_and_session(self):
-        gateway = MemoryGateway(store=MarmOutbox(self.path), client=self.client)
+        gateway = MemoryGateway(store=MarmOutbox(self.path), client=self.client,
+                                evaluator=MemoryEvaluator(Path(self.tmp.name) / "eval.sqlite3"))
         results = gateway.recall('face search', limit=2)
         self.assertEqual(results[0].content, 'found on LEFT')
         path, _, payload = self.server.requests[-1]
@@ -90,6 +93,20 @@ class MarmTests(unittest.TestCase):
         self.assertEqual((payload['project'], payload['session_name']),
                          ('charlie', 'charlie-experiences'))
         self.assertEqual(payload['detail'], 3)
+
+    def test_corrected_memory_is_filtered_from_recall(self):
+        box = MarmOutbox(self.path)
+        evaluator = MemoryEvaluator(Path(self.tmp.name) / 'eval.sqlite3')
+        gateway = MemoryGateway(store=box, client=self.client, evaluator=evaluator)
+        gateway.remember(Experience('fact', 'The room is empty', 'camera',
+                                    significant=True, evidence='camera-1'))
+        original = evaluator.recent()[0]['id']
+        with box._connect() as conn:
+            entry = json.loads(conn.execute('SELECT payload FROM outbox').fetchone()[0])['entry']
+        self.server.recall_response['results'] = [{'id': 'mem-1', 'content': entry}]
+        self.assertEqual(len(gateway.recall('room')), 1)
+        gateway.correct(original, 'The camera was covered', 'Lens cap', 'correction-1')
+        self.assertEqual(gateway.recall('room'), [])
 
     def test_connection_failure_leaves_pending(self):
         box = MarmOutbox(self.path)

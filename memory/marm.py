@@ -78,10 +78,14 @@ class MarmOutbox:
     def _connect(self):
         return sqlite3.connect(self.path, timeout=10)
 
+    def identity(self, memory: CandidateMemory):
+        serialized = json.dumps(memory.to_dict(), sort_keys=True, ensure_ascii=False)
+        return hashlib.sha256((self.project + '\n' + self.session + '\n' + serialized).encode()).hexdigest()
+
     def save(self, memory: CandidateMemory):
         record = memory.to_dict()
         serialized = json.dumps(record, sort_keys=True, ensure_ascii=False)
-        identifier = hashlib.sha256((self.project + '\n' + self.session + '\n' + serialized).encode()).hexdigest()
+        identifier = self.identity(memory)
         payload = {
             "project": self.project, "session_name": self.session,
             "entry": f"Charlie memory {identifier}\n{memory.text}\nMetadata: {serialized}",

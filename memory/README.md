@@ -31,8 +31,32 @@ A durable memory should capture:
 - confidence/source;
 - links/tags for the subsystem involved.
 
-MARM's writes are explicit, so Charlie's future cognition layer should contain a
-memory-former that decides which working experiences deserve promotion.
+The initial `MemoryFormer` is implemented in `memory/former.py`. Producers send
+`Experience` records with explicit source, outcome, confidence and evidence.
+Routine observations are dropped; selected `CandidateMemory` records carry the
+selection reason and importance. The former does not infer causal success from
+adjacent observations. Repeated identical events are suppressed within one run.
+
+## Try the PPAL adapter
+
+From the repository root:
+
+```bash
+python3 -m experiments.ppal.run --log /tmp/ppal-transitions.jsonl \
+  --memory-log /tmp/charlie-selected.jsonl
+```
+
+`--memory-log` is optional. PPAL's dense transition logger still records every
+transition, while `memory/ppal.py` selects observed changes for Charlie. PPAL-0
+uses scripted frames and null rewards: an absent target is recorded as "no
+longer visible," never as a confirmed rescue. Producers can also submit facts,
+decisions, and explicit outcomes using `MemoryFormer.consider()`.
+
+`JsonlStore` is a local staging backend with a `MemoryStore` protocol. Point it
+at a persistent path outside the repository when running on Charlie. The MARM
+storage adapter can implement the same `save()` method once its write API and
+local installation are verified. JSONL is append-only; repeated runs append
+records, so the consuming store should deduplicate by source/evidence/subject.
 
 ## Install on Charlie
 
@@ -70,9 +94,8 @@ codex mcp add marm-memory --url http://localhost:8001/mcp
 Keep HTTP bound to localhost unless we deliberately configure authentication and
 network exposure.
 
-## Future integration
+## Next integration
 
-The cognition/agent layer should use MARM recall before planning when past
-experience may matter, and write a concise durable memory after significant
-outcomes. PPAL can later add a promotion adapter that summarizes selected
-transitions/episodes instead of copying its JSONL stream wholesale.
+Connect a verified MARM writer to `MemoryStore`, and let the cognition layer
+retrieve relevant memories before planning. As real PPAL outcome/reward signals
+arrive, feed them as explicit outcome experiences; keep raw transitions in PPAL.

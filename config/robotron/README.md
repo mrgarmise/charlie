@@ -25,3 +25,32 @@ For a faster preview, run:
 ```
 
 The target rate is a ceiling, not a guarantee. Use only one preview browser tab.
+
+## Draft real-camera sprite detector
+
+`sprites-draft.json` contains nine small sprite examples from timing-QSsAxcb8's
+physical camera image. Labels were assigned visually and need user review.
+The detector groups bright pixels with OpenCV, compares normalized shape/color,
+and keeps low or conflicting matches unknown. It does not cover all animations,
+waves, overlaps, explosions or screen transitions. Match similarity is not a
+probability. No online learning or temporal tracking is added by this detector.
+
+The source frame yields one player candidate, two human candidates, 27 threat
+candidates and 16 unknown regions. This is a fitting check, NOT accuracy on
+unseen images. Replay of the earlier 12-frame camera-mBPTGSQy capture shows
+missed player/human appearances and some false threat matches. It is not ready
+for autonomous control. These failures are why observations cannot produce a
+WorldState, even if someone removes the profile's draft flag. The live runner
+also rejects this profile format; use the observation tools only.
+
+On the Pi, stop the preview and run `bash setup/observe_robotron_pi.sh` while
+playing manually. It records 60 raw/annotated frames and per-frame capture,
+vision, and save timing. It uses robotron-runs/playfield-current.json when
+available; otherwise the latest measured geometry. The resulting detection
+archive lets us inspect mistakes and measure the actual Pi processing cost.
+
+For labeled live preview:
+
+```
+.venv-robotron/bin/python -m experiments.ppal.eyes.serve_eyes --source pi --bind 0.0.0.0 --fps 20 --calibration robotron-runs/playfield-current.json --profile config/robotron/sprites-draft.json
+```

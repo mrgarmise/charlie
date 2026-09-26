@@ -18,6 +18,7 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=8766)
     parser.add_argument("--fps", type=float, default=20,
                         help="target preview rate; actual speed depends on processing/network")
+    parser.add_argument("--raw", action="store_true", help="show full camera frame without crop or labels")
     args = parser.parse_args()
     if not 1 <= args.fps <= 60:
         parser.error("fps must be 1..60")
@@ -45,9 +46,10 @@ def main() -> None:
             try:
                 while True:
                     started = time.monotonic()
-                    result = pipeline.process(source.read(), tick)
+                    frame = source.read()
+                    shown = frame if args.raw else pipeline.process(frame, tick).annotated
                     image = BytesIO()
-                    result.annotated.save(image, format="JPEG", quality=75)
+                    shown.save(image, format="JPEG", quality=75)
                     data = image.getvalue()
                     self.wfile.write(b"--frame\r\nContent-Type: image/jpeg\r\nContent-Length: "
                                      + str(len(data)).encode("ascii") + b"\r\n\r\n" + data + b"\r\n")

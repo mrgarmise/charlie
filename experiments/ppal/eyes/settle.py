@@ -35,7 +35,7 @@ def locate(frame):
         for item in sorted(group,key=lambda x:x[0],reverse=True):
             if all(abs(item[1]-other[1])>12 for other in kept):
                 kept.append(item)
-            if len(kept)==8:
+            if len(kept)==12:
                 break
         selected.append(sorted(kept,key=lambda x:x[1]))
     from itertools import combinations

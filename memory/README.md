@@ -52,11 +52,53 @@ uses scripted frames and null rewards: an absent target is recorded as "no
 longer visible," never as a confirmed rescue. Producers can also submit facts,
 decisions, and explicit outcomes using `MemoryFormer.consider()`.
 
-`JsonlStore` is a local staging backend with a `MemoryStore` protocol. Point it
-at a persistent path outside the repository when running on Charlie. The MARM
-storage adapter can implement the same `save()` method once its write API and
-local installation are verified. JSONL is append-only; repeated runs append
-records, so the consuming store should deduplicate by source/evidence/subject.
+## Send memories to MARM
+
+MARM must be installed and running on the same machine for the default URL.
+Start it with `marm-memory start`. If authentication is enabled, supply the
+server's existing key via `MARM_API_KEY` in the environment (never in Git).
+
+```bash
+# Capture locally, including when MARM is unavailable:
+python3 -m experiments.ppal.run --log /tmp/ppal-transitions.jsonl --marm-outbox
+
+# Deliver the pending memories:
+python3 -m memory.sync
+```
+
+The outbox defaults to `~/.local/share/charlie/memory-outbox.sqlite3`.
+Use `--marm-outbox PATH` and `memory.sync --outbox PATH` to choose another file.
+The sync command accepts `--url http://127.0.0.1:8001` (server root, without
+`/mcp`), `--timeout 10`, and `--limit 100`; `CHARLIE_MARM_URL` can set the URL.
+Run sync again after an outage. Capture does no network I/O; a control loop can
+keep running while an independent sync process delivers the queue.
+
+`MarmOutbox` implements `MemoryStore.save()`. It queues the full memory record
+and writes through MARM's public `POST /marm_log_entry`, explicitly scoped to
+project `charlie` and session `charlie-experiences`. Source, confidence, importance,
+selection reason, tags, evidence and formation time are preserved as readable
+metadata in the entry. Optional project/session constructor arguments support
+other producers without changing their memory-selection code.
+
+Sync prints delivered, pending, log-only and error counts/status. A nonzero exit
+means delivery failed; queued entries are retained. A `log_only` count means
+MARM confirmed the durable log but returned no semantic-memory ID. The receipt
+is retained and the log is not resent; inspect MARM's indexing before assuming
+semantic recall is available.
+
+Confirmed records remain locally for audit and are not resent after restart.
+Saving the same candidate twice is idempotent locally. Delivery is **at least
+once**, not exactly once: if the server writes but the connection fails before
+acknowledgment, a later retry can duplicate the remote log. Each entry includes
+a stable Charlie ID for reconciliation. New runs have distinct formation times.
+The outbox serializes sync processes with a Linux file lock (Pi/Mint supported).
+
+The adapter was checked against MARM 2.52.3 source commit
+`f3a9c0749f57541f399476873835474356683d1b`, specifically
+`endpoints/logging.py`, `core/models.py`, and `services/log_entry.py` in
+[the upstream repository](https://github.com/Lyellr88/marm-memory).
+Tests use a local HTTP server with that request/response contract; a live Pi
+MARM install still needs an end-to-end write/recall check.
 
 ## Install on Charlie
 
@@ -96,6 +138,5 @@ network exposure.
 
 ## Next integration
 
-Connect a verified MARM writer to `MemoryStore`, and let the cognition layer
-retrieve relevant memories before planning. As real PPAL outcome/reward signals
+Let the cognition layer retrieve relevant memories before planning. As real PPAL outcome/reward signals
 arrive, feed them as explicit outcome experiences; keep raw transitions in PPAL.

@@ -18,7 +18,10 @@ def main() -> None:
     parser.add_argument("--frames", type=int, default=12)
     parser.add_argument("--interval-ms", type=int, default=100)
     parser.add_argument("--output", type=Path, default=Path("ppal_readiness"))
+    parser.add_argument('--auto-calibrate', action='store_true', help='settle camera and find current game border')
     args = parser.parse_args()
+    if args.auto_calibrate and args.calibration:
+        parser.error('choose auto-calibrate or an explicit calibration, not both')
     if not 1 <= args.frames <= 200 or not 0 <= args.interval_ms <= 5000:
         parser.error("frames must be 1..200 and interval-ms 0..5000")
     if args.source == "images" and args.input is None:
@@ -27,6 +30,9 @@ def main() -> None:
     hud = BitmapHUDReader.load(args.hud_profile) if args.hud_profile else None
     source = make_source(args.source, args.input)
     try:
+        if args.auto_calibrate:
+            from .settle import prepare
+            pipeline.calibration = prepare(source, args.output)
         summary = audit(source, pipeline, args.output, args.frames, args.interval_ms, hud)
     finally:
         source.close()

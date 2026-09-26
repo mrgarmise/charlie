@@ -54,3 +54,30 @@ For labeled live preview:
 ```
 .venv-robotron/bin/python -m experiments.ppal.eyes.serve_eyes --source pi --bind 0.0.0.0 --fps 20 --calibration robotron-runs/playfield-current.json --profile config/robotron/sprites-draft.json
 ```
+
+## Per-recording setup (current default)
+
+All three Pi recording scripts now use --auto-calibrate rather than a saved
+camera position. The same open camera is warmed up for exposure/autofocus,
+then twelve frames are checked for a complete high-contrast colored border.
+Line support on all sides selects the best rectangle; a six-pixel maximum
+corner deviation rejects a view that has not settled. This is geometry
+estimation, not proof of focus or sprite accuracy. Strong reflections, border
+animations, steep angles and partial occlusion can require another attempt.
+
+Each output directory contains calibration.json, setup-raw.png,
+setup-border.png, setup-playfield.png and setup.json. A failed setup records
+setup-failed.png and an explanation and aborts before the recording. The
+recording commands never send controller inputs. The camera may be moved
+between runs, but this version does not track drift during a recording.
+Keep the whole game border visible and reasonably steady for that short run.
+
+Automatic exposure remains enabled by the camera defaults; setup allows it
+to settle. The draft sprite classifier still needs validation under changing
+illumination. Automatic geometric calibration does not make its current color
+examples lighting-invariant. The playfield crop excludes score/lives; keep the
+original camera images for eventual HUD processing.
+
+Validation: located the playfield in both saved camera positions, rejected the
+blank TV capture, and passed synthetic geometry/color and blank-frame tests.
+Pi runtime and new lighting conditions still need live verification.

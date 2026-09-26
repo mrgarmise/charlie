@@ -38,13 +38,19 @@ def main():
     parser.add_argument('--calibration', type=Path)
     parser.add_argument('--profile', type=Path)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--auto-calibrate', action='store_true', help='settle camera and find current game border')
     args = parser.parse_args()
+    if args.auto_calibrate and args.calibration:
+        parser.error('choose auto-calibrate or an explicit calibration, not both')
     if not 1 <= args.frames <= 600:
         parser.error('frames must be 1..600')
     args.output.mkdir(parents=True, exist_ok=False)
     pipeline = make_pipeline(args.source, args.profile, args.calibration)
     source = make_source(args.source, None)
     try:
+        if args.auto_calibrate:
+            from .settle import prepare
+            pipeline.calibration = prepare(source, args.output)
         for _ in range(15):
             source.read()  # Camera exposure/focus warm-up, excluded from timings.
         report = measure(source, pipeline, args.frames)

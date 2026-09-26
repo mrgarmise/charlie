@@ -13,11 +13,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', choices=('pi', 'images'), default='pi')
     parser.add_argument('--input', type=Path)
-    parser.add_argument('--calibration', type=Path, required=True)
+    parser.add_argument('--calibration', type=Path)
     parser.add_argument('--profile', type=Path, required=True)
     parser.add_argument('--frames', type=int, default=60)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--auto-calibrate', action='store_true', help='settle camera and find current game border')
     args = parser.parse_args()
+    if args.auto_calibrate and args.calibration:
+        parser.error('choose auto-calibrate or an explicit calibration, not both')
     if not 1 <= args.frames <= 200:
         parser.error('frames must be 1..200')
     pipeline = make_pipeline(args.source, args.profile, args.calibration)
@@ -27,7 +30,10 @@ def main():
     source = make_source(args.source, args.input)
     rows = []
     try:
-        if args.source == 'pi':
+        if args.auto_calibrate:
+            from .settle import prepare
+            pipeline.calibration = prepare(source, args.output)
+        elif args.source == 'pi':
             for _ in range(15):
                 source.read()
         for tick in range(args.frames):

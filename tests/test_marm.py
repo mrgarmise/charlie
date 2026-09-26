@@ -6,6 +6,7 @@ import threading
 import unittest
 
 from memory.former import Experience, MemoryFormer
+from memory.gateway import MemoryGateway
 from memory.marm import MarmClient, MarmOutbox, MarmWriteError
 
 
@@ -19,7 +20,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(self.server.code)
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
-        self.wfile.write(json.dumps(self.server.response).encode())
+        self.wfile.write(json.dumps(self.server.recall_response if self.path == '/marm_smart_recall' else self.server.response).encode())
 
 
 class MarmTests(unittest.TestCase):
@@ -30,6 +31,7 @@ class MarmTests(unittest.TestCase):
         self.server.requests = []
         self.server.code = 200
         self.server.response = {'status': 'success', 'entry_id': 'log-1', 'memory_id': 'mem-1'}
+        self.server.recall_response = {'status': 'success', 'results': [{'id': 'mem-1', 'content': 'found on LEFT', 'similarity': .9}]}
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.addCleanup(self.stop_server)
@@ -78,6 +80,16 @@ class MarmTests(unittest.TestCase):
         self.assertEqual(box.pending(), 0)
         with self.assertRaises(ValueError):
             MarmClient('http://localhost:8001/mcp')
+
+    def test_recall_uses_charlie_project_and_session(self):
+        gateway = MemoryGateway(store=MarmOutbox(self.path), client=self.client)
+        results = gateway.recall('face search', limit=2)
+        self.assertEqual(results[0].content, 'found on LEFT')
+        path, _, payload = self.server.requests[-1]
+        self.assertEqual(path, '/marm_smart_recall')
+        self.assertEqual((payload['project'], payload['session_name']),
+                         ('charlie', 'charlie-experiences'))
+        self.assertEqual(payload['detail'], 3)
 
     def test_connection_failure_leaves_pending(self):
         box = MarmOutbox(self.path)

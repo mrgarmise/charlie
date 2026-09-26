@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 import time
+import sqlite3
 
 from hardware.elegoo_camera import ElegooCamera
 from vision.mobile_face import MobileFaceDetector
 from behaviors.mobile_face_track import MobileFaceTrackBehavior
+from memory.gateway import MemoryGateway
+from memory.head_search import HeadSearchMemory, preferred_direction
 
 
 camera = ElegooCamera()
@@ -12,7 +15,9 @@ detector = MobileFaceDetector(
     model_path="face_detection_yunet.onnx"
 )
 
-behavior = MobileFaceTrackBehavior()
+memory = MemoryGateway()
+behavior = MobileFaceTrackBehavior(search_preference=preferred_direction(memory))
+search_memory = HeadSearchMemory(memory)
 
 print("Charlie Elegoo Head 2")
 print("Face tracking + yaw-guided ATTEND")
@@ -29,6 +34,10 @@ try:
             status = behavior.update_face(
                 face
             )
+            try:
+                search_memory.observe(behavior, face, status)
+            except (OSError, sqlite3.Error) as error:
+                print(f"\nHead memory queue unavailable: {error}")
 
             if face is not None:
                 print(

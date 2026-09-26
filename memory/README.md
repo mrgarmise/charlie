@@ -70,8 +70,19 @@ The outbox defaults to `~/.local/share/charlie/memory-outbox.sqlite3`.
 Use `--marm-outbox PATH` and `memory.sync --outbox PATH` to choose another file.
 The sync command accepts `--url http://127.0.0.1:8001` (server root, without
 `/mcp`), `--timeout 10`, and `--limit 100`; `CHARLIE_MARM_URL` can set the URL.
-Run sync again after an outage. Capture does no network I/O; a control loop can
-keep running while an independent sync process delivers the queue.
+On the Pi, enable automatic delivery for the current user:
+
+```bash
+bash memory/install_sync_timer.sh
+systemctl --user status charlie-memory-sync.timer
+```
+
+The user timer invokes sync every minute after the first run. Its service reads
+optional `~/.config/charlie/marm.env` with `MARM_API_KEY=...` and/or
+`CHARLIE_MARM_URL=...` when the local MARM server requires those settings.
+Only the current user's service reads this file; keep its permissions private.
+The timer keeps retrying after an outage. Capture does no network I/O; the
+control loop continues while the sync service delivers the queue.
 
 `MarmOutbox` implements `MemoryStore.save()`. It queues the full memory record
 and writes through MARM's public `POST /marm_log_entry`, explicitly scoped to
@@ -140,3 +151,20 @@ network exposure.
 
 Let the cognition layer retrieve relevant memories before planning. As real PPAL outcome/reward signals
 arrive, feed them as explicit outcome experiences; keep raw transitions in PPAL.
+
+## Task memory and head search
+
+`MemoryGateway.remember(Experience(...))` queues selected events from any
+Charlie task. `MemoryGateway.recall(query, limit=5)` returns project- and
+session-scoped memories; callers should use a short timeout and fall back to
+normal behavior when MARM is unavailable. It does not execute recalled text as
+instructions.
+
+`run_elegoo_head2.py` now records a face reacquired after a search, with a
+run/attempt identifier, the initial search direction, and detector confidence.
+This does not identify the person or prove the search caused the detection. At
+startup it checks prior outcomes. Only three independent observations favoring
+one direction by at least two can bias the initial sentry direction, and recent
+face movement/last-seen direction continue to take priority. No actuator limits
+or safety rules change. Other tasks can use the same gateway with their own
+selection and conservative decision policy.

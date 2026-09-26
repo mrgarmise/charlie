@@ -6,7 +6,6 @@ from pathlib import Path
 from memory.former import MemoryFormer
 from memory.ppal import PPALMemoryAdapter
 from memory.store import JsonlStore
-from memory.marm import DEFAULT_OUTBOX, MarmOutbox
 
 from .controller import DryRunController
 from .forebrain import Forebrain
@@ -18,17 +17,12 @@ from .vision import demo_frames
 def main() -> None:
     parser = argparse.ArgumentParser(description="PPAL-0 synthetic rescue demonstration")
     parser.add_argument("--log", type=Path, default=Path("ppal_demo.jsonl"))
-    storage = parser.add_mutually_exclusive_group()
-    storage.add_argument("--memory-log", type=Path,
+    parser.add_argument("--memory-log", type=Path,
                         help="optionally save selected Charlie memories as JSONL")
-    storage.add_argument("--marm-outbox", type=Path, nargs="?", const=DEFAULT_OUTBOX,
-                         help="queue selected memories for python -m memory.sync")
     args = parser.parse_args()
     frames = demo_frames()
     forebrain, hindbrain, controller, memory = Forebrain(), Hindbrain(), DryRunController(), Memory(args.log)
     adapter = PPALMemoryAdapter(MemoryFormer(), JsonlStore(args.memory_log)) if args.memory_log else None
-    if args.marm_outbox:
-        adapter = PPALMemoryAdapter(MemoryFormer(), MarmOutbox(args.marm_outbox), source="ppal:scripted")
     promoted = 0
     print("Scripted observations; actions do not alter the next frame. No learning or hardware control.")
     for before, after in zip(frames, frames[1:]):
@@ -45,7 +39,7 @@ def main() -> None:
     print(f"{frames[-1].tick}: goal={final_goal.kind} (rescue target no longer visible)")
     print(f"Recorded {len(frames) - 1} scripted transitions in {args.log}")
     if adapter:
-        print(f"Selected {promoted} Charlie memories in {args.memory_log or args.marm_outbox}")
+        print(f"Selected {promoted} Charlie memories in {args.memory_log}")
 
 
 if __name__ == "__main__":

@@ -11,6 +11,16 @@ class PiCameraSource:
     def __init__(self, width: int = 1280, height: int = 720) -> None:
         from vision.camera import Camera
         self.camera = Camera(width=width, height=height)
+        try:
+            if "AfMode" in self.camera.picam2.camera_controls:
+                from libcamera import controls
+                self.camera.picam2.set_controls({"AfMode": controls.AfModeEnum.Continuous})
+                print("Camera: continuous autofocus enabled")
+            else:
+                print("Camera: autofocus is not advertised by this camera/driver")
+        except Exception:
+            self.camera.close()
+            raise
 
     def read(self) -> Image.Image:
         # Camera uses Picamera2 RGB888: its array is BGR byte order.

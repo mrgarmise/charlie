@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "domain": "synthetic-rendered-only",
+  "features": [
+    "bias",
+    "sideways_over_lane",
+    "forward_over_range"
+  ],
+  "weights": [
+    9.869539779196483,
+    -19.368830252547873,
+    1.9014477927001028
+  ],
+  "threshold": 0.5
+}

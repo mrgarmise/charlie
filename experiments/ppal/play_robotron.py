@@ -17,7 +17,7 @@ import time
 from .arcade_transport import ArcadeController
 from .forebrain import Forebrain
 from .hindbrain import Hindbrain
-from .models import Object, Position, WorldState
+from .models import Action, Object, Position, WorldState
 from .eyes.sources import PiCameraSource
 from .eyes.settle import prepare
 from .eyes.taught_recognizer import TaughtRecognizer
@@ -147,6 +147,11 @@ def main():
                                targets=targets, threats=threats, alive=True)
             goal = forebrain.update(world)
             intent, action = hindbrain.decide(world, goal)
+            # Hindbrain direction() uses STAY for a zero/deadband vector.
+            # That is valid for movement, but the arcade firing vocabulary uses
+            # NONE for a centered right stick. Normalize at the transport edge.
+            if action.fire == "STAY":
+                action = Action(action.move, "NONE", action.reason)
 
             remaining_ms = int(max(0.0, deadline-time.monotonic()) * 1000)
             if remaining_ms < 30:

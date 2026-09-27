@@ -1,7 +1,7 @@
 """Small live Robotron runner using Charlie's taught eyes and PPAL brain.
 
 This is deliberately bounded: gameplay time defaults to 20 seconds and the
-controller is neutralized on every pulse, on vision loss, and on exit.
+controller is neutralized on every pulse, during vision uncertainty, and on exit.
 Normal play reuses the promoted playfield calibration for fast startup. Charlie
 may start Robotron himself after the camera is ready, then waits for visual proof
 of gameplay before acquiring self. Fresh calibration remains opt-in and occurs
@@ -328,16 +328,84 @@ def main():
             new_player = _player_fix(pairs, player)
             if new_player is None:
                 lost += 1
-                rows.append({"tick": tick, "t": time.monotonic()-started,
-                             "status": "player_lost", "lost": lost})
-                # Do not act on a guessed self location.
-                if lost >= 3:
-                    result = "STOPPED: player lost for 3 consecutive frames"
-                    print(result)
-                    break
+
+                # Uncertainty stops ACTION, not EFFORT.  Never drive from a
+                # guessed self location; neutralize and spend the remaining
+                # gameplay window trying to reacquire Charlie.
+                try:
+                    controller._command("NEUTRAL")
+                except (OSError, ConnectionError):
+                    raise
+
+                recovery_frames = _quick_frames(
+                    source, calibration, recognizer, count=4, interval=0.025)
+                recovered = _appearance_bootstrap(
+                    recovery_frames, min_score=0.78, max_spread=5.0)
+
+                recovery = "appearance"
+                if recovered is None:
+                    # Prefer continuity around the last trustworthy location.
+                    local_fixes = []
+                    anchor = player
+                    for recovery_pairs in recovery_frames:
+                        fix = _player_fix(
+                            recovery_pairs, anchor,
+                            max_distance=min(24.0, 12.0 + lost * 2.0),
+                            min_score=max(0.72, 0.78 - lost * 0.01))
+                        if fix is not None:
+                            local_fixes.append(fix)
+                            anchor = fix
+                    if local_fixes:
+                        recovered = local_fixes[-1]
+                        recovery = "local_continuity"
+
+                # If passive observation still cannot establish self, ask one
+                # small causal question.  This is deliberately occasional,
+                # not every missing frame.
+                if recovered is None and lost >= 3 and lost % 3 == 0:
+                    print(f"REACQUIRING: {lost} misses; trying tiny east self-ID probe")
+                    before_frames = recovery_frames
+                    controller.execute(
+                        Action("E", "NONE", "reacquire self"), 60)
+                    after_frames = _quick_frames(
+                        source, calibration, recognizer, count=4, interval=0.025)
+                    recovered = _causal_bootstrap(
+                        before_frames, after_frames)
+                    if recovered is not None:
+                        recovery = "causal_east_probe"
+
+                if recovered is None:
+                    rows.append({
+                        "tick": tick,
+                        "t": time.monotonic() - started,
+                        "status": "reacquiring",
+                        "lost": lost,
+                        "last_player": list(player),
+                    })
+                    if lost == 1:
+                        print("PLAYER LOST: controls neutral; REACQUIRING")
+                    tick += 1
+                    continue
+
+                player = recovered
+                rows.append({
+                    "tick": tick,
+                    "t": time.monotonic() - started,
+                    "status": "player_reacquired",
+                    "lost": lost,
+                    "method": recovery,
+                    "player": list(player),
+                })
+                print(
+                    f"PLAYER REACQUIRED ({recovery}) after {lost} misses "
+                    f"x={player[0]:.2f} y={player[1]:.2f}")
+                lost = 0
                 tick += 1
                 continue
+
             player = new_player
+            if lost:
+                print(f"PLAYER REACQUIRED (local track) after {lost} misses")
             lost = 0
 
             targets = _objects(pairs, HUMANS, "human")

@@ -8,6 +8,7 @@ import time
 from .benchmark import summarize
 from .cli import make_pipeline, make_source
 from .recording_cues import RecordingCues
+from .tracking import SpriteTracker
 
 
 def countdown(source, seconds, live, cues=None):
@@ -60,6 +61,7 @@ def main():
     source = make_source(args.source, args.input)
     cues = None
     rows = []
+    tracker = SpriteTracker()
     try:
         cues = RecordingCues(args.sound)
         if args.auto_calibrate:
@@ -92,8 +94,14 @@ def main():
             frame.save(args.output / f'raw_{tick:03d}.jpg', quality=90)
             result.annotated.save(args.output / f'view_{tick:03d}.jpg', quality=90)
             finished = time.perf_counter()
+            assignments = tracker.update(tick, result.detections)
+            detections = []
+            for index, detection in enumerate(result.detections):
+                row = asdict(detection)
+                row['track_id'] = assignments[index]
+                detections.append(row)
             rows.append({'tick': tick, 'captured_at_seconds': captured-recording_start, 'counts': dict(Counter(d.kind for d in result.detections)),
-                         'detections': [asdict(d) for d in result.detections],
+                         'detections': detections,
                          'capture': captured-start, 'vision': processed-captured,
                          'save': finished-processed, 'total': finished-start})
             tick += 1
@@ -106,7 +114,13 @@ def main():
         finally:
             if cues:
                 cues.close()
-    summary = {'frames': len(rows), 'controller': 'DISCONNECTED',
+    tracks = tracker.finish()
+    track_rows = [tracker.describe(track) for track in tracks]
+    (args.output / 'tracks.json').write_text(
+        json.dumps({'tracks': track_rows}, indent=2) + '\n'
+    )
+    summary = {'frames': len(rows), 'tracks': len(track_rows),
+               'controller': 'DISCONNECTED',
                'mode': 'OBSERVATION ONLY; labels are unvalidated candidates',
                'source': args.source, 'requested_seconds': args.seconds,
                'recording_seconds': recording_elapsed, 'sound': args.sound,

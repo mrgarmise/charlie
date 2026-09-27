@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 
 
 class PiCameraSource:
-    """Reuses Charlie's existing Picamera2 Camera wrapper on the Pi."""
+    """Reuses Charlie's Picamera2 Camera wrapper on the Pi."""
 
     def __init__(self, width: int = 1280, height: int = 720) -> None:
         from vision.camera import Camera
@@ -15,6 +15,25 @@ class PiCameraSource:
     def read(self) -> Image.Image:
         # Camera uses Picamera2 RGB888: its array is BGR byte order.
         return Image.fromarray(self.camera.read()[..., ::-1].copy(), mode="RGB")
+
+    def autofocus(self) -> None:
+        self.camera.autofocus()
+
+    def manual_focus(self, lens_position: float) -> None:
+        self.camera.manual_focus(lens_position)
+
+    def lens_position(self) -> float | None:
+        return self.camera.lens_position()
+
+    def capture_frame(self):
+        """NumPy frame interface used by PPAL's FocusManager."""
+        return self.camera.read()
+
+    def set_autofocus(self) -> None:
+        self.autofocus()
+
+    def set_manual_focus(self, lens_position: float) -> None:
+        self.manual_focus(lens_position)
 
     def close(self) -> None:
         self.camera.close()

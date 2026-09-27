@@ -2,9 +2,11 @@
 
 This is deliberately bounded: gameplay time defaults to 20 seconds and the
 controller is neutralized on every pulse, on vision loss, and on exit.
-Normal play reuses the promoted playfield calibration for fast startup.  Fresh
-calibration is opt-in because the Robotron border exists only during gameplay.
-The run clock starts only after player acquisition.
+Normal play reuses the promoted playfield calibration for fast startup. Charlie
+may start Robotron himself after the camera is ready, then waits for visual proof
+of gameplay before acquiring self. Fresh calibration remains opt-in and occurs
+only after START because the Robotron border exists only during gameplay. The
+run clock starts only after player acquisition.
 """
 from __future__ import annotations
 
@@ -122,6 +124,34 @@ def _causal_bootstrap(before_frames, after_frames, direction="E", min_motion=0.2
         return None
     return candidates[0][1]
 
+def _acquire_from_frames(frames):
+    """Prefer untouched center spawn, then repeated appearance evidence."""
+    for pairs in frames:
+        player = _center_bootstrap(pairs)
+        if player is not None:
+            return player, "new_game_center"
+    player = _appearance_bootstrap(frames)
+    if player is not None:
+        return player, "appearance"
+    return None, None
+
+
+def _wait_for_gameplay(source, calibration, recognizer, timeout=4.0):
+    """Wait for post-START visual evidence; never act merely because START was ACKed."""
+    deadline = time.monotonic() + timeout
+    collected = []
+    while time.monotonic() < deadline:
+        playfield = calibration.apply(source.read())
+        pairs = recognizer.detect(playfield)
+        collected.append(pairs)
+        collected = collected[-6:]
+        player, acquisition = _acquire_from_frames(collected)
+        if player is not None:
+            return player, acquisition, collected
+        time.sleep(0.025)
+    return None, None, collected
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--seconds", type=float, default=20.0)
@@ -134,7 +164,11 @@ def main():
                         default=Path("config/robotron/playfield-latest.json"),
                         help="promoted playfield calibration used for fast startup")
     parser.add_argument("--recalibrate", action="store_true",
-                        help="rediscover the live game border instead of loading --calibration")
+                        help="after START, rediscover the live game border instead of loading --calibration")
+    parser.add_argument("--no-start-game", action="store_true",
+                        help="do not tap START; use when Robotron gameplay is already running")
+    parser.add_argument("--start-wait", type=float, default=4.0,
+                        help="seconds to wait after START for visual gameplay/self evidence")
     parser.add_argument("--threshold", type=float, default=0.82)
     parser.add_argument("--margin", type=float, default=0.04)
     parser.add_argument("--output", type=Path)
@@ -146,6 +180,8 @@ def main():
         parser.error("--seconds must be 1..60")
     if not 30 <= args.pulse_ms <= 200:
         parser.error("--pulse-ms must be 30..200")
+    if not 1.0 <= args.start_wait <= 10.0:
+        parser.error("--start-wait must be 1..10 seconds")
     if args.output is None:
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         args.output = Path(f"robotron-runs/play-{stamp}")
@@ -162,7 +198,23 @@ def main():
     result = "not started"
 
     try:
+        # Start the camera first. In normal operation this happens while Robotron
+        # is still in attract/demo mode, giving exposure/AF time without costing
+        # any gameplay. No demo-screen calibration is attempted.
+        for _ in range(6):
+            source.read()
+            time.sleep(0.04)
+
+        auto_start = args.arm and not args.no_start_game
+        if auto_start:
+            controller = ArcadeController(args.host, args.port, protocol="positions")
+            print("CAMERA READY; tapping Robotron START")
+            controller._command("START")  # Zero v2 protocol: momentary button tap
+            print("START sent; waiting for visual gameplay evidence")
+
         if args.recalibrate:
+            if not args.arm and not args.no_start_game:
+                raise RuntimeError("--recalibrate needs live gameplay; start the game first and use --no-start-game")
             calibration = prepare(source, args.output)
             calibration_mode = "fresh"
         else:
@@ -171,29 +223,20 @@ def main():
                     f"saved calibration missing: {args.calibration}; run once with --recalibrate")
             calibration = Calibration.load(args.calibration)
             calibration_mode = "saved"
-            # Prime exposure/AF without waiting for border rediscovery.
-            for _ in range(4):
-                source.read()
-                time.sleep(0.04)
             print(f"Loaded calibration: {args.calibration}")
 
-        frames = _quick_frames(source, calibration, recognizer, count=5)
-        player = None
-        acquisition = None
-        for pairs in frames:
-            player = _center_bootstrap(pairs)
-            if player is not None:
-                acquisition = "new_game_center"
-                break
-        if player is None:
-            player = _appearance_bootstrap(frames)
-            if player is not None:
-                acquisition = "appearance"
+        if auto_start:
+            player, acquisition, frames = _wait_for_gameplay(
+                source, calibration, recognizer, timeout=args.start_wait)
+        else:
+            frames = _quick_frames(source, calibration, recognizer, count=5)
+            player, acquisition = _acquire_from_frames(frames)
 
         # If appearance cannot settle the question, ask the game one tiny causal
         # question: move east briefly and watch which player-like sprite obeys.
         if player is None and args.arm:
-            controller = ArcadeController(args.host, args.port, protocol="positions")
+            if controller is None:
+                controller = ArcadeController(args.host, args.port, protocol="positions")
             print("SELF-ID: appearance ambiguous; trying one 60ms east probe")
             controller.execute(Action("E", "NONE", "causal self-identification"), 60)
             after_frames = _quick_frames(source, calibration, recognizer, count=4, interval=0.025)
@@ -285,6 +328,7 @@ def main():
         source.close()
         report = {"result": result, "armed": args.arm, "seconds": args.seconds,
                   "pulse_ms": args.pulse_ms, "ticks": len(rows),
+                  "auto_start": bool(args.arm and not args.no_start_game),
                   "calibration_mode": locals().get("calibration_mode"),
                   "acquisition": locals().get("acquisition"), "steps": rows}
         (args.output / "report.json").write_text(json.dumps(report, indent=2) + "\n")

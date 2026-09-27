@@ -187,7 +187,15 @@ def main():
         if track_id in labeled_ids:
             continue
 
-        paths = crop_paths(args.recording, track_id)
+        # Prefer the authoritative crop paths recorded by build_tracks.
+        recorded_crops = track.get("crops", [])
+        if recorded_crops:
+            paths = [args.recording / Path(path) for path in recorded_crops]
+            paths = [path for path in paths if path.exists()]
+        else:
+            # Backward compatibility with older tracking output.
+            paths = crop_paths(args.recording, track_id)
+
         if len(paths) < 3:
             continue
 

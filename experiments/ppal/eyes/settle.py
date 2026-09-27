@@ -1,4 +1,4 @@
-"""Find Robotron's colored rectangular border anew for each recording."""
+"""Find Robotron's bright rectangular border anew for each recording."""
 import json
 import time
 from pathlib import Path
@@ -12,8 +12,12 @@ def locate(frame):
     rgb = np.asarray(frame.convert('RGB'))
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
     height, width = rgb.shape[:2]
-    mask = ((hsv[:,:,1] > 10) & (hsv[:,:,2] > 155)).astype(np.uint8)*255
-    lines = cv2.HoughLinesP(mask, 1, np.pi/180, 100,
+    # Exposure can wash the colored border out to white. Geometry and
+    # contrast on all four edges, rather than saturation, establish support.
+    mask = (hsv[:, :, 2] > 155).astype(np.uint8)*255
+    # Do not let large bright walls flood the line candidate budget.
+    ridges = mask - cv2.erode(mask, np.ones((15, 15), np.uint8))
+    lines = cv2.HoughLinesP(ridges, 1, np.pi/180, 100,
                            minLineLength=min(width,height)*.35, maxLineGap=30)
     if lines is None:
         raise ValueError('No game border found; show active Robotron and all four corners')
@@ -57,23 +61,31 @@ def locate(frame):
             support=[]
             colors=[]
             for start,end in zip(points,np.roll(points,-1,axis=0)):
-                samples=np.linspace(start,end,100).astype(int)
-                normal=np.array([-(end-start)[1],(end-start)[0]])
-                normal=normal/max(np.linalg.norm(normal),1)*9
-                hits=[]
-                edge_colors=[]
-                for x,y in samples:
-                    sides=[np.array([x,y])+normal,np.array([x,y])-normal]
-                    if any(not (0<=q[0]<width and 0<=q[1]<height) for q in sides):
-                        hits.append(False); continue
-                    patch=rgb[y-2:y+3,x-2:x+3].reshape(-1,3)
-                    pixel=patch[np.argmax(patch.max(axis=1))].astype(float)
-                    edge_colors.append(pixel/max(float(pixel.sum()),1))
-                    peak=float(hsv[y-2:y+3,x-2:x+3,2].max())
-                    side_values=[float(hsv[int(q[1]),int(q[0]),2]) for q in sides]
-                    hits.append(bool(mask[y-2:y+3,x-2:x+3].any()) and peak-max(side_values)>35)
-                support.append(np.mean(hits))
-                colors.append(np.median(edge_colors,axis=0))
+                samples = np.linspace(start, end, 100).astype(int)
+                normal = np.array([-(end-start)[1], (end-start)[0]])
+                normal = normal/max(np.linalg.norm(normal), 1)*12
+                sides = samples[:, None, :] + np.array([normal, -normal])
+                valid = ((sides[:, :, 0] >= 0) & (sides[:, :, 0] < width)
+                         & (sides[:, :, 1] >= 0) & (sides[:, :, 1] < height)).all(axis=1)
+                if not valid.any():
+                    support.append(0.)
+                    colors.append(np.zeros(3))
+                    continue
+                # A thick/soft camera border can put the Hough line several
+                # pixels off its bright ridge. Inspect a bounded neighbourhood.
+                samples = samples[valid]
+                sides = sides[valid].astype(int)
+                offsets = np.arange(-5, 6)
+                xs = np.clip(samples[:, 0, None, None] + offsets[None, None, :], 0, width-1)
+                ys = np.clip(samples[:, 1, None, None] + offsets[None, :, None], 0, height-1)
+                patches = rgb[ys, xs].reshape(-1, 121, 3)
+                peaks = patches.max(axis=2)
+                pixels = patches[np.arange(len(patches)), peaks.argmax(axis=1)].astype(float)
+                side_values = hsv[sides[:, :, 1], sides[:, :, 0], 2].max(axis=1).astype(float)
+                peak = peaks.max(axis=1).astype(float)
+                hits = (peak > 155) & (peak-side_values > 35)
+                support.append(float(hits.sum())/100)
+                colors.append(np.median(pixels/np.maximum(pixels.sum(axis=1, keepdims=True), 1), axis=0))
             if min(support)<.65:
                 continue
             if np.max(np.linalg.norm(np.array(colors)-np.median(colors,axis=0),axis=1))>.10:
@@ -96,14 +108,32 @@ def prepare(source, output: Path):
     observations = []
     frame = None
     try:
-        for _ in range(12):
+        # Require six consecutive agreeing views, but tolerate transient
+        # flashes and give a bumped camera a chance to settle again.
+        deadline = time.monotonic() + 30
+        last_reason = 'No stable game border found'
+        for attempt in range(24):
             frame = source.read()
-            observations.append(locate(frame))
+            try:
+                points = locate(frame)
+            except ValueError as exc:
+                observations.clear()
+                last_reason = str(exc)
+            else:
+                observations.append(points)
+                corners = np.median(observations, axis=0)
+                jitter = float(np.max(np.linalg.norm(np.array(observations)-corners, axis=2)))
+                if jitter > 6:
+                    observations = [points]
+                    last_reason = f'Camera view or detected border still moving ({jitter:.1f}px)'
+                if len(observations) >= 6:
+                    break
+            if time.monotonic() >= deadline:
+                break
             time.sleep(.1)
-        corners = np.median(observations,axis=0)
-        jitter = float(np.max(np.linalg.norm(np.array(observations)-corners,axis=2)))
-        if jitter > 6:
-            raise ValueError(f'Camera view still moving ({jitter:.1f}px); let it settle and retry')
+        if len(observations) < 6:
+            raise ValueError(last_reason + '; could not confirm six stable views. '
+                             'Show the game border and retry; see setup-failed.png')
         calibration = Calibration.from_pixels(corners.tolist(),frame.size)
         calibration.save(output/'calibration.json')
         frame.save(output/'setup-raw.png')
@@ -112,6 +142,7 @@ def prepare(source, output: Path):
         preview.save(output/'setup-border.png')
         calibration.apply(frame).save(output/'setup-playfield.png')
         (output/'setup.json').write_text(json.dumps({'status':'border stable', 'max_jitter_pixels':jitter,
+            'attempts': attempt+1, 'stable_views': len(observations),
             'note':'Geometry check only; does not certify focus, exposure, or object recognition.'},indent=2)+'\n')
         print(f'New screen calibration saved; border jitter {jitter:.1f}px')
         return calibration

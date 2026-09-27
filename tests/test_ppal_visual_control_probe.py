@@ -1,4 +1,12 @@
-from experiments.ppal.visual_control_probe import stable_player_fix, direction_verified
+from experiments.ppal.visual_control_probe import (
+    PlayerFix,
+    stable_player_fix,
+    direction_verified,
+    center_bootstrap_fix,
+    anchored_player_fix,
+    stationary_anchor_fix,
+    motion_probe_fix,
+)
 
 
 def test_stable_player_fix_accepts_repeated_single_candidate():
@@ -30,7 +38,6 @@ def test_direction_verification_cardinals():
     assert direction_verified((50, 50), (50, 51), "S")[0]
     assert not direction_verified((50, 50), (49, 50), "E")[0]
 
-from experiments.ppal.visual_control_probe import center_bootstrap_fix, anchored_player_fix
 
 
 def _candidate(x, y, player_score=.90, kind="unknown"):
@@ -60,3 +67,30 @@ def test_anchored_reacquisition_carries_identity_forward():
 def test_anchored_reacquisition_requires_player_evidence():
     frames = [[_candidate(51, 50, .70)] for _ in range(6)]
     assert anchored_player_fix(frames, (50, 50)) is None
+
+
+
+def _scored_candidate(x, y, player=.88, mine=.70):
+    return {"center": [x, y], "player_score": player,
+            "class_scores": {"player": player, "mine": mine}, "kind": "unknown"}
+
+
+def test_stationary_anchor_uses_neutral_stillness():
+    frames = [[_scored_candidate(52.0 + i*.02, 50.0), _scored_candidate(58+i, 55)]
+              for i in range(6)]
+    fix = stationary_anchor_fix(frames, (50, 50))
+    assert fix is not None
+    assert 51.9 < fix.center[0] < 52.2
+
+
+def test_stationary_anchor_rejects_mine_like_object():
+    frames = [[_scored_candidate(51, 50, player=.80, mine=.93)] for _ in range(6)]
+    assert stationary_anchor_fix(frames, (50, 50)) is None
+
+
+def test_motion_probe_identifies_candidate_that_obeys_command():
+    neutral = PlayerFix((50, 50), 5, 6, .2)
+    frames = [[_candidate(50.8 + i*.02, 50), _candidate(48, 50)] for i in range(6)]
+    fix = motion_probe_fix(neutral, frames, "E")
+    assert fix is not None
+    assert fix.center[0] > 50.7

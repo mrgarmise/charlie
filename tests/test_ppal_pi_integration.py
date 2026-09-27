@@ -1,3 +1,4 @@
+from contextlib import closing
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -17,6 +18,21 @@ from memory.marm import MarmOutbox
 
 
 class PiIntegrationTests(unittest.TestCase):
+    def test_memory_connections_close_on_success_and_error(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as folder:
+            for store in (MarmOutbox(Path(folder) / 'outbox.db'),
+                          MemoryEvaluator(Path(folder) / 'evaluation.db')):
+                with store._connect() as conn:
+                    conn.execute('SELECT 1')
+                with self.assertRaises(sqlite3.ProgrammingError):
+                    conn.execute('SELECT 1')
+                with self.assertRaisesRegex(RuntimeError, 'failure'):
+                    with store._connect() as conn:
+                        raise RuntimeError('failure')
+                with self.assertRaises(sqlite3.ProgrammingError):
+                    conn.execute('SELECT 1')
+
     def test_picamera_bgr_is_converted_for_rgb_detection(self):
         source = PiCameraSource.__new__(PiCameraSource)
         source.camera = SimpleNamespace(read=lambda: np.array([[[10, 20, 200]]], dtype=np.uint8))
@@ -34,7 +50,7 @@ class PiIntegrationTests(unittest.TestCase):
             self.assertIsNone(outcome['reward'])
             self.assertEqual(len({row['run_id'] for row in rows}), 1)
             import sqlite3
-            with sqlite3.connect(root / 'outbox.db') as db:
+            with closing(sqlite3.connect(root / 'outbox.db')) as db:
                 payload = db.execute("SELECT payload FROM outbox").fetchone()[0]
                 self.assertIn("robotron:camera", payload)
                 self.assertIn(rows[0]["run_id"], payload)

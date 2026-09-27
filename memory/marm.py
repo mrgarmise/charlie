@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from contextlib import contextmanager
 import sqlite3
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
@@ -75,8 +76,14 @@ class MarmOutbox:
                 id TEXT PRIMARY KEY, payload TEXT NOT NULL, receipt TEXT,
                 attempts INTEGER NOT NULL DEFAULT 0, last_error TEXT)""")
 
+    @contextmanager
     def _connect(self):
-        return sqlite3.connect(self.path, timeout=10)
+        conn = sqlite3.connect(self.path, timeout=10)
+        try:
+            with conn:
+                yield conn
+        finally:
+            conn.close()
 
     def identity(self, memory: CandidateMemory):
         serialized = json.dumps(memory.to_dict(), sort_keys=True, ensure_ascii=False)

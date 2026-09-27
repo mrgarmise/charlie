@@ -39,8 +39,8 @@ class Plan:
         if not all((self.hypothesis.strip(), self.context.strip(), self.adapter_version.strip(),
                     self.baseline.strip(), self.candidate.strip())) or self.baseline == self.candidate:
             raise ValueError('Specify hypothesis, context, adapter version and distinct policies')
-        if self.pairs < 2 or not 0 < self.alpha < 1:
-            raise ValueError('At least two pairs and alpha within (0,1) are required')
+        if not 2 <= self.pairs <= 2**32 or not 0 < self.alpha < 1:
+            raise ValueError('Between two and 2**32 pairs and alpha within (0,1) are required')
         metrics = (self.primary,) + self.guardrails
         if len({m.name for m in metrics}) != len(metrics):
             raise ValueError('Metric names must be unique')
@@ -102,7 +102,15 @@ def run(plan: Plan, adapter: Adapter, directory: Path):
     (directory / 'plan.json').write_text(serialized + '\n')
     experiment_id = hashlib.sha256(serialized.encode()).hexdigest()
     rng = random.Random(plan.seed)
-    seeds = rng.sample(range(2**32), plan.pairs)
+    # len(range(2**32)) overflows Py_ssize_t on 32-bit Raspberry Pi OS.
+    # Draw without replacement without asking for that population's length.
+    seeds = []
+    seen = set()
+    while len(seeds) < plan.pairs:
+        seed = rng.getrandbits(32)
+        if seed not in seen:
+            seen.add(seed)
+            seeds.append(seed)
     trials = []
     error = None
     for index, seed in enumerate(seeds):

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import hashlib
 import json
 from pathlib import Path
+from contextlib import contextmanager
 import sqlite3
 from typing import Literal
 
@@ -58,8 +59,14 @@ class MemoryEvaluator:
                 CREATE INDEX IF NOT EXISTS idx_candidates_remote ON candidates(remote_key);
             """)
 
+    @contextmanager
     def _connect(self):
-        return sqlite3.connect(self.path, timeout=10)
+        conn = sqlite3.connect(self.path, timeout=10)
+        try:
+            with conn:
+                yield conn
+        finally:
+            conn.close()
 
     @staticmethod
     def feature(event: Experience) -> str:

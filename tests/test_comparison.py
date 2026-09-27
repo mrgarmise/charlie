@@ -1,5 +1,7 @@
 from dataclasses import replace
 from pathlib import Path
+import json
+from unittest.mock import patch
 import tempfile
 import unittest
 
@@ -56,3 +58,14 @@ class ComparisonTests(unittest.TestCase):
             run(self.plan, Adapter(), self.root / 'immutable')
         with self.assertRaises(ValueError):
             run(replace(self.plan, adapter_version='wrong'), Adapter(), self.root / 'wrong')
+
+    def test_seeds_are_unique_reproducible_without_large_population_length(self):
+        with patch('random.Random.sample', side_effect=OverflowError('32-bit population length')):
+            for name in ('first', 'second'):
+                run(self.plan, Adapter(), self.root / name)
+        first = [json.loads(line) for line in (self.root / 'first/trials.jsonl').read_text().splitlines()]
+        second = [json.loads(line) for line in (self.root / 'second/trials.jsonl').read_text().splitlines()]
+        self.assertEqual(first, second)
+        seeds = [row['seed'] for row in first]
+        self.assertEqual(len(set(seeds)), self.plan.pairs)
+        self.assertTrue(all(0 <= seed < 2**32 for seed in seeds))

@@ -29,14 +29,17 @@ class VisionPipeline:
         players = [item for item in detections if item.kind == "player"]
         status = "CALIBRATED" if self.calibration else "UNCALIBRATED"
         world = None
-        if len(players) == 1:
+        observation_only = getattr(self.detector, "observation_only", False)
+        if observation_only:
+            status += " | OBSERVATION ONLY"
+        if len(players) == 1 and not observation_only:
             others = {kind: [item for item in detections if item.kind == kind]
                       for kind in ("human", "threat")}
             def objects(kind: str) -> tuple[Object, ...]:
                 return tuple(Object(f"{kind}_{index}", Position(*item.center))
                              for index, item in enumerate(others[kind], start=1))
             world = WorldState(tick, Position(*players[0].center), objects("human"), objects("threat"))
-        else:
+        elif not observation_only:
             status += f" | player candidates={len(players)}; no WorldState"
         annotated = playfield.copy()
         draw = ImageDraw.Draw(annotated)

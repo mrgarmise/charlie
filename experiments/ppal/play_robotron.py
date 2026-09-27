@@ -2,8 +2,9 @@
 
 This is deliberately bounded: gameplay time defaults to 20 seconds and the
 controller is neutralized on every pulse, on vision loss, and on exit.
-Calibration happens first because the Robotron playfield border exists only
-once gameplay is visible; the run clock starts after calibration/acquisition.
+Normal play reuses the promoted playfield calibration for fast startup.  Fresh
+calibration is opt-in because the Robotron border exists only during gameplay.
+The run clock starts only after player acquisition.
 """
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ from .forebrain import Forebrain
 from .hindbrain import Hindbrain
 from .models import Action, Object, Position, WorldState
 from .eyes.sources import PiCameraSource
+from .eyes.calibration import Calibration
 from .eyes.settle import prepare
 from .eyes.taught_recognizer import TaughtRecognizer
 
@@ -61,6 +63,65 @@ def _objects(pairs, identities, prefix):
                  for i, (kind, center) in enumerate(accepted, 1))
 
 
+
+def _quick_frames(source, calibration, recognizer, count=5, interval=0.035):
+    frames = []
+    for _ in range(count):
+        playfield = calibration.apply(source.read())
+        frames.append(recognizer.detect(playfield))
+        if interval:
+            time.sleep(interval)
+    return frames
+
+
+def _appearance_bootstrap(frames, min_score=0.82, max_spread=4.0):
+    """Use repeated strong player appearance only when it forms one stable cluster."""
+    points = []
+    for pairs in frames:
+        candidates = []
+        for detection, evidence in pairs:
+            score = float(evidence.get("class_scores", {}).get("player", -1.0))
+            if detection.kind == "player" or score >= min_score:
+                candidates.append((score, tuple(detection.center)))
+        if len(candidates) == 1:
+            points.append(candidates[0][1])
+    if len(points) < 3:
+        return None
+    cx = sum(p[0] for p in points) / len(points)
+    cy = sum(p[1] for p in points) / len(points)
+    if max(_distance(p, (cx, cy)) for p in points) > max_spread:
+        return None
+    return (cx, cy)
+
+
+def _causal_bootstrap(before_frames, after_frames, direction="E", min_motion=0.20,
+                      max_match=7.0, min_player_score=0.72):
+    """Find the sprite whose observed displacement matches our tiny probe command."""
+    if direction != "E":
+        raise ValueError("initial causal bootstrap currently supports E only")
+    before = before_frames[-1] if before_frames else []
+    after = after_frames[-1] if after_frames else []
+    candidates = []
+    for bd, be in before:
+        pscore = float(be.get("class_scores", {}).get("player", -1.0))
+        mscore = float(be.get("class_scores", {}).get("mine", -1.0))
+        if pscore < min_player_score or mscore > pscore + 0.02:
+            continue
+        for ad, ae in after:
+            dist = _distance(bd.center, ad.center)
+            dx = ad.center[0] - bd.center[0]
+            dy = ad.center[1] - bd.center[1]
+            if dist <= max_match and dx >= min_motion and abs(dy) <= max(2.5, abs(dx) * 1.5):
+                ascore = float(ae.get("class_scores", {}).get("player", -1.0))
+                score = pscore + ascore + dx * 0.05 - abs(dy) * 0.02
+                candidates.append((score, tuple(ad.center), dx, dy))
+    candidates.sort(reverse=True)
+    if not candidates:
+        return None
+    if len(candidates) > 1 and candidates[0][0] - candidates[1][0] < 0.03:
+        return None
+    return candidates[0][1]
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--seconds", type=float, default=20.0)
@@ -69,6 +130,11 @@ def main():
     parser.add_argument("--pulse-ms", type=int, default=80)
     parser.add_argument("--knowledge", type=Path,
                         default=Path("config/robotron/sprite-knowledge.json"))
+    parser.add_argument("--calibration", type=Path,
+                        default=Path("config/robotron/playfield-latest.json"),
+                        help="promoted playfield calibration used for fast startup")
+    parser.add_argument("--recalibrate", action="store_true",
+                        help="rediscover the live game border instead of loading --calibration")
     parser.add_argument("--threshold", type=float, default=0.82)
     parser.add_argument("--margin", type=float, default=0.04)
     parser.add_argument("--output", type=Path)
@@ -96,26 +162,57 @@ def main():
     result = "not started"
 
     try:
-        calibration = prepare(source, args.output)
-        # New-game spawn is our one-time self bootstrap. Give it several looks.
+        if args.recalibrate:
+            calibration = prepare(source, args.output)
+            calibration_mode = "fresh"
+        else:
+            if not args.calibration.exists():
+                raise RuntimeError(
+                    f"saved calibration missing: {args.calibration}; run once with --recalibrate")
+            calibration = Calibration.load(args.calibration)
+            calibration_mode = "saved"
+            # Prime exposure/AF without waiting for border rediscovery.
+            for _ in range(4):
+                source.read()
+                time.sleep(0.04)
+            print(f"Loaded calibration: {args.calibration}")
+
+        frames = _quick_frames(source, calibration, recognizer, count=5)
         player = None
-        for _ in range(8):
-            frame = calibration.apply(source.read())
-            pairs = recognizer.detect(frame)
+        acquisition = None
+        for pairs in frames:
             player = _center_bootstrap(pairs)
             if player is not None:
+                acquisition = "new_game_center"
                 break
-            time.sleep(0.04)
         if player is None:
-            raise RuntimeError("could not acquire the player at new-game center; controls untouched")
+            player = _appearance_bootstrap(frames)
+            if player is not None:
+                acquisition = "appearance"
 
-        print(f"PLAYER ACQUIRED x={player[0]:.2f} y={player[1]:.2f}")
+        # If appearance cannot settle the question, ask the game one tiny causal
+        # question: move east briefly and watch which player-like sprite obeys.
+        if player is None and args.arm:
+            controller = ArcadeController(args.host, args.port, protocol="positions")
+            print("SELF-ID: appearance ambiguous; trying one 60ms east probe")
+            controller.execute(Action("E", "NONE", "causal self-identification"), 60)
+            after_frames = _quick_frames(source, calibration, recognizer, count=4, interval=0.025)
+            player = _causal_bootstrap(frames, after_frames)
+            if player is not None:
+                acquisition = "causal_east_probe"
+                frames = after_frames
+
+        if player is None:
+            raise RuntimeError("could not identify the player; controls neutral")
+
+        print(f"PLAYER ACQUIRED ({acquisition}) x={player[0]:.2f} y={player[1]:.2f}")
         if not args.arm:
             result = "PREFLIGHT PASS: player acquired; controls untouched"
             print(result)
             return
 
-        controller = ArcadeController(args.host, args.port, protocol="positions")
+        if controller is None:
+            controller = ArcadeController(args.host, args.port, protocol="positions")
         started = time.monotonic()
         deadline = started + args.seconds
         tick = 0
@@ -187,7 +284,9 @@ def main():
                 pass
         source.close()
         report = {"result": result, "armed": args.arm, "seconds": args.seconds,
-                  "pulse_ms": args.pulse_ms, "ticks": len(rows), "steps": rows}
+                  "pulse_ms": args.pulse_ms, "ticks": len(rows),
+                  "calibration_mode": locals().get("calibration_mode"),
+                  "acquisition": locals().get("acquisition"), "steps": rows}
         (args.output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
         print(f"Evidence: {args.output}/report.json")
 

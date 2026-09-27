@@ -147,7 +147,7 @@ def main():
             "examples": len(track_examples),
         })
 
-    testable = [r for r in results if r["result"] != "not_testable"]
+    testable = [r for r in results if r.get("result") != "not_testable"]
     counts = Counter(r["outcome"] for r in testable)
 
     print("ROBOTRON LEAVE-ONE-TRACK-OUT TEST")

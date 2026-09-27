@@ -7,12 +7,15 @@ from pathlib import Path
 import time
 from .benchmark import summarize
 from .cli import make_pipeline, make_source
+from .recording_cues import RecordingCues
 
 
-def countdown(source, seconds, live):
+def countdown(source, seconds, live, cues=None):
     """Count down after calibration, draining live frames to avoid stale input."""
     for remaining in range(seconds, 0, -1):
         print(f'Recording starts in {remaining}...', flush=True)
+        if cues:
+            cues.play('tick')
         if live:
             deadline = time.perf_counter() + 1
             while time.perf_counter() < deadline:
@@ -20,6 +23,8 @@ def countdown(source, seconds, live):
                 time.sleep(.01)
         else:
             time.sleep(1)
+    if cues:
+        cues.play('start')
     print('RECORDING NOW — play your short sequence.', flush=True)
 
 
@@ -33,6 +38,8 @@ def main():
     duration.add_argument('--frames', type=int, help='record 1..200 frames (default: 60)')
     duration.add_argument('--seconds', type=float, help='record for 1..30 seconds after countdown')
     parser.add_argument('--countdown', type=int, default=0, help='0..15 seconds to get ready after calibration')
+    parser.add_argument('--sound', choices=('auto', 'terminal', 'off'), default='off',
+                        help='auto plays through Pi audio; terminal uses the terminal bell')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--auto-calibrate', action='store_true', help='settle camera and find current game border')
     args = parser.parse_args()
@@ -51,21 +58,29 @@ def main():
         parser.error('This recorder requires an observation-only sprite profile')
     args.output.mkdir(parents=True, exist_ok=False)
     source = make_source(args.source, args.input)
+    cues = None
     rows = []
     try:
+        cues = RecordingCues(args.sound)
         if args.auto_calibrate:
             from .settle import prepare
             pipeline.calibration = prepare(source, args.output)
         elif args.source == 'pi':
             for _ in range(15):
                 source.read()
-        countdown(source, args.countdown, args.source == 'pi')
+        countdown(source, args.countdown, args.source == 'pi', cues)
         recording_start = time.perf_counter()
+        halfway_played = False
         tick = 0
         while args.frames is None or tick < args.frames:
             start = time.perf_counter()
             if args.seconds is not None and start-recording_start >= args.seconds:
                 break
+            progress = ((start-recording_start)/args.seconds if args.seconds is not None
+                        else tick/args.frames)
+            if not halfway_played and progress >= .5:
+                cues.play('halfway')
+                halfway_played = True
             try:
                 frame = source.read()
             except EOFError:
@@ -83,13 +98,20 @@ def main():
                          'save': finished-processed, 'total': finished-start})
             tick += 1
         recording_elapsed = time.perf_counter()-recording_start
+        cues.play('finish')
         print(f'RECORDING COMPLETE — {len(rows)} frames in {recording_elapsed:.1f}s. Packaging next.', flush=True)
     finally:
-        source.close()
+        try:
+            source.close()
+        finally:
+            if cues:
+                cues.close()
     summary = {'frames': len(rows), 'controller': 'DISCONNECTED',
                'mode': 'OBSERVATION ONLY; labels are unvalidated candidates',
                'source': args.source, 'requested_seconds': args.seconds,
-               'recording_seconds': recording_elapsed, 'countdown_seconds': args.countdown,
+               'recording_seconds': recording_elapsed, 'sound': args.sound,
+               'game_state': 'unknown',
+               'game_state_note': 'Border calibration does not distinguish attract mode from active play.', 'countdown_seconds': args.countdown,
                'timing': {key: summarize([r[key] for r in rows])
                           for key in ('capture', 'vision', 'save', 'total')} if rows else {}}
     (args.output / 'detections.json').write_text(json.dumps({'summary': summary, 'frames': rows}, indent=2)+'\n')

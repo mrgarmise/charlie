@@ -1,6 +1,6 @@
 """PPAL-2 task-aware focus management.
 
-Hardware-specific camera operations live elsewhere.  This module decides when
+Hardware-specific camera operations live elsewhere. This module decides when
 PPAL should autofocus, lock focus, use a manual position, or recover from blur.
 """
 
@@ -25,6 +25,7 @@ class FocusMode(Enum):
 class FocusStatus:
     mode: FocusMode = FocusMode.AUTO
     lens_position: float | None = None
+    known_good_position: float | None = None
     sharpness: float = 0.0
     baseline_sharpness: float | None = None
     blurry_frames: int = 0
@@ -40,16 +41,18 @@ class FocusConfig:
     # Don't establish a baseline until the image contains useful detail.
     minimum_sharpness: float = 20.0
 
-    # Automatic manual recovery remains disabled until the physical camera
-    # reports its supported LensPosition range.
+    # Automatic recovery remains opt-in.
     recovery_enabled: bool = False
 
-    # Manual recovery search. These are placeholders until hardware discovery.
-    sweep_start: float = 0.0
-    sweep_end: float = 10.0
+    # Physical limits reported by Charlie's IMX708/libcamera stack.
+    lens_min: float = 0.0
+    lens_max: float = 32.0
+
+    # Manual fallback searches near the last known-good position.
+    recovery_radius: float = 1.5
     sweep_step: float = 0.25
 
-    # Frames evaluated at each focus position.
+    # Frames evaluated at each candidate focus position.
     samples_per_position: int = 3
 
 
@@ -102,9 +105,11 @@ class FocusManager:
         self.status.blurry_frames = 0
 
     def lock(self, lens_position: float) -> None:
-        self.camera.set_manual_focus(lens_position)
+        position = self._clamp(lens_position)
+        self.camera.set_manual_focus(position)
         self.status.mode = FocusMode.LOCK
-        self.status.lens_position = lens_position
+        self.status.lens_position = position
+        self.status.known_good_position = position
         self.status.blurry_frames = 0
 
     def observe(self, frame: np.ndarray) -> float:
@@ -117,13 +122,10 @@ class FocusManager:
 
         if score >= self.config.minimum_sharpness:
             if baseline is None:
-                # First sufficiently detailed image establishes normal focus.
                 self.status.baseline_sharpness = score
                 baseline = score
 
             elif score > baseline:
-                # Adapt upward slowly so one unusually detailed game frame
-                # cannot suddenly redefine normal focus.
                 baseline = baseline * 0.95 + score * 0.05
                 self.status.baseline_sharpness = baseline
 
@@ -146,17 +148,28 @@ class FocusManager:
         return score
 
     def recover(self) -> tuple[float, float]:
-        """Sweep configured focus positions and lock the sharpest."""
+        """Search near the last known-good focus and lock the sharpest result."""
 
         self.status.mode = FocusMode.RECOVER
         self.status.recovery_count += 1
 
+        center = self.status.known_good_position
+
+        if center is None:
+            # Without a known-good neighborhood, let hardware autofocus
+            # reacquire rather than blindly sweeping the entire lens range.
+            self.auto()
+            return (0.0, 0.0)
+
+        start = self._clamp(center - self.config.recovery_radius)
+        end = self._clamp(center + self.config.recovery_radius)
+
         best_position: float | None = None
         best_score = -1.0
 
-        position = self.config.sweep_start
+        position = start
 
-        while position <= self.config.sweep_end + 1e-9:
+        while position <= end + 1e-9:
             self.camera.set_manual_focus(position)
 
             scores: list[float] = []
@@ -178,9 +191,11 @@ class FocusManager:
             return (0.0, 0.0)
 
         self.lock(best_position)
-
         self.status.sharpness = best_score
         self.status.baseline_sharpness = best_score
         self.status.blurry_frames = 0
 
         return best_position, best_score
+
+    def _clamp(self, position: float) -> float:
+        return max(self.config.lens_min, min(self.config.lens_max, position))

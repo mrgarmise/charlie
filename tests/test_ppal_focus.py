@@ -50,15 +50,30 @@ def test_auto_requests_camera_autofocus():
     assert focus.status.mode is FocusMode.AUTO
 
 
-def test_lock_holds_requested_lens_position():
+def test_lock_holds_and_remembers_requested_lens_position():
     camera = FakeCamera()
     focus = FocusManager(camera)
 
-    focus.lock(2.5)
+    focus.lock(0.75)
 
-    assert camera.manual_positions[-1] == 2.5
+    assert camera.manual_positions[-1] == 0.75
     assert focus.status.mode is FocusMode.LOCK
-    assert focus.status.lens_position == 2.5
+    assert focus.status.lens_position == 0.75
+    assert focus.status.known_good_position == 0.75
+
+
+def test_lock_clamps_to_physical_lens_range():
+    camera = FakeCamera()
+    focus = FocusManager(
+        camera,
+        FocusConfig(lens_min=0.0, lens_max=32.0),
+    )
+
+    focus.lock(100.0)
+
+    assert camera.manual_positions[-1] == 32.0
+    assert focus.status.lens_position == 32.0
+    assert focus.status.known_good_position == 32.0
 
 
 def test_good_frame_establishes_baseline():
@@ -90,28 +105,67 @@ def test_sustained_blur_is_detected_without_automatic_recovery():
     assert focus.status.mode is FocusMode.AUTO
 
 
-def test_recovery_can_be_explicitly_enabled():
+def test_recovery_without_known_good_position_returns_to_autofocus():
+    camera = FakeCamera()
+    focus = FocusManager(
+        camera,
+        FocusConfig(
+            recovery_enabled=True,
+            blur_frames=2,
+        ),
+    )
+
+    focus.observe(detailed_frame())
+    focus.observe(blurry_frame())
+    focus.observe(blurry_frame())
+
+    assert focus.status.recovery_count == 1
+    assert camera.autofocus_calls == 1
+    assert focus.status.mode is FocusMode.AUTO
+
+
+def test_recovery_searches_near_known_good_position():
     camera = FakeCamera()
     config = FocusConfig(
-        blur_ratio=0.55,
-        blur_frames=2,
         recovery_enabled=True,
-        sweep_start=1.0,
-        sweep_end=1.0,
+        recovery_radius=0.25,
         sweep_step=0.25,
         samples_per_position=1,
     )
     focus = FocusManager(camera, config)
 
-    focus.observe(detailed_frame())
+    # Approximately the position Charlie's real IMX708 selected for Robotron.
+    focus.lock(0.75)
+
+    camera.manual_positions.clear()
     camera.frame = detailed_frame()
 
-    # Force two observations to look blurry without affecting the frame
-    # that recover() obtains from FakeCamera.
-    flat = blurry_frame()
-    focus.observe(flat)
-    focus.observe(flat)
+    best_position, best_score = focus.recover()
 
-    assert focus.status.recovery_count == 1
-    assert camera.manual_positions[-1] == 1.0
+    assert camera.manual_positions[:3] == [0.5, 0.75, 1.0]
+    assert best_position in (0.5, 0.75, 1.0)
+    assert best_score > 0
     assert focus.status.mode is FocusMode.LOCK
+    assert focus.status.known_good_position == best_position
+
+
+def test_recovery_near_zero_never_requests_negative_lens_position():
+    camera = FakeCamera()
+    focus = FocusManager(
+        camera,
+        FocusConfig(
+            lens_min=0.0,
+            lens_max=32.0,
+            recovery_radius=1.5,
+            sweep_step=0.5,
+            samples_per_position=1,
+        ),
+    )
+
+    focus.lock(0.25)
+    camera.manual_positions.clear()
+    camera.frame = detailed_frame()
+
+    focus.recover()
+
+    assert min(camera.manual_positions) >= 0.0

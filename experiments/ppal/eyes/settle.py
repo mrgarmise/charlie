@@ -121,13 +121,28 @@ def prepare(source, output: Path):
                 last_reason = str(exc)
             else:
                 observations.append(points)
+
+                # Keep a short rolling history. Real photographed game borders
+                # have a few pixels of detector jitter from glow, autofocus,
+                # exposure and Hough-line quantisation even when the camera is
+                # physically stationary.
+                observations = observations[-6:]
                 corners = np.median(observations, axis=0)
-                jitter = float(np.max(np.linalg.norm(np.array(observations)-corners, axis=2)))
-                if jitter > 6:
-                    observations = [points]
-                    last_reason = f'Camera view or detected border still moving ({jitter:.1f}px)'
-                if len(observations) >= 6:
+                jitter = float(np.max(
+                    np.linalg.norm(np.array(observations) - corners, axis=2)
+                ))
+
+                if len(observations) >= 6 and jitter <= 8:
                     break
+
+                if jitter > 8:
+                    # Reject the oldest observation rather than destroying the
+                    # entire stable sequence because of one marginal frame.
+                    observations.pop(0)
+                    last_reason = (
+                        f'Camera view or detected border still moving '
+                        f'({jitter:.1f}px)'
+                    )
             if time.monotonic() >= deadline:
                 break
             time.sleep(.1)

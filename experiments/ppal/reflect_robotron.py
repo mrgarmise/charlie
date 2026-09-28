@@ -60,6 +60,23 @@ def analyze(summary, rows, tracks):
         "visual_tracks": len(tracks),
     }
 
+    # Reliability is about the replay interpretation, not about success in the game.
+    # A replay with unstable SELF or an implausibly fragmented visual field should
+    # diagnose perception before drawing strategy conclusions.
+    tracks_per_frame = 0.0 if not frames else len(tracks) / frames
+    observations["tracks_per_frame"] = round(tracks_per_frame, 2)
+    reliability_reasons = []
+    if observations["self_unknown_pct"] >= 15:
+        reliability_reasons.append("SELF unknown on >=15% of frames")
+    if reacq >= 3:
+        reliability_reasons.append("SELF reacquired >=3 times")
+    if tracks_per_frame >= 3:
+        reliability_reasons.append("visual tracking is highly fragmented")
+    if decisions and target_frames == 0 and threat_frames == decisions:
+        reliability_reasons.append("semantic coverage is all-threat/no-target")
+    observations["replay_reliable_for_strategy"] = not reliability_reasons
+    observations["reliability_reasons"] = reliability_reasons
+
     findings = []
     if unknown:
         findings.append(("self_uncertainty",
@@ -76,6 +93,10 @@ def analyze(summary, rows, tracks):
         findings.append(("perception_coverage",
                          f"Targets appeared on {target_frames}/{decisions} decision frames and "
                          f"threats on {threat_frames}/{decisions}."))
+    if reliability_reasons:
+        findings.append(("replay_quality",
+                         "Replay is not yet reliable for strategy conclusions: "
+                         + "; ".join(reliability_reasons) + "."))
     return observations, findings
 
 
@@ -141,8 +162,13 @@ def reflect(replay_dir, gateway=None, questions_path=DEFAULT_QUESTIONS):
             subject=category,
             confidence=1.0,
             novelty=not recurring,
-            significant=recurring or category in ("self_uncertainty", "inaction"),
-            tags=("robotron", "reflection", category),
+            significant=(recurring
+                         or category in ("self_uncertainty", "replay_quality")
+                         or (category == "inaction"
+                             and observations["replay_reliable_for_strategy"])),
+            tags=("robotron", "reflection", category,
+                  "diagnostic" if not observations["replay_reliable_for_strategy"]
+                  else "strategy-capable"),
             evidence=f"robotron:{episode_key}:{category}",
         )
         if gateway.remember(event):
@@ -151,7 +177,8 @@ def reflect(replay_dir, gateway=None, questions_path=DEFAULT_QUESTIONS):
     questions = []
     # Questions are deliberately about interpretation/teaching, not facts the
     # replay can settle by counting its own evidence.
-    if observations["stay_none_pct_of_decisions"] >= 50:
+    if (observations["stay_none_pct_of_decisions"] >= 50
+            and observations["replay_reliable_for_strategy"]):
         qid = f"robotron:{episode_key}:inaction-meaning"
         questions.append({
             "id": qid,
@@ -162,8 +189,8 @@ def reflect(replay_dir, gateway=None, questions_path=DEFAULT_QUESTIONS):
                 f"I chose STAY/NONE on {observations['stay_none_frames']}/"
                 f"{observations['decisions']} decision frames "
                 f"({observations['stay_none_pct_of_decisions']:.1f}%). "
-                "When we review representative frames, should those be genuine "
-                "wait decisions, or evidence that I failed to perceive something actionable?"
+                "My replay passed its perception-quality checks. When we review "
+                "representative frames, were these appropriate wait decisions?"
             ),
             "evidence": str(replay_dir / "replay.json"),
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -188,7 +215,7 @@ def reflect(replay_dir, gateway=None, questions_path=DEFAULT_QUESTIONS):
     queued = sum(_queue_question(questions_path, q) for q in questions)
 
     result = {
-        "schema": "charlie-robotron-reflection-v1",
+        "schema": "charlie-robotron-reflection-v2",
         "recording": recording,
         "replay": str(replay_dir),
         "observations": observations,
@@ -221,6 +248,10 @@ def main():
     print(f"SELF REACQUISITIONS: {o['self_reacquisitions']}")
     print(f"STAY/NONE: {o['stay_none_frames']}/{o['decisions']} decisions "
           f"({o['stay_none_pct_of_decisions']:.1f}%)")
+    print("STRATEGY RELIABILITY: "
+          + ("PASS" if o["replay_reliable_for_strategy"] else "DEFER"))
+    if o["reliability_reasons"]:
+        print("WHY: " + "; ".join(o["reliability_reasons"]))
     print(f"PRIOR LOCAL MEMORIES: {result['comparison']['local_memories_considered']}")
     print(f"REMOTE RECALLS: {result['comparison']['remote_memories_recalled']}")
     print(f"MEMORIES PROMOTED: {len(result['memory']['promoted_categories'])}")

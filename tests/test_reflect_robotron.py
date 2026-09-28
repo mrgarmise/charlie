@@ -54,3 +54,43 @@ def test_reflection_uses_existing_memory_gateway(tmp_path):
     assert (replay / "reflection.json").exists()
     assert (tmp_path / "questions.jsonl").exists()
     assert evaluator.recent()
+
+
+def test_unreliable_replay_defers_strategy_question(tmp_path):
+    replay = tmp_path / "replay"
+    replay.mkdir()
+    (replay / "summary.json").write_text(json.dumps({
+        "recording": "robotron-runs/noisy",
+        "frames": 10, "decision_frames": 8, "self_unknown_frames": 2,
+        "self_reacquisitions": 4,
+        "actions": [{"move": "STAY", "fire": "NONE", "count": 7}],
+    }))
+    (replay / "replay.json").write_text(json.dumps([
+        {"status": "decision", "targets": [], "threats": [{"id": "threat_1"}]}
+        for _ in range(8)
+    ]))
+    (replay / "tracks.json").write_text(json.dumps({
+        "tracks": [{"track_id": i} for i in range(40)]
+    }))
+
+    evaluator = MemoryEvaluator(path=tmp_path / "eval.sqlite3", exploration_rate=0)
+    gateway = MemoryGateway(
+        store=JsonlStore(tmp_path / "memories.jsonl"),
+        client=type("Offline", (), {
+            "url": "http://127.0.0.1:1/marm_log_entry",
+            "api_key": None, "timeout": 0.01, "opener": None
+        })(),
+        evaluator=evaluator,
+    )
+    import experiments.ppal.reflect_robotron as module
+    old = module._prior_remote
+    module._prior_remote = lambda gateway, query: []
+    try:
+        result = reflect(replay, gateway=gateway,
+                         questions_path=tmp_path / "questions.jsonl")
+    finally:
+        module._prior_remote = old
+
+    assert result["observations"]["replay_reliable_for_strategy"] is False
+    assert "visual tracking is highly fragmented" in result["observations"]["reliability_reasons"]
+    assert not any(q["category"] == "strategy" for q in result["questions"])

@@ -22,6 +22,7 @@ from .forebrain import Forebrain
 from .hindbrain import Hindbrain
 from .vision_tracker import ObjectTracker
 from .robotron_session import PersistentSelfTracker
+from .shadow_predictor import ShadowPredictor, action_dict
 from .models import Action, Object, Position, WorldState
 from .eyes.sources import PiCameraSource
 from .eyes.calibration import Calibration
@@ -251,6 +252,9 @@ def main():
     recognizer = TaughtRecognizer.load(args.knowledge, args.threshold, args.margin)
     forebrain = Forebrain()
     hindbrain = Hindbrain()
+    shadow_forebrain = Forebrain()
+    shadow_hindbrain = Hindbrain()
+    shadow_predictor = ShadowPredictor(horizon_ticks=1)
     object_tracker = ObjectTracker()
     self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3)
     source = PiCameraSource()
@@ -450,6 +454,16 @@ def main():
             world = object_tracker.update(world)
             goal = forebrain.update(world)
             intent, action = hindbrain.decide(world, goal)
+
+            # SHADOW ONLY: anticipate the next visual state and ask a separate
+            # PPAL brain what it would do.  The real controller below still
+            # receives `action`, never `shadow_action`.
+            shadow_predictor.observe(world)
+            projected_world = shadow_predictor.project(world)
+            shadow_goal = shadow_forebrain.update(projected_world)
+            shadow_intent, shadow_action = shadow_hindbrain.decide(
+                projected_world, shadow_goal)
+
             # Hindbrain direction() uses STAY for a zero/deadband vector.
             # That is valid for movement, but the arcade firing vocabulary uses
             # NONE for a centered right stick. Normalize at the transport edge.
@@ -474,6 +488,20 @@ def main():
                 "intent": {"kind": intent.kind, "target_id": intent.target_id},
                 "action": {"move": action.move, "fire": action.fire,
                            "reason": action.reason},
+                "shadow": {
+                    "prediction": shadow_predictor.snapshot(
+                        world, projected_world),
+                    "goal": {"kind": shadow_goal.kind,
+                             "target_id": shadow_goal.target_id},
+                    "intent": {"kind": shadow_intent.kind,
+                               "target_id": shadow_intent.target_id},
+                    "action": action_dict(shadow_action),
+                    "differs": (
+                        shadow_action.move != action.move
+                        or ("NONE" if shadow_action.fire == "STAY"
+                            else shadow_action.fire) != action.fire
+                    ),
+                },
             })
             tick += 1
         else:

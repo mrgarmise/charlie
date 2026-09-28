@@ -99,33 +99,118 @@ def _appearance_bootstrap(frames, min_score=0.82, max_spread=4.0):
     return (cx, cy)
 
 
-def _causal_bootstrap(before_frames, after_frames, direction="E", min_motion=0.20,
-                      max_match=7.0, min_player_score=0.72):
-    """Find the sprite whose observed displacement matches our tiny probe command."""
-    if direction != "E":
-        raise ValueError("initial causal bootstrap currently supports E only")
+def _causal_bootstrap(before_frames, after_frames, direction="E",
+                      min_motion=0.20, max_match=7.0,
+                      min_player_score=0.72, anchor=None):
+    """Find a player-looking sprite whose displacement obeys our probe."""
+    vectors = {
+        "E": (1.0, 0.0),
+        "S": (0.0, 1.0),
+        "W": (-1.0, 0.0),
+        "N": (0.0, -1.0),
+    }
+    if direction not in vectors:
+        raise ValueError(f"unsupported causal direction: {direction}")
+
+    vx, vy = vectors[direction]
     before = before_frames[-1] if before_frames else []
     after = after_frames[-1] if after_frames else []
     candidates = []
+
     for bd, be in before:
         pscore = float(be.get("class_scores", {}).get("player", -1.0))
         mscore = float(be.get("class_scores", {}).get("mine", -1.0))
+
         if pscore < min_player_score or mscore > pscore + 0.02:
             continue
+
+        if anchor is not None and _distance(bd.center, anchor) > max_match:
+            continue
+
         for ad, ae in after:
             dist = _distance(bd.center, ad.center)
             dx = ad.center[0] - bd.center[0]
             dy = ad.center[1] - bd.center[1]
-            if dist <= max_match and dx >= min_motion and abs(dy) <= max(2.5, abs(dx) * 1.5):
-                ascore = float(ae.get("class_scores", {}).get("player", -1.0))
-                score = pscore + ascore + dx * 0.05 - abs(dy) * 0.02
-                candidates.append((score, tuple(ad.center), dx, dy))
+
+            along = dx * vx + dy * vy
+            sideways = abs(dx * vy - dy * vx)
+
+            if (dist <= max_match
+                    and along >= min_motion
+                    and sideways <= max(2.5, abs(along) * 1.5)):
+                ascore = float(
+                    ae.get("class_scores", {}).get("player", -1.0))
+                score = (
+                    pscore + ascore
+                    + along * 0.05
+                    - sideways * 0.02
+                )
+                candidates.append(
+                    (score, tuple(ad.center), dx, dy))
+
     candidates.sort(reverse=True)
+
     if not candidates:
         return None
-    if len(candidates) > 1 and candidates[0][0] - candidates[1][0] < 0.03:
+
+    if (len(candidates) > 1
+            and candidates[0][0] - candidates[1][0] < 0.03):
         return None
+
     return candidates[0][1]
+
+
+def _control_challenge(source, calibration, recognizer, controller,
+                       initial_frames=None, pulse_ms=60):
+    """Require a suspected SELF to demonstrate control: E, S, W."""
+    frames = initial_frames or _quick_frames(
+        source, calibration, recognizer, count=4, interval=0.025)
+
+    anchor = None
+    evidence = []
+
+    for direction in ("E", "S", "W"):
+        before = frames
+
+        controller.execute(
+            Action(direction, "NONE", "control challenge"),
+            pulse_ms)
+
+        after = _quick_frames(
+            source, calibration, recognizer,
+            count=4, interval=0.025)
+
+        observed = _causal_bootstrap(
+            before, after,
+            direction=direction,
+            anchor=anchor)
+
+        evidence.append({
+            "direction": direction,
+            "obeyed": observed is not None,
+            "observed": (
+                list(observed)
+                if observed is not None
+                else None
+            ),
+        })
+
+        if observed is not None:
+            anchor = observed
+
+        frames = after
+
+    hits = sum(x["obeyed"] for x in evidence)
+
+    return {
+        "confirmed": hits >= 2,
+        "hits": hits,
+        "attempts": 3,
+        "player": anchor if hits >= 2 else None,
+        "evidence": evidence,
+        "frames": frames,
+    }
+
 
 def _stable_center_bootstrap(frames, radius=5.0, min_support=3, max_spread=3.0):
     """Require the new-game center candidate to persist, not merely flash once."""
@@ -386,20 +471,47 @@ def main():
                         recovered = local_fixes[-1]
                         recovery = "local_continuity"
 
-                # If passive observation still cannot establish self, ask one
-                # small causal question.  This is deliberately occasional,
-                # not every missing frame.
-                if recovered is None and lost >= 3 and lost % 3 == 0:
-                    print(f"REACQUIRING: {lost} misses; trying tiny east self-ID probe")
-                    before_frames = recovery_frames
-                    controller.execute(
-                        Action("E", "NONE", "reacquire self"), 60)
-                    after_frames = _quick_frames(
-                        source, calibration, recognizer, count=4, interval=0.025)
-                    recovered = _causal_bootstrap(
-                        before_frames, after_frames)
-                    if recovered is not None:
-                        recovery = "causal_east_probe"
+                # After sustained uncertainty, visual resemblance is not
+                # sufficient. Ask the suspected SELF to demonstrate agency.
+                if lost >= 3:
+                    print(
+                        f"REACQUIRING: {lost} misses; "
+                        "running E/S/W control challenge")
+
+                    challenge = _control_challenge(
+                        source, calibration, recognizer, controller,
+                        initial_frames=recovery_frames)
+
+                    rows.append({
+                        "tick": tick,
+                        "t": time.monotonic() - started,
+                        "status": "control_challenge",
+                        "lost": lost,
+                        "confirmed": challenge["confirmed"],
+                        "hits": challenge["hits"],
+                        "attempts": challenge["attempts"],
+                        "evidence": challenge["evidence"],
+                    })
+
+                    if challenge["confirmed"]:
+                        recovered = challenge["player"]
+                        recovery = "causal_control_challenge"
+
+                        final_pairs = challenge["frames"][-1]
+                        detections = [d for d, _ in final_pairs]
+
+                        print(
+                            "CONTROL CONFIRMED: "
+                            f"{challenge['hits']}/"
+                            f"{challenge['attempts']}")
+                    else:
+                        result = "NOT_GAMEPLAY: control challenge failed"
+                        print(
+                            "NOT GAMEPLAY: control challenge "
+                            f"{challenge['hits']}/"
+                            f"{challenge['attempts']}; "
+                            "ending episode")
+                        break
 
                 if recovered is None:
                     rows.append({

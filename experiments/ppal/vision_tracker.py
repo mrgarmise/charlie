@@ -24,6 +24,10 @@ class ObjectTracker:
                                 key=lambda pair: (pair[0], pair[1], pair[2].position.x,
                                                   pair[2].position.y))
             for distance, ident, new in candidates:
+                alternatives = [d for d,i,n in candidates
+                                if (i == ident and n is not new) or (n is new and i != ident)]
+                if alternatives and min(alternatives) <= distance + .5:
+                    continue
                 if distance > self.max_jump or ident in current or new not in unmatched:
                     continue
                 stable = Object(ident, new.position)

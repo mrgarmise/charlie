@@ -102,7 +102,10 @@ class PersistentSelfTracker:
         choices = [(self._distance(d.center, player_center), i) for i, d in enumerate(detections)]
         if not choices:
             return SelfObservation(tick, None, None, "seed_missing", self.misses)
-        distance, index = min(choices)
+        choices.sort()
+        distance, index = choices[0]
+        if len(choices) > 1 and choices[1][0]-distance < .5:
+            return SelfObservation(tick, None, None, 'seed_ambiguous', self.misses)
         if distance > max_seed_distance:
             return SelfObservation(tick, None, None, "seed_too_far", self.misses)
         self.player_track_id = assignments[index]

@@ -16,6 +16,8 @@ import json
 import math
 from pathlib import Path
 import time
+import hashlib
+import subprocess
 
 from .arcade_transport import ArcadeController
 from .forebrain import Forebrain
@@ -140,6 +142,8 @@ def _causal_bootstrap(before_frames, after_frames, direction="E",
                     and sideways <= max(2.5, abs(along) * 1.5)):
                 ascore = float(
                     ae.get("class_scores", {}).get("player", -1.0))
+                if ascore < min_player_score:
+                    continue
                 score = (
                     pscore + ascore
                     + along * 0.05
@@ -195,18 +199,20 @@ def _control_challenge(source, calibration, recognizer, controller,
             ),
         })
 
-        if observed is not None:
-            anchor = observed
+        if observed is None:
+            # A failed leg breaks evidence continuity; do not combine different sprites.
+            break
+        anchor = observed
 
         frames = after
 
     hits = sum(x["obeyed"] for x in evidence)
 
     return {
-        "confirmed": hits >= 2,
+        "confirmed": hits == 3,
         "hits": hits,
-        "attempts": 3,
-        "player": anchor if hits >= 2 else None,
+        "attempts": len(evidence),
+        "player": anchor if hits == 3 else None,
         "evidence": evidence,
         "frames": frames,
     }
@@ -339,11 +345,25 @@ def main():
     hindbrain = Hindbrain()
     shadow_forebrain = Forebrain()
     shadow_hindbrain = Hindbrain()
-    shadow_predictor = ShadowPredictor(horizon_ticks=1)
+    shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
     object_tracker = ObjectTracker()
     self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3)
     source = PiCameraSource()
     rows = []
+    review_frames = []
+    def save_review(raw, tick, reason):
+        if len(review_frames) >= (40 if reason == 'final-view' else 39):
+            return
+        name = f'review-{len(review_frames):03d}-{tick}-{reason}.jpg'
+        raw.save(args.output/name, quality=85)
+        review_frames.append({'tick':tick,'reason':reason,'path':name})
+    try:
+        revision = subprocess.check_output(['git','rev-parse','HEAD'],text=True,stderr=subprocess.DEVNULL).strip()
+        dirty = bool(subprocess.check_output(['git','status','--porcelain'],text=True,stderr=subprocess.DEVNULL))
+    except (OSError,subprocess.CalledProcessError):
+        revision,dirty = None,None
+    provenance = {'git_commit':revision,'dirty_worktree':dirty,
+                  'knowledge_sha256':hashlib.sha256(args.knowledge.read_bytes()).hexdigest()}
     controller = None
     result = "not started"
 
@@ -427,6 +447,7 @@ def main():
 
         while time.monotonic() < deadline:
             raw = source.read()
+            observed_at = time.monotonic()-started
             playfield = calibration.apply(raw)
             pairs = recognizer.detect(playfield)
             detections = [d for d, _ in pairs]
@@ -440,6 +461,8 @@ def main():
 
             if new_player is None:
                 lost += 1
+                if lost in (1,3):
+                    save_review(raw,tick,'identity-loss')
 
                 # Uncertainty stops ACTION, not EFFORT.  Never drive from a
                 # guessed self location; neutralize and spend the remaining
@@ -451,8 +474,7 @@ def main():
 
                 recovery_frames = _quick_frames(
                     source, calibration, recognizer, count=4, interval=0.025)
-                recovered = _appearance_bootstrap(
-                    recovery_frames, min_score=0.78, max_spread=5.0)
+                recovered = None  # Global resemblance is not proof of a new SELF.
 
                 recovery = "appearance"
                 if recovered is None:
@@ -467,7 +489,7 @@ def main():
                         if fix is not None:
                             local_fixes.append(fix)
                             anchor = fix
-                    if local_fixes:
+                    if len(local_fixes) >= 3:
                         recovered = local_fixes[-1]
                         recovery = "local_continuity"
 
@@ -505,9 +527,9 @@ def main():
                             f"{challenge['hits']}/"
                             f"{challenge['attempts']}")
                     else:
-                        result = "NOT_GAMEPLAY: control challenge failed"
+                        result = "UNCERTAIN: control challenge failed"
                         print(
-                            "NOT GAMEPLAY: control challenge "
+                            "UNCONFIRMED GAME STATE: control challenge "
                             f"{challenge['hits']}/"
                             f"{challenge['attempts']}; "
                             "ending episode")
@@ -526,6 +548,12 @@ def main():
                     tick += 1
                     continue
 
+                # Recovery used NEW frames. Do not seed against the stale pre-recovery view.
+                if recovery != 'causal_control_challenge':
+                    detections = [d for d, _ in recovery_frames[-1]]
+                object_tracker = ObjectTracker()
+                shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
+                forebrain = Forebrain(); shadow_forebrain = Forebrain()
                 player = recovered
                 reseed = self_tracker.reseed(
                     tick + 1, detections, player, max_seed_distance=7.0)
@@ -547,6 +575,8 @@ def main():
                 tick += 1
                 continue
 
+            if tick % 50 == 0:
+                save_review(raw,tick,'gameplay')
             player = new_player
             if self_obs.center is None:
                 reseed = self_tracker.reseed(
@@ -570,7 +600,7 @@ def main():
             # SHADOW ONLY: anticipate the next visual state and ask a separate
             # PPAL brain what it would do.  The real controller below still
             # receives `action`, never `shadow_action`.
-            shadow_predictor.observe(world)
+            shadow_predictor.observe(world, observed_at)
             projected_world = shadow_predictor.project(world)
             shadow_goal = shadow_forebrain.update(projected_world)
             shadow_intent, shadow_action = shadow_hindbrain.decide(
@@ -592,7 +622,7 @@ def main():
                 break
             controller.execute(action, pulse_ms)
             rows.append({
-                "tick": tick, "t": time.monotonic()-started,
+                "tick": tick, "observed_at": observed_at, "t": time.monotonic()-started,
                 "player": list(player),
                 "self_track_id": self_tracker.player_track_id,
                 "targets": len(targets), "threats": len(threats),
@@ -623,6 +653,9 @@ def main():
     except KeyboardInterrupt:
         result = "INTERRUPTED"
         print("INTERRUPTED; neutralizing")
+    except Exception as exc:
+        result = f'ERROR: {type(exc).__name__}: {exc}'
+        raise
     finally:
         if controller is not None:
             try:
@@ -630,8 +663,13 @@ def main():
             except (OSError, ConnectionError):
                 pass
         source.close()
-        report = {"result": result, "armed": args.arm, "seconds": args.seconds,
+        if 'raw' in locals():
+            save_review(raw,locals().get('tick',0),'final-view')
+        report = {"provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
                   "pulse_ms": args.pulse_ms, "ticks": len(rows),
+                  "episode_end": {"state": "unknown", "confirmed": False, "evidence": None},
+                  "score": None, "score_status": "unmeasured",
+                  "learning_mode": "fixed_policy_with_shadow_diagnostics",
                   "auto_start": bool(args.arm and not args.no_start_game),
                   "calibration_mode": locals().get("calibration_mode"),
                   "acquisition": locals().get("acquisition"),

@@ -33,11 +33,23 @@ def established_gameplay(report):
     return bool(report.get("armed") and report.get("acquisition") and
                 any("action" in s for s in steps))
 
+def safe_to_restart(report, returncode=0):
+    """Only an explicit, evidenced terminal screen may authorize another START."""
+    if returncode != 0 or not report:
+        return False
+    end = report.get('episode_end', {})
+    return (end.get('state') == 'game_over' and end.get('confirmed') is True
+            and bool(end.get('evidence')))
+
+
 def write_session(path, doc):
-    path.write_text(json.dumps(doc,indent=2)+"\n")
+    temporary = path.with_suffix(path.suffix+".tmp")
+    temporary.write_text(json.dumps(doc,indent=2)+"\n")
+    temporary.replace(path)
 
 def meditate_session(session_dir, games):
     """Never merge games. Analyze each episode separately, then summarize metadata."""
+    from .learning_review import review_session
     results=[]
     for game in games:
         g=Path(game["path"])
@@ -63,6 +75,7 @@ def meditate_session(session_dir, games):
     }
     p=session_dir/"meditation.json"
     p.write_text(json.dumps(summary,indent=2)+"\n")
+    review_session(session_dir, games)
     print(f"MEDITATION COMPLETE: {p}")
 
 def main():
@@ -75,6 +88,13 @@ def main():
     ap.add_argument("--root",type=Path,default=Path("robotron-runs"))
     ap.add_argument("--arm",action="store_true",help="required to send controls")
     a=ap.parse_args()
+    import math
+    if not 1 <= a.max_games <= 100: ap.error('--max-games must be 1..100')
+    if not math.isfinite(a.game_seconds) or not 1 <= a.game_seconds <= 3600:
+        ap.error('--game-seconds must be 1..3600')
+    if not 1 <= a.failed_starts <= 10: ap.error('--failed-starts must be 1..10')
+    if not math.isfinite(a.retry_wait) or not 0 <= a.retry_wait <= 60:
+        ap.error('--retry-wait must be 0..60')
     if not a.arm: ap.error("--arm is required for an autonomous marathon")
     session=a.root/f"marathon-{stamp()}"
     session.mkdir(parents=True,exist_ok=False)
@@ -107,7 +127,11 @@ def main():
                     print("GAMEPLAY HIT SAFETY HORIZON; stopping marathon rather than risking START mid-game.")
                     doc["status"]="safety_horizon"
                     break
-                print("GAME ENDED / gameplay no longer established; preparing next START.")
+                if not safe_to_restart(report, rc):
+                    doc['status'] = 'needs_episode_end_review'
+                    print('STOP: tracking loss is not confirmed game over; no further START.')
+                    break
+                print("Confirmed game over; preparing next START.")
                 time.sleep(a.retry_wait)
                 continue
 
@@ -116,6 +140,9 @@ def main():
                                          "at":datetime.now(timezone.utc).isoformat()})
             write_session(session/"session.json",doc)
             print(f"NO GAMEPLAY after START attempt {failures}/{a.failed_starts}")
+            if not safe_to_restart(report, rc):
+                doc['status'] = 'unverified_start_or_episode_end'
+                break
             if failures >= a.failed_starts:
                 doc["status"]="credits_exhausted_or_gameplay_unavailable"
                 break
@@ -128,7 +155,7 @@ def main():
         write_session(session/"session.json",doc)
         print(f"MARATHON ENDED: {doc['status']}; games={len(doc['games'])}")
         print("ENTERING MEDITATION")
-        meditate_session(session,doc["games"])
+        meditate_session(session,doc["games"]+doc["failed_starts"])
 
 if __name__=="__main__":
     main()

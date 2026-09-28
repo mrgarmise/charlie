@@ -7,7 +7,7 @@ The shadow brain may recommend an action, but it never touches the controller.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import hypot
+from math import hypot, isfinite
 
 from .models import Object, Position, WorldState
 
@@ -25,7 +25,11 @@ class ShadowPredictor:
     """Causal constant-velocity projector for live PPAL shadow evaluation."""
 
     def __init__(self, horizon_ticks: int = 1, velocity_alpha: float = 0.65,
-                 max_speed: float = 12.0) -> None:
+                 max_speed: float = 12.0, horizon_seconds: float | None = None) -> None:
+        if horizon_seconds is not None and (not isfinite(horizon_seconds) or horizon_seconds <= 0):
+            raise ValueError('horizon_seconds must be positive and finite')
+        self.horizon_seconds = horizon_seconds
+        self.observed_at = None
         self.horizon_ticks = int(horizon_ticks)
         self.velocity_alpha = float(velocity_alpha)
         self.max_speed = float(max_speed)
@@ -52,13 +56,20 @@ class ShadowPredictor:
             vy = a * raw_vy + (1.0 - a) * previous.vy
         return _Motion(tick, position, vx, vy, previous.observations + 1)
 
-    def observe(self, world: WorldState) -> None:
-        self._player = self._update_motion(self._player, world.tick, world.player)
+    def observe(self, world: WorldState, timestamp: float | None = None) -> None:
+        if self.horizon_seconds is not None:
+            if timestamp is None or not isfinite(timestamp):
+                raise ValueError('time-based prediction requires a finite capture timestamp')
+            if self.observed_at is not None and timestamp <= self.observed_at:
+                raise ValueError('capture timestamps must increase')
+            self.observed_at = timestamp
+        moment = timestamp if self.horizon_seconds is not None else world.tick
+        self._player = self._update_motion(self._player, moment, world.player)
         seen = set()
         for item in (*world.targets, *world.threats):
             seen.add(item.id)
             self._objects[item.id] = self._update_motion(
-                self._objects.get(item.id), world.tick, item.position)
+                self._objects.get(item.id), moment, item.position)
         # ObjectTracker already handles brief visual absence. Do not preserve
         # stale shadow velocity after a semantic object disappears.
         self._objects = {k: v for k, v in self._objects.items() if k in seen}
@@ -72,7 +83,7 @@ class ShadowPredictor:
 
     def project(self, world: WorldState) -> WorldState:
         """Return anticipated state; caller must have called observe(world)."""
-        horizon = self.horizon_ticks
+        horizon = self.horizon_seconds if self.horizon_seconds is not None else self.horizon_ticks
         player = (self._project(self._player, horizon)
                   if self._player is not None else world.player)
 
@@ -85,7 +96,7 @@ class ShadowPredictor:
             return tuple(result)
 
         return WorldState(
-            tick=world.tick + horizon,
+            tick=world.tick + self.horizon_ticks,
             player=player,
             targets=projected(world.targets),
             threats=projected(world.threats),
@@ -112,6 +123,10 @@ class ShadowPredictor:
         pm = self._player
         return {
             "horizon_ticks": self.horizon_ticks,
+            "horizon_seconds": self.horizon_seconds,
+            "observed_at": self.observed_at,
+            "velocity_units": "board_percent_per_second" if self.horizon_seconds is not None else "board_percent_per_tick",
+            "prediction_kind": "constant_velocity_diagnostic_not_action_counterfactual",
             "player_now": [round(world.player.x, 3), round(world.player.y, 3)],
             "player_predicted": [round(projected.player.x, 3),
                                  round(projected.player.y, 3)],

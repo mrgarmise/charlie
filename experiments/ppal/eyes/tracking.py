@@ -71,6 +71,10 @@ class SpriteTracker:
                     candidates.append((distance, track_id, index))
 
         for distance, track_id, index in sorted(candidates):
+            alternatives = [d for d,t,i in candidates
+                            if (t == track_id and i != index) or (i == index and t != track_id)]
+            if alternatives and min(alternatives) <= distance + .5:
+                continue  # Unresolved crossings get fresh IDs; do not silently swap SELF.
             if track_id not in unmatched_tracks or index not in unmatched_detections:
                 continue
             unmatched_tracks.remove(track_id)

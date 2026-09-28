@@ -13,7 +13,8 @@ def _objects(pred):
     return d
 
 def evaluate(report):
-    steps=report["steps"]
+    steps=report.get("steps", [])
+    skipped=0
     shadow=[s for s in steps if isinstance(s.get("shadow"),dict)]
     diffs=sum(bool(s["shadow"].get("differs")) for s in shadow)
     samples=[]
@@ -23,7 +24,19 @@ def evaluate(report):
         if b.get("tick") != a.get("tick", -99)+1: continue
         sa=a.get("shadow"); sb=b.get("shadow")
         if not isinstance(sa,dict) or not isinstance(sb,dict): continue
-        pa=sa["prediction"]; pb=sb["prediction"]
+        pa=sa.get("prediction"); pb=sb.get("prediction")
+        if not isinstance(pa,dict) or not isinstance(pb,dict):
+            skipped += 1; continue
+        if a.get('self_track_id') != b.get('self_track_id'):
+            skipped += 1; continue
+        horizon = pa.get('horizon_seconds')
+        if horizon is not None:
+            ta,tb = pa.get('observed_at'),pb.get('observed_at')
+            if (not all(isinstance(t,(int,float)) and math.isfinite(t) for t in (ta,tb,horizon))
+                    or horizon <= 0 or abs((tb-ta)-horizon) > max(.025,horizon*.25)):
+                skipped += 1; continue
+        elif pa.get('horizon_ticks',1) != 1:
+            skipped += 1; continue
         row={"tick":a["tick"],"player":[],"objects":[]}
         pe=dist(pa["player_predicted"], pb["player_now"])
         base=dist(pa["player_now"], pb["player_now"])
@@ -53,6 +66,8 @@ def evaluate(report):
     return {
       "schema":"charlie-robotron-shadow-evaluation-v1",
       "objective_note":"Prediction metrics are diagnostic; game SCORE is the primary performance objective.",
+      "skipped_incompatible_pairs":skipped,
+      "limitations":"Diagnostics only: observations may contain tracking errors; no score or causal policy improvement claim.",
       "steps":len(steps),"shadow_steps":len(shadow),
       "disagreements":diffs,
       "disagreement_rate":round(100*diffs/len(shadow),1) if shadow else 0,

@@ -236,8 +236,8 @@ def main():
                         help="actually send movement/fire commands")
     args = parser.parse_args()
 
-    if not 1 <= args.seconds <= 60:
-        parser.error("--seconds must be 1..60")
+    if not 1 <= args.seconds <= 3600:
+        parser.error("--seconds must be 1..3600")
     if not 30 <= args.pulse_ms <= 200:
         parser.error("--pulse-ms must be 30..200")
     if not 1.0 <= args.start_wait <= 10.0:

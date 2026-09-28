@@ -20,6 +20,8 @@ import time
 from .arcade_transport import ArcadeController
 from .forebrain import Forebrain
 from .hindbrain import Hindbrain
+from .vision_tracker import ObjectTracker
+from .robotron_session import PersistentSelfTracker
 from .models import Action, Object, Position, WorldState
 from .eyes.sources import PiCameraSource
 from .eyes.calibration import Calibration
@@ -249,6 +251,8 @@ def main():
     recognizer = TaughtRecognizer.load(args.knowledge, args.threshold, args.margin)
     forebrain = Forebrain()
     hindbrain = Hindbrain()
+    object_tracker = ObjectTracker()
+    self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3)
     source = PiCameraSource()
     rows = []
     controller = None
@@ -308,6 +312,17 @@ def main():
             raise RuntimeError("could not identify the player; controls neutral")
 
         print(f"PLAYER ACQUIRED ({acquisition}) x={player[0]:.2f} y={player[1]:.2f}")
+
+        # Bind trusted startup acquisition to an identity-independent visual track.
+        seed_pairs = frames[-1] if frames else []
+        seed_detections = [d for d, _ in seed_pairs]
+        self_obs = self_tracker.seed(0, seed_detections, player, max_seed_distance=7.0)
+        if self_obs.center is not None:
+            player = self_obs.center
+            print(f"SELF TRACK SEEDED: track={self_obs.track_id}")
+        else:
+            print("SELF TRACK: startup seed deferred to live frame")
+
         if not args.arm:
             result = "PREFLIGHT PASS: player acquired; controls untouched"
             print(result)
@@ -325,7 +340,15 @@ def main():
             raw = source.read()
             playfield = calibration.apply(raw)
             pairs = recognizer.detect(playfield)
-            new_player = _player_fix(pairs, player)
+            detections = [d for d, _ in pairs]
+
+            # Follow the same physical visual track before asking appearance again.
+            self_obs = self_tracker.update(tick + 1, detections)
+            if self_obs.center is not None:
+                new_player = self_obs.center
+            else:
+                new_player = _player_fix(pairs, player)
+
             if new_player is None:
                 lost += 1
 
@@ -388,10 +411,15 @@ def main():
                     continue
 
                 player = recovered
+                reseed = self_tracker.reseed(
+                    tick + 1, detections, player, max_seed_distance=7.0)
+                if reseed.center is not None:
+                    player = reseed.center
                 rows.append({
                     "tick": tick,
                     "t": time.monotonic() - started,
                     "status": "player_reacquired",
+                    "self_track_id": reseed.track_id,
                     "lost": lost,
                     "method": recovery,
                     "player": list(player),
@@ -404,6 +432,11 @@ def main():
                 continue
 
             player = new_player
+            if self_obs.center is None:
+                reseed = self_tracker.reseed(
+                    tick + 1, detections, player, max_seed_distance=7.0)
+                if reseed.center is not None:
+                    player = reseed.center
             if lost:
                 print(f"PLAYER REACQUIRED (local track) after {lost} misses")
             lost = 0
@@ -412,6 +445,9 @@ def main():
             threats = _objects(pairs, THREATS, "threat")
             world = WorldState(tick=tick, player=Position(*player),
                                targets=targets, threats=threats, alive=True)
+
+            # Semantic gameplay IDs persist even as raw detector IDs change.
+            world = object_tracker.update(world)
             goal = forebrain.update(world)
             intent, action = hindbrain.decide(world, goal)
             # Hindbrain direction() uses STAY for a zero/deadband vector.
@@ -432,6 +468,7 @@ def main():
             rows.append({
                 "tick": tick, "t": time.monotonic()-started,
                 "player": list(player),
+                "self_track_id": self_tracker.player_track_id,
                 "targets": len(targets), "threats": len(threats),
                 "goal": {"kind": goal.kind, "target_id": goal.target_id},
                 "intent": {"kind": intent.kind, "target_id": intent.target_id},

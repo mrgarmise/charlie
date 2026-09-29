@@ -69,13 +69,32 @@ def test_control_challenge_does_not_bridge_failed_leg(monkeypatch):
     from experiments.ppal import play_robotron as play
     from unittest.mock import Mock
     monkeypatch.setattr(play,'_quick_frames',lambda *a,**k:[[]])
+    monkeypatch.setattr(play,'_appearance_bootstrap',lambda frames:(50,50))
     answers=iter([(50,50),None,(51,51)])
     monkeypatch.setattr(play,'_causal_bootstrap',lambda *a,**k:next(answers))
     controller=Mock()
     r=play._control_challenge(None,None,None,controller,initial_frames=[[]])
+    assert r['eligible']
     assert not r['confirmed']
     assert r['attempts']==2
     assert controller.execute.call_count==2
+
+
+def test_control_challenge_sends_nothing_without_plausible_self(monkeypatch):
+    from experiments.ppal import play_robotron as play
+    from unittest.mock import Mock
+    monkeypatch.setattr(play,'_appearance_bootstrap',lambda frames:None)
+    controller=Mock()
+
+    r=play._control_challenge(None,None,None,controller,initial_frames=[[]])
+
+    assert not r['eligible']
+    assert not r['confirmed']
+    assert r['attempts']==0
+    assert r['hits']==0
+    assert r['player'] is None
+    assert r['evidence']==[]
+    controller.execute.assert_not_called()
 
 
 def test_causal_match_requires_after_player_evidence():

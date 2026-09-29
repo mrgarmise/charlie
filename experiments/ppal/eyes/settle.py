@@ -8,7 +8,7 @@ from PIL import ImageDraw
 from .calibration import Calibration
 
 
-def locate(frame):
+def locate(frame, require_uniform_border=True):
     rgb = np.asarray(frame.convert('RGB'))
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
     height, width = rgb.shape[:2]
@@ -88,9 +88,15 @@ def locate(frame):
                 colors.append(np.median(pixels/np.maximum(pixels.sum(axis=1, keepdims=True), 1), axis=0))
             if min(support)<.65:
                 continue
-            if np.max(np.linalg.norm(np.array(colors)-np.median(colors,axis=0),axis=1))>.10:
+            color_spread = float(np.max(
+                np.linalg.norm(
+                    np.array(colors) - np.median(colors, axis=0),
+                    axis=1,
+                )
+            ))
+            if require_uniform_border and color_spread > .10:
                 continue
-            candidates.append((min(support),points))
+            candidates.append((min(support), points))
     if not candidates:
         raise ValueError('No complete game border found; include all corners and aim more squarely at TV')
     candidates.sort(key=lambda item:item[0],reverse=True)

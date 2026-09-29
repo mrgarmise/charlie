@@ -31,6 +31,7 @@ from .eyes.calibration import Calibration
 from .eyes.settle import prepare
 from .eyes.taught_recognizer import TaughtRecognizer
 from .robotron_screen_state import classify_screen_state
+from .episode_end import EpisodeEndObserver
 
 HUMANS = {"dad", "mom", "kid"}
 THREATS = {"grunt", "hulk", "red_circle_enemy", "mine"}
@@ -171,8 +172,22 @@ def _control_challenge(source, calibration, recognizer, controller,
     frames = initial_frames or _quick_frames(
         source, calibration, recognizer, count=4, interval=0.025)
 
-    anchor = None
+    # Do not manufacture negative agency evidence when there is nobody
+    # plausible to challenge.  A control failure is meaningful only after
+    # visual evidence supplies a persistent SELF-like candidate.
+    anchor = _appearance_bootstrap(frames)
     evidence = []
+
+    if anchor is None:
+        return {
+            "confirmed": False,
+            "eligible": False,
+            "hits": 0,
+            "attempts": 0,
+            "player": None,
+            "evidence": [],
+            "frames": frames,
+        }
 
     for direction in ("E", "S", "W"):
         before = frames
@@ -211,6 +226,7 @@ def _control_challenge(source, calibration, recognizer, controller,
 
     return {
         "confirmed": hits == 3,
+        "eligible": True,
         "hits": hits,
         "attempts": len(evidence),
         "player": anchor if hits == 3 else None,
@@ -445,8 +461,7 @@ def main():
         deadline = started + args.seconds
         tick = 0
         lost = 0
-        non_gameplay_streak = 0
-        agency_failures = 0
+        episode_observer = EpisodeEndObserver(required_not_gameplay=8)
         print(f"CHARLIE LOOSE: {args.seconds:.1f}s hard gameplay limit")
 
         while time.monotonic() < deadline:
@@ -501,12 +516,7 @@ def main():
                 # does: remain neutral, keep looking, and gather independent
                 # evidence about whether Robotron itself has left gameplay.
                 screen = classify_screen_state(playfield)
-                if screen["state"] == "not_gameplay":
-                    non_gameplay_streak += 1
-                else:
-                    # Require consecutive positive terminal evidence.  Gameplay
-                    # or uncertainty breaks the streak rather than guessing.
-                    non_gameplay_streak = 0
+                episode_observer.observe_screen(screen["state"])
 
                 # A causal challenge is corroborating evidence, not a termination
                 # rule.  Do it occasionally after sustained loss; failure means
@@ -526,6 +536,7 @@ def main():
                         "status": "control_challenge",
                         "lost": lost,
                         "confirmed": challenge["confirmed"],
+                        "eligible": challenge["eligible"],
                         "hits": challenge["hits"],
                         "attempts": challenge["attempts"],
                         "evidence": challenge["evidence"],
@@ -535,7 +546,7 @@ def main():
                     if challenge["confirmed"]:
                         recovered = challenge["player"]
                         recovery = "causal_control_challenge"
-                        agency_failures = 0
+                        episode_observer.observe_agency(True)
 
                         final_pairs = challenge["frames"][-1]
                         detections = [d for d, _ in final_pairs]
@@ -543,10 +554,14 @@ def main():
                             "CONTROL CONFIRMED: "
                             f"{challenge['hits']}/"
                             f"{challenge['attempts']}")
-                    else:
-                        agency_failures += 1
+                    elif challenge["eligible"]:
+                        episode_observer.observe_agency(False)
                         print(
-                            "NO CONTROLLABLE SELF CONFIRMED; "
+                            "PLAUSIBLE SELF FAILED CONTROL CHALLENGE; "
+                            "remaining neutral and continuing observation")
+                    else:
+                        print(
+                            "NO PLAUSIBLE SELF TO CHALLENGE; "
                             "remaining neutral and continuing observation")
 
                 # Episode termination requires a transition out of established
@@ -554,20 +569,15 @@ def main():
                 # attract border supplies positive visual evidence; failed agency
                 # is independent corroboration.  Eight consecutive observations
                 # deliberately makes a one-frame transition/glitch insufficient.
-                if (recovered is None
-                        and non_gameplay_streak >= 8
-                        and agency_failures >= 1):
+                if recovered is None and episode_observer.confirmed:
                     result = "GAME OVER"
                     episode_end = {
                         "state": "game_over",
                         "confirmed": True,
-                        "evidence": {
-                            "rule": "persistent_not_gameplay_plus_no_controlled_self",
-                            "not_gameplay_streak": non_gameplay_streak,
-                            "agency_failures": agency_failures,
-                            "screen": screen,
-                            "self_lost_frames": lost,
-                        },
+                        "evidence": episode_observer.evidence(
+                            screen=screen,
+                            self_lost_frames=lost,
+                        ),
                     }
                     save_review(raw, tick, "game-over")
                     print(
@@ -583,7 +593,7 @@ def main():
                         "lost": lost,
                         "last_player": list(player),
                         "screen_state": screen,
-                        "not_gameplay_streak": non_gameplay_streak,
+                        "not_gameplay_streak": episode_observer.not_gameplay_streak,
                     })
                     if lost == 1:
                         print("PLAYER LOST: controls neutral; REACQUIRING")
@@ -613,6 +623,7 @@ def main():
                 print(
                     f"PLAYER REACQUIRED ({recovery}) after {lost} misses "
                     f"x={player[0]:.2f} y={player[1]:.2f}")
+                episode_observer.self_reacquired()
                 lost = 0
                 tick += 1
                 continue
@@ -627,9 +638,8 @@ def main():
                     player = reseed.center
             if lost:
                 print(f"PLAYER REACQUIRED (local track) after {lost} misses")
+                episode_observer.self_reacquired()
             lost = 0
-            non_gameplay_streak = 0
-            agency_failures = 0
 
             targets = _objects(pairs, HUMANS, "human")
             threats = _objects(pairs, THREATS, "threat")

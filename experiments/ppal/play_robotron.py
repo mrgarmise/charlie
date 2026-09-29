@@ -30,6 +30,7 @@ from .eyes.sources import PiCameraSource
 from .eyes.calibration import Calibration
 from .eyes.settle import prepare
 from .eyes.taught_recognizer import TaughtRecognizer
+from .robotron_screen_state import classify_screen_state
 
 HUMANS = {"dad", "mom", "kid"}
 THREATS = {"grunt", "hulk", "red_circle_enemy", "mine"}
@@ -366,6 +367,7 @@ def main():
                   'knowledge_sha256':hashlib.sha256(args.knowledge.read_bytes()).hexdigest()}
     controller = None
     result = "not started"
+    episode_end = {"state": "unknown", "confirmed": False, "evidence": None}
 
     try:
         # Start the camera first. In normal operation this happens while Robotron
@@ -443,6 +445,8 @@ def main():
         deadline = started + args.seconds
         tick = 0
         lost = 0
+        non_gameplay_streak = 0
+        agency_failures = 0
         print(f"CHARLIE LOOSE: {args.seconds:.1f}s hard gameplay limit")
 
         while time.monotonic() < deadline:
@@ -493,13 +497,25 @@ def main():
                         recovered = local_fixes[-1]
                         recovery = "local_continuity"
 
-                # After sustained uncertainty, visual resemblance is not
-                # sufficient. Ask the suspected SELF to demonstrate agency.
-                if lost >= 3:
+                # SELF loss never ends an episode.  It only changes what Charlie
+                # does: remain neutral, keep looking, and gather independent
+                # evidence about whether Robotron itself has left gameplay.
+                screen = classify_screen_state(playfield)
+                if screen["state"] == "not_gameplay":
+                    non_gameplay_streak += 1
+                else:
+                    # Require consecutive positive terminal evidence.  Gameplay
+                    # or uncertainty breaks the streak rather than guessing.
+                    non_gameplay_streak = 0
+
+                # A causal challenge is corroborating evidence, not a termination
+                # rule.  Do it occasionally after sustained loss; failure means
+                # "no controllable SELF demonstrated", never "the game is over".
+                challenge = None
+                if lost >= 3 and (lost == 3 or lost % 12 == 0):
                     print(
                         f"REACQUIRING: {lost} misses; "
-                        "running E/S/W control challenge")
-
+                        "checking for controllable SELF")
                     challenge = _control_challenge(
                         source, calibration, recognizer, controller,
                         initial_frames=recovery_frames)
@@ -513,27 +529,51 @@ def main():
                         "hits": challenge["hits"],
                         "attempts": challenge["attempts"],
                         "evidence": challenge["evidence"],
+                        "screen_state": screen,
                     })
 
                     if challenge["confirmed"]:
                         recovered = challenge["player"]
                         recovery = "causal_control_challenge"
+                        agency_failures = 0
 
                         final_pairs = challenge["frames"][-1]
                         detections = [d for d, _ in final_pairs]
-
                         print(
                             "CONTROL CONFIRMED: "
                             f"{challenge['hits']}/"
                             f"{challenge['attempts']}")
                     else:
-                        result = "UNCERTAIN: control challenge failed"
+                        agency_failures += 1
                         print(
-                            "UNCONFIRMED GAME STATE: control challenge "
-                            f"{challenge['hits']}/"
-                            f"{challenge['attempts']}; "
-                            "ending episode")
-                        break
+                            "NO CONTROLLABLE SELF CONFIRMED; "
+                            "remaining neutral and continuing observation")
+
+                # Episode termination requires a transition out of established
+                # gameplay, not merely loss of SELF.  The striped/multicolour
+                # attract border supplies positive visual evidence; failed agency
+                # is independent corroboration.  Eight consecutive observations
+                # deliberately makes a one-frame transition/glitch insufficient.
+                if (recovered is None
+                        and non_gameplay_streak >= 8
+                        and agency_failures >= 1):
+                    result = "GAME OVER"
+                    episode_end = {
+                        "state": "game_over",
+                        "confirmed": True,
+                        "evidence": {
+                            "rule": "persistent_not_gameplay_plus_no_controlled_self",
+                            "not_gameplay_streak": non_gameplay_streak,
+                            "agency_failures": agency_failures,
+                            "screen": screen,
+                            "self_lost_frames": lost,
+                        },
+                    }
+                    save_review(raw, tick, "game-over")
+                    print(
+                        "GAME OVER CONFIRMED: persistent non-gameplay "
+                        "appearance + no controllable SELF")
+                    break
 
                 if recovered is None:
                     rows.append({
@@ -542,6 +582,8 @@ def main():
                         "status": "reacquiring",
                         "lost": lost,
                         "last_player": list(player),
+                        "screen_state": screen,
+                        "not_gameplay_streak": non_gameplay_streak,
                     })
                     if lost == 1:
                         print("PLAYER LOST: controls neutral; REACQUIRING")
@@ -586,6 +628,8 @@ def main():
             if lost:
                 print(f"PLAYER REACQUIRED (local track) after {lost} misses")
             lost = 0
+            non_gameplay_streak = 0
+            agency_failures = 0
 
             targets = _objects(pairs, HUMANS, "human")
             threats = _objects(pairs, THREATS, "threat")
@@ -667,7 +711,7 @@ def main():
             save_review(raw,locals().get('tick',0),'final-view')
         report = {"provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
                   "pulse_ms": args.pulse_ms, "ticks": len(rows),
-                  "episode_end": {"state": "unknown", "confirmed": False, "evidence": None},
+                  "episode_end": episode_end,
                   "score": None, "score_status": "unmeasured",
                   "learning_mode": "fixed_policy_with_shadow_diagnostics",
                   "auto_start": bool(args.arm and not args.no_start_game),

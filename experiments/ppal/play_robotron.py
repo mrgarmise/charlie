@@ -335,6 +335,8 @@ def main():
                         help="after START, rediscover the live game border instead of loading --calibration")
     parser.add_argument("--no-start-game", action="store_true",
                         help="do not tap START; use when Robotron gameplay is already running")
+    parser.add_argument("--focus", type=float, default=None,
+                        help="lock camera to this manual lens position after warm-up and before START")
     parser.add_argument("--start-wait", type=float, default=4.0,
                         help="seconds to wait after START for visual gameplay/self evidence")
     parser.add_argument("--threshold", type=float, default=0.82)
@@ -392,6 +394,17 @@ def main():
         for _ in range(6):
             source.read()
             time.sleep(0.04)
+
+        if args.focus is not None:
+            if not 0.0 <= args.focus <= 32.0:
+                raise ValueError("--focus must be between 0.0 and 32.0")
+            source.set_manual_focus(args.focus)
+            # Discard a few frames after the lens move before gameplay begins.
+            for _ in range(4):
+                source.read()
+                time.sleep(0.04)
+            actual_focus = source.lens_position()
+            print(f"FOCUS LOCKED: requested={args.focus:.3f} actual={actual_focus}")
 
         auto_start = args.arm and not args.no_start_game
         if auto_start:

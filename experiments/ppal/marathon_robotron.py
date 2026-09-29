@@ -85,6 +85,8 @@ def main():
                     help="safety horizon per current single-game runner")
     ap.add_argument("--failed-starts",type=int,default=2)
     ap.add_argument("--retry-wait",type=float,default=5.0)
+    ap.add_argument("--focus",type=float,default=1.30,
+                    help="manual camera lens position passed to each game")
     ap.add_argument("--root",type=Path,default=Path("robotron-runs"))
     ap.add_argument("--arm",action="store_true",help="required to send controls")
     a=ap.parse_args()
@@ -110,7 +112,8 @@ def main():
             while game.exists():
                 time.sleep(1.05); game=a.root/f"play-{stamp()}"
             rc=run([sys.executable,"-m","experiments.ppal.play_robotron",
-                    "--arm","--seconds",str(a.game_seconds),"--output",str(game)])
+                    "--arm","--seconds",str(a.game_seconds),
+                    "--focus",str(a.focus),"--output",str(game)])
             report=load_report(game/"report.json")
             if established_gameplay(report):
                 failures=0

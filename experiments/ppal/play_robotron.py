@@ -168,29 +168,29 @@ def _causal_bootstrap(before_frames, after_frames, direction="E",
 
 def _control_challenge(source, calibration, recognizer, controller,
                        initial_frames=None, pulse_ms=60):
-    """Require a suspected SELF to demonstrate control: E, S, W."""
+    """Test a suspected SELF causally.
+
+    Three successful directional probes confirm SELF.
+    Two independently eligible failed probes reject SELF.
+    Anything weaker is inconclusive.
+    """
     frames = initial_frames or _quick_frames(
         source, calibration, recognizer, count=4, interval=0.025)
 
-    # Do not manufacture negative agency evidence when there is nobody
-    # plausible to challenge.  A control failure is meaningful only after
-    # visual evidence supplies a persistent SELF-like candidate.
-    anchor = _appearance_bootstrap(frames)
     evidence = []
-
-    if anchor is None:
-        return {
-            "confirmed": False,
-            "eligible": False,
-            "hits": 0,
-            "attempts": 0,
-            "player": None,
-            "evidence": [],
-            "frames": frames,
-        }
+    hits = 0
+    failures = 0
+    anchor = None
 
     for direction in ("E", "S", "W"):
-        before = frames
+        # Every leg must begin with its own stable player-like candidate.
+        # After a failed leg we therefore do not blindly carry the old anchor
+        # into another causal claim.
+        candidate = _appearance_bootstrap(frames)
+        if candidate is None:
+            break
+
+        anchor = candidate
 
         controller.execute(
             Action(direction, "NONE", "control challenge"),
@@ -201,39 +201,41 @@ def _control_challenge(source, calibration, recognizer, controller,
             count=4, interval=0.025)
 
         observed = _causal_bootstrap(
-            before, after,
+            frames, after,
             direction=direction,
             anchor=anchor)
 
+        obeyed = observed is not None
         evidence.append({
             "direction": direction,
-            "obeyed": observed is not None,
-            "observed": (
-                list(observed)
-                if observed is not None
-                else None
-            ),
+            "obeyed": obeyed,
+            "observed": list(observed) if observed is not None else None,
         })
 
-        if observed is None:
-            # A failed leg breaks evidence continuity; do not combine different sprites.
-            break
-        anchor = observed
+        if obeyed:
+            hits += 1
+            anchor = observed
+        else:
+            failures += 1
 
         frames = after
 
-    hits = sum(x["obeyed"] for x in evidence)
+    attempts = len(evidence)
+    eligible = attempts > 0
+    confirmed = attempts == 3 and hits == 3
+    rejected = failures >= 2
 
     return {
-        "confirmed": hits == 3,
-        "eligible": True,
+        "confirmed": confirmed,
+        "rejected": rejected,
+        "eligible": eligible,
         "hits": hits,
-        "attempts": len(evidence),
-        "player": anchor if hits == 3 else None,
+        "failures": failures,
+        "attempts": attempts,
+        "player": anchor if confirmed else None,
         "evidence": evidence,
         "frames": frames,
     }
-
 
 def _stable_center_bootstrap(frames, radius=5.0, min_support=3, max_spread=3.0):
     """Require the new-game center candidate to persist, not merely flash once."""
@@ -567,11 +569,36 @@ def main():
                             "CONTROL CONFIRMED: "
                             f"{challenge['hits']}/"
                             f"{challenge['attempts']}")
-                    elif challenge["eligible"]:
+                    elif challenge["rejected"]:
+                        # Established gameplay was followed by genuine SELF loss,
+                        # and independently eligible causal probes rejected the
+                        # stable SELF-like candidates. Appearance must not
+                        # overrule this stronger negative agency evidence.
                         episode_observer.observe_agency(False)
+                        recovered = None
+                        result = "GAME OVER"
+                        episode_end = {
+                            "state": "game_over",
+                            "confirmed": True,
+                            "evidence": episode_observer.evidence(
+                                screen=screen,
+                                self_lost_frames=lost,
+                            ),
+                        }
+                        episode_end["evidence"]["rule"] = (
+                            "established_gameplay_plus_eligible_failed_agency"
+                        )
+                        episode_end["evidence"]["control_challenge"] = challenge
+                        save_review(raw, tick, "game-over-failed-agency")
                         print(
-                            "PLAUSIBLE SELF FAILED CONTROL CHALLENGE; "
-                            "remaining neutral and continuing observation")
+                            "GAME OVER CONFIRMED: stable SELF candidates "
+                            "failed robust causal control challenge")
+                        break
+                    elif challenge["eligible"]:
+                        recovered = None
+                        print(
+                            "SELF CHALLENGE INCONCLUSIVE; remaining neutral "
+                            "and continuing observation")
                     else:
                         print(
                             "NO PLAUSIBLE SELF TO CHALLENGE; "

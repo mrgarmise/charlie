@@ -65,20 +65,70 @@ def test_score_rejects_invalid_and_marks_partial_run(tmp_path):
     assert record['score_source']=='human_reported'
 
 
-def test_control_challenge_does_not_bridge_failed_leg(monkeypatch):
+def test_control_challenge_requires_three_hits_to_confirm(monkeypatch):
     from experiments.ppal import play_robotron as play
     from unittest.mock import Mock
-    monkeypatch.setattr(play,'_quick_frames',lambda *a,**k:[[]])
-    monkeypatch.setattr(play,'_appearance_bootstrap',lambda frames:(50,50))
-    answers=iter([(50,50),None,(51,51)])
-    monkeypatch.setattr(play,'_causal_bootstrap',lambda *a,**k:next(answers))
-    controller=Mock()
-    r=play._control_challenge(None,None,None,controller,initial_frames=[[]])
+    monkeypatch.setattr(play, '_quick_frames', lambda *a, **k: [[]])
+    monkeypatch.setattr(play, '_appearance_bootstrap', lambda frames: (50, 50))
+    answers = iter([(51, 50), (51, 51), (50, 51)])
+    monkeypatch.setattr(play, '_causal_bootstrap',
+                        lambda *a, **k: next(answers))
+    controller = Mock()
+
+    r = play._control_challenge(
+        None, None, None, controller, initial_frames=[[]])
+
+    assert r['eligible']
+    assert r['confirmed']
+    assert not r['rejected']
+    assert r['hits'] == 3
+    assert r['failures'] == 0
+    assert r['attempts'] == 3
+    assert controller.execute.call_count == 3
+
+
+def test_control_challenge_two_failures_reject_self(monkeypatch):
+    from experiments.ppal import play_robotron as play
+    from unittest.mock import Mock
+    monkeypatch.setattr(play, '_quick_frames', lambda *a, **k: [[]])
+    monkeypatch.setattr(play, '_appearance_bootstrap', lambda frames: (50, 50))
+    answers = iter([None, None, (50, 51)])
+    monkeypatch.setattr(play, '_causal_bootstrap',
+                        lambda *a, **k: next(answers))
+    controller = Mock()
+
+    r = play._control_challenge(
+        None, None, None, controller, initial_frames=[[]])
+
     assert r['eligible']
     assert not r['confirmed']
-    assert r['attempts']==2
-    assert controller.execute.call_count==2
+    assert r['rejected']
+    assert r['hits'] == 1
+    assert r['failures'] == 2
+    assert r['attempts'] == 3
+    assert controller.execute.call_count == 3
 
+
+def test_control_challenge_one_failure_is_inconclusive(monkeypatch):
+    from experiments.ppal import play_robotron as play
+    from unittest.mock import Mock
+    monkeypatch.setattr(play, '_quick_frames', lambda *a, **k: [[]])
+    monkeypatch.setattr(play, '_appearance_bootstrap', lambda frames: (50, 50))
+    answers = iter([(51, 50), None, (50, 51)])
+    monkeypatch.setattr(play, '_causal_bootstrap',
+                        lambda *a, **k: next(answers))
+    controller = Mock()
+
+    r = play._control_challenge(
+        None, None, None, controller, initial_frames=[[]])
+
+    assert r['eligible']
+    assert not r['confirmed']
+    assert not r['rejected']
+    assert r['hits'] == 2
+    assert r['failures'] == 1
+    assert r['attempts'] == 3
+    assert controller.execute.call_count == 3
 
 def test_control_challenge_sends_nothing_without_plausible_self(monkeypatch):
     from experiments.ppal import play_robotron as play

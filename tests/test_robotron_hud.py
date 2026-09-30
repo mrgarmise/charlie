@@ -38,7 +38,7 @@ def test_channel_reads_score_and_absent_channel():
     x=8
     for d in "8400":
         g=cv2_resize(glyph(d), 15, 28)
-        canvas[8:36,x:x+15]=np.maximum(canvas[8:36,x:x+15],g[:,:,None]*255)
+        canvas[8:36,x:x+15]=np.maximum(canvas[8:36,x:x+15],g[:,:,None]*np.array([80,255,255],dtype=np.uint8))
         x += 21
     score, confidence=RobotronHUDReader._read_channel(canvas)
     assert score == 8400

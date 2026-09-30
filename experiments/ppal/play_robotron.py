@@ -32,6 +32,8 @@ from .eyes.settle import prepare
 from .eyes.taught_recognizer import TaughtRecognizer
 from .robotron_screen_state import classify_screen_state
 from .episode_end import EpisodeEndObserver
+from .robotron_agency import VisualAgency
+from PIL import ImageDraw
 
 HUMANS = {"dad", "mom", "kid"}
 THREATS = {"grunt", "hulk", "red_circle_enemy", "mine"}
@@ -369,9 +371,40 @@ def main():
     shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
     object_tracker = ObjectTracker()
     self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3)
+    visual_agency = VisualAgency()
     source = PiCameraSource()
     rows = []
     review_frames = []
+    agency_rows = []
+    agency_frames = []
+    latest_agency_frame = None
+    def record_agency(snapshot):
+        row = {"sample": visual_agency.tick, **snapshot}
+        if latest_agency_frame is not None and len(agency_frames) < 24:
+            frame = latest_agency_frame.copy()
+            draw = ImageDraw.Draw(frame)
+            for track_id in visual_agency.positions:
+                track = visual_agency.tracker.active[track_id]
+                belief = visual_agency.agency.beliefs[track_id]
+                color = "lime" if track_id == snapshot["self_track_id"] else "yellow"
+                draw.rectangle(track.box, outline=color)
+                draw.text((track.box[0], track.box[1]), f"{track_id} {belief.confidence:.2f}", fill=color)
+            name = f"agency-{len(agency_frames):03d}.png"
+            frame.save(args.output / name)
+            row["frame"] = name
+            agency_frames.append({"sample": visual_agency.tick, "path": name,
+                                  "candidates": _pair_evidence(visual_agency.pairs)})
+        agency_rows.append(row)
+        with (args.output / "agency.jsonl").open("a") as stream:
+            stream.write(json.dumps(row) + "\n")
+        if snapshot["event"]:
+            print(f"AGENCY {snapshot['event'].upper()}: self={snapshot['self_track_id']} "
+                  f"candidate={snapshot['candidate_track_id']} confidence={snapshot['confidence']:.2f} "
+                  f"runner={snapshot['runner_up_confidence']:.2f}")
+    def read_agency_pairs():
+        nonlocal latest_agency_frame
+        latest_agency_frame = calibration.apply(source.read())
+        return recognizer.detect(latest_agency_frame)
     def save_review(raw, tick, reason):
         if len(review_frames) >= (40 if reason == 'final-view' else 39):
             return
@@ -437,18 +470,14 @@ def main():
             gameplay_visual_frame = None
             player, acquisition = _acquire_from_frames(frames)
 
-        # If appearance cannot settle the question, ask the game one tiny causal
-        # question: move east briefly and watch which player-like sprite obeys.
-        if player is None and args.arm:
+        # Appearance/center are proposals. Armed play requires direct agency.
+        if args.arm:
             if controller is None:
                 controller = ArcadeController(args.host, args.port, protocol="positions")
-            print("CENTER WATCH EXPIRED; self-ID still ambiguous; trying one 60ms east probe")
-            controller.execute(Action("E", "NONE", "causal self-identification"), 60)
-            after_frames = _quick_frames(source, calibration, recognizer, count=4, interval=0.025)
-            player = _causal_bootstrap(frames, after_frames)
-            if player is not None:
-                acquisition = "causal_east_probe"
-                frames = after_frames
+            print("DISCOVERING SELF: short movement/neutral probes over all visual candidates")
+            player = visual_agency.discover(read_agency_pairs, controller, record=record_agency)
+            frames = [visual_agency.pairs]
+            acquisition = "generic_visual_agency" if player is not None else None
 
         if player is None:
             raise RuntimeError("could not identify the player; controls neutral")
@@ -476,6 +505,8 @@ def main():
         deadline = started + args.seconds
         tick = 0
         lost = 0
+        pending_move = None
+        pending_at = None
         episode_observer = EpisodeEndObserver(required_not_gameplay=8)
         print(f"CHARLIE LOOSE: {args.seconds:.1f}s hard gameplay limit")
 
@@ -486,12 +517,25 @@ def main():
             pairs = recognizer.detect(playfield)
             detections = [d for d, _ in pairs]
 
-            # Follow the same physical visual track before asking appearance again.
+            # Normal movement is another causal experiment; right-stick firing
+            # never enters the BODY evidence model. Track continuity supplies WHERE.
+            agency_snapshot = visual_agency.observe(
+                pairs, pending_move,
+                time.monotonic()-pending_at if pending_at is not None else None)
+            latest_agency_frame = playfield
+            record_agency(agency_snapshot)
+            pending_move = None
+            pending_at = None
             self_obs = self_tracker.update(tick + 1, detections)
-            if self_obs.center is not None:
-                new_player = self_obs.center
-            else:
-                new_player = _player_fix(pairs, player)
+            agency_player = visual_agency.player
+            new_player = None
+            if agency_player is not None:
+                if self_obs.center is not None and _distance(self_obs.center, agency_player) <= .5:
+                    new_player = self_obs.center
+                else:
+                    # Conservative track lineage changes require new causal identity.
+                    self_obs = self_tracker.reseed(tick + 1, detections, agency_player)
+                    new_player = self_obs.center
 
             if new_player is None:
                 lost += 1
@@ -510,22 +554,12 @@ def main():
                     source, calibration, recognizer, count=4, interval=0.025)
                 recovered = None  # Global resemblance is not proof of a new SELF.
 
-                recovery = "appearance"
-                if recovered is None:
-                    # Prefer continuity around the last trustworthy location.
-                    local_fixes = []
-                    anchor = player
-                    for recovery_pairs in recovery_frames:
-                        fix = _player_fix(
-                            recovery_pairs, anchor,
-                            max_distance=min(24.0, 12.0 + lost * 2.0),
-                            min_score=max(0.72, 0.78 - lost * 0.01))
-                        if fix is not None:
-                            local_fixes.append(fix)
-                            anchor = fix
-                    if len(local_fixes) >= 3:
-                        recovered = local_fixes[-1]
-                        recovery = "local_continuity"
+                recovery = "generic_visual_agency"
+                if lost == 1 or lost % 12 == 0:
+                    recovered = visual_agency.discover(
+                        read_agency_pairs, controller, deadline=deadline, record=record_agency)
+                    recovery_frames = [visual_agency.pairs]
+                    detections = [d for d, _ in visual_agency.pairs]
 
                 # SELF loss never ends an episode.  It only changes what Charlie
                 # does: remain neutral, keep looking, and gather independent
@@ -537,7 +571,7 @@ def main():
                 # rule.  Do it occasionally after sustained loss; failure means
                 # "no controllable SELF demonstrated", never "the game is over".
                 challenge = None
-                if lost >= 3 and (lost == 3 or lost % 12 == 0):
+                if recovered is None and lost >= 3 and (lost == 3 or lost % 12 == 0):
                     print(
                         f"REACQUIRING: {lost} misses; "
                         "checking for controllable SELF")
@@ -559,8 +593,8 @@ def main():
                     })
 
                     if challenge["confirmed"]:
-                        recovered = challenge["player"]
-                        recovery = "causal_control_challenge"
+                        # Legacy appearance challenge can corroborate gameplay,
+                        # but cannot authorize a different SELF without generic agency.
                         episode_observer.observe_agency(True)
 
                         final_pairs = challenge["frames"][-1]
@@ -714,11 +748,14 @@ def main():
             if pulse_ms < 30:
                 result = "TIME LIMIT"
                 break
+            pending_at = time.monotonic()
             controller.execute(action, pulse_ms)
+            pending_move = action.move
             rows.append({
                 "tick": tick, "observed_at": observed_at, "t": time.monotonic()-started,
                 "player": list(player),
                 "self_track_id": self_tracker.player_track_id,
+                "agency": agency_snapshot,
                 "targets": len(targets), "threats": len(threats),
                 "goal": {"kind": goal.kind, "target_id": goal.target_id},
                 "intent": {"kind": intent.kind, "target_id": intent.target_id},
@@ -769,6 +806,9 @@ def main():
                   "acquisition": locals().get("acquisition"),
                   "gameplay_visual_frame": locals().get("gameplay_visual_frame"),
                   "startup_watch": locals().get("startup_watch", []),
+                  "agency_frames": agency_frames,
+                  "agency_samples": len(agency_rows),
+                  "agency_log": "agency.jsonl",
                   "steps": rows}
         (args.output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
         print(f"Evidence: {args.output}/report.json")

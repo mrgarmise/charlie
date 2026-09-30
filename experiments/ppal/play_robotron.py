@@ -32,6 +32,7 @@ from .eyes.taught_recognizer import TaughtRecognizer
 from .robotron_screen_state import classify_screen_state
 from .episode_end import EpisodeEndObserver
 from .robotron_agency import VisualAgency
+from .score_observer import ScoreObserver, ObservedCamera
 from PIL import ImageDraw
 
 HUMANS = {"dad", "mom", "kid"}
@@ -381,7 +382,9 @@ def main():
     visual_agency = VisualAgency()
     self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3,
                                          tracker=visual_agency.tracker if args.arm else None)
-    source = PiCameraSource()
+    source = ObservedCamera(PiCameraSource())
+    score_observer = None
+    preceding_action = None
     rows = []
     review_frames = []
     agency_rows = []
@@ -390,7 +393,7 @@ def main():
     buffered_frames = []
     raw_frames = []
     def record_agency(snapshot):
-        row = {"sample": visual_agency.tick, **snapshot}
+        row = {"sample": visual_agency.tick, "capture_timestamp": source.timestamp, **snapshot}
         # Encoding PNGs between pulses lengthened unseen intervals substantially.
         # Buffer a bounded set of originals; write images only after controls close.
         if latest_agency_frame is not None and len(raw_frames) < 96:
@@ -419,10 +422,15 @@ def main():
             print(f"AGENCY {snapshot['event'].upper()}: self={snapshot['self_track_id']} "
                   f"candidate={snapshot['candidate_track_id']} confidence={snapshot['confidence']:.2f} "
                   f"runner={snapshot['runner_up_confidence']:.2f}")
+        if score_observer is not None and source.raw is not None:
+            score_observer.submit(source.raw, timestamp=source.timestamp,
+                                  sample=visual_agency.tick, preceding_action={
+                                      "action":preceding_action, "agency_command":snapshot.get("command"),
+                                      "self_track_id":snapshot.get("self_track_id")} if preceding_action or snapshot.get("command") is not None else None)
     def observe_unmeasured(pairs, frame):
         nonlocal latest_agency_frame
         latest_agency_frame = frame
-        record_agency(visual_agency.observe(pairs, observed_at=time.monotonic()))
+        record_agency(visual_agency.observe(pairs, observed_at=source.timestamp))
     def read_agency_pairs():
         nonlocal latest_agency_frame
         latest_agency_frame = calibration.apply(source.read())
@@ -482,6 +490,12 @@ def main():
             calibration = Calibration.load(args.calibration)
             calibration_mode = "saved"
             print(f"Loaded calibration: {args.calibration}")
+
+        # Fresh temporal state belongs to this run/new START, never unreadable frames.
+        try:
+            score_observer = ScoreObserver(calibration, args.output / "score.jsonl")
+        except Exception as exc:
+            print(f"SCORE UNKNOWN: {type(exc).__name__}: {exc}")
 
         if auto_start:
             player, acquisition, frames, startup_watch, gameplay_visual_frame = _wait_for_gameplay(
@@ -547,7 +561,7 @@ def main():
             agency_snapshot = visual_agency.observe(
                 pairs, pending_move,
                 time.monotonic()-pending_at if pending_at is not None else None,
-                observed_at=time.monotonic())
+                observed_at=source.timestamp)
             latest_agency_frame = playfield
             record_agency(agency_snapshot)
             pending_move = None
@@ -718,7 +732,9 @@ def main():
                     "self_track_id": reseed.track_id,
                     "lost": lost,
                     "method": recovery,
-                    "player": list(player),
+                    "capture_timestamp": source.timestamp,
+                "action_timestamp": pending_at,
+                "player": list(player),
                 })
                 print(
                     f"PLAYER REACQUIRED ({recovery}) after {lost} misses "
@@ -777,10 +793,13 @@ def main():
                 result = "TIME LIMIT"
                 break
             pending_at = time.monotonic()
+            preceding_action = {"tick":tick, "timestamp":pending_at, **action_dict(action)}
             controller.execute(action, pulse_ms)
             pending_move = action.move
             rows.append({
                 "tick": tick, "observed_at": observed_at, "t": time.monotonic()-started,
+                "capture_timestamp": source.timestamp,
+                "action_timestamp": pending_at,
                 "player": list(player),
                 "self_track_id": self_tracker.player_track_id,
                 "agency": agency_snapshot,
@@ -822,6 +841,11 @@ def main():
             except (OSError, ConnectionError):
                 pass
         source.close()
+        if score_observer is not None:
+            score_observer.close()
+        if score_observer is not None and not score_observer.thread.is_alive():
+            buffered_frames.extend(score_observer.frames)
+        score_summary = score_observer.report() if score_observer is not None else {"status":"unmeasured", "self_score":None}
         if 'raw' in locals():
             save_review(raw,locals().get('tick',0),'final-view')
         # Controllers are already neutral/closed before any image encoding.
@@ -832,7 +856,8 @@ def main():
         report = {"provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
                   "pulse_ms": args.pulse_ms, "ticks": len(rows),
                   "episode_end": episode_end,
-                  "score": None, "score_status": "unmeasured",
+                  "score": score_summary["self_score"], "score_status": score_summary["status"],
+                  "score_summary": score_summary,
                   "learning_mode": "fixed_policy_with_shadow_diagnostics",
                   "auto_start": bool(args.arm and not args.no_start_game),
                   "calibration_mode": locals().get("calibration_mode"),

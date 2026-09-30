@@ -139,3 +139,17 @@ def test_visual_wrapper_tolerates_unreadable_frame():
             return None
     row = VisualScoreTracker(Reader()).observe(object())
     assert row.player1.score is None and row.player2.score is None
+
+
+def test_score_event_log_records_both_channels_and_self_delta(tmp_path):
+    import json
+    from experiments.ppal.score_events import ScoreEventLog
+    t = DualScoreTracker(self_channel=2)
+    t.observe(1000, 2000, player1_confidence=.99, player2_confidence=.99)
+    channels = t.observe(1100, 2500, player1_confidence=.99, player2_confidence=.99)
+    row = ScoreEventLog(tmp_path/"score.jsonl").append(t=1.25, channels=channels)
+    assert row["p1"]["delta"] == 100
+    assert row["p2"]["delta"] == 500
+    assert row["self_delta"] == 500
+    saved = json.loads((tmp_path/"score.jsonl").read_text())
+    assert saved["self_channel"] == 2

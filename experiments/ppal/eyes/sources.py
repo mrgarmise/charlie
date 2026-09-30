@@ -54,10 +54,33 @@ class PiCameraSource:
                 "first_pixel_exposure_at": exposure_start,
                 "frame_duration_us": metadata.get("FrameDuration"),
                 "lens_position": metadata.get("LensPosition"),
+                "analogue_gain": metadata.get("AnalogueGain"),
+                "digital_gain": metadata.get("DigitalGain"),
+                "colour_gains": metadata.get("ColourGains"),
+                "colour_temperature": metadata.get("ColourTemperature"),
+                "ae_locked": metadata.get("AeLocked"),
             }
             return Image.fromarray(rgb, mode="RGB")
         finally:
             request.release()
+
+    def set_exposure_value(self, ev: float) -> bool:
+        picam = self.camera.picam2
+        if not all(key in picam.camera_controls for key in ("ExposureValue", "AeEnable")):
+            return False
+        low, high, _ = picam.camera_controls["ExposureValue"]
+        picam.set_controls({"AeEnable": True, "ExposureValue": max(low, min(high, float(ev)))})
+        return True
+
+    def lock_exposure(self, capture: dict) -> bool:
+        picam = self.camera.picam2
+        exposure, gain = capture.get("exposure_time_us"), capture.get("analogue_gain")
+        if exposure is None or gain is None or not all(
+                key in picam.camera_controls for key in ("AeEnable", "ExposureTime", "AnalogueGain")):
+            return False
+        picam.set_controls({"AeEnable": False, "ExposureTime": int(exposure),
+                            "AnalogueGain": float(gain)})
+        return True
 
     def autofocus(self) -> None:
         self.camera.autofocus()

@@ -14,9 +14,12 @@ def locate(frame, require_uniform_border=True):
     height, width = rgb.shape[:2]
     # Exposure can wash the colored border out to white. Geometry and
     # contrast on all four edges, rather than saturation, establish support.
+    background = cv2.medianBlur(rgb, 31).astype(np.int16)
+    contrast = (rgb.astype(np.int16)-background).max(axis=2)
     mask = (hsv[:, :, 2] > 155).astype(np.uint8)*255
+    detail = ((contrast > 45) & (hsv[:, :, 2] > 80)).astype(np.uint8)*255
     # Do not let large bright walls flood the line candidate budget.
-    ridges = mask - cv2.erode(mask, np.ones((15, 15), np.uint8))
+    ridges = (mask - cv2.erode(mask, np.ones((15, 15), np.uint8))) | detail
     lines = cv2.HoughLinesP(ridges, 1, np.pi/180, 100,
                            minLineLength=min(width,height)*.35, maxLineGap=30)
     if lines is None:
@@ -79,11 +82,14 @@ def locate(frame, require_uniform_border=True):
                 xs = np.clip(samples[:, 0, None, None] + offsets[None, None, :], 0, width-1)
                 ys = np.clip(samples[:, 1, None, None] + offsets[None, :, None], 0, height-1)
                 patches = rgb[ys, xs].reshape(-1, 121, 3)
-                peaks = patches.max(axis=2)
+                peaks = patches.sum(axis=2, dtype=np.int32)
                 pixels = patches[np.arange(len(patches)), peaks.argmax(axis=1)].astype(float)
-                side_values = hsv[sides[:, :, 1], sides[:, :, 0], 2].max(axis=1).astype(float)
-                peak = peaks.max(axis=1).astype(float)
-                hits = (peak > 155) & (peak-side_values > 35)
+                side_pixels = rgb[sides[:, :, 1], sides[:, :, 0]].astype(float)
+                # White and saturated blue can have identical HSV value.
+                # Require positive RGB contrast against BOTH sides, without
+                # discarding the channels that distinguish the border.
+                contrast = (pixels[:, None, :]-side_pixels).max(axis=2).min(axis=1)
+                hits = (pixels.max(axis=1) > 100) & (contrast > 35)
                 support.append(float(hits.sum())/100)
                 colors.append(np.median(pixels/np.maximum(pixels.sum(axis=1, keepdims=True), 1), axis=0))
             if min(support)<.65:
@@ -113,6 +119,9 @@ def prepare(source, output: Path):
             break
     observations = []
     frame = None
+    attempts = []
+    def save_attempts():
+        (output/"setup-attempts.json").write_text(json.dumps(attempts, indent=2)+"\n")
     try:
         # Require six consecutive agreeing views, but tolerate transient
         # flashes and give a bumped camera a chance to settle again.
@@ -120,12 +129,22 @@ def prepare(source, output: Path):
         last_reason = 'No stable game border found'
         for attempt in range(24):
             frame = source.read()
+            frame_name = f"setup-attempt-{attempt:03d}.png"
+            frame.save(output/frame_name)
+            capture = getattr(source, "capture", None)
+            row = {"attempt": attempt+1, "frame": frame_name,
+                   "timestamp": (getattr(source, "timestamp", None)
+                                 if isinstance(getattr(source, "timestamp", None), (int, float)) else None),
+                   "capture": capture if isinstance(capture, dict) else None}
+            attempts.append(row)
             try:
                 points = locate(frame)
             except ValueError as exc:
                 observations.clear()
                 last_reason = str(exc)
+                row["reason"] = last_reason
             else:
+                row["corners"] = points.tolist()
                 observations.append(points)
 
                 # Keep a short rolling history. Real photographed game borders
@@ -138,6 +157,9 @@ def prepare(source, output: Path):
                     np.linalg.norm(np.array(observations) - corners, axis=2)
                 ))
 
+                row["jitter_pixels"] = jitter
+                row["stable_views"] = len(observations)
+                last_reason = f"Only {len(observations)} agreeing border views ({jitter:.1f}px jitter)"
                 if len(observations) >= 6 and jitter <= 8:
                     break
 
@@ -155,6 +177,7 @@ def prepare(source, output: Path):
         if len(observations) < 6:
             raise ValueError(last_reason + '; could not confirm six stable views. '
                              'Show the game border and retry; see setup-failed.png')
+        save_attempts()
         calibration = Calibration.from_pixels(corners.tolist(),frame.size)
         calibration.save(output/'calibration.json')
         frame.save(output/'setup-raw.png')
@@ -168,6 +191,7 @@ def prepare(source, output: Path):
         print(f'New screen calibration saved; border jitter {jitter:.1f}px')
         return calibration
     except ValueError as exc:
+        save_attempts()
         if frame is not None:
             frame.save(output/'setup-failed.png')
         (output/'setup.json').write_text(json.dumps({'status':'failed','reason':str(exc)},indent=2)+'\n')

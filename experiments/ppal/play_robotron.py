@@ -28,6 +28,7 @@ from .models import Action, Object, Position, WorldState
 from .eyes.sources import PiCameraSource
 from .eyes.calibration import Calibration
 from .eyes.settle import prepare
+from .eyes.exposure import optimize_screen_exposure
 from .eyes.taught_recognizer import TaughtRecognizer
 from .robotron_screen_state import classify_screen_state
 from .episode_end import EpisodeEndObserver
@@ -483,6 +484,11 @@ def main():
             actual_focus = source.lens_position()
             print(f"FOCUS LOCKED: requested={args.focus:.3f} actual={actual_focus}")
 
+        # Task-aware optics preflight runs before START, with neutral controls,
+        # and never inside the time-critical tracking/score observation loop.
+        if args.recalibrate:
+            exposure_preflight = optimize_screen_exposure(source, args.output)
+
         auto_start = args.arm and not args.no_start_game
         if auto_start:
             controller = ArcadeController(args.host, args.port, protocol="positions")
@@ -877,6 +883,7 @@ def main():
                   "learning_mode": "fixed_policy_with_shadow_diagnostics",
                   "auto_start": bool(args.arm and not args.no_start_game),
                   "calibration_mode": locals().get("calibration_mode"),
+                  "exposure_preflight": locals().get("exposure_preflight"),
                   "calibration": {"corners":getattr(locals().get("calibration"), "corners", None),
                                   "output_size":getattr(locals().get("calibration"), "output_size", None)},
                   "acquisition": locals().get("acquisition"),

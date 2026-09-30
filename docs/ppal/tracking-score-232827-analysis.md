@@ -1,5 +1,7 @@
 # Analysis and repairs from tracking-score-20260930-232827
 
+Later calibration-only follow-up: [002659 exposure/calibration analysis](calibration-exposure-002659.md).
+
 This archive ran `4ffb951`, the fresh-exposure implementation with passive score
 instrumentation, and ended before normal autonomous gameplay: SELF acquisition
 failed, policy ticks were zero, and controls closed neutral. Alex independently

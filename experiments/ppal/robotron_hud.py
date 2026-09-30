@@ -126,44 +126,38 @@ class RobotronHUDReader:
         if distance > 2 or distance == second:
             return DigitRead(None, max(0.0, 1.0 - distance / 4.0), distance)
         confidence = max(0.0, 1.0 - distance / 3.0)
+        # 7 is currently the only digit without a real Charlie-camera exemplar.
+        if digit == "7":
+            confidence = min(confidence, 0.72)
         return DigitRead(digit, confidence, distance)
 
     @classmethod
     def _read_channel(cls, channel: np.ndarray) -> tuple[int | None, float]:
-        """Locate the cyan score word, split its glyph cells, then classify.
-
-        Camera bloom can connect adjacent digits into one component, so connected
-        components are used to find the score *word*, not assumed to be digits.
-        """
-        hsv = cv2.cvtColor(channel, cv2.COLOR_RGB2HSV)
-        cyan = (((hsv[:, :, 0] >= 72) & (hsv[:, :, 0] <= 112)
-                 & (hsv[:, :, 1] >= 45) & (hsv[:, :, 2] >= 95))).astype(np.uint8)
-        cyan = cv2.morphologyEx(cyan, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
-        n, _, stats, _ = cv2.connectedComponentsWithStats(cyan, 8)
-        h, w = cyan.shape
+        """Locate a bright score word independent of its current arcade hue."""
+        bright = cls._bright_mask(channel)
+        bright = cv2.morphologyEx(bright, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+        n, _, stats, _ = cv2.connectedComponentsWithStats(bright, 8)
+        h, w = bright.shape
         words = []
         for k in range(1, n):
             x, y, bw, bh, area = stats[k]
             if area < 18 or bh < max(7, int(h * .12)) or bw < 3:
                 continue
-            if bh > h * .65:
+            if bh > h * .65 or bw > w * .75:
                 continue
-            words.append((area, x, y, bw, bh))
+            aspect = bw / max(1.0, bh)
+            if aspect < .18:
+                continue
+            position_bonus = 1.25 if y < h * .60 else 1.0
+            words.append((area * position_bonus, x, y, bw, bh))
         if not words:
             return None, 0.0
-
-        # The score is the strongest compact cyan word in its P1/P2 channel.
         _, x, y, bw, bh = max(words, key=lambda b: (b[0], b[3]))
-        # Arcade score glyph pitch is roughly 0.7-0.85 of glyph height. Estimate
-        # count from the whole word so bloom between digits does not matter.
         estimated = int(round(bw / max(1.0, bh * .76)))
         count = max(1, min(7, estimated))
-
-        bright = cls._bright_mask(channel)
         pad_y = max(1, int(bh * .15))
         y0, y1 = max(0, y-pad_y), min(h, y+bh+pad_y)
-        digits = []
-        confidences = []
+        digits, confidences = [], []
         for index in range(count):
             gx0 = int(round(x + index * bw / count))
             gx1 = int(round(x + (index + 1) * bw / count))
@@ -174,7 +168,6 @@ class RobotronHUDReader:
                 return None, max(0.0, float(sum(confidences) / max(1, len(confidences))) * .5)
             digits.append(read.digit)
             confidences.append(read.confidence)
-
         if not digits:
             return None, 0.0
         value = int("".join(digits))

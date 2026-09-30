@@ -130,54 +130,55 @@ class RobotronHUDReader:
 
     @classmethod
     def _read_channel(cls, channel: np.ndarray) -> tuple[int | None, float]:
-        mask = cls._bright_mask(channel)
-        # Horizontal closing joins broken camera/moire strokes without joining
-        # normally spaced adjacent digits.
-        kernel = np.ones((2, 2), np.uint8)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        """Locate the cyan score word, split its glyph cells, then classify.
 
-        n, labels, stats, _ = cv2.connectedComponentsWithStats(mask, 8)
-        boxes = []
-        h, w = mask.shape
-        for i in range(1, n):
-            x, y, bw, bh, area = stats[i]
-            if area < 10 or bh < max(8, int(h * .16)) or bw < 2:
+        Camera bloom can connect adjacent digits into one component, so connected
+        components are used to find the score *word*, not assumed to be digits.
+        """
+        hsv = cv2.cvtColor(channel, cv2.COLOR_RGB2HSV)
+        cyan = (((hsv[:, :, 0] >= 72) & (hsv[:, :, 0] <= 112)
+                 & (hsv[:, :, 1] >= 45) & (hsv[:, :, 2] >= 95))).astype(np.uint8)
+        cyan = cv2.morphologyEx(cyan, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+        n, _, stats, _ = cv2.connectedComponentsWithStats(cyan, 8)
+        h, w = cyan.shape
+        words = []
+        for k in range(1, n):
+            x, y, bw, bh, area = stats[k]
+            if area < 18 or bh < max(7, int(h * .12)) or bw < 3:
                 continue
-            # Reject long border/glare components.
-            if bw > w * .28 or bh > h * .75:
+            if bh > h * .65:
                 continue
-            boxes.append((x, y, bw, bh))
-
-        if not boxes:
+            words.append((area, x, y, bw, bh))
+        if not words:
             return None, 0.0
 
-        # Keep components around the dominant digit height, then order left-right.
-        heights = sorted(b[3] for b in boxes)
-        median_h = heights[len(heights)//2]
-        boxes = [b for b in boxes if b[3] >= median_h * .65]
-        boxes.sort()
-        if len(boxes) > 7:
-            boxes = boxes[-7:]
+        # The score is the strongest compact cyan word in its P1/P2 channel.
+        _, x, y, bw, bh = max(words, key=lambda b: (b[0], b[3]))
+        # Arcade score glyph pitch is roughly 0.7-0.85 of glyph height. Estimate
+        # count from the whole word so bloom between digits does not matter.
+        estimated = int(round(bw / max(1.0, bh * .76)))
+        count = max(1, min(7, estimated))
 
+        bright = cls._bright_mask(channel)
+        pad_y = max(1, int(bh * .15))
+        y0, y1 = max(0, y-pad_y), min(h, y+bh+pad_y)
         digits = []
         confidences = []
-        for x, y, bw, bh in boxes:
-            pad_x = max(1, int(bw * .12))
-            pad_y = max(1, int(bh * .08))
-            x0, y0 = max(0, x-pad_x), max(0, y-pad_y)
-            x1, y1 = min(w, x+bw+pad_x), min(h, y+bh+pad_y)
-            read = cls._read_digit(mask[y0:y1, x0:x1])
-            if read.digit is None:
+        for index in range(count):
+            gx0 = int(round(x + index * bw / count))
+            gx1 = int(round(x + (index + 1) * bw / count))
+            if gx1 <= gx0:
                 continue
+            read = cls._read_digit(bright[y0:y1, gx0:gx1])
+            if read.digit is None:
+                return None, max(0.0, float(sum(confidences) / max(1, len(confidences))) * .5)
             digits.append(read.digit)
             confidences.append(read.confidence)
 
         if not digits:
             return None, 0.0
-        # Robotron displays no leading zeroes. A one-digit score is valid.
         value = int("".join(digits))
         confidence = float(sum(confidences) / len(confidences))
-        # More than one coherent digit gives additional structural confidence.
         if len(digits) >= 2:
             confidence = min(1.0, confidence + .08)
         return value, confidence

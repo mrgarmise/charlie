@@ -97,3 +97,28 @@ def test_equal_read_is_stable_not_reward():
     assert row.delta == 0
     assert not row.changed
     assert row.status == "stable"
+
+
+def test_visual_wrapper_uses_reader_score_and_confidence():
+    from experiments.ppal.eyes.hud import HUDObservation
+    from experiments.ppal.score_tracker import VisualScoreTracker
+
+    class Reader:
+        def read(self, image):
+            return HUDObservation(score=900, lives=3, confidence=.99)
+
+    row = VisualScoreTracker(Reader()).observe(object())
+    assert row.score == 900
+    assert row.status == "baseline"
+
+
+def test_visual_wrapper_tolerates_unreadable_frame():
+    from experiments.ppal.score_tracker import VisualScoreTracker
+
+    class Reader:
+        def read(self, image):
+            return None
+
+    row = VisualScoreTracker(Reader()).observe(object())
+    assert row.score is None
+    assert row.status == "unreadable"

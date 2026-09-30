@@ -80,7 +80,7 @@ class RobotronHUDReader:
         # Extend the left/right arena edges upward by HUD_HEIGHT/480 of their
         # full side vectors. This follows camera perspective instead of using
         # fixed raw-pixel coordinates.
-        frac = self.HUD_HEIGHT / float(self.calibration.output_size[1])
+        frac = 0.10  # source strip height relative to arena side; output is magnified to 96px
         top_left = tl - (bl - tl) * frac
         top_right = tr - (br - tr) * frac
 

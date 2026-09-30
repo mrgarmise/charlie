@@ -51,6 +51,7 @@ class ArcadeController:
         self.held: frozenset[str] = frozenset()
         self.positions = ("LS_CENTER", "RS_CENTER")
         self.closed = False
+        self.last_execution = None
         try:
             self._command("NEUTRAL")
         except BaseException:
@@ -72,28 +73,39 @@ class ArcadeController:
         desired = controls_for(action) if self.protocol == "legacy" else frozenset()
         if not 30 <= duration_ms <= 500:
             raise ValueError("duration_ms must be 30..500")
+        timing = {"started_at":time.monotonic(), "move":action.move,
+                  "fire":action.fire, "duration_ms":duration_ms, "commands":[]}
+        self.last_execution = timing
+        def send(command):
+            began = time.monotonic()
+            self._command(command)
+            timing["commands"].append({"command":command, "sent_at":began,
+                                       "ack_at":time.monotonic()})
         try:
             if self.protocol == "positions":
                 for current, new in zip(self.positions, desired_positions):
                     if current != new:
-                        self._command(new)
+                        send(new)
                 self.positions = desired_positions
             else:
                 for control in sorted(self.held - desired):
-                    self._command(control + "_UP")
+                    send(control + "_UP")
                 for control in sorted(desired - self.held):
-                    self._command(control + "_DOWN")
+                    send(control + "_DOWN")
                 self.held = desired
+            timing["controls_ready_at"] = time.monotonic()
             self.sleep(duration_ms / 1000)
+            timing["pulse_finished_at"] = time.monotonic()
             if self.pulse:
                 if self.protocol == "positions":
                     for command in ("LS_CENTER", "RS_CENTER"):
-                        self._command(command)
+                        send(command)
                     self.positions = ("LS_CENTER", "RS_CENTER")
                 else:
                     for control in sorted(self.held):
-                        self._command(control + "_UP")
+                        send(control + "_UP")
                     self.held = frozenset()
+            timing["returned_at"] = time.monotonic()
         except BaseException:
             # A dropped connection makes the Zero-side launcher neutralize too.
             try:

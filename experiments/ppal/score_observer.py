@@ -103,19 +103,3 @@ class ScoreObserver:
                 'accepted_confidence':dict(self.accepted_confidence),
                 'mode':'observational_background', 'timestamp_clock':'monotonic',
                 'metric':'official_game_score', 'policy_feedback':False}
-
-
-class ObservedCamera:
-    """Retain the full camera frame without changing calibration/capture callers."""
-    def __init__(self, source):
-        self.source = source
-        self.raw = None
-        self.timestamp = None
-
-    def read(self):
-        self.raw = self.source.read()
-        self.timestamp = time.monotonic()
-        return self.raw
-
-    def __getattr__(self, name):
-        return getattr(self.source, name)

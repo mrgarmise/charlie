@@ -1,3 +1,5 @@
+> Updated after separately analyzing the repaired second Pi run. See [second-pi-run-and-capture-timing.md](second-pi-run-and-capture-timing.md) for first/second-run distinctions, the fresh-exposure repair and remaining limits.
+
 # Observational score integration
 
 The agency branch merges score branch `72f4958` with the physical-tracking repair
@@ -54,7 +56,9 @@ recalibrate before the next game.
 
 Keep local modifications; never reset or discard files. A failed fast-forward
 must be investigated before running. The gameplay limit is 20 seconds after SELF
-acquisition; bounded startup/probes and cleanup are additional time.
+acquisition; bounded startup/probes and cleanup are additional time. The command
+uses the existing border recalibration so HUD geometry follows the current
+camera view, and retains the requested manual focus.
 
 ```bash
 cd ~/Projects/charlie
@@ -69,7 +73,7 @@ mkdir -p robotron-runs
 run_dir="robotron-runs/tracking-score-$(date +%Y%m%d-%H%M%S)"
 set -o pipefail
 PYTHONPATH="$PWD" python -m experiments.ppal.play_robotron \
-  --seconds 20 --focus 1.30 --arm --output "$run_dir" \
+  --seconds 20 --focus 1.30 --recalibrate --arm --output "$run_dir" \
   2>&1 | tee "$run_dir.console.log"
 python -m experiments.ppal.replay_tracking "$run_dir/agency.jsonl" \
   --output "$run_dir/tracking-replay.json"
@@ -101,8 +105,8 @@ continued-during-neutral penalties. This is strong evidence of observation/actio
 phase misalignment, not fragmentation of this likely player during the probes.
 It does not establish whether camera buffering, transport latency, or another
 capture/actuation delay is responsible. Do not weaken agency identity gates to
-hide the timing problem. A follow-up capture-timing repair should precede another
-armed experiment; score remains observational during that repair.
+hide the timing problem. The fresh-exposure capture repair is now included and locally tested; its
+physical effect remains pending the next Pi experiment. Score remains observational.
 
 Alex observed 1200 official points later in the game. Since normal policy ticks
 are zero, those points cannot be credited to Charlie's normal planner. Probes did

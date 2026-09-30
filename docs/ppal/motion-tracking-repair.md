@@ -1,3 +1,5 @@
+> Historical first-run diagnosis and repair. The separate second-run analysis and capture repair are in [second-pi-run-and-capture-timing.md](second-pi-run-and-capture-timing.md).
+
 # First Pi agency run: diagnosis and tracker repair
 
 Source: `play-20260930-024128`, running `a70149c`. The recorded knowledge hash

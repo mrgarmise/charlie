@@ -32,7 +32,8 @@ from .eyes.taught_recognizer import TaughtRecognizer
 from .robotron_screen_state import classify_screen_state
 from .episode_end import EpisodeEndObserver
 from .robotron_agency import VisualAgency
-from .score_observer import ScoreObserver, ObservedCamera
+from .score_observer import ScoreObserver
+from .observation_camera import ObservedCamera
 from PIL import ImageDraw
 
 HUMANS = {"dad", "mom", "kid"}
@@ -382,7 +383,7 @@ def main():
     visual_agency = VisualAgency()
     self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3,
                                          tracker=visual_agency.tracker if args.arm else None)
-    source = ObservedCamera(PiCameraSource())
+    source = ObservedCamera(PiCameraSource(), require_fresh=args.arm)
     score_observer = None
     preceding_action = None
     rows = []
@@ -393,7 +394,8 @@ def main():
     buffered_frames = []
     raw_frames = []
     def record_agency(snapshot):
-        row = {"sample": visual_agency.tick, "capture_timestamp": source.timestamp, **snapshot}
+        row = {"sample": visual_agency.tick, "capture_timestamp": source.timestamp, "capture": source.capture,
+               "control_execution": getattr(controller, "last_execution", None), **snapshot}
         # Encoding PNGs between pulses lengthened unseen intervals substantially.
         # Buffer a bounded set of originals; write images only after controls close.
         if latest_agency_frame is not None and len(raw_frames) < 96:
@@ -513,7 +515,8 @@ def main():
             if controller is None:
                 controller = ArcadeController(args.host, args.port, protocol="positions")
             print("DISCOVERING SELF: short movement/neutral probes over all visual candidates")
-            player = visual_agency.discover(read_agency_pairs, controller, record=record_agency)
+            player = visual_agency.discover(read_agency_pairs, controller, record=record_agency,
+                                           observation_time=lambda: source.timestamp)
             frames = [visual_agency.pairs]
             acquisition = "generic_visual_agency" if player is not None else None
 
@@ -598,7 +601,8 @@ def main():
                 recovery = "generic_visual_agency"
                 if lost == 1 or lost % 12 == 0:
                     recovered = visual_agency.discover(
-                        read_agency_pairs, controller, deadline=deadline, record=record_agency)
+                        read_agency_pairs, controller, deadline=deadline, record=record_agency,
+                        observation_time=lambda: source.timestamp)
                     recovery_frames = [visual_agency.pairs]
                     detections = [d for d, _ in visual_agency.pairs]
 
@@ -733,8 +737,9 @@ def main():
                     "lost": lost,
                     "method": recovery,
                     "capture_timestamp": source.timestamp,
-                "action_timestamp": pending_at,
-                "player": list(player),
+                    "capture": source.capture,
+                    "action_timestamp": pending_at,
+                    "player": list(player),
                 })
                 print(
                     f"PLAYER REACQUIRED ({recovery}) after {lost} misses "
@@ -799,6 +804,7 @@ def main():
             rows.append({
                 "tick": tick, "observed_at": observed_at, "t": time.monotonic()-started,
                 "capture_timestamp": source.timestamp,
+                "capture": source.capture,
                 "action_timestamp": pending_at,
                 "player": list(player),
                 "self_track_id": self_tracker.player_track_id,
@@ -868,6 +874,7 @@ def main():
                   "raw_frames": raw_frames,
                   "tracking_log": "agency.jsonl",
                   "tracking_schema": "sprite-tracking-v2",
+                  "capture_mode": "fresh_exposure" if args.arm else "read_completion",
                   "tracks": "tracks.json",
                   "agency_samples": len(agency_rows),
                   "agency_log": "agency.jsonl",

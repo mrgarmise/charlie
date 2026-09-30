@@ -1,6 +1,7 @@
 """Camera, saved-image, and synthetic frame sources; all return RGB PIL images."""
 
 from pathlib import Path
+import time
 
 from PIL import Image, ImageDraw
 
@@ -25,6 +26,38 @@ class PiCameraSource:
     def read(self) -> Image.Image:
         # Camera uses Picamera2 RGB888: its array is BGR byte order.
         return Image.fromarray(self.camera.read()[..., ::-1].copy(), mode="RGB")
+
+    def read_fresh(self) -> Image.Image:
+        """Use a new exposure, never Picamera2's cached pre-command frame.
+
+        flush=True requires exposure to start after capture_request is called.
+        Metadata and pixels must come from the same request. No arbitrary delay
+        or candidate-dependent frame selection is used. Unsupported versions
+        fail explicitly rather than silently restoring stale agency evidence.
+        """
+        requested_at = time.monotonic()
+        request = self.camera.picam2.capture_request(flush=True)
+        try:
+            metadata = request.get_metadata()
+            # Copy before release: CompletedRequest borrows camera buffers.
+            rgb = request.make_array("main")[..., ::-1].copy()
+            completed_at = time.monotonic()
+            sensor_ns = metadata.get("SensorTimestamp")
+            exposure_us = metadata.get("ExposureTime")
+            exposure_start = (sensor_ns / 1e9 - exposure_us / 1e6
+                              if sensor_ns is not None and exposure_us is not None else None)
+            self.last_capture = {
+                "mode": "fresh_exposure", "requested_at": requested_at,
+                "completed_at": completed_at,
+                "capture_seconds": completed_at-requested_at,
+                "sensor_timestamp_ns": sensor_ns, "exposure_time_us": exposure_us,
+                "first_pixel_exposure_at": exposure_start,
+                "frame_duration_us": metadata.get("FrameDuration"),
+                "lens_position": metadata.get("LensPosition"),
+            }
+            return Image.fromarray(rgb, mode="RGB")
+        finally:
+            request.release()
 
     def autofocus(self) -> None:
         self.camera.autofocus()

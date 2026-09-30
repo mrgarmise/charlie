@@ -54,14 +54,15 @@ class VisualAgency:
     def player(self):
         return self.positions.get(self.agency.self_id)
 
-    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None):
+    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None):
         """Bounded reversal/orthogonal taps interleaved with measured neutral.
 
         Controller.execute centers both sticks at each pulse's end. Read the
-        first post-pulse frame immediately, then measure an independent neutral
+        first fresh post-pulse exposure, then measure an independent neutral
         interval. Do not average several post-pulse frames into movement evidence.
         """
-        initial = self.observe(read_pairs(), observed_at=time.monotonic())
+        pairs = read_pairs()
+        initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
         if record:
             record(initial)  # pre-command detections are essential for exact replay
         for move in ('E', 'W', 'S', 'N', 'E', 'W'):
@@ -73,7 +74,8 @@ class VisualAgency:
                 start = time.monotonic()
                 controller.execute(Action(direction, 'NONE', 'agency discovery'), pulse_ms)
                 pairs = read_pairs()
-                snapshot = self.observe(pairs, direction, time.monotonic()-start, observed_at=time.monotonic())
+                snapshot = self.observe(pairs, direction, time.monotonic()-start,
+                                        observed_at=observation_time() if observation_time else time.monotonic())
                 if record:
                     record(snapshot)
             if self.player is not None:

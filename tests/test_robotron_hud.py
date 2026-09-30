@@ -30,7 +30,7 @@ def test_all_digits_classify_from_segment_geometry():
     for d in "0123456789":
         r=RobotronHUDReader._read_digit(glyph(d))
         assert r.digit == d
-        assert r.confidence == 1.0
+        assert r.confidence == (0.72 if d == "7" else 1.0)
 
 
 def test_channel_reads_score_and_absent_channel():
@@ -68,3 +68,24 @@ def test_real_hud_observation_flows_into_temporal_dual_tracker():
     assert scores.player1.score == 8400
     assert scores.player2.score is None
     assert scores.self_score == 8400
+
+
+def test_score_reader_is_hue_independent_for_same_shape():
+    import cv2
+    for color in ([255,240,80], [80,255,255], [255,80,220], [255,255,255]):
+        canvas=np.zeros((48,180,3),dtype=np.uint8)
+        x=8
+        for d in "8400":
+            g=cv2_resize(glyph(d),15,28)
+            canvas[8:36,x:x+15]=np.maximum(
+                canvas[8:36,x:x+15],
+                g[:,:,None]*np.array(color,dtype=np.uint8))
+            x += 21
+        score,_=RobotronHUDReader._read_channel(canvas)
+        assert score == 8400
+
+
+def test_real_corpus_covers_every_digit_except_seven():
+    from experiments.ppal.robotron_score_corpus import covered_digits, UNOBSERVED_DIGITS
+    assert covered_digits() == frozenset("012345689")
+    assert UNOBSERVED_DIGITS == frozenset("7")

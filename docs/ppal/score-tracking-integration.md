@@ -1,3 +1,5 @@
+> Later live-run analysis and repairs: [tracking-score-232827-analysis.md](tracking-score-232827-analysis.md).
+
 > Updated after separately analyzing the repaired second Pi run. See [second-pi-run-and-capture-timing.md](second-pi-run-and-capture-timing.md) for first/second-run distinctions, the fresh-exposure repair and remaining limits.
 
 # Observational score integration

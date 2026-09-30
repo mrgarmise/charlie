@@ -1,0 +1,27 @@
+{
+  "run": "tracking-score-20260930-232827",
+  "commit": "4ffb9519d7385e146d2ac4a68297250747beef2e",
+  "scores": {
+    "camera-zero.jpg": 0,
+    "camera-100.jpg": 100
+  },
+  "diagnostic_corners_pixels": [
+    [
+      525,
+      70
+    ],
+    [
+      1275,
+      105
+    ],
+    [
+      1280,
+      650
+    ],
+    [
+      442,
+      565
+    ]
+  ],
+  "note": "JPEG reencodings of original full-camera PNGs; manually estimated partial-border geometry for diagnostic HUD regression only. Automatic full-board locator correctly rejects this obstructed/clipped scene."
+}

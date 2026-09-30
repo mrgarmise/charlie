@@ -1,3 +1,5 @@
+> Later live-run analysis and repairs: [tracking-score-232827-analysis.md](tracking-score-232827-analysis.md).
+
 # Separate diagnoses of the two agency Pi runs
 
 The first-run report is historical. Timing repair here is justified by the

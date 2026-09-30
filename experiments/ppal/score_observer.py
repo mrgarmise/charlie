@@ -10,7 +10,7 @@ from .score_events import ScoreEventLog
 
 class ScoreObserver:
     def __init__(self, calibration, path):
-        self.system = RobotronScoreSystem(calibration, self_channel=1)
+        self.system = RobotronScoreSystem(calibration, self_channel=1, confirm_baseline=True)
         self.log = ScoreEventLog(path)
         self.queue = queue.Queue(maxsize=2)
         self.dropped = 0
@@ -65,7 +65,7 @@ class ScoreObserver:
                     row['raw_frame'] = name
                 row.update(sample=sample, timestamp=timestamp, preceding_action=action,
                            processing_seconds=elapsed, enqueue_copy_seconds=copy_seconds,
-                           error=error, reward_evidence=channels.self_delta if action else 0,
+                           error=error, reward_evidence=channels.self_delta,
                            attribution='temporal_association_only')
                 with self.log.path.open('a', encoding='utf-8') as stream:
                     stream.write(json.dumps(row)+'\n')

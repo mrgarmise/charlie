@@ -292,7 +292,7 @@ def _pair_evidence(pairs):
     return rows
 
 
-def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.0, on_observation=None):
+def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.0, on_observation=None, generic_ready=False):
     """Observe quietly after START and preserve why acquisition passed or failed."""
     deadline = time.monotonic() + timeout
     collected = []
@@ -323,6 +323,14 @@ def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.
         # Save a small visual trail without turning every run into a frame dump.
         if frame_no < 4 or frame_no % 8 == 0 or center is not None:
             playfield.save(evidence_dir / f"startup-{frame_no:03d}.png")
+        if generic_ready and len(collected) >= 3:
+            recent = collected[-3:]
+            stable = all(old and new and .5 <= len(new)/len(old) <= 2.
+                         and sum(min(_distance(d.center, before.center) for before, _ in old) <= 3.
+                                 for d, _ in new) / len(new) >= .8
+                         for old, new in zip(recent, recent[1:]))
+            if stable:
+                return None, "generic_visual_ready", collected, watch, first_visual
         if center is not None:
             return center, "new_game_center", collected, watch, first_visual
         frame_no += 1
@@ -428,7 +436,9 @@ def main():
             score_observer.submit(source.raw, timestamp=source.timestamp,
                                   sample=visual_agency.tick, preceding_action={
                                       "action":preceding_action, "agency_command":snapshot.get("command"),
-                                      "self_track_id":snapshot.get("self_track_id")} if preceding_action or snapshot.get("command") is not None else None)
+                                      "self_track_id":snapshot.get("self_track_id"),
+                                      "control_execution":getattr(controller, "last_execution", None),
+                                      "phase":snapshot.get("phase")} if preceding_action or snapshot.get("command") is not None or getattr(controller, "last_execution", None) is not None else None)
     def observe_unmeasured(pairs, frame):
         nonlocal latest_agency_frame
         latest_agency_frame = frame
@@ -502,7 +512,7 @@ def main():
         if auto_start:
             player, acquisition, frames, startup_watch, gameplay_visual_frame = _wait_for_gameplay(
                 source, calibration, recognizer, args.output, timeout=args.start_wait,
-                on_observation=observe_unmeasured)
+                on_observation=observe_unmeasured, generic_ready=True)
         else:
             frames = _quick_frames(source, calibration, recognizer, count=5,
                                    on_observation=observe_unmeasured if args.arm else None)
@@ -867,13 +877,15 @@ def main():
                   "learning_mode": "fixed_policy_with_shadow_diagnostics",
                   "auto_start": bool(args.arm and not args.no_start_game),
                   "calibration_mode": locals().get("calibration_mode"),
+                  "calibration": {"corners":getattr(locals().get("calibration"), "corners", None),
+                                  "output_size":getattr(locals().get("calibration"), "output_size", None)},
                   "acquisition": locals().get("acquisition"),
                   "gameplay_visual_frame": locals().get("gameplay_visual_frame"),
                   "startup_watch": locals().get("startup_watch", []),
                   "agency_frames": agency_frames,
                   "raw_frames": raw_frames,
                   "tracking_log": "agency.jsonl",
-                  "tracking_schema": "sprite-tracking-v2",
+                  "tracking_schema": "sprite-tracking-v3",
                   "capture_mode": "fresh_exposure" if args.arm else "read_completion",
                   "tracks": "tracks.json",
                   "agency_samples": len(agency_rows),

@@ -102,11 +102,14 @@ class SpriteTracker:
     semantic labels never determine physical association.
     """
 
-    def __init__(self, max_distance=7.0, max_missed=3, max_speed=100., ambiguity_margin=.5):
+    def __init__(self, max_distance=7.0, max_missed=3, max_speed=100., ambiguity_margin=.5, association_version=2):
         self.max_distance = float(max_distance)
         self.max_missed = int(max_missed)
         self.max_speed = float(max_speed)
         self.ambiguity_margin = float(ambiguity_margin)
+        if association_version not in (1, 2):
+            raise ValueError("association_version must be 1 or 2")
+        self.association_version = association_version
         self.next_id = 1
         self.active = {}
         self.finished = []
@@ -178,7 +181,12 @@ class SpriteTracker:
                     rejected_edges.append({'detection_index':index, 'reason':reason,
                                            'distance':distance, 'prediction_error':residual,
                                            'box_area_ratio':ratio})
-            row.extend([gate]*len(track_ids))  # independent unmatched choices
+            # Version 1 allowed all rows to exchange identical unmatched
+            # columns. Those dummy permutations are not physical ambiguity.
+            # Private dummy columns preserve the same physical optimization
+            # while preventing irrelevant permutations from quarantining IDs.
+            row.extend([gate if self.association_version == 1 or j == len(costs) else 1e6
+                        for j in range(len(track_ids))])
             costs.append(row)
             diagnostics.append({'track_id':track_id, 'previous':list(track.center),
                                 'predicted':list(predicted), 'velocity':list(track.velocity),
@@ -186,7 +194,9 @@ class SpriteTracker:
                                 'missed':track.missed, 'candidates':candidates,
                                 'rejected_counts':rejected,
                                 'nearest_rejections':sorted(rejected_edges,key=lambda r:r['distance'])[:3]})
-        viable = [i for i,row in enumerate(costs) if any(value < 1e6 for value in row[:n])]
+        viable = [i for i,row in enumerate(costs)
+                  if any(value < (1e6 if self.association_version == 1 else gates[i])
+                         for value in row[:n])]
         matrix = [costs[i] for i in viable]
         selected, row_prices, column_prices = _assignment(matrix, return_duals=True)
         matched = {i:col for i,col in zip(viable,selected) if col < n and costs[i][col] < gates[i]}
@@ -282,12 +292,15 @@ class SpriteTracker:
         self.last_update = {'configuration':{'max_distance':self.max_distance,
                                             'max_missed':self.max_missed,
                                             'max_speed':self.max_speed,
-                                            'ambiguity_margin':self.ambiguity_margin},
+                                            'ambiguity_margin':self.ambiguity_margin,
+                                            'association_version':self.association_version},
                             'tick':tick, 'observed_at':observed_at, 'clock':'seconds' if seconds_mode else 'ticks',
                             'detections':[{'index':i, 'track_id':assignments[i], 'center':list(d.center),
                                            'box':list(d.box), 'pixels':getattr(d,'pixels',None), 'kind':d.kind}
                                           for i,d in enumerate(detections)],
                             'predictions':diagnostics, 'events':events}
+        if self.association_version == 1:
+            self.last_update['configuration'].pop('association_version')
         return assignments
 
     def finish(self):

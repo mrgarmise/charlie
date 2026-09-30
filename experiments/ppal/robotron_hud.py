@@ -67,7 +67,7 @@ class RobotronHUDReader:
     P1_X = (0.10, 0.28)
     P2_X = (0.72, 0.90)
 
-    def __init__(self, calibration: Calibration, *, min_channel_confidence: float = .55):
+    def __init__(self, calibration: Calibration, *, min_channel_confidence: float = .70):
         self.calibration = calibration
         self.min_channel_confidence = float(min_channel_confidence)
 
@@ -96,9 +96,8 @@ class RobotronHUDReader:
     @staticmethod
     def _bright_mask(rgb: np.ndarray) -> np.ndarray:
         """Keep luminous arcade glyph pixels while suppressing dark TV/bezel."""
-        hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
-        # Digits are bright cyan/white; this intentionally accepts either hue.
-        return (hsv[:, :, 2] >= 200).astype(np.uint8)
+        # Hue and saturation never enter recognition.
+        return (rgb.max(axis=2) >= 200).astype(np.uint8)
 
     @staticmethod
     def _segment_signature(glyph: np.ndarray) -> tuple[int, ...]:
@@ -119,6 +118,25 @@ class RobotronHUDReader:
     @classmethod
     def _read_digit(cls, glyph: np.ndarray) -> DigitRead:
         sig = cls._segment_signature(glyph)
+        if sig == (1,1,1,1,0,1,1):
+            g = cv2.resize(glyph.astype(np.uint8), (20,32), interpolation=cv2.INTER_AREA)
+            if g[7:12,15:18].mean() <= .35:
+                # A blurred middle-bar corner can resemble the upper-right
+                # stroke distinguishing 5 from 9. Abstain rather than invent 9.
+                return DigitRead(None, .5, 1)
+        if sig not in _SEGMENTS:
+            # The photographed Robotron font has a central-stem serif 1,
+            # unlike a right-side seven-segment 1. Stretching that glyph and
+            # counting its base as a segment produced a confident false 2.
+            g = cv2.resize(glyph.astype(np.uint8), (20,32), interpolation=cv2.INTER_NEAREST)
+            core = g[7:25]
+            pillars = np.flatnonzero(core.mean(axis=0) >= .8)
+            if (len(pillars) and pillars[-1]-pillars[0] < 7
+                    and 6 <= pillars.mean() <= 15):
+                outside = core.copy()
+                outside[:, max(0,pillars[0]-1):min(20,pillars[-1]+2)] = 0
+                if outside.mean() <= .08:
+                    return DigitRead("1", .9, 0)
         ranked = sorted((sum(a != b for a, b in zip(sig, ref)), digit)
                         for ref, digit in _SEGMENTS.items())
         distance, digit = ranked[0]
@@ -135,7 +153,8 @@ class RobotronHUDReader:
     def _read_channel(cls, channel: np.ndarray) -> tuple[int | None, float]:
         """Locate a bright score word independent of its current arcade hue."""
         bright = cls._bright_mask(channel)
-        bright = cv2.morphologyEx(bright, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+        # Fill vertical stroke gaps without joining neighboring characters.
+        bright = cv2.morphologyEx(bright, cv2.MORPH_CLOSE, np.ones((3, 1), np.uint8))
         n, _, stats, _ = cv2.connectedComponentsWithStats(bright, 8)
         h, w = bright.shape
         words = []
@@ -155,6 +174,11 @@ class RobotronHUDReader:
         _, x, y, bw, bh = max(words, key=lambda b: (b[0], b[3]))
         aligned = sorted((b for b in words if abs(b[2]-y) <= max(2, bh*.2)
                           and abs(b[4]-bh) <= max(2, bh*.25)), key=lambda b:b[1])
+        right = max(b[1]+b[3] for b in aligned)
+        # Scores are right-aligned in their channel. Isolated left fragments
+        # of a dim number must not be promoted to a shorter, confident score.
+        if h >= cls.HUD_HEIGHT and right < w*.8:
+            return None, 0.
         if len(aligned) > 1:
             digits, confidences = [], []
             for _, gx, gy, gw, gh in aligned:
@@ -187,9 +211,7 @@ class RobotronHUDReader:
         if not digits:
             return None, 0.0
         value = int("".join(digits))
-        confidence = float(sum(confidences) / len(confidences))
-        if len(digits) >= 2:
-            confidence = min(1.0, confidence + .08)
+        confidence = min(confidences)
         return value, confidence
 
     def read(self, raw: Image.Image) -> RobotronHUDObservation:

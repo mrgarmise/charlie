@@ -16,7 +16,9 @@ def replay(path):
     samples=[json.loads(line) for line in Path(path).read_text().splitlines() if line.strip()]
     if not samples or any('tracking' not in sample for sample in samples):
         raise ValueError('exact replay requires v2 tracking inputs; legacy endpoint logs lack boxes and initial observations')
-    tracker=SpriteTracker(**samples[0]['tracking']['configuration'])
+    configuration = dict(samples[0]['tracking']['configuration'])
+    configuration.setdefault('association_version', 1)
+    tracker=SpriteTracker(**configuration)
     mismatches=[]
     total_detections=0
     for sample in samples:

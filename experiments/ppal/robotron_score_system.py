@@ -5,14 +5,15 @@ from pathlib import Path
 
 from .robotron_hud import RobotronHUDReader
 from .score_events import ScoreEventLog
-from .score_tracker import VisualScoreTracker
+from .score_tracker import VisualScoreTracker, DualScoreTracker
 
 
 class RobotronScoreSystem:
     def __init__(self, calibration, *, log_path: Path | None = None,
-                 self_channel: int | None = 1) -> None:
+                 self_channel: int | None = 1, confirm_baseline: bool = False) -> None:
         self.reader = RobotronHUDReader(calibration)
-        self.tracker = VisualScoreTracker(self.reader, self_channel=self_channel)
+        self.tracker = VisualScoreTracker(self.reader, DualScoreTracker(self_channel=self_channel,
+                                                confirm_baseline=confirm_baseline))
         self.log = ScoreEventLog(log_path) if log_path is not None else None
         self.latest = None
 

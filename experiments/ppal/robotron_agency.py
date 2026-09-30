@@ -71,6 +71,8 @@ class VisualAgency:
             if not self.positions:
                 break
             for direction in (move, 'STAY'):
+                if deadline is not None and time.monotonic() + pulse_ms/1000 >= deadline:
+                    return self.player
                 start = time.monotonic()
                 controller.execute(Action(direction, 'NONE', 'agency discovery'), pulse_ms)
                 pairs = read_pairs()
@@ -78,6 +80,18 @@ class VisualAgency:
                                         observed_at=observation_time() if observation_time else time.monotonic())
                 if record:
                     record(snapshot)
+                if direction != 'STAY':
+                    if deadline is not None and time.monotonic() >= deadline:
+                        return self.player
+                    # The new Pi run demonstrates response spilling into the
+                    # first fresh neutral endpoint. Track that handoff without
+                    # claiming it is an independent stop test. The following
+                    # measured neutral interval still uses unchanged gates.
+                    pairs = read_pairs()
+                    handoff = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
+                    handoff['phase'] = 'neutral_handoff_unmeasured'
+                    if record:
+                        record(handoff)
             if self.player is not None:
                 break
         return self.player

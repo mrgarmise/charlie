@@ -48,13 +48,15 @@ class ScoreTracker:
     """Conservative monotonic score belief over noisy visual observations."""
 
     def __init__(self, *, confirm_samples: int = 2, min_confidence: float = 0.70,
-                 immediate_confidence: float = 0.97, max_jump: int | None = None) -> None:
+                 immediate_confidence: float = 0.97, max_jump: int | None = None,
+                 confirm_baseline: bool = False) -> None:
         if confirm_samples < 1:
             raise ValueError("confirm_samples must be >= 1")
         self.confirm_samples = int(confirm_samples)
         self.min_confidence = float(min_confidence)
         self.immediate_confidence = float(immediate_confidence)
         self.max_jump = max_jump
+        self.confirm_baseline = confirm_baseline
         self.reset()
 
     def reset(self) -> None:
@@ -79,7 +81,7 @@ class ScoreTracker:
         if confidence < self.min_confidence:
             return self._result(observed_score, 0, False, "low_confidence", confidence)
         if self.score is None:
-            if confidence >= self.immediate_confidence or self.confirm_samples == 1:
+            if (confidence >= self.immediate_confidence and not self.confirm_baseline) or self.confirm_samples == 1:
                 self.score = observed_score
                 self._clear_pending()
                 return self._result(observed_score, 0, False, "baseline", confidence)

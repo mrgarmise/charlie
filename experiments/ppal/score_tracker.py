@@ -143,3 +143,24 @@ class ScoreTracker:
             changed=bool(changed),
             status=status,
         )
+
+
+class VisualScoreTracker:
+    """Connect any HUDReader to temporal score belief.
+
+    The reader owns pixel recognition. This class deliberately ignores lives for
+    now; score is the performance objective and can be validated independently.
+    """
+
+    def __init__(self, reader, tracker: ScoreTracker | None = None) -> None:
+        self.reader = reader
+        self.tracker = tracker or ScoreTracker()
+
+    def reset(self) -> None:
+        self.tracker.reset()
+
+    def observe(self, image) -> ScoreObservation:
+        hud = self.reader.read(image)
+        if hud is None:
+            return self.tracker.observe(None, 0.0)
+        return self.tracker.observe(hud.score, hud.confidence)

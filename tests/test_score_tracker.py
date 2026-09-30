@@ -153,3 +153,22 @@ def test_score_event_log_records_both_channels_and_self_delta(tmp_path):
     assert row["self_delta"] == 500
     saved = json.loads((tmp_path/"score.jsonl").read_text())
     assert saved["self_channel"] == 2
+
+
+def test_score_system_report_and_log(tmp_path):
+    from experiments.ppal.eyes.calibration import Calibration
+    from experiments.ppal.robotron_score_system import RobotronScoreSystem
+    from experiments.ppal.robotron_hud import RobotronHUDObservation
+
+    system = RobotronScoreSystem(Calibration(((0,0),(1,0),(1,1),(0,1))),
+                                 log_path=tmp_path/"score.jsonl")
+    class Reader:
+        def read(self, frame):
+            return RobotronHUDObservation(8400, None, .99, 0.0)
+    system.reader = Reader()
+    system.tracker.reader = system.reader
+    row = system.observe(object(), t=.25)
+    assert row.self_score == 8400
+    assert system.report()["self_score"] == 8400
+    assert system.report()["p2_score"] is None
+    assert (tmp_path/"score.jsonl").exists()

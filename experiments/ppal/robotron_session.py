@@ -85,8 +85,8 @@ class PersistentSelfTracker:
     every frame.  After too many misses it requests reacquisition rather than guess.
     """
 
-    def __init__(self, max_distance: float = 7.0, max_missed: int = 3) -> None:
-        self.tracker = SpriteTracker(max_distance=max_distance, max_missed=max_missed)
+    def __init__(self, max_distance: float = 7.0, max_missed: int = 3, tracker=None) -> None:
+        self.tracker = tracker if tracker is not None else SpriteTracker(max_distance=max_distance, max_missed=max_missed)
         self.player_track_id: int | None = None
         self.misses = 0
         self.max_missed = int(max_missed)
@@ -95,10 +95,22 @@ class PersistentSelfTracker:
     def _distance(a, b) -> float:
         return ((a[0]-b[0])**2 + (a[1]-b[1])**2) ** 0.5
 
+    def _associate_once(self, tick, detections):
+        previous = self.tracker.last_update
+        if previous.get("clock") == "ticks" and previous.get("tick") == tick:
+            serialized = previous["detections"]
+            same = len(serialized) == len(detections) and all(
+                tuple(row["center"]) == tuple(d.center) and tuple(row["box"]) == tuple(d.box)
+                and row["kind"] == d.kind for row,d in zip(serialized,detections))
+            if not same:
+                raise ValueError("different observations need different tracking times")
+            return {row["index"]:row["track_id"] for row in serialized}
+        return self.tracker.update(tick, detections)
+
     def seed(self, tick: int, detections: Iterable[Any], player_center: tuple[float, float],
              max_seed_distance: float = 5.0) -> SelfObservation:
         detections = list(detections)
-        assignments = self.tracker.update(tick, detections)
+        assignments = self._associate_once(tick, detections)
         choices = [(self._distance(d.center, player_center), i) for i, d in enumerate(detections)]
         if not choices:
             return SelfObservation(tick, None, None, "seed_missing", self.misses)
@@ -114,7 +126,7 @@ class PersistentSelfTracker:
 
     def update(self, tick: int, detections: Iterable[Any]) -> SelfObservation:
         detections = list(detections)
-        assignments = self.tracker.update(tick, detections)
+        assignments = self._associate_once(tick, detections)
         if self.player_track_id is None:
             return SelfObservation(tick, None, None, "unseeded", self.misses)
         for index, track_id in assignments.items():
@@ -130,6 +142,29 @@ class PersistentSelfTracker:
         self.player_track_id = None
         self.misses = 0
         return self.seed(tick, detections, player_center, max_seed_distance)
+
+    def bind_track(self, tick: int, track_id: int | None, positions) -> SelfObservation:
+        """Bind agency identity on an ALREADY updated generic tracker.
+
+        Never run association twice on one camera observation. All physical IDs
+        (SELF, humans, unknowns, threats) share the same tracking substrate.
+        """
+        if track_id is None or track_id not in positions:
+            return SelfObservation(tick, None, None, "seed_missing", self.misses)
+        self.player_track_id = track_id
+        self.misses = 0
+        return SelfObservation(tick, track_id, tuple(positions[track_id]), "seeded", 0)
+
+    def observe_tracks(self, tick: int, positions) -> SelfObservation:
+        if self.player_track_id is None:
+            return SelfObservation(tick, None, None, "unseeded", self.misses)
+        center = positions.get(self.player_track_id)
+        if center is not None:
+            self.misses = 0
+            return SelfObservation(tick, self.player_track_id, tuple(center), "tracked", 0)
+        self.misses += 1
+        status = "reacquire" if self.misses > self.max_missed else "temporarily_missing"
+        return SelfObservation(tick, self.player_track_id, None, status, self.misses)
 
     def tracks(self) -> list[dict[str, Any]]:
         tracks = list(self.tracker.finished) + list(self.tracker.active.values())

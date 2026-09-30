@@ -1,5 +1,10 @@
 # Agency-first SELF: implementation and next live experiment
 
+**Updated after the first Pi run:** see [motion-tracking-repair.md](motion-tracking-repair.md)
+for the current tracker, diagnostics and test commands. The acquisition principles
+below remain; the old 24-frame diagnostics and independent location association
+were superseded by the shared motion-aware tracker.
+
 Armed `play_robotron` discovers SELF over every generic visual detection. A taught
 PLAYER score is not an admission requirement. Unarmed preflight still reports
 appearance/center proposals without issuing controls; it does not prove agency.

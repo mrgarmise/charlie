@@ -23,6 +23,7 @@ class Belief:
     awaiting_stop: bool = False
     misses: int = 0
     indirect_score: float = 0.0
+    lineage_source: int | None = None
 
 
 class AgencyTracker:
@@ -39,6 +40,7 @@ class AgencyTracker:
         self.last_confirmed_id = None
         self.last_command = None
         self.last_snapshot = {}
+        self.pending_lineage = {}
 
     def reset(self):
         """Explicit death/world reset. New tracks must earn identity afresh."""
@@ -48,6 +50,23 @@ class AgencyTracker:
         self.last_confirmed_id = None
         self.last_command = None
         self.last_snapshot = {}
+        self.pending_lineage = {}
+
+    def propose_successor(self, previous_id, successor_id):
+        """A bounded prior only; no hits, stops or reversal are inherited.
+
+        The visual caller must supply a unique plausible spatial successor to a
+        missing, previously confirmed identity. The prior is consumed only after
+        the successor itself obeys a subsequent BODY command.
+        """
+        prior = self.beliefs.get(previous_id)
+        if (previous_id != self.last_confirmed_id or prior is None
+                or prior.confidence < self.threshold or successor_id == previous_id):
+            return False
+        if successor_id in self.pending_lineage or self.beliefs.get(successor_id, Belief()).lineage_source is not None:
+            return False
+        self.pending_lineage[successor_id] = (previous_id, min(.18, prior.confidence*.2), 3)
+        return True
 
     def observe(self, positions, command=None, *, interval_seconds=None):
         """command caused displacement since previous observation; None=unmeasured.
@@ -112,10 +131,16 @@ class AgencyTracker:
                 belief.last_direction = command
                 belief.confidence = min(1., belief.confidence + .18)
                 reason = 'signed_command_response'
+                lineage = self.pending_lineage.pop(key, None)
+                if lineage is not None:
+                    belief.lineage_source = lineage[0]
+                    belief.confidence = min(1., belief.confidence + lineage[1])
+                    reason = 'signed_command_response_with_lineage_prior'
             else:
                 belief.awaiting_stop = False
                 belief.confidence = max(0., belief.confidence - (.30 if agreement < -.3 else .12))
                 belief.contradictions += 1
+                self.pending_lineage.pop(key, None)
                 reason = 'wrong_way' if agreement < -.3 else 'nonresponse_or_off_axis'
             # Exploratory indirect influence: motion toward previously known SELF.
             # This is descriptive evidence, not a learned causal mediation claim.
@@ -127,7 +152,8 @@ class AgencyTracker:
             evidence.append({'track_id': key, 'displacement': list(v), 'agreement': agreement,
                              'confidence_before': old, 'confidence': belief.confidence,
                              'reason': reason, 'contradictions': belief.contradictions,
-                             'indirect_score': belief.indirect_score})
+                             'indirect_score': belief.indirect_score,
+                             'lineage_source': belief.lineage_source})
         ranked = sorted(self.beliefs, key=lambda k: self.beliefs[k].confidence, reverse=True)
         leader = ranked[0] if ranked else None
         runner = ranked[1] if len(ranked) > 1 else None
@@ -146,6 +172,11 @@ class AgencyTracker:
             event = 'lost'
         if self.self_id is not None:
             self.last_confirmed_id = self.self_id
+        for key,(source,prior,remaining) in list(self.pending_lineage.items()):
+            if remaining <= 1 or source in positions:
+                del self.pending_lineage[key]
+            else:
+                self.pending_lineage[key] = (source,prior,remaining-1)
         self.previous = positions
         self.last_command = command
         self.last_snapshot = {'self_track_id': self.self_id, 'confidence': top.confidence if top else 0.,

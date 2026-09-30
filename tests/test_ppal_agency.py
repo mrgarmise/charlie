@@ -247,3 +247,45 @@ def test_new_lineage_is_reported_as_reacquisition():
     for _ in range(4): a.observe({2:p[2]})
     a,_,rows=experiment(a,ids=(31,2))
     assert any(row['event']=='reacquired' for row in rows)
+
+
+def test_lineage_proposal_transfers_no_control_facts():
+    a,p,_=experiment()
+    assert a.propose_successor(1,31)
+    p[31]=p.pop(1)
+    a.observe(p,None)
+    p[31]=(p[31][0]+1,p[31][1]); row=a.observe(p,(1,0))
+    successor=a.beliefs[31]
+    assert successor.lineage_source==1 and successor.hits==1
+    assert successor.stops==0 and not successor.reversed
+    assert a.self_id!=31
+    assert any(e['reason']=='signed_command_response_with_lineage_prior' for e in row['evidence'])
+
+
+def test_lineage_prior_requires_a_new_direct_response():
+    a,p,_=experiment()
+    assert a.propose_successor(1,31)
+    p[31]=p.pop(1); a.observe(p,None)
+    p[31]=(p[31][0]-1,p[31][1]); a.observe(p,(1,0))
+    assert a.beliefs[31].confidence==0 and a.beliefs[31].lineage_source is None
+    assert 31 not in a.pending_lineage
+
+
+def test_lineage_prior_cannot_come_from_unconfirmed_candidate():
+    a,p,_=experiment(sequence=[(1,0)])
+    assert not a.propose_successor(1,31)
+
+
+def test_generic_tracks_preserve_direct_self_and_follower_trajectories():
+    v=VisualAgency(); points=[(20.,20.),(75.,75.),(10.,80.)]
+    def pairs():return [(Detection('unknown',p,(0,0,10,20),100),{}) for p in points]
+    v.observe(pairs(),observed_at=0.); initial=list(v.positions)
+    previous=(0,0)
+    for tick,u in enumerate(SEQ,1):
+        points[0]=(points[0][0]+u[0],points[0][1]+u[1])
+        points[1]=(points[1][0]+previous[0]*.7,points[1][1]+previous[1]*.7)
+        move={(1,0):'E',(-1,0):'W',(0,1):'S',(0,0):'STAY'}[u]
+        v.observe(pairs(),move,observed_at=tick*.15);previous=u
+        assert list(v.positions)==initial
+    assert v.player==points[0]
+    assert v.agency.beliefs[initial[1]].contradictions>=3

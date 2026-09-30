@@ -22,7 +22,6 @@ import subprocess
 from .arcade_transport import ArcadeController
 from .forebrain import Forebrain
 from .hindbrain import Hindbrain
-from .vision_tracker import ObjectTracker
 from .robotron_session import PersistentSelfTracker
 from .shadow_predictor import ShadowPredictor, action_dict
 from .models import Action, Object, Position, WorldState
@@ -64,7 +63,12 @@ def _player_fix(pairs, previous, max_distance=12.0, min_score=0.78):
     return choices[0][2]
 
 
-def _objects(pairs, identities, prefix):
+def _objects(pairs, identities, prefix, assignments=None, exclude_track_id=None):
+    if assignments is not None:
+        return tuple(Object(f"sprite_{assignments[index]}", Position(*detection.center))
+                     for index, (detection, _) in enumerate(pairs)
+                     if detection.kind in identities and index in assignments
+                     and assignments[index] != exclude_track_id)
     accepted = []
     for detection, evidence in pairs:
         if detection.kind in identities:
@@ -75,11 +79,14 @@ def _objects(pairs, identities, prefix):
 
 
 
-def _quick_frames(source, calibration, recognizer, count=5, interval=0.035):
+def _quick_frames(source, calibration, recognizer, count=5, interval=0.035, on_observation=None):
     frames = []
     for _ in range(count):
         playfield = calibration.apply(source.read())
-        frames.append(recognizer.detect(playfield))
+        pairs = recognizer.detect(playfield)
+        frames.append(pairs)
+        if on_observation:
+            on_observation(pairs, playfield)
         if interval:
             time.sleep(interval)
     return frames
@@ -169,7 +176,7 @@ def _causal_bootstrap(before_frames, after_frames, direction="E",
 
 
 def _control_challenge(source, calibration, recognizer, controller,
-                       initial_frames=None, pulse_ms=60):
+                       initial_frames=None, pulse_ms=60, on_observation=None):
     """Test a suspected SELF causally.
 
     Three successful directional probes confirm SELF.
@@ -177,7 +184,7 @@ def _control_challenge(source, calibration, recognizer, controller,
     Anything weaker is inconclusive.
     """
     frames = initial_frames or _quick_frames(
-        source, calibration, recognizer, count=4, interval=0.025)
+        source, calibration, recognizer, count=4, interval=0.025, on_observation=on_observation)
 
     evidence = []
     hits = 0
@@ -200,7 +207,7 @@ def _control_challenge(source, calibration, recognizer, controller,
 
         after = _quick_frames(
             source, calibration, recognizer,
-            count=4, interval=0.025)
+            count=4, interval=0.025, on_observation=on_observation)
 
         observed = _causal_bootstrap(
             frames, after,
@@ -283,7 +290,7 @@ def _pair_evidence(pairs):
     return rows
 
 
-def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.0):
+def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.0, on_observation=None):
     """Observe quietly after START and preserve why acquisition passed or failed."""
     deadline = time.monotonic() + timeout
     collected = []
@@ -293,6 +300,8 @@ def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.
     while time.monotonic() < deadline:
         playfield = calibration.apply(source.read())
         pairs = recognizer.detect(playfield)
+        if on_observation:
+            on_observation(pairs, playfield)
         collected.append(pairs)
         collected = collected[-6:]
         center = _stable_center_bootstrap(collected)
@@ -369,17 +378,26 @@ def main():
     shadow_forebrain = Forebrain()
     shadow_hindbrain = Hindbrain()
     shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
-    object_tracker = ObjectTracker()
-    self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3)
     visual_agency = VisualAgency()
+    self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3,
+                                         tracker=visual_agency.tracker if args.arm else None)
     source = PiCameraSource()
     rows = []
     review_frames = []
     agency_rows = []
     agency_frames = []
     latest_agency_frame = None
+    buffered_frames = []
+    raw_frames = []
     def record_agency(snapshot):
         row = {"sample": visual_agency.tick, **snapshot}
+        # Encoding PNGs between pulses lengthened unseen intervals substantially.
+        # Buffer a bounded set of originals; write images only after controls close.
+        if latest_agency_frame is not None and len(raw_frames) < 96:
+            raw_name = f"raw-{visual_agency.tick:04d}.png"
+            buffered_frames.append((raw_name, latest_agency_frame.copy()))
+            row["raw_frame"] = raw_name
+            raw_frames.append({"sample":visual_agency.tick, "path":raw_name})
         if latest_agency_frame is not None and len(agency_frames) < 24:
             frame = latest_agency_frame.copy()
             draw = ImageDraw.Draw(frame)
@@ -390,7 +408,7 @@ def main():
                 draw.rectangle(track.box, outline=color)
                 draw.text((track.box[0], track.box[1]), f"{track_id} {belief.confidence:.2f}", fill=color)
             name = f"agency-{len(agency_frames):03d}.png"
-            frame.save(args.output / name)
+            buffered_frames.append((name, frame))
             row["frame"] = name
             agency_frames.append({"sample": visual_agency.tick, "path": name,
                                   "candidates": _pair_evidence(visual_agency.pairs)})
@@ -401,6 +419,10 @@ def main():
             print(f"AGENCY {snapshot['event'].upper()}: self={snapshot['self_track_id']} "
                   f"candidate={snapshot['candidate_track_id']} confidence={snapshot['confidence']:.2f} "
                   f"runner={snapshot['runner_up_confidence']:.2f}")
+    def observe_unmeasured(pairs, frame):
+        nonlocal latest_agency_frame
+        latest_agency_frame = frame
+        record_agency(visual_agency.observe(pairs, observed_at=time.monotonic()))
     def read_agency_pairs():
         nonlocal latest_agency_frame
         latest_agency_frame = calibration.apply(source.read())
@@ -409,7 +431,7 @@ def main():
         if len(review_frames) >= (40 if reason == 'final-view' else 39):
             return
         name = f'review-{len(review_frames):03d}-{tick}-{reason}.jpg'
-        raw.save(args.output/name, quality=85)
+        buffered_frames.append((name, raw.copy()))
         review_frames.append({'tick':tick,'reason':reason,'path':name})
     try:
         revision = subprocess.check_output(['git','rev-parse','HEAD'],text=True,stderr=subprocess.DEVNULL).strip()
@@ -463,9 +485,11 @@ def main():
 
         if auto_start:
             player, acquisition, frames, startup_watch, gameplay_visual_frame = _wait_for_gameplay(
-                source, calibration, recognizer, args.output, timeout=args.start_wait)
+                source, calibration, recognizer, args.output, timeout=args.start_wait,
+                on_observation=observe_unmeasured)
         else:
-            frames = _quick_frames(source, calibration, recognizer, count=5)
+            frames = _quick_frames(source, calibration, recognizer, count=5,
+                                   on_observation=observe_unmeasured if args.arm else None)
             startup_watch = []
             gameplay_visual_frame = None
             player, acquisition = _acquire_from_frames(frames)
@@ -487,7 +511,8 @@ def main():
         # Bind trusted startup acquisition to an identity-independent visual track.
         seed_pairs = frames[-1] if frames else []
         seed_detections = [d for d, _ in seed_pairs]
-        self_obs = self_tracker.seed(0, seed_detections, player, max_seed_distance=7.0)
+        self_obs = (self_tracker.bind_track(0, visual_agency.agency.self_id, visual_agency.positions)
+                    if args.arm else self_tracker.seed(0, seed_detections, player, max_seed_distance=7.0))
         if self_obs.center is not None:
             player = self_obs.center
             print(f"SELF TRACK SEEDED: track={self_obs.track_id}")
@@ -521,12 +546,13 @@ def main():
             # never enters the BODY evidence model. Track continuity supplies WHERE.
             agency_snapshot = visual_agency.observe(
                 pairs, pending_move,
-                time.monotonic()-pending_at if pending_at is not None else None)
+                time.monotonic()-pending_at if pending_at is not None else None,
+                observed_at=time.monotonic())
             latest_agency_frame = playfield
             record_agency(agency_snapshot)
             pending_move = None
             pending_at = None
-            self_obs = self_tracker.update(tick + 1, detections)
+            self_obs = self_tracker.observe_tracks(tick + 1, visual_agency.positions)
             agency_player = visual_agency.player
             new_player = None
             if agency_player is not None:
@@ -534,7 +560,7 @@ def main():
                     new_player = self_obs.center
                 else:
                     # Conservative track lineage changes require new causal identity.
-                    self_obs = self_tracker.reseed(tick + 1, detections, agency_player)
+                    self_obs = self_tracker.bind_track(tick + 1, visual_agency.agency.self_id, visual_agency.positions)
                     new_player = self_obs.center
 
             if new_player is None:
@@ -551,7 +577,8 @@ def main():
                     raise
 
                 recovery_frames = _quick_frames(
-                    source, calibration, recognizer, count=4, interval=0.025)
+                    source, calibration, recognizer, count=4, interval=0.025,
+                    on_observation=observe_unmeasured)
                 recovered = None  # Global resemblance is not proof of a new SELF.
 
                 recovery = "generic_visual_agency"
@@ -577,7 +604,7 @@ def main():
                         "checking for controllable SELF")
                     challenge = _control_challenge(
                         source, calibration, recognizer, controller,
-                        initial_frames=recovery_frames)
+                        initial_frames=recovery_frames, on_observation=observe_unmeasured)
 
                     rows.append({
                         "tick": tick,
@@ -677,12 +704,11 @@ def main():
                 # Recovery used NEW frames. Do not seed against the stale pre-recovery view.
                 if recovery != 'causal_control_challenge':
                     detections = [d for d, _ in recovery_frames[-1]]
-                object_tracker = ObjectTracker()
                 shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
                 forebrain = Forebrain(); shadow_forebrain = Forebrain()
                 player = recovered
-                reseed = self_tracker.reseed(
-                    tick + 1, detections, player, max_seed_distance=7.0)
+                reseed = self_tracker.bind_track(
+                    tick + 1, visual_agency.agency.self_id, visual_agency.positions)
                 if reseed.center is not None:
                     player = reseed.center
                 rows.append({
@@ -706,8 +732,8 @@ def main():
                 save_review(raw,tick,'gameplay')
             player = new_player
             if self_obs.center is None:
-                reseed = self_tracker.reseed(
-                    tick + 1, detections, player, max_seed_distance=7.0)
+                reseed = self_tracker.bind_track(
+                    tick + 1, visual_agency.agency.self_id, visual_agency.positions)
                 if reseed.center is not None:
                     player = reseed.center
             if lost:
@@ -715,13 +741,15 @@ def main():
                 episode_observer.self_reacquired()
             lost = 0
 
-            targets = _objects(pairs, HUMANS, "human")
-            threats = _objects(pairs, THREATS, "threat")
+            targets = _objects(pairs, HUMANS, "human", visual_agency.assignments,
+                               visual_agency.agency.self_id)
+            threats = _objects(pairs, THREATS, "threat", visual_agency.assignments,
+                               visual_agency.agency.self_id)
             world = WorldState(tick=tick, player=Position(*player),
                                targets=targets, threats=threats, alive=True)
 
-            # Semantic gameplay IDs persist even as raw detector IDs change.
-            world = object_tracker.update(world)
+            # Physical IDs come directly from generic tracks. A semantic label
+            # change does not rename the object or run a second association pass.
             goal = forebrain.update(world)
             intent, action = hindbrain.decide(world, goal)
 
@@ -796,6 +824,11 @@ def main():
         source.close()
         if 'raw' in locals():
             save_review(raw,locals().get('tick',0),'final-view')
+        # Controllers are already neutral/closed before any image encoding.
+        for name, frame in buffered_frames:
+            frame.save(args.output / name)
+        tracks = self_tracker.tracks() if args.arm else []
+        (args.output / "tracks.json").write_text(json.dumps({"tracks":tracks}, indent=2)+"\n")
         report = {"provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
                   "pulse_ms": args.pulse_ms, "ticks": len(rows),
                   "episode_end": episode_end,
@@ -807,6 +840,10 @@ def main():
                   "gameplay_visual_frame": locals().get("gameplay_visual_frame"),
                   "startup_watch": locals().get("startup_watch", []),
                   "agency_frames": agency_frames,
+                  "raw_frames": raw_frames,
+                  "tracking_log": "agency.jsonl",
+                  "tracking_schema": "sprite-tracking-v2",
+                  "tracks": "tracks.json",
                   "agency_samples": len(agency_rows),
                   "agency_log": "agency.jsonl",
                   "steps": rows}

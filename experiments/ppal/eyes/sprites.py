@@ -22,13 +22,24 @@ def feature(rgb):
 
 def regions(frame):
     rgb = np.asarray(frame.convert('RGB'))
-    mask = (rgb.max(axis=2) > 145).astype(np.uint8)
+    # Physical screens have luminous, spatially varying backgrounds. Absolute
+    # max-channel brightness alone turns a blue background into giant blobs.
+    # Local per-channel contrast retains colored sprites, including blue ones,
+    # while rejecting smooth illumination. This changes candidate segmentation,
+    # not the taught feature vectors or class admission policy.
+    background = cv2.medianBlur(rgb, 31)
+    contrast = (rgb.astype(np.int16) - background.astype(np.int16)).max(axis=2)
+    mask = ((rgb.max(axis=2) > 145) & (contrast > 45)).astype(np.uint8)
     mask[:5] = 0; mask[-5:] = 0; mask[:, :5] = 0; mask[:, -5:] = 0
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
     count, labels, stats, centers = cv2.connectedComponentsWithStats(mask, connectivity=8)
     output = []
     for x, y, w, h, area in stats[1:]:
-        if area < 8 or w < 3 or h < 3:
+        # Borders and transition streaks are not local sprite observations.
+        # Oversized merged components remain unresolved rather than receiving
+        # a misleading center at the middle of the board.
+        if (area < 8 or w < 3 or h < 3
+                or w > rgb.shape[1] * .4 or h > rgb.shape[0] * .4):
             continue
         output.append(((int(x), int(y), int(x+w), int(y+h)), int(area),
                        rgb[y:y+h, x:x+w]))

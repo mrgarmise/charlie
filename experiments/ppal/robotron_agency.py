@@ -20,7 +20,7 @@ class VisualAgency:
         self.positions = {}
         self.assignments = {}
 
-    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None):
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
         self.pairs = pairs
         tracking_started = time.perf_counter()
         assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
@@ -43,7 +43,7 @@ class VisualAgency:
                     lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
                                     "status":"proposal_requires_new_direct_response"})
         snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
-                                   interval_seconds=interval_seconds)
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions)
         for row in self.tracker.last_update["detections"]:
             row["class_scores"] = dict(pairs[row["index"]][1].get("class_scores", {}))
         snapshot["tracking"] = self.tracker.last_update
@@ -58,8 +58,9 @@ class VisualAgency:
         """Bounded reversal/orthogonal taps interleaved with measured neutral.
 
         Controller.execute centers both sticks at each pulse's end. Read the
-        first fresh post-pulse exposure, then measure an independent neutral
-        interval. Do not average several post-pulse frames into movement evidence.
+        two fresh post-pulse exposures, measuring displacement from the pre-pulse
+        reference to the second endpoint, then an independent neutral interval.
+        The intermediate exposure is retained without scoring an early response.
         """
         pairs = read_pairs()
         initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
@@ -73,25 +74,37 @@ class VisualAgency:
             for direction in (move, 'STAY'):
                 if deadline is not None and time.monotonic() + pulse_ms/1000 >= deadline:
                     return self.player
+                origin = dict(self.positions)
+                origin_at = self.tracker.last_update['observed_at']
                 start = time.monotonic()
                 controller.execute(Action(direction, 'NONE', 'agency discovery'), pulse_ms)
                 pairs = read_pairs()
-                snapshot = self.observe(pairs, direction, time.monotonic()-start,
-                                        observed_at=observation_time() if observation_time else time.monotonic())
-                if record:
-                    record(snapshot)
+                at = observation_time() if observation_time else time.monotonic()
                 if direction != 'STAY':
+                    # Fresh sensor exposure does not guarantee the TV has yet
+                    # rendered the action. Preserve the early frame, associating
+                    # exactly once, but withhold agency judgment until the fixed
+                    # second endpoint. The reference remains the pre-pulse view.
+                    early = self.observe(pairs, observed_at=at)
+                    early['phase'] = 'response_window_early_unmeasured'
+                    early['response_window'] = {'origin_at': origin_at, 'move': direction,
+                                                'endpoint': 1, 'endpoints': 2}
+                    if record:
+                        record(early)
                     if deadline is not None and time.monotonic() >= deadline:
                         return self.player
-                    # The new Pi run demonstrates response spilling into the
-                    # first fresh neutral endpoint. Track that handoff without
-                    # claiming it is an independent stop test. The following
-                    # measured neutral interval still uses unchanged gates.
                     pairs = read_pairs()
-                    handoff = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
-                    handoff['phase'] = 'neutral_handoff_unmeasured'
-                    if record:
-                        record(handoff)
+                    at = observation_time() if observation_time else time.monotonic()
+                snapshot = self.observe(pairs, direction, time.monotonic()-start,
+                                        observed_at=at,
+                                        reference_positions=origin if direction != 'STAY' else None)
+                if direction != 'STAY':
+                    snapshot['phase'] = 'action_response_window'
+                    snapshot['response_window'] = {'origin_at': origin_at, 'endpoint_at': at,
+                                                    'move': direction, 'endpoint': 2, 'endpoints': 2,
+                                                    'duration_seconds': at-origin_at}
+                if record:
+                    record(snapshot)
             if self.player is not None:
                 break
         return self.player

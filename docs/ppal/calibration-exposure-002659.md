@@ -1,5 +1,7 @@
 # Calibration failures, 20261001-002127 and 002659
 
+Follow-up hardware result: [exposure-010300 analysis](exposure-run-010300-analysis.md).
+
 Both archives ran bce4e95 and failed in fresh calibration. Both report zero
 agency samples and zero policy ticks; score is **unmeasured**, not an observed
 score-reader failure. No movement is expected because neither reached probes.

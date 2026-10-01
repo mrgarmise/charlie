@@ -68,9 +68,11 @@ class AgencyTracker:
         self.pending_lineage[successor_id] = (previous_id, min(.18, prior.confidence*.2), 3)
         return True
 
-    def observe(self, positions, command=None, *, interval_seconds=None):
+    def observe(self, positions, command=None, *, interval_seconds=None, reference_positions=None):
         """command caused displacement since previous observation; None=unmeasured.
 
+        reference_positions optionally supplies an explicit pre-action window
+        origin. IDs absent from the intervening observation are excluded.
         A zero vector denotes a measured neutral interval, not missing control
         data. Missing observations never create displacement across an occlusion.
         Right-stick effects are deliberately excluded by the caller.
@@ -79,8 +81,10 @@ class AgencyTracker:
         if command is not None:
             length = math.hypot(*command)
             command = tuple(x / length for x in command) if length else (0., 0.)
-        displacements = {key: (pos[0]-self.previous[key][0], pos[1]-self.previous[key][1])
-                         for key, pos in positions.items() if key in self.previous}
+        reference = (self.previous if reference_positions is None else
+                     {k: v for k, v in reference_positions.items() if k in self.previous})
+        displacements = {key: (pos[0]-reference[key][0], pos[1]-reference[key][1])
+                         for key, pos in positions.items() if key in reference}
         # A coherent field displacement is not evidence for any particular body.
         global_motion = False
         if len(displacements) >= 3:
@@ -144,8 +148,8 @@ class AgencyTracker:
                 reason = 'wrong_way' if agreement < -.3 else 'nonresponse_or_off_axis'
             # Exploratory indirect influence: motion toward previously known SELF.
             # This is descriptive evidence, not a learned causal mediation claim.
-            if self.self_id in self.previous and key != self.self_id and magnitude:
-                toward = tuple(self.previous[self.self_id][i]-self.previous[key][i] for i in (0,1))
+            if self.self_id in reference and key != self.self_id and magnitude:
+                toward = tuple(reference[self.self_id][i]-reference[key][i] for i in (0,1))
                 norm = math.hypot(*toward)
                 if norm and sum(a*b for a,b in zip(v,toward))/(magnitude*norm) > .8 and agreement < .8:
                     belief.indirect_score = min(1., belief.indirect_score + .1)
@@ -185,4 +189,6 @@ class AgencyTracker:
                               'command': list(command) if command is not None else None,
                               'interval_seconds': interval_seconds, 'latency_seconds': None,
                               'global_motion': global_motion, 'evidence': evidence}
+        if reference_positions is not None:
+            self.last_snapshot["response_reference_positions"] = {str(k): list(v) for k,v in reference.items()}
         return self.last_snapshot

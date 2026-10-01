@@ -76,7 +76,7 @@ def test_new_assignment_removes_spurious_ambiguity_but_does_not_hide_flash_birth
     assert t.next_id-1 == 258  # no claim that transition fragments are physical births
 
 
-def test_neutral_handoff_does_not_count_delayed_response_as_stop_or_contradiction():
+def test_response_window_includes_delayed_motion_before_independent_stop():
     from experiments.ppal.robotron_agency import VisualAgency, VECTORS
     points = [(20.,20.),(70.,70.)]
     pending = [None]
@@ -105,8 +105,10 @@ def test_neutral_handoff_does_not_count_delayed_response_as_stop_or_contradictio
     assert visual.agency.beliefs[1].contradictions == 0
     assert visual.agency.beliefs[1].hits == 3 and visual.agency.beliefs[1].stops == 3
     assert visual.agency.beliefs[2].contradictions >= 3
-    handoffs = [r for r in rows if r.get('phase')=='neutral_handoff_unmeasured']
-    assert len(handoffs)==3 and all(r['command'] is None for r in handoffs)
+    early = [r for r in rows if r.get('phase')=='response_window_early_unmeasured']
+    assert len(early)==3 and all(r['command'] is None for r in early)
+    endpoints = [r for r in rows if r.get('phase')=='action_response_window']
+    assert len(endpoints)==3 and all(r['response_reference_positions'] for r in endpoints)
 
 
 def test_score_gain_is_reward_evidence_even_when_no_action_can_be_attributed(tmp_path):

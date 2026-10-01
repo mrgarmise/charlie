@@ -1,0 +1,8 @@
+{
+  "source_run": "exposure-calibration-20261001-010300",
+  "source_commit": "2188d5a38d2ece0e238ca4c7732524866baf90a6",
+  "score_image": "lossless copy of score-raw-0002.png",
+  "visible_score": 100,
+  "tracking": "Exact boxes, centers, timestamps/configuration/assignments; diagnostic class scores omitted",
+  "likely_player_id": 117
+}

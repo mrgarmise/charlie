@@ -151,8 +151,29 @@ class RobotronHUDReader:
 
     @classmethod
     def _read_channel(cls, channel: np.ndarray) -> tuple[int | None, float]:
+        primary = cls._read_channel_at_threshold(channel)
+        if primary[0] is not None:
+            return primary
+        # Camera exposure and arcade hue change luminous intensity. A dim
+        # proposal must survive three independently thresholded shapes; never
+        # select whichever threshold happens to yield a convenient number.
+        level = float(np.percentile(channel.max(axis=2), 99))
+        if level < 80:
+            return None, 0.
+        thresholds = [max(60, min(160, int(level*f))) for f in (.4, .5, .6)]
+        if len(set(thresholds)) < 3:
+            return None, 0.
+        proposals = [cls._read_channel_at_threshold(channel, t) for t in thresholds]
+        if (all(value is not None and confidence >= .70 for value, confidence in proposals)
+                and len({value for value, _ in proposals}) == 1):
+            return proposals[0][0], min(confidence for _, confidence in proposals)
+        return None, 0.
+
+    @classmethod
+    def _read_channel_at_threshold(cls, channel: np.ndarray, threshold=200) -> tuple[int | None, float]:
         """Locate a bright score word independent of its current arcade hue."""
-        bright = cls._bright_mask(channel)
+        bright = ((channel.max(axis=2) >= threshold).astype(np.uint8)
+                  if threshold != 200 else cls._bright_mask(channel))
         # Fill vertical stroke gaps without joining neighboring characters.
         bright = cv2.morphologyEx(bright, cv2.MORPH_CLOSE, np.ones((3, 1), np.uint8))
         n, _, stats, _ = cv2.connectedComponentsWithStats(bright, 8)

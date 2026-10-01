@@ -439,7 +439,8 @@ def main():
                                       "action":preceding_action, "agency_command":snapshot.get("command"),
                                       "self_track_id":snapshot.get("self_track_id"),
                                       "control_execution":getattr(controller, "last_execution", None),
-                                      "phase":snapshot.get("phase")} if preceding_action or snapshot.get("command") is not None or getattr(controller, "last_execution", None) is not None else None)
+                                      "phase":snapshot.get("phase"),
+                                      "response_window":snapshot.get("response_window")} if preceding_action or snapshot.get("command") is not None or getattr(controller, "last_execution", None) is not None else None)
     def observe_unmeasured(pairs, frame):
         nonlocal latest_agency_frame
         latest_agency_frame = frame
@@ -565,6 +566,8 @@ def main():
         lost = 0
         pending_move = None
         pending_at = None
+        pending_origin = None
+        pending_origin_at = None
         episode_observer = EpisodeEndObserver(required_not_gameplay=8)
         print(f"CHARLIE LOOSE: {args.seconds:.1f}s hard gameplay limit")
 
@@ -577,10 +580,34 @@ def main():
 
             # Normal movement is another causal experiment; right-stick firing
             # never enters the BODY evidence model. Track continuity supplies WHERE.
+            response_window = pending_move not in (None, 'STAY')
+            if response_window:
+                early = visual_agency.observe(pairs, observed_at=source.timestamp)
+                early['phase'] = 'response_window_early_unmeasured'
+                early['response_window'] = {'origin_at': pending_origin_at, 'move': pending_move,
+                                            'endpoint': 1, 'endpoints': 2}
+                latest_agency_frame = playfield
+                record_agency(early)
+                if time.monotonic() >= deadline:
+                    result = "TIME LIMIT"
+                    break
+                raw = source.read()
+                observed_at = time.monotonic()-started
+                playfield = calibration.apply(raw)
+                pairs = recognizer.detect(playfield)
+                detections = [d for d, _ in pairs]
             agency_snapshot = visual_agency.observe(
                 pairs, pending_move,
                 time.monotonic()-pending_at if pending_at is not None else None,
-                observed_at=source.timestamp)
+                observed_at=source.timestamp,
+                reference_positions=pending_origin if response_window else None)
+            if response_window:
+                agency_snapshot['phase'] = 'action_response_window'
+                agency_snapshot['response_window'] = {
+                    'origin_at': pending_origin_at, 'endpoint_at': source.timestamp,
+                    'move': pending_move, 'endpoint': 2, 'endpoints': 2,
+                    'duration_seconds': source.timestamp-pending_origin_at}
+
             latest_agency_frame = playfield
             record_agency(agency_snapshot)
             pending_move = None
@@ -813,6 +840,8 @@ def main():
             if pulse_ms < 30:
                 result = "TIME LIMIT"
                 break
+            pending_origin = dict(visual_agency.positions)
+            pending_origin_at = source.timestamp
             pending_at = time.monotonic()
             preceding_action = {"tick":tick, "timestamp":pending_at, **action_dict(action)}
             controller.execute(action, pulse_ms)
@@ -894,6 +923,7 @@ def main():
                   "tracking_log": "agency.jsonl",
                   "tracking_schema": "sprite-tracking-v3",
                   "capture_mode": "fresh_exposure" if args.arm else "read_completion",
+                  "agency_acquisition_protocol": "two_fresh_endpoints_then_independent_neutral",
                   "tracks": "tracks.json",
                   "agency_samples": len(agency_rows),
                   "agency_log": "agency.jsonl",

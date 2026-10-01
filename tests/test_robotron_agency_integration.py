@@ -7,14 +7,22 @@ from experiments.ppal.eyes.detectors import Detection
 from experiments.ppal.robotron_agency import VECTORS
 
 
-@pytest.mark.parametrize('fail_during_play,respawn', [(False,False),(True,False),(False,True)])
-def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn):
+@pytest.mark.parametrize('fail_during_play,respawn,delayed_render',
+                         [(False,False,False),(True,False,False),(False,True,False),(False,False,True)])
+def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render):
     from experiments.ppal import play_robotron as play
     clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
     image=Image.new('RGB',(100,100))
+    pending = [None]; response_reads = [0]
     class Source:
         def read(self):
             clock[0]+=.01; reads[0]+=1
+            if pending[0] is not None:
+                response_reads[0] += 1
+                if response_reads[0] == 2:
+                    u = pending[0]; p = points[0]
+                    points[0] = (p[0]+u[0],p[1]+u[1])
+                    pending[0] = None
             if respawn and reads[0] == 22: points[0]=(80.,80.)
             if fail_during_play and reads[0]>25: raise RuntimeError('camera disconnected')
             return image
@@ -29,7 +37,11 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         def _command(self,command): commands.append(command)
         def execute(self,action,ms):
             commands.append(action)
-            u=VECTORS[action.move]; p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+            u=VECTORS[action.move]
+            if delayed_render and action.move != "STAY":
+                pending[0] = u; response_reads[0] = 0
+            else:
+                p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
             clock[0]+=ms/1000
         def close(self): closed.append('controller')
     monkeypatch.setattr(play,'PiCameraSource',Source)

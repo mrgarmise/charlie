@@ -7,9 +7,10 @@ from experiments.ppal.eyes.detectors import Detection
 from experiments.ppal.robotron_agency import VECTORS
 
 
-@pytest.mark.parametrize('fail_during_play,respawn,delayed_render',
-                         [(False,False,False),(True,False,False),(False,True,False),(False,False,True)])
-def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render):
+@pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap',
+                         [(False,False,False,False),(True,False,False,False),
+                          (False,True,False,False),(False,False,True,False),(False,False,True,True)])
+def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap):
     from experiments.ppal import play_robotron as play
     clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
     image=Image.new('RGB',(100,100))
@@ -50,13 +51,14 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     monkeypatch.setattr(play,'ArcadeController',Controller)
     monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
     monkeypatch.setattr(play.time,'sleep',lambda duration:None)
-    monkeypatch.setattr(sys,'argv',['play','--arm','--seconds','1','--output',str(tmp_path/'run')])
+    monkeypatch.setattr(sys,'argv',['play','--arm','--seconds','1','--output',str(tmp_path/'run')]
+                        + (['--bootstrap-body-fire'] if bootstrap else []))
     if fail_during_play:
         with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
     else:
         play.main()
     report=json.loads((tmp_path/'run/report.json').read_text())
-    assert report['acquisition']=='generic_visual_agency'
+    assert report['acquisition']==('provisional_body_agency' if bootstrap else 'generic_visual_agency')
     actions=[r for r in report['steps'] if 'action' in r]
     assert actions
     if respawn:
@@ -64,7 +66,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         assert any(r['player'][0]>60 for r in actions)
     else:
         assert all(r['player'][0]<40 for r in actions)
-    assert all(r['agency']['self_track_id'] is not None for r in actions)
+    assert all(r['agency']['controlled_track_id'] is not None for r in actions)
     assert closed==['controller','camera']
     assert (tmp_path/'run/agency.jsonl').exists()
     telemetry=list(map(json.loads,(tmp_path/'run/agency.jsonl').read_text().splitlines()))
@@ -74,5 +76,9 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     assert (tmp_path/'run/tracks.json').exists()
     original=Image.open(tmp_path/'run'/report['raw_frames'][0]['path'])
     assert original.getextrema()==((0,0),(0,0),(0,0))
-    assert all(r['self_track_id']==r['agency']['self_track_id'] for r in actions)
+    assert all(r['self_track_id']==r['agency']['controlled_track_id'] for r in actions)
+    if bootstrap:
+        assert report['bootstrap_body_fire']
+        assert any(getattr(c,'fire','NONE') != 'NONE' for c in commands)
+        assert any(r['agency']['identity_status']=='provisional' for r in actions)
     assert report['result'].startswith('ERROR:') if fail_during_play else report['result']=='TIME LIMIT'

@@ -31,7 +31,9 @@ def distance_to_segment(point: Position, start: Position, end: Position) -> floa
 
 class Hindbrain:
     def __init__(self, panic_radius: float = 9, route_width: float = 9,
-                 shot_model: "ShotModel | None" = None) -> None:
+                 shot_model: "ShotModel | None" = None, explore_fire: bool = False) -> None:
+        self.explore_fire = explore_fire
+        self.fire_explorations = 0
         self.panic_radius = panic_radius
         self.route_width = route_width
         self.shot_model = shot_model
@@ -62,8 +64,12 @@ class Hindbrain:
         self.last_open_move = move
         threat = min(world.threats, key=lambda o:world.player.distance(o.position), default=None)
         fire = direction(world.player, threat.position, 0) if threat else 'NONE'
+        if threat is None and self.explore_fire:
+            fire = ('N','E','S','W')[self.fire_explorations % 4]
+            self.fire_explorations += 1
         return (Intent("explore", destination=end),
-                Action(move, fire, "seek open space; no current rescue target"))
+                Action(move, fire, "seek open space; explore FIRE effects" if threat is None and self.explore_fire
+                       else "seek open space; no current rescue target"))
 
     def decide(self, world: WorldState, goal: Goal) -> tuple[Intent, Action]:
         if not world.alive:

@@ -12,7 +12,8 @@ VECTORS = {'E': (1, 0), 'W': (-1, 0), 'S': (0, 1), 'N': (0, -1),
 
 class VisualAgency:
     """Track every visible region, independent of its taught identity."""
-    def __init__(self):
+    def __init__(self, *, bootstrap_body_fire=False):
+        self.bootstrap_body_fire = bootstrap_body_fire
         self.tracker = SpriteTracker()
         self.agency = AgencyTracker()
         self.tick = 0
@@ -48,11 +49,29 @@ class VisualAgency:
             row["class_scores"] = dict(pairs[row["index"]][1].get("class_scores", {}))
         snapshot["tracking"] = self.tracker.last_update
         snapshot["lineage_proposals"] = lineage
+        snapshot["controlled_track_id"] = self.controlled_track_id
+        snapshot["identity_status"] = ("confirmed" if self.agency.self_id is not None else
+                                       "provisional" if self.controlled_track_id is not None else "unknown")
         return snapshot
 
     @property
+    def controlled_track_id(self):
+        if self.agency.self_id is not None:
+            return self.agency.self_id
+        if not self.bootstrap_body_fire or self.agency.last_snapshot.get('global_motion'):
+            return None
+        leader = self.agency.last_snapshot.get('candidate_track_id')
+        belief = self.agency.beliefs.get(leader)
+        if (leader in self.positions and belief and belief.hits >= 2
+                and len(belief.directions) >= 2 and belief.contradictions == 0
+                and belief.confidence-self.agency.last_snapshot.get('runner_up_confidence',0)
+                    >= self.agency.separation):
+            return leader
+        return None
+
+    @property
     def player(self):
-        return self.positions.get(self.agency.self_id)
+        return self.positions.get(self.controlled_track_id)
 
     def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None):
         """Bounded reversal/orthogonal taps interleaved with measured neutral.
@@ -66,7 +85,21 @@ class VisualAgency:
         initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
         if record:
             record(initial)  # pre-command detections are essential for exact replay
-        for move in ('E', 'W', 'S', 'N', 'E', 'W'):
+        if self.bootstrap_body_fire:
+            if deadline is not None and time.monotonic()+pulse_ms/1000 >= deadline:
+                return self.player
+            controller.execute(Action('STAY', 'E', 'FIRE actuator exploration'), pulse_ms)
+            for endpoint in (1,2):
+                pairs = read_pairs()
+                snapshot = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
+                snapshot['phase'] = 'fire_exploration_unmeasured_body'
+                snapshot['actuators'] = {'body':'STAY', 'fire':'E', 'endpoint':endpoint,
+                                         'interpretation':'effects unknown; no projectile labels inferred'}
+                if record:
+                    record(snapshot)
+                if deadline is not None and time.monotonic() >= deadline:
+                    return self.player
+        for probe, move in enumerate(('E', 'W', 'S', 'N', 'E', 'W')):
             if deadline is not None and time.monotonic() + 2*pulse_ms/1000 >= deadline:
                 break
             if not self.positions:
@@ -77,7 +110,8 @@ class VisualAgency:
                 origin = dict(self.positions)
                 origin_at = self.tracker.last_update['observed_at']
                 start = time.monotonic()
-                controller.execute(Action(direction, 'NONE', 'agency discovery'), pulse_ms)
+                fire = ('N','E','S','W','N','E')[probe] if self.bootstrap_body_fire and direction != 'STAY' else 'NONE'
+                controller.execute(Action(direction, fire, 'agency discovery'), pulse_ms)
                 pairs = read_pairs()
                 at = observation_time() if observation_time else time.monotonic()
                 if direction != 'STAY':
@@ -87,6 +121,7 @@ class VisualAgency:
                     # second endpoint. The reference remains the pre-pulse view.
                     early = self.observe(pairs, observed_at=at)
                     early['phase'] = 'response_window_early_unmeasured'
+                    early['actuators'] = {'body':direction, 'fire':fire}
                     early['response_window'] = {'origin_at': origin_at, 'move': direction,
                                                 'endpoint': 1, 'endpoints': 2}
                     if record:
@@ -98,6 +133,7 @@ class VisualAgency:
                 snapshot = self.observe(pairs, direction, time.monotonic()-start,
                                         observed_at=at,
                                         reference_positions=origin if direction != 'STAY' else None)
+                snapshot['actuators'] = {'body':direction, 'fire':fire}
                 if direction != 'STAY':
                     snapshot['phase'] = 'action_response_window'
                     snapshot['response_window'] = {'origin_at': origin_at, 'endpoint_at': at,

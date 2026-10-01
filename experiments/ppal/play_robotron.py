@@ -368,6 +368,8 @@ def main():
     parser.add_argument("--output", type=Path)
     parser.add_argument("--arm", action="store_true",
                         help="actually send movement/fire commands")
+    parser.add_argument("--bootstrap-body-fire", action="store_true",
+                        help="experimental provisional BODY identity with independent and simultaneous FIRE exploration")
     args = parser.parse_args()
 
     if not 1 <= args.seconds <= 3600:
@@ -385,11 +387,11 @@ def main():
 
     recognizer = TaughtRecognizer.load(args.knowledge, args.threshold, args.margin)
     forebrain = Forebrain()
-    hindbrain = Hindbrain()
+    hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
     shadow_forebrain = Forebrain()
-    shadow_hindbrain = Hindbrain()
+    shadow_hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
     shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
-    visual_agency = VisualAgency()
+    visual_agency = VisualAgency(bootstrap_body_fire=args.bootstrap_body_fire)
     self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3,
                                          tracker=visual_agency.tracker if args.arm else None)
     source = ObservedCamera(PiCameraSource(), require_fresh=args.arm)
@@ -440,7 +442,9 @@ def main():
                                       "self_track_id":snapshot.get("self_track_id"),
                                       "control_execution":getattr(controller, "last_execution", None),
                                       "phase":snapshot.get("phase"),
-                                      "response_window":snapshot.get("response_window")} if preceding_action or snapshot.get("command") is not None or getattr(controller, "last_execution", None) is not None else None)
+                                      "response_window":snapshot.get("response_window"),
+                                      "identity_status":snapshot.get("identity_status"),
+                                      "actuators":snapshot.get("actuators")} if preceding_action or snapshot.get("command") is not None or getattr(controller, "last_execution", None) is not None else None)
     def observe_unmeasured(pairs, frame):
         nonlocal latest_agency_frame
         latest_agency_frame = frame
@@ -535,17 +539,21 @@ def main():
             player = visual_agency.discover(read_agency_pairs, controller, record=record_agency,
                                            observation_time=lambda: source.timestamp)
             frames = [visual_agency.pairs]
-            acquisition = "generic_visual_agency" if player is not None else None
+            acquisition = ("generic_visual_agency" if visual_agency.agency.self_id is not None else
+                           "provisional_body_agency" if player is not None else None)
+            if acquisition == "provisional_body_agency":
+                print(f"SELF PROVISIONAL: hypothesis={visual_agency.controlled_track_id}; FIRE outcomes unconfirmed")
 
         if player is None:
             raise RuntimeError("could not identify the player; controls neutral")
 
-        print(f"PLAYER ACQUIRED ({acquisition}) x={player[0]:.2f} y={player[1]:.2f}")
+        identity_word = "HYPOTHESIS" if acquisition == "provisional_body_agency" else "ACQUIRED"
+        print(f"PLAYER {identity_word} ({acquisition}) x={player[0]:.2f} y={player[1]:.2f}")
 
         # Bind trusted startup acquisition to an identity-independent visual track.
         seed_pairs = frames[-1] if frames else []
         seed_detections = [d for d, _ in seed_pairs]
-        self_obs = (self_tracker.bind_track(0, visual_agency.agency.self_id, visual_agency.positions)
+        self_obs = (self_tracker.bind_track(0, visual_agency.controlled_track_id, visual_agency.positions)
                     if args.arm else self_tracker.seed(0, seed_detections, player, max_seed_distance=7.0))
         if self_obs.center is not None:
             player = self_obs.center
@@ -620,7 +628,7 @@ def main():
                     new_player = self_obs.center
                 else:
                     # Conservative track lineage changes require new causal identity.
-                    self_obs = self_tracker.bind_track(tick + 1, visual_agency.agency.self_id, visual_agency.positions)
+                    self_obs = self_tracker.bind_track(tick + 1, visual_agency.controlled_track_id, visual_agency.positions)
                     new_player = self_obs.center
 
             if new_player is None:
@@ -646,6 +654,8 @@ def main():
                     recovered = visual_agency.discover(
                         read_agency_pairs, controller, deadline=deadline, record=record_agency,
                         observation_time=lambda: source.timestamp)
+                    if recovered is not None and visual_agency.agency.self_id is None:
+                        recovery = "provisional_body_agency"
                     recovery_frames = [visual_agency.pairs]
                     detections = [d for d, _ in visual_agency.pairs]
 
@@ -769,7 +779,7 @@ def main():
                 forebrain = Forebrain(); shadow_forebrain = Forebrain()
                 player = recovered
                 reseed = self_tracker.bind_track(
-                    tick + 1, visual_agency.agency.self_id, visual_agency.positions)
+                    tick + 1, visual_agency.controlled_track_id, visual_agency.positions)
                 if reseed.center is not None:
                     player = reseed.center
                 rows.append({
@@ -779,6 +789,7 @@ def main():
                     "self_track_id": reseed.track_id,
                     "lost": lost,
                     "method": recovery,
+                    "identity_status": "confirmed" if visual_agency.agency.self_id is not None else "provisional",
                     "capture_timestamp": source.timestamp,
                     "capture": source.capture,
                     "action_timestamp": pending_at,
@@ -797,7 +808,7 @@ def main():
             player = new_player
             if self_obs.center is None:
                 reseed = self_tracker.bind_track(
-                    tick + 1, visual_agency.agency.self_id, visual_agency.positions)
+                    tick + 1, visual_agency.controlled_track_id, visual_agency.positions)
                 if reseed.center is not None:
                     player = reseed.center
             if lost:
@@ -806,12 +817,12 @@ def main():
             lost = 0
 
             targets = _objects(pairs, HUMANS, "human", visual_agency.assignments,
-                               visual_agency.agency.self_id)
+                               visual_agency.controlled_track_id)
             threats = _objects(pairs, THREATS, "threat", visual_agency.assignments,
-                               visual_agency.agency.self_id)
+                               visual_agency.controlled_track_id)
             unresolved = _objects(pairs, {d.kind for d, _ in pairs}-HUMANS-THREATS,
                                   "unresolved", visual_agency.assignments,
-                                  visual_agency.agency.self_id)
+                                  visual_agency.controlled_track_id)
             world = WorldState(tick=tick, player=Position(*player),
                                targets=targets, threats=threats, alive=True, unresolved=unresolved)
 
@@ -856,6 +867,7 @@ def main():
                 "action_timestamp": pending_at,
                 "player": list(player),
                 "self_track_id": self_tracker.player_track_id,
+                "identity_status": agency_snapshot.get("identity_status"),
                 "agency": agency_snapshot,
                 "targets": len(targets), "threats": len(threats),
                 "unresolved": len(unresolved),
@@ -933,6 +945,8 @@ def main():
                   "capture_mode": "fresh_exposure" if args.arm else "read_completion",
                   "agency_acquisition_protocol": "two_fresh_endpoints_then_independent_neutral",
                   "planning_mode": "rescue_with_open_space_fallback",
+                  "bootstrap_body_fire": args.bootstrap_body_fire,
+                  "fire_agency_status": "exploratory evidence only; projectile/origin interpretation unvalidated",
                   "tracks": "tracks.json",
                   "agency_samples": len(agency_rows),
                   "agency_log": "agency.jsonl",

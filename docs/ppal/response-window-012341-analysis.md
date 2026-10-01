@@ -1,5 +1,7 @@
 # response-window-20261001-012341: agency works, policy deliberately idles
 
+Next experiment is superseded by [BODY/FIRE exploratory bootstrap](body-fire-bootstrap.md).
+
 This archive ran 4e29db2. Alex observed a small rightward step after an initial
 death, then stillness and further deaths. The logs explain this without assuming
 that successful SELF acquisition means successful autonomous play.

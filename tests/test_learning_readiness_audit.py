@@ -13,7 +13,9 @@ from experiments.ppal.evaluate_robotron_shadow import evaluate
 def test_no_restart_on_tracking_loss_or_error():
     for result in ('TIME LIMIT','NOT_GAMEPLAY: control challenge failed','UNCERTAIN','INTERRUPTED'):
         assert not safe_to_restart({'result':result,'armed':True,'acquisition':'x','steps':[{'action':{}}]})
-    report={'episode_end':{'state':'game_over','confirmed':True,'evidence':'frame-123.jpg'}}
+    report={'result':'GAME OVER','episode_end':{'state':'game_over','confirmed':True,
+        'evidence':{'rule':'persistent_not_gameplay_plus_no_controlled_self',
+                    'not_gameplay_streak':8,'agency_failures':1,'screen':{'state':'not_gameplay','phase':'terminal'}}}}
     assert safe_to_restart(report)
     assert not safe_to_restart(report,1)
     report['episode_end']['evidence']=None

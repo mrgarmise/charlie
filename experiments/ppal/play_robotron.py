@@ -4,8 +4,8 @@ This is deliberately bounded: gameplay time defaults to 20 seconds and the
 controller is neutralized on every pulse, during vision uncertainty, and on exit.
 Normal play reuses the promoted playfield calibration for fast startup. Charlie
 may start Robotron himself after the camera is ready, then waits for visual proof
-of gameplay before acquiring self. Fresh calibration remains opt-in and occurs
-only after START because the Robotron border exists only during gameplay. The
+of gameplay before acquiring self. Fresh geometric calibration is completed
+before START using either an attract or gameplay border. The
 run clock starts only after player acquisition.
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ import subprocess
 from .arcade_transport import ArcadeController
 from .forebrain import Forebrain
 from .hindbrain import Hindbrain
-from .robotron_session import PersistentSelfTracker
+from .robotron_session import PersistentSelfTracker, RobotronSessionManager, SessionState, GameDiary
 from .shadow_predictor import ShadowPredictor, action_dict
 from .models import Action, Object, Position, WorldState
 from .eyes.sources import PiCameraSource
@@ -82,16 +82,18 @@ def _objects(pairs, identities, prefix, assignments=None, exclude_track_id=None)
 
 
 
-def _quick_frames(source, calibration, recognizer, count=5, interval=0.035, on_observation=None):
+def _quick_frames(source, calibration, recognizer, count=5, interval=0.035, on_observation=None, deadline=None):
     frames = []
     for _ in range(count):
+        if deadline is not None and time.monotonic() >= deadline:
+            break
         playfield = calibration.apply(source.read())
         pairs = recognizer.detect(playfield)
         frames.append(pairs)
         if on_observation:
             on_observation(pairs, playfield)
         if interval:
-            time.sleep(interval)
+            time.sleep(interval if deadline is None else max(0., min(interval, deadline-time.monotonic())))
     return frames
 
 
@@ -179,7 +181,7 @@ def _causal_bootstrap(before_frames, after_frames, direction="E",
 
 
 def _control_challenge(source, calibration, recognizer, controller,
-                       initial_frames=None, pulse_ms=60, on_observation=None):
+                       initial_frames=None, pulse_ms=60, on_observation=None, deadline=None):
     """Test a suspected SELF causally.
 
     Three successful directional probes confirm SELF.
@@ -187,7 +189,7 @@ def _control_challenge(source, calibration, recognizer, controller,
     Anything weaker is inconclusive.
     """
     frames = initial_frames or _quick_frames(
-        source, calibration, recognizer, count=4, interval=0.025, on_observation=on_observation)
+        source, calibration, recognizer, count=4, interval=0.025, on_observation=on_observation, deadline=deadline)
 
     evidence = []
     hits = 0
@@ -195,6 +197,8 @@ def _control_challenge(source, calibration, recognizer, controller,
     anchor = None
 
     for direction in ("E", "S", "W"):
+        if deadline is not None and time.monotonic()+pulse_ms/1000 >= deadline:
+            break
         # Every leg must begin with its own stable player-like candidate.
         # After a failed leg we therefore do not blindly carry the old anchor
         # into another causal claim.
@@ -210,7 +214,9 @@ def _control_challenge(source, calibration, recognizer, controller,
 
         after = _quick_frames(
             source, calibration, recognizer,
-            count=4, interval=0.025, on_observation=on_observation)
+            count=4, interval=0.025, on_observation=on_observation, deadline=deadline)
+        if deadline is not None and time.monotonic() >= deadline:
+            break  # An incomplete observation window is not failed agency.
 
         observed = _causal_bootstrap(
             frames, after,
@@ -293,6 +299,26 @@ def _pair_evidence(pairs):
     return rows
 
 
+def _initial_start_decision(source, calibration, *, timeout=4., required=3):
+    """Positive stable pregame authorizes one START; gameplay attaches, else stop."""
+    deadline=time.monotonic()+timeout
+    history=[]; frames=[]; previous=None; streak=0
+    while time.monotonic()<deadline:
+        raw=source.read()
+        screen=classify_screen_state(calibration.apply(raw))
+        phase=screen.get('phase','unknown')
+        streak=streak+1 if phase==previous else 1
+        previous=phase
+        history.append(dict(at=time.monotonic(),capture_timestamp=source.timestamp,
+                            capture=source.capture,screen=screen,consecutive=streak))
+        if len(frames)<6:frames.append((f'start-decision-{len(frames):03d}.png',raw.copy()))
+        if streak>=required and phase in ('startable','gameplay'):
+            return dict(action='start' if phase=='startable' else 'attach',
+                        reason='stable positive '+phase,observations=history),frames
+        time.sleep(.025)
+    return dict(action='stop',reason='no stable positive pregame or gameplay evidence',observations=history),frames
+
+
 def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.0, on_observation=None, generic_ready=False):
     """Observe quietly after START and preserve why acquisition passed or failed."""
     deadline = time.monotonic() + timeout
@@ -313,6 +339,9 @@ def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.
             "frame": frame_no,
             "t": round(timeout - max(0.0, deadline - time.monotonic()), 4),
             "candidate_count": len(pairs),
+            "capture_timestamp": getattr(source, 'timestamp', None),
+            "observed_at_monotonic": time.monotonic(),
+            "screen_state": classify_screen_state(playfield),
             "stable_center": list(center) if center else None,
             "stable_appearance": list(appearance) if appearance else None,
             "candidates": _pair_evidence(pairs),
@@ -324,7 +353,8 @@ def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.
         # Save a small visual trail without turning every run into a frame dump.
         if frame_no < 4 or frame_no % 8 == 0 or center is not None:
             playfield.save(evidence_dir / f"startup-{frame_no:03d}.png")
-        if generic_ready and len(collected) >= 3:
+        gameplay_confirmed = len(watch)>=3 and all(r['screen_state'].get('phase')=='gameplay' for r in watch[-3:])
+        if generic_ready and gameplay_confirmed and len(collected) >= 3:
             recent = collected[-3:]
             stable = all(old and new and .5 <= len(new)/len(old) <= 2.
                          and sum(min(_distance(d.center, before.center) for before, _ in old) <= 3.
@@ -332,13 +362,14 @@ def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.
                          for old, new in zip(recent, recent[1:]))
             if stable:
                 return None, "generic_visual_ready", collected, watch, first_visual
-        if center is not None:
+        if gameplay_confirmed and center is not None:
             return center, "new_game_center", collected, watch, first_visual
         frame_no += 1
         time.sleep(0.025)
 
     # Only after the protected center-spawn watch expires do we allow appearance.
-    player = _appearance_bootstrap(collected)
+    player = _appearance_bootstrap(collected) if len(watch)>=3 and all(
+        r['screen_state'].get('phase')=='gameplay' for r in watch[-3:]) else None
     if player is not None:
         return player, "appearance_after_center_window", collected, watch, first_visual
     return None, None, collected, watch, first_visual
@@ -356,7 +387,7 @@ def main():
                         default=Path("config/robotron/playfield-latest.json"),
                         help="promoted playfield calibration used for fast startup")
     parser.add_argument("--recalibrate", action="store_true",
-                        help="after START, rediscover the live game border instead of loading --calibration")
+                        help="before START, rediscover screen geometry instead of loading --calibration")
     parser.add_argument("--no-start-game", action="store_true",
                         help="do not tap START; use when Robotron gameplay is already running")
     parser.add_argument("--focus", type=float, default=None,
@@ -408,6 +439,19 @@ def main():
     visual_agency = VisualAgency(bootstrap_body_fire=args.bootstrap_body_fire)
     self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3,
                                          tracker=visual_agency.tracker if args.arm else None)
+    session = RobotronSessionManager(clock=time.monotonic)
+    diary = GameDiary(args.output, clock=time.monotonic)
+    timing = {'clock':'monotonic', 'gameplay_timer_boundary':'after SELF discovery; includes reacquisition',
+              'first_life_lost_at':None, 'life_tracking':'unmeasured; SELF loss is not a life boundary'}
+    def mark(kind, **data):
+        at = time.monotonic()
+        timing[kind] = at
+        diary.event(kind, at=at, **data)
+        return at
+    def phase(state, reason):
+        if session.state != state:
+            diary.transition(session.transition(state, reason))
+    mark('camera_initialization_started')
     source = ObservedCamera(PiCameraSource(), require_fresh=args.arm)
     score_observer = None
     preceding_action = None
@@ -419,8 +463,17 @@ def main():
     buffered_frames = []
     raw_frames = []
     def record_agency(snapshot):
+        execution = getattr(controller, 'last_execution', None) or {}
+        if session.state == SessionState.ACQUIRING and execution.get('move') not in (None,'STAY') and 'first_body_probe_at' not in timing:
+            timing['first_body_probe_at'] = execution.get('started_at')
+            diary.event('first_body_probe', at=execution.get('started_at'), control_execution=execution)
+        status = snapshot.get('identity_status')
+        if status in ('provisional', 'confirmed') and f'first_{status}_self_at' not in timing:
+            timing[f'first_{status}_self_at'] = source.timestamp
+            mark(f'first_{status}_self_recorded', capture_timestamp=source.timestamp,
+                 track_id=snapshot.get('controlled_track_id'), identity_status=status)
         row = {"sample": visual_agency.tick, "capture_timestamp": source.timestamp, "capture": source.capture,
-               "control_execution": getattr(controller, "last_execution", None), **snapshot}
+               "control_execution": getattr(controller, "last_execution", None), "session_phase":session.state.value, **snapshot}
         # Encoding PNGs between pulses lengthened unseen intervals substantially.
         # Buffer a bounded set of originals; write images only after controls close.
         if latest_agency_frame is not None and len(raw_frames) < 96:
@@ -506,27 +559,49 @@ def main():
         # Task-aware optics preflight runs before START, with neutral controls,
         # and never inside the time-critical tracking/score observation loop.
         if args.recalibrate:
+            mark('exposure_started')
             exposure_preflight = optimize_screen_exposure(source, args.output)
+            mark('exposure_finished', status=exposure_preflight.get('status'))
+
+        # Attract's striped border supplies geometry, not gameplay identity.
+        # Complete all slow optical/geometric preparation before spending a life.
+        mark('calibration_started')
+        if args.recalibrate:
+            calibration = prepare(source, args.output, require_uniform_border=False)
+            calibration_mode = 'fresh_before_start'
+        else:
+            if not args.calibration.exists():
+                raise RuntimeError(f'saved calibration missing: {args.calibration}; run once with --recalibrate')
+            calibration = Calibration.load(args.calibration)
+            calibration_mode = 'saved'
+            print(f'Loaded calibration: {args.calibration}')
+        mark('calibration_finished', mode=calibration_mode)
+        phase(SessionState.CAMERA_READY, 'optics and geometric calibration complete')
+        mark('camera_ready')
 
         auto_start = args.arm and not args.no_start_game
         if auto_start:
-            controller = ArcadeController(args.host, args.port, protocol="positions")
-            print("CAMERA READY; tapping Robotron START")
-            controller._command("START")  # Zero v2 protocol: momentary button tap
-            print("START sent; waiting for visual gameplay evidence")
-
-        if args.recalibrate:
-            if not args.arm and not args.no_start_game:
-                raise RuntimeError("--recalibrate needs live gameplay; start the game first and use --no-start-game")
-            calibration = prepare(source, args.output)
-            calibration_mode = "fresh"
+            decision, decision_frames = _initial_start_decision(source, calibration, timeout=args.start_wait)
+            buffered_frames.extend(decision_frames)
+            mark('start_decision', decision=decision)
+            if decision['action']=='stop':
+                raise RuntimeError('initial START not authorized: '+decision['reason'])
+            auto_start = decision['action']=='start'
+            if not auto_start:
+                print('GAMEPLAY ALREADY VISIBLE: attaching without START')
         else:
-            if not args.calibration.exists():
-                raise RuntimeError(
-                    f"saved calibration missing: {args.calibration}; run once with --recalibrate")
-            calibration = Calibration.load(args.calibration)
-            calibration_mode = "saved"
-            print(f"Loaded calibration: {args.calibration}")
+            decision = {'action':'attach' if args.arm else 'observe', 'reason':'explicit --no-start-game or unarmed observation'}
+            mark('start_decision', decision=decision)
+        if auto_start:
+            controller = ArcadeController(args.host, args.port, protocol="positions")
+            phase(SessionState.STARTING, 'stable recognized pregame plus explicit --arm')
+            print('CAMERA READY; tapping Robotron START')
+            mark('start_requested')
+            controller._command('START')
+            timing['start_transport'] = getattr(controller, 'last_command', None)
+            mark('start_acknowledged')
+            phase(SessionState.WAITING_FOR_GAMEPLAY, 'START acknowledged; candidate watch is not semantic certification')
+            print('START sent; waiting for visual gameplay evidence')
 
         # Fresh temporal state belongs to this run/new START, never unreadable frames.
         try:
@@ -534,10 +609,12 @@ def main():
         except Exception as exc:
             print(f"SCORE UNKNOWN: {type(exc).__name__}: {exc}")
 
-        if auto_start:
+        if args.arm:
             player, acquisition, frames, startup_watch, gameplay_visual_frame = _wait_for_gameplay(
                 source, calibration, recognizer, args.output, timeout=args.start_wait,
                 on_observation=observe_unmeasured, generic_ready=True)
+            if acquisition is None:
+                raise RuntimeError('gameplay entry unconfirmed; controls neutral')
         else:
             frames = _quick_frames(source, calibration, recognizer, count=5,
                                    on_observation=observe_unmeasured if args.arm else None)
@@ -545,13 +622,23 @@ def main():
             gameplay_visual_frame = None
             player, acquisition = _acquire_from_frames(frames)
 
+        mark('candidate_watch_finished')
+        timing['first_visual_candidates_at'] = next((r['capture_timestamp'] for r in startup_watch if r['candidate_count']), None)
+        timing['first_classified_gameplay_at'] = next((r['capture_timestamp'] for r in startup_watch
+            if r['screen_state']['state']=='gameplay'), None)
+        timing['gameplay_confirmed_at'] = next((startup_watch[i]['capture_timestamp'] for i in range(2,len(startup_watch))
+            if all(r['screen_state'].get('phase')=='gameplay' for r in startup_watch[i-2:i+1])), None)
+        phase(SessionState.ACQUIRING, 'candidate watch complete; direct actuator evidence follows')
+
         # Appearance/center are proposals. Armed play requires direct agency.
         if args.arm:
             if controller is None:
                 controller = ArcadeController(args.host, args.port, protocol="positions")
             print("DISCOVERING SELF: short movement/neutral probes over all visual candidates")
+            mark('self_discovery_started')
             player = visual_agency.discover(read_agency_pairs, controller, record=record_agency,
                                            observation_time=lambda: source.timestamp)
+            mark('self_discovery_finished', identity_status='confirmed' if visual_agency.agency.self_id is not None else 'provisional' if player is not None else 'unknown')
             frames = [visual_agency.pairs]
             acquisition = ("generic_visual_agency" if visual_agency.agency.self_id is not None else
                            "provisional_body_agency" if player is not None else None)
@@ -584,6 +671,9 @@ def main():
             controller = ArcadeController(args.host, args.port, protocol="positions")
         started = time.monotonic()
         deadline = started + args.seconds
+        timing.update(gameplay_timer_started_at=started, gameplay_deadline=deadline)
+        phase(SessionState.PLAYING, 'ordinary policy enabled with acquired or provisional SELF')
+        diary.event('gameplay_timer_started', at=started, deadline=deadline, identity=acquisition)
         tick = 0
         lost = 0
         pending_move = None
@@ -647,6 +737,7 @@ def main():
 
             if new_player is None:
                 lost += 1
+                phase(SessionState.REACQUIRING, 'SELF unavailable; life boundary UNKNOWN')
                 if lost in (1,3):
                     save_review(raw,tick,'identity-loss')
 
@@ -660,7 +751,10 @@ def main():
 
                 recovery_frames = _quick_frames(
                     source, calibration, recognizer, count=4, interval=0.025,
-                    on_observation=observe_unmeasured)
+                    on_observation=observe_unmeasured, deadline=deadline)
+                if time.monotonic() >= deadline:
+                    result = 'TIME LIMIT'
+                    break
                 recovered = None  # Global resemblance is not proof of a new SELF.
 
                 recovery = "generic_visual_agency"
@@ -676,8 +770,8 @@ def main():
                 # SELF loss never ends an episode.  It only changes what Charlie
                 # does: remain neutral, keep looking, and gather independent
                 # evidence about whether Robotron itself has left gameplay.
-                screen = classify_screen_state(playfield)
-                episode_observer.observe_screen(screen["state"])
+                screen = classify_screen_state(latest_agency_frame if latest_agency_frame is not None else playfield)
+                screen['capture_timestamp'] = source.timestamp
 
                 # A causal challenge is corroborating evidence, not a termination
                 # rule.  Do it occasionally after sustained loss; failure means
@@ -689,7 +783,7 @@ def main():
                         "checking for controllable SELF")
                     challenge = _control_challenge(
                         source, calibration, recognizer, controller,
-                        initial_frames=recovery_frames, on_observation=observe_unmeasured)
+                        initial_frames=recovery_frames, on_observation=observe_unmeasured, deadline=deadline)
 
                     rows.append({
                         "tick": tick,
@@ -716,30 +810,11 @@ def main():
                             f"{challenge['hits']}/"
                             f"{challenge['attempts']}")
                     elif challenge["rejected"]:
-                        # Established gameplay was followed by genuine SELF loss,
-                        # and independently eligible causal probes rejected the
-                        # stable SELF-like candidates. Appearance must not
-                        # overrule this stronger negative agency evidence.
+                        # Failed probes cannot distinguish death, respawn, bad
+                        # identity or delay from the end of a whole game.
                         episode_observer.observe_agency(False)
                         recovered = None
-                        result = "GAME OVER"
-                        episode_end = {
-                            "state": "game_over",
-                            "confirmed": True,
-                            "evidence": episode_observer.evidence(
-                                screen=screen,
-                                self_lost_frames=lost,
-                            ),
-                        }
-                        episode_end["evidence"]["rule"] = (
-                            "established_gameplay_plus_eligible_failed_agency"
-                        )
-                        episode_end["evidence"]["control_challenge"] = challenge
-                        save_review(raw, tick, "game-over-failed-agency")
-                        print(
-                            "GAME OVER CONFIRMED: stable SELF candidates "
-                            "failed robust causal control challenge")
-                        break
+                        print('SELF CHALLENGE REJECTED; episode boundary remains unconfirmed')
                     elif challenge["eligible"]:
                         recovered = None
                         print(
@@ -755,6 +830,11 @@ def main():
                 # attract border supplies positive visual evidence; failed agency
                 # is independent corroboration.  Eight consecutive observations
                 # deliberately makes a one-frame transition/glitch insufficient.
+                # Recovery/challenge may have taken seconds: use its newest
+                # already-calibrated evidence, not the frame preceding it.
+                screen = classify_screen_state(latest_agency_frame if latest_agency_frame is not None else playfield)
+                screen['capture_timestamp'] = source.timestamp
+                episode_observer.observe_screen(screen['state'] if screen.get('phase') in ('startable','terminal','gameplay') else 'unknown')
                 if recovered is None and episode_observer.confirmed:
                     result = "GAME OVER"
                     episode_end = {
@@ -813,6 +893,7 @@ def main():
                     f"PLAYER REACQUIRED ({recovery}) after {lost} misses "
                     f"x={player[0]:.2f} y={player[1]:.2f}")
                 episode_observer.self_reacquired()
+                phase(SessionState.PLAYING, 'SELF reacquired; no new-game inference')
                 lost = 0
                 tick += 1
                 continue
@@ -886,8 +967,15 @@ def main():
             pending_origin = dict(visual_agency.positions)
             pending_origin_at = source.timestamp
             pending_at = time.monotonic()
+            if 'first_ordinary_action_requested' not in timing:
+                mark('first_ordinary_action_requested', action=action_dict(action), identity_status=agency_snapshot.get('identity_status'))
             preceding_action = {"tick":tick, "timestamp":pending_at, **action_dict(action)}
             controller.execute(action, pulse_ms)
+            if 'first_ordinary_execution' not in timing:
+                execution = getattr(controller, 'last_execution', None)
+                timing['first_ordinary_execution'] = dict(execution) if execution else None
+                diary.event('first_ordinary_execution', at=execution.get('started_at') if execution else None,
+                            control_execution=execution, identity_status=agency_snapshot.get('identity_status'))
             if experiment_context is not None:
                 experiment_status.update(status='executed',attempted=True,reason=experiment_plan['reason'])
                 print(f"EXPERIMENT: BODY={action.move} FIRE={action.fire}; prediction={experiment_plan['prediction_id'][:12]}")
@@ -939,6 +1027,14 @@ def main():
         result = f'ERROR: {type(exc).__name__}: {exc}'
         raise
     finally:
+        timing['stopped_at'] = time.monotonic()
+        start_transport = timing.get('start_transport') or {}
+        ordinary = timing.get('first_ordinary_execution') or {}
+        if ordinary.get('started_at') is not None and start_transport.get('write_completed_at') is not None:
+            timing['start_to_first_ordinary_action_seconds'] = ordinary['started_at']-start_transport['write_completed_at']
+            timing['start_to_first_ordinary_action_basis'] = 'controller action start minus START local write completion; not remote execution/display onset'
+        diary.transition(session.stop(result))
+        diary.close()
         if controller is not None:
             try:
                 controller.close()
@@ -957,13 +1053,14 @@ def main():
             frame.save(args.output / name)
         tracks = self_tracker.tracks() if args.arm else []
         (args.output / "tracks.json").write_text(json.dumps({"tracks":tracks}, indent=2)+"\n")
-        report = {"provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
+        report = {"session_timing":timing, "session_transitions":[vars(r) for r in session.transitions], "session_events":"events.jsonl", "provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
                   "pulse_ms": args.pulse_ms, "ticks": len(rows),
                   "episode_end": episode_end,
                   "score": score_summary["self_score"], "score_status": score_summary["status"],
                   "score_summary": score_summary,
                   "learning_mode": "fixed_policy_with_shadow_diagnostics",
-                  "auto_start": bool(args.arm and not args.no_start_game),
+                  "auto_start": locals().get('auto_start', False),
+                  "start_decision": locals().get('decision'),
                   "calibration_mode": locals().get("calibration_mode"),
                   "exposure_preflight": locals().get("exposure_preflight"),
                   "calibration": {"corners":getattr(locals().get("calibration"), "corners", None),

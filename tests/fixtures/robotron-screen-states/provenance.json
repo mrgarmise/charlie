@@ -1,0 +1,162 @@
+[
+  {
+    "path": "pregame-bright.jpg",
+    "source_run": "body-fire-bootstrap-20261001-020552",
+    "source_file": "exposure-ev-0.png",
+    "source_sha256": "e5d09521b8ad5b7ac22470c9e9990af588bd9e095512e3c8a23eb812b84ae8d5",
+    "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+    "calibration": {
+      "corners": [
+        [
+          0.11998016084180993,
+          0.21179578020011722
+        ],
+        [
+          0.6847962025784925,
+          0.1146773202156617
+        ],
+        [
+          0.7672169800355161,
+          0.7972213232796561
+        ],
+        [
+          0.13227011834529548,
+          0.9550675102556031
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "expected_phase": "startable"
+  },
+  {
+    "path": "pregame-heldout.jpg",
+    "source_run": "response-window-20261001-012341",
+    "source_file": "exposure-ev-2.png",
+    "source_sha256": "c354137b7aac2797f8e9ed10c04857d0a2afd4ce3d2ffd56609cdf511e864035",
+    "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+    "calibration": {
+      "corners": [
+        [
+          0.12031101591235549,
+          0.2154569873890193
+        ],
+        [
+          0.6849457057815312,
+          0.10864048947858333
+        ],
+        [
+          0.7690819488650085,
+          0.7920378696048298
+        ],
+        [
+          0.12852105520912888,
+          0.9510977705297269
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "expected_phase": "startable"
+  },
+  {
+    "path": "terminal.jpg",
+    "source_run": "body-fire-bootstrap-20261001-020552",
+    "source_file": "review-003-14-final-view.jpg",
+    "source_sha256": "ab97d61292d060bbb233da0389e9804b9670e83328511a85558bff3ddd94dbac",
+    "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+    "calibration": {
+      "corners": [
+        [
+          0.11998016084180993,
+          0.21179578020011722
+        ],
+        [
+          0.6847962025784925,
+          0.1146773202156617
+        ],
+        [
+          0.7672169800355161,
+          0.7972213232796561
+        ],
+        [
+          0.13227011834529548,
+          0.9550675102556031
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "expected_phase": "terminal"
+  },
+  {
+    "path": "gameplay-white.jpg",
+    "source_run": "body-fire-bootstrap-20261001-020552",
+    "source_file": "setup-attempt-000.png",
+    "source_sha256": "7d59d9bb713b630b2bd68096950572e8271a21d92babeb47f86d622b5f42a853",
+    "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+    "calibration": {
+      "corners": [
+        [
+          0.11998016084180993,
+          0.21179578020011722
+        ],
+        [
+          0.6847962025784925,
+          0.1146773202156617
+        ],
+        [
+          0.7672169800355161,
+          0.7972213232796561
+        ],
+        [
+          0.13227011834529548,
+          0.9550675102556031
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "expected_phase": "gameplay"
+  },
+  {
+    "path": "gameplay-colored.jpg",
+    "source_run": "response-window-20261001-012341",
+    "source_file": "setup-attempt-000.png",
+    "source_sha256": "48c82efec9113c58d228b8d9a3bb9dc138126f6fe7497d2d6ea2cb6b4b9dc59e",
+    "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+    "calibration": {
+      "corners": [
+        [
+          0.12031101591235549,
+          0.2154569873890193
+        ],
+        [
+          0.6849457057815312,
+          0.10864048947858333
+        ],
+        [
+          0.7690819488650085,
+          0.7920378696048298
+        ],
+        [
+          0.12852105520912888,
+          0.9510977705297269
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "expected_phase": "gameplay"
+  }
+]

@@ -221,3 +221,10 @@ Line tracing and subsequent runs did not reproduce that replacement; its cause
 is not established. Failed artifacts were preserved. No retry that discards or
 rewrites committed evidence was added; a persistence failure stops the marathon
 and is reported rather than silently continuing.
+
+The subsequent [startup/transition audit](startup-transition-audit.md) supersedes
+this document’s initial border-only startup and terminal assumptions. Calibration
+now precedes START, explicit recorded page evidence authorizes the initial START,
+and failed SELF probes alone can never authorize a restart. Multiple physical
+games remain unvalidated; inspect the available/new physical archive before
+extending marathon operation.

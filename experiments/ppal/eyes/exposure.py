@@ -69,6 +69,13 @@ def optimize_screen_exposure(source, output):
                 break
         valid = [r for r in report['samples'] if r.get('detail_pixels', 0) >= 50]
         baseline = next((r for r in valid if r['ev'] == 0), None)
+        if baseline is None and valid:
+            # A clipped zero-EV frame can hide geometry entirely. Retain a
+            # measured reference from the least dim valid view instead of
+            # restoring the unreadable setting after a successful sweep.
+            baseline = max(valid, key=lambda r:r['ev'])
+            report['reference_note'] = 'zero EV lacked geometry; least dim measured valid view used'
+        report['reference_ev'] = baseline['ev'] if baseline else None
         # A changing attract scene cannot justify arbitrarily darker settings.
         # Require ample remaining screen detail and meaningful improvement.
         if baseline:

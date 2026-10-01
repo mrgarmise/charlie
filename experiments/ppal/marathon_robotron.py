@@ -169,8 +169,14 @@ def safe_to_restart(report, returncode=0):
     if returncode != 0 or not report:
         return False
     end = report.get('episode_end', {})
-    return (end.get('state') == 'game_over' and end.get('confirmed') is True
-            and bool(end.get('evidence')))
+    evidence = end.get('evidence') or {}
+    return (report.get('result') == 'GAME OVER' and end.get('state') == 'game_over'
+            and end.get('confirmed') is True and isinstance(evidence, dict)
+            and evidence.get('rule') == 'persistent_not_gameplay_plus_no_controlled_self'
+            and evidence.get('not_gameplay_streak', 0) >= 8
+            and evidence.get('agency_failures', 0) >= 1
+            and (evidence.get('screen') or {}).get('state') == 'not_gameplay'
+            and (evidence.get('screen') or {}).get('phase') in ('startable','terminal'))
 
 
 def write_session(path, doc):

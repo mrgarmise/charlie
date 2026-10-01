@@ -1,0 +1,44 @@
+[
+  {
+    "label": "pregame",
+    "source_run": "body-fire-bootstrap-20261001-020552",
+    "source_file": "exposure-ev-2.png",
+    "source_sha256": "0726e82866ede0f72524b0cd2022c3c2905acb52d798557d0f8038bd589b9140",
+    "calibration_sha256": "835343779c29d1128277fc8bc2c119e8e98dc2584e67a35e28c82ffe0496aa14",
+    "crop": [
+      208,
+      24,
+      403,
+      53
+    ],
+    "normalization": "640x480 calibration; positive grayscale local contrast >25; no color label"
+  },
+  {
+    "label": "heroes",
+    "source_run": "body-fire-bootstrap-20261001-020552",
+    "source_file": "review-003-14-final-view.jpg",
+    "source_sha256": "ab97d61292d060bbb233da0389e9804b9670e83328511a85558bff3ddd94dbac",
+    "calibration_sha256": "835343779c29d1128277fc8bc2c119e8e98dc2584e67a35e28c82ffe0496aa14",
+    "crop": [
+      205,
+      25,
+      420,
+      56
+    ],
+    "normalization": "640x480 calibration; positive grayscale local contrast >25; no color label"
+  },
+  {
+    "label": "all-time",
+    "source_run": "body-fire-bootstrap-20261001-020552",
+    "source_file": "review-003-14-final-view.jpg",
+    "source_sha256": "ab97d61292d060bbb233da0389e9804b9670e83328511a85558bff3ddd94dbac",
+    "calibration_sha256": "835343779c29d1128277fc8bc2c119e8e98dc2584e67a35e28c82ffe0496aa14",
+    "crop": [
+      205,
+      186,
+      420,
+      220
+    ],
+    "normalization": "640x480 calibration; positive grayscale local contrast >25; no color label"
+  }
+]

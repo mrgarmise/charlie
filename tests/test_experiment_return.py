@@ -139,7 +139,8 @@ def test_three_unattended_attempts_have_behavioral_return_path(tmp_path,monkeypa
         # Synthetic transport episode; real live hook covered separately.
         delivered.append((action.move,action.fire))
         report={'armed':True,'acquisition':'provisional_body_agency','result':'GAME OVER','score':None,
-                'episode_end':{'state':'game_over','confirmed':True,'evidence':{'synthetic_terminal':True}},
+                'episode_end':{'state':'game_over','confirmed':True,'evidence':{'synthetic_terminal':True,'rule':'persistent_not_gameplay_plus_no_controlled_self',
+                    'not_gameplay_streak':8,'agency_failures':1,'screen':{'state':'not_gameplay','phase':'terminal'}}},
                 'steps':[{'tick':0,'identity_status':'provisional','action':{'move':action.move,'fire':action.fire},
                           'experiment':{'prediction_id':plan['prediction_id'],'track_id':9,'origin_at':now}}]}
         (game/'report.json').write_text(json.dumps(report))

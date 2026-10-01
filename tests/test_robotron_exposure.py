@@ -79,3 +79,19 @@ def test_hardware_controls_preserve_awb_and_use_selected_metadata():
     assert picam.set_controls.call_args.args[0] == {
         'AeEnable':False, 'ExposureTime':12000, 'AnalogueGain':1.5}
     assert all('AwbEnable' not in call.args[0] for call in picam.set_controls.call_args_list)
+
+
+def test_zero_ev_missing_geometry_uses_measured_valid_reference(monkeypatch,tmp_path):
+    from experiments.ppal.eyes import exposure
+    source=SimpleNamespace(ev=0.,capture={},read=lambda:Image.new('RGB',(64,64)),
+                           lock_exposure=lambda capture:True)
+    source.set_exposure_value=lambda ev:setattr(source,'ev',ev) or True
+    def geometry(frame,**kw):
+        if source.ev==0:raise ValueError('clipped zero EV hides geometry')
+        return np.array([(0,0),(63,0),(63,63),(0,63)])
+    monkeypatch.setattr(exposure,'locate',geometry)
+    monkeypatch.setattr(exposure,'screen_evidence',lambda *a:{'detail_pixels':100,
+        'clipped_channel_fraction':.5 if source.ev==-1 else .05})
+    report=exposure.optimize_screen_exposure(source,tmp_path)
+    assert report['reference_ev']==-1 and report['selected_ev']==-2
+    assert report['exposure_locked'] and source.ev==-2

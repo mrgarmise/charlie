@@ -123,3 +123,12 @@ def test_offline_failure_preserves_sources_and_live_has_no_dependency(tmp_path,m
     modules=[n.module or '' for n in ast.walk(tree) if isinstance(n,ast.ImportFrom)]
     assert not any('episode_evidence' in m or 'memory.evidence' in m for m in modules)
     j.close()
+
+
+def test_existing_session_diary_retains_absolute_phase_time(tmp_path):
+    root=make_episode(tmp_path/'run')
+    (root/'events.jsonl').write_text(json.dumps({'kind':'start_requested','at':1234.5,'t':2.})+'\n')
+    journal=EvidenceJournal(tmp_path/'events.sqlite3');ep=import_episode(root,journal)
+    rows=[r for r in journal.records('observation') if r.data['payload']['category']=='session_event_observation']
+    assert len(rows)==1 and rows[0].data['at']==1234.5
+    journal.close()

@@ -52,6 +52,7 @@ class ArcadeController:
         self.positions = ("LS_CENTER", "RS_CENTER")
         self.closed = False
         self.last_execution = None
+        self.last_command = None
         try:
             self._command("NEUTRAL")
         except BaseException:
@@ -60,8 +61,12 @@ class ArcadeController:
             raise
 
     def _command(self, command: str) -> None:
+        self.last_command = {'command':command, 'write_started_at':time.monotonic()}
         self.stream.write((command + "\n").encode("ascii"))
+        self.last_command['write_completed_at'] = time.monotonic()
         response = self.stream.readline(64)
+        self.last_command['ack_at'] = time.monotonic()
+        self.last_command['accepted'] = response == b'OK\n'
         if response != b"OK\n":
             raise ConnectionError(f"arcade rejected {command}: {response[:32]!r}")
 

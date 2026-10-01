@@ -27,7 +27,10 @@ def _border_image(colors):
 
 
 def test_uniform_border_is_gameplay():
-    result = classify_screen_state(_border_image([(255, 0, 255)]))
+    image=_border_image([(255, 0, 255)])
+    draw=ImageDraw.Draw(image)
+    draw.rectangle((100,100,110,115),fill='white');draw.rectangle((300,300,310,315),fill='white')
+    result = classify_screen_state(image)
     assert result["state"] == "gameplay"
 
 

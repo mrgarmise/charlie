@@ -109,7 +109,7 @@ def locate(frame, require_uniform_border=True):
     return candidates[0][1]
 
 
-def prepare(source, output: Path):
+def prepare(source, output: Path, *, require_uniform_border=True):
     output.mkdir(parents=True, exist_ok=True)
     print('Settling camera exposure/autofocus, then locating the game border...')
     start = time.monotonic()
@@ -117,6 +117,7 @@ def prepare(source, output: Path):
         source.read()
         if time.monotonic()-start >= 2:
             break
+    settled_at = time.monotonic()
     observations = []
     frame = None
     attempts = []
@@ -130,20 +131,26 @@ def prepare(source, output: Path):
         for attempt in range(24):
             frame = source.read()
             frame_name = f"setup-attempt-{attempt:03d}.png"
+            encoding_started = time.monotonic()
             frame.save(output/frame_name)
+            encoding_seconds = time.monotonic()-encoding_started
             capture = getattr(source, "capture", None)
             row = {"attempt": attempt+1, "frame": frame_name,
+                   "frame_save_seconds":encoding_seconds,
                    "timestamp": (getattr(source, "timestamp", None)
                                  if isinstance(getattr(source, "timestamp", None), (int, float)) else None),
                    "capture": capture if isinstance(capture, dict) else None}
             attempts.append(row)
+            locate_started = time.monotonic()
             try:
-                points = locate(frame)
+                points = locate(frame, require_uniform_border=require_uniform_border)
             except ValueError as exc:
+                row['locate_seconds'] = time.monotonic()-locate_started
                 observations.clear()
                 last_reason = str(exc)
                 row["reason"] = last_reason
             else:
+                row['locate_seconds'] = time.monotonic()-locate_started
                 row["corners"] = points.tolist()
                 observations.append(points)
 
@@ -187,6 +194,10 @@ def prepare(source, output: Path):
         calibration.apply(frame).save(output/'setup-playfield.png')
         (output/'setup.json').write_text(json.dumps({'status':'border stable', 'max_jitter_pixels':jitter,
             'attempts': attempt+1, 'stable_views': len(observations),
+            'require_uniform_border': require_uniform_border,
+            'started_at':start, 'finished_at':time.monotonic(), 'settle_seconds':settled_at-start,
+            'locate_seconds':sum(r.get('locate_seconds',0.) for r in attempts),
+            'frame_save_seconds':sum(r.get('frame_save_seconds',0.) for r in attempts),
             'note':'Geometry check only; does not certify focus, exposure, or object recognition.'},indent=2)+'\n')
         print(f'New screen calibration saved; border jitter {jitter:.1f}px')
         return calibration

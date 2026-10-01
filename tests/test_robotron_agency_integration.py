@@ -7,11 +7,14 @@ from experiments.ppal.eyes.detectors import Detection
 from experiments.ppal.robotron_agency import VECTORS
 
 
-@pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment',
-                         [(False,False,False,False,False),(True,False,False,False,False),
-                          (False,True,False,False,False),(False,False,True,False,False),
-                          (False,False,True,True,False),(False,False,True,True,True)])
-def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment):
+@pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                         [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                          (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                          (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                          (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                          (False,False,False,False,False,False,False,True)])
+
+def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay):
     from experiments.ppal import play_robotron as play
     clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
     image=Image.new('RGB',(100,100))
@@ -25,8 +28,8 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
                     u = pending[0]; p = points[0]
                     points[0] = (p[0]+u[0],p[1]+u[1])
                     pending[0] = None
-            if respawn and reads[0] == 22: points[0]=(80.,80.)
-            if fail_during_play and reads[0]>25: raise RuntimeError('camera disconnected')
+            if respawn and reads[0] == 25: points[0]=(80.,80.)
+            if fail_during_play and reads[0]>28: raise RuntimeError('camera disconnected')
             return image
         def close(self): closed.append('camera')
     class Recognizer:
@@ -36,7 +39,9 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
                      {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
     class Controller:
         def __init__(self,*a,**k): self.last_execution=None
-        def _command(self,command): commands.append(command)
+        def _command(self,command):
+            commands.append(command)
+            self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
         def execute(self,action,ms):
             commands.append(action)
             self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
@@ -53,6 +58,27 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     monkeypatch.setattr(play,'ArcadeController',Controller)
     monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
     monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+    monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+        'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+    challenges=[]
+    if rejected_challenge:
+        original_player=play.VisualAgency.player.fget
+        monkeypatch.setattr(play.VisualAgency,'player',property(
+            lambda self:None if reads[0]>28 else original_player(self)))
+        def reject(*a,**kw):
+            challenges.append(True)
+            return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                        attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+        monkeypatch.setattr(play,'_control_challenge',reject)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+    if recalibrate:
+        def prepare(source,output,**kwargs):
+            assert 'START' not in commands
+            assert kwargs['require_uniform_border'] is False
+            clock[0]+=20.  # Slow geometry must spend no armed game time.
+            return type('Calibration',(),{'apply':lambda self,f:f})()
+        monkeypatch.setattr(play,'prepare',prepare)
+        monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
     if experiment:
         from pathlib import Path
         from memory.evidence import EvidenceJournal
@@ -72,14 +98,32 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
         plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
         (tmp_path/'plan.json').write_text(json.dumps(plan))
-    monkeypatch.setattr(sys,'argv',['play','--arm','--seconds','1','--output',str(tmp_path/'run')]
+    monkeypatch.setattr(sys,'argv',['play','--arm','--seconds','3' if rejected_challenge else '1','--output',str(tmp_path/'run')]
                         + (['--bootstrap-body-fire'] if bootstrap else [])
-                        + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else []))
+                        + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                        + (['--recalibrate'] if recalibrate else []))
     if fail_during_play:
         with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
     else:
         play.main()
     report=json.loads((tmp_path/'run/report.json').read_text())
+    t=report['session_timing']
+    if already_gameplay:
+        assert 'START' not in commands and 'start_requested' not in t
+        assert report['start_decision']['action']=='attach'
+    else:
+        assert commands.count('START')==1
+        assert t['calibration_finished'] <= t['start_requested'] <= t['start_acknowledged']
+        assert t['start_to_first_ordinary_action_seconds']==pytest.approx(
+            t['first_ordinary_execution']['started_at']-t['start_transport']['write_completed_at'])
+    assert t['self_discovery_started'] < t['self_discovery_finished'] <= t['gameplay_timer_started_at']
+    assert t['first_ordinary_action_requested'] >= t['gameplay_timer_started_at']
+    assert t['gameplay_deadline']-t['gameplay_timer_started_at']==pytest.approx(3. if rejected_challenge else 1.)
+    telemetry_events=list(map(json.loads,(tmp_path/'run/events.jsonl').read_text().splitlines()))
+    assert any(e['kind']=='state_transition' and e['new']=='playing' for e in telemetry_events)
+    assert t['first_life_lost_at'] is None
+    if recalibrate:
+        assert t['start_requested']>=20. and report['calibration_mode']=='fresh_before_start'
     assert report['acquisition']==('provisional_body_agency' if bootstrap else 'generic_visual_agency')
     actions=[r for r in report['steps'] if 'action' in r]
     assert actions
@@ -113,4 +157,8 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         resolution=resolve_experiment(tmp_path/'run',evidence,next_episode,commitments,plan,gateway)
         assert resolution['result']=='supported'
         evidence.close();commitments.close();journal.close()
+    if rejected_challenge:
+        assert challenges and report['episode_end']['confirmed'] is False
+        assert any(r.get('status')=='control_challenge' for r in report['steps'])
+        assert report['result']=='TIME LIMIT'
     assert report['result'].startswith('ERROR:') if fail_during_play else report['result']=='TIME LIMIT'

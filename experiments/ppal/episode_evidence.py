@@ -52,6 +52,8 @@ def import_episode(root, journal):
                 continue
             row = json.loads(text)
             at = row.get('capture_timestamp', row.get('timestamp'))
+            if name == 'events.jsonl':
+                at = row.get('at', at)  # Existing diary's explicit monotonic phase timestamps.
             # Legacy relative t is NOT interchangeable with sensor monotonic time.
             ref = {**refs[name], 'line':line}
             add(category, ref, at=at, subsystem=name.removesuffix('.jsonl'))

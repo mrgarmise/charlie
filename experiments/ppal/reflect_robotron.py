@@ -22,6 +22,31 @@ from memory.marm import MarmWriteError
 DEFAULT_QUESTIONS = Path.home() / ".local/share/charlie/robotron-questions.jsonl"
 
 
+def reflect_evidence(journal, episode, gateway):
+    """Consolidate explicit diagnostic resolutions through the existing path.
+
+    No automatic helpful/harmful credit, semantic teaching or policy update.
+    Each model version retains its own evidence identity in MemoryEvaluator.
+    """
+    from collections import Counter
+    rows = [r for r in journal.records('resolution_reference') if r.data['episode'] == episode]
+    versions = sorted({r.data['version'] for r in rows})
+    findings = []
+    for version in versions:
+        selected = [r for r in rows if r.data['version'] == version]
+        counts = Counter(r.data['payload']['result'] for r in selected)
+        event = Experience(kind='observation', source='ppal:evidence-reflection',
+            summary=f"Replay model {version}: {dict(counts)}. These are diagnostic replay tests, not live commitments or causal game rules",
+            subject=episode, confidence=1.0, significant=True,
+            tags=('ppal','reflection','prediction-diagnostic'),
+            evidence=f"{journal.path.resolve()}#" + selected[-1].id)
+        promoted = gateway.remember(event)
+        findings.append(dict(version=version,results=dict(counts),promoted=promoted,
+                             evidence_ids=[r.id for r in selected]))
+    return dict(episode=episode,findings=findings,policy_updated=False,
+                memory_path='Experience -> MemoryGateway -> MemoryEvaluator -> existing store/MARM outbox')
+
+
 def _load(path):
     return json.loads(Path(path).read_text())
 

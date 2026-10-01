@@ -26,6 +26,9 @@ class WorldState:
     targets: tuple[Object, ...]
     threats: tuple[Object, ...]
     alive: bool = True
+    # Physical objects whose semantic role is unresolved; never silently drop
+    # them or rename their track when a later label becomes available.
+    unresolved: tuple[Object, ...] = ()
 
 
 @dataclass(frozen=True)

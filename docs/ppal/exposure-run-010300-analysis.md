@@ -1,5 +1,7 @@
 # exposure-calibration-20261001-010300: stable player, discarded delayed response
 
+Live follow-up: [response-window-012341 analysis](response-window-012341-analysis.md).
+
 The archive ran 2188d5a. Fresh calibration succeeded (six stable views, 6.8px
 jitter), then discovery failed. There were 27 observations, zero normal policy
 ticks and no confirmed SELF. Controls closed neutral. Alex's glasses observation

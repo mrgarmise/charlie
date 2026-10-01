@@ -66,7 +66,7 @@ class ShadowPredictor:
         moment = timestamp if self.horizon_seconds is not None else world.tick
         self._player = self._update_motion(self._player, moment, world.player)
         seen = set()
-        for item in (*world.targets, *world.threats):
+        for item in (*world.targets, *world.threats, *world.unresolved):
             seen.add(item.id)
             self._objects[item.id] = self._update_motion(
                 self._objects.get(item.id), moment, item.position)
@@ -101,6 +101,7 @@ class ShadowPredictor:
             targets=projected(world.targets),
             threats=projected(world.threats),
             alive=world.alive,
+            unresolved=projected(world.unresolved),
         )
 
     def snapshot(self, world: WorldState, projected: WorldState) -> dict:
@@ -134,6 +135,7 @@ class ShadowPredictor:
                                 if pm else [0.0, 0.0]),
             "targets": rows(world.targets, projected.targets),
             "threats": rows(world.threats, projected.threats),
+            "unresolved": rows(world.unresolved, projected.unresolved),
         }
 
 

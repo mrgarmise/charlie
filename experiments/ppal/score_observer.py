@@ -17,6 +17,9 @@ class ScoreObserver:
         self.costs = []
         self.errors = 0
         self.frames = []
+        self.latest_frame = None
+        self.late_change_frames = 0
+        self.omitted_change_frames = 0
         self.accepted_confidence = {1:None, 2:None}
         self.thread = threading.Thread(target=self._run, daemon=True)
         self.thread.start()
@@ -59,10 +62,17 @@ class ScoreObserver:
                     if observation.status in ('baseline', 'changed'):
                         self.accepted_confidence[player] = observation.confidence
                     row[f'p{player}']['accepted_confidence'] = self.accepted_confidence[player]
-                if len(self.frames) < 16:
-                    name = f'score-raw-{sample:04d}.png'
+                name = f'score-raw-{sample:04d}.png'
+                self.latest_frame = (name, frame)
+                changed = channels.player1.changed or channels.player2.changed
+                initial = sample <= 16
+                if initial or (changed and self.late_change_frames < 16):
+                    if not initial:
+                        self.late_change_frames += 1
                     self.frames.append((name, frame))
                     row['raw_frame'] = name
+                elif changed:
+                    self.omitted_change_frames += 1
                 row.update(sample=sample, timestamp=timestamp, preceding_action=action,
                            processing_seconds=elapsed, enqueue_copy_seconds=copy_seconds,
                            error=error, reward_evidence=channels.self_delta,
@@ -92,6 +102,9 @@ class ScoreObserver:
         except queue.Full:
             return
         self.thread.join(timeout=5.)
+        if not self.thread.is_alive() and self.latest_frame is not None:
+            if all(name != self.latest_frame[0] for name, _ in self.frames):
+                self.frames.append(self.latest_frame)
 
     def report(self):
         return {**self.system.report(), 'log':'score.jsonl', 'samples':len(self.costs),
@@ -100,6 +113,8 @@ class ScoreObserver:
                 'processing_seconds_total':sum(self.costs),
                 'processing_seconds_max':max(self.costs, default=0.),
                 'raw_frames':[name for name, _ in self.frames],
+                'raw_frame_retention':'first 16 samples, up to 16 later accepted changes, final sample',
+                'omitted_change_frames':self.omitted_change_frames,
                 'accepted_confidence':dict(self.accepted_confidence),
                 'mode':'observational_background', 'timestamp_clock':'monotonic',
                 'metric':'official_game_score', 'policy_feedback':False}

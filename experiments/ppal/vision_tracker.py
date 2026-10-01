@@ -45,4 +45,4 @@ class ObjectTracker:
                     current[ident] = (old, missed + 1)
             self.previous[kind] = current
             results[kind] = tuple(sorted(matched, key=lambda item: item.id))
-        return WorldState(world.tick, world.player, results["human"], results["threat"], world.alive)
+        return WorldState(world.tick, world.player, results["human"], results["threat"], world.alive, world.unresolved)

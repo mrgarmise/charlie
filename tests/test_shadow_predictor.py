@@ -62,5 +62,5 @@ def test_shadow_can_disagree_without_changing_live_brain():
     shadow_goal = Forebrain().update(projected)
     _, shadow_action = Hindbrain().decide(projected, shadow_goal)
 
-    assert live_action.reason == "no current rescue target"
+    assert live_action.reason == "seek open space; no current rescue target"
     assert shadow_action.reason != live_action.reason

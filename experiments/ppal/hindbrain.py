@@ -39,8 +39,35 @@ class Hindbrain:
         self.last_clear_tick: int | None = None
         self.last_panic_hold_id: str | None = None
         self.last_panic_hold_tick: int | None = None
+        self.last_open_move: str | None = None
+
+    def _open_space(self, world: WorldState) -> tuple[Intent, Action]:
+        # Unresolved objects are occupied space, not fabricated enemies or
+        # rescues. Choose a bounded direction with the clearest route/endpoint.
+        occupants = (*world.threats, *world.unresolved)
+        candidates = []
+        for move, (dx, dy) in MOVE_VECTORS.items():
+            length = hypot(dx, dy)
+            end = Position(world.player.x+8*dx/length, world.player.y+8*dy/length)
+            if not (4 <= end.x <= 96 and 4 <= end.y <= 96):
+                continue
+            route = min((distance_to_segment(o.position, world.player, end)
+                         for o in occupants), default=100.)
+            clearance = min((end.distance(o.position) for o in occupants), default=100.)
+            margin = min(end.x, end.y, 100-end.x, 100-end.y)
+            candidates.append(((route, clearance, move == self.last_open_move, margin), move, end))
+        if not candidates:
+            return Intent("hold"), Action(reason="no bounded open-space step")
+        _, move, end = max(candidates, key=lambda row:row[0])
+        self.last_open_move = move
+        threat = min(world.threats, key=lambda o:world.player.distance(o.position), default=None)
+        fire = direction(world.player, threat.position, 0) if threat else 'NONE'
+        return (Intent("explore", destination=end),
+                Action(move, fire, "seek open space; no current rescue target"))
 
     def decide(self, world: WorldState, goal: Goal) -> tuple[Intent, Action]:
+        if not world.alive:
+            return Intent("hold"), Action(reason="world not alive")
         nearby = [threat for threat in world.threats if world.player.distance(threat.position) < self.panic_radius]
         if nearby:
             threat = min(nearby, key=lambda item: world.player.distance(item.position))
@@ -66,7 +93,7 @@ class Hindbrain:
 
         target = next((item for item in world.targets if item.id == goal.target_id), None)
         if target is None:
-            return Intent("hold"), Action(reason="no current rescue target")
+            return self._open_space(world)
 
         blockers = [threat for threat in world.threats
                     if distance_to_segment(threat.position, world.player, target.position) < self.route_width

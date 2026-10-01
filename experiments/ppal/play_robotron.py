@@ -809,8 +809,11 @@ def main():
                                visual_agency.agency.self_id)
             threats = _objects(pairs, THREATS, "threat", visual_agency.assignments,
                                visual_agency.agency.self_id)
+            unresolved = _objects(pairs, {d.kind for d, _ in pairs}-HUMANS-THREATS,
+                                  "unresolved", visual_agency.assignments,
+                                  visual_agency.agency.self_id)
             world = WorldState(tick=tick, player=Position(*player),
-                               targets=targets, threats=threats, alive=True)
+                               targets=targets, threats=threats, alive=True, unresolved=unresolved)
 
             # Physical IDs come directly from generic tracks. A semantic label
             # change does not rename the object or run a second association pass.
@@ -855,6 +858,11 @@ def main():
                 "self_track_id": self_tracker.player_track_id,
                 "agency": agency_snapshot,
                 "targets": len(targets), "threats": len(threats),
+                "unresolved": len(unresolved),
+                "world_objects": {role:[{"id":o.id, "position":[o.position.x,o.position.y]}
+                                        for o in getattr(world,role)]
+                                  for role in ("targets","threats","unresolved")},
+                "intent": {"kind":intent.kind, "target_id":intent.target_id},
                 "goal": {"kind": goal.kind, "target_id": goal.target_id},
                 "intent": {"kind": intent.kind, "target_id": intent.target_id},
                 "action": {"move": action.move, "fire": action.fire,
@@ -924,6 +932,7 @@ def main():
                   "tracking_schema": "sprite-tracking-v3",
                   "capture_mode": "fresh_exposure" if args.arm else "read_completion",
                   "agency_acquisition_protocol": "two_fresh_endpoints_then_independent_neutral",
+                  "planning_mode": "rescue_with_open_space_fallback",
                   "tracks": "tracks.json",
                   "agency_samples": len(agency_rows),
                   "agency_log": "agency.jsonl",

@@ -1,5 +1,8 @@
 # Learning return-path audit (before implementation)
 
+Historical tactical-gap audit. For the current strategic ownership review and
+optional project integration, see [Learning Executive audit](learning-executive-audit.md).
+
 Concrete source: `body-fire-bootstrap-20261001-020552`, `dfdccde`.
 
 | Existing path | Actual behavior | Reuse / gap |

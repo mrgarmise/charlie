@@ -34,11 +34,11 @@ def run_bounded(cmd, timeout):
         return 124
 
 
-def process_completed_episode(game, output, gateway, commitments, plan=None):
+def process_completed_episode(game, output, gateway, commitments, plan=None, executive=None):
     """Existing E/E + Reflection + Meditation + Evaluator, between games only."""
     from memory.evidence import EvidenceJournal
     from .episode_evidence import import_episode, derive_episode, summarize
-    from .reflect_robotron import reflect_evidence, reflect_actuator_evidence
+    from .reflect_robotron import reflect_evidence, reflect_actuator_evidence, reflect_learning_projects
     from .experiment_return import resolve_experiment
     from .meditate_robotron import meditate, quality
     from .evaluate_robotron_shadow import evaluate
@@ -52,6 +52,14 @@ def process_completed_episode(game, output, gateway, commitments, plan=None):
         derive_episode(game,journal,episode)
         reflection=reflect_evidence(journal,episode,gateway)
         proposals=reflect_actuator_evidence(game,journal,episode,gateway)
+        project_updates = None
+        if executive is not None:
+            project_proposals = reflect_learning_projects(journal, episode, proposals)
+            ids = [executive.propose(p['proposal'], journal, [p['evidence_id']]) for p in project_proposals]
+            assessment = None
+            if plan and plan.get('project_id') and resolution:
+                assessment = executive.record_result(plan['project_id'], plan, resolution, commitments, episode=episode)
+            project_updates = dict(proposed=ids, assessment=assessment)
         report=load_report(game/'report.json')
         (output/'shadow-evaluation.json').write_text(json.dumps(evaluate(report),indent=2)+'\n')
         meditation=None
@@ -64,6 +72,8 @@ def process_completed_episode(game, output, gateway, commitments, plan=None):
         result={'episode':episode,'resolution':resolution,'reflection':reflection,
                 'proposals':proposals,'meditation':str(output/'meditation.json') if meditation else None,
                 'evidence':summarize(journal,episode)}
+        if executive is not None:
+            result['learning_projects'] = project_updates
         (output/'between-game.json').write_text(json.dumps(result,indent=2)+'\n')
         return result
     finally:
@@ -71,7 +81,7 @@ def process_completed_episode(game, output, gateway, commitments, plan=None):
 
 
 def developmental_marathon(args, *, driver=run_bounded, gateway=None):
-    """Bounded mode of the existing runner; no general Learning Executive."""
+    """Bounded runner with optional project continuity, between games only."""
     from collections import Counter
     from memory.evidence import EvidenceJournal
     from memory.gateway import MemoryGateway
@@ -80,16 +90,32 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
     session=args.root/f'development-{stamp()}'
     session.mkdir(parents=True,exist_ok=False)
     commitments=EvidenceJournal(session/'experiment-evidence.sqlite3')
+    project_journal = None
+    executive = None
+    if getattr(args, 'learning_projects', False):
+        from memory.learning_projects import LearningExecutive
+        # Shared durable operational evidence survives new marathon directories.
+        path = getattr(args, 'project_evidence', None) or gateway.evaluator.path.with_name('learning-project-evidence.sqlite3')
+        project_journal = EvidenceJournal(path)
+        executive = LearningExecutive(project_journal, gateway)
     doc={'schema':'charlie-developmental-marathon-v1','status':'running','games':[],
          'objective':'official_game_score','policy':'existing policy plus at most one explicit actuator experiment',
          'seed':str(args.seed_episode) if args.seed_episode else None}
     plan=None
     try:
         if args.seed_episode:
-            doc['seed_processing']=process_completed_episode(args.seed_episode,session/'seed-evidence',gateway,commitments)
+            doc['seed_processing']=process_completed_episode(args.seed_episode,session/'seed-evidence',gateway,commitments,executive=executive)
         for index in range(1,args.max_games+1):
             game=session/f'game-{index:02d}'
-            plan=select_experiment(gateway,commitments,game,horizon_seconds=args.game_seconds+120.)
+            selection = None
+            context = None
+            if executive:
+                selection = executive.select(methods={'actuator-response'},
+                    resources={'camera-evidence', 'actuator-experiment-slot'}, authorized_methods={'actuator-response'})
+                if selection['project']:
+                    context = executive.chooser_context(selection['project']['id'])
+            plan = None if executive and context is None else select_experiment(
+                gateway,commitments,game,horizon_seconds=args.game_seconds+120.,project_context=context)
             plan_path=session/f'game-{index:02d}-experiment.json'
             if plan:write_session(plan_path,plan)
             reason=plan['reason'] if plan else 'no justified experiment yet; existing policy only'
@@ -102,18 +128,24 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             report=load_report(game/'report.json')
             entry={'path':str(game),'returncode':rc,'result':report.get('result') if report else 'missing report',
                    'experiment':plan,'reason_for_experiment':reason}
+            if executive:
+                entry['project_selection'] = selection
             doc['games'].append(entry)
             write_session(session/'session.json',doc)
             if report:
                 entry['score_evidence']=report.get('score_summary',{'self_score':report.get('score'),'status':report.get('score_status','unknown')})
                 entry['score_attribution']='unknown; accepted reading is not independently verified score'
                 entry['self_status']=dict(Counter(s.get('identity_status','unknown') for s in report.get('steps',[])))
-                entry['between_game']=process_completed_episode(game,session/f'game-{index:02d}-evidence',gateway,commitments,plan)
+                entry['between_game']=process_completed_episode(game,session/f'game-{index:02d}-evidence',gateway,commitments,plan,executive)
             else:
                 entry['between_game']={'status':'unknown; no complete report'}
                 if plan:
                     resolution=commitments.resolve(plan['prediction_id'],sources=(),result='unresolved',reason='child ended without report')
                     entry['resolution_id']=resolution.id
+                    if executive and plan.get('project_id'):
+                        executive.record_result(plan['project_id'], plan,
+                            dict(resolution_id=resolution.id, result='unresolved', reason='child ended without report'),
+                            commitments, episode='missing-report:'+str(game))
             resolution=(entry['between_game'].get('resolution') or {}).get('result','no prediction')
             before=(entry['between_game'].get('resolution') or {}).get('memory_evaluation_before',{})
             after=(entry['between_game'].get('resolution') or {}).get('memory_evaluation_after',{})
@@ -124,6 +156,12 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                   f"memory={before.get('priority','UNKNOWN')}->{after.get('priority','UNKNOWN')} "
                   f"({after.get('status','UNKNOWN')}); "
                   f"belief={(entry['between_game'].get('resolution') or {}).get('belief_change','none')}",flush=True)
+            if executive:
+                project_state = executive.projects().get(context['project_id'], {}) if context else {}
+                print(f"PROJECT: {context['project_id'][:12] if context else 'NONE'}; "
+                      f"goal={project_state.get('goal','UNKNOWN')}; status={project_state.get('status','UNKNOWN')}; "
+                      f"selection={selection['reason']}; progress={project_state.get('progress','UNKNOWN')}; "
+                      f"next={project_state.get('next_direction','no justified experiment yet')}", flush=True)
             write_session(session/'session.json',doc)
             if rc==124:
                 doc['status']='child_timeout';break
@@ -146,10 +184,20 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 unresolved=commitments.resolve(plan['prediction_id'],sources=(),result='unresolved',
                     reason='orchestration stopped without sufficient resolving evidence')
                 doc['unresolved_on_stop']=unresolved.id
+                if executive and plan.get('project_id'):
+                    executive.record_result(plan['project_id'], plan,
+                        dict(resolution_id=unresolved.id, result='unresolved',
+                             reason='orchestration stopped without sufficient resolving evidence'),
+                        commitments, episode='orchestration-stop:'+plan['scope'])
             except Exception as exc:
                 doc['resolution_persistence_error']=f'{type(exc).__name__}: {exc}'
         write_session(session/'session.json',doc)
         commitments.close()
+        if project_journal:
+            doc['learning_project_evidence'] = str(project_journal.path)
+            doc['learning_projects'] = executive.projects()
+            write_session(session/'session.json',doc)
+            project_journal.close()
         print(f"DEVELOPMENT COMPLETE: {doc['status']}; attempts={len(doc['games'])}; {session}",flush=True)
     return doc
 
@@ -228,6 +276,8 @@ def main():
     ap.add_argument("--arm",action="store_true",help="required to send controls")
     ap.add_argument('--developmental',action='store_true',help='automatic between-game evidence-backed experiments; 3..5 attempts')
     ap.add_argument('--seed-episode',type=Path,help='optional prior episode to process before developmental game 1')
+    ap.add_argument('--learning-projects',action='store_true',help='opt-in durable diagnostic project continuity between developmental games')
+    ap.add_argument('--project-evidence',type=Path,help='existing-format durable project evidence notebook; default beside local memory evaluator')
     a=ap.parse_args()
     if a.max_games is None:a.max_games=3 if a.developmental else 50
     import math
@@ -238,6 +288,10 @@ def main():
     if not math.isfinite(a.retry_wait) or not 0 <= a.retry_wait <= 60:
         ap.error('--retry-wait must be 0..60')
     if not a.arm: ap.error("--arm is required for an autonomous marathon")
+    if (a.learning_projects or a.project_evidence) and not a.developmental:
+        ap.error('learning project options require --developmental')
+    if a.project_evidence and not a.learning_projects:
+        ap.error('--project-evidence requires --learning-projects')
     if a.developmental:
         if not 3<=a.max_games<=5:ap.error('developmental mode requires 3..5 bounded attempts')
         if not 1<=a.game_seconds<=120:ap.error('developmental game seconds must be 1..120')

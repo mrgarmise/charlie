@@ -14,16 +14,24 @@ from .hands import AXES
 from .reflect_robotron import ACTUATOR_HYPOTHESIS_MARKER
 
 
-def select_experiment(gateway, journal, game_path, *, horizon_seconds):
+def select_experiment(gateway, journal, game_path, *, horizon_seconds, project_context=None):
     """Use local evaluated memories; remote prose is never executable control."""
     choices=[]
-    for row in gateway.evaluator.recent(100):
+    memories = (gateway.evaluator.for_evidence(project_context.get('hypothesis_evidence', []))
+                if project_context is not None else gateway.evaluator.recent(100))
+    for row in memories:
         if (row['status'] != 'promoted' or row.get('source')!='ppal:actuator-response-reflection'
                 or not row['text'].startswith(ACTUATOR_HYPOTHESIS_MARKER)):
             continue
         try:
             spec,_=json.JSONDecoder().raw_decode(row['text'][len(ACTUATOR_HYPOTHESIS_MARKER):])
         except (ValueError,TypeError):
+            continue
+        if project_context is not None and (
+                project_context.get('method') != 'actuator-response'
+                or project_context.get('scope') != {'body': spec.get('body')}
+                or project_context.get('expected') != spec.get('expected')
+                or row.get('evidence') not in project_context.get('hypothesis_evidence', [])):
             continue
         if (spec.get('schema')=='charlie-actuator-test-v2' and spec.get('body') in AXES and spec.get('body')!='NONE'
                 and spec.get('fire') in AXES and spec.get('fire')!='STAY' and isinstance(spec.get('expected'),str)
@@ -32,12 +40,26 @@ def select_experiment(gateway, journal, game_path, *, horizon_seconds):
             choices.append((row,spec))
     if not choices:
         return None
+    all_choices = choices
+    coverage_reason = None
+    if project_context:
+        # Tactical coverage of the declared criterion; Executive picks no setting.
+        history = project_context.get('experiment_history', [])
+        settled = {h['condition']['fire'] for h in history if h['result'] != 'unresolved'}
+        tried = {h['condition']['fire'] for h in history}
+        novel = [choice for choice in choices if choice[1]['fire'] not in tried]
+        if len(settled) < project_context['criteria']['min_conditions'] and novel:
+            choices = novel
+            coverage_reason = 'chooser explores unattempted conditions until project coverage criterion is met; Evaluator ranking within that set'
     # Existing Evaluator priority first; explicit evidence rank resolves ties.
     row,spec=max(choices,key=lambda x:(x[0]['priority'],*x[1]['proposal_rank']))
     scope='planned-episode:'+str(Path(game_path).resolve())
     at=time.monotonic()
-    recalled=journal.append('observation',dict(category='evaluated_memory_recalled',
-        memory_id=row['id'],proposal=spec,intended_game=str(game_path)),episode=scope,at=at,
+    recalled_payload = dict(category='evaluated_memory_recalled',
+        memory_id=row['id'],proposal=spec,intended_game=str(game_path))
+    if project_context:
+        recalled_payload['project_context'] = project_context
+    recalled=journal.append('observation',recalled_payload,episode=scope,at=at,
         producer='MemoryEvaluator',version='1')
     at=time.monotonic()
     prediction=journal.predict(dict(condition='one eligible normal action under provisional or confirmed SELF',
@@ -47,14 +69,19 @@ def select_experiment(gateway, journal, game_path, *, horizon_seconds):
         episode=scope,at=at,deadline=at+horizon_seconds,sources=(recalled.id,),
         producer='existing-memory-actuator-test',version='1',mode='live_prospective')
     decision_id='experiment:'+prediction.id
-    return dict(schema='charlie-actuator-plan-v1',prediction_id=prediction.id,
+    plan = dict(schema='charlie-actuator-plan-v1',prediction_id=prediction.id,
         prediction_at=at,deadline=prediction.data['payload']['deadline'],memory_id=row['id'],
         decision_id=decision_id,scope=scope,body=spec['body'],fire=spec['fire'],
         max_actions=1,intended_game=str(Path(game_path).resolve()),source_episode=spec['source_episode'],
         source_evidence=spec['source_evidence'],
         expected=spec['expected'],alternatives=[dict(memory_id=r['id'],evaluator_priority=r['priority'],
-            body=s['body'],fire=s['fire'],expected=s['expected'],proposal_rank=s['proposal_rank']) for r,s in choices],
+            body=s['body'],fire=s['fire'],expected=s['expected'],proposal_rank=s['proposal_rank']) for r,s in all_choices],
         reason='Evaluator priority then evidence-based proposal rank: untested binding, modal-response support, window count, observed setting frequency')
+    if project_context:
+        plan['project_id'] = project_context['project_id']
+        plan['project_objective'] = project_context['objective']
+        plan['project_coverage_reason'] = coverage_reason
+    return plan
 
 
 def validate_plan(plan, output):

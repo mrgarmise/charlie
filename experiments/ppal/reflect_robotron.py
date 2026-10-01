@@ -100,6 +100,22 @@ def reflect_actuator_evidence(root, journal, episode, gateway):
     return proposals
 
 
+def reflect_learning_projects(journal, episode, proposals):
+    """Normalize existing hypotheses for generic project Reflection, not strategy."""
+    from memory.learning_projects import reflect_project_opportunities
+    from .hands import AXES
+    hypotheses = []
+    for row in proposals:
+        spec = row['proposal']
+        hypotheses.append(dict(method='actuator-response', scope={'body': spec['body']},
+            established_objective='official_game_score',
+            expected=spec['expected'], evidence_ids=[row['evidence_id']],
+            conditions=[{'fire': f} for f in sorted(set(AXES)-{'STAY'})],
+            observed_conditions=[{'fire': f} for f in spec['source_fire_settings']],
+            requires=['camera-evidence', 'actuator-experiment-slot']))
+    return reflect_project_opportunities(journal, episode, hypotheses)
+
+
 def reflect_evidence(journal, episode, gateway):
     """Consolidate explicit diagnostic resolutions through the existing path.
 

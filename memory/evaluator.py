@@ -235,6 +235,20 @@ class MemoryEvaluator:
                  **{k:json.loads(payload).get(k) for k in ('text','source','tags','confidence','evidence')}}
                 for identifier, status, priority, payload in rows]
 
+    def for_evidence(self, evidence_ids):
+        """Retrieve a persistent project's hypotheses beyond the recent window."""
+        ids = list(dict.fromkeys(evidence_ids)); rows = []
+        with self._connect() as conn:
+            for offset in range(0, len(ids), 100):
+                batch = ids[offset:offset+100]
+                marks = ','.join('?' for _ in batch)
+                rows.extend(conn.execute(
+                    f"SELECT id,status,priority,payload FROM candidates WHERE json_extract(payload,'$.evidence') IN ({marks}) ORDER BY rowid DESC",
+                    batch).fetchall())
+        return [{"id": identifier, "status": status, "priority": priority,
+                 **{k:json.loads(payload).get(k) for k in ('text','source','tags','confidence','evidence')}}
+                for identifier, status, priority, payload in rows]
+
     def stats(self, source: str, kind: str, tags=()):
         feature = json.dumps([source, kind, sorted(tags)], separators=(",", ":"))
         with self._connect() as conn:

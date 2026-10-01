@@ -7,10 +7,11 @@ from experiments.ppal.eyes.detectors import Detection
 from experiments.ppal.robotron_agency import VECTORS
 
 
-@pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap',
-                         [(False,False,False,False),(True,False,False,False),
-                          (False,True,False,False),(False,False,True,False),(False,False,True,True)])
-def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap):
+@pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment',
+                         [(False,False,False,False,False),(True,False,False,False,False),
+                          (False,True,False,False,False),(False,False,True,False,False),
+                          (False,False,True,True,False),(False,False,True,True,True)])
+def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment):
     from experiments.ppal import play_robotron as play
     clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
     image=Image.new('RGB',(100,100))
@@ -34,10 +35,11 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
             return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
                      {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
     class Controller:
-        def __init__(self,*a,**k): pass
+        def __init__(self,*a,**k): self.last_execution=None
         def _command(self,command): commands.append(command)
         def execute(self,action,ms):
             commands.append(action)
+            self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
             u=VECTORS[action.move]
             if delayed_render and action.move != "STAY":
                 pending[0] = u; response_reads[0] = 0
@@ -51,8 +53,28 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     monkeypatch.setattr(play,'ArcadeController',Controller)
     monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
     monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+    if experiment:
+        from pathlib import Path
+        from memory.evidence import EvidenceJournal
+        from memory.evaluator import MemoryEvaluator
+        from memory.gateway import MemoryGateway
+        from memory.store import JsonlStore
+        from experiments.ppal.episode_evidence import import_episode
+        from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+        from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+        fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+        root=tmp_path/'real-seed';root.mkdir()
+        (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+        (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+        gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+        journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+        reflect_actuator_evidence(root,journal,ep,gateway)
+        commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+        plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+        (tmp_path/'plan.json').write_text(json.dumps(plan))
     monkeypatch.setattr(sys,'argv',['play','--arm','--seconds','1','--output',str(tmp_path/'run')]
-                        + (['--bootstrap-body-fire'] if bootstrap else []))
+                        + (['--bootstrap-body-fire'] if bootstrap else [])
+                        + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else []))
     if fail_during_play:
         with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
     else:
@@ -81,4 +103,14 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         assert report['bootstrap_body_fire']
         assert any(getattr(c,'fire','NONE') != 'NONE' for c in commands)
         assert any(r['agency']['identity_status']=='provisional' for r in actions)
+    if experiment:
+        attempted=[r for r in actions if r.get('experiment')]
+        assert len(attempted)==1
+        action=attempted[0]['action'];baseline=attempted[0]['experiment']['baseline_action']
+        assert (action['move'],action['fire'])==(plan['body'],plan['fire'])
+        assert (baseline['move'],baseline['fire'])!=(plan['body'],plan['fire'])
+        evidence=EvidenceJournal(tmp_path/'next.sqlite3');next_episode=import_episode(tmp_path/'run',evidence)
+        resolution=resolve_experiment(tmp_path/'run',evidence,next_episode,commitments,plan,gateway)
+        assert resolution['result']=='supported'
+        evidence.close();commitments.close();journal.close()
     assert report['result'].startswith('ERROR:') if fail_during_play else report['result']=='TIME LIMIT'

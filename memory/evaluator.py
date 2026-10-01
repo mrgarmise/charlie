@@ -232,7 +232,8 @@ class MemoryEvaluator:
             rows = conn.execute("SELECT id,status,priority,payload FROM candidates ORDER BY rowid DESC LIMIT ?",
                                 (limit,)).fetchall()
         return [{"id": identifier, "status": status, "priority": priority,
-                 "text": json.loads(payload)["text"]} for identifier, status, priority, payload in rows]
+                 **{k:json.loads(payload).get(k) for k in ('text','source','tags','confidence','evidence')}}
+                for identifier, status, priority, payload in rows]
 
     def stats(self, source: str, kind: str, tags=()):
         feature = json.dumps([source, kind, sorted(tags)], separators=(",", ":"))

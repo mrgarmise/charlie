@@ -20,6 +20,84 @@ from memory.gateway import MemoryGateway
 from memory.marm import MarmWriteError
 
 DEFAULT_QUESTIONS = Path.home() / ".local/share/charlie/robotron-questions.jsonl"
+ACTUATOR_HYPOTHESIS_MARKER = 'Actuator response hypothesis: '
+
+
+def reflect_actuator_evidence(root, journal, episode, gateway):
+    """Generate/rank one-actuator variations using observed response distributions.
+
+    Directions, settings and expected verdicts are data, never selected constants.
+    Existing Experience/Evaluator remain the hypothesis and ranking machinery.
+    """
+    from memory.evidence import canonical, read_artifact, digest
+    from .hands import AXES
+    from collections import Counter
+    groups = {}
+    fire_counts = Counter()
+    fire_sources = {}
+    executions = set()
+    observations = {}
+    for record in journal.records('observation'):
+        if record.data['episode'] != episode or record.data['payload'].get('category') != 'agency_tracking_observation':
+            continue
+        row = read_artifact(root, record.data['payload']['artifact'])
+        control = row.get('control_execution') or {}
+        fire = control.get('fire')
+        if control and fire in AXES and fire != 'STAY' and digest(control) not in executions:
+            executions.add(digest(control))
+            fire_counts[fire] += 1
+            fire_sources.setdefault(fire,[]).append(record.id)
+        window = row.get('response_window') or {}
+        origin = observations.get(window.get('origin_at'),row)
+        identity = origin.get('identity_status', 'confirmed' if origin.get('self_track_id') is not None else 'unknown')
+        candidate = origin.get('controlled_track_id',origin.get('self_track_id'))
+        observations[row.get('capture_timestamp')] = row
+        if identity not in ('provisional','confirmed') or candidate is None or window.get('endpoint') != 2 or row.get('global_motion'):
+            continue
+        body = control.get('move')
+        if body not in AXES or body=='NONE' or fire not in AXES or fire=='STAY':
+            continue
+        evidence = next((x for x in row.get('evidence',[]) if x.get('track_id')==candidate),None)
+        if not evidence or not isinstance(evidence.get('reason'),str):
+            continue
+        if any(e.get('track_id')==candidate and e.get('kind') in ('ambiguous','created') for e in row.get('tracking',{}).get('events',[])):
+            continue
+        groups.setdefault((candidate,body),{}).setdefault(control.get('started_at'),
+            dict(record=record,fire=fire,result=evidence['reason'],identity=identity,sample=row.get('sample')))
+    proposals=[]
+    # This is a bounded local one-variable proposal adapter, not broad curiosity.
+    for (candidate,body), windows in sorted(groups.items()):
+        rows=list(windows.values())
+        fires=sorted({r['fire'] for r in rows})
+        distribution=Counter(r['result'] for r in rows)
+        ranked_results=distribution.most_common()
+        if len(rows)<2 or len(fires)<2 or (len(ranked_results)>1 and ranked_results[0][1]==ranked_results[1][1]):
+            continue
+        expected,support=ranked_results[0]
+        for alternate in sorted(set(AXES)-{'STAY'}):
+            joint=[r for r in rows if r['fire']==alternate]
+            untested=not joint
+            spec=dict(schema='charlie-actuator-test-v2',body=body,fire=alternate,
+                      expected=expected,variable_changed='one FIRE setting; observed BODY setting held fixed',
+                      observed_result_distribution=dict(distribution),
+                      source_episode=episode,source_track_id=candidate,
+                      source_evidence=[r['record'].id for r in rows],source_fire_settings=fires,
+                      source_samples=[r['sample'] for r in rows],
+                      setting_frequency=fire_counts[alternate],setting_evidence=fire_sources.get(alternate,[]),
+                      evidence_windows=len(rows),joint_observations=len(joint),
+                      proposal_rank=[int(untested),support/len(rows),len(rows),fire_counts[alternate]],
+                      hypothesis_status='tentative; SELF unverified',score_claim=None,
+                      confidence_note='heuristic hypothesis score, not calibrated probability')
+            derived=journal.append('event',dict(category='actuator_response_hypothesis_proposal',proposal=spec),
+                episode=episode,sources=tuple(dict.fromkeys(spec['source_evidence']+spec['setting_evidence'])),
+                producer='Reflection',version='actuator-response-v2')
+            event=Experience(kind='observation',summary=ACTUATOR_HYPOTHESIS_MARKER+canonical(spec),
+                source='ppal:actuator-response-reflection',subject='actuator response',
+                confidence=.5,significant=True,novelty=untested,
+                tags=('actuator-hypothesis','diagnostic','tentative',f'body:{body}',f'fire:{alternate}'),evidence=derived.id)
+            gateway.remember(event)
+            proposals.append(dict(proposal=spec,evidence_id=derived.id))
+    return proposals
 
 
 def reflect_evidence(journal, episode, gateway):

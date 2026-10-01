@@ -370,6 +370,8 @@ def main():
                         help="actually send movement/fire commands")
     parser.add_argument("--bootstrap-body-fire", action="store_true",
                         help="experimental provisional BODY identity with independent and simultaneous FIRE exploration")
+    parser.add_argument('--experiment-plan', type=Path,
+                        help='one precommitted developmental actuator experiment')
     args = parser.parse_args()
 
     if not 1 <= args.seconds <= 3600:
@@ -384,6 +386,18 @@ def main():
     if args.output.exists():
         parser.error(f"output already exists: {args.output}")
     args.output.mkdir(parents=True)
+
+    experiment_plan = None
+    experiment_status = {'status':'not_requested','attempted':False,'reason':None}
+    if args.experiment_plan:
+        try:
+            from .experiment_return import validate_plan
+            experiment_plan = validate_plan(json.loads(args.experiment_plan.read_text()),args.output)
+            experiment_status = {'status':'pending','attempted':False,'reason':None,
+                                 'prediction_id':experiment_plan['prediction_id']}
+        except (OSError,ValueError,TypeError) as exc:
+            experiment_status = {'status':'rejected','attempted':False,'reason':str(exc)}
+            print(f'EXPERIMENT REJECTED: {exc}; existing policy retained')
 
     recognizer = TaughtRecognizer.load(args.knowledge, args.threshold, args.margin)
     forebrain = Forebrain()
@@ -830,6 +844,21 @@ def main():
             # change does not rename the object or run a second association pass.
             goal = forebrain.update(world)
             intent, action = hindbrain.decide(world, goal)
+            experiment_context = None
+            if experiment_plan and not experiment_status['attempted']:
+                from .experiment_return import experimental_action
+                baseline_action = action
+                proposed, skip_reason = experimental_action(
+                    experiment_plan, world, intent, baseline_action, agency_snapshot, now=time.monotonic())
+                experiment_status['reason'] = skip_reason
+                if proposed is not None:
+                    action = proposed
+                    experiment_context = {'prediction_id':experiment_plan['prediction_id'],
+                        'memory_id':experiment_plan['memory_id'],
+                        'track_id':visual_agency.controlled_track_id,
+                        'identity_status':agency_snapshot.get('identity_status'),
+                        'origin_at':source.timestamp,'baseline_action':action_dict(baseline_action),
+                        'action':action_dict(action)}
 
             # SHADOW ONLY: anticipate the next visual state and ask a separate
             # PPAL brain what it would do.  The real controller below still
@@ -859,6 +888,9 @@ def main():
             pending_at = time.monotonic()
             preceding_action = {"tick":tick, "timestamp":pending_at, **action_dict(action)}
             controller.execute(action, pulse_ms)
+            if experiment_context is not None:
+                experiment_status.update(status='executed',attempted=True,reason=experiment_plan['reason'])
+                print(f"EXPERIMENT: BODY={action.move} FIRE={action.fire}; prediction={experiment_plan['prediction_id'][:12]}")
             pending_move = action.move
             rows.append({
                 "tick": tick, "observed_at": observed_at, "t": time.monotonic()-started,
@@ -868,6 +900,7 @@ def main():
                 "player": list(player),
                 "self_track_id": self_tracker.player_track_id,
                 "identity_status": agency_snapshot.get("identity_status"),
+                "experiment": experiment_context,
                 "agency": agency_snapshot,
                 "targets": len(targets), "threats": len(threats),
                 "unresolved": len(unresolved),
@@ -947,6 +980,7 @@ def main():
                   "planning_mode": "rescue_with_open_space_fallback",
                   "bootstrap_body_fire": args.bootstrap_body_fire,
                   "fire_agency_status": "exploratory evidence only; projectile/origin interpretation unvalidated",
+                  "experiment_status": experiment_status,
                   "tracks": "tracks.json",
                   "agency_samples": len(agency_rows),
                   "agency_log": "agency.jsonl",

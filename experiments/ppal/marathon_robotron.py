@@ -22,6 +22,137 @@ def run(cmd):
     print("+", " ".join(map(str,cmd)), flush=True)
     return subprocess.run(cmd, check=False).returncode
 
+
+def run_bounded(cmd, timeout):
+    print('+', ' '.join(map(str,cmd)),flush=True)
+    try:
+        return subprocess.run(cmd,check=False,timeout=timeout).returncode
+    except subprocess.TimeoutExpired:
+        # subprocess.run kills/reaps its child. TCP disconnect releases controls
+        # in the existing Zero transport; no next START after a timeout.
+        print('DEVELOPMENT STOP: child exceeded wall-time bound',flush=True)
+        return 124
+
+
+def process_completed_episode(game, output, gateway, commitments, plan=None):
+    """Existing E/E + Reflection + Meditation + Evaluator, between games only."""
+    from memory.evidence import EvidenceJournal
+    from .episode_evidence import import_episode, derive_episode, summarize
+    from .reflect_robotron import reflect_evidence, reflect_actuator_evidence
+    from .experiment_return import resolve_experiment
+    from .meditate_robotron import meditate, quality
+    from .evaluate_robotron_shadow import evaluate
+    output.mkdir(parents=True,exist_ok=True)
+    journal=EvidenceJournal(output/'evidence.sqlite3')
+    try:
+        episode=import_episode(game,journal)
+        # Resolve live commitment first. Replay diagnostics must not masquerade
+        # as outcomes of the pre-game experiment.
+        resolution=resolve_experiment(game,journal,episode,commitments,plan,gateway) if plan else None
+        derive_episode(game,journal,episode)
+        reflection=reflect_evidence(journal,episode,gateway)
+        proposals=reflect_actuator_evidence(game,journal,episode,gateway)
+        report=load_report(game/'report.json')
+        (output/'shadow-evaluation.json').write_text(json.dumps(evaluate(report),indent=2)+'\n')
+        meditation=None
+        if (game/'tracks.json').exists():
+            tracks=json.loads((game/'tracks.json').read_text()).get('tracks',[])
+            rebuilt,history,merges=meditate(tracks)
+            meditation={'source':str(game/'tracks.json'),'history':history,'merges':merges,
+                        'quality':quality(rebuilt),'note':'offline interpreted IDs; not canonical identity or policy advice'}
+            (output/'meditation.json').write_text(json.dumps(meditation,indent=2)+'\n')
+        result={'episode':episode,'resolution':resolution,'reflection':reflection,
+                'proposals':proposals,'meditation':str(output/'meditation.json') if meditation else None,
+                'evidence':summarize(journal,episode)}
+        (output/'between-game.json').write_text(json.dumps(result,indent=2)+'\n')
+        return result
+    finally:
+        journal.close()
+
+
+def developmental_marathon(args, *, driver=run_bounded, gateway=None):
+    """Bounded mode of the existing runner; no general Learning Executive."""
+    from collections import Counter
+    from memory.evidence import EvidenceJournal
+    from memory.gateway import MemoryGateway
+    from .experiment_return import select_experiment
+    gateway=gateway or MemoryGateway()
+    session=args.root/f'development-{stamp()}'
+    session.mkdir(parents=True,exist_ok=False)
+    commitments=EvidenceJournal(session/'experiment-evidence.sqlite3')
+    doc={'schema':'charlie-developmental-marathon-v1','status':'running','games':[],
+         'objective':'official_game_score','policy':'existing policy plus at most one explicit actuator experiment',
+         'seed':str(args.seed_episode) if args.seed_episode else None}
+    plan=None
+    try:
+        if args.seed_episode:
+            doc['seed_processing']=process_completed_episode(args.seed_episode,session/'seed-evidence',gateway,commitments)
+        for index in range(1,args.max_games+1):
+            game=session/f'game-{index:02d}'
+            plan=select_experiment(gateway,commitments,game,horizon_seconds=args.game_seconds+120.)
+            plan_path=session/f'game-{index:02d}-experiment.json'
+            if plan:write_session(plan_path,plan)
+            reason=plan['reason'] if plan else 'no justified experiment yet; existing policy only'
+            print(f'DEVELOPMENT GAME {index}/{args.max_games}: {reason}',flush=True)
+            write_session(session/'session.json',doc)
+            cmd=[sys.executable,'-m','experiments.ppal.play_robotron','--arm','--bootstrap-body-fire',
+                 '--seconds',str(args.game_seconds),'--focus',str(args.focus),'--recalibrate','--output',str(game)]
+            if plan:cmd.extend(['--experiment-plan',str(plan_path)])
+            rc=driver(cmd,args.game_seconds+120.)
+            report=load_report(game/'report.json')
+            entry={'path':str(game),'returncode':rc,'result':report.get('result') if report else 'missing report',
+                   'experiment':plan,'reason_for_experiment':reason}
+            doc['games'].append(entry)
+            write_session(session/'session.json',doc)
+            if report:
+                entry['score_evidence']=report.get('score_summary',{'self_score':report.get('score'),'status':report.get('score_status','unknown')})
+                entry['score_attribution']='unknown; accepted reading is not independently verified score'
+                entry['self_status']=dict(Counter(s.get('identity_status','unknown') for s in report.get('steps',[])))
+                entry['between_game']=process_completed_episode(game,session/f'game-{index:02d}-evidence',gateway,commitments,plan)
+            else:
+                entry['between_game']={'status':'unknown; no complete report'}
+                if plan:
+                    resolution=commitments.resolve(plan['prediction_id'],sources=(),result='unresolved',reason='child ended without report')
+                    entry['resolution_id']=resolution.id
+            resolution=(entry['between_game'].get('resolution') or {}).get('result','no prediction')
+            before=(entry['between_game'].get('resolution') or {}).get('memory_evaluation_before',{})
+            after=(entry['between_game'].get('resolution') or {}).get('memory_evaluation_after',{})
+            score=(entry.get('score_evidence') or {}).get('self_score')
+            print(f"GAME {index}: score evidence={score}; SELF={entry.get('self_status','UNKNOWN')}; "
+                  f"experiment attempted={(entry['between_game'].get('resolution') or {}).get('attempted',False)}; "
+                  f"prediction={plan['prediction_id'][:12] if plan else 'NONE'}; resolution={resolution}; "
+                  f"memory={before.get('priority','UNKNOWN')}->{after.get('priority','UNKNOWN')} "
+                  f"({after.get('status','UNKNOWN')}); "
+                  f"belief={(entry['between_game'].get('resolution') or {}).get('belief_change','none')}",flush=True)
+            write_session(session/'session.json',doc)
+            if rc==124:
+                doc['status']='child_timeout';break
+            if index>=args.max_games:
+                doc['status']='bounded_attempts_complete';break
+            if not safe_to_restart(report,rc):
+                doc['status']='unverified_episode_boundary'
+                print('DEVELOPMENT STOP: no confirmed game-over evidence; no further START',flush=True)
+                break
+            time.sleep(args.retry_wait)
+    except KeyboardInterrupt:
+        doc['status']='interrupted'
+    except Exception as exc:
+        doc['status']='between_game_failure'
+        doc['error']=f'{type(exc).__name__}: {exc}'
+        print(f"DEVELOPMENT STOP: {doc['error']}",flush=True)
+    finally:
+        if plan and not any(r.data['payload']['prediction_id']==plan['prediction_id'] for r in commitments.records('resolution')):
+            try:
+                unresolved=commitments.resolve(plan['prediction_id'],sources=(),result='unresolved',
+                    reason='orchestration stopped without sufficient resolving evidence')
+                doc['unresolved_on_stop']=unresolved.id
+            except Exception as exc:
+                doc['resolution_persistence_error']=f'{type(exc).__name__}: {exc}'
+        write_session(session/'session.json',doc)
+        commitments.close()
+        print(f"DEVELOPMENT COMPLETE: {doc['status']}; attempts={len(doc['games'])}; {session}",flush=True)
+    return doc
+
 def load_report(path):
     try: return json.loads(path.read_text())
     except (OSError, ValueError): return None
@@ -80,7 +211,7 @@ def meditate_session(session_dir, games):
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--max-games",type=int,default=50)
+    ap.add_argument("--max-games",type=int)
     ap.add_argument("--game-seconds",type=float,default=60.0,
                     help="safety horizon per current single-game runner")
     ap.add_argument("--failed-starts",type=int,default=2)
@@ -89,7 +220,10 @@ def main():
                     help="manual camera lens position passed to each game")
     ap.add_argument("--root",type=Path,default=Path("robotron-runs"))
     ap.add_argument("--arm",action="store_true",help="required to send controls")
+    ap.add_argument('--developmental',action='store_true',help='automatic between-game evidence-backed experiments; 3..5 attempts')
+    ap.add_argument('--seed-episode',type=Path,help='optional prior episode to process before developmental game 1')
     a=ap.parse_args()
+    if a.max_games is None:a.max_games=3 if a.developmental else 50
     import math
     if not 1 <= a.max_games <= 100: ap.error('--max-games must be 1..100')
     if not math.isfinite(a.game_seconds) or not 1 <= a.game_seconds <= 3600:
@@ -98,6 +232,12 @@ def main():
     if not math.isfinite(a.retry_wait) or not 0 <= a.retry_wait <= 60:
         ap.error('--retry-wait must be 0..60')
     if not a.arm: ap.error("--arm is required for an autonomous marathon")
+    if a.developmental:
+        if not 3<=a.max_games<=5:ap.error('developmental mode requires 3..5 bounded attempts')
+        if not 1<=a.game_seconds<=120:ap.error('developmental game seconds must be 1..120')
+        developmental_marathon(a)
+        return
+    if a.seed_episode:ap.error('--seed-episode requires --developmental')
     session=a.root/f"marathon-{stamp()}"
     session.mkdir(parents=True,exist_ok=False)
     doc={"schema":SCHEMA,"started_at":datetime.now(timezone.utc).isoformat(),

@@ -4,6 +4,10 @@ Governing milestone: Alex's `PPAL_EE_Foundation_Gap_First_Work_Spec.md`.
 This implementation is offline. No E/E import, emission, persistence, model,
 memory feedback or policy change was added to `play_robotron.py`.
 
+This describes foundation commit `a46398d`. The subsequent opt-in
+[developmental return path](developmental-marathon.md) adds one explicit
+experiment action slot; E/E persistence still runs only between games.
+
 ## Reuse/gap audit
 
 | Requirement | Existing implementation | Decision and reason |

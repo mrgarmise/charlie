@@ -167,6 +167,9 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         if result['status']=='resolved' and project['method'] not in ('model-diagnostics','evidence-review'):
             from experiments.ppal.reflect_robotron import reflect_model_outcome
             result['reflection']=reflect_model_outcome(dataset.journal,plan,result,gateway)
+        elif result['status']=='resolved':
+            from experiments.ppal.reflect_robotron import reflect_retrieval_outcome
+            result['reflection']=reflect_retrieval_outcome(dataset.journal,plan,result,gateway)
         results.append(dict(project_id=project['id'],selection=selection,plan=plan,result=result))
         if result['status']=='deferred': break
         # Serial offline jobs can serve additional projects; no second physical

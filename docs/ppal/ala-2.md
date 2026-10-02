@@ -45,4 +45,24 @@ This uses the existing persistent Evaluator/project stores. Keep originals; use 
 
 Still unimplemented: learned value-of-information calibration; broad explanatory synthesis; executable visual-example/clarification acquisition; adaptive model/preprocessing refinement with a fresh independent final test; concurrent resource leases; production validated-model/policy adapters; learning-derived gameplay strategy deployment; actual before/after physical score comparison. Diagnostic retrieval changes the next investigation, but is not evidence of improved Robotron operation. Storing a conclusion is not operational learning.
 
+## Real archived follow-up and acceptance levels
+
+The [preserved follow-up trace](ala-2-demonstration.json) was produced by running the normal investigation path with an isolated copy of ALA-1's operational notebook, existing Executive notebook, Evaluator and selected memory. No hypothesis, selected experiment or expected result was manually inserted. All 44 original operational records retained their exact documents and IDs. Existing import notebooks and original archives were not changed. Original artifact locations were retained; diagnostics need no relocation because they retrieve immutable metadata.
+
+The actual selected candidate's 59 recorded epochs were still improving at the training boundary; that retrieval prediction was supported. Validation did not exceed training loss at its best epoch; the other retrieval prediction was contradicted. Training loss is measured before an optimizer step and validation after it, so neither result identifies a causal explanation. The failed independent test and rejected deployment remain unchanged. Two further retrievals found the already reported SELF and episode-boundary questions across distinct original episodes. These are four offline investigations over four existing physical episodes, **zero new physical experiments**. The two model signatures share one historical candidate and are not independent replications.
+
+The combined host investigation took **0.05095 seconds** (not a Pi cost measurement). The normal Executive compared declared portfolio terms; the normal chooser selected promoted memories using actual Evaluator priorities. The trace includes competing explanations, ranking entries, exact evidence IDs, prospective predictions, resolutions and outcome-derived follow-up questions. A second invocation selected zero duplicate investigations. Interrupted retrieval, lost provenance, contradictory signatures and host-clock changes have separate regressions.
+
+Reflection's next questions include: would bounded continuation improve validation performance and survive a new independent evaluation; what alternative measurement distinguishes the remaining failure explanations; which independent conditions distinguish the recurring episode-boundary and SELF questions? These are generated questions, not Work-selected remedies or gameplay directions. An executable bounded continuation/fresh evaluation adapter remains to be implemented.
+
+| Acceptance level | Current evidence |
+|---|---|
+| Functioning infrastructure | Integrated retrieval/design/provenance/recovery/score-protocol extension; existing CNN/shadow infrastructure retained |
+| Autonomous experimental control | Demonstrated narrowly through existing rule-based Reflection, Executive and chooser on real archived metadata |
+| Independently improved task capability | Not demonstrated; candidate remains rejected |
+| Approved operational gameplay change | None deployed |
+| Robotron score improvement attributable to learning | Not demonstrated; measurement/readiness and physical trials still required |
+
+The independently tested implementation checkpoint is published as `577a2aa` on `feature/agency-first-self`. Regression result: **461 passed**, including all existing regressions and new retrieval/provenance/score-protocol cases. This test count is infrastructure verification, not ALA-2 acceptance. Diff checking and compilation also passed. Offline Pi processing/recovery validation remains outstanding; no armed marathon was initiated or recommended.
+
 ALA-2's full hypothesis → intervention → independent validation → approved operational change → physical score comparison cycle remains open. The remaining work must use Charlie's evidence and mechanisms rather than a manually supplied winning strategy.

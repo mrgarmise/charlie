@@ -34,6 +34,10 @@ def test_competing_evidence_proposals_and_independent_chooser(tmp_path):
         assert ds.journal.get(plan['prediction_id']).sequence < ds.journal.get(result['evaluation_id']).sequence
         assert report['projects'][row['project_id']]['progress']['independent_physical_episodes']==0
         assert report['projects'][row['project_id']]['status']=='paused'
+        reflection=ds.journal.get(result['reflection']['evidence_id'])
+        assert reflection.data['sources']==[result['resolution_id']]
+        assert reflection.data['payload']['causal_explanation']=='UNKNOWN'
+        assert result['reflection']['operational_change'] is None
     assert investigate(ds,g,diagnostics_only=True)['results']==[]
     ds.journal.verify()
 

@@ -580,3 +580,28 @@ def reflect_question_investigations(dataset,gateway,registry):
                 episode=SCOPE,sources=[hypothesis.id],producer='Reflection',version='ala-2-question-review')
             output.append(dict(proposal=proposal,evidence_id=record.id,hypothesis_id=hypothesis.id,alternatives=alternatives))
     return output
+
+
+def reflect_retrieval_outcome(journal,plan,result,gateway):
+    """Return resolved distinctions to the existing question/memory machinery."""
+    from memory.evidence import digest
+    if result['result']=='unresolved':
+        question='Which missing provenance or observations could resolve this distinction?'
+    elif plan['method']=='evidence-review':
+        question=('Which independently observed conditions distinguish the recurring '+plan['question_category']+' question?'
+                  if result['result']=='supported' else
+                  'Which new independent episode could test whether '+plan['question_category']+' generalizes beyond this evidence?')
+    elif plan['predicate']=='improving_at_budget' and result['result']=='supported':
+        question='Would a bounded continuation improve validation performance, and would that improvement survive a new independent final evaluation?'
+    else:
+        question='Which alternative measurement or independent intervention could distinguish the remaining model-failure explanations?'
+    event=journal.append('event',dict(category='retrieval_experiment_reflection',question=question,
+        prediction_id=plan['prediction_id'],result=result['result'],explanations=plan['competing_explanations'],
+        finding='reported diagnostic distinction only',causal_explanation='UNKNOWN',task_improvement='UNKNOWN'),
+        episode=plan['episode'],sources=[result['resolution_id']],producer='Reflection',version='ala-2')
+    _queue_question(gateway.evaluator.path.with_name('robotron-questions.jsonl'),
+        dict(id=digest(dict(evidence=event.id,question=question)),question=question,status='open',evidence=event.id,
+             category='experimental-followup'))
+    gateway.remember(Experience(kind='outcome',summary=question,source='learning:retrieval-reflection',
+        subject=plan['project_id'],significant=True,tags=('reflection','question','uncertain'),evidence=event.id))
+    return dict(evidence_id=event.id,question=question,operational_change=None)

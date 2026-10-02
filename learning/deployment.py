@@ -11,7 +11,7 @@ class CapabilityDeployment:
             if p.get('category')=='capability_activation' and p['target']==target: active=p
         return active
     def activate(self, proposal_id, *, target, authorization, adapters=('offline-shadow','ppal-semantics'),shadow_id=None,readiness_id=None):
-        p=self.journal.get(proposal_id).data['payload']
+        proposal_record=self.journal.get(proposal_id);p=proposal_record.data['payload'];scope=proposal_record.data['episode']
         if p.get('category')!='model_deployment_proposal' or not p['eligible'] or p['target']!=target:
             raise ValueError('supported independent deployment proposal required')
         if target not in adapters or target not in ('offline-shadow','ppal-semantics'): raise ValueError('production integration is not authorized or implemented')
@@ -39,13 +39,17 @@ class CapabilityDeployment:
                 required={'processing_recovery','controller_release','terminal_boundaries','camera_ownership','operational_cadence'}
                 if readiness.get('category')!='physical_readiness_validation' or not readiness.get('passed') or readiness.get('candidate_id')!=candidate['identifier'] or not readiness.get('source_evidence') or any(readiness.get('checks',{}).get(k) is not True for k in required):
                     raise ValueError('candidate-specific offline readiness evidence required')
+                if self.journal.get(readiness_id).data['episode']!=scope:
+                    readiness_id=self.journal.append('observation',dict(category='consolidated_evidence_reference',record_id=readiness_id,
+                        source_episode=self.journal.get(readiness_id).data['episode'],journal=str(self.journal.path.resolve())),
+                        episode=scope,producer='existing-evidence-consolidation',version='ala-2').id
                 sources.append(readiness_id)
         previous=self.active(target)
         return self.journal.append('event',dict(category='capability_activation',target=target,
             candidate_id=p['candidate_id'],candidate=candidate,proposal_id=proposal_id,authorization=authorization,
-            contract=contract,shadow_id=shadow_id,physical_readiness=readiness,
+            contract=contract,shadow_id=shadow_id,physical_readiness=readiness,evidence_scope=scope,
             previous_activation=previous['activation_key'] if previous else None,
-            activation_key=digest(dict(proposal=proposal_id,authorization=authorization))),episode=SCOPE,
+            activation_key=digest(dict(proposal=proposal_id,authorization=authorization))),episode=scope,
             sources=sources,producer='authorized-capability-deployment',version='ala-2')
     def rollback(self, target, *, reason, authorization):
         current=self.active(target)

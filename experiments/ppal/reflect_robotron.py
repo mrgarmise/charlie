@@ -441,7 +441,7 @@ def reflect_perceptual_opportunities(dataset, gateway, registry):
             alternatives.append(dict(method=method,eligible=False,rank=0,reason=str(exc)))
     for method in ('collect-examples','clarify-labels'):
         alternatives.append(dict(method=method,eligible=True,rank=0,
-            reason='requires future independent evidence; no executable acquisition/verification adapter'))
+            reason='recorded-box extraction and annotation ingestion available; independent evidence/verification still required'))
     eligible=[a for a in alternatives if a['eligible'] and a['method'] in snapshots]
     if not eligible:
         dataset.journal.append('event',dict(category='perceptual_learning_deferred',alternatives=alternatives,
@@ -488,8 +488,9 @@ def reflect_model_outcome(journal, plan, result, gateway):
     else:
         questions.append(dict(category='model_utility',question='Which independent observations could establish whether diagnostic generalization improves the task capability?',measured=metric))
     event=journal.append('event',dict(category='model_experiment_reflection',prediction=plan['prediction_id'],
-        resolution=result['resolution_id'],questions=questions,validated_finding='this frozen independent diagnostic comparison only',
-        semantic_improvement='UNKNOWN',performance_improvement='UNKNOWN'),episode=SCOPE,
+        resolution=result['resolution_id'],questions=questions,
+        validated_finding='matched reused-validation comparison only; no independent generalization finding' if plan.get('evaluation_mode')=='validation-only' else 'this frozen independent diagnostic comparison only',
+        semantic_improvement='UNKNOWN',performance_improvement='UNKNOWN'),episode=plan.get('episode',SCOPE),
         sources=[result['resolution_id'],result['evaluation_id']],producer='Reflection',version='ala-1')
     for q in questions:
         _queue_question(gateway.evaluator.path.with_name('robotron-questions.jsonl'),dict(q,id=digest(dict(evidence=event.id,question=q)),status='open',evidence=event.id))
@@ -510,7 +511,12 @@ def reflect_model_investigations(dataset, gateway, registry):
     output=[]
     for evaluation in dataset.journal.records('observation'):
         p=evaluation.data['payload']
-        if p.get('category')!='offline_model_evaluation' or p.get('metrics',{}).get('improved') is not False: continue
+        if p.get('category')!='offline_model_evaluation' or p.get('metrics',{}).get('improved') is not False or p.get('metrics',{}).get('test_consulted') is False: continue
+        reference=evaluation.id
+        if evaluation.data['episode']!=SCOPE:
+            reference=dataset.journal.append('observation',dict(category='consolidated_evidence_reference',record_id=evaluation.id,
+                source_episode=evaluation.data['episode'],journal=str(dataset.journal.path.resolve())),
+                episode=SCOPE,producer='existing-evidence-consolidation',version='ala-2').id
         # Do not peek at training history to select the expected retrieval outcome.
         alternatives=[dict(explanation='A fitting/generalization gap may contribute',predicate='validation_exceeds_training'),
                       dict(explanation='Optimization may still be progressing at the resource boundary',predicate='improving_at_budget')]
@@ -523,7 +529,7 @@ def reflect_model_investigations(dataset, gateway, registry):
                 assumption='Observable signatures discriminate possibilities but do not identify causes',
                 rank=[1],objective='Reduce uncertainty before another model or operational change')
             hypothesis=dataset.journal.append('event',dict(category='perceptual_experiment_proposal',proposal=spec),
-                episode=SCOPE,sources=[evaluation.id],producer='Reflection',version='ala-2-diagnostics')
+                episode=SCOPE,sources=[reference],producer='Reflection',version='ala-2-diagnostics')
             gateway.remember(Experience(kind='observation',summary='Perceptual experiment hypothesis: '+canonical(spec),
                 source='ppal:perceptual-reflection',subject='model-diagnostics',confidence=.5,significant=True,novelty=True,
                 tags=('hypothesis','offline','tentative'),evidence=hypothesis.id))
@@ -537,6 +543,55 @@ def reflect_model_investigations(dataset, gateway, registry):
             record=dataset.journal.append('event',dict(category='learning_project_proposal',proposal=proposal),
                 episode=SCOPE,sources=[hypothesis.id],producer='Reflection',version='ala-2-diagnostics')
             output.append(dict(proposal=proposal,evidence_id=record.id,hypothesis_id=hypothesis.id,alternatives=alternatives))
+    return output
+
+
+def reflect_training_extensions(dataset,gateway,registry):
+    """A new intervention from a retrieved signature, not a supplied remedy.
+
+    The finite supported method can test duration, but does not establish why a
+    model failed. Reused validation cannot certify generalization or deployment.
+    """
+    from learning.datasets import SCOPE
+    from memory.evidence import canonical
+    output=[];seen=set()
+    for diagnostic in dataset.journal.records('observation'):
+        p=diagnostic.data['payload'];measure=p.get('measurements',{})
+        if p.get('category')!='model_diagnostic_retrieval' or measure.get('improving_at_budget') is not True:continue
+        evaluation=dataset.journal.get(measure['evaluation_id']);candidate=evaluation.data['payload']['candidate']
+        if evaluation.id in seen:continue
+        seen.add(evaluation.id)
+        if candidate['spec']['epochs']>=100:continue
+        try:snapshot=dataset.snapshot(objective=candidate['spec']['objective'])
+        except ValueError:continue
+        reference=diagnostic.id
+        if diagnostic.data['episode']!=SCOPE:
+            reference=dataset.journal.append('observation',dict(category='consolidated_evidence_reference',record_id=diagnostic.id,
+                source_episode=diagnostic.data['episode'],journal=str(dataset.journal.path.resolve())),episode=SCOPE,
+                producer='existing-evidence-consolidation',version='ala-2').id
+        alternatives=[dict(method='cnn-validation-extension',eligible=True,reason='retrieved validation loss still decreased at epoch boundary'),
+                      dict(method='collect-examples',eligible=True,reason='coverage may instead limit generalization; needs independent captures'),
+                      dict(method='clarify-labels',eligible=True,reason='uncertain targets cannot establish semantic utility')]
+        scope={'evaluation_id':evaluation.id,'intervention':'training-duration'}
+        spec=dict(method='cnn-validation-extension',scope=scope,expected='extended duration improves matched validation loss',
+            evaluation_id=evaluation.id,dataset_id=snapshot.id,source_evidence=[diagnostic.id],rank=[1],
+            question='Does additional bounded fitting improve validation relative to the same configuration stopped earlier?',
+            alternatives=alternatives,assumption='decreasing validation is a tentative opportunity, not a cause or generalization guarantee')
+        hypothesis=dataset.journal.append('event',dict(category='perceptual_experiment_proposal',proposal=spec),episode=SCOPE,
+            sources=[reference,snapshot.id],producer='Reflection',version='ala-2-refinement')
+        gateway.remember(Experience(kind='observation',summary='Perceptual experiment hypothesis: '+canonical(spec),
+            source='ppal:perceptual-reflection',subject=spec['method'],confidence=.5,significant=True,novelty=True,
+            tags=('hypothesis','offline','tentative'),evidence=hypothesis.id))
+        proposal=dict(originator='Reflection',method=spec['method'],scope=scope,expected=spec['expected'],goal=spec['question'],
+            motivation='Test a bounded intervention suggested by retrieved optimization evidence',
+            open_questions=['Does added duration change validation loss?','Does any change generalize independently?'],
+            requires=['offline-slot','RGB-examples','torch','model-evaluation'],dependencies=[],established_objective='official_game_score',
+            objective_contribution=.4,learning_value=.65,uncertainty=.8,cost=registry.get(spec['method']).cost,risk=.1,
+            priority_provenance='retrieved diagnostic signature and declared cost; no learned score utility',
+            tactical_hypothesis_evidence=[hypothesis.id],conditions=[],revision='1')
+        record=dataset.journal.append('event',dict(category='learning_project_proposal',proposal=proposal),episode=SCOPE,
+            sources=[hypothesis.id],producer='Reflection',version='ala-2-refinement')
+        output.append(dict(proposal=proposal,evidence_id=record.id,hypothesis_id=hypothesis.id,alternatives=alternatives))
     return output
 
 

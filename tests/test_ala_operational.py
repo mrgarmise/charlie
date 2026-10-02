@@ -106,3 +106,27 @@ def test_autonomous_candidate_return_under_preexisting_bounded_authority(tmp_pat
     deploy.apply_authority(result,authority,Path(deployment['manifest']))
     assert len(ds.journal.records())==count
     assert not deploy.apply_authority(result,dict(authority,allowed_domains=['other-domain']),tmp_path/'bad.json')['manifest']
+    deploy.rollback('ppal-semantics',reason='explicit rejection must survive retries',authorization={'source':'lab','target':'ppal-semantics'})
+    assert deploy.apply_authority(result,authority,Path(deployment['manifest']))['status']=='blocked'
+
+
+def test_recovery_after_resolution_before_shadow_does_not_retest(tmp_path,monkeypatch):
+    pytest.importorskip('torch')
+    import learning.operational as operational
+    from learning.cycle import run_plan
+    original=operational.shadow
+    monkeypatch.setattr(operational,'shadow',lambda *a:(_ for _ in ()).throw(InterruptedError('crash before adapter handoff')))
+    with pytest.raises(InterruptedError):lab(tmp_path)
+    journal=EvidenceJournal(tmp_path/'e.sqlite3');ds=ExperienceDataset(journal,tmp_path/'pixels')
+    plans=[r.data['payload']['plan'] for r in journal.records('event') if r.data['payload'].get('category')=='offline_experiment_plan']
+    assert journal.resolution_for(plans[0]['prediction_id'])
+    monkeypatch.setattr(operational,'shadow',original)
+    monkeypatch.setattr('learning.foundry.evaluate',lambda *a:(_ for _ in ()).throw(AssertionError('test rerun')))
+    result=run_plan(plans[0],ds,tmp_path/'models',driver=driver)
+    assert result['status']=='already_resolved' and result['shadow_id']
+    deploy=CapabilityDeployment(journal)
+    grant={'source':'preexisting-lab-grant','target':'ppal-semantics','allowed_domains':['controlled-lab']}
+    assert deploy.apply_authority(result,grant,tmp_path/'activation.json')['status']=='activated'
+    before=len(journal.records());run_plan(plans[0],ds,tmp_path/'models',driver=driver)
+    assert len(journal.records())==before
+    journal.verify();journal.close()

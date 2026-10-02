@@ -186,7 +186,7 @@ def select_offline_experiment(gateway, journal, project_context, *, budget_secon
     from memory.evidence import digest
     if project_context['method'] in ('model-diagnostics','evidence-review'):
         return select_diagnostic_experiment(gateway,journal,project_context,budget_seconds=budget_seconds)
-    if project_context['method'] not in ('cnn-reconstruction','cnn-classification'): return None
+    if project_context['method'] not in ('cnn-reconstruction','cnn-classification','cnn-validation-extension'): return None
     choices=[]
     for row in gateway.evaluator.for_evidence(project_context['hypothesis_evidence']):
         if row['status']!='promoted' or row.get('source')!='ppal:perceptual-reflection': continue
@@ -206,24 +206,32 @@ def select_offline_experiment(gateway, journal, project_context, *, budget_secon
     candidates=[dict(family='small-cnn',objective=snapshot['objective'],channels=channels,kernel=3,
         activation='relu',size=size,epochs=epochs,lr=lr,seed=0,patience=10)
         for channels,lr in [([4],.01),([8,16],.003)]]
+    validation_only=spec['method']=='cnn-validation-extension'
+    if validation_only:
+        original=journal.get(spec['evaluation_id']).data['payload']['candidate']['spec']
+        if original['epochs']>=100:return None
+        candidates=[dict(original),dict(original,epochs=min(100,2*original['epochs']))]
     key=digest(dict(project_id=project_context['project_id'],dataset=spec['dataset_id'],method=spec['method']))
     prior=[r for r in journal.records('event') if r.data['payload'].get('category')=='offline_experiment_plan' and r.data['payload'].get('key')==key]
     if prior: return prior[0].data['payload']['plan']
+    from learning.clock import domain
+    clock_domain=domain(); scope=SCOPE+':'+clock_domain
     recalled=journal.append('observation',dict(category='evaluated_memory_recalled',proposal=spec,memory_id=row['id'],project_context=project_context),
-        episode=SCOPE,producer='MemoryEvaluator',version='ala-1')
+        episode=scope,producer='MemoryEvaluator',version='ala-1')
     at=time.monotonic()
     prediction=journal.predict(dict(expected=spec['expected'],dataset=spec['dataset_id'],
-        metric='balanced_accuracy' if snapshot['objective']=='classification' else 'reconstruction_mse',
-        uncertainty='diagnostic expectation, no semantic or score claim'),episode=SCOPE,at=at,
+        metric='matched_validation_loss' if validation_only else 'balanced_accuracy' if snapshot['objective']=='classification' else 'reconstruction_mse',
+        uncertainty='diagnostic expectation, no semantic or score claim'),episode=scope,at=at,
         deadline=at+budget_seconds+60,sources=[recalled.id],producer='existing-memory-offline-test',version='ala-1',mode='live_prospective')
     plan=dict(project_id=project_context['project_id'],prediction_id=prediction.id,memory_id=row['id'],
         dataset_id=spec['dataset_id'],expected=spec['expected'],condition=dict(spec['scope'],dataset_id=spec['dataset_id']),candidates=candidates,
-        budget_seconds=budget_seconds,experiment_kind='offline',
+        budget_seconds=budget_seconds,experiment_kind='offline',episode=scope,clock_domain=clock_domain,
         independence_unit=digest(sorted({r['independence_group'] for r in snapshot['examples'] if r['partition']=='test'})),
         evidence_groups=sorted({r['source_episode'] for r in snapshot['examples'] if r['partition']=='test'}),
         source_evidence=spec['source_evidence'],alternatives=[dict(memory_id=r['id'],evaluator_priority=r['priority'],rank=s['rank']) for r,s in choices],
-        method_alternatives=spec['alternatives'],reason='existing Evaluator priority, then independent coverage; architecture comparison on validation only')
-    journal.append('event',dict(category='offline_experiment_plan',key=key,plan=plan),episode=SCOPE,
+        method_alternatives=spec['alternatives'],evaluation_mode='validation-only' if validation_only else 'independent-test',
+        reason='existing Evaluator priority; matched duration alternatives from retrieved history' if validation_only else 'existing Evaluator priority, then independent coverage; architecture comparison on validation only')
+    journal.append('event',dict(category='offline_experiment_plan',key=key,plan=plan),episode=scope,
         sources=[prediction.id],producer='existing-chooser',version='ala-1')
     gateway.record_decision('offline:'+prediction.id,'diagnostic-generalization',[row['id']])
     return plan

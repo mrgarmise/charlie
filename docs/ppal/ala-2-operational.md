@@ -32,6 +32,37 @@ The controlled integration test uses independently generated, explicitly labeled
 
 The rejected real ALA-1 reconstruction model remains rejected. No verified Robotron semantic dataset, improved Robotron recognizer, candidate-specific Pi readiness or before/after physical score comparison has yet been supplied. The [score comparison protocol](ala-2.md#physical-score-comparison-protocol) retains official score as the external objective and rejects uncertain scores/boundaries. No armed experiment was initiated.
 
-Regression checkpoint: **468 passed in 37.41 seconds**. All pre-existing tracking, agency, score, startup, viewer, supervision, evidence, Executive and foundry regressions remain included. `run_camera.py` was untouched.
+First continuation checkpoint: published **`b35501f`**, **468 passed in 37.41 seconds**. Implementation continued after that checkpoint; it was not treated as ALA-2 completion. All pre-existing tracking, agency, score, startup, viewer, supervision, evidence, Executive and foundry regressions remain included. `run_camera.py` was untouched.
 
-Remaining work includes adaptive model refinement, broader hypothesis synthesis and independent physical validation. Publishing this checkpoint is not declaration of ALA-2 completion; implementation continues within the authorized session.
+## Continued intervention, recovery and real-evidence validation
+
+The existing Reflection now turns a retrieved `improving_at_budget` signature into a tentative training-duration question. The Executive and existing Evaluator/chooser select `cnn-validation-extension`; the chooser preserves the evaluated architecture, optimizer, seed and preprocessing and compares the original epoch count with twice that count (maximum 100). This finite declarative capability is a method vocabulary, not a prescribed Robotron strategy or asserted explanation. Additional examples and independent label clarification remain explicit alternatives. No extension is proposed after the supported epoch bound is exhausted. Both outcomes remain meaningful; a failed extension cannot deploy.
+
+Only training and validation tensors are opened during the intervention. Final test inference and learned-group extraction are skipped; confidence admission and deployment are prohibited for this reused-validation result. The resolved result goes through existing Reflection, memory, Evaluator and Executive history, then pauses pending independent evidence. Shared archive observations do not become additional physical experiments. A regression removes test images after the prospective plan is committed and verifies successful execution without opening them.
+
+New CNN commitments use an explicit host boot clock domain, matching the diagnostic path. Historical observations cannot masquerade as observations in the new forecast horizon. If the host clock changed before evaluation, checkpoints survive but that prediction resolves UNKNOWN/unresolved. Existing completed outcomes are reused during recovery. A crash after resolution but before shadow/activation can reconcile the missing handoff without training again, reopening final evaluation, duplicating the resolution, or undoing an explicit rollback.
+
+Content-hashed pixel archives can be explicitly relocated using `--resolve-artifacts DIRECTORY`. Verified location events project new paths while original records remain immutable. Location changes do not constitute new scientific data, reset held-out partitions, count as another physical experiment, or alone reopen a held project. Annotation ingestion is offline-only and bounded to 512 items per atomic batch.
+
+Actual archived-evidence run: `ala2-continuation-real-verified`, all **81 original records unchanged**, zero new physical experiments. Reflection's source was diagnostic `f564b84e87616e499de147fe0e468c9065bf0f71fa31b7fd136746bd0f72ffca`, reporting continuing validation improvement in the rejected 59-epoch ALA-1 CNN. Executive selection used its declared value/uncertainty-minus-cost/risk policy; the sole eligible evaluated tactical proposal had priority **0.65**. There was no fabricated multi-proposal ranking. Chooser-generated duration alternatives were **59 and 100 epochs**. Prospective prediction `c3873198ef3ab467217e36cb1210056bd8a210ad561ee7f3862c26613288a5ce` resolved supported: matched validation loss **0.0156782 → 0.00577389**, elapsed **6.24 seconds** on this host. Resolution `8883d20f90acb9623b047b750c4ec6e6aaaf2e150452fd9c516047f2d78ac07d` preserves the reused-validation limitation. Final test was not evaluated again; no operational proposal was issued. Historical test MSE **0.0169905** versus baseline **0.00349975** remains rejected and unchanged.
+
+Reproduction without camera, START or deployment authority:
+
+```bash
+python -m pytest tests -q
+python -m learning.validate_continuation ALA_2_EVIDENCE_ROOT \
+  --pixels ALA_1_EVIDENCE_ROOT/pixels \
+  --output NEW_ISOLATED_OUTPUT --budget-seconds 60
+```
+
+The input must contain the original journal and completed diagnostics; paths are selected by the caller, but hypotheses, configs, predictions and results are generated by the implemented mechanisms. The validator refuses to overwrite an existing output. The standard cycle supports `--refinement-only` for this bounded continuation rather than rerunning final tests. Foundry checkpoint recovery and exact-plan retry remain the normal execution mechanisms.
+
+Host-only semantic-hook benchmark, 300 loop iterations per condition with 16 candidate crops and a real controlled-lab CNN: detached median **0.00032 ms**, attached median **0.03313 ms**, attached p99 **0.17107 ms**, maximum **0.25022 ms**. Total loop time was **3.027 versus 3.040 seconds**. This is not a Pi gameplay frame-rate, controller-latency or thermal-contention measurement; those remain required physical-readiness inputs. A nonblocking worker does not imply zero resource contention.
+
+## Completion boundary and smallest next inputs
+
+Regression after the intervention/recovery additions: **473 passed**. Functioning infrastructure and a controlled learned-model-to-ordinary-action cycle are demonstrated. Real evidence has produced a subsequent executed intervention and a measurable **validation-only** improvement. An independently validated improved Robotron operational capability and actual Robotron score improvement are **not demonstrated**. No armed run occurred, no permission to restart an uncertain game was added, and no winning movement/firing strategy was encoded.
+
+Independent verified Robotron role labels across isolated source games (or a separately validated observational labeling capability) are missing for semantic deployment. The extracted crop clarification request can provide those examples without another armed game. UNKNOWN/provisional labels remain excluded. For the real reconstruction continuation, new independent evaluation evidence is required before generalization or deployment claims. Candidate-specific Pi cadence/recovery/readiness evidence and explicit physical authorization are additionally required before a live comparison. The existing randomized complete-game score protocol remains ready for qualified measurements; historical score disagreements prevent performance claims.
+
+Broader causal hypothesis synthesis, learned value-of-information, representation/dataset/preprocessing search with fresh final tests, autonomous discovery of reward-grounded roles, learning-derived strategy deployment and physical score comparison remain unfinished. ALA-2 is **not declared complete**. The next evidence-generated questions concern independent generalization of the duration result, whether diagnostic gains help task capability, and whether independent examples or verified targets resolve the remaining semantic gap—not a manually supplied direction or firing strategy.

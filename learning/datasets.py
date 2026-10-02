@@ -13,6 +13,15 @@ from memory.evidence import digest
 SCOPE = 'autonomous-learning-v1'
 VERSION = 'experience-dataset-v1'
 
+def scientific_content(journal,identifier):
+    """Artifact relocation is not new scientific data or independent evidence."""
+    try:p=journal.get(identifier).data['payload']
+    except KeyError:return identifier
+    if p.get('category')!='experience_dataset_snapshot':return identifier
+    return digest(dict(objective=p['objective'],examples=sorted(
+        (r['id'],r['pixel_sha256'],r['partition'],r['annotation']['id'] if r.get('annotation') else None)
+        for r in p['examples'])))
+
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
@@ -77,7 +86,24 @@ class ExperienceDataset:
             p=record.data['payload']
             if p.get('category')=='dataset_annotation' and p['example'] in rows:
                 rows[p['example']]['annotation']=dict(p,id=record.id)
+            if p.get('category')=='experience_artifact_location' and p['example'] in rows:
+                row=rows[p['example']]
+                row['historical_pixel_path']=row.get('historical_pixel_path',row['pixel_path'])
+                row['pixel_path']=p['path'];row['artifact_location_id']=record.id
         return list(rows.values())
+
+    def locate_artifacts(self,directory):
+        """Append verified locations; never edit historical records after relocation."""
+        directory=Path(directory).resolve();outputs=[]
+        with self.journal.batch():
+            for row in self.examples():
+                target=directory/(row['pixel_sha256']+'.png')
+                if not target.exists() or sha(target)!=row['pixel_sha256']:raise ValueError('relocated pixels unavailable or modified')
+                record=self.journal.append('event',dict(category='experience_artifact_location',example=row['id'],
+                    path=str(target),sha256=row['pixel_sha256'],historical_path=row.get('historical_pixel_path',row['pixel_path'])),
+                    episode=SCOPE,sources=[row['id']],producer='verified-artifact-resolution',version=VERSION)
+                outputs.append(record.id)
+        return outputs
 
     def snapshot(self, *, objective='reconstruction', split=None):
         if objective not in ('reconstruction','classification'): raise ValueError('unsupported training objective')
@@ -134,5 +160,6 @@ class ExperienceDataset:
             split=split,independent_groups=len(groups),physical_experiments=len(parent),
             note='offline reuse is correlated evidence, not another physical experiment')
         sources=[r['id'] for r in selected]+[r['annotation']['id'] for r in selected if r['annotation']]
+        sources += [r['artifact_location_id'] for r in selected if r.get('artifact_location_id')]
         return self.journal.append('event',document,episode=SCOPE,sources=sources,
             producer='ExperienceDataset',version=VERSION)

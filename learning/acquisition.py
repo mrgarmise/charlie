@@ -44,8 +44,11 @@ def collect_crops(root,dataset,*,max_crops=128):
 
 def apply_annotations(dataset,path):
     """Explicit external labels/corrections; no privileged person or silent rewrite."""
+    from .cycle import gameplay_active
+    if gameplay_active():raise RuntimeError('offline annotation unavailable during gameplay')
     path=Path(path);records=json.loads(path.read_text());outputs=[]
     if not isinstance(records,list):raise ValueError('annotation list required')
+    if len(records)>512:raise ValueError('bounded annotation batch required (at most 512)')
     with dataset.journal.batch():
         for row in records:
             if row.get('value') not in ('human','threat',None) or (row.get('value') is None and row.get('status')=='verified'):raise ValueError('supported role or abstention required; no SELF labels')

@@ -59,7 +59,29 @@ def test_registry_is_optional_and_inspectable():
     subprocess.run([sys.executable,'-c',"import learning.datasets, learning.capabilities, learning.cycle; import sys; assert 'torch' not in sys.modules"],check=True)
     registry=default_registry()
     assert registry.get('cnn-reconstruction').execution=='offline'
-    assert len(registry.describe())==6
+    assert registry.get('cnn-validation-extension').execution=='offline'
+    assert len(registry.describe())==7
+
+
+def test_verified_relocation_preserves_original_records_and_partitions(tmp_path):
+    import shutil
+    ds=dataset(tmp_path)
+    for i in range(3):add(ds,tmp_path,str(i),(i*40,20,100))
+    old=ds.snapshot(); originals={r.id:r.document for r in ds.journal.records()}
+    destination=tmp_path/'relocated';shutil.copytree(ds.artifacts,destination)
+    for p in ds.artifacts.glob('*.png'):p.unlink()
+    ids=ds.locate_artifacts(destination);count=len(ds.journal.records())
+    assert ds.locate_artifacts(destination)==ids and len(ds.journal.records())==count
+    newer=ds.snapshot();new=newer.data['payload']
+    from learning.datasets import scientific_content
+    assert scientific_content(ds.journal,newer.id)==scientific_content(ds.journal,old.id)
+    assert new['split']==old.data['payload']['split'] and new['physical_experiments']==3
+    assert all(ds.journal.get(i).document==text for i,text in originals.items())
+    assert all(r['historical_pixel_path']!=r['pixel_path'] for r in new['examples'])
+    ds.journal.verify()
+    before=len(ds.journal.records());next(destination.glob('*.png')).write_bytes(b'bad')
+    with pytest.raises(ValueError,match='modified'):ds.locate_artifacts(destination)
+    assert len(ds.journal.records())==before
 
 
 def test_dataset_growth_cannot_turn_test_into_train(tmp_path):

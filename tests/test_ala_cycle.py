@@ -46,6 +46,9 @@ def test_evidence_originated_cycle_resolution_memory_and_restart(tmp_path):
     assert g.evaluator.recent(10)
     report2=investigate(ds,g,budget_seconds=8,max_jobs=2,driver=driver)
     assert all(r['plan']['method']=='model-diagnostics' for r in report2['results'])
+    refinement=investigate(ds,g,budget_seconds=8,max_jobs=2,driver=driver)
+    assert all(r['plan']['evaluation_mode']=='validation-only' for r in refinement['results'])
+    assert all(not r['result']['metrics']['test_consulted'] for r in refinement['results'])
     assert investigate(ds,g,budget_seconds=8,max_jobs=2,driver=driver)['results']==[]
     deploy=CapabilityDeployment(ds.journal)
     with pytest.raises(ValueError): deploy.activate(result['result']['deployment_proposal'],target='offline-shadow',authorization=None)

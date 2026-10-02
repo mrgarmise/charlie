@@ -59,7 +59,7 @@ def shadow(journal,proposal_id,snapshot):
     return journal.append('observation',dict(category='operational_shadow_evaluation',proposal_id=proposal_id,
         passed=passed,coverage=coverage,accepted_accuracy=accuracy,outputs=outputs,
         dataset_digest=digest(snapshot),independence='same frozen held-out evidence; correlated integration check',
-        physical_score_improvement='UNKNOWN'),episode=SCOPE,sources=[proposal_id,proposal['evaluation_id']],
+        physical_score_improvement='UNKNOWN'),episode=journal.get(proposal_id).data['episode'],sources=[proposal_id,proposal['evaluation_id']],
         producer='controlled-semantic-adapter',version='ala-2')
 
 

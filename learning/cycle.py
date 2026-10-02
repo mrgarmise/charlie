@@ -67,6 +67,21 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
     if len(committed)!=1 or committed[0]!=plan: raise ValueError('execution must match the exact committed chooser plan')
     snapshot=journal.get(plan['dataset_id']).data['payload']
     resolved=journal.resolution_for(plan['prediction_id'])
+    scope=plan.get('episode',SCOPE)
+    from .clock import domain
+    prior_outcomes=[r for r in journal.records('observation') if r.data['payload'].get('category')=='offline_model_evaluation' and r.data['payload'].get('prediction_id')==plan['prediction_id']]
+    if resolved and not prior_outcomes:
+        p=resolved.data['payload']
+        return dict(status='already_resolved',result=p['result'],reason=p['reason'],resolution=p,resolution_id=resolved.id,metrics={'evaluation':'not completed'})
+    if not resolved and not prior_outcomes and plan.get('clock_domain') and plan['clock_domain']!=domain():
+        reason='Host clock changed before evaluation; preserve checkpoints but do not invent deadline continuity'
+        resolution=journal.resolve(plan['prediction_id'],sources=[],result='unresolved',reason=reason)
+        return dict(status='resolved',result='unresolved',reason=reason,resolution_id=resolution.id,metrics={'clock_continuity':'UNKNOWN'})
+    dataset_reference=plan['dataset_id']
+    if journal.get(dataset_reference).data['episode']!=scope:
+        dataset_reference=journal.append('observation',dict(category='consolidated_evidence_reference',record_id=dataset_reference,
+            source_episode=journal.get(dataset_reference).data['episode'],journal=str(journal.path.resolve())),
+            episode=scope,producer='existing-evidence-consolidation',version='ala-2').id
     # A committed resolution may precede a crash before proposal/shadow/export.
     # Reconcile those durable handoffs; do not rerun the final evaluation.
     output=Path(output)/plan['prediction_id']; output.mkdir(parents=True,exist_ok=True)
@@ -82,19 +97,19 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
             if rc!=0:
                 journal.append('event',dict(category='offline_experiment_deferred',prediction_id=plan['prediction_id'],returncode=rc,
                     checkpoint=str(candidate/'last.pt'),reason='worker yielded, failed or stopped; no verdict fabricated'),
-                    episode=SCOPE,sources=[plan['prediction_id']],producer='offline-orchestrator',version='ala-1')
+                    episode=scope,sources=[plan['prediction_id']],producer='offline-orchestrator',version='ala-1')
                 return dict(status='deferred',returncode=rc)
         value=json.loads((candidate/'training.json').read_text())
         if value['dataset_digest']!=digest(snapshot) or value['spec']!=spec or sha(value['checkpoint'])!=value['checkpoint_sha256']:
             raise ValueError('candidate artifact provenance changed')
         record=journal.append('event',dict(category='model_training',candidate=value,experiment_kind='offline',
-            prediction_id=plan['prediction_id'],dataset_id=plan['dataset_id']),episode=SCOPE,
-            sources=[plan['prediction_id'],plan['dataset_id']],producer='ModelFoundry',version='ala-1')
+            prediction_id=plan['prediction_id'],dataset_id=plan['dataset_id']),episode=scope,
+            sources=[plan['prediction_id'],dataset_reference],producer='ModelFoundry',version='ala-1')
         training.append((record,value))
     record,candidate=min(training,key=lambda pair:pair[1]['validation_loss'])
     selected=journal.append('event',dict(category='model_candidate_selected',candidate_id=candidate['identifier'],
         criterion='validation loss only',alternatives=[dict(id=v['identifier'],validation_loss=v['validation_loss']) for _,v in training]),
-        episode=SCOPE,sources=[r.id for r,_ in training],producer='ModelFoundry',version='ala-1')
+        episode=scope,sources=[r.id for r,_ in training],producer='ModelFoundry',version='ala-1')
     prior=[r for r in journal.records('observation') if r.data['payload'].get('category')=='offline_model_evaluation' and r.data['payload'].get('prediction_id')==plan['prediction_id']]
     if len(prior)>1: raise ValueError('conflicting final evaluations; create an explicit version')
     if prior:
@@ -102,33 +117,40 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
         if value['candidate']!=candidate: raise ValueError('frozen evaluation candidate changed')
         metric=value['metrics']
     else:
-        metric=evaluate(snapshot,candidate)
-        groups=discover_groups(snapshot,candidate,output)
-        journal.append('event',dict(category='opaque_visual_groups',interpretation=groups),episode=SCOPE,
-            sources=[selected.id,plan['dataset_id']],producer='Meditation:learned-representation',version='ala-1')
+        if plan.get('evaluation_mode')=='validation-only':
+            control=training[0][1];extended=training[1][1]
+            metric=dict(metric='matched_validation_loss',value=extended['validation_loss'],baseline=control['validation_loss'],
+                improved=extended['validation_loss']<control['validation_loss'],independence_groups=[],operational=None,
+                test_consulted=False,limitations=['reused validation is correlated, not independent confirmation','not eligible for deployment','no score claim'])
+        else:
+            metric=evaluate(snapshot,candidate)
+            groups=discover_groups(snapshot,candidate,output)
+            journal.append('event',dict(category='opaque_visual_groups',interpretation=groups),episode=scope,
+                sources=[selected.id,dataset_reference],producer='Meditation:learned-representation',version='ala-1')
         outcome=journal.append('observation',dict(category='offline_model_evaluation',ee_episode=SCOPE,
             prediction_id=plan['prediction_id'],candidate=candidate,metrics=metric,
             experiment_kind='offline',independence_unit=plan['independence_unit'],
-            semantic_finding='UNKNOWN',physical_performance='not tested'),episode=SCOPE,
-            at=time.monotonic(),sources=[selected.id,plan['dataset_id']],producer='ModelFoundry',version='ala-1')
+            semantic_finding='UNKNOWN',physical_performance='not tested'),episode=scope,
+            at=time.monotonic(),sources=[selected.id,dataset_reference],producer='ModelFoundry',version='ala-1')
     forecast=journal.get(plan['prediction_id']).data
     in_horizon=forecast['at'] < outcome.data['at'] <= forecast['payload']['deadline']
     verdict=('supported' if metric['improved'] else 'contradicted') if in_horizon else 'unresolved'
-    reason='Independent diagnostic metric compared with frozen train-only baseline; no gameplay causation inferred'
+    reason=('Matched training duration comparison on reused validation only; independent generalization and task utility remain UNKNOWN'
+            if plan.get('evaluation_mode')=='validation-only' else 'Independent diagnostic metric compared with frozen train-only baseline; no gameplay causation inferred')
     if not in_horizon: reason='Completed outside the committed prediction horizon; diagnostic evaluation retained, forecast unresolved'
     resolution=resolved or journal.resolve(plan['prediction_id'],sources=[outcome.id] if outcome.data['at']>forecast['at'] else [],result=verdict,reason=reason)
     verdict=resolution.data['payload']['result'];reason=resolution.data['payload']['reason']
     proposal=journal.append('event',dict(category='model_deployment_proposal',candidate_id=candidate['identifier'],
-        evaluation_id=outcome.id,eligible=metric['improved'],target='offline-shadow',
-        production=False,reason='independent diagnostic improvement' if metric['improved'] else 'candidate failed diagnostic baseline',
-        limitations=metric['limitations']),episode=SCOPE,sources=[resolution.id,outcome.id],producer='Reflection',version='ala-1')
+        evaluation_id=outcome.id,eligible=metric['improved'] and plan.get('evaluation_mode')!='validation-only',target='offline-shadow',
+        production=False,reason='correlated validation-only result; independent evaluation still required' if plan.get('evaluation_mode')=='validation-only' else 'independent diagnostic improvement' if metric['improved'] else 'candidate failed diagnostic baseline',
+        limitations=metric['limitations']),episode=scope,sources=[resolution.id,outcome.id],producer='Reflection',version='ala-1')
     operational_proposal=None
     contract=metric.get('operational')
     if contract and contract['eligible'] and verdict=='supported':
         operational_proposal=journal.append('event',dict(category='model_deployment_proposal',candidate_id=candidate['identifier'],
             evaluation_id=outcome.id,eligible=True,target='ppal-semantics',production=False,contract=contract,
             reason='independently evaluated semantic admission; separate shadow test and authorization required'),
-            episode=SCOPE,sources=[resolution.id,outcome.id],producer='Reflection',version='ala-2').id
+            episode=scope,sources=[resolution.id,outcome.id],producer='Reflection',version='ala-2').id
     shadow_id=None
     if operational_proposal:
         from .operational import shadow
@@ -137,26 +159,29 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
         evaluation_id=outcome.id,deployment_proposal=proposal.id,operational_proposal=operational_proposal,shadow_id=shadow_id,metrics=metric,candidate_id=candidate['identifier'])
 
 
-def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None, executive=None, on_progress=None, diagnostics_only=False, review_questions=False, deployment_authority=None):
+def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None, executive=None, on_progress=None, diagnostics_only=False, review_questions=False, deployment_authority=None, refinement_only=False):
     """Existing Executive selects portfolio; existing chooser selects method trial."""
     if gameplay_active(): raise RuntimeError('offline learning unavailable during active gameplay')
     if not 1<=max_jobs<=8 or not 1<=budget_seconds<=3600: raise ValueError('bounded offline resources required')
-    from experiments.ppal.reflect_robotron import reflect_perceptual_opportunities, reflect_model_investigations, reflect_question_investigations
+    from experiments.ppal.reflect_robotron import reflect_perceptual_opportunities, reflect_model_investigations, reflect_question_investigations, reflect_training_extensions
     from experiments.ppal.experiment_return import select_offline_experiment
     registry=default_registry(); executive=executive or LearningExecutive(dataset.journal,gateway)
-    opportunities=([] if diagnostics_only else reflect_perceptual_opportunities(dataset,gateway,registry))+reflect_model_investigations(dataset,gateway,registry)
+    opportunities=([] if diagnostics_only or refinement_only else reflect_perceptual_opportunities(dataset,gateway,registry))+([] if refinement_only else reflect_model_investigations(dataset,gateway,registry))
+    if not diagnostics_only:opportunities+=reflect_training_extensions(dataset,gateway,registry)
     if review_questions: opportunities+=reflect_question_investigations(dataset,gateway,registry)
     for item in opportunities:
         identifier=executive.propose(item['proposal'],dataset.journal,[item['evidence_id']])
         project=executive.projects()[identifier]
         spec=dataset.journal.get(item['hypothesis_id']).data['payload']['proposal']
-        if project.get('hold') and project['status']=='paused' and project.get('disposition')!='budget_exhausted' and not any(h.get('dataset_id')==spec['dataset_id'] for h in project['experiment_history']):
+        from .datasets import scientific_content
+        if project.get('hold') and project['status']=='paused' and project.get('disposition')!='budget_exhausted' and not any(scientific_content(dataset.journal,h.get('dataset_id'))==scientific_content(dataset.journal,spec['dataset_id']) for h in project['experiment_history']):
             executive.transition(identifier,'candidate','New versioned evidence permits reassessment; no independent confirmation assumed',dataset.journal,[item['evidence_id']])
     started=time.monotonic(); results=[]; seen=set()
     for _ in range(max_jobs):
         remaining=budget_seconds-(time.monotonic()-started)
         if remaining<1: break
-        available = {'model-diagnostics'} | ({'evidence-review'} if review_questions else set()) | ({'cnn-reconstruction','cnn-classification'} if not diagnostics_only and importlib.util.find_spec('torch') else set())
+        available = {'model-diagnostics'} | ({'evidence-review'} if review_questions else set()) | ({'cnn-reconstruction','cnn-classification','cnn-validation-extension'} if not diagnostics_only and importlib.util.find_spec('torch') else set())
+        if refinement_only:available={'cnn-validation-extension'} if importlib.util.find_spec('torch') else set()
         selection=executive.select(methods=available,
             resources={'offline-slot','RGB-examples','torch','model-evaluation','context-evidence'},authorized_methods=available)
         if not selection['project']: break
@@ -176,7 +201,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
                 source='learning:foundry-resolution',subject=project['id'],goal=project['goal'],
                 outcome=json.dumps(result.get('metrics',{})),significant=True,
                 tags=('offline','diagnostic','uncertain'),evidence=result['resolution_id']))
-        if result['status'] in ('resolved','already_resolved') and project['method'] not in ('model-diagnostics','evidence-review'):
+        if result['status'] in ('resolved','already_resolved') and result.get('evaluation_id') and project['method'] not in ('model-diagnostics','evidence-review'):
             from experiments.ppal.reflect_robotron import reflect_model_outcome
             result['reflection']=reflect_model_outcome(dataset.journal,plan,result,gateway)
             from .deployment import CapabilityDeployment
@@ -219,7 +244,9 @@ def main():
     parser.add_argument('--ingest-only',action='store_true')
     parser.add_argument('--diagnostics-only',action='store_true',help='retrieve existing failed-model evidence without opening pixel/model artifacts')
     parser.add_argument('--review-questions',action='store_true',help='also investigate unresolved questions by retrieving frozen experience references')
+    parser.add_argument('--refinement-only',action='store_true',help='only evidence-generated training interventions; never reopen the final test')
     parser.add_argument('--deployment-authority',type=Path,help='pre-existing external bounded deployment authorization; not generated by learning')
+    parser.add_argument('--resolve-artifacts',type=Path,help='explicit directory of original content-hashed pixels after relocation; histories remain immutable')
     args=parser.parse_args()
     if gameplay_active(): parser.error('offline only: active player detected')
     args.output.mkdir(parents=True,exist_ok=True)
@@ -229,10 +256,11 @@ def main():
         journal=EvidenceJournal(args.output/'learning-evidence.sqlite3'); dataset=ExperienceDataset(journal,args.output/'pixels')
         gateway=MemoryGateway()
         try:
+            if args.resolve_artifacts:dataset.locate_artifacts(args.resolve_artifacts)
             for episode in args.episodes: ingest_episode(episode,dataset,gateway)
             if not args.ingest_only:
                 project_journal=EvidenceJournal(gateway.evaluator.path.with_name('learning-project-evidence.sqlite3'))
-                try: report=investigate(dataset,gateway,budget_seconds=args.budget_seconds,max_jobs=args.max_jobs,executive=LearningExecutive(project_journal,gateway),diagnostics_only=args.diagnostics_only,review_questions=args.review_questions,deployment_authority=json.loads(args.deployment_authority.read_text()) if args.deployment_authority else None)
+                try: report=investigate(dataset,gateway,budget_seconds=args.budget_seconds,max_jobs=args.max_jobs,executive=LearningExecutive(project_journal,gateway),diagnostics_only=args.diagnostics_only,review_questions=args.review_questions,deployment_authority=json.loads(args.deployment_authority.read_text()) if args.deployment_authority else None,refinement_only=args.refinement_only)
                 finally: project_journal.close()
                 print(json.dumps({k:report[k] for k in ('elapsed','autonomy','physical_gameplay_improvement')}))
         finally: journal.close()

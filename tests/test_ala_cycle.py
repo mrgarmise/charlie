@@ -72,3 +72,70 @@ def test_productive_worker_deferred_not_resolved(tmp_path):
     result=report['results'][0]
     assert result['result']['status']=='deferred'
     assert ds.journal.resolution_for(result['plan']['prediction_id']) is None
+
+
+def test_checkpointed_resolution_recovery_does_not_retest(tmp_path,monkeypatch):
+    pytest.importorskip('torch')
+    ds,g=make(tmp_path)
+    original=ds.journal.resolve
+    def stop(*a,**kw): raise InterruptedError('crash after test observation')
+    monkeypatch.setattr(ds.journal,'resolve',stop)
+    with pytest.raises(InterruptedError): investigate(ds,g,budget_seconds=8,driver=driver)
+    plans=[r.data['payload']['plan'] for r in ds.journal.records('event') if r.data['payload'].get('category')=='offline_experiment_plan']
+    monkeypatch.setattr(ds.journal,'resolve',original)
+    monkeypatch.setattr('learning.foundry.evaluate',lambda *a:(_ for _ in ()).throw(AssertionError('test repeated')))
+    result=run_plan(plans[0],ds,tmp_path/'models',driver=driver)
+    assert result['status']=='resolved'
+    assert len([r for r in ds.journal.records('observation') if r.data['payload'].get('category')=='offline_model_evaluation'])==1
+
+
+def test_shadow_activation_requires_independent_support_and_rollback(tmp_path):
+    ds,g=make(tmp_path)
+    from learning.datasets import sha
+    weights=tmp_path/'weights.bin';weights.write_bytes(b'controlled-test-candidate')
+    evaluation=ds.journal.append('observation',dict(category='offline_model_evaluation',metrics={'improved':True,'independence_groups':['controlled-held-out']},candidate={'checkpoint':str(weights),'checkpoint_sha256':sha(weights)}),episode=SCOPE,producer='ModelFoundry',version='1')
+    proposal=ds.journal.append('event',dict(category='model_deployment_proposal',candidate_id='controlled',evaluation_id=evaluation.id,eligible=True,target='offline-shadow'),episode=SCOPE,sources=[evaluation.id],producer='Reflection',version='1')
+    deploy=CapabilityDeployment(ds.journal)
+    with pytest.raises(ValueError): deploy.activate(proposal.id,target='live-PPAL',authorization={'source':'test'})
+    auth={'source':'explicit-controlled-authorization','target':'offline-shadow','proposal_id':proposal.id}
+    deploy.activate(proposal.id,target='offline-shadow',authorization=auth)
+    assert deploy.active('offline-shadow')['candidate_id']=='controlled'
+    deploy.rollback('offline-shadow',reason='controlled regression',authorization=auth)
+    assert deploy.active('offline-shadow')['candidate_id'] is None
+
+
+def test_new_evidence_releases_wait_without_independent_confirmation(tmp_path):
+    pytest.importorskip('torch')
+    ds,g=make(tmp_path)
+    first=investigate(ds,g,budget_seconds=8,driver=driver)
+    p=tmp_path/'new.png';Image.new('RGB',(16,16),(9,11,77)).save(p)
+    # Additional frame within the same held-out episode is NOT independent replication.
+    ds.add(p,episode='2',source={'kind':'controlled-additional-observation'})
+    second=investigate(ds,g,budget_seconds=8,driver=driver)
+    assert len(second['results'])==1
+    project=next(iter(second['projects'].values()))
+    assert project['progress']['offline_trials']==2 and project['progress']['independent_offline_evidence_units']==1
+    assert project['status']!='completed'
+
+
+def test_mutated_chooser_plan_cannot_execute(tmp_path):
+    ds,g=make(tmp_path)
+    report=investigate(ds,g,budget_seconds=8,driver=lambda *a,**kw:75)
+    plan=report['results'][0]['plan']; plan['candidates'][0]['lr']=.02
+    with pytest.raises(ValueError,match='exact committed'): run_plan(plan,ds,tmp_path/'models',driver=driver)
+
+
+def test_optional_hook_reuses_existing_context_and_no_camera(tmp_path,monkeypatch):
+    from learning.cycle import postgame_learning
+    from memory.learning_projects import LearningExecutive
+    ds,g=make(tmp_path)
+    root=tmp_path/'episode';root.mkdir(); Image.new('RGB',(16,16),'cyan').save(root/'review-000.jpg')
+    context={'identity_samples':{'unknown':1},'questions':[]}
+    source=ds.journal.append('event',dict(category='postgame_learning_context',**context),episode='episode-one',producer='Reflection',version='test')
+    context['evidence_id']=source.id
+    executive=LearningExecutive(ds.journal,g)
+    report=postgame_learning(root,ds.journal,'episode-one',context,g,executive,tmp_path/'shared',budget_seconds=1)
+    assert report['results']==[]
+    copied=EvidenceJournal(tmp_path/'shared/learning-evidence.sqlite3')
+    assert len(ExperienceDataset(copied,tmp_path/'shared/pixels').examples())==1
+    copied.verify();copied.close()

@@ -224,10 +224,16 @@ class LearningExecutive:
         # correlated trials; they cannot supply independent replication.
         offline = [h for h in resolved if h.get('experiment_kind') == 'offline']
         physical = [h for h in resolved if h.get('experiment_kind', 'physical') == 'physical']
-        units = {h.get('independence_unit', h['episode']) for h in offline}
+        units=[]
+        for h in offline:
+            group=set(h.get('evidence_groups') or [h.get('independence_unit',h['episode'])])
+            overlaps=[existing for existing in units if existing & group]
+            for existing in overlaps:
+                group.update(existing); units.remove(existing)
+            units.append(group)
         effective_resolved = len(physical) + len(units)
         counts = Counter(h['result'] for h in history)
-        episodes = {h.get('independence_unit', h['episode']) for h in resolved}
+        episodes = {h['episode'] for h in physical} | {digest(sorted(unit)) for unit in units}
         conditions = {digest(h['condition']) for h in resolved}
         fraction = counts['supported'] / len(resolved) if resolved else None
         progress = dict(attempts=len(history), resolved=len(resolved), results=dict(counts),
@@ -284,7 +290,8 @@ class LearningExecutive:
             episode=episode, condition=condition,
             result=resolution['result'], reason=resolution['reason'], memory_id=plan['memory_id'],
             experiment_kind=plan.get('experiment_kind','physical'),
-            independence_unit=plan.get('independence_unit',episode), dataset_id=plan.get('dataset_id'))
+            independence_unit=plan.get('independence_unit',episode), dataset_id=plan.get('dataset_id'),
+            evidence_groups=plan.get('evidence_groups',[]))
         self._event(dict(op='outcome', project_id=project_id, outcome=outcome), (ref.id,))
         return self.assess(project_id)
 

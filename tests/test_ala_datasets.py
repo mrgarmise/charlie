@@ -60,3 +60,15 @@ def test_registry_is_optional_and_inspectable():
     registry=default_registry()
     assert registry.get('cnn-reconstruction').execution=='offline'
     assert len(registry.describe())==4
+
+
+def test_dataset_growth_cannot_turn_test_into_train(tmp_path):
+    ds=dataset(tmp_path)
+    for i in range(3): add(ds,tmp_path,str(i),(i*40,20,100))
+    original=ds.snapshot().data['payload']['split']
+    add(ds,tmp_path,'3','yellow')
+    updated=ds.snapshot().data['payload']['split']
+    assert all(updated[group]==role for group,role in original.items())
+    assert updated['3']=='train'
+    bad=dict(updated);bad['2']='train';bad['3']='test'
+    with pytest.raises(ValueError,match='cannot enter'): ds.snapshot(split=bad)

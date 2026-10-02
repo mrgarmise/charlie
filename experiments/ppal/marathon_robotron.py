@@ -40,14 +40,15 @@ class ProcessingDeferred(RuntimeError):
     """Bounded productive processing needs another offline invocation."""
 
 
-def process_supervised(game, output, gateway, commitments, plan=None, executive=None, budget=300., chunks=3):
+def process_supervised(game, output, gateway, commitments, plan=None, executive=None, budget=300., chunks=3, ala_root=None, ala_budget=60.):
     from .progress_supervision import supervise
     output.mkdir(parents=True, exist_ok=True)
     config = dict(game=str(game), output=str(output), evaluator=str(gateway.evaluator.path),
                   outbox=str(gateway.store.path), project=gateway.project, session=gateway.session,
                   commitments=str(commitments.path), plan=plan,
                   project_evidence=str(executive.journal.path) if executive else None,
-                  progress=str(output/'processing-progress.json'), work_budget=budget)
+                  progress=str(output/'processing-progress.json'), work_budget=budget,
+                  ala_root=str(ala_root) if ala_root else None, ala_budget=ala_budget)
     # Paths and already committed plan only; no credentials or new hypotheses.
     path = output/'processing-config.json'
     write_session(path, config)
@@ -65,7 +66,7 @@ def process_supervised(game, output, gateway, commitments, plan=None, executive=
     return load_report(output/'between-game.json')
 
 
-def process_completed_episode(game, output, gateway, commitments, plan=None, executive=None, progress=None, work_budget=None):
+def process_completed_episode(game, output, gateway, commitments, plan=None, executive=None, progress=None, work_budget=None, ala_root=None, ala_budget=60.):
     """Existing E/E + Reflection + Meditation + Evaluator, between games only."""
     from memory.evidence import EvidenceJournal
     from .episode_evidence import import_episode, derive_episode, summarize
@@ -142,7 +143,12 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
             f"Score observations: {context['score_observations']}. Causal performance improvement: UNKNOWN.\n\n"
             f"Meditation: {context['meditation_status']}. Replay tests are correlated diagnostics from one episode.\n\nOpen questions:\n\n"
             +''.join('- '+q['question']+'\n' for q in context['questions']))
-        result={'episode':episode,'resolution':resolution,'reflection':reflection,
+        ala=None
+        if ala_root is not None and executive is not None:
+            stage('autonomous_learning')
+            from learning.cycle import postgame_learning
+            ala=postgame_learning(game,journal,episode,context,gateway,executive,ala_root,budget_seconds=ala_budget,on_progress=pulse)
+        result={'autonomous_learning':ala,'episode':episode,'resolution':resolution,'reflection':reflection,
                 'proposals':proposals,'learning_context':context,'meditation':str(output/'meditation.json') if meditation else None,
                 'evidence':summarize(journal,episode)}
         if executive is not None:
@@ -187,7 +193,9 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
     # supervises offline work in a separate process with existing durable stores.
     if driver is run_bounded:
         def processor(*values, **options):
-            return process_supervised(*values, **options, budget=getattr(args,'processing_budget',300.))
+            return process_supervised(*values, **options, budget=getattr(args,'processing_budget',300.),
+                ala_root=(getattr(args,'learning_root',None) or gateway.evaluator.path.with_name('autonomous-learning')) if getattr(args,'ala_learning',False) else None,
+                ala_budget=getattr(args,'ala_budget',60.))
     else:
         processor = process_completed_episode
     try:
@@ -385,6 +393,9 @@ def main():
     ap.add_argument('--developmental',action='store_true',help='automatic between-game evidence-backed experiments; 3..5 attempts')
     ap.add_argument('--seed-episode',type=Path,help='optional prior episode to process before developmental game 1')
     ap.add_argument('--learning-projects',action='store_true',help='opt-in durable diagnostic project continuity between developmental games')
+    ap.add_argument('--ala-learning',action='store_true',help='opt-in bounded offline model investigations after completed episodes; requires learning projects')
+    ap.add_argument('--learning-root',type=Path,help='durable experience artifacts and evidence; no live training')
+    ap.add_argument('--ala-budget',type=float,default=60.,help='offline foundry budget 1..3600 seconds')
     ap.add_argument('--project-evidence',type=Path,help='existing-format durable project evidence notebook; default beside local memory evaluator')
     a=ap.parse_args()
     if a.max_games is None:a.max_games=3 if a.developmental else 50
@@ -400,6 +411,9 @@ def main():
     if not a.arm: ap.error("--arm is required for an autonomous marathon")
     if (a.learning_projects or a.project_evidence) and not a.developmental:
         ap.error('learning project options require --developmental')
+    if (a.ala_learning or a.learning_root) and not a.learning_projects:
+        ap.error('ALA options require --developmental --learning-projects')
+    if not math.isfinite(a.ala_budget) or not 1<=a.ala_budget<=3600: ap.error('--ala-budget must be 1..3600')
     if a.project_evidence and not a.learning_projects:
         ap.error('--project-evidence requires --learning-projects')
     if a.developmental:

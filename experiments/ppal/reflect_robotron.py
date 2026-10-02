@@ -474,3 +474,26 @@ def reflect_perceptual_opportunities(dataset, gateway, registry):
             episode=SCOPE,sources=[hypothesis.id],producer='Reflection',version='perception-opportunities-v1')
         output.append(dict(proposal=proposal,evidence_id=record.id,hypothesis_id=hypothesis.id,alternatives=alternatives))
     return output
+
+
+def reflect_model_outcome(journal, plan, result, gateway):
+    """New uncertainty from actual diagnostic outcome, never a selected tactic."""
+    from learning.datasets import SCOPE
+    from memory.evidence import digest
+    metric=result['metrics']
+    questions=[]
+    if result['result']=='contradicted':
+        questions.append(dict(category='model_generalization',question='Which training, representation, or evidence-coverage limitation explains failure to outperform the independent baseline?',
+            measured=metric,alternatives=['inspect training/validation divergence','obtain additional independent examples','compare supported representations','verify evaluation assumptions']))
+    else:
+        questions.append(dict(category='model_utility',question='Which independent observations could establish whether diagnostic generalization improves the task capability?',measured=metric))
+    event=journal.append('event',dict(category='model_experiment_reflection',prediction=plan['prediction_id'],
+        resolution=result['resolution_id'],questions=questions,validated_finding='this frozen independent diagnostic comparison only',
+        semantic_improvement='UNKNOWN',performance_improvement='UNKNOWN'),episode=SCOPE,
+        sources=[result['resolution_id'],result['evaluation_id']],producer='Reflection',version='ala-1')
+    for q in questions:
+        _queue_question(gateway.evaluator.path.with_name('robotron-questions.jsonl'),dict(q,id=digest(dict(evidence=event.id,question=q)),status='open',evidence=event.id))
+    gateway.remember(Experience(kind='outcome',summary='Independent model comparison '+result['result']+'; semantic and task utility remain unresolved',
+        source='learning:perceptual-reflection',subject=plan['project_id'],significant=True,
+        outcome=str(metric),tags=('model','reflection','diagnostic'),evidence=event.id))
+    return dict(evidence_id=event.id,questions=questions)

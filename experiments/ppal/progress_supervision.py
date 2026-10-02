@@ -109,7 +109,7 @@ def stop_process(child, *, grace=5.):
 
 
 def supervise(cmd, progress_path, *, silence=30., camera=10., controller=10.,
-              processing=60., budget=None, poll=.2, grace=5.):
+              processing=60., budget=None, poll=.2, grace=5., on_progress=None):
     """Parent watchdog works even if capture, transport or the child loop blocks.
 
     Optional budget is for offline processing only, never healthy gameplay.
@@ -122,12 +122,17 @@ def supervise(cmd, progress_path, *, silence=30., camera=10., controller=10.,
     began = time.monotonic()
     reason = None
     row = None
+    reported_units = 0
     try:
         while child.poll() is None:
             try:
                 candidate = json.loads(path.read_text())
                 if candidate.get('pid') == child.pid:
                     row = candidate
+                    units = row.get('processing_units', 0)
+                    if on_progress is not None and units > reported_units:
+                        reported_units = units
+                        on_progress()
             except (OSError, ValueError):
                 pass
             now = time.monotonic()

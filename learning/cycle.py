@@ -14,6 +14,7 @@ from memory.former import Experience
 from memory.learning_projects import LearningExecutive
 from .datasets import ExperienceDataset, SCOPE, sha
 from .capabilities import default_registry
+import importlib.util
 from .foundry import atomic_json
 
 
@@ -56,11 +57,15 @@ def ingest_episode(root, dataset, gateway):
     finally: source.close()
 
 
-def run_plan(plan, dataset, output, *, driver=None):
+def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
     """Frozen alternative comparison; final test never ranks architectures."""
+    if gameplay_active(): raise RuntimeError('offline learning unavailable during active gameplay')
     from experiments.ppal.progress_supervision import supervise
-    from .foundry import evaluate
-    journal=dataset.journal; snapshot=journal.get(plan['dataset_id']).data['payload']
+    from .foundry import evaluate, discover_groups
+    journal=dataset.journal
+    committed=[r.data['payload']['plan'] for r in journal.records('event') if r.data['payload'].get('category')=='offline_experiment_plan' and r.data['payload']['plan']['prediction_id']==plan['prediction_id']]
+    if len(committed)!=1 or committed[0]!=plan: raise ValueError('execution must match the exact committed chooser plan')
+    snapshot=journal.get(plan['dataset_id']).data['payload']
     resolved=journal.resolution_for(plan['prediction_id'])
     if resolved:
         return dict(status='already_resolved',resolution=resolved.data['payload'],resolution_id=resolved.id)
@@ -73,7 +78,7 @@ def run_plan(plan, dataset, output, *, driver=None):
         if not (candidate/'training.json').exists():
             cmd=[sys.executable,'-m','learning.worker',str(config_path)]
             rc=(driver(cmd,candidate/'progress.json',budget=config['budget_seconds']+40) if driver else
-                supervise(cmd,candidate/'progress.json',silence=30.,processing=30.,budget=config['budget_seconds']+40))
+                supervise(cmd,candidate/'progress.json',silence=30.,processing=30.,budget=config['budget_seconds']+40,on_progress=on_progress))
             if rc!=0:
                 journal.append('event',dict(category='offline_experiment_deferred',prediction_id=plan['prediction_id'],returncode=rc,
                     checkpoint=str(candidate/'last.pt'),reason='worker yielded, failed or stopped; no verdict fabricated'),
@@ -90,12 +95,22 @@ def run_plan(plan, dataset, output, *, driver=None):
     selected=journal.append('event',dict(category='model_candidate_selected',candidate_id=candidate['identifier'],
         criterion='validation loss only',alternatives=[dict(id=v['identifier'],validation_loss=v['validation_loss']) for _,v in training]),
         episode=SCOPE,sources=[r.id for r,_ in training],producer='ModelFoundry',version='ala-1')
-    metric=evaluate(snapshot,candidate)
-    outcome=journal.append('observation',dict(category='offline_model_evaluation',ee_episode=SCOPE,
-        prediction_id=plan['prediction_id'],candidate=candidate,metrics=metric,
-        experiment_kind='offline',independence_unit=plan['independence_unit'],
-        semantic_finding='UNKNOWN',physical_performance='not tested'),episode=SCOPE,
-        at=time.monotonic(),sources=[selected.id,plan['dataset_id']],producer='ModelFoundry',version='ala-1')
+    prior=[r for r in journal.records('observation') if r.data['payload'].get('category')=='offline_model_evaluation' and r.data['payload'].get('prediction_id')==plan['prediction_id']]
+    if len(prior)>1: raise ValueError('conflicting final evaluations; create an explicit version')
+    if prior:
+        outcome=prior[0]; value=outcome.data['payload']
+        if value['candidate']!=candidate: raise ValueError('frozen evaluation candidate changed')
+        metric=value['metrics']
+    else:
+        metric=evaluate(snapshot,candidate)
+        groups=discover_groups(snapshot,candidate,output)
+        journal.append('event',dict(category='opaque_visual_groups',interpretation=groups),episode=SCOPE,
+            sources=[selected.id,plan['dataset_id']],producer='Meditation:learned-representation',version='ala-1')
+        outcome=journal.append('observation',dict(category='offline_model_evaluation',ee_episode=SCOPE,
+            prediction_id=plan['prediction_id'],candidate=candidate,metrics=metric,
+            experiment_kind='offline',independence_unit=plan['independence_unit'],
+            semantic_finding='UNKNOWN',physical_performance='not tested'),episode=SCOPE,
+            at=time.monotonic(),sources=[selected.id,plan['dataset_id']],producer='ModelFoundry',version='ala-1')
     forecast=journal.get(plan['prediction_id']).data
     in_horizon=forecast['at'] < outcome.data['at'] <= forecast['payload']['deadline']
     verdict=('supported' if metric['improved'] else 'contradicted') if in_horizon else 'unresolved'
@@ -110,7 +125,7 @@ def run_plan(plan, dataset, output, *, driver=None):
         evaluation_id=outcome.id,deployment_proposal=proposal.id,metrics=metric,candidate_id=candidate['identifier'])
 
 
-def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None, executive=None):
+def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None, executive=None, on_progress=None):
     """Existing Executive selects portfolio; existing chooser selects method trial."""
     if gameplay_active(): raise RuntimeError('offline learning unavailable during active gameplay')
     if not 1<=max_jobs<=8 or not 1<=budget_seconds<=3600: raise ValueError('bounded offline resources required')
@@ -128,14 +143,16 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
     for _ in range(max_jobs):
         remaining=budget_seconds-(time.monotonic()-started)
         if remaining<1: break
-        selection=executive.select(methods={'cnn-reconstruction','cnn-classification'},
+        available = {'cnn-reconstruction','cnn-classification'} if importlib.util.find_spec('torch') else set()
+        selection=executive.select(methods=available,
             resources={'offline-slot','RGB-examples','torch'},authorized_methods={'cnn-reconstruction','cnn-classification'})
         if not selection['project']: break
         project=selection['project']; context=executive.chooser_context(project['id'])
         plan=select_offline_experiment(gateway,dataset.journal,context,budget_seconds=remaining)
         if plan is None or plan['prediction_id'] in seen: break
         seen.add(plan['prediction_id'])
-        result=run_plan(plan,dataset,dataset.artifacts.parent/'models',driver=driver)
+        result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups'},
+            authorized={project['method']},plan=plan,dataset=dataset,output=dataset.artifacts.parent/'models',driver=driver,on_progress=on_progress)
         if result['status'] in ('resolved','already_resolved'):
             if result['status']=='already_resolved':
                 payload=result['resolution']; result.update(result=payload['result'],reason=payload['reason'])
@@ -146,6 +163,9 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
                 source='learning:foundry-resolution',subject=project['id'],goal=project['goal'],
                 outcome=json.dumps(result.get('metrics',{})),significant=True,
                 tags=('offline','diagnostic','uncertain'),evidence=result['resolution_id']))
+        if result['status']=='resolved':
+            from experiments.ppal.reflect_robotron import reflect_model_outcome
+            result['reflection']=reflect_model_outcome(dataset.journal,plan,result,gateway)
         results.append(dict(project_id=project['id'],selection=selection,plan=plan,result=result))
         if result['status']=='deferred': break
         # Serial offline jobs can serve additional projects; no second physical
@@ -157,6 +177,18 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         autonomy='bounded rule-based evidence-to-experiment control, not general intelligence',
         physical_gameplay_improvement='not demonstrated')
     atomic_json(dataset.artifacts.parent/'ala-report.json',report)
+    lines=['ALA-1 offline learning report','',report['autonomy'],'']
+    for item in results:
+        result=item['result']
+        lines.extend([f"Project {item['project_id'][:12]}: {item['selection']['project']['goal']}",
+            'Selection: '+item['plan']['reason'],
+            f"Prediction {item['plan']['prediction_id'][:12]}: {item['plan']['expected']}",
+            'Resolution: '+result.get('result',result['status']),
+            'Diagnostic metrics: '+json.dumps(result.get('metrics',{})),
+            'Next: '+(report['projects'][item['project_id']].get('completion_rationale') or 'Resume the checkpointed investigation; prediction unresolved'),
+            'Physical task improvement: UNKNOWN',''])
+    if not results: lines.append('No justified executable experiment under current evidence and resources.')
+    (dataset.artifacts.parent/'ala-report.md').write_text('\n'.join(lines)+'\n')
     return report
 
 
@@ -184,3 +216,24 @@ def main():
         finally: journal.close()
 
 if __name__=='__main__': main()
+
+
+def postgame_learning(root, source_journal, episode, context, gateway, executive, output, *, budget_seconds=60., on_progress=None):
+    """Optional existing between-game hook; reuse already computed context."""
+    output=Path(output); output.mkdir(parents=True,exist_ok=True)
+    with (output/'offline.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        journal=EvidenceJournal(output/'learning-evidence.sqlite3')
+        dataset=ExperienceDataset(journal,output/'pixels')
+        try:
+            reference=journal.append('observation',dict(category='learning_context_reference',context=context,
+                source_journal=str(source_journal.path.resolve()),source_id=context['evidence_id'],source_episode=episode),
+                episode=SCOPE,producer='existing-evidence-consolidation',version='ala-1')
+            for path in sorted(Path(root).glob('review-*.jpg')):
+                dataset.add(path,episode=episode,source=dict(journal=str(source_journal.path.resolve()),
+                    context_id=context['evidence_id'],artifact=str(path.resolve()),sha256=sha(path)),
+                    metadata=dict(review_subset=True,identity_status='unknown',physical_experiment=episode,
+                        temporal_context='see original agency/action evidence',context_reference=reference.id))
+                if on_progress: on_progress()
+            return investigate(dataset,gateway,budget_seconds=budget_seconds,executive=executive,on_progress=on_progress)
+        finally: journal.close()

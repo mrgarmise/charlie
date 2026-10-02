@@ -215,9 +215,10 @@ def select_offline_experiment(gateway, journal, project_context, *, budget_secon
         uncertainty='diagnostic expectation, no semantic or score claim'),episode=SCOPE,at=at,
         deadline=at+budget_seconds+60,sources=[recalled.id],producer='existing-memory-offline-test',version='ala-1',mode='live_prospective')
     plan=dict(project_id=project_context['project_id'],prediction_id=prediction.id,memory_id=row['id'],
-        dataset_id=spec['dataset_id'],expected=spec['expected'],condition=spec['scope'],candidates=candidates,
+        dataset_id=spec['dataset_id'],expected=spec['expected'],condition=dict(spec['scope'],dataset_id=spec['dataset_id']),candidates=candidates,
         budget_seconds=budget_seconds,experiment_kind='offline',
         independence_unit=digest(sorted({r['independence_group'] for r in snapshot['examples'] if r['partition']=='test'})),
+        evidence_groups=sorted({r['source_episode'] for r in snapshot['examples'] if r['partition']=='test'}),
         source_evidence=spec['source_evidence'],alternatives=[dict(memory_id=r['id'],evaluator_priority=r['priority'],rank=s['rank']) for r,s in choices],
         method_alternatives=spec['alternatives'],reason='existing Evaluator priority, then independent coverage; architecture comparison on validation only')
     journal.append('event',dict(category='offline_experiment_plan',key=key,plan=plan),episode=SCOPE,

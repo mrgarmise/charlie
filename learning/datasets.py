@@ -6,6 +6,7 @@ Annotations are separate evidence. Model/replay labels cannot become verificatio
 from pathlib import Path
 import hashlib
 import io
+import os
 from PIL import Image
 from memory.evidence import digest
 
@@ -34,7 +35,13 @@ class ExperienceDataset:
         pixel_hash=hashlib.sha256(pixels).hexdigest()
         target=self.artifacts/(pixel_hash+'.png')
         if not target.exists():
-            tmp=target.with_suffix('.tmp'); tmp.write_bytes(pixels); tmp.replace(target)
+            tmp=target.with_suffix('.tmp')
+            with tmp.open('wb') as stream:
+                stream.write(pixels); stream.flush(); os.fsync(stream.fileno())
+            tmp.replace(target)
+            descriptor=os.open(str(target.parent),os.O_DIRECTORY)
+            try: os.fsync(descriptor)
+            finally: os.close(descriptor)
         if sha(target)!=pixel_hash: raise ValueError('pixel artifact modified')
         return self.journal.append('observation',dict(category='experience_example',
             source_episode=episode,source=source,original_path=str(path.resolve()),original_sha256=original_hash,
@@ -54,6 +61,8 @@ class ExperienceDataset:
         if supersedes:
             old=self.journal.get(supersedes)
             if old.data['payload'].get('example')!=example: raise ValueError('correction escaped example')
+            latest=next(r for r in self.examples() if r['id']==example)['annotation']
+            if latest is None or latest['id']!=supersedes: raise ValueError('correction must supersede the latest interpretation')
             sources.append(supersedes)
         elif any(r.data['payload'].get('example')==example for r in self.journal.records('event') if r.data['payload'].get('category')=='dataset_annotation'):
             raise ValueError('annotation correction must explicitly supersede prior evidence')
@@ -88,8 +97,23 @@ class ExperienceDataset:
                 seen[key]=r['source_episode']
         groups=sorted(set(find(x) for x in parent))
         if len(groups)<3: raise ValueError('need three independent episode groups for train/validation/test')
+        prior_roles={}
+        for previous in self.journal.records('event'):
+            doc=previous.data['payload']
+            if doc.get('category')!='experience_dataset_snapshot': continue
+            for example in doc['examples']:
+                if example['source_episode'] in parent:
+                    group=find(example['source_episode'])
+                    prior_roles.setdefault(group,set()).add(example['partition'])
+        if any(len(roles)>1 for roles in prior_roles.values()):
+            raise ValueError('new duplicate joins previously isolated evaluation partitions')
         if split is None:
-            split={g:('test' if i==len(groups)-1 else 'validation' if i==len(groups)-2 else 'train') for i,g in enumerate(groups)}
+            if prior_roles:
+                split={g:next(iter(prior_roles[g])) if g in prior_roles else 'train' for g in groups}
+            else:
+                split={g:('test' if i==len(groups)-1 else 'validation' if i==len(groups)-2 else 'train') for i,g in enumerate(groups)}
+        if any(split.get(g) not in roles for g,roles in prior_roles.items()):
+            raise ValueError('preserved evaluation groups cannot enter another partition')
         if set(split)!=set(groups) or set(split.values())!={'train','validation','test'}:
             raise ValueError('all groups must be assigned exactly one independent partition')
         unique={}

@@ -15,7 +15,13 @@ from .datasets import sha
 
 
 def atomic_json(path, data):
-    path=Path(path); tmp=path.with_suffix('.tmp'); tmp.write_text(json.dumps(data,indent=2,allow_nan=False)+'\n'); tmp.replace(path)
+    path=Path(path); tmp=path.with_suffix('.tmp')
+    with tmp.open('w') as stream:
+        stream.write(json.dumps(data,indent=2,allow_nan=False)+'\n'); stream.flush(); os.fsync(stream.fileno())
+    tmp.replace(path)
+    descriptor=os.open(str(path.parent),os.O_DIRECTORY)
+    try: os.fsync(descriptor)
+    finally: os.close(descriptor)
 
 
 def validate_spec(spec):
@@ -76,6 +82,7 @@ def load_data(snapshot, size, partitions=('train','validation','test')):
 def checkpoint(path, value):
     import torch
     path=Path(path); tmp=path.with_suffix('.tmp'); torch.save(value,tmp)
+    with tmp.open('rb') as stream: os.fsync(stream.fileno())
     fingerprint=sha(tmp); target=path.parent/(fingerprint+'.pt')
     if target.exists(): tmp.unlink()
     else: tmp.replace(target)
@@ -166,3 +173,31 @@ def evaluate(snapshot, candidate):
     return dict(metric=metric,candidate=score,baseline=baseline,improved=improved,
         examples=len(x['test']),independence_groups=sorted({r['independence_group'] for r in snapshot['examples'] if r['partition']=='test'}),
         limitations=['one held-out partition; no physical gameplay utility established','no semantic discovery or SELF certification inferred'])
+
+
+def discover_groups(snapshot,candidate,output):
+    """Train-only latent clustering; category names remain opaque hypotheses."""
+    import torch
+    spec=candidate['spec']; x,_,classes=load_data(snapshot,spec['size'])
+    model=build(spec,len(classes)); model.load_state_dict(checked_load(candidate['checkpoint'])['weights']); model.eval()
+    arrays={}
+    with torch.no_grad():
+        for partition in x: arrays[partition]=model[0](x[partition]).flatten(1).numpy()
+    # Centers fitted only on train. No new label is added to ExperienceDataset.
+    train_vectors=arrays['train']; count=min(4,len(train_vectors))
+    centers=train_vectors[np.linspace(0,len(train_vectors)-1,count,dtype=int)].copy()
+    for _ in range(12):
+        assignments=((train_vectors[:,None]-centers[None])**2).mean(2).argmin(1)
+        new=np.stack([train_vectors[assignments==i].mean(0) if (assignments==i).any() else centers[i] for i in range(count)])
+        if np.allclose(new,centers): break
+        centers=new
+    groups={}
+    for partition,vectors in arrays.items():
+        groups[partition]=((vectors[:,None]-centers[None])**2).mean(2).argmin(1).tolist()
+    path=Path(output)/'embeddings.npz'; tmp=path.with_suffix('.tmp')
+    with tmp.open('wb') as stream:
+        np.savez_compressed(stream,centers=centers,**arrays); stream.flush(); os.fsync(stream.fileno())
+    tmp.replace(path)
+    return dict(candidate_id=candidate['identifier'],artifact=str(path.resolve()),sha256=sha(path),groups=groups,
+        vocabulary=[f"opaque:{candidate['identifier'][:12]}:{i}" for i in range(count)],
+        label_status='unverified interpretation; not training labels',fit_partition='train')

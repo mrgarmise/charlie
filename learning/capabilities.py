@@ -19,6 +19,19 @@ class CapabilityRegistry:
         self._items[capability.id]=capability
     def describe(self): return [asdict(c) for c in self._items.values()]
     def get(self, identifier): return self._items[identifier]
+    def invoke(self, identifier, *, resources, authorized, **inputs):
+        capability=self.get(identifier)
+        if identifier not in authorized or set(capability.inputs)-set(resources):
+            raise ValueError('available inputs and separate method authorization required')
+        if identifier in ('cnn-reconstruction','cnn-classification'):
+            from .cycle import run_plan, gameplay_active
+            if gameplay_active(): raise RuntimeError('offline capability unavailable during gameplay')
+            objective='reconstruction' if identifier=='cnn-reconstruction' else 'classification'
+            if inputs['dataset'].journal.get(inputs['plan']['dataset_id']).data['payload']['objective']!=objective:
+                raise ValueError('method does not match the frozen objective')
+            return run_plan(**inputs)
+        raise ValueError('capability is a prospective evidence request; no acquisition adapter available')
+
 
 def default_registry():
     registry=CapabilityRegistry()

@@ -119,7 +119,7 @@ def resolve_experiment(root, episode_journal, episode, commitment_journal, plan,
     report=json.loads((Path(root)/'report.json').read_text())
     read_verified=ArtifactReader(root)
     attempts=[s for s in report.get('steps',[]) if (s.get('experiment') or {}).get('prediction_id')==plan['prediction_id']]
-    result='unresolved';reason='experiment not executed';source_ids=[];matching=None
+    result='unresolved';reason='experiment not executed';source_ids=[];matching=None;observed=None
     if attempts:
         step=attempts[0];context=step['experiment'];track_id=context['track_id']
         reason='no trustworthy same-ID response window'
@@ -132,6 +132,7 @@ def resolve_experiment(root, episode_journal, episode, commitment_journal, plan,
                     or window.get('move')!=plan['body']):continue
             matching=record
             evidence=next((e for e in row.get('evidence',[]) if e.get('track_id')==track_id),None)
+            observed=evidence
             at=data['at']
             if (at is None or at<=plan['prediction_at'] or at>plan['deadline']
                     or control.get('started_at',-1)<=plan['prediction_at']
@@ -172,6 +173,7 @@ def resolve_experiment(root, episode_journal, episode, commitment_journal, plan,
     after=next((r for r in gateway.evaluator.recent(100) if r['id']==plan['memory_id']),{})
     return dict(prediction_id=plan['prediction_id'],result=result,reason=reason,
         resolution_id=resolution.id,memory_id=plan['memory_id'],belief_change=change,
+        outcome_evidence_ids=source_ids,canonical_response_evidence=matching.id if matching else None,observed_agency_evidence=observed,
         memory_evaluation_before={k:before.get(k) for k in ('status','priority')},
         memory_evaluation_after={k:after.get(k) for k in ('status','priority')},
         hypothesis_status='tentative; no physical identity or game-rule certification',

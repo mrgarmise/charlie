@@ -382,3 +382,32 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def reflect_episode_context(root,journal,episode,gateway,*,plan=None,resolution=None,meditation=None):
+    """Connect evidence gaps to existing Reflection, memory and question queue.
+
+    These are interpretation questions, not tactical proposals or selected goals.
+    Replay records remain correlated observations of one source episode.
+    """
+    from memory.evidence import ArtifactReader,digest
+    read=ArtifactReader(root);sources=[];identities=Counter();report={};external=[]
+    for record in journal.records('observation'):
+        if record.data['episode']!=episode:continue
+        category=record.data['payload'].get('category')
+        if category not in ('session_report','agency_tracking_observation','external_observation'):continue
+        row=read(record.data['payload']['artifact']);sources.append(record.id)
+        if category=='session_report':report=row
+        elif category=='external_observation':external.append(row)
+        else:identities[row.get('identity_status','unknown')]+=1
+    questions=[]
+    if identities.get('unknown'):questions.append(dict(category='self_uncertainty',question='Which observations distinguish loss of identity from loss of the physical object?',measured=dict(unknown_samples=identities['unknown'],samples=sum(identities.values()))))
+    if (report.get('episode_end') or {}).get('confirmed') is not True:questions.append(dict(category='episode_boundary',question='Which missing independent observations could settle the episode boundary?',measured=dict(result=report.get('result'),boundary='unverified')))
+    if meditation and meditation.get('merges'):questions.append(dict(category='retrospective_identity',question='Which additional observations could verify or contradict the reconstructed identity links?',measured=dict(hypothesized_links=len(meditation['merges']),independently_verified_links=None)))
+    score=[dict(source='automated_tracker_report',value=(report.get('score_summary') or {}).get('self_score',report.get('score')),verified=False),*external]
+    if external:questions.append(dict(category='observation_agreement',question='What explains disagreement between these separately preserved observations?',measured=dict(observations=score)))
+    context=dict(category='postgame_learning_context',independent_source_episodes=1,objective='official_game_score',prediction=plan,resolution=resolution,identity_samples=dict(identities),score_observations=score,causal_performance_change='unknown; no controlled comparison',questions=questions,meditation_provenance={k:meditation.get(k) for k in ('source_sha256','version')} if meditation else None,meditation_status='retrospective hypotheses, not verified physical identity' if meditation else 'unavailable')
+    event=journal.append('event',context,episode=episode,sources=tuple(sources),producer='Reflection',version='episode-context-v1')
+    for question in questions:_queue_question(gateway.evaluator.path.with_name('robotron-questions.jsonl'),dict(question,id=digest(dict(episode=episode,question=question)),status='open',recording=str(root),evidence=event.id,episode=episode))
+    gateway.remember(Experience(kind='observation',summary=f"One source episode: identity reports {dict(identities)}; outcome {report.get('result')}; experiment {(resolution or {}).get('result','none')}; {len(questions)} unresolved evidence questions. Retrospective links and score changes do not establish causal performance improvement",source='ppal:episode-context-reflection',subject=episode,confidence=1.,significant=True,tags=('reflection','diagnostic','uncertain'),evidence=event.id))
+    return dict(context,evidence_id=event.id)

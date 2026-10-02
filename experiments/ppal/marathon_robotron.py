@@ -69,7 +69,7 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
     """Existing E/E + Reflection + Meditation + Evaluator, between games only."""
     from memory.evidence import EvidenceJournal
     from .episode_evidence import import_episode, derive_episode, summarize
-    from .reflect_robotron import reflect_evidence, reflect_actuator_evidence, reflect_learning_projects
+    from .reflect_robotron import reflect_evidence, reflect_actuator_evidence, reflect_learning_projects, reflect_episode_context
     from .experiment_return import resolve_experiment
     from .meditate_robotron import meditate, quality
     from .evaluate_robotron_shadow import evaluate
@@ -123,12 +123,27 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
         meditation=None
         if (game/'tracks.json').exists():
             tracks=json.loads((game/'tracks.json').read_text()).get('tracks',[])
-            rebuilt,history,merges=meditate(tracks,on_progress=pulse)
-            meditation={'source':str(game/'tracks.json'),'history':history,'merges':merges,
-                        'quality':quality(rebuilt),'note':'offline interpreted IDs; not canonical identity or policy advice'}
+            import hashlib
+            source_hash=hashlib.sha256((game/'tracks.json').read_bytes()).hexdigest()
+            cached=load_report(output/'meditation.json')
+            if cached and cached.get('source_sha256')==source_hash and cached.get('version')=='reconstruction-v1':
+                meditation=cached; pulse()
+            else:
+                rebuilt,history,merges=meditate(tracks,on_progress=pulse)
+                meditation=dict(source=str(game/'tracks.json'),source_sha256=source_hash,version='reconstruction-v1',history=history,merges=merges,quality=quality(rebuilt),note='offline interpreted IDs; not canonical identity or policy advice')
             (output/'meditation.json').write_text(json.dumps(meditation,indent=2)+'\n')
+        stage('context_reflection')
+        context=reflect_episode_context(game,journal,episode,gateway,plan=plan,resolution=resolution,meditation=meditation)
+        (output/'learning-report.md').write_text(
+            f"Episode: {episode}\n\nObjective: official game score. Experiment: BODY={(plan or {}).get('body','UNKNOWN')} FIRE={(plan or {}).get('fire','UNKNOWN')}; expected={(plan or {}).get('expected','none justified')}.\n\n"
+            f"Prediction resolution: {(resolution or {}).get('result','no commitment')}; {(resolution or {}).get('reason','no resolving evidence')}.\n\n"
+            f"Resolving evidence: {(resolution or {}).get('canonical_response_evidence','NONE')}; resolution={(resolution or {}).get('resolution_id','NONE')}. Memory update: {(resolution or {}).get('belief_change','none')}.\n\n"
+            f"Identity reports: {context['identity_samples']} (provisional remains provisional).\n\n"
+            f"Score observations: {context['score_observations']}. Causal performance improvement: UNKNOWN.\n\n"
+            f"Meditation: {context['meditation_status']}. Replay tests are correlated diagnostics from one episode.\n\nOpen questions:\n\n"
+            +''.join('- '+q['question']+'\n' for q in context['questions']))
         result={'episode':episode,'resolution':resolution,'reflection':reflection,
-                'proposals':proposals,'meditation':str(output/'meditation.json') if meditation else None,
+                'proposals':proposals,'learning_context':context,'meditation':str(output/'meditation.json') if meditation else None,
                 'evidence':summarize(journal,episode)}
         if executive is not None:
             result['learning_projects'] = project_updates
@@ -306,13 +321,17 @@ def safe_to_restart(report, returncode=0):
         return False
     end = report.get('episode_end', {})
     evidence = end.get('evidence') or {}
-    return (report.get('result') == 'GAME OVER' and end.get('state') == 'game_over'
-            and end.get('confirmed') is True and isinstance(evidence, dict)
-            and evidence.get('rule') == 'persistent_not_gameplay_plus_no_controlled_self'
-            and evidence.get('not_gameplay_streak', 0) >= 8
-            and evidence.get('agency_failures', 0) >= 1
-            and (evidence.get('screen') or {}).get('state') == 'not_gameplay'
-            and (evidence.get('screen') or {}).get('phase') in ('startable','terminal'))
+    terminal=(report.get('result')=='GAME OVER' and end.get('state')=='game_over' and end.get('confirmed') is True
+        and evidence.get('not_gameplay_streak',0)>=8 and (evidence.get('screen') or {}).get('state')=='not_gameplay'
+        and (evidence.get('screen') or {}).get('phase') in ('startable','terminal'))
+    causal=evidence.get('rule')=='persistent_not_gameplay_plus_no_controlled_self' and evidence.get('agency_failures',0)>=1
+    visual=(evidence.get('rule')=='gameplay_terminal_attract_sequence' and evidence.get('established_gameplay') is True
+        and evidence.get('terminal_corroborated') is True and evidence.get('attract_streak',0)>=3
+        and len(set(evidence.get('terminal_capture_timestamps',[])))>=3
+        and len(set(evidence.get('attract_capture_timestamps',[])))>=3
+        and (evidence.get('screen') or {}).get('phase')=='startable')
+    return terminal and (causal or visual)
+
 
 
 def write_session(path, doc):

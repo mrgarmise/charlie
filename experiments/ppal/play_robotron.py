@@ -738,6 +738,8 @@ def main():
         pending_origin = None
         pending_origin_at = None
         episode_observer = EpisodeEndObserver(required_not_gameplay=8)
+        for watched in startup_watch:
+            episode_observer.observe_phase(dict(watched['screen_state'],capture_timestamp=watched.get('capture_timestamp')))
         print(f"CHARLIE LOOSE: diagnostic limit {args.seconds:.1f}s" if args.seconds else "CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state")
 
         while time.monotonic() < deadline:
@@ -781,6 +783,17 @@ def main():
             record_agency(agency_snapshot)
             pending_move = None
             pending_at = None
+            # Observe terminal transitions independently of a lingering SELF belief.
+            screen=classify_screen_state(playfield)
+            screen['capture_timestamp']=source.timestamp
+            episode_observer.observe_phase(screen)
+            if episode_observer.visual_boundary:
+                result='GAME OVER'
+                episode_end=dict(state='game_over',confirmed=True,evidence=episode_observer.evidence(screen=screen,self_lost_frames=lost))
+                save_review(raw,tick,'game-over')
+                diary.event('episode_boundary_confirmed',evidence=episode_end['evidence'])
+                print('GAME OVER CONFIRMED: gameplay → rankings → attract evidence')
+                break
             self_obs = self_tracker.observe_tracks(tick + 1, visual_agency.positions)
             agency_player = visual_agency.player
             new_player = None
@@ -891,7 +904,7 @@ def main():
                 # already-calibrated evidence, not the frame preceding it.
                 screen = classify_screen_state(latest_agency_frame if latest_agency_frame is not None else playfield)
                 screen['capture_timestamp'] = source.timestamp
-                episode_observer.observe_screen(screen['state'] if screen.get('phase') in ('startable','terminal','gameplay') else 'unknown')
+                episode_observer.observe_phase(screen)
                 if recovered is None and episode_observer.confirmed:
                     result = "GAME OVER"
                     episode_end = {

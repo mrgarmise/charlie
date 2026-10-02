@@ -172,3 +172,22 @@ def test_productive_budget_yields_then_retries(tmp_path):
     second=process_completed_episode(root,output,gateway,commitments)
     assert first['evidence']['records']==second['evidence']['records']
     commitments.close()
+
+
+def test_external_observations_preserve_capture_ids_and_do_not_adjudicate(tmp_path):
+    from experiments.ppal.reflect_robotron import reflect_episode_context
+    root=make_episode(tmp_path/'run');report=json.loads((root/'report.json').read_text());report['score']=3300
+    (root/'report.json').write_text(json.dumps(report));journal=EvidenceJournal(tmp_path/'e.sqlite3');episode=import_episode(root,journal)
+    original={r.id for r in journal.records('observation')}
+    (root/'external-observations.json').write_text(json.dumps([dict(source='physical observer',value=1300,timestamp=None)]))
+    assert import_episode(root,journal)==episode
+    assert len(journal.records('episode'))==1
+    assert original <= {r.id for r in journal.records('observation')}
+    assert len(journal.records('observation'))==len(original)+1
+    gateway=MemoryGateway(store=JsonlStore(tmp_path/'memory.jsonl'),evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3'))
+    context=reflect_episode_context(root,journal,episode,gateway,meditation=dict(merges=[{}],version='v1',source_sha256='raw'))
+    assert [x['value'] for x in context['score_observations']]==[3300,1300]
+    assert context['causal_performance_change'].startswith('unknown')
+    assert {'retrospective_identity','observation_agreement','episode_boundary'} <= {q['category'] for q in context['questions']}
+    assert json.loads((root/'report.json').read_text())['score']==3300
+    journal.close()

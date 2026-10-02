@@ -80,14 +80,14 @@ def _screen_labels(mask):
     if _LABEL_MASKS is None:
         from pathlib import Path
         directory = Path(__file__).resolve().parents[2]/'config/robotron/screen-labels'
-        _LABEL_MASKS = {name:np.asarray(Image.open(directory/f'{name}.png'))
+        _LABEL_MASKS = {name:[np.asarray(Image.open(path)) for path in sorted(directory.glob(name+'*.png'))]
                         for name in ('pregame','heroes','all-time')}
     scores={}
-    for name,reference in _LABEL_MASKS.items():
+    for name,references in _LABEL_MASKS.items():
         target=mask[15:130,80:560] if name!='all-time' else mask[140:300,80:560]
         scores[name]=max(float(cv2.matchTemplate(target,
             cv2.resize(reference,None,fx=scale,fy=scale,interpolation=cv2.INTER_NEAREST),
-            cv2.TM_CCOEFF_NORMED).max()) for scale in (.85,.925,1.,1.075,1.15))
+            cv2.TM_CCOEFF_NORMED).max()) for reference in references for scale in (.85,.925,1.,1.075,1.15))
     return scores
 
 

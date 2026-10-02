@@ -153,7 +153,12 @@ class RobotronHUDReader:
     def _read_channel(cls, channel: np.ndarray) -> tuple[int | None, float]:
         primary = cls._read_channel_at_threshold(channel)
         if primary[0] is not None:
-            return primary
+            nearby=[cls._read_channel_at_threshold(channel,t) for t in (190,205)]
+            if all(value==primary[0] and confidence>=.70 for value,confidence in nearby):
+                return primary[0],min(primary[1],*(confidence for _,confidence in nearby))
+            # An exact segment signature is not calibrated certainty. Unstable
+            # thresholds remain unreadable; no score/game/person-specific rule.
+            return None,0.
         # Camera exposure and arcade hue change luminous intensity. A dim
         # proposal must survive three independently thresholded shapes; never
         # select whichever threshold happens to yield a convenient number.

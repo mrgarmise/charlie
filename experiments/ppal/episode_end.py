@@ -16,6 +16,44 @@ class EpisodeEndObserver:
     required_not_gameplay: int = 8
     not_gameplay_streak: int = 0
     agency_failures: int = 0
+    established_gameplay: bool = False
+    terminal_streak: int = 0
+    terminal_corroborated: bool = False
+    attract_streak: int = 0
+    last_capture: float | None = None
+    phase_history: list | None = None
+    terminal_captures: list | None = None
+    attract_captures: list | None = None
+
+    def observe_phase(self, screen: dict) -> None:
+        """Fresh positive page transitions; UNKNOWN/SELF absence never suffice."""
+        at=screen.get('capture_timestamp')
+        if at is None or (self.last_capture is not None and at<=self.last_capture):return
+        self.last_capture=at
+        phase=screen.get('phase','unknown')
+        if self.phase_history is None:self.phase_history=[]
+        if not self.phase_history or self.phase_history[-1]['phase']!=phase:
+            self.phase_history.append(dict(phase=phase,capture_timestamp=at,reason=screen.get('reason'),label_scores=screen.get('label_scores')))
+        self.observe_screen(screen.get('state','unknown') if phase in ('gameplay','terminal','startable') else 'unknown')
+        if phase=='gameplay':
+            self.established_gameplay=True;self.terminal_streak=0;self.terminal_corroborated=False;self.attract_streak=0
+            self.terminal_captures=[];self.attract_captures=[]
+        elif phase=='terminal' and self.established_gameplay:
+            self.terminal_streak+=1;self.attract_streak=0;self.attract_captures=[]
+            self.terminal_captures=((self.terminal_captures or [])+[at])[-3:]
+            if self.terminal_streak>=3:self.terminal_corroborated=True
+        elif phase=='startable':
+            self.terminal_streak=0;self.attract_streak+=1
+            self.attract_captures=((self.attract_captures or [])+[at])[-self.required_not_gameplay:]
+        else:
+            self.terminal_streak=0;self.attract_streak=0;self.attract_captures=[]
+            if not self.terminal_corroborated:self.terminal_captures=[]
+
+    @property
+    def visual_boundary(self):
+        return (self.established_gameplay and self.terminal_corroborated
+                and self.attract_streak>=3 and self.not_gameplay_streak>=self.required_not_gameplay)
+
 
     def observe_screen(self, state: str) -> None:
         """Record visual evidence.
@@ -37,19 +75,22 @@ class EpisodeEndObserver:
 
     def self_reacquired(self) -> None:
         """A trustworthy SELF observation clears accumulated terminal suspicion."""
-        self.not_gameplay_streak = 0
+        if not self.phase_history or self.phase_history[-1]['phase']=='gameplay':self.not_gameplay_streak = 0
         self.agency_failures = 0
 
     @property
     def confirmed(self) -> bool:
-        return (
+        return self.visual_boundary or (
             self.not_gameplay_streak >= self.required_not_gameplay
             and self.agency_failures >= 1
         )
 
     def evidence(self, *, screen: dict, self_lost_frames: int) -> dict:
         return {
-            "rule": "persistent_not_gameplay_plus_no_controlled_self",
+            "rule": "gameplay_terminal_attract_sequence" if self.visual_boundary else "persistent_not_gameplay_plus_no_controlled_self",
+            "established_gameplay":self.established_gameplay,"terminal_corroborated":self.terminal_corroborated,
+            "attract_streak":self.attract_streak,"phase_history":self.phase_history or [],
+            "terminal_capture_timestamps":self.terminal_captures or [],"attract_capture_timestamps":self.attract_captures or [],
             "not_gameplay_streak": self.not_gameplay_streak,
             "agency_failures": self.agency_failures,
             "screen": screen,

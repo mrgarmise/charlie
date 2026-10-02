@@ -1,0 +1,3853 @@
+{
+  "schema": "charlie-physical-learning-audit-v1",
+  "baseline": "b9624ce",
+  "sessions": [
+    {
+      "session": "development-20261002-003511",
+      "archive_sha256": "0ec32e4ab56c9fe2a4f73c31fc0822d48e816e94965f64c36bf137cb06a831ec",
+      "report_sha256": "b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+      "provenance": {
+        "git_commit": "0bd08c1a2ce2019c37996ee6e72f99a1ba2d1636",
+        "dirty_worktree": true,
+        "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+      },
+      "agency_samples": 81,
+      "stop": "TIME LIMIT",
+      "score_tracker": {
+        "p1_score": 1000,
+        "p2_score": null,
+        "self_channel": 1,
+        "self_score": 1000,
+        "status": "measured",
+        "log": "score.jsonl",
+        "samples": 81,
+        "dropped_samples": 0,
+        "errors": 0,
+        "worker_finished": true,
+        "processing_seconds_total": 1.1841013420003037,
+        "processing_seconds_max": 0.02177342699997098,
+        "raw_frames": [
+          "score-raw-0001.png",
+          "score-raw-0002.png",
+          "score-raw-0003.png",
+          "score-raw-0004.png",
+          "score-raw-0005.png",
+          "score-raw-0006.png",
+          "score-raw-0007.png",
+          "score-raw-0008.png",
+          "score-raw-0009.png",
+          "score-raw-0010.png",
+          "score-raw-0011.png",
+          "score-raw-0012.png",
+          "score-raw-0013.png",
+          "score-raw-0014.png",
+          "score-raw-0015.png",
+          "score-raw-0016.png",
+          "score-raw-0023.png",
+          "score-raw-0067.png",
+          "score-raw-0068.png",
+          "score-raw-0074.png",
+          "score-raw-0077.png",
+          "score-raw-0081.png"
+        ],
+        "raw_frame_retention": "first 16 samples, up to 16 later accepted changes, final sample",
+        "omitted_change_frames": 0,
+        "accepted_confidence": {
+          "1": 0.9,
+          "2": null
+        },
+        "mode": "observational_background",
+        "timestamp_clock": "monotonic",
+        "metric": "official_game_score",
+        "policy_feedback": false
+      },
+      "startup": {
+        "clock": "monotonic",
+        "gameplay_timer_boundary": "after SELF discovery; includes reacquisition",
+        "first_life_lost_at": null,
+        "life_tracking": "unmeasured; SELF loss is not a life boundary",
+        "camera_initialization_started": 1155.767147171,
+        "exposure_started": 1157.657446522,
+        "exposure_finished": 1171.03710425,
+        "calibration_started": 1171.037143879,
+        "calibration_finished": 1198.888922688,
+        "camera_ready": 1198.889047392,
+        "start_decision": 1199.395590501,
+        "start_requested": 1199.795790262,
+        "start_transport": {
+          "command": "START",
+          "write_started_at": 1199.795810836,
+          "write_completed_at": 1199.795835929,
+          "ack_at": 1199.909894173,
+          "accepted": true
+        },
+        "start_acknowledged": 1199.909899766,
+        "candidate_watch_finished": 1203.151359367,
+        "first_visual_candidates_at": 1199.930181,
+        "first_classified_gameplay_at": 1200.507936,
+        "gameplay_confirmed_at": 1202.058756,
+        "self_discovery_started": 1203.151504941,
+        "first_body_probe_at": 1204.104151896,
+        "first_provisional_self_at": 1205.40366,
+        "first_provisional_self_recorded": 1205.617270239,
+        "self_discovery_finished": 1205.960560444,
+        "gameplay_timer_started_at": 1205.966075684,
+        "gameplay_deadline": 1225.966075684,
+        "first_ordinary_action_requested": 1206.202210105,
+        "first_ordinary_execution": {
+          "started_at": 1206.204325093,
+          "move": "N",
+          "fire": "NE",
+          "duration_ms": 80,
+          "commands": [
+            {
+              "command": "LS_UP",
+              "sent_at": 1206.204344816,
+              "ack_at": 1206.217004023
+            },
+            {
+              "command": "RS_UP_RIGHT",
+              "sent_at": 1206.217006838,
+              "ack_at": 1206.223110061
+            },
+            {
+              "command": "LS_CENTER",
+              "sent_at": 1206.30317465,
+              "ack_at": 1206.314114907
+            },
+            {
+              "command": "RS_CENTER",
+              "sent_at": 1206.314115814,
+              "ack_at": 1206.320123945
+            }
+          ],
+          "controls_ready_at": 1206.223112116,
+          "pulse_finished_at": 1206.303171631,
+          "returned_at": 1206.320124963
+        },
+        "first_confirmed_self_at": 1206.5895819999998,
+        "first_confirmed_self_recorded": 1206.799706236,
+        "stopped_at": 1226.040127303,
+        "start_to_first_ordinary_action_seconds": 6.408489164000002,
+        "start_to_first_ordinary_action_basis": "controller action start minus START local write completion; not remote execution/display onset"
+      },
+      "steps_identity": {
+        "provisional": 3,
+        "confirmed": 19
+      },
+      "committed_records": {
+        "episode": 1,
+        "observation": 296,
+        "event": 2257,
+        "resolution_reference": 1220,
+        "derivation_complete": 1
+      },
+      "commit_timeline": {
+        "episode": {
+          "count": 1,
+          "first": "2026-10-01T23:36:56.797852+00:00",
+          "last": "2026-10-01T23:36:56.797852+00:00"
+        },
+        "observation": {
+          "count": 296,
+          "first": "2026-10-01T23:36:56.810470+00:00",
+          "last": "2026-10-01T23:36:59.140106+00:00"
+        },
+        "event": {
+          "count": 2257,
+          "first": "2026-10-01T23:36:59.201921+00:00",
+          "last": "2026-10-01T23:38:01.866520+00:00"
+        },
+        "resolution_reference": {
+          "count": 1220,
+          "first": "2026-10-01T23:37:25.113090+00:00",
+          "last": "2026-10-01T23:37:55.746226+00:00"
+        },
+        "derivation_complete": {
+          "count": 1,
+          "first": "2026-10-01T23:37:55.767062+00:00",
+          "last": "2026-10-01T23:37:55.767062+00:00"
+        }
+      },
+      "live_resolutions": [],
+      "proposal_count": 36,
+      "meditation_history": [
+        {
+          "iteration": 1,
+          "tracks_before": 451,
+          "tracks_after": 407,
+          "merges": 44,
+          "quality": {
+            "all": {
+              "predictions": 1264,
+              "mean_error": 1.5520024654236095,
+              "median_error": 1.0903344487217839,
+              "p90_error": 3.744299051975556,
+              "within_2": 70.01582278481013,
+              "within_4": 91.06012658227849,
+              "within_7": 97.70569620253164
+            },
+            "adjacent": {
+              "predictions": 1196,
+              "mean_error": 1.3932564354877954,
+              "median_error": 1.0510643786776337,
+              "p90_error": 3.343896024848859,
+              "within_2": 72.65886287625418,
+              "within_4": 93.64548494983278,
+              "within_7": 98.4113712374582
+            },
+            "gaps": {
+              "predictions": 68,
+              "mean_error": 4.3440649919417496,
+              "median_error": 4.33432638645132,
+              "p90_error": 7.997972019431618,
+              "within_2": 23.529411764705884,
+              "within_4": 45.588235294117645,
+              "within_7": 85.29411764705883
+            },
+            "moving": {
+              "predictions": 1108,
+              "mean_error": 1.7434728978677985,
+              "median_error": 1.228665339263539,
+              "p90_error": 4.051802153911822,
+              "within_2": 66.06498194945848,
+              "within_4": 89.89169675090253,
+              "within_7": 97.47292418772564
+            },
+            "stationary": {
+              "predictions": 156,
+              "mean_error": 0.19207144524308864,
+              "median_error": 0.0390625,
+              "p90_error": 0.22250009753431294,
+              "within_2": 98.07692307692308,
+              "within_4": 99.35897435897436,
+              "within_7": 99.35897435897436
+            }
+          }
+        },
+        {
+          "iteration": 2,
+          "tracks_before": 407,
+          "tracks_after": 394,
+          "merges": 13,
+          "quality": {
+            "all": {
+              "predictions": 1277,
+              "mean_error": 1.579764819805282,
+              "median_error": 1.0903344487217868,
+              "p90_error": 3.7503616723738897,
+              "within_2": 69.30305403288959,
+              "within_4": 90.68128425998434,
+              "within_7": 97.5724353954581
+            },
+            "adjacent": {
+              "predictions": 1202,
+              "mean_error": 1.402263754378123,
+              "median_error": 1.0510643786776337,
+              "p90_error": 3.290563213319377,
+              "within_2": 72.3793677204659,
+              "within_4": 93.67720465890183,
+              "within_7": 98.33610648918469
+            },
+            "gaps": {
+              "predictions": 75,
+              "mean_error": 4.424515228384552,
+              "median_error": 4.4270833333333,
+              "p90_error": 7.787503413700873,
+              "within_2": 20.0,
+              "within_4": 42.666666666666664,
+              "within_7": 85.33333333333333
+            },
+            "moving": {
+              "predictions": 1142,
+              "mean_error": 1.7456688610923197,
+              "median_error": 1.228665339263539,
+              "p90_error": 4.125858102034655,
+              "within_2": 65.8493870402802,
+              "within_4": 89.66725043782837,
+              "within_7": 97.37302977232925
+            },
+            "stationary": {
+              "predictions": 135,
+              "mean_error": 0.17633952239937822,
+              "median_error": 0.052083333333328596,
+              "p90_error": 0.22250009753429298,
+              "within_2": 98.51851851851852,
+              "within_4": 99.25925925925925,
+              "within_7": 99.25925925925925
+            }
+          }
+        },
+        {
+          "iteration": 3,
+          "tracks_before": 394,
+          "tracks_after": 391,
+          "merges": 3,
+          "quality": {
+            "all": {
+              "predictions": 1280,
+              "mean_error": 1.5903689113176207,
+              "median_error": 1.0903344487217947,
+              "p90_error": 3.917778127978852,
+              "within_2": 69.0625,
+              "within_4": 90.46875,
+              "within_7": 97.5
+            },
+            "adjacent": {
+              "predictions": 1202,
+              "mean_error": 1.4034096050870506,
+              "median_error": 1.0564006823569463,
+              "p90_error": 3.290563213319377,
+              "within_2": 72.29617304492513,
+              "within_4": 93.67720465890183,
+              "within_7": 98.33610648918469
+            },
+            "gaps": {
+              "predictions": 78,
+              "mean_error": 4.471459758614357,
+              "median_error": 4.432591186747138,
+              "p90_error": 7.787503413700873,
+              "within_2": 19.23076923076923,
+              "within_4": 41.02564102564103,
+              "within_7": 84.61538461538461
+            },
+            "moving": {
+              "predictions": 1146,
+              "mean_error": 1.7564176114585,
+              "median_error": 1.2413496895482496,
+              "p90_error": 4.156094171316473,
+              "within_2": 65.6195462478185,
+              "within_4": 89.44153577661432,
+              "within_7": 97.29493891797557
+            },
+            "stationary": {
+              "predictions": 134,
+              "mean_error": 0.17028077429189134,
+              "median_error": 0.0455729166666643,
+              "p90_error": 0.2083333333333357,
+              "within_2": 98.50746268656717,
+              "within_4": 99.25373134328358,
+              "within_7": 99.25373134328358
+            }
+          }
+        },
+        {
+          "iteration": 4,
+          "tracks_before": 391,
+          "tracks_after": 390,
+          "merges": 1,
+          "quality": {
+            "all": {
+              "predictions": 1281,
+              "mean_error": 1.5936267702876121,
+              "median_error": 1.0903344487217947,
+              "p90_error": 3.918730063745141,
+              "within_2": 69.00858704137393,
+              "within_4": 90.39812646370024,
+              "within_7": 97.50195160031225
+            },
+            "adjacent": {
+              "predictions": 1202,
+              "mean_error": 1.4034096050870506,
+              "median_error": 1.0564006823569463,
+              "p90_error": 3.290563213319377,
+              "within_2": 72.29617304492513,
+              "within_4": 93.67720465890183,
+              "within_7": 98.33610648918469
+            },
+            "gaps": {
+              "predictions": 79,
+              "mean_error": 4.4878170559974215,
+              "median_error": 4.438099040160976,
+              "p90_error": 7.787503413700873,
+              "within_2": 18.9873417721519,
+              "within_4": 40.50632911392405,
+              "within_7": 84.81012658227849
+            },
+            "moving": {
+              "predictions": 1147,
+              "mean_error": 1.7599113068729881,
+              "median_error": 1.245720212429831,
+              "p90_error": 4.303104701194764,
+              "within_2": 65.56233653007847,
+              "within_4": 89.36355710549259,
+              "within_7": 97.29729729729729
+            },
+            "stationary": {
+              "predictions": 134,
+              "mean_error": 0.17028077429189134,
+              "median_error": 0.0455729166666643,
+              "p90_error": 0.2083333333333357,
+              "within_2": 98.50746268656717,
+              "within_4": 99.25373134328358,
+              "within_7": 99.25373134328358
+            }
+          }
+        },
+        {
+          "iteration": 5,
+          "tracks_before": 390,
+          "tracks_after": 390,
+          "merges": 0,
+          "quality": {
+            "all": {
+              "predictions": 1281,
+              "mean_error": 1.5936267702876121,
+              "median_error": 1.0903344487217947,
+              "p90_error": 3.918730063745141,
+              "within_2": 69.00858704137393,
+              "within_4": 90.39812646370024,
+              "within_7": 97.50195160031225
+            },
+            "adjacent": {
+              "predictions": 1202,
+              "mean_error": 1.4034096050870506,
+              "median_error": 1.0564006823569463,
+              "p90_error": 3.290563213319377,
+              "within_2": 72.29617304492513,
+              "within_4": 93.67720465890183,
+              "within_7": 98.33610648918469
+            },
+            "gaps": {
+              "predictions": 79,
+              "mean_error": 4.4878170559974215,
+              "median_error": 4.438099040160976,
+              "p90_error": 7.787503413700873,
+              "within_2": 18.9873417721519,
+              "within_4": 40.50632911392405,
+              "within_7": 84.81012658227849
+            },
+            "moving": {
+              "predictions": 1147,
+              "mean_error": 1.7599113068729881,
+              "median_error": 1.245720212429831,
+              "p90_error": 4.303104701194764,
+              "within_2": 65.56233653007847,
+              "within_4": 89.36355710549259,
+              "within_7": 97.29729729729729
+            },
+            "stationary": {
+              "predictions": 134,
+              "mean_error": 0.17028077429189134,
+              "median_error": 0.0455729166666643,
+              "p90_error": 0.2083333333333357,
+              "within_2": 98.50746268656717,
+              "within_4": 99.25373134328358,
+              "within_7": 99.25373134328358
+            }
+          }
+        }
+      ],
+      "meditation_links": 61,
+      "external_observations": []
+    },
+    {
+      "session": "development-20261002-005944",
+      "archive_sha256": "68ba09254926ee13d7cbc7813d82f52f139e79f8279505f3f888fddab9d49137",
+      "report_sha256": "d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da",
+      "provenance": {
+        "git_commit": "0bd08c1a2ce2019c37996ee6e72f99a1ba2d1636",
+        "dirty_worktree": true,
+        "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+      },
+      "agency_samples": 380,
+      "stop": "TIME LIMIT",
+      "score_tracker": {
+        "p1_score": 1200,
+        "p2_score": null,
+        "self_channel": 1,
+        "self_score": 1200,
+        "status": "measured",
+        "log": "score.jsonl",
+        "samples": 380,
+        "dropped_samples": 0,
+        "errors": 0,
+        "worker_finished": true,
+        "processing_seconds_total": 6.1496507420069975,
+        "processing_seconds_max": 0.022681739999825368,
+        "raw_frames": [
+          "score-raw-0001.png",
+          "score-raw-0002.png",
+          "score-raw-0003.png",
+          "score-raw-0004.png",
+          "score-raw-0005.png",
+          "score-raw-0006.png",
+          "score-raw-0007.png",
+          "score-raw-0008.png",
+          "score-raw-0009.png",
+          "score-raw-0010.png",
+          "score-raw-0011.png",
+          "score-raw-0012.png",
+          "score-raw-0013.png",
+          "score-raw-0014.png",
+          "score-raw-0015.png",
+          "score-raw-0016.png",
+          "score-raw-0020.png",
+          "score-raw-0115.png",
+          "score-raw-0136.png",
+          "score-raw-0181.png",
+          "score-raw-0380.png"
+        ],
+        "raw_frame_retention": "first 16 samples, up to 16 later accepted changes, final sample",
+        "omitted_change_frames": 0,
+        "accepted_confidence": {
+          "1": 0.9,
+          "2": null
+        },
+        "mode": "observational_background",
+        "timestamp_clock": "monotonic",
+        "metric": "official_game_score",
+        "policy_feedback": false
+      },
+      "startup": {
+        "clock": "monotonic",
+        "gameplay_timer_boundary": "after SELF discovery; includes reacquisition",
+        "first_life_lost_at": null,
+        "life_tracking": "unmeasured; SELF loss is not a life boundary",
+        "camera_initialization_started": 2628.216826795,
+        "exposure_started": 2630.059506415,
+        "exposure_finished": 2639.059418687,
+        "calibration_started": 2639.059459854,
+        "calibration_finished": 2658.618234224,
+        "camera_ready": 2658.618351503,
+        "start_decision": 2659.146190899,
+        "start_requested": 2659.396509432,
+        "start_transport": {
+          "command": "START",
+          "write_started_at": 2659.396532098,
+          "write_completed_at": 2659.396553802,
+          "ack_at": 2659.512062543,
+          "accepted": true
+        },
+        "start_acknowledged": 2659.51206708,
+        "candidate_watch_finished": 2662.85170109,
+        "first_visual_candidates_at": 2659.522163,
+        "first_classified_gameplay_at": 2660.06686,
+        "gameplay_confirmed_at": 2661.247036,
+        "self_discovery_started": 2662.851848424,
+        "first_body_probe_at": 2663.919828655,
+        "first_provisional_self_at": 2665.180956,
+        "first_provisional_self_recorded": 2665.394760952,
+        "self_discovery_finished": 2665.735887671,
+        "gameplay_timer_started_at": 2665.73673273,
+        "gameplay_deadline": 2785.73673273,
+        "first_ordinary_action_requested": 2665.979506955,
+        "first_ordinary_execution": {
+          "started_at": 2665.981483594,
+          "move": "E",
+          "fire": "NONE",
+          "duration_ms": 80,
+          "commands": [
+            {
+              "command": "LS_RIGHT",
+              "sent_at": 2665.981493445,
+              "ack_at": 2665.995225769
+            },
+            {
+              "command": "LS_CENTER",
+              "sent_at": 2666.075291938,
+              "ack_at": 2666.08842987
+            },
+            {
+              "command": "RS_CENTER",
+              "sent_at": 2666.088431055,
+              "ack_at": 2666.10396422
+            }
+          ],
+          "controls_ready_at": 2665.995228565,
+          "pulse_finished_at": 2666.075288827,
+          "returned_at": 2666.103965498
+        },
+        "first_confirmed_self_at": 2666.361133,
+        "first_confirmed_self_recorded": 2666.572579368,
+        "stopped_at": 2785.850223043,
+        "start_to_first_ordinary_action_seconds": 6.584929791999912,
+        "start_to_first_ordinary_action_basis": "controller action start minus START local write completion; not remote execution/display onset"
+      },
+      "steps_identity": {
+        "provisional": 3,
+        "confirmed": 64,
+        "unknown": 30
+      },
+      "committed_records": {
+        "episode": 1,
+        "observation": 1145,
+        "event": 7657,
+        "resolution_reference": 10812,
+        "derivation_complete": 1
+      },
+      "commit_timeline": {
+        "episode": {
+          "count": 1,
+          "first": "2026-10-02T00:02:59.485737+00:00",
+          "last": "2026-10-02T00:02:59.485737+00:00"
+        },
+        "observation": {
+          "count": 1145,
+          "first": "2026-10-02T00:02:59.497861+00:00",
+          "last": "2026-10-02T00:03:10.242834+00:00"
+        },
+        "event": {
+          "count": 7657,
+          "first": "2026-10-02T00:03:18.140350+00:00",
+          "last": "2026-10-02T00:19:31.365431+00:00"
+        },
+        "resolution_reference": {
+          "count": 10812,
+          "first": "2026-10-02T00:09:13.906814+00:00",
+          "last": "2026-10-02T00:16:55.925302+00:00"
+        },
+        "derivation_complete": {
+          "count": 1,
+          "first": "2026-10-02T00:16:56.057651+00:00",
+          "last": "2026-10-02T00:16:56.057651+00:00"
+        }
+      },
+      "live_resolutions": [
+        {
+          "at": 2666.361133,
+          "episode": "planned-episode:/home/five/Projects/charlie/robotron-runs/development-20261002-005944/game-01",
+          "kind": "resolution",
+          "payload": {
+            "error": null,
+            "prediction_id": "5462867db00e7d60d9dc54c16866a136d9e08c313f3b2c20b808aa84decc8fbd",
+            "reason": "existing AgencyTracker matched the evidence-derived modal response",
+            "result": "supported"
+          },
+          "producer": "existing-memory-actuator-test",
+          "provenance": {},
+          "schema": "charlie-evidence-v1",
+          "sources": [
+            "5462867db00e7d60d9dc54c16866a136d9e08c313f3b2c20b808aa84decc8fbd",
+            "017fcc67abcd157676aee2eda9e0152bd74807ec4bf4337b5020f8f84a4a5675"
+          ],
+          "version": "1"
+        }
+      ],
+      "proposal_count": 81,
+      "meditation_history": [
+        {
+          "iteration": 1,
+          "tracks_before": 1533,
+          "tracks_after": 1310,
+          "merges": 223,
+          "quality": {
+            "all": {
+              "predictions": 11035,
+              "mean_error": 0.8011413398104906,
+              "median_error": 0.052083333333328596,
+              "p90_error": 2.457455925695533,
+              "within_2": 87.17716357045764,
+              "within_4": 94.29995468962393,
+              "within_7": 97.78885364748527
+            },
+            "adjacent": {
+              "predictions": 10521,
+              "mean_error": 0.6728497210685745,
+              "median_error": 0.0390625,
+              "p90_error": 2.155174097520894,
+              "within_2": 89.1835376865317,
+              "within_4": 95.65630643474955,
+              "within_7": 98.34616481323069
+            },
+            "gaps": {
+              "predictions": 514,
+              "mean_error": 3.4271260105958974,
+              "median_error": 2.3054155501546503,
+              "p90_error": 7.9392495884546745,
+              "within_2": 46.10894941634241,
+              "within_4": 66.53696498054475,
+              "within_7": 86.38132295719845
+            },
+            "moving": {
+              "predictions": 6728,
+              "mean_error": 1.257216412791107,
+              "median_error": 0.16105881350068685,
+              "p90_error": 3.6861838885433063,
+              "within_2": 79.384661117717,
+              "within_4": 90.81450653983353,
+              "within_7": 96.4179548156956
+            },
+            "stationary": {
+              "predictions": 4307,
+              "mean_error": 0.08870273033438486,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.34989551892268,
+              "within_4": 99.74460181100534,
+              "within_7": 99.93034594845601
+            }
+          }
+        },
+        {
+          "iteration": 2,
+          "tracks_before": 1310,
+          "tracks_after": 1213,
+          "merges": 97,
+          "quality": {
+            "all": {
+              "predictions": 11132,
+              "mean_error": 0.8386052954819073,
+              "median_error": 0.05208333333333215,
+              "p90_error": 2.558055300106466,
+              "within_2": 86.6600790513834,
+              "within_4": 93.91843334531082,
+              "within_7": 97.58354293927417
+            },
+            "adjacent": {
+              "predictions": 10542,
+              "mean_error": 0.6794188582468853,
+              "median_error": 0.0390625,
+              "p90_error": 2.157689988174723,
+              "within_2": 89.10073989755264,
+              "within_4": 95.66495921077595,
+              "within_7": 98.33997343957503
+            },
+            "gaps": {
+              "predictions": 590,
+              "mean_error": 3.6829161790947924,
+              "median_error": 2.7344852248336435,
+              "p90_error": 8.235798026944622,
+              "within_2": 43.05084745762712,
+              "within_4": 62.71186440677966,
+              "within_7": 84.0677966101695
+            },
+            "moving": {
+              "predictions": 7052,
+              "mean_error": 1.27056943691361,
+              "median_error": 0.15625000000001066,
+              "p90_error": 3.7849213122966994,
+              "within_2": 79.32501418037437,
+              "within_4": 90.54169030062394,
+              "within_7": 96.22802041973908
+            },
+            "stationary": {
+              "predictions": 4080,
+              "mean_error": 0.09198492161515072,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.33823529411765,
+              "within_4": 99.75490196078431,
+              "within_7": 99.92647058823529
+            }
+          }
+        },
+        {
+          "iteration": 3,
+          "tracks_before": 1213,
+          "tracks_after": 1181,
+          "merges": 32,
+          "quality": {
+            "all": {
+              "predictions": 11164,
+              "mean_error": 0.8506833139405204,
+              "median_error": 0.05208333333333215,
+              "p90_error": 2.600648665410767,
+              "within_2": 86.49229666786098,
+              "within_4": 93.77463274811895,
+              "within_7": 97.50089573629523
+            },
+            "adjacent": {
+              "predictions": 10548,
+              "mean_error": 0.6826585923193129,
+              "median_error": 0.0390625,
+              "p90_error": 2.170469809838646,
+              "within_2": 89.05953735305272,
+              "within_4": 95.64846416382252,
+              "within_7": 98.33143723928707
+            },
+            "gaps": {
+              "predictions": 616,
+              "mean_error": 3.72783390429847,
+              "median_error": 2.7595159545395402,
+              "p90_error": 8.312188342632927,
+              "within_2": 42.532467532467535,
+              "within_4": 61.688311688311686,
+              "within_7": 83.27922077922078
+            },
+            "moving": {
+              "predictions": 7132,
+              "mean_error": 1.2788986310490964,
+              "median_error": 0.1562500000000071,
+              "p90_error": 3.826286583786865,
+              "within_2": 79.23443634324173,
+              "within_4": 90.3954010095345,
+              "within_7": 96.13011777902412
+            },
+            "stationary": {
+              "predictions": 4032,
+              "mean_error": 0.0932349901264422,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.33035714285714,
+              "within_4": 99.75198412698413,
+              "within_7": 99.92559523809524
+            }
+          }
+        },
+        {
+          "iteration": 4,
+          "tracks_before": 1181,
+          "tracks_after": 1169,
+          "merges": 12,
+          "quality": {
+            "all": {
+              "predictions": 11176,
+              "mean_error": 0.8547821613055504,
+              "median_error": 0.05208333333333215,
+              "p90_error": 2.605338278113375,
+              "within_2": 86.41732283464567,
+              "within_4": 93.72763063707946,
+              "within_7": 97.48568360773085
+            },
+            "adjacent": {
+              "predictions": 10551,
+              "mean_error": 0.6837093080952314,
+              "median_error": 0.0390625,
+              "p90_error": 2.1706943733515325,
+              "within_2": 89.03421476637286,
+              "within_4": 95.64970145009951,
+              "within_7": 98.33191166714056
+            },
+            "gaps": {
+              "predictions": 625,
+              "mean_error": 3.7427656400608686,
+              "median_error": 2.774751498195127,
+              "p90_error": 8.343672378566334,
+              "within_2": 42.24,
+              "within_4": 61.28,
+              "within_7": 83.2
+            },
+            "moving": {
+              "predictions": 7181,
+              "mean_error": 1.2772137199354703,
+              "median_error": 0.15625000000000355,
+              "p90_error": 3.828125,
+              "within_2": 79.27865199832893,
+              "within_4": 90.37738476535301,
+              "within_7": 96.12867288678457
+            },
+            "stationary": {
+              "predictions": 3995,
+              "mean_error": 0.09546275641907831,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.24906132665832,
+              "within_4": 99.7496871088861,
+              "within_7": 99.92490613266584
+            }
+          }
+        },
+        {
+          "iteration": 5,
+          "tracks_before": 1169,
+          "tracks_after": 1163,
+          "merges": 6,
+          "quality": {
+            "all": {
+              "predictions": 11182,
+              "mean_error": 0.8568303368875358,
+              "median_error": 0.05208333333333215,
+              "p90_error": 2.625466280098445,
+              "within_2": 86.37095331783223,
+              "within_4": 93.704167411912,
+              "within_7": 97.4870327311751
+            },
+            "adjacent": {
+              "predictions": 10552,
+              "mean_error": 0.6843040033929519,
+              "median_error": 0.0390625,
+              "p90_error": 2.173592087645832,
+              "within_2": 89.01630022744503,
+              "within_4": 95.65011372251706,
+              "within_7": 98.33206974981046
+            },
+            "gaps": {
+              "predictions": 630,
+              "mean_error": 3.746509497260312,
+              "median_error": 2.796006673346491,
+              "p90_error": 8.312188342632927,
+              "within_2": 42.06349206349206,
+              "within_4": 61.111111111111114,
+              "within_7": 83.33333333333333
+            },
+            "moving": {
+              "predictions": 7270,
+              "mean_error": 1.266626002881381,
+              "median_error": 0.15625000000000044,
+              "p90_error": 3.8033539900133815,
+              "within_2": 79.44979367262724,
+              "within_4": 90.45392022008254,
+              "within_7": 96.17606602475928
+            },
+            "stationary": {
+              "predictions": 3912,
+              "mean_error": 0.09527244021697023,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.23312883435582,
+              "within_4": 99.74437627811861,
+              "within_7": 99.92331288343559
+            }
+          }
+        },
+        {
+          "iteration": 6,
+          "tracks_before": 1163,
+          "tracks_after": 1161,
+          "merges": 2,
+          "quality": {
+            "all": {
+              "predictions": 11184,
+              "mean_error": 0.8572850613599201,
+              "median_error": 0.05208333333333215,
+              "p90_error": 2.629047805025825,
+              "within_2": 86.36444921316166,
+              "within_4": 93.69635193133047,
+              "within_7": 97.48748211731045
+            },
+            "adjacent": {
+              "predictions": 10552,
+              "mean_error": 0.6843040033929519,
+              "median_error": 0.0390625,
+              "p90_error": 2.173592087645832,
+              "within_2": 89.01630022744503,
+              "within_4": 95.65011372251706,
+              "within_7": 98.33206974981046
+            },
+            "gaps": {
+              "predictions": 632,
+              "mean_error": 3.745411839314743,
+              "median_error": 2.796006673346491,
+              "p90_error": 8.312188342632927,
+              "within_2": 42.08860759493671,
+              "within_4": 61.075949367088604,
+              "within_7": 83.38607594936708
+            },
+            "moving": {
+              "predictions": 7271,
+              "mean_error": 1.267207335517691,
+              "median_error": 0.15625000000000044,
+              "p90_error": 3.8106353591334057,
+              "within_2": 79.43886673084857,
+              "within_4": 90.44147985146472,
+              "within_7": 96.1765919405859
+            },
+            "stationary": {
+              "predictions": 3913,
+              "mean_error": 0.09558180161007314,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.23332481472016,
+              "within_4": 99.74444160490673,
+              "within_7": 99.92333248147202
+            }
+          }
+        }
+      ],
+      "meditation_links": 372,
+      "plan": {
+        "schema": "charlie-actuator-plan-v1",
+        "prediction_id": "5462867db00e7d60d9dc54c16866a136d9e08c313f3b2c20b808aa84decc8fbd",
+        "prediction_at": 2627.15646066,
+        "deadline": 2867.15646066,
+        "memory_id": "4449ab240d7e3aaee2d92e7a1d41ef411f371f64e506fae4c2b802ffade7cd32",
+        "decision_id": "experiment:5462867db00e7d60d9dc54c16866a136d9e08c313f3b2c20b808aa84decc8fbd",
+        "scope": "planned-episode:/home/five/Projects/charlie/robotron-runs/development-20261002-005944/game-01",
+        "body": "E",
+        "fire": "NONE",
+        "max_actions": 1,
+        "intended_game": "/home/five/Projects/charlie/robotron-runs/development-20261002-005944/game-01",
+        "source_episode": "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+        "source_evidence": [
+          "55096e837cbbed284ebfa02abbe56c3b78ca04c0d5e6b0e463c3190778b31e9b",
+          "3126b2c437eaf80f25520ee53ab7d8f881ed0a6e036d85a0c7128a6f520c160b",
+          "e5b3d4c33a5a4e8479226957be45fd311d367f6ca5a02402381a5b66f0b8a7fd"
+        ],
+        "expected": "signed_command_response",
+        "alternatives": [
+          {
+            "memory_id": "713c731fb4a3a88a1e16596b2cc02c1325d5fa69dc5497cd983d0e4cdaf21bba",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              2
+            ]
+          },
+          {
+            "memory_id": "b40496f0b38c8a1895ce227de87fafda6e4fac98da36546fb9650280f2c8a69e",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              3
+            ]
+          },
+          {
+            "memory_id": "13216dc6ce807d0b64597232b9823659ba134af80b9b0635fbbdc3edc45409fe",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              3
+            ]
+          },
+          {
+            "memory_id": "0a1c9eebc0e8532dce427c15864b1b2683c281ed39d98a608a18c709c0820b8b",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              2
+            ]
+          },
+          {
+            "memory_id": "f7988c64529c358c62312a2bd2c64f7b22948fa5d3a662d3529b2cfdfbce2b57",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              4
+            ]
+          },
+          {
+            "memory_id": "4449ab240d7e3aaee2d92e7a1d41ef411f371f64e506fae4c2b802ffade7cd32",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              7
+            ]
+          },
+          {
+            "memory_id": "61a68c6a19273238b5c887f0188abfe38f1dd442be88ad3880b542b92b7790b0",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              3,
+              5
+            ]
+          },
+          {
+            "memory_id": "9447b2032d2b8caec88fe2f08309a438c9a640e4554883d40994fa9b07b43bc6",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              5
+            ]
+          },
+          {
+            "memory_id": "71c961f0a26bd2ff95bd89b2bd2c3200bd46a408943e41dbf82f1d90dd93d3c6",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              3,
+              6
+            ]
+          }
+        ],
+        "reason": "Evaluator priority then evidence-based proposal rank: untested binding, modal-response support, window count, observed setting frequency",
+        "project_id": "d838af954e2eda9abc646b8da48e6c5adb6d17ddfe0ee9c95f6b4354bc1ae60d",
+        "project_objective": "Measure whether signed_command_response repeats across conditions for {'body': 'E'}",
+        "project_coverage_reason": "chooser explores unattempted conditions until project coverage criterion is met; Evaluator ranking within that set"
+      },
+      "external_observations": []
+    },
+    {
+      "session": "development-20261002-012801",
+      "archive_sha256": "43059f380110ea979fe7a570bd04f1ee512f5d429ca82091078c9102b1fb325f",
+      "report_sha256": "685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+      "provenance": {
+        "git_commit": "49632c45d744a1971d063deff5e943748cacdda6",
+        "dirty_worktree": true,
+        "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+      },
+      "agency_samples": 347,
+      "stop": "TIME LIMIT",
+      "score_tracker": {
+        "p1_score": 3500,
+        "p2_score": null,
+        "self_channel": 1,
+        "self_score": 3500,
+        "status": "measured",
+        "log": "score.jsonl",
+        "samples": 347,
+        "dropped_samples": 0,
+        "errors": 0,
+        "worker_finished": true,
+        "processing_seconds_total": 5.444704776003164,
+        "processing_seconds_max": 0.03398975599975529,
+        "raw_frames": [
+          "score-raw-0001.png",
+          "score-raw-0002.png",
+          "score-raw-0003.png",
+          "score-raw-0004.png",
+          "score-raw-0005.png",
+          "score-raw-0006.png",
+          "score-raw-0007.png",
+          "score-raw-0008.png",
+          "score-raw-0009.png",
+          "score-raw-0010.png",
+          "score-raw-0011.png",
+          "score-raw-0012.png",
+          "score-raw-0013.png",
+          "score-raw-0014.png",
+          "score-raw-0015.png",
+          "score-raw-0016.png",
+          "score-raw-0024.png",
+          "score-raw-0026.png",
+          "score-raw-0028.png",
+          "score-raw-0030.png",
+          "score-raw-0051.png",
+          "score-raw-0053.png",
+          "score-raw-0059.png",
+          "score-raw-0064.png",
+          "score-raw-0070.png",
+          "score-raw-0097.png",
+          "score-raw-0347.png"
+        ],
+        "raw_frame_retention": "first 16 samples, up to 16 later accepted changes, final sample",
+        "omitted_change_frames": 0,
+        "accepted_confidence": {
+          "1": 1.0,
+          "2": null
+        },
+        "mode": "observational_background",
+        "timestamp_clock": "monotonic",
+        "metric": "official_game_score",
+        "policy_feedback": false
+      },
+      "startup": {
+        "clock": "monotonic",
+        "gameplay_timer_boundary": "after SELF discovery; includes reacquisition",
+        "first_life_lost_at": null,
+        "life_tracking": "unmeasured; SELF loss is not a life boundary",
+        "camera_initialization_started": 4325.158216322,
+        "exposure_started": 4326.980095175,
+        "exposure_finished": 4337.087968849,
+        "calibration_started": 4337.088046016,
+        "calibration_finished": 4348.89050503,
+        "camera_ready": 4348.890632438,
+        "start_decision": 4349.375822697,
+        "start_requested": 4349.54292705,
+        "start_transport": {
+          "command": "START",
+          "write_started_at": 4349.542947087,
+          "write_completed_at": 4349.542965846,
+          "ack_at": 4349.659114436,
+          "accepted": true
+        },
+        "start_acknowledged": 4349.659120085,
+        "candidate_watch_finished": 4352.911666277,
+        "first_visual_candidates_at": 4349.681525,
+        "first_classified_gameplay_at": 4350.227586,
+        "gameplay_confirmed_at": 4351.49035,
+        "self_discovery_started": 4352.911814056,
+        "first_body_probe_at": 4353.775312169,
+        "first_provisional_self_at": 4355.1080010000005,
+        "first_provisional_self_recorded": 4355.321066737,
+        "self_discovery_finished": 4355.675792192,
+        "gameplay_timer_started_at": 4355.676344362,
+        "gameplay_deadline": 4475.676344362,
+        "first_ordinary_action_requested": 4355.91299392,
+        "first_ordinary_execution": {
+          "started_at": 4355.91479969,
+          "move": "E",
+          "fire": "N",
+          "duration_ms": 80,
+          "commands": [
+            {
+              "command": "LS_RIGHT",
+              "sent_at": 4355.914806634,
+              "ack_at": 4355.943192338
+            },
+            {
+              "command": "RS_UP",
+              "sent_at": 4355.943194931,
+              "ack_at": 4355.951530758
+            },
+            {
+              "command": "LS_CENTER",
+              "sent_at": 4356.03159845,
+              "ack_at": 4356.038370305
+            },
+            {
+              "command": "RS_CENTER",
+              "sent_at": 4356.038371398,
+              "ack_at": 4356.048519383
+            }
+          ],
+          "controls_ready_at": 4355.951532387,
+          "pulse_finished_at": 4356.031596006,
+          "returned_at": 4356.04852042
+        },
+        "first_confirmed_self_at": 4356.302508000001,
+        "first_confirmed_self_recorded": 4356.518211811,
+        "stopped_at": 4475.808925825,
+        "start_to_first_ordinary_action_seconds": 6.371833844000321,
+        "start_to_first_ordinary_action_basis": "controller action start minus START local write completion; not remote execution/display onset"
+      },
+      "steps_identity": {
+        "provisional": 17,
+        "confirmed": 26,
+        "unknown": 29
+      },
+      "committed_records": {
+        "episode": 1,
+        "observation": 992,
+        "event": 9596,
+        "resolution_reference": 10885,
+        "derivation_complete": 1
+      },
+      "commit_timeline": {
+        "episode": {
+          "count": 1,
+          "first": "2026-10-02T00:31:04.908720+00:00",
+          "last": "2026-10-02T00:31:04.908720+00:00"
+        },
+        "observation": {
+          "count": 992,
+          "first": "2026-10-02T00:31:04.915876+00:00",
+          "last": "2026-10-02T00:31:14.443564+00:00"
+        },
+        "event": {
+          "count": 9596,
+          "first": "2026-10-02T00:31:22.763898+00:00",
+          "last": "2026-10-02T00:47:37.405041+00:00"
+        },
+        "resolution_reference": {
+          "count": 10885,
+          "first": "2026-10-02T00:37:25.678291+00:00",
+          "last": "2026-10-02T00:45:05.381449+00:00"
+        },
+        "derivation_complete": {
+          "count": 1,
+          "first": "2026-10-02T00:45:05.491252+00:00",
+          "last": "2026-10-02T00:45:05.491252+00:00"
+        }
+      },
+      "live_resolutions": [
+        {
+          "at": 4356.302508000001,
+          "episode": "planned-episode:/home/five/Projects/charlie/robotron-runs/development-20261002-012801/game-01",
+          "kind": "resolution",
+          "payload": {
+            "error": null,
+            "prediction_id": "629b28c834e90717750aee06b0a26d1a8c63015e735dad3d6f04d906581f37df",
+            "reason": "existing AgencyTracker matched the evidence-derived modal response",
+            "result": "supported"
+          },
+          "producer": "existing-memory-actuator-test",
+          "provenance": {},
+          "schema": "charlie-evidence-v1",
+          "sources": [
+            "629b28c834e90717750aee06b0a26d1a8c63015e735dad3d6f04d906581f37df",
+            "2eaa1cb6847208895935963d92aba4baa0004a6969236d3c238922986f70d77e"
+          ],
+          "version": "1"
+        }
+      ],
+      "proposal_count": 81,
+      "meditation_history": [
+        {
+          "iteration": 1,
+          "tracks_before": 1916,
+          "tracks_after": 1658,
+          "merges": 258,
+          "quality": {
+            "all": {
+              "predictions": 11143,
+              "mean_error": 0.9722092865149466,
+              "median_error": 0.052083333333328596,
+              "p90_error": 3.156337019221213,
+              "within_2": 83.22713811361393,
+              "within_4": 92.47060935116217,
+              "within_7": 97.08337072601633
+            },
+            "adjacent": {
+              "predictions": 10693,
+              "mean_error": 0.844746643118552,
+              "median_error": 0.0390625,
+              "p90_error": 2.690779703014769,
+              "within_2": 85.28008977835968,
+              "within_4": 93.87449733470494,
+              "within_7": 97.62461423361077
+            },
+            "gaps": {
+              "predictions": 450,
+              "mean_error": 4.001004943931943,
+              "median_error": 2.898992892408575,
+              "p90_error": 8.002930846054845,
+              "within_2": 34.44444444444444,
+              "within_4": 59.111111111111114,
+              "within_7": 84.22222222222223
+            },
+            "moving": {
+              "predictions": 7238,
+              "mean_error": 1.4389713069148398,
+              "median_error": 0.17469281074217108,
+              "p90_error": 4.376937195125084,
+              "within_2": 74.70295661785023,
+              "within_4": 88.60182370820668,
+              "within_7": 95.59270516717325
+            },
+            "stationary": {
+              "predictions": 3905,
+              "mean_error": 0.10705602053429947,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.02688860435339,
+              "within_4": 99.64148527528809,
+              "within_7": 99.84635083226632
+            }
+          }
+        },
+        {
+          "iteration": 2,
+          "tracks_before": 1658,
+          "tracks_after": 1551,
+          "merges": 107,
+          "quality": {
+            "all": {
+              "predictions": 11250,
+              "mean_error": 1.0061835770972662,
+              "median_error": 0.05208333333333215,
+              "p90_error": 3.292417545224284,
+              "within_2": 82.53333333333333,
+              "within_4": 92.10666666666667,
+              "within_7": 97.04
+            },
+            "adjacent": {
+              "predictions": 10720,
+              "mean_error": 0.8550573879744239,
+              "median_error": 0.0390625,
+              "p90_error": 2.730310719576433,
+              "within_2": 85.04664179104478,
+              "within_4": 93.84328358208955,
+              "within_7": 97.63059701492537
+            },
+            "gaps": {
+              "predictions": 530,
+              "mean_error": 4.0629246099215495,
+              "median_error": 3.1774963402629153,
+              "p90_error": 7.708338221031986,
+              "within_2": 31.69811320754717,
+              "within_4": 56.9811320754717,
+              "within_7": 85.09433962264151
+            },
+            "moving": {
+              "predictions": 7656,
+              "mean_error": 1.4316527396806986,
+              "median_error": 0.15679159607802548,
+              "p90_error": 4.4090472061007695,
+              "within_2": 74.69958202716823,
+              "within_4": 88.51880877742947,
+              "within_7": 95.71577847439916
+            },
+            "stationary": {
+              "predictions": 3594,
+              "mean_error": 0.09984192191118964,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.22092376182526,
+              "within_4": 99.74958263772955,
+              "within_7": 99.86087924318308
+            }
+          }
+        },
+        {
+          "iteration": 3,
+          "tracks_before": 1551,
+          "tracks_after": 1514,
+          "merges": 37,
+          "quality": {
+            "all": {
+              "predictions": 11287,
+              "mean_error": 1.0260970570833308,
+              "median_error": 0.05208333333333304,
+              "p90_error": 3.4078782104954146,
+              "within_2": 82.23620093913351,
+              "within_4": 91.85788960751307,
+              "within_7": 96.92566669619917
+            },
+            "adjacent": {
+              "predictions": 10723,
+              "mean_error": 0.857179983755555,
+              "median_error": 0.0390625,
+              "p90_error": 2.734374999999993,
+              "within_2": 84.98554508999347,
+              "within_4": 93.84500606173646,
+              "within_7": 97.63125990860766
+            },
+            "gaps": {
+              "predictions": 564,
+              "mean_error": 4.237617938809815,
+              "median_error": 3.6131917698211984,
+              "p90_error": 8.313167331713545,
+              "within_2": 29.9645390070922,
+              "within_4": 54.07801418439716,
+              "within_7": 83.51063829787235
+            },
+            "moving": {
+              "predictions": 7739,
+              "mean_error": 1.4504998106814848,
+              "median_error": 0.16105881350067522,
+              "p90_error": 4.493395067162552,
+              "within_2": 74.4540638325365,
+              "within_4": 88.24137485463238,
+              "within_7": 95.58082439591678
+            },
+            "stationary": {
+              "predictions": 3548,
+              "mean_error": 0.10037752210697322,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.2108229988726,
+              "within_4": 99.74633596392334,
+              "within_7": 99.85907553551297
+            }
+          }
+        },
+        {
+          "iteration": 4,
+          "tracks_before": 1514,
+          "tracks_after": 1503,
+          "merges": 11,
+          "quality": {
+            "all": {
+              "predictions": 11298,
+              "mean_error": 1.0312159092838904,
+              "median_error": 0.052083333333333925,
+              "p90_error": 3.4375,
+              "within_2": 82.129580456718,
+              "within_4": 91.77730571782617,
+              "within_7": 96.89325544344132
+            },
+            "adjacent": {
+              "predictions": 10723,
+              "mean_error": 0.8573367734536685,
+              "median_error": 0.0390625,
+              "p90_error": 2.734374999999993,
+              "within_2": 84.97621934160216,
+              "within_4": 93.84500606173646,
+              "within_7": 97.63125990860766
+            },
+            "gaps": {
+              "predictions": 575,
+              "mean_error": 4.273834993644703,
+              "median_error": 3.6669773779337347,
+              "p90_error": 8.313167331713545,
+              "within_2": 29.043478260869566,
+              "within_4": 53.21739130434783,
+              "within_7": 83.1304347826087
+            },
+            "moving": {
+              "predictions": 7757,
+              "mean_error": 1.4568692892037005,
+              "median_error": 0.16105881350068815,
+              "p90_error": 4.528854730901744,
+              "within_2": 74.31996906020369,
+              "within_4": 88.13974474668042,
+              "within_7": 95.53951269820807
+            },
+            "stationary": {
+              "predictions": 3541,
+              "mean_error": 0.09876934954427784,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.23750353007625,
+              "within_4": 99.74583451002542,
+              "within_7": 99.85879695001412
+            }
+          }
+        },
+        {
+          "iteration": 5,
+          "tracks_before": 1503,
+          "tracks_after": 1502,
+          "merges": 1,
+          "quality": {
+            "all": {
+              "predictions": 11299,
+              "mean_error": 1.031896269711454,
+              "median_error": 0.052083333333333925,
+              "p90_error": 3.437894548064427,
+              "within_2": 82.1223117090008,
+              "within_4": 91.76033277281175,
+              "within_7": 96.89353040092044
+            },
+            "adjacent": {
+              "predictions": 10723,
+              "mean_error": 0.8575210457102435,
+              "median_error": 0.0390625,
+              "p90_error": 2.734374999999993,
+              "within_2": 84.97621934160216,
+              "within_4": 93.83568031334515,
+              "within_7": 97.63125990860766
+            },
+            "gaps": {
+              "predictions": 576,
+              "mean_error": 4.278121142914545,
+              "median_error": 3.6701648110736915,
+              "p90_error": 8.313167331713545,
+              "within_2": 28.993055555555557,
+              "within_4": 53.125,
+              "within_7": 83.15972222222223
+            },
+            "moving": {
+              "predictions": 7758,
+              "mean_error": 1.4578053215691453,
+              "median_error": 0.16105881350068815,
+              "p90_error": 4.528854730901747,
+              "within_2": 74.31038927558649,
+              "within_4": 88.11549368393916,
+              "within_7": 95.54008765145656
+            },
+            "stationary": {
+              "predictions": 3541,
+              "mean_error": 0.09876934954427784,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.23750353007625,
+              "within_4": 99.74583451002542,
+              "within_7": 99.85879695001412
+            }
+          }
+        },
+        {
+          "iteration": 6,
+          "tracks_before": 1502,
+          "tracks_after": 1502,
+          "merges": 0,
+          "quality": {
+            "all": {
+              "predictions": 11299,
+              "mean_error": 1.031896269711454,
+              "median_error": 0.052083333333333925,
+              "p90_error": 3.437894548064427,
+              "within_2": 82.1223117090008,
+              "within_4": 91.76033277281175,
+              "within_7": 96.89353040092044
+            },
+            "adjacent": {
+              "predictions": 10723,
+              "mean_error": 0.8575210457102435,
+              "median_error": 0.0390625,
+              "p90_error": 2.734374999999993,
+              "within_2": 84.97621934160216,
+              "within_4": 93.83568031334515,
+              "within_7": 97.63125990860766
+            },
+            "gaps": {
+              "predictions": 576,
+              "mean_error": 4.278121142914545,
+              "median_error": 3.6701648110736915,
+              "p90_error": 8.313167331713545,
+              "within_2": 28.993055555555557,
+              "within_4": 53.125,
+              "within_7": 83.15972222222223
+            },
+            "moving": {
+              "predictions": 7758,
+              "mean_error": 1.4578053215691453,
+              "median_error": 0.16105881350068815,
+              "p90_error": 4.528854730901747,
+              "within_2": 74.31038927558649,
+              "within_4": 88.11549368393916,
+              "within_7": 95.54008765145656
+            },
+            "stationary": {
+              "predictions": 3541,
+              "mean_error": 0.09876934954427784,
+              "median_error": 0.0,
+              "p90_error": 0.15625,
+              "within_2": 99.23750353007625,
+              "within_4": 99.74583451002542,
+              "within_7": 99.85879695001412
+            }
+          }
+        }
+      ],
+      "meditation_links": 414,
+      "plan": {
+        "schema": "charlie-actuator-plan-v1",
+        "prediction_id": "629b28c834e90717750aee06b0a26d1a8c63015e735dad3d6f04d906581f37df",
+        "prediction_at": 4324.070914637,
+        "deadline": 4564.070914637,
+        "memory_id": "9447b2032d2b8caec88fe2f08309a438c9a640e4554883d40994fa9b07b43bc6",
+        "decision_id": "experiment:629b28c834e90717750aee06b0a26d1a8c63015e735dad3d6f04d906581f37df",
+        "scope": "planned-episode:/home/five/Projects/charlie/robotron-runs/development-20261002-012801/game-01",
+        "body": "E",
+        "fire": "N",
+        "max_actions": 1,
+        "intended_game": "/home/five/Projects/charlie/robotron-runs/development-20261002-012801/game-01",
+        "source_episode": "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+        "source_evidence": [
+          "55096e837cbbed284ebfa02abbe56c3b78ca04c0d5e6b0e463c3190778b31e9b",
+          "3126b2c437eaf80f25520ee53ab7d8f881ed0a6e036d85a0c7128a6f520c160b",
+          "e5b3d4c33a5a4e8479226957be45fd311d367f6ca5a02402381a5b66f0b8a7fd"
+        ],
+        "expected": "signed_command_response",
+        "alternatives": [
+          {
+            "memory_id": "2bc0ff156367ed8e3fe634b93bfc27c59ccb4bff9e47561d82c90314b59503d6",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              0.875,
+              8,
+              9
+            ]
+          },
+          {
+            "memory_id": "ece5ed49a65dfe35af948248af5c36c018f7d1537cb97df8b4e69628803d18e9",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              11
+            ]
+          },
+          {
+            "memory_id": "53b6d0ecc255228237acccf4ab92c2d67115d7cc4e158a93bd4f22a768ef79e9",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              13
+            ]
+          },
+          {
+            "memory_id": "fb154a82118d3dad347a78b3a4d70feee459cbd07eead99093218af7336b8529",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              10
+            ]
+          },
+          {
+            "memory_id": "1aebe53245c3d8e29d84da40661f213b6a5259a0fdb8d880afb430887fbe6d9b",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              13
+            ]
+          },
+          {
+            "memory_id": "a4dddc0e9a2a0627977f71d4b4a840f415f51a33f31e6b573266efbc8ff31419",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              0.875,
+              8,
+              27
+            ]
+          },
+          {
+            "memory_id": "39285dd8674d28b1e2676677f9171e8a8c927c31c63daab96e99274c18ddabea",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              5
+            ]
+          },
+          {
+            "memory_id": "1fc8a3ca2a7e1f034cc93133519d029dc55bb7ca997e5bc91764cf330f123718",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              0.875,
+              8,
+              14
+            ]
+          },
+          {
+            "memory_id": "6efedbb355a5dc3fbb08e3a4de25896fc20679199d22d20c31165e67b59f4fbc",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              0.875,
+              8,
+              21
+            ]
+          },
+          {
+            "memory_id": "713c731fb4a3a88a1e16596b2cc02c1325d5fa69dc5497cd983d0e4cdaf21bba",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              2
+            ]
+          },
+          {
+            "memory_id": "b40496f0b38c8a1895ce227de87fafda6e4fac98da36546fb9650280f2c8a69e",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              3
+            ]
+          },
+          {
+            "memory_id": "13216dc6ce807d0b64597232b9823659ba134af80b9b0635fbbdc3edc45409fe",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              3
+            ]
+          },
+          {
+            "memory_id": "0a1c9eebc0e8532dce427c15864b1b2683c281ed39d98a608a18c709c0820b8b",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              2
+            ]
+          },
+          {
+            "memory_id": "f7988c64529c358c62312a2bd2c64f7b22948fa5d3a662d3529b2cfdfbce2b57",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              4
+            ]
+          },
+          {
+            "memory_id": "4449ab240d7e3aaee2d92e7a1d41ef411f371f64e506fae4c2b802ffade7cd32",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              7
+            ]
+          },
+          {
+            "memory_id": "61a68c6a19273238b5c887f0188abfe38f1dd442be88ad3880b542b92b7790b0",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              3,
+              5
+            ]
+          },
+          {
+            "memory_id": "9447b2032d2b8caec88fe2f08309a438c9a640e4554883d40994fa9b07b43bc6",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              5
+            ]
+          },
+          {
+            "memory_id": "71c961f0a26bd2ff95bd89b2bd2c3200bd46a408943e41dbf82f1d90dd93d3c6",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              3,
+              6
+            ]
+          }
+        ],
+        "reason": "Evaluator priority then evidence-based proposal rank: untested binding, modal-response support, window count, observed setting frequency",
+        "project_id": "d838af954e2eda9abc646b8da48e6c5adb6d17ddfe0ee9c95f6b4354bc1ae60d",
+        "project_objective": "Measure whether signed_command_response repeats across conditions for {'body': 'E'}",
+        "project_coverage_reason": "chooser explores unattempted conditions until project coverage criterion is met; Evaluator ranking within that set"
+      },
+      "external_observations": [
+        {
+          "source": "Alex physical screen observation",
+          "value": 2400,
+          "timestamp": null
+        }
+      ]
+    },
+    {
+      "session": "development-20261002-015817",
+      "archive_sha256": "7e348d98e89526cfe72f979ed0801599b51969490a25de4116ad551679bfa85f",
+      "report_sha256": "9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+      "provenance": {
+        "git_commit": "b9624ce6cbd2283781b7a974c5af0da05f398d4b",
+        "dirty_worktree": true,
+        "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+      },
+      "agency_samples": 365,
+      "stop": "OBSERVATION UNCERTAIN",
+      "score_tracker": {
+        "p1_score": 3300,
+        "p2_score": null,
+        "self_channel": 1,
+        "self_score": 3300,
+        "status": "measured",
+        "log": "score.jsonl",
+        "samples": 365,
+        "dropped_samples": 0,
+        "errors": 0,
+        "worker_finished": true,
+        "processing_seconds_total": 5.569978949002689,
+        "processing_seconds_max": 0.020651928000006592,
+        "raw_frames": [
+          "score-raw-0001.png",
+          "score-raw-0002.png",
+          "score-raw-0003.png",
+          "score-raw-0004.png",
+          "score-raw-0005.png",
+          "score-raw-0006.png",
+          "score-raw-0007.png",
+          "score-raw-0008.png",
+          "score-raw-0009.png",
+          "score-raw-0010.png",
+          "score-raw-0011.png",
+          "score-raw-0012.png",
+          "score-raw-0013.png",
+          "score-raw-0014.png",
+          "score-raw-0015.png",
+          "score-raw-0016.png",
+          "score-raw-0021.png",
+          "score-raw-0023.png",
+          "score-raw-0025.png",
+          "score-raw-0029.png",
+          "score-raw-0042.png",
+          "score-raw-0049.png",
+          "score-raw-0084.png",
+          "score-raw-0098.png",
+          "score-raw-0175.png",
+          "score-raw-0365.png"
+        ],
+        "raw_frame_retention": "first 16 samples, up to 16 later accepted changes, final sample",
+        "omitted_change_frames": 0,
+        "accepted_confidence": {
+          "1": 1.0,
+          "2": null
+        },
+        "mode": "observational_background",
+        "timestamp_clock": "monotonic",
+        "metric": "official_game_score",
+        "policy_feedback": false
+      },
+      "startup": {
+        "clock": "monotonic",
+        "gameplay_timer_boundary": "after SELF discovery; includes reacquisition",
+        "first_life_lost_at": null,
+        "life_tracking": "unmeasured; SELF loss is not a life boundary",
+        "camera_initialization_started": 6141.719212465,
+        "exposure_started": 6143.540879256,
+        "exposure_finished": 6153.464405136,
+        "calibration_started": 6153.464440173,
+        "calibration_finished": 6177.508062637,
+        "camera_ready": 6177.508462784,
+        "start_decision": 6178.013387099,
+        "start_requested": 6178.136931181,
+        "start_transport": {
+          "command": "START",
+          "write_started_at": 6178.13724731,
+          "write_completed_at": 6178.137274198,
+          "ack_at": 6178.251138808,
+          "accepted": true
+        },
+        "start_acknowledged": 6178.251429918,
+        "candidate_watch_finished": 6181.71692594,
+        "first_visual_candidates_at": 6178.274084,
+        "first_classified_gameplay_at": 6178.791022,
+        "gameplay_confirmed_at": 6180.037752,
+        "self_discovery_started": 6181.71743192,
+        "first_body_probe_at": 6182.700478428,
+        "first_provisional_self_at": 6184.021207,
+        "first_provisional_self_recorded": 6184.236753144,
+        "self_discovery_finished": 6184.579607906,
+        "gameplay_timer_started_at": 6184.580241108,
+        "gameplay_deadline": null,
+        "duration_limit_kind": "none",
+        "first_ordinary_action_requested": 6184.825058227,
+        "first_ordinary_execution": {
+          "started_at": 6184.827952589,
+          "move": "E",
+          "fire": "NONE",
+          "duration_ms": 80,
+          "commands": [
+            {
+              "command": "LS_RIGHT",
+              "sent_at": 6184.827959423,
+              "ack_at": 6184.841866441
+            },
+            {
+              "command": "LS_CENTER",
+              "sent_at": 6184.921933264,
+              "ack_at": 6184.934762377
+            },
+            {
+              "command": "RS_CENTER",
+              "sent_at": 6184.934763377,
+              "ack_at": 6184.942937485
+            }
+          ],
+          "controls_ready_at": 6184.841869478,
+          "pulse_finished_at": 6184.921930615,
+          "returned_at": 6184.942939596
+        },
+        "first_confirmed_self_at": 6185.20712,
+        "first_confirmed_self_recorded": 6185.425784266,
+        "stopped_at": 6298.101184943,
+        "start_to_first_ordinary_action_seconds": 6.690678390999892,
+        "start_to_first_ordinary_action_basis": "controller action start minus START local write completion; not remote execution/display onset"
+      },
+      "steps_identity": {
+        "provisional": 7,
+        "confirmed": 48,
+        "unknown": 29
+      },
+      "committed_records": {
+        "episode": 1,
+        "observation": 1071,
+        "event": 6850,
+        "resolution_reference": 7569
+      },
+      "commit_timeline": {
+        "episode": {
+          "count": 1,
+          "first": "2026-10-02T01:01:33.726916+00:00",
+          "last": "2026-10-02T01:01:33.726916+00:00"
+        },
+        "observation": {
+          "count": 1071,
+          "first": "2026-10-02T01:01:34.066941+00:00",
+          "last": "2026-10-02T01:01:45.620029+00:00"
+        },
+        "event": {
+          "count": 6850,
+          "first": "2026-10-02T01:01:52.230304+00:00",
+          "last": "2026-10-02T01:02:58.175366+00:00"
+        },
+        "resolution_reference": {
+          "count": 7569,
+          "first": "2026-10-02T01:02:58.434282+00:00",
+          "last": "2026-10-02T01:06:32.393041+00:00"
+        }
+      },
+      "live_resolutions": [
+        {
+          "at": 6185.20712,
+          "episode": "planned-episode:/home/five/Projects/charlie/robotron-runs/development-20261002-015817/game-01",
+          "kind": "resolution",
+          "payload": {
+            "error": null,
+            "prediction_id": "8649742050f6d80a6ae792a5e8e76cac1f323b61ad7bf1303044246bb6164ce6",
+            "reason": "existing AgencyTracker matched the evidence-derived modal response",
+            "result": "supported"
+          },
+          "producer": "existing-memory-actuator-test",
+          "provenance": {},
+          "schema": "charlie-evidence-v1",
+          "sources": [
+            "8649742050f6d80a6ae792a5e8e76cac1f323b61ad7bf1303044246bb6164ce6",
+            "c09bcc9bfc8d9da53f01f23bd771de7f10f260b215e7b3768dcb12973c50e7e5"
+          ],
+          "version": "1"
+        }
+      ],
+      "proposal_count": null,
+      "meditation_history": null,
+      "meditation_links": null,
+      "plan": {
+        "schema": "charlie-actuator-plan-v1",
+        "prediction_id": "8649742050f6d80a6ae792a5e8e76cac1f323b61ad7bf1303044246bb6164ce6",
+        "prediction_at": 6140.632415009,
+        "deadline": 6380.632415009,
+        "memory_id": "246325c4d3f0723337ca767811a0d7b3ad7033243c9884058503a6a83a5a0ad7",
+        "decision_id": "experiment:8649742050f6d80a6ae792a5e8e76cac1f323b61ad7bf1303044246bb6164ce6",
+        "scope": "planned-episode:/home/five/Projects/charlie/robotron-runs/development-20261002-015817/game-01",
+        "body": "E",
+        "fire": "NONE",
+        "max_actions": 1,
+        "intended_game": "/home/five/Projects/charlie/robotron-runs/development-20261002-015817/game-01",
+        "source_episode": "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+        "source_evidence": [
+          "d88bbbdc44cf0c2a9be2a322e16da025520881cd8ec39771f1bf35f5989050d5",
+          "f0cf273b5fc3968c4c20f15d4634dc8766c082ead06647a276b6dc777cc1774d",
+          "8996cbcec975f0cf5022758809785786c001760a6d794999634c5c5a7683a709"
+        ],
+        "expected": "signed_command_response",
+        "alternatives": [
+          {
+            "memory_id": "f78a6986ad4fb195956eba2bea4545e5c3be8a94d0896a4cc047457871a3429c",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              6
+            ]
+          },
+          {
+            "memory_id": "dd2ffbcb6a1e031607833254f73caddc4c6cbfb2e96850052c113e2c9fe8b3b5",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              4
+            ]
+          },
+          {
+            "memory_id": "b56a63ae690b2d771af9fc4ec02f8485317d79c5e96a8158b553493ff2535ec5",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              6
+            ]
+          },
+          {
+            "memory_id": "5c347232ee1461f2881833cf0085da3cfad958abccd6153e2ba87ff79651d32d",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              8
+            ]
+          },
+          {
+            "memory_id": "e31824be14e432869760254265f3325294bf1edcf59df0775e5640857ba48e9d",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              8
+            ]
+          },
+          {
+            "memory_id": "f0035f736b8d053232276fbc6fcf61e2694c8d9ebc6c19374ca6030c0da94f58",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              35
+            ]
+          },
+          {
+            "memory_id": "778051235c00140897fb657cdda7f0ed19f6344612e4e1425316db8415fd673f",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              7
+            ]
+          },
+          {
+            "memory_id": "e895604c3602bd1ac73f8f52fa6e0b425696d7148b2f19f2ed16da63d51dd8ba",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              15
+            ]
+          },
+          {
+            "memory_id": "8aa4a0f814f996372f7b7356b2425aee35ffc93132b8ebb1454e756cff1064fe",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              20
+            ]
+          },
+          {
+            "memory_id": "88255c2c28b65bf7df7c5917eb4ae8401f2ce4d9a440a95d023fa0fe452d8c72",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              3,
+              6
+            ]
+          },
+          {
+            "memory_id": "6ef1f71de7adc463b2237dcd240d7830a98bc70c597aef8b57541186e6648ecb",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              3,
+              4
+            ]
+          },
+          {
+            "memory_id": "8fc4c4231ee1ecc07f40a65859b67a25f09dcb54d2f9519622022bac9c2d7a2d",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              6
+            ]
+          },
+          {
+            "memory_id": "cf764752f5f931aaf930a293723374c7e262bca74a3abc6065f5fe8f2bd7f7bc",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              3,
+              8
+            ]
+          },
+          {
+            "memory_id": "7cedaf5fe590134d387f872c4f36d807d04236be10b4e9a40b3001431e8f6bdb",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              8
+            ]
+          },
+          {
+            "memory_id": "246325c4d3f0723337ca767811a0d7b3ad7033243c9884058503a6a83a5a0ad7",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              35
+            ]
+          },
+          {
+            "memory_id": "0a75365f8ca7067c0a91f76c8378a0d143807fac342588901442342714f816bc",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              7
+            ]
+          },
+          {
+            "memory_id": "09e9b2af821eba74bf3ff3b397bf4fcce82a052ad5190ec96d19082f7fc7c156",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              15
+            ]
+          },
+          {
+            "memory_id": "fabf2fcf9d13c86f8d2372e6fad305065b0239beb669f3c8160d59948b0de97f",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              20
+            ]
+          },
+          {
+            "memory_id": "2fc2b5424387b382a2192d19eaa49dbc92a3fffefb2a855aa6412d584dee671d",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              6
+            ]
+          },
+          {
+            "memory_id": "c66acb4350793b6f9ccaddd8bf1a522826a0f039cae171080829c01702d4e3d4",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              4
+            ]
+          },
+          {
+            "memory_id": "a4cab75244de48e182fd19ead8430c7eb6fdad379b40908139b3665d1e21321e",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              6
+            ]
+          },
+          {
+            "memory_id": "5654eae320719a61662c43e23d0825d4e65d6bd6f447cbc1541140140ac6f886",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              8
+            ]
+          },
+          {
+            "memory_id": "c3c7b361f3d071fd912c57c4ea968c1a87eb6ce2793d4c4b41349bec498d26f1",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              8
+            ]
+          },
+          {
+            "memory_id": "eb84aadcd9c87ab79913196565d5e70ede93032f21e0b5335a1c65838bd44163",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              35
+            ]
+          },
+          {
+            "memory_id": "5679c686d06ec3b8d3e52c28a94cb8375c94282c7fa7d9def5148fb4f1617ed8",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              7
+            ]
+          },
+          {
+            "memory_id": "0b787b64f0e00ee7e2f4fb29f49fa1a981eddeee83e5f28037bf17f3517e0722",
+            "evaluator_priority": 0.576,
+            "body": "E",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              15
+            ]
+          },
+          {
+            "memory_id": "421ca994039db34c03b6d634bc7e48b535352882a3b544dff096a28dc5c241b5",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              20
+            ]
+          },
+          {
+            "memory_id": "2bc0ff156367ed8e3fe634b93bfc27c59ccb4bff9e47561d82c90314b59503d6",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              0.875,
+              8,
+              9
+            ]
+          },
+          {
+            "memory_id": "ece5ed49a65dfe35af948248af5c36c018f7d1537cb97df8b4e69628803d18e9",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              11
+            ]
+          },
+          {
+            "memory_id": "53b6d0ecc255228237acccf4ab92c2d67115d7cc4e158a93bd4f22a768ef79e9",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              13
+            ]
+          },
+          {
+            "memory_id": "fb154a82118d3dad347a78b3a4d70feee459cbd07eead99093218af7336b8529",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              10
+            ]
+          },
+          {
+            "memory_id": "1aebe53245c3d8e29d84da40661f213b6a5259a0fdb8d880afb430887fbe6d9b",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              13
+            ]
+          },
+          {
+            "memory_id": "a4dddc0e9a2a0627977f71d4b4a840f415f51a33f31e6b573266efbc8ff31419",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              0.875,
+              8,
+              27
+            ]
+          },
+          {
+            "memory_id": "39285dd8674d28b1e2676677f9171e8a8c927c31c63daab96e99274c18ddabea",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              0.875,
+              8,
+              5
+            ]
+          },
+          {
+            "memory_id": "1fc8a3ca2a7e1f034cc93133519d029dc55bb7ca997e5bc91764cf330f123718",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              0.875,
+              8,
+              14
+            ]
+          },
+          {
+            "memory_id": "6efedbb355a5dc3fbb08e3a4de25896fc20679199d22d20c31165e67b59f4fbc",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              0.875,
+              8,
+              21
+            ]
+          },
+          {
+            "memory_id": "713c731fb4a3a88a1e16596b2cc02c1325d5fa69dc5497cd983d0e4cdaf21bba",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              2
+            ]
+          },
+          {
+            "memory_id": "b40496f0b38c8a1895ce227de87fafda6e4fac98da36546fb9650280f2c8a69e",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              3
+            ]
+          },
+          {
+            "memory_id": "13216dc6ce807d0b64597232b9823659ba134af80b9b0635fbbdc3edc45409fe",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              3
+            ]
+          },
+          {
+            "memory_id": "0a1c9eebc0e8532dce427c15864b1b2683c281ed39d98a608a18c709c0820b8b",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              2
+            ]
+          },
+          {
+            "memory_id": "f7988c64529c358c62312a2bd2c64f7b22948fa5d3a662d3529b2cfdfbce2b57",
+            "evaluator_priority": 0.65,
+            "body": "E",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              4
+            ]
+          },
+          {
+            "memory_id": "4449ab240d7e3aaee2d92e7a1d41ef411f371f64e506fae4c2b802ffade7cd32",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              7
+            ]
+          },
+          {
+            "memory_id": "61a68c6a19273238b5c887f0188abfe38f1dd442be88ad3880b542b92b7790b0",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              3,
+              5
+            ]
+          },
+          {
+            "memory_id": "9447b2032d2b8caec88fe2f08309a438c9a640e4554883d40994fa9b07b43bc6",
+            "evaluator_priority": 0.72,
+            "body": "E",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              3,
+              5
+            ]
+          },
+          {
+            "memory_id": "71c961f0a26bd2ff95bd89b2bd2c3200bd46a408943e41dbf82f1d90dd93d3c6",
+            "evaluator_priority": 0.52,
+            "body": "E",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              3,
+              6
+            ]
+          }
+        ],
+        "reason": "Evaluator priority then evidence-based proposal rank: untested binding, modal-response support, window count, observed setting frequency",
+        "project_id": "d838af954e2eda9abc646b8da48e6c5adb6d17ddfe0ee9c95f6b4354bc1ae60d",
+        "project_objective": "Measure whether signed_command_response repeats across conditions for {'body': 'E'}",
+        "project_coverage_reason": null
+      },
+      "processing_supervisor": {
+        "reason": "processing_budget_exhausted",
+        "returncode": -2,
+        "last_progress": {
+          "pid": 2363,
+          "phase": "processing",
+          "phase_started_at": 6335.619313493,
+          "updated_at": 6634.950886382,
+          "fresh_at": 6335.619092419,
+          "sensor_at": null,
+          "perception_at": 6335.619092419,
+          "cycle_at": 6335.619092419,
+          "cycles": 0,
+          "stage": "derive",
+          "processing_units": 290
+        },
+        "elapsed": 300.21352801800003,
+        "episode_boundary": "unverified",
+        "progress_path": "processing-progress.json",
+        "reaped": true
+      },
+      "external_observations": [
+        {
+          "source": "Alex physical screen observation",
+          "value": 1300,
+          "timestamp": null
+        }
+      ]
+    }
+  ],
+  "measurements": {
+    "validated-before-051002": {
+      "elapsed": 11.820185117999927,
+      "cpu": 11.808237,
+      "max_rss_kib": 333652,
+      "db_bytes": 45506560,
+      "records": {
+        "episode": 1,
+        "observation": 1145,
+        "event": 7657,
+        "resolution_reference": 10812,
+        "derivation_complete": 1
+      },
+      "timing": {
+        "import": 1983.706597197,
+        "resolve_experiment": 1984.925792591,
+        "derive": 1984.925985702,
+        "reflection": 1992.835901656,
+        "meditation": 1994.082976968,
+        "complete": 1995.493968954
+      }
+    },
+    "validated-after-051002": {
+      "elapsed": 3.9426706420001665,
+      "cpu": 3.998597,
+      "max_rss_kib": 322160,
+      "db_bytes": 45535232,
+      "records": {
+        "episode": 1,
+        "observation": 1145,
+        "event": 7658,
+        "resolution_reference": 10812,
+        "derivation_complete": 1
+      },
+      "timing": {
+        "import": 1996.038259325,
+        "resolve_experiment": 1997.136047117,
+        "derive": 1997.1360954,
+        "reflection": 1997.295940203,
+        "meditation": 1998.416942364,
+        "context_reflection": 1998.461163267,
+        "complete": 1999.516429299
+      }
+    },
+    "fresh_after_verified": {
+      "elapsed": 9.474990359999993,
+      "cpu": 9.529463,
+      "max_rss_kib": 334096,
+      "db_bytes": 45535232,
+      "import_seconds": 1.185725399,
+      "derive_seconds": 4.679715468,
+      "reflection_seconds": 1.375386669,
+      "meditation_seconds": 1.160651723,
+      "context_reflection_seconds": 1.036582456,
+      "scope": "fresh isolated host stores, full pipeline without live plan; SQLite integrity and evidence verification passed"
+    },
+    "physical_resume": {
+      "retained": 15491,
+      "after": 17133,
+      "elapsed": 3.0442530640000314,
+      "complete": 1
+    },
+    "screen_before": {
+      "samples": 78,
+      "median_ms": 12.756259999832764,
+      "p95_ms": 14.15262500040626,
+      "scope": "host classification only; no physical action cadence claim"
+    },
+    "screen_after": {
+      "samples": 78,
+      "median_ms": 22.3812755000381,
+      "p95_ms": 25.060557999950106,
+      "scope": "host classification only; no physical action cadence claim"
+    }
+  },
+  "screen_classification": [
+    {
+      "path": "003511-review-000-0-gameplay.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1659,
+          "heroes": 0.1723,
+          "all-time": 0.1791
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          0.9956,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 67
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.2,
+          "heroes": 0.1723,
+          "all-time": 0.1791
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          0.9956,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 67
+      }
+    },
+    {
+      "path": "003511-review-001-10-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.0532,
+          "heroes": 0.0865,
+          "all-time": 0.1881
+        },
+        "geometric_border_support": [
+          1.0,
+          0.9934,
+          0.9956,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 61
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.065,
+          "heroes": 0.0865,
+          "all-time": 0.1881
+        },
+        "geometric_border_support": [
+          1.0,
+          0.9934,
+          0.9956,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 61
+      }
+    },
+    {
+      "path": "003511-review-002-22-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.0994,
+          "heroes": 0.1308,
+          "all-time": 0.1985
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 28
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.0994,
+          "heroes": 0.1308,
+          "all-time": 0.1985
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 28
+      }
+    },
+    {
+      "path": "003511-review-003-22-final-view.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.0994,
+          "heroes": 0.1308,
+          "all-time": 0.1985
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 28
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.0994,
+          "heroes": 0.1308,
+          "all-time": 0.1985
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 28
+      }
+    },
+    {
+      "path": "005944-review-000-0-gameplay.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0052,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.157,
+          "heroes": 0.1401,
+          "all-time": 0.179
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 71
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0052,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.157,
+          "heroes": 0.1401,
+          "all-time": 0.179
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 71
+      }
+    },
+    {
+      "path": "005944-review-001-3-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.003,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1584,
+          "heroes": 0.1375,
+          "all-time": 0.192
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          0.9956
+        ],
+        "phase": "gameplay",
+        "interior_regions": 59
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.003,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1584,
+          "heroes": 0.1394,
+          "all-time": 0.192
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          0.9956
+        ],
+        "phase": "gameplay",
+        "interior_regions": 59
+      }
+    },
+    {
+      "path": "005944-review-002-38-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0012,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.211,
+          "heroes": 0.1974,
+          "all-time": 0.1452
+        },
+        "geometric_border_support": [
+          0.9967,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 14
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0012,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.211,
+          "heroes": 0.1974,
+          "all-time": 0.1452
+        },
+        "geometric_border_support": [
+          0.9967,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 14
+      }
+    },
+    {
+      "path": "005944-review-003-50-gameplay.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0047,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1679,
+          "heroes": 0.1549,
+          "all-time": 0.1707
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          0.9844
+        ],
+        "phase": "gameplay",
+        "interior_regions": 25
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0047,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1679,
+          "heroes": 0.1549,
+          "all-time": 0.1707
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          0.9844
+        ],
+        "phase": "gameplay",
+        "interior_regions": 25
+      }
+    },
+    {
+      "path": "005944-review-004-67-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0027,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1707,
+          "heroes": 0.1526,
+          "all-time": 0.0
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 8
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0027,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1707,
+          "heroes": 0.1526,
+          "all-time": 0.0
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 8
+      }
+    },
+    {
+      "path": "005944-review-005-69-identity-loss.jpg",
+      "before": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.9997,
+        "hue_concentration": 0.6708,
+        "occupied_hue_bins": 5,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.6078,
+          "heroes": 0.7733,
+          "all-time": 0.7972
+        },
+        "geometric_border_support": [
+          0.9639,
+          0.018,
+          0.0356,
+          0.1089
+        ],
+        "phase": "unknown",
+        "interior_regions": 119
+      },
+      "after": {
+        "state": "not_gameplay",
+        "reason": "recorded_heroes_headings",
+        "coverage": 0.9997,
+        "hue_concentration": 0.6708,
+        "occupied_hue_bins": 5,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.6078,
+          "heroes": 1.0,
+          "all-time": 1.0
+        },
+        "geometric_border_support": [
+          0.9639,
+          0.018,
+          0.0356,
+          0.1089
+        ],
+        "phase": "terminal"
+      }
+    },
+    {
+      "path": "005944-review-006-94-final-view.jpg",
+      "before": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.0595,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.7258,
+          "heroes": 0.5126,
+          "all-time": 0.5343
+        },
+        "geometric_border_support": [
+          0.1016,
+          1.0,
+          0.7956,
+          0.8044
+        ],
+        "phase": "unknown",
+        "interior_regions": 167
+      },
+      "after": {
+        "state": "not_gameplay",
+        "reason": "recorded_robotron_instruction_heading",
+        "coverage": 0.0595,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 1.0,
+          "heroes": 0.5211,
+          "all-time": 0.5343
+        },
+        "geometric_border_support": [
+          0.1016,
+          1.0,
+          0.7956,
+          0.8044
+        ],
+        "phase": "startable"
+      }
+    },
+    {
+      "path": "012801-review-000-0-gameplay.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1562,
+          "heroes": 0.1612,
+          "all-time": 0.2013
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 59
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1569,
+          "heroes": 0.1612,
+          "all-time": 0.2013
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 59
+      }
+    },
+    {
+      "path": "012801-review-001-8-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0033,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1568,
+          "heroes": 0.1541,
+          "all-time": 0.18
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          0.9822
+        ],
+        "phase": "gameplay",
+        "interior_regions": 38
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0033,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1619,
+          "heroes": 0.1541,
+          "all-time": 0.18
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          0.9822
+        ],
+        "phase": "gameplay",
+        "interior_regions": 38
+      }
+    },
+    {
+      "path": "012801-review-002-27-identity-loss.jpg",
+      "before": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.0,
+          "heroes": 0.0,
+          "all-time": 0.4101
+        },
+        "geometric_border_support": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase": "unknown",
+        "interior_regions": 1
+      },
+      "after": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.0,
+          "heroes": 0.0,
+          "all-time": 0.4101
+        },
+        "geometric_border_support": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase": "unknown",
+        "interior_regions": 1
+      }
+    },
+    {
+      "path": "012801-review-003-32-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0277,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.149,
+          "heroes": 0.1466,
+          "all-time": 0.1938
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 60
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0277,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1708,
+          "heroes": 0.1466,
+          "all-time": 0.1938
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 60
+      }
+    },
+    {
+      "path": "012801-review-004-43-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1582,
+          "heroes": 0.1602,
+          "all-time": 0.1901
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 35
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1582,
+          "heroes": 0.1602,
+          "all-time": 0.1901
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 35
+      }
+    },
+    {
+      "path": "012801-review-005-45-identity-loss.jpg",
+      "before": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.9944,
+        "hue_concentration": 0.6876,
+        "occupied_hue_bins": 5,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.6482,
+          "heroes": 0.7628,
+          "all-time": 0.789
+        },
+        "geometric_border_support": [
+          0.9689,
+          0.059,
+          0.2,
+          0.1622
+        ],
+        "phase": "unknown",
+        "interior_regions": 128
+      },
+      "after": {
+        "state": "not_gameplay",
+        "reason": "recorded_heroes_headings",
+        "coverage": 0.9944,
+        "hue_concentration": 0.6876,
+        "occupied_hue_bins": 5,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.6482,
+          "heroes": 0.8774,
+          "all-time": 0.9088
+        },
+        "geometric_border_support": [
+          0.9689,
+          0.059,
+          0.2,
+          0.1622
+        ],
+        "phase": "terminal"
+      }
+    },
+    {
+      "path": "012801-review-006-69-final-view.jpg",
+      "before": {
+        "state": "not_gameplay",
+        "reason": "recorded_robotron_instruction_heading",
+        "coverage": 0.0008,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.8023,
+          "heroes": 0.6216,
+          "all-time": 0.4784
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          0.9489,
+          0.9533
+        ],
+        "phase": "startable"
+      },
+      "after": {
+        "state": "not_gameplay",
+        "reason": "recorded_robotron_instruction_heading",
+        "coverage": 0.0008,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.8023,
+          "heroes": 0.6359,
+          "all-time": 0.4784
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          0.9489,
+          0.9533
+        ],
+        "phase": "startable"
+      }
+    },
+    {
+      "path": "015817-review-000-0-gameplay.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1604,
+          "heroes": 0.1627,
+          "all-time": 0.1755
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 64
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1884,
+          "heroes": 0.1627,
+          "all-time": 0.1755
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 64
+      }
+    },
+    {
+      "path": "015817-review-001-9-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1652,
+          "heroes": 0.1569,
+          "all-time": 0.2212
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 70
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1652,
+          "heroes": 0.1569,
+          "all-time": 0.2212
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 70
+      }
+    },
+    {
+      "path": "015817-review-002-37-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1725,
+          "heroes": 0.1551,
+          "all-time": 0.2135
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 122
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1927,
+          "heroes": 0.1551,
+          "all-time": 0.2155
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 122
+      }
+    },
+    {
+      "path": "015817-review-003-44-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1373,
+          "heroes": 0.1386,
+          "all-time": 0.1549
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 33
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1373,
+          "heroes": 0.1386,
+          "all-time": 0.1628
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 33
+      }
+    },
+    {
+      "path": "015817-review-004-50-gameplay.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1325,
+          "heroes": 0.1352,
+          "all-time": 0.1893
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 29
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1325,
+          "heroes": 0.1352,
+          "all-time": 0.1893
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 29
+      }
+    },
+    {
+      "path": "015817-review-005-55-identity-loss.jpg",
+      "before": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1392,
+          "heroes": 0.1457,
+          "all-time": 0.1727
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 22
+      },
+      "after": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1392,
+          "heroes": 0.1457,
+          "all-time": 0.1727
+        },
+        "geometric_border_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 22
+      }
+    },
+    {
+      "path": "015817-review-006-57-identity-loss.jpg",
+      "before": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.9996,
+        "hue_concentration": 0.6598,
+        "occupied_hue_bins": 6,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.6393,
+          "heroes": 0.7715,
+          "all-time": 0.8202
+        },
+        "geometric_border_support": [
+          0.9705,
+          0.6902,
+          0.0711,
+          0.1044
+        ],
+        "phase": "unknown",
+        "interior_regions": 52
+      },
+      "after": {
+        "state": "not_gameplay",
+        "reason": "recorded_heroes_headings",
+        "coverage": 0.9996,
+        "hue_concentration": 0.6598,
+        "occupied_hue_bins": 6,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.6393,
+          "heroes": 0.8212,
+          "all-time": 0.8807
+        },
+        "geometric_border_support": [
+          0.9705,
+          0.6902,
+          0.0711,
+          0.1044
+        ],
+        "phase": "terminal"
+      }
+    },
+    {
+      "path": "015817-review-007-81-final-view.jpg",
+      "before": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.01,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.7304,
+          "heroes": 0.5373,
+          "all-time": 0.5202
+        },
+        "geometric_border_support": [
+          0.282,
+          1.0,
+          0.8089,
+          0.8533
+        ],
+        "phase": "unknown",
+        "interior_regions": 166
+      },
+      "after": {
+        "state": "not_gameplay",
+        "reason": "recorded_robotron_instruction_heading",
+        "coverage": 0.01,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.77,
+          "heroes": 0.5699,
+          "all-time": 0.5241
+        },
+        "geometric_border_support": [
+          0.282,
+          1.0,
+          0.8089,
+          0.8533
+        ],
+        "phase": "startable"
+      }
+    }
+  ]
+}

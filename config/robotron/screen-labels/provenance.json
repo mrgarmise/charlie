@@ -40,5 +40,119 @@
       220
     ],
     "normalization": "640x480 calibration; positive grayscale local contrast >25; no color label"
+  },
+  {
+    "label": "heroes",
+    "reference": "heroes-development.png",
+    "source_run": "development-20261002-005944",
+    "source_file": "review-005-69-identity-loss.jpg",
+    "source_sha256": "faedd73bc51524307d10b4bd2d9ea7c463a024c35482c5c8dc52187ebecf59a9",
+    "calibration": {
+      "corners": [
+        [
+          0.10192405164467773,
+          0.20506015814150058
+        ],
+        [
+          0.6686758054387726,
+          0.09800209664973415
+        ],
+        [
+          0.7527977155402633,
+          0.7844695368461282
+        ],
+        [
+          0.11549856856597134,
+          0.9442266992044498
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "crop": [
+      208,
+      28,
+      423,
+      59
+    ],
+    "normalization": "same local contrast mask; thresholds unchanged"
+  },
+  {
+    "label": "all-time",
+    "reference": "all-time-development.png",
+    "source_run": "development-20261002-005944",
+    "source_file": "review-005-69-identity-loss.jpg",
+    "source_sha256": "faedd73bc51524307d10b4bd2d9ea7c463a024c35482c5c8dc52187ebecf59a9",
+    "calibration": {
+      "corners": [
+        [
+          0.10192405164467773,
+          0.20506015814150058
+        ],
+        [
+          0.6686758054387726,
+          0.09800209664973415
+        ],
+        [
+          0.7527977155402633,
+          0.7844695368461282
+        ],
+        [
+          0.11549856856597134,
+          0.9442266992044498
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "crop": [
+      208,
+      189,
+      423,
+      223
+    ],
+    "normalization": "same local contrast mask; thresholds unchanged"
+  },
+  {
+    "label": "pregame",
+    "reference": "pregame-development.png",
+    "source_run": "development-20261002-005944",
+    "source_file": "review-006-94-final-view.jpg",
+    "source_sha256": "87a7107ebb9074bbcc84cb01cf1375567b15d2e4ee71e1c57ad77c294190451d",
+    "calibration": {
+      "corners": [
+        [
+          0.10192405164467773,
+          0.20506015814150058
+        ],
+        [
+          0.6686758054387726,
+          0.09800209664973415
+        ],
+        [
+          0.7527977155402633,
+          0.7844695368461282
+        ],
+        [
+          0.11549856856597134,
+          0.9442266992044498
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "crop": [
+      211,
+      27,
+      406,
+      56
+    ],
+    "normalization": "same local contrast mask; thresholds unchanged"
   }
 ]

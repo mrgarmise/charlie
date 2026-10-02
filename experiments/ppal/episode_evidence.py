@@ -26,6 +26,7 @@ def import_episode(root, journal):
     provenance = report.get('provenance', {})
     refs = {}
     for path in sorted(root.rglob('*')):
+        if path.name=='external-observations.json':continue # annotations do not change captured manifest
         if path.is_file() and path.suffix.lower() in ('.json', '.jsonl', '.png', '.jpg', '.jpeg'):
             refs[path.relative_to(root).as_posix()] = dict(
                 path=path.relative_to(root).as_posix(), sha256=hashlib.sha256(path.read_bytes()).hexdigest())
@@ -82,6 +83,13 @@ def import_episode(root, journal):
             add('action_issued', ref, step.get('action_timestamp'))
         if 'shadow' in step:
             add('reported_forecast', {**ref,'pointer':ref['pointer']+['shadow']}, step.get('observed_at'))
+    external_path=root/'external-observations.json'
+    if external_path.is_file():
+        reference=dict(path=external_path.name,sha256=hashlib.sha256(external_path.read_bytes()).hexdigest())
+        for index,row in enumerate(json.loads(external_path.read_text())):
+            if not isinstance(row,dict) or not row.get('source') or 'value' not in row:
+                raise ValueError('external observation needs source and value')
+            add('external_observation',{**reference,'pointer':[index]},row.get('timestamp'))
     # Index preflight/failure context without inventing transition timestamps.
     for field in ('startup_watch','exposure_preflight','episode_end','calibration','acquisition'):
         if field in report:

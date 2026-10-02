@@ -159,3 +159,11 @@ boundary cannot be confirmed. Ctrl-C remains available and preserves evidence.
 `--game-seconds` remains an explicit diagnostic option. Existing scripts that
 supply them still stop intentionally, with DIAGNOSTIC LIMIT evidence. Omit them
 for normal gameplay. `--processing-budget` controls offline work only.
+
+## Physical follow-up
+
+See [physical-learning-audit.md](physical-learning-audit.md) for the b9624ce
+physical findings. Productive offline work now yields/resumes at durable units;
+inactivity remains independently supervised. Positive gameplay → rankings →
+instruction/attract evidence adds corroboration when no SELF probe is eligible.
+UNKNOWN never authorizes START.

@@ -220,15 +220,23 @@ class LearningExecutive:
             return project
         history = project['experiment_history']; c = project['success_criteria']
         resolved = [h for h in history if h['result'] != 'unresolved']
+        # Offline architecture variants sharing a held-out evidence group are
+        # correlated trials; they cannot supply independent replication.
+        offline = [h for h in resolved if h.get('experiment_kind') == 'offline']
+        physical = [h for h in resolved if h.get('experiment_kind', 'physical') == 'physical']
+        units = {h.get('independence_unit', h['episode']) for h in offline}
+        effective_resolved = len(physical) + len(units)
         counts = Counter(h['result'] for h in history)
-        episodes = {h['episode'] for h in resolved}
+        episodes = {h.get('independence_unit', h['episode']) for h in resolved}
         conditions = {digest(h['condition']) for h in resolved}
         fraction = counts['supported'] / len(resolved) if resolved else None
         progress = dict(attempts=len(history), resolved=len(resolved), results=dict(counts),
-                        episodes=len(episodes), conditions=len(conditions), support_fraction=fraction)
+                        episodes=len(episodes), conditions=len(conditions), support_fraction=fraction,
+                        independent_physical_episodes=len({h['episode'] for h in physical}),
+                        offline_trials=len(offline), independent_offline_evidence_units=len(units))
         status = project['status']; rationale = None; disposition = None
         # A single success/failure is never project completion.
-        if (len(resolved) >= c['min_resolved'] and len(episodes) >= c['min_episodes']
+        if (effective_resolved >= c['min_resolved'] and len(episodes) >= c['min_episodes']
                 and len(conditions) >= c['min_conditions'] and fraction >= c['support_fraction']):
             status, disposition = 'completed', 'achieved'
             rationale = 'Cumulative diagnostic replication criterion met across episodes and conditions; not a causal score or SELF certification'
@@ -274,7 +282,9 @@ class LearningExecutive:
             raise ValueError('experiment escaped project question')
         outcome = dict(prediction_id=plan['prediction_id'], resolution_id=record.id,
             episode=episode, condition=condition,
-            result=resolution['result'], reason=resolution['reason'], memory_id=plan['memory_id'])
+            result=resolution['result'], reason=resolution['reason'], memory_id=plan['memory_id'],
+            experiment_kind=plan.get('experiment_kind','physical'),
+            independence_unit=plan.get('independence_unit',episode), dataset_id=plan.get('dataset_id'))
         self._event(dict(op='outcome', project_id=project_id, outcome=outcome), (ref.id,))
         return self.assess(project_id)
 

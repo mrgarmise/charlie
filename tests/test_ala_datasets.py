@@ -55,7 +55,8 @@ def test_partial_crops_of_same_capture_do_not_leak(tmp_path):
 
 
 def test_registry_is_optional_and_inspectable():
-    assert 'torch' not in sys.modules
+    import subprocess
+    subprocess.run([sys.executable,'-c',"import learning.datasets, learning.capabilities, learning.cycle; import sys; assert 'torch' not in sys.modules"],check=True)
     registry=default_registry()
     assert registry.get('cnn-reconstruction').execution=='offline'
     assert len(registry.describe())==4

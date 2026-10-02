@@ -411,3 +411,66 @@ def reflect_episode_context(root,journal,episode,gateway,*,plan=None,resolution=
     for question in questions:_queue_question(gateway.evaluator.path.with_name('robotron-questions.jsonl'),dict(question,id=digest(dict(episode=episode,question=question)),status='open',recording=str(root),evidence=event.id,episode=episode))
     gateway.remember(Experience(kind='observation',summary=f"One source episode: identity reports {dict(identities)}; outcome {report.get('result')}; experiment {(resolution or {}).get('result','none')}; {len(questions)} unresolved evidence questions. Retrospective links and score changes do not establish causal performance improvement",source='ppal:episode-context-reflection',subject=episode,confidence=1.,significant=True,tags=('reflection','diagnostic','uncertain'),evidence=event.id))
     return dict(context,evidence_id=event.id)
+
+
+def reflect_perceptual_opportunities(dataset, gateway, registry):
+    """Generic evidence-gap/method adapter within existing rule-based Reflection.
+
+    No Robotron appearance, selected direction, verified identity or score label.
+    Reconstruction is an investigatory method, not an explanation of SELF loss.
+    """
+    from learning.datasets import SCOPE
+    from memory.evidence import canonical, digest
+    rows=dataset.examples()
+    contexts=[r for r in dataset.journal.records('observation') if r.data['payload'].get('category')=='learning_context_reference']
+    gaps=[]
+    for r in contexts:
+        p=r.data['payload']['context']; counts=p.get('identity_samples',{})
+        if counts.get('unknown',0) or p.get('questions'):
+            gaps.append(r)
+    if not gaps: return []
+    snapshots={}; alternatives=[]
+    for objective,method in [('classification','cnn-classification'),('reconstruction','cnn-reconstruction')]:
+        try:
+            snap=dataset.snapshot(objective=objective); snapshots[method]=snap
+            # Independent verified targets allow direct supervised evaluation.
+            rank=2 if objective=='classification' else 1
+            alternatives.append(dict(method=method,eligible=True,rank=rank,
+                reason='verified target coverage' if rank==2 else 'unlabeled independent RGB coverage; investigate representation only'))
+        except ValueError as exc:
+            alternatives.append(dict(method=method,eligible=False,rank=0,reason=str(exc)))
+    for method in ('collect-examples','clarify-labels'):
+        alternatives.append(dict(method=method,eligible=True,rank=0,
+            reason='requires future independent evidence; no executable acquisition/verification adapter'))
+    eligible=[a for a in alternatives if a['eligible'] and a['method'] in snapshots]
+    if not eligible:
+        dataset.journal.append('event',dict(category='perceptual_learning_deferred',alternatives=alternatives,
+            question='What independent evidence would permit a useful perception experiment?'),episode=SCOPE,
+            sources=[r.id for r in gaps],producer='Reflection',version='perception-opportunities-v1')
+        return []
+    output=[]
+    for selected in sorted(eligible,key=lambda a:a['rank'],reverse=True):
+        method=selected['method']; snap=snapshots[method]; cap=registry.get(method)
+        spec=dict(method=method,scope={'objective':snap.data['payload']['objective'],'dataset_family':'visual-experience'},
+            expected='held-out metric improves over train-only baseline',dataset_id=snap.id,
+            question='Can an available learned visual representation generalize to independent episodes, and what remains unrepresented?',
+            source_evidence=[r.id for r in gaps],alternatives=alternatives,
+            objective='diagnostic generalization; official game score benefit unestablished',
+            rank=[selected['rank'],snap.data['payload']['independent_groups']])
+        hypothesis=dataset.journal.append('event',dict(category='perceptual_experiment_proposal',proposal=spec),
+            episode=SCOPE,sources=[snap.id]+[r.id for r in gaps],producer='Reflection',version='perception-opportunities-v1')
+        gateway.remember(Experience(kind='observation',summary='Perceptual experiment hypothesis: '+canonical(spec),
+            source='ppal:perceptual-reflection',subject=method,confidence=.5,significant=True,novelty=True,
+            tags=('perception','hypothesis','offline','tentative'),evidence=hypothesis.id))
+        proposal=dict(originator='Reflection',method=method,scope=spec['scope'],expected=spec['expected'],
+            goal=spec['question'],motivation='Investigate observed evidence gaps without converting interpretations into facts',
+            open_questions=['Does this method improve independent diagnostic generalization?',
+                            'Does any diagnostic improvement help actual task performance?'],
+            requires=['offline-slot','RGB-examples','torch'],dependencies=[],established_objective='official_game_score',
+            objective_contribution=.5,learning_value=.6+.05*selected['rank'],uncertainty=.8,cost=cap.cost,risk=.2,
+            priority_provenance='declared capability cost and verified-versus-unlabeled coverage; not learned reward utility',
+            tactical_hypothesis_evidence=[hypothesis.id],conditions=[],revision='1')
+        record=dataset.journal.append('event',dict(category='learning_project_proposal',proposal=proposal),
+            episode=SCOPE,sources=[hypothesis.id],producer='Reflection',version='perception-opportunities-v1')
+        output.append(dict(proposal=proposal,evidence_id=record.id,hypothesis_id=hypothesis.id,alternatives=alternatives))
+    return output

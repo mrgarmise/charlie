@@ -178,3 +178,49 @@ def resolve_experiment(root, episode_journal, episode, commitment_journal, plan,
         memory_evaluation_after={k:after.get(k) for k in ('status','priority')},
         hypothesis_status='tentative; no physical identity or game-rule certification',
         attempted=bool(attempts),score_attribution=None)
+
+
+def select_offline_experiment(gateway, journal, project_context, *, budget_seconds):
+    """Offline method extension of the existing Evaluator-first tactical chooser."""
+    from learning.datasets import SCOPE
+    from memory.evidence import digest
+    if project_context['method'] not in ('cnn-reconstruction','cnn-classification'): return None
+    choices=[]
+    for row in gateway.evaluator.for_evidence(project_context['hypothesis_evidence']):
+        if row['status']!='promoted' or row.get('source')!='ppal:perceptual-reflection': continue
+        try: spec=json.JSONDecoder().raw_decode(row['text'][len('Perceptual experiment hypothesis: '):])[0]
+        except (ValueError,TypeError): continue
+        if spec.get('method')==project_context['method'] and spec.get('scope')==project_context['scope'] and spec.get('expected')==project_context['expected']:
+            choices.append((row,spec))
+    if not choices: return None
+    attempted={h.get('dataset_id') for h in project_context['experiment_history']}
+    fresh=[choice for choice in choices if choice[1]['dataset_id'] not in attempted]
+    row,spec=max(fresh or choices,key=lambda pair:(pair[0]['priority'],*pair[1]['rank']))
+    snapshot=journal.get(spec['dataset_id']).data['payload']
+    # Fixed bounded component vocabulary, not a finished classifier. Candidate
+    # alternatives are generated from input shape/coverage and resource budget.
+    size=32
+    epochs=min(100,max(8,int(budget_seconds)))
+    candidates=[dict(family='small-cnn',objective=snapshot['objective'],channels=channels,kernel=3,
+        activation='relu',size=size,epochs=epochs,lr=lr,seed=0,patience=10)
+        for channels,lr in [([4],.01),([8,16],.003)]]
+    key=digest(dict(project_id=project_context['project_id'],dataset=spec['dataset_id'],method=spec['method']))
+    prior=[r for r in journal.records('event') if r.data['payload'].get('category')=='offline_experiment_plan' and r.data['payload'].get('key')==key]
+    if prior: return prior[0].data['payload']['plan']
+    recalled=journal.append('observation',dict(category='evaluated_memory_recalled',proposal=spec,memory_id=row['id'],project_context=project_context),
+        episode=SCOPE,producer='MemoryEvaluator',version='ala-1')
+    at=time.monotonic()
+    prediction=journal.predict(dict(expected=spec['expected'],dataset=spec['dataset_id'],
+        metric='balanced_accuracy' if snapshot['objective']=='classification' else 'reconstruction_mse',
+        uncertainty='diagnostic expectation, no semantic or score claim'),episode=SCOPE,at=at,
+        deadline=at+budget_seconds+60,sources=[recalled.id],producer='existing-memory-offline-test',version='ala-1',mode='live_prospective')
+    plan=dict(project_id=project_context['project_id'],prediction_id=prediction.id,memory_id=row['id'],
+        dataset_id=spec['dataset_id'],expected=spec['expected'],condition=spec['scope'],candidates=candidates,
+        budget_seconds=budget_seconds,experiment_kind='offline',
+        independence_unit=digest(sorted({r['independence_group'] for r in snapshot['examples'] if r['partition']=='test'})),
+        source_evidence=spec['source_evidence'],alternatives=[dict(memory_id=r['id'],evaluator_priority=r['priority'],rank=s['rank']) for r,s in choices],
+        method_alternatives=spec['alternatives'],reason='existing Evaluator priority, then independent coverage; architecture comparison on validation only')
+    journal.append('event',dict(category='offline_experiment_plan',key=key,plan=plan),episode=SCOPE,
+        sources=[prediction.id],producer='existing-chooser',version='ala-1')
+    gateway.record_decision('offline:'+prediction.id,'diagnostic-generalization',[row['id']])
+    return plan

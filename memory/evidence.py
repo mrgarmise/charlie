@@ -7,6 +7,7 @@ Replay commitments are explicitly replay commitments, never historical forecasts
 from __future__ import annotations
 
 from dataclasses import dataclass
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -46,6 +47,7 @@ class EvidenceJournal:
     def __init__(self, path, on_progress=None):
         self.path = Path(path)
         self.on_progress = on_progress
+        self._batch_depth = 0
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(self.path)
         self.conn.execute("PRAGMA foreign_keys=ON")
@@ -86,12 +88,45 @@ class EvidenceJournal:
         return EvidenceRecord(*row)
 
     def verify(self):
-        for row in self.records():
+        for values in self.conn.execute("SELECT sequence,id,document,committed_at FROM records ORDER BY sequence"):
+            row = EvidenceRecord(*values)
             if row.data.get('schema') != SCHEMA or digest(row.data) != row.id:
                 raise ValueError("invalid evidence schema or content digest")
             for source in row.data['sources']:
                 if self.get(source).sequence >= row.sequence:
                     raise ValueError("evidence references must precede commitment")
+            if self.on_progress: self.on_progress()
+
+    @contextmanager
+    def batch(self):
+        """Atomic durable observation unit; synchronous durability is unchanged."""
+        outer = self._batch_depth == 0
+        if outer: self.conn.execute('BEGIN')
+        self._batch_depth += 1
+        try:
+            yield
+            if outer: self.conn.commit()
+        except BaseException:
+            if outer: self.conn.rollback()
+            raise
+        finally:
+            self._batch_depth -= 1
+        if outer and self.on_progress: self.on_progress()
+
+    def existing_prediction(self, expected, *, episode, at, deadline, sources, producer,
+                            version, mode='replay_prospective'):
+        """Recover only an exact committed forecast; no hindsight creation."""
+        doc = dict(schema=SCHEMA, kind='prediction', episode=episode, at=at,
+                   producer=producer, version=version, sources=list(sources), provenance={},
+                   payload=dict(expected=expected, deadline=deadline, mode=mode))
+        try: return self.get(digest(doc))
+        except KeyError: return None
+
+    def resolution_for(self, prediction_id):
+        row = self.conn.execute("SELECT sequence,id,document,committed_at FROM records WHERE "
+            "json_extract(document,'$.kind')='resolution' AND "
+            "json_extract(document,'$.payload.prediction_id')=?", (prediction_id,)).fetchone()
+        return EvidenceRecord(*row) if row else None
 
     def append(self, kind, payload, *, episode, at=None, sources=(), producer,
                version, provenance=None):
@@ -113,11 +148,18 @@ class EvidenceJournal:
                    producer=producer, version=version, sources=list(sources),
                    provenance=provenance or {}, payload=payload)
         identifier = digest(doc)
-        with self.conn:
+        try: existing = self.get(identifier)
+        except KeyError: existing = None
+        if existing is not None:
+            if self.on_progress and not self._batch_depth: self.on_progress()
+            return existing
+        def insert():
             self.conn.execute("INSERT OR IGNORE INTO records(id,document,committed_at) VALUES (?,?,?)",
                               (identifier, canonical(doc), datetime.now(timezone.utc).isoformat()))
-        if self.on_progress:
-            self.on_progress()
+        if self._batch_depth: insert()
+        else:
+            with self.conn: insert()
+        if self.on_progress and not self._batch_depth: self.on_progress()
         return self.get(identifier)
 
     def predict(self, expected, *, episode, at, deadline, sources, producer,

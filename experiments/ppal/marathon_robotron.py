@@ -33,25 +33,39 @@ def run_bounded(cmd, timeout=None):
                      silence=timeout or 30., processing=90.)
 
 
-def process_supervised(game, output, gateway, commitments, plan=None, executive=None, budget=300.):
+class ProcessingYield(Exception):
+    """Checkpoint after productive work, not an episode failure or verdict."""
+
+class ProcessingDeferred(RuntimeError):
+    """Bounded productive processing needs another offline invocation."""
+
+
+def process_supervised(game, output, gateway, commitments, plan=None, executive=None, budget=300., chunks=3):
     from .progress_supervision import supervise
     output.mkdir(parents=True, exist_ok=True)
     config = dict(game=str(game), output=str(output), evaluator=str(gateway.evaluator.path),
                   outbox=str(gateway.store.path), project=gateway.project, session=gateway.session,
                   commitments=str(commitments.path), plan=plan,
                   project_evidence=str(executive.journal.path) if executive else None,
-                  progress=str(output/'processing-progress.json'))
+                  progress=str(output/'processing-progress.json'), work_budget=budget)
     # Paths and already committed plan only; no credentials or new hypotheses.
     path = output/'processing-config.json'
     write_session(path, config)
-    rc = supervise([sys.executable,'-m','experiments.ppal.process_robotron_episode',str(path)],
-                   config['progress'], processing=60., budget=budget)
-    if rc != 0:
-        raise RuntimeError(f'between-game processing stopped (rc={rc}); retained partial evidence at {output}')
+    for attempt in range(chunks):
+        rc = supervise([sys.executable,'-m','experiments.ppal.process_robotron_episode',str(path)],
+                       config['progress'], processing=60., budget=budget+10.)
+        write_session(output/f'processing-chunk-{attempt+1:02d}.json',dict(
+            supervisor=load_report(output/'processing-progress-supervisor.json'),
+            resources=load_report(output/'processing-resources.json')))
+        if rc == 0: break
+        if rc != 75:
+            raise RuntimeError(f'between-game processing stopped (rc={rc}); retained partial evidence at {output}')
+    else:
+        raise ProcessingDeferred(f'between-game processing deferred after {chunks} productive chunks; resume {path}; no new START authorized')
     return load_report(output/'between-game.json')
 
 
-def process_completed_episode(game, output, gateway, commitments, plan=None, executive=None, progress=None):
+def process_completed_episode(game, output, gateway, commitments, plan=None, executive=None, progress=None, work_budget=None):
     """Existing E/E + Reflection + Meditation + Evaluator, between games only."""
     from memory.evidence import EvidenceJournal
     from .episode_evidence import import_episode, derive_episode, summarize
@@ -60,15 +74,22 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
     from .meditate_robotron import meditate, quality
     from .evaluate_robotron_shadow import evaluate
     output.mkdir(parents=True,exist_ok=True)
+    import resource
+    began=time.monotonic()
+    stage_resources={}
     stage_times = {}
     last_progress = [0.]
     def pulse():
+        if work_budget is not None and time.monotonic()-began >= work_budget:
+            raise ProcessingYield('productive work budget reached; committed units retained')
         if progress and time.monotonic()-last_progress[0] >= 1.:
             progress.update(processing_units=progress.data.get('processing_units',0)+1)
             last_progress[0] = time.monotonic()
     def stage(name):
         now = time.monotonic()
         stage_times[name] = now
+        usage=resource.getrusage(resource.RUSAGE_SELF)
+        stage_resources[name]=dict(elapsed=now-began,cpu=usage.ru_utime+usage.ru_stime,max_rss_kib=usage.ru_maxrss)
         if progress: progress.update(stage=name)
         print(f'BETWEEN GAME: {name}', flush=True)
     journal=EvidenceJournal(output/'evidence.sqlite3', on_progress=pulse)
@@ -79,6 +100,9 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
         # as outcomes of the pre-game experiment.
         stage('resolve_experiment')
         resolution=resolve_experiment(game,journal,episode,commitments,plan,gateway) if plan else None
+        assessment = None
+        if executive is not None and plan and plan.get('project_id') and resolution:
+            assessment=executive.record_result(plan['project_id'],plan,resolution,commitments,episode=episode)
         stage('derive')
         derive_episode(game,journal,episode)
         stage('reflection')
@@ -87,10 +111,10 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
         project_updates = None
         if executive is not None:
             project_proposals = reflect_learning_projects(journal, episode, proposals)
-            ids = [executive.propose(p['proposal'], journal, [p['evidence_id']]) for p in project_proposals]
-            assessment = None
-            if plan and plan.get('project_id') and resolution:
-                assessment = executive.record_result(plan['project_id'], plan, resolution, commitments, episode=episode)
+            ids=[]
+            for proposal in project_proposals:
+                ids.append(executive.propose(proposal['proposal'],journal,[proposal['evidence_id']]))
+                pulse()
             project_updates = dict(proposed=ids, assessment=assessment)
         report=load_report(game/'report.json')
         shadow = evaluate(report) if report else {'status':'unavailable; no finalized report', 'boundary':'unknown'}
@@ -110,9 +134,14 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
             result['learning_projects'] = project_updates
         stage('complete')
         result['processing_timing'] = stage_times
+        result['processing_resources'] = stage_resources
         (output/'between-game.json').write_text(json.dumps(result,indent=2)+'\n')
         return result
     finally:
+        usage=resource.getrusage(resource.RUSAGE_SELF)
+        write_session(output/'processing-resources.json',dict(elapsed=time.monotonic()-began,
+            cpu_seconds=usage.ru_utime+usage.ru_stime,max_rss_kib=usage.ru_maxrss,stages=stage_resources,
+            database_bytes={p.name:p.stat().st_size for p in output.glob('*.sqlite3')}))
         journal.close()
 
 
@@ -229,6 +258,10 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             time.sleep(args.retry_wait)
     except KeyboardInterrupt:
         doc['status']='interrupted'
+    except ProcessingDeferred as exc:
+        doc['status']='processing_deferred'
+        doc['error']=str(exc)
+        print(f'DEVELOPMENT PAUSED: {exc}',flush=True)
     except Exception as exc:
         doc['status']='between_game_failure'
         doc['error']=f'{type(exc).__name__}: {exc}'

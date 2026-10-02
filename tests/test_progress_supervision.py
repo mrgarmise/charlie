@@ -204,3 +204,20 @@ def test_partial_episode_runs_existing_between_game_path_without_report(tmp_path
     assert result['proposals']==[] and result['resolution'] is None
     assert json.loads((tmp_path/'between/shadow-evaluation.json').read_text())['boundary']=='unknown'
     commitments.close()
+
+
+def test_productive_derivation_exceeds_inactivity_threshold(tmp_path):
+    path=tmp_path/'processing.json';database=tmp_path/'evidence.sqlite3';game=tmp_path/'game';game.mkdir()
+    (game/'report.json').write_text('{}')
+    rows=[dict(sample=n,capture_timestamp=float(n),tracking=dict(events=[],detections=[dict(track_id=1,center=[n,0])])) for n in range(1,31)]
+    (game/'agency.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in rows))
+    body=("from memory.evidence import EvidenceJournal\n"
+          "from experiments.ppal.episode_evidence import import_episode,derive_episode\n"
+          "p.enter('processing')\n"
+          "def committed():p.update(processing_units=p.data.get('processing_units',0)+1);time.sleep(.02)\n"
+          f"j=EvidenceJournal({str(database)!r},on_progress=committed)\n"
+          f"episode=import_episode({str(game)!r},j)\n"
+          f"derive_episode({str(game)!r},j,episode)\n"
+          "j.close()\n")
+    assert supervise(child_command(path,body),path,processing=.15,silence=2.,poll=.01,grace=.2)==0
+    assert json.loads(path.with_name('processing-supervisor.json').read_text())['elapsed']>.5

@@ -68,12 +68,13 @@ def import_episode(root, journal):
                 at = row.get('at', at)  # Existing diary's explicit monotonic phase timestamps.
             # Legacy relative t is NOT interchangeable with sensor monotonic time.
             ref = {**refs[name], 'line':line}
-            add(category, ref, at=at, subsystem=name.removesuffix('.jsonl'))
-            execution = row.get('control_execution') if name=='agency.jsonl' else None
-            if execution and digest(execution) not in executions:
-                executions.add(digest(execution))
-                add('action_transport_report',{**ref,'pointer':['control_execution']},
-                    at=execution.get('started_at'),subsystem='controller')
+            with journal.batch():
+                add(category, ref, at=at, subsystem=name.removesuffix('.jsonl'))
+                execution = row.get('control_execution') if name=='agency.jsonl' else None
+                if execution and digest(execution) not in executions:
+                    executions.add(digest(execution))
+                    add('action_transport_report',{**ref,'pointer':['control_execution']},
+                        at=execution.get('started_at'),subsystem='controller')
     for index, step in enumerate(report.get('steps', [])):
         ref = {**refs['report.json'], 'pointer':['steps', index]}
         add('planning_observation', ref, step.get('observed_at',step.get('capture_timestamp')))
@@ -128,31 +129,41 @@ def derive_episode(root, journal, episode, *, window=3, tolerance=2.0):
         track = row.get('tracking')
         if not track:
             continue
-        for event in track.get('events',[]):
-            # 'created' means tracker allocation, not confirmed physical birth.
-            if event.get('kind') in ('created','missed','finished'):
-                derivations.append(journal.append('event', dict(category='tracker_'+event['kind'],
-                    report=event, physical_birth_death='unknown'), episode=episode, at=doc['at'],
-                    sources=(record.id,), producer='SpriteTracker-report-adapter', version=version))
-        if previous_agency:
-            old = read_verified(previous_agency.data['payload']['artifact'])
-            before = old.get('identity_status', 'confirmed' if old.get('self_track_id') is not None else 'unknown')
-            after = row.get('identity_status', 'confirmed' if row.get('self_track_id') is not None else 'unknown')
-            if before != after or old.get('self_track_id') != row.get('self_track_id'):
-                derivations.append(journal.append('event', dict(category='self_belief_changed',
-                    before=dict(status=before,track_id=old.get('controlled_track_id',old.get('self_track_id'))),
-                    after=dict(status=after,track_id=row.get('controlled_track_id',row.get('self_track_id'))),
-                    confidence=row.get('confidence'), status='belief, not certified physical identity'),
-                    episode=episode, at=doc['at'], sources=(previous_agency.id,record.id),
-                    producer='AgencyTracker-report-adapter', version=version))
-        previous_agency = record
-        for d in track.get('detections',[]):
-            history.setdefault(d['track_id'], []).append((record,dict(tick=row['sample'],center=d['center'])))
+        with journal.batch():
+            for event in track.get('events',[]):
+                # 'created' means tracker allocation, not confirmed physical birth.
+                if event.get('kind') in ('created','missed','finished'):
+                    derivations.append(journal.append('event', dict(category='tracker_'+event['kind'],
+                        report=event, physical_birth_death='unknown'), episode=episode, at=doc['at'],
+                        sources=(record.id,), producer='SpriteTracker-report-adapter', version=version))
+            if previous_agency:
+                old = read_verified(previous_agency.data['payload']['artifact'])
+                before = old.get('identity_status', 'confirmed' if old.get('self_track_id') is not None else 'unknown')
+                after = row.get('identity_status', 'confirmed' if row.get('self_track_id') is not None else 'unknown')
+                if before != after or old.get('self_track_id') != row.get('self_track_id'):
+                    derivations.append(journal.append('event', dict(category='self_belief_changed',
+                        before=dict(status=before,track_id=old.get('controlled_track_id',old.get('self_track_id'))),
+                        after=dict(status=after,track_id=row.get('controlled_track_id',row.get('self_track_id'))),
+                        confidence=row.get('confidence'), status='belief, not certified physical identity'),
+                        episode=episode, at=doc['at'], sources=(previous_agency.id,record.id),
+                        producer='AgencyTracker-report-adapter', version=version))
+            previous_agency = record
+            for d in track.get('detections',[]):
+                history.setdefault(d['track_id'], []).append((record,dict(tick=row['sample'],center=d['center'])))
     # One ordered replay notebook, not one tracker/association per object.
     replay_path = journal.path.with_name(journal.path.stem + f'.{version}.replay.sqlite3')
-    if replay_path.exists():
-        raise ValueError('incomplete replay derivation exists; retain it and use a new output/version')
     replay = EvidenceJournal(replay_path, on_progress=journal.on_progress)
+    def predict_once(expected, **args):
+        return replay.existing_prediction(expected, **args) or replay.predict(expected, **args)
+    def resolve_once(identifier, **args):
+        existing = replay.resolution_for(identifier)
+        if existing:
+            payload = existing.data['payload']
+            if (any(payload[k] != args.get(k) for k in ('result','reason','error'))
+                    or existing.data['sources'] != [identifier,*args.get('sources',())]):
+                raise ValueError('resumption conflicts with committed resolution; use a new interpretation version')
+            return existing
+        return replay.resolve(identifier, **args)
     pending = {}
     past = {}
     by_record = {}
@@ -164,35 +175,36 @@ def derive_episode(root, journal, episode, *, window=3, tolerance=2.0):
             at = source.data['at']
             if at is None:
                 continue
-            observation = replay.append('observation',dict(canonical_evidence=source.id,
-                artifact=source.data['payload']['artifact']), episode=episode,at=at,
-                producer='canonical-evidence-reference',version='1')
-            sample = next(iter(points.values()))['tick']
-            for identifier, prediction in list(pending.items()):
-                point = points.get(identifier)
-                expected = prediction.data['payload']['expected']
-                timely = at<=prediction.data['payload']['deadline'] and sample==expected['target_sample']
-                error = hypot(point['center'][0]-expected['center'][0],point['center'][1]-expected['center'][1]) if point else None
-                resolution = replay.resolve(prediction.id,sources=(observation.id,),
-                    result=('supported' if error<=tolerance else 'contradicted') if point and timely else 'unresolved',
-                    reason='same tracker ID at predicted sample within horizon' if point and timely else 'same ID not observed at predicted sample within horizon',
-                    error=error if point and timely else None)
-                derivations.append(journal.append('resolution_reference',dict(**resolution.data['payload'],
-                    replay_artifact=replay_path.name, replay_resolution_id=resolution.id),
-                    episode=episode,at=at,sources=(source.id,),producer='predict_robotron.predict_next',version=version))
-                del pending[identifier]
-            for identifier, point in points.items():
-                past.setdefault(identifier,[]).append(point)
-                if identifier in pending or len(past[identifier])<2:
-                    continue
-                expected = predict_next(past[identifier],point['tick']+1,window=window)
-                pending[identifier] = replay.predict(dict(track_id=identifier,center=list(expected),
-                    target_sample=point['tick']+1,tolerance=tolerance,units='normalized_board_percent',
-                    condition='same ID in next agency sample within one second'),
-                    episode=episode,at=at,deadline=at+1.0,sources=(observation.id,),
-                    producer='predict_robotron.predict_next',version=version)
+            with journal.batch(), replay.batch():
+                observation = replay.append('observation',dict(canonical_evidence=source.id,
+                    artifact=source.data['payload']['artifact']), episode=episode,at=at,
+                    producer='canonical-evidence-reference',version='1')
+                sample = next(iter(points.values()))['tick']
+                for identifier, prediction in list(pending.items()):
+                    point = points.get(identifier)
+                    expected = prediction.data['payload']['expected']
+                    timely = at<=prediction.data['payload']['deadline'] and sample==expected['target_sample']
+                    error = hypot(point['center'][0]-expected['center'][0],point['center'][1]-expected['center'][1]) if point else None
+                    resolution = resolve_once(prediction.id,sources=(observation.id,),
+                        result=('supported' if error<=tolerance else 'contradicted') if point and timely else 'unresolved',
+                        reason='same tracker ID at predicted sample within horizon' if point and timely else 'same ID not observed at predicted sample within horizon',
+                        error=error if point and timely else None)
+                    derivations.append(journal.append('resolution_reference',dict(**resolution.data['payload'],
+                        replay_artifact=replay_path.name, replay_resolution_id=resolution.id),
+                        episode=episode,at=at,sources=(source.id,),producer='predict_robotron.predict_next',version=version))
+                    del pending[identifier]
+                for identifier, point in points.items():
+                    past.setdefault(identifier,[]).append(point)
+                    if identifier in pending or len(past[identifier])<2:
+                        continue
+                    expected = predict_next(past[identifier],point['tick']+1,window=window)
+                    pending[identifier] = predict_once(dict(track_id=identifier,center=list(expected),
+                        target_sample=point['tick']+1,tolerance=tolerance,units='normalized_board_percent',
+                        condition='same ID in next agency sample within one second'),
+                        episode=episode,at=at,deadline=at+1.0,sources=(observation.id,),
+                        producer='predict_robotron.predict_next',version=version)
         for prediction in pending.values():
-            resolution = replay.resolve(prediction.id,sources=(),result='unresolved',reason='episode ended without outcome')
+            resolution = resolve_once(prediction.id,sources=(),result='unresolved',reason='episode ended without outcome')
             derivations.append(journal.append('resolution_reference',dict(**resolution.data['payload'],
                 replay_artifact=replay_path.name,replay_resolution_id=resolution.id),episode=episode,
                 producer='predict_robotron.predict_next',version=version))

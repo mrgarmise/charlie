@@ -6,7 +6,7 @@ from math import hypot, isfinite
 from pathlib import Path
 import time
 
-from memory.evidence import EvidenceJournal, read_artifact
+from memory.evidence import ArtifactReader, EvidenceJournal, read_artifact
 from memory.former import Experience
 from .hindbrain import MOVE_VECTORS, distance_to_segment
 from .models import Action, Position
@@ -117,6 +117,7 @@ def experimental_action(plan, world, intent, baseline, snapshot, *, now):
 
 def resolve_experiment(root, episode_journal, episode, commitment_journal, plan, gateway):
     report=json.loads((Path(root)/'report.json').read_text())
+    read_verified=ArtifactReader(root)
     attempts=[s for s in report.get('steps',[]) if (s.get('experiment') or {}).get('prediction_id')==plan['prediction_id']]
     result='unresolved';reason='experiment not executed';source_ids=[];matching=None
     if attempts:
@@ -125,7 +126,7 @@ def resolve_experiment(root, episode_journal, episode, commitment_journal, plan,
         for record in episode_journal.records('observation'):
             data=record.data
             if data['episode']!=episode or data['payload'].get('category')!='agency_tracking_observation':continue
-            row=read_artifact(root,data['payload']['artifact']);window=row.get('response_window') or {}
+            row=read_verified(data['payload']['artifact']);window=row.get('response_window') or {}
             control=row.get('control_execution') or {}
             if (window.get('endpoint')!=2 or window.get('origin_at')!=context['origin_at']
                     or window.get('move')!=plan['body']):continue
@@ -151,7 +152,13 @@ def resolve_experiment(root, episode_journal, episode, commitment_journal, plan,
                 episode=plan['scope'],at=at,producer='AgencyTracker-report-adapter',version='1')
             source_ids.append(outcome.id)
             break
-    resolution=commitment_journal.resolve(plan['prediction_id'],sources=source_ids,result=result,reason=reason)
+    resolution=commitment_journal.resolution_for(plan['prediction_id'])
+    if resolution:
+        payload=resolution.data['payload']
+        if payload['result']!=result or payload['reason']!=reason or resolution.data['sources'] != [plan['prediction_id'],*source_ids]:
+            raise ValueError('new interpretation conflicts with committed experiment resolution')
+    else:
+        resolution=commitment_journal.resolve(plan['prediction_id'],sources=source_ids,result=result,reason=reason)
     before=next((r for r in gateway.evaluator.recent(100) if r['id']==plan['memory_id']),{})
     change='no usefulness credit for unresolved evidence'
     if result!='unresolved':

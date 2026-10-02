@@ -132,3 +132,43 @@ def test_existing_session_diary_retains_absolute_phase_time(tmp_path):
     rows=[r for r in journal.records('observation') if r.data['payload']['category']=='session_event_observation']
     assert len(rows)==1 and rows[0].data['at']==1234.5
     journal.close()
+
+
+def test_interrupted_replay_resumes_exact_forecasts(tmp_path):
+    root=make_episode(tmp_path/'run');journal=EvidenceJournal(tmp_path/'e.sqlite3')
+    episode=import_episode(root,journal);calls=[0]
+    def checkpoint():
+        if list(tmp_path.glob('*.replay.sqlite3')):
+            calls[0]+=1
+            if calls[0]==4:raise InterruptedError('checkpoint')
+    journal.on_progress=checkpoint
+    with pytest.raises(InterruptedError):derive_episode(root,journal,episode)
+    journal.on_progress=None
+    derive_episode(root,journal,episode);ids=[r.id for r in journal.records()]
+    derive_episode(root,journal,episode);assert [r.id for r in journal.records()]==ids
+    replay=EvidenceJournal(next(tmp_path.glob('*.replay.sqlite3')));replay.verify()
+    assert len(replay.records('prediction'))==len(replay.records('resolution'))
+    assert len(journal.records('derivation_complete'))==1
+    replay.close();journal.close()
+
+
+def test_failed_atomic_unit_rolls_back(tmp_path):
+    journal=EvidenceJournal(tmp_path/'e.sqlite3')
+    with pytest.raises(InterruptedError):
+        with journal.batch():
+            journal.append('observation',{},episode='e',at=1,producer='sensor',version='1')
+            raise InterruptedError()
+    assert journal.records()==[];journal.close()
+
+
+def test_productive_budget_yields_then_retries(tmp_path):
+    from experiments.ppal.marathon_robotron import process_completed_episode,ProcessingYield
+    root=make_episode(tmp_path/'run');output=tmp_path/'between'
+    gateway=MemoryGateway(store=JsonlStore(tmp_path/'memory.jsonl'),evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3'))
+    commitments=EvidenceJournal(tmp_path/'commit.sqlite3')
+    with pytest.raises(ProcessingYield):process_completed_episode(root,output,gateway,commitments,work_budget=0)
+    assert not (output/'between-game.json').exists()
+    first=process_completed_episode(root,output,gateway,commitments)
+    second=process_completed_episode(root,output,gateway,commitments)
+    assert first['evidence']['records']==second['evidence']['records']
+    commitments.close()

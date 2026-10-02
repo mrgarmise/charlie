@@ -67,8 +67,8 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
     if len(committed)!=1 or committed[0]!=plan: raise ValueError('execution must match the exact committed chooser plan')
     snapshot=journal.get(plan['dataset_id']).data['payload']
     resolved=journal.resolution_for(plan['prediction_id'])
-    if resolved:
-        return dict(status='already_resolved',resolution=resolved.data['payload'],resolution_id=resolved.id)
+    # A committed resolution may precede a crash before proposal/shadow/export.
+    # Reconcile those durable handoffs; do not rerun the final evaluation.
     output=Path(output)/plan['prediction_id']; output.mkdir(parents=True,exist_ok=True)
     training=[]
     for spec in plan['candidates']:
@@ -116,16 +116,28 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
     verdict=('supported' if metric['improved'] else 'contradicted') if in_horizon else 'unresolved'
     reason='Independent diagnostic metric compared with frozen train-only baseline; no gameplay causation inferred'
     if not in_horizon: reason='Completed outside the committed prediction horizon; diagnostic evaluation retained, forecast unresolved'
-    resolution=journal.resolve(plan['prediction_id'],sources=[outcome.id] if outcome.data['at']>forecast['at'] else [],result=verdict,reason=reason)
+    resolution=resolved or journal.resolve(plan['prediction_id'],sources=[outcome.id] if outcome.data['at']>forecast['at'] else [],result=verdict,reason=reason)
+    verdict=resolution.data['payload']['result'];reason=resolution.data['payload']['reason']
     proposal=journal.append('event',dict(category='model_deployment_proposal',candidate_id=candidate['identifier'],
         evaluation_id=outcome.id,eligible=metric['improved'],target='offline-shadow',
         production=False,reason='independent diagnostic improvement' if metric['improved'] else 'candidate failed diagnostic baseline',
         limitations=metric['limitations']),episode=SCOPE,sources=[resolution.id,outcome.id],producer='Reflection',version='ala-1')
-    return dict(status='resolved',result=verdict,reason=reason,resolution_id=resolution.id,
-        evaluation_id=outcome.id,deployment_proposal=proposal.id,metrics=metric,candidate_id=candidate['identifier'])
+    operational_proposal=None
+    contract=metric.get('operational')
+    if contract and contract['eligible'] and verdict=='supported':
+        operational_proposal=journal.append('event',dict(category='model_deployment_proposal',candidate_id=candidate['identifier'],
+            evaluation_id=outcome.id,eligible=True,target='ppal-semantics',production=False,contract=contract,
+            reason='independently evaluated semantic admission; separate shadow test and authorization required'),
+            episode=SCOPE,sources=[resolution.id,outcome.id],producer='Reflection',version='ala-2').id
+    shadow_id=None
+    if operational_proposal:
+        from .operational import shadow
+        shadow_id=shadow(journal,operational_proposal,snapshot).id
+    return dict(status='already_resolved' if resolved else 'resolved',resolution=resolution.data['payload'],result=verdict,reason=reason,resolution_id=resolution.id,
+        evaluation_id=outcome.id,deployment_proposal=proposal.id,operational_proposal=operational_proposal,shadow_id=shadow_id,metrics=metric,candidate_id=candidate['identifier'])
 
 
-def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None, executive=None, on_progress=None, diagnostics_only=False, review_questions=False):
+def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None, executive=None, on_progress=None, diagnostics_only=False, review_questions=False, deployment_authority=None):
     """Existing Executive selects portfolio; existing chooser selects method trial."""
     if gameplay_active(): raise RuntimeError('offline learning unavailable during active gameplay')
     if not 1<=max_jobs<=8 or not 1<=budget_seconds<=3600: raise ValueError('bounded offline resources required')
@@ -164,9 +176,11 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
                 source='learning:foundry-resolution',subject=project['id'],goal=project['goal'],
                 outcome=json.dumps(result.get('metrics',{})),significant=True,
                 tags=('offline','diagnostic','uncertain'),evidence=result['resolution_id']))
-        if result['status']=='resolved' and project['method'] not in ('model-diagnostics','evidence-review'):
+        if result['status'] in ('resolved','already_resolved') and project['method'] not in ('model-diagnostics','evidence-review'):
             from experiments.ppal.reflect_robotron import reflect_model_outcome
             result['reflection']=reflect_model_outcome(dataset.journal,plan,result,gateway)
+            from .deployment import CapabilityDeployment
+            result['deployment']=CapabilityDeployment(dataset.journal).apply_authority(result,deployment_authority,dataset.artifacts.parent/'semantic-activation.json')
         elif result['status']=='resolved':
             from experiments.ppal.reflect_robotron import reflect_retrieval_outcome
             result['reflection']=reflect_retrieval_outcome(dataset.journal,plan,result,gateway)
@@ -205,6 +219,7 @@ def main():
     parser.add_argument('--ingest-only',action='store_true')
     parser.add_argument('--diagnostics-only',action='store_true',help='retrieve existing failed-model evidence without opening pixel/model artifacts')
     parser.add_argument('--review-questions',action='store_true',help='also investigate unresolved questions by retrieving frozen experience references')
+    parser.add_argument('--deployment-authority',type=Path,help='pre-existing external bounded deployment authorization; not generated by learning')
     args=parser.parse_args()
     if gameplay_active(): parser.error('offline only: active player detected')
     args.output.mkdir(parents=True,exist_ok=True)
@@ -217,7 +232,7 @@ def main():
             for episode in args.episodes: ingest_episode(episode,dataset,gateway)
             if not args.ingest_only:
                 project_journal=EvidenceJournal(gateway.evaluator.path.with_name('learning-project-evidence.sqlite3'))
-                try: report=investigate(dataset,gateway,budget_seconds=args.budget_seconds,max_jobs=args.max_jobs,executive=LearningExecutive(project_journal,gateway),diagnostics_only=args.diagnostics_only,review_questions=args.review_questions)
+                try: report=investigate(dataset,gateway,budget_seconds=args.budget_seconds,max_jobs=args.max_jobs,executive=LearningExecutive(project_journal,gateway),diagnostics_only=args.diagnostics_only,review_questions=args.review_questions,deployment_authority=json.loads(args.deployment_authority.read_text()) if args.deployment_authority else None)
                 finally: project_journal.close()
                 print(json.dumps({k:report[k] for k in ('elapsed','autonomy','physical_gameplay_improvement')}))
         finally: journal.close()
@@ -225,7 +240,7 @@ def main():
 if __name__=='__main__': main()
 
 
-def postgame_learning(root, source_journal, episode, context, gateway, executive, output, *, budget_seconds=60., on_progress=None):
+def postgame_learning(root, source_journal, episode, context, gateway, executive, output, *, budget_seconds=60., on_progress=None, deployment_authority=None):
     """Optional existing between-game hook; reuse already computed context."""
     output=Path(output); output.mkdir(parents=True,exist_ok=True)
     with (output/'offline.lock').open('a') as lock:
@@ -242,5 +257,5 @@ def postgame_learning(root, source_journal, episode, context, gateway, executive
                     metadata=dict(review_subset=True,identity_status='unknown',physical_experiment=episode,
                         temporal_context='see original agency/action evidence',context_reference=reference.id))
                 if on_progress: on_progress()
-            return investigate(dataset,gateway,budget_seconds=budget_seconds,executive=executive,on_progress=on_progress)
+            return investigate(dataset,gateway,budget_seconds=budget_seconds,executive=executive,on_progress=on_progress,deployment_authority=deployment_authority)
         finally: journal.close()

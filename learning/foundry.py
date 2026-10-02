@@ -157,6 +157,7 @@ def evaluate(snapshot, candidate):
     spec=candidate['spec']; x,y,classes=load_data(snapshot,spec['size'])
     if candidate['dataset_digest']!=digest(snapshot) or sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']: raise ValueError('evaluation inputs changed')
     model=build(spec,len(classes)); model.load_state_dict(checked_load(candidate['checkpoint'])['weights']); model.eval()
+    operational=None
     with torch.no_grad():
         predictions=model(x['test'])
         if spec['objective']=='reconstruction':
@@ -170,8 +171,25 @@ def evaluate(snapshot, candidate):
             modal=y['train'].bincount(minlength=len(classes)).argmax()
             baseline=float(torch.stack([(y['test'][y['test']==c]==modal).float().mean() for c in present]).mean())
             metric='balanced_accuracy'; improved=score>baseline
+            if set(classes)=={'human','threat'} and all(r.get('crop') is not None and
+                    r.get('annotation',{}).get('status')=='verified' for r in snapshot['examples']):
+                # Admission thresholds are selected on validation, never test.
+                vp=model(x['validation']).softmax(1); vc,vi=vp.max(1)
+                wrong=vc[vi!=y['validation']]
+                threshold=max(.5,float(wrong.max())+1e-6) if len(wrong) else .5
+                tp=predictions.softmax(1);confidence,labels=tp.max(1)
+                accepted=confidence>=threshold
+                count=int(accepted.sum());coverage=count/len(labels)
+                accuracy=float((labels[accepted]==y['test'][accepted]).float().mean()) if count else None
+                operational=dict(target='ppal-semantics',input='RGB-candidate-crop',classes=classes,
+                    threshold=threshold,threshold_partition='validation',test_coverage=coverage,
+                    accepted_accuracy=accuracy,verified_targets=True,
+                    domains=sorted({r.get('metadata',{}).get('domain','unspecified') for r in snapshot['examples']}),
+                    eligible=bool(improved and coverage>=.8 and accuracy==1.),
+                    limitations=['finite held-out admission test; no safety guarantee or score utility',
+                                 'semantic metadata only; never SELF or physical identity'])
     return dict(metric=metric,candidate=score,baseline=baseline,improved=improved,
-        examples=len(x['test']),independence_groups=sorted({r['independence_group'] for r in snapshot['examples'] if r['partition']=='test'}),
+        examples=len(x['test']),independence_groups=sorted({r['independence_group'] for r in snapshot['examples'] if r['partition']=='test'}),operational=operational,
         limitations=['one held-out partition; no physical gameplay utility established','no semantic discovery or SELF certification inferred'])
 
 

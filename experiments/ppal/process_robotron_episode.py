@@ -30,10 +30,10 @@ def main():
         if args.resume:
             from .marathon_robotron import process_supervised
             process_supervised(Path(config['game']),Path(config['output']),gateway,commitments,
-                config.get('plan'),executive,budget=config.get('work_budget',300.),ala_root=config.get('ala_root'),ala_budget=config.get('ala_budget',60.))
+                config.get('plan'),executive,budget=config.get('work_budget',300.),ala_root=config.get('ala_root'),ala_budget=config.get('ala_budget',60.),ala_authority=config.get('ala_authority'))
             return
         process_completed_episode(Path(config['game']), Path(config['output']), gateway,
-                                  commitments, config.get('plan'), executive, progress=progress, work_budget=config.get('work_budget'),ala_root=config.get('ala_root'),ala_budget=config.get('ala_budget',60.))
+                                  commitments, config.get('plan'), executive, progress=progress, work_budget=config.get('work_budget'),ala_root=config.get('ala_root'),ala_budget=config.get('ala_budget',60.),ala_authority=config.get('ala_authority'))
     except ProcessingYield as exc:
         progress.update(stage='yielded',reason=str(exc))
         raise SystemExit(75)

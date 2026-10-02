@@ -33,6 +33,12 @@ class CapabilityRegistry:
         if identifier in ('model-diagnostics','evidence-review'):
             from .diagnostics import execute
             return execute(**inputs)
+        if identifier=='collect-examples':
+            from .acquisition import collect_crops
+            return collect_crops(**inputs)
+        if identifier=='clarify-labels':
+            from .acquisition import apply_annotations
+            return apply_annotations(**inputs)
         raise ValueError('capability is a prospective evidence request; no acquisition adapter available')
 
 

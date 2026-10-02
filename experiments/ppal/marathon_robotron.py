@@ -40,7 +40,7 @@ class ProcessingDeferred(RuntimeError):
     """Bounded productive processing needs another offline invocation."""
 
 
-def process_supervised(game, output, gateway, commitments, plan=None, executive=None, budget=300., chunks=3, ala_root=None, ala_budget=60.):
+def process_supervised(game, output, gateway, commitments, plan=None, executive=None, budget=300., chunks=3, ala_root=None, ala_budget=60.,ala_authority=None):
     from .progress_supervision import supervise
     output.mkdir(parents=True, exist_ok=True)
     config = dict(game=str(game), output=str(output), evaluator=str(gateway.evaluator.path),
@@ -48,7 +48,7 @@ def process_supervised(game, output, gateway, commitments, plan=None, executive=
                   commitments=str(commitments.path), plan=plan,
                   project_evidence=str(executive.journal.path) if executive else None,
                   progress=str(output/'processing-progress.json'), work_budget=budget,
-                  ala_root=str(ala_root) if ala_root else None, ala_budget=ala_budget)
+                  ala_root=str(ala_root) if ala_root else None, ala_budget=ala_budget,ala_authority=ala_authority)
     # Paths and already committed plan only; no credentials or new hypotheses.
     path = output/'processing-config.json'
     write_session(path, config)
@@ -66,7 +66,7 @@ def process_supervised(game, output, gateway, commitments, plan=None, executive=
     return load_report(output/'between-game.json')
 
 
-def process_completed_episode(game, output, gateway, commitments, plan=None, executive=None, progress=None, work_budget=None, ala_root=None, ala_budget=60.):
+def process_completed_episode(game, output, gateway, commitments, plan=None, executive=None, progress=None, work_budget=None, ala_root=None, ala_budget=60.,ala_authority=None):
     """Existing E/E + Reflection + Meditation + Evaluator, between games only."""
     from memory.evidence import EvidenceJournal
     from .episode_evidence import import_episode, derive_episode, summarize
@@ -147,7 +147,7 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
         if ala_root is not None and executive is not None:
             stage('autonomous_learning')
             from learning.cycle import postgame_learning
-            ala=postgame_learning(game,journal,episode,context,gateway,executive,ala_root,budget_seconds=ala_budget,on_progress=pulse)
+            ala=postgame_learning(game,journal,episode,context,gateway,executive,ala_root,budget_seconds=ala_budget,on_progress=pulse,deployment_authority=ala_authority)
         result={'autonomous_learning':ala,'episode':episode,'resolution':resolution,'reflection':reflection,
                 'proposals':proposals,'learning_context':context,'meditation':str(output/'meditation.json') if meditation else None,
                 'evidence':summarize(journal,episode)}
@@ -173,6 +173,8 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
     from memory.gateway import MemoryGateway
     from .experiment_return import select_experiment
     gateway=gateway or MemoryGateway()
+    authority_path=getattr(args,'ala_deployment_authority',None)
+    authority=json.loads(Path(authority_path).read_text()) if authority_path else None
     developmental = getattr(args,'developmental',True)
     session=args.root/f'{"development" if developmental else "marathon"}-{stamp()}'
     session.mkdir(parents=True,exist_ok=False)
@@ -195,7 +197,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
         def processor(*values, **options):
             return process_supervised(*values, **options, budget=getattr(args,'processing_budget',300.),
                 ala_root=(getattr(args,'learning_root',None) or gateway.evaluator.path.with_name('autonomous-learning')) if getattr(args,'ala_learning',False) else None,
-                ala_budget=getattr(args,'ala_budget',60.))
+                ala_budget=getattr(args,'ala_budget',60.),ala_authority=authority)
     else:
         processor = process_completed_episode
     try:
@@ -222,6 +224,12 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             if developmental:cmd.extend(['--bootstrap-body-fire','--recalibrate'])
             if args.game_seconds is not None:cmd.extend(['--diagnostic-seconds',str(args.game_seconds)])
             if plan:cmd.extend(['--experiment-plan',str(plan_path)])
+            semantic_manifest=getattr(args,'learned_semantics',None)
+            if semantic_manifest is None and authority:
+                candidate_root=getattr(args,'learning_root',None) or gateway.evaluator.path.with_name('autonomous-learning')
+                candidate_manifest=Path(candidate_root)/'semantic-activation.json'
+                if candidate_manifest.exists():semantic_manifest=candidate_manifest
+            if semantic_manifest:cmd.extend(['--learned-semantics',str(semantic_manifest)])
             if executive:
                 viewer_context = session/f'game-{index:02d}-observer-context.json'
                 write_session(viewer_context, {'episode':str(game.resolve()), 'project':selection['project']})
@@ -396,6 +404,8 @@ def main():
     ap.add_argument('--ala-learning',action='store_true',help='opt-in bounded offline model investigations after completed episodes; requires learning projects')
     ap.add_argument('--learning-root',type=Path,help='durable experience artifacts and evidence; no live training')
     ap.add_argument('--ala-budget',type=float,default=60.,help='offline foundry budget 1..3600 seconds')
+    ap.add_argument('--learned-semantics',type=Path,help='authorized frozen candidate manifest; physical readiness still checked by player')
+    ap.add_argument('--ala-deployment-authority',type=Path,help='external bounded model deployment policy, never generated by learner')
     ap.add_argument('--project-evidence',type=Path,help='existing-format durable project evidence notebook; default beside local memory evaluator')
     a=ap.parse_args()
     if a.max_games is None:a.max_games=3 if a.developmental else 50

@@ -409,6 +409,7 @@ def main():
     parser.add_argument('--experiment-plan', type=Path,
                         help='one precommitted developmental actuator experiment')
     parser.add_argument('--observer-context', type=Path, help='optional display-only project context; never policy input')
+    parser.add_argument('--learned-semantics',type=Path,help='separately authorized, independently validated candidate-crop activation manifest')
     args = parser.parse_args()
 
     if args.seconds is not None and (not math.isfinite(args.seconds) or not 1 <= args.seconds <= 3600):
@@ -449,6 +450,16 @@ def main():
             print(f'EXPERIMENT REJECTED: {exc}; existing policy retained')
 
     recognizer = TaughtRecognizer.load(args.knowledge, args.threshold, args.margin)
+    semantic_observer=None;semantic_error=None
+    if args.learned_semantics:
+        try:
+            from learning.operational import load_manifest
+            from .semantic_observer import SemanticObserver
+            activation,model=load_manifest(args.learned_semantics,physical=args.arm)
+            semantic_observer=SemanticObserver(model,activation)
+        except (OSError,ValueError,KeyError,ImportError,RuntimeError) as exc:
+            semantic_error=f'{type(exc).__name__}: {exc}'
+            print('LEARNED SEMANTICS UNAVAILABLE: '+semantic_error+'; baseline retained')
     forebrain = Forebrain()
     hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
     shadow_forebrain = Forebrain()
@@ -987,11 +998,19 @@ def main():
                 episode_observer.self_reacquired()
             lost = 0
 
-            targets = _objects(pairs, HUMANS, "human", visual_agency.assignments,
+            planning_pairs=pairs;semantic_evidence=[]
+            if semantic_observer is not None:
+                # The generic association and agency observation are already done.
+                # Only soft metadata can change; no inference on this thread.
+                planning_pairs,semantic_evidence=semantic_observer.apply(pairs,visual_agency.assignments,
+                    visual_agency.tracker.active,self_id=visual_agency.controlled_track_id,timestamp=source.timestamp)
+                semantic_observer.submit(playfield,pairs,visual_agency.assignments,visual_agency.tracker.active,
+                    self_id=visual_agency.controlled_track_id,timestamp=source.timestamp)
+            targets = _objects(planning_pairs, HUMANS|{'human'}, "human", visual_agency.assignments,
                                visual_agency.controlled_track_id)
-            threats = _objects(pairs, THREATS, "threat", visual_agency.assignments,
+            threats = _objects(planning_pairs, THREATS|{'threat'}, "threat", visual_agency.assignments,
                                visual_agency.controlled_track_id)
-            unresolved = _objects(pairs, {d.kind for d, _ in pairs}-HUMANS-THREATS,
+            unresolved = _objects(planning_pairs, {d.kind for d, _ in planning_pairs}-HUMANS-THREATS-{'human','threat'},
                                   "unresolved", visual_agency.assignments,
                                   visual_agency.controlled_track_id)
             world = WorldState(tick=tick, player=Position(*player),
@@ -1073,6 +1092,7 @@ def main():
                 "self_track_id": self_tracker.player_track_id,
                 "identity_status": agency_snapshot.get("identity_status"),
                 "experiment": experiment_context,
+                "learned_semantics": semantic_evidence,
                 "agency": agency_snapshot,
                 "targets": len(targets), "threats": len(threats),
                 "unresolved": len(unresolved),
@@ -1137,6 +1157,8 @@ def main():
         if progress: progress.enter('finalizing')
         if publisher is not None:
             publisher.close()
+        if semantic_observer is not None:
+            semantic_observer.close()
         if score_observer is not None:
             score_observer.close()
         if score_observer is not None and not score_observer.thread.is_alive():
@@ -1176,6 +1198,7 @@ def main():
                   "camera_lease_handoff_seconds": getattr(getattr(getattr(source,'camera',None),'lease',None),'handoff_seconds',None),
                   "agency_acquisition_protocol": "two_fresh_endpoints_then_independent_neutral",
                   "planning_mode": "rescue_with_open_space_fallback",
+                  "learned_semantics": semantic_observer.report() if semantic_observer is not None else {'status':'baseline','error':semantic_error},
                   "bootstrap_body_fire": args.bootstrap_body_fire,
                   "fire_agency_status": "exploratory evidence only; projectile/origin interpretation unvalidated",
                   "experiment_status": experiment_status,

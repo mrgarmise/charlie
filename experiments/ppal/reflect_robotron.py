@@ -497,3 +497,86 @@ def reflect_model_outcome(journal, plan, result, gateway):
         source='learning:perceptual-reflection',subject=plan['project_id'],significant=True,
         outcome=str(metric),tags=('model','reflection','diagnostic'),evidence=event.id))
     return dict(evidence_id=event.id,questions=questions)
+
+
+def reflect_model_investigations(dataset, gateway, registry):
+    """Competing explanations from failed comparisons, not prescribed remedies.
+
+    This generic diagnostic vocabulary is deliberately finite. Each explanation
+    stays tentative even if its observable signature is supported.
+    """
+    from learning.datasets import SCOPE
+    from memory.evidence import canonical
+    output=[]
+    for evaluation in dataset.journal.records('observation'):
+        p=evaluation.data['payload']
+        if p.get('category')!='offline_model_evaluation' or p.get('metrics',{}).get('improved') is not False: continue
+        # Do not peek at training history to select the expected retrieval outcome.
+        alternatives=[dict(explanation='A fitting/generalization gap may contribute',predicate='validation_exceeds_training'),
+                      dict(explanation='Optimization may still be progressing at the resource boundary',predicate='improving_at_budget')]
+        for alternative in alternatives:
+            spec=dict(method='model-diagnostics',scope={'evaluation_id':evaluation.id,'predicate':alternative['predicate']},
+                expected=alternative['predicate']+' is observed',evaluation_id=evaluation.id,
+                independence_unit=evaluation.id,evidence_groups=[evaluation.id],
+                dataset_id=p['candidate']['dataset_digest'],predicate=alternative['predicate'],
+                question=alternative['explanation'],alternatives=alternatives,source_evidence=[evaluation.id],
+                assumption='Observable signatures discriminate possibilities but do not identify causes',
+                rank=[1],objective='Reduce uncertainty before another model or operational change')
+            hypothesis=dataset.journal.append('event',dict(category='perceptual_experiment_proposal',proposal=spec),
+                episode=SCOPE,sources=[evaluation.id],producer='Reflection',version='ala-2-diagnostics')
+            gateway.remember(Experience(kind='observation',summary='Perceptual experiment hypothesis: '+canonical(spec),
+                source='ppal:perceptual-reflection',subject='model-diagnostics',confidence=.5,significant=True,novelty=True,
+                tags=('hypothesis','offline','tentative'),evidence=hypothesis.id))
+            proposal=dict(originator='Reflection',method=spec['method'],scope=spec['scope'],expected=spec['expected'],
+                goal=spec['question'],motivation='Investigate a rejected independent comparison before choosing a remedy',
+                open_questions=['Is this diagnostic signature present?','What independent intervention could establish a cause?'],
+                requires=['offline-slot','model-evaluation'],dependencies=[],established_objective='official_game_score',
+                objective_contribution=.5,learning_value=.8,uncertainty=1.,cost=registry.get('model-diagnostics').cost,risk=.05,
+                priority_provenance='cheap discriminating evidence retrieval before repeating expensive fitting; not learned score utility',
+                tactical_hypothesis_evidence=[hypothesis.id],conditions=[],revision='1')
+            record=dataset.journal.append('event',dict(category='learning_project_proposal',proposal=proposal),
+                episode=SCOPE,sources=[hypothesis.id],producer='Reflection',version='ala-2-diagnostics')
+            output.append(dict(proposal=proposal,evidence_id=record.id,hypothesis_id=hypothesis.id,alternatives=alternatives))
+    return output
+
+
+def reflect_question_investigations(dataset,gateway,registry):
+    """Use any existing question category, without assigning a gameplay remedy."""
+    from learning.datasets import SCOPE
+    from memory.evidence import digest,canonical
+    grouped={}
+    for record in dataset.journal.records('observation'):
+        p=record.data['payload']
+        if p.get('category')!='learning_context_reference':continue
+        for q in p['context'].get('questions',[]):
+            if isinstance(q.get('category'),str) and q['category']:
+                grouped.setdefault(q['category'],{})[record.id]=record
+    output=[]
+    for category,records in sorted(grouped.items()):
+        sources=list(records)
+        alternatives=[dict(explanation='The unresolved question may recur in independent experience',predicate='recurrent_context_gap'),
+                      dict(explanation='The recorded gap may be confined to one source episode',predicate='isolated_context_gap')]
+        # Generate alternatives before retrieval; source count does not select an answer.
+        # One retrieval discriminates both explanations; do not count complementary predicates as separate experiments.
+        for alternative in alternatives[:1]:
+            spec=dict(method='evidence-review',scope={'question_category':category,'predicate':alternative['predicate']},
+                question_category=category,predicate=alternative['predicate'],expected=alternative['predicate']+' is observed',
+                dataset_id=digest(sources),
+                source_evidence=sources,alternatives=alternatives,rank=[1],
+                independence_unit=digest(sources),evidence_groups=sorted({r.data['payload'].get('source_episode') or 'unknown-source' for r in records.values()}))
+            hypothesis=dataset.journal.append('event',dict(category='perceptual_experiment_proposal',proposal=spec),
+                episode=SCOPE,sources=sources,producer='Reflection',version='ala-2-question-review')
+            gateway.remember(Experience(kind='observation',summary='Perceptual experiment hypothesis: '+canonical(spec),
+                source='ppal:perceptual-reflection',subject=category,confidence=.5,significant=True,novelty=True,
+                tags=('hypothesis','offline','uncertain'),evidence=hypothesis.id))
+            proposal=dict(originator='Reflection',method='evidence-review',scope=spec['scope'],expected=spec['expected'],
+                goal=alternative['explanation']+': '+category,motivation='Determine evidence breadth before choosing an intervention',
+                open_questions=['Which independent conditions reproduce this uncertainty?','Which acquisition could distinguish its causes?'],
+                requires=['offline-slot','context-evidence'],dependencies=[],established_objective='official_game_score',
+                objective_contribution=.5,learning_value=.6,uncertainty=1.,cost=registry.get('evidence-review').cost,risk=.05,
+                priority_provenance='generic cheap uncertainty reduction; no category-specific tactic or score expectation',
+                tactical_hypothesis_evidence=[hypothesis.id],conditions=[],revision='1')
+            record=dataset.journal.append('event',dict(category='learning_project_proposal',proposal=proposal),
+                episode=SCOPE,sources=[hypothesis.id],producer='Reflection',version='ala-2-question-review')
+            output.append(dict(proposal=proposal,evidence_id=record.id,hypothesis_id=hypothesis.id,alternatives=alternatives))
+    return output

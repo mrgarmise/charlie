@@ -30,12 +30,17 @@ class CapabilityRegistry:
             if inputs['dataset'].journal.get(inputs['plan']['dataset_id']).data['payload']['objective']!=objective:
                 raise ValueError('method does not match the frozen objective')
             return run_plan(**inputs)
+        if identifier in ('model-diagnostics','evidence-review'):
+            from .diagnostics import execute
+            return execute(**inputs)
         raise ValueError('capability is a prospective evidence request; no acquisition adapter available')
 
 
 def default_registry():
     registry=CapabilityRegistry()
     for item in (
+        Capability('evidence-review','Search frozen experience references for recurring unresolved questions',('context-evidence',),('retrieval-resolution',),.05,('reported questions are not established causal facts',),'distinct source episodes; unknown provenance abstains'),
+        Capability('model-diagnostics','Retrieve discriminating training-history evidence for competing failure explanations',('model-evaluation',),('diagnostic-resolution',),.05,('compatibility is not causal identification','no test pixels are opened'),'frozen training-history predicates'),
         Capability('collect-examples','Obtain independent examples before fitting a model',('evidence-gap',),('dataset-request',),.2,('requires future observations',),'independent coverage'),
         Capability('clarify-labels','Seek independent verification of ambiguous interpretations',('uncertainty',),('annotation-request',),.2,('does not certify existing predictions',),'annotation provenance'),
         Capability('cnn-reconstruction','Test whether a compact visual representation generalizes',('RGB-examples','three-independent-groups'),('candidate','heldout-error','opaque-embeddings'),.6,('reconstruction is not semantic recognition or score utility',),'independent held-out reconstruction MSE'),

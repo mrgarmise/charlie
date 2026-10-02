@@ -45,7 +45,8 @@ def test_evidence_originated_cycle_resolution_memory_and_restart(tmp_path):
     assert repeat['status']=='already_resolved' and len(ds.journal.records())==before
     assert g.evaluator.recent(10)
     report2=investigate(ds,g,budget_seconds=8,max_jobs=2,driver=driver)
-    assert report2['results']==[] # unchanged evidence is not another experiment
+    assert all(r['plan']['method']=='model-diagnostics' for r in report2['results'])
+    assert investigate(ds,g,budget_seconds=8,max_jobs=2,driver=driver)['results']==[]
     deploy=CapabilityDeployment(ds.journal)
     with pytest.raises(ValueError): deploy.activate(result['result']['deployment_proposal'],target='offline-shadow',authorization=None)
     ds.journal.verify()
@@ -111,9 +112,9 @@ def test_new_evidence_releases_wait_without_independent_confirmation(tmp_path):
     p=tmp_path/'new.png';Image.new('RGB',(16,16),(9,11,77)).save(p)
     # Additional frame within the same held-out episode is NOT independent replication.
     ds.add(p,episode='2',source={'kind':'controlled-additional-observation'})
-    second=investigate(ds,g,budget_seconds=8,driver=driver)
-    assert len(second['results'])==1
-    project=next(iter(second['projects'].values()))
+    second=investigate(ds,g,budget_seconds=8,max_jobs=3,driver=driver)
+    assert sum('candidates' in r['plan'] for r in second['results'])==1
+    project=next(p for p in second['projects'].values() if p['method']=='cnn-reconstruction')
     assert project['progress']['offline_trials']==2 and project['progress']['independent_offline_evidence_units']==1
     assert project['status']!='completed'
 

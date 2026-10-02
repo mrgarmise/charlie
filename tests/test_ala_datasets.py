@@ -59,7 +59,7 @@ def test_registry_is_optional_and_inspectable():
     subprocess.run([sys.executable,'-c',"import learning.datasets, learning.capabilities, learning.cycle; import sys; assert 'torch' not in sys.modules"],check=True)
     registry=default_registry()
     assert registry.get('cnn-reconstruction').execution=='offline'
-    assert len(registry.describe())==4
+    assert len(registry.describe())==6
 
 
 def test_dataset_growth_cannot_turn_test_into_train(tmp_path):

@@ -125,14 +125,15 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
         evaluation_id=outcome.id,deployment_proposal=proposal.id,metrics=metric,candidate_id=candidate['identifier'])
 
 
-def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None, executive=None, on_progress=None):
+def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None, executive=None, on_progress=None, diagnostics_only=False, review_questions=False):
     """Existing Executive selects portfolio; existing chooser selects method trial."""
     if gameplay_active(): raise RuntimeError('offline learning unavailable during active gameplay')
     if not 1<=max_jobs<=8 or not 1<=budget_seconds<=3600: raise ValueError('bounded offline resources required')
-    from experiments.ppal.reflect_robotron import reflect_perceptual_opportunities
+    from experiments.ppal.reflect_robotron import reflect_perceptual_opportunities, reflect_model_investigations, reflect_question_investigations
     from experiments.ppal.experiment_return import select_offline_experiment
     registry=default_registry(); executive=executive or LearningExecutive(dataset.journal,gateway)
-    opportunities=reflect_perceptual_opportunities(dataset,gateway,registry)
+    opportunities=([] if diagnostics_only else reflect_perceptual_opportunities(dataset,gateway,registry))+reflect_model_investigations(dataset,gateway,registry)
+    if review_questions: opportunities+=reflect_question_investigations(dataset,gateway,registry)
     for item in opportunities:
         identifier=executive.propose(item['proposal'],dataset.journal,[item['evidence_id']])
         project=executive.projects()[identifier]
@@ -143,15 +144,15 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
     for _ in range(max_jobs):
         remaining=budget_seconds-(time.monotonic()-started)
         if remaining<1: break
-        available = {'cnn-reconstruction','cnn-classification'} if importlib.util.find_spec('torch') else set()
+        available = {'model-diagnostics'} | ({'evidence-review'} if review_questions else set()) | ({'cnn-reconstruction','cnn-classification'} if not diagnostics_only and importlib.util.find_spec('torch') else set())
         selection=executive.select(methods=available,
-            resources={'offline-slot','RGB-examples','torch'},authorized_methods={'cnn-reconstruction','cnn-classification'})
+            resources={'offline-slot','RGB-examples','torch','model-evaluation','context-evidence'},authorized_methods=available)
         if not selection['project']: break
         project=selection['project']; context=executive.chooser_context(project['id'])
         plan=select_offline_experiment(gateway,dataset.journal,context,budget_seconds=remaining)
         if plan is None or plan['prediction_id'] in seen: break
         seen.add(plan['prediction_id'])
-        result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups'},
+        result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups','model-evaluation','context-evidence'},
             authorized={project['method']},plan=plan,dataset=dataset,output=dataset.artifacts.parent/'models',driver=driver,on_progress=on_progress)
         if result['status'] in ('resolved','already_resolved'):
             if result['status']=='already_resolved':
@@ -159,11 +160,11 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
             executive.record_result(project['id'],plan,result,dataset.journal,episode=SCOPE)
             gateway.assess_decision('offline:'+plan['prediction_id'],'helpful' if result['result']=='supported' else 'harmful',
                 result['resolution_id'],'diagnostic prediction usefulness only; no score reward attribution')
-            gateway.remember(Experience(kind='outcome',summary='Offline model experiment: '+result['result'],
+            gateway.remember(Experience(kind='outcome',summary='Offline '+project['method']+' experiment: '+result['result'],
                 source='learning:foundry-resolution',subject=project['id'],goal=project['goal'],
                 outcome=json.dumps(result.get('metrics',{})),significant=True,
                 tags=('offline','diagnostic','uncertain'),evidence=result['resolution_id']))
-        if result['status']=='resolved':
+        if result['status']=='resolved' and project['method'] not in ('model-diagnostics','evidence-review'):
             from experiments.ppal.reflect_robotron import reflect_model_outcome
             result['reflection']=reflect_model_outcome(dataset.journal,plan,result,gateway)
         results.append(dict(project_id=project['id'],selection=selection,plan=plan,result=result))
@@ -198,7 +199,10 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('episodes',nargs='*',type=Path); parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--budget-seconds',type=float,default=60.); parser.add_argument('--max-jobs',type=int,default=2)
-    parser.add_argument('--ingest-only',action='store_true'); args=parser.parse_args()
+    parser.add_argument('--ingest-only',action='store_true')
+    parser.add_argument('--diagnostics-only',action='store_true',help='retrieve existing failed-model evidence without opening pixel/model artifacts')
+    parser.add_argument('--review-questions',action='store_true',help='also investigate unresolved questions by retrieving frozen experience references')
+    args=parser.parse_args()
     if gameplay_active(): parser.error('offline only: active player detected')
     args.output.mkdir(parents=True,exist_ok=True)
     with (args.output/'offline.lock').open('a') as lock:
@@ -210,7 +214,7 @@ def main():
             for episode in args.episodes: ingest_episode(episode,dataset,gateway)
             if not args.ingest_only:
                 project_journal=EvidenceJournal(gateway.evaluator.path.with_name('learning-project-evidence.sqlite3'))
-                try: report=investigate(dataset,gateway,budget_seconds=args.budget_seconds,max_jobs=args.max_jobs,executive=LearningExecutive(project_journal,gateway))
+                try: report=investigate(dataset,gateway,budget_seconds=args.budget_seconds,max_jobs=args.max_jobs,executive=LearningExecutive(project_journal,gateway),diagnostics_only=args.diagnostics_only,review_questions=args.review_questions)
                 finally: project_journal.close()
                 print(json.dumps({k:report[k] for k in ('elapsed','autonomy','physical_gameplay_improvement')}))
         finally: journal.close()

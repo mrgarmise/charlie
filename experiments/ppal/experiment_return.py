@@ -184,6 +184,8 @@ def select_offline_experiment(gateway, journal, project_context, *, budget_secon
     """Offline method extension of the existing Evaluator-first tactical chooser."""
     from learning.datasets import SCOPE
     from memory.evidence import digest
+    if project_context['method'] in ('model-diagnostics','evidence-review'):
+        return select_diagnostic_experiment(gateway,journal,project_context,budget_seconds=budget_seconds)
     if project_context['method'] not in ('cnn-reconstruction','cnn-classification'): return None
     choices=[]
     for row in gateway.evaluator.for_evidence(project_context['hypothesis_evidence']):
@@ -224,4 +226,49 @@ def select_offline_experiment(gateway, journal, project_context, *, budget_secon
     journal.append('event',dict(category='offline_experiment_plan',key=key,plan=plan),episode=SCOPE,
         sources=[prediction.id],producer='existing-chooser',version='ala-1')
     gateway.record_decision('offline:'+prediction.id,'diagnostic-generalization',[row['id']])
+    return plan
+
+
+def select_diagnostic_experiment(gateway,journal,context,*,budget_seconds):
+    """Evaluator-first retrieval experiments, without examining their outcomes."""
+    from learning.datasets import SCOPE
+    from memory.evidence import digest
+    from learning.clock import domain
+    clock=domain(); scope=SCOPE+':'+clock
+    choices=[]
+    attempted={h['prediction_id'] for h in context['experiment_history']}
+    for row in gateway.evaluator.for_evidence(context['hypothesis_evidence']):
+        if row['status']!='promoted' or row.get('source')!='ppal:perceptual-reflection': continue
+        try: spec=json.JSONDecoder().raw_decode(row['text'][len('Perceptual experiment hypothesis: '):])[0]
+        except (ValueError,TypeError): continue
+        if spec.get('method')==context['method'] and spec.get('scope')==context['scope'] and spec.get('expected')==context['expected']:
+            choices.append((row,spec))
+    if not choices:return None
+    used={h.get('dataset_id') for h in context['experiment_history']}
+    fresh=[pair for pair in choices if pair[1].get('dataset_id') not in used]
+    row,spec=max(fresh or choices,key=lambda pair:(pair[0]['priority'],*pair[1]['rank']))
+    key=digest(dict(project_id=context['project_id'],scope=spec['scope'],method=spec['method'],sources=spec['source_evidence']))
+    prior=[r for r in journal.records('event') if r.data['payload'].get('category')=='offline_experiment_plan' and r.data['payload'].get('key')==key]
+    if prior:
+        plan=prior[0].data['payload']['plan']
+        return None if plan['prediction_id'] in attempted else plan
+    recalled=journal.append('observation',dict(category='evaluated_memory_recalled',proposal=spec,memory_id=row['id'],project_context=context),
+        episode=scope,producer='MemoryEvaluator',version='ala-2',
+        provenance={'clock_domain':clock,'historical_source_ids':spec['source_evidence']})
+    at=time.monotonic()
+    prediction=journal.predict(dict(expected=spec['expected'],predicate=spec['predicate'],
+        interpretation='prospective retrieval; historical causal explanation remains tentative'),episode=scope,at=at,
+        deadline=at+budget_seconds+60,sources=[recalled.id],producer='existing-memory-offline-test',version='ala-2',mode='live_prospective')
+    plan=dict(project_id=context['project_id'],prediction_id=prediction.id,memory_id=row['id'],method=spec['method'],
+        episode=scope,clock_domain=clock,
+        evaluation_id=spec.get('evaluation_id'),predicate=spec['predicate'],dataset_id=spec.get('dataset_id'),expected=spec['expected'],
+        question_category=spec.get('question_category'),
+        condition=spec['scope'],budget_seconds=budget_seconds,experiment_kind='offline',
+        independence_unit=spec['independence_unit'],evidence_groups=spec['evidence_groups'],source_evidence=spec['source_evidence'],
+        competing_explanations=spec['alternatives'],alternatives=[dict(memory_id=r['id'],evaluator_priority=r['priority'],rank=s['rank']) for r,s in choices],
+        reason='Existing Evaluator priority; retrieve discriminating evidence before expensive new fitting',
+        stopping='one committed retrieval; no automatic retest or production deployment')
+    journal.append('event',dict(category='offline_experiment_plan',key=key,plan=plan),episode=scope,
+        sources=[prediction.id],producer='existing-chooser',version='ala-2')
+    gateway.record_decision('offline:'+prediction.id,'model-diagnostic',[row['id']])
     return plan

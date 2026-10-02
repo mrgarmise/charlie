@@ -1,0 +1,949 @@
+{
+  "scope": "physical archive audit plus offline regression; no new Pi run",
+  "runs": [
+    {
+      "name": "development-20261002-003511",
+      "report_sha256": "b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+      "result": "TIME LIMIT",
+      "session_status": "unverified_episode_boundary",
+      "score_evidence": 1000,
+      "first_ordinary_latency": 6.408489164000002,
+      "journal_commit_span_seconds": 65.068668,
+      "terminal_rows": []
+    },
+    {
+      "name": "development-20261002-005944",
+      "report_sha256": "d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da",
+      "result": "TIME LIMIT",
+      "session_status": "unverified_episode_boundary",
+      "score_evidence": 1200,
+      "first_ordinary_latency": 6.584929791999912,
+      "journal_commit_span_seconds": 991.879694,
+      "terminal_rows": [
+        {
+          "tick": 67,
+          "t": 55.631880217000344,
+          "status": "reacquiring",
+          "lost": 1,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.0,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.0,
+              "heroes": 0.0,
+              "all-time": 0.0
+            },
+            "geometric_border_support": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "phase": "unknown",
+            "interior_regions": 0,
+            "capture_timestamp": 2721.012367
+          }
+        },
+        {
+          "tick": 68,
+          "t": 57.39549209699999,
+          "status": "reacquiring",
+          "lost": 2,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.9989,
+            "hue_concentration": 0.6575,
+            "occupied_hue_bins": 5,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.6112,
+              "heroes": 0.774,
+              "all-time": 0.7966
+            },
+            "geometric_border_support": [
+              0.9623,
+              0.0164,
+              0.0311,
+              0.1222
+            ],
+            "phase": "unknown",
+            "interior_regions": 125,
+            "capture_timestamp": 2722.646459
+          }
+        },
+        {
+          "tick": 69,
+          "t": 59.38211379400036,
+          "status": "control_challenge",
+          "lost": 3,
+          "confirmed": false,
+          "eligible": false,
+          "attempts": 0,
+          "not_gameplay_streak": null,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.999,
+            "hue_concentration": 0.6663,
+            "occupied_hue_bins": 5,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.609,
+              "heroes": 0.7736,
+              "all-time": 0.7978
+            },
+            "geometric_border_support": [
+              0.9607,
+              0.018,
+              0.0333,
+              0.1222
+            ],
+            "phase": "unknown",
+            "interior_regions": 128,
+            "capture_timestamp": 2724.7344630000002
+          }
+        },
+        {
+          "tick": 69,
+          "t": 59.454964829000346,
+          "status": "reacquiring",
+          "lost": 3,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.999,
+            "hue_concentration": 0.6663,
+            "occupied_hue_bins": 5,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.609,
+              "heroes": 0.7736,
+              "all-time": 0.7978
+            },
+            "geometric_border_support": [
+              0.9607,
+              0.018,
+              0.0333,
+              0.1222
+            ],
+            "phase": "unknown",
+            "interior_regions": 128,
+            "capture_timestamp": 2724.7344630000002
+          }
+        },
+        {
+          "tick": 70,
+          "t": 61.17751696999994,
+          "status": "reacquiring",
+          "lost": 4,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.9986,
+            "hue_concentration": 0.6654,
+            "occupied_hue_bins": 5,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.6079,
+              "heroes": 0.7716,
+              "all-time": 0.7992
+            },
+            "geometric_border_support": [
+              0.9623,
+              0.0164,
+              0.0356,
+              0.1333
+            ],
+            "phase": "unknown",
+            "interior_regions": 126,
+            "capture_timestamp": 2726.459335
+          }
+        },
+        {
+          "tick": 71,
+          "t": 62.87033406799992,
+          "status": "reacquiring",
+          "lost": 5,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.9989,
+            "hue_concentration": 0.6626,
+            "occupied_hue_bins": 5,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.6082,
+              "heroes": 0.7714,
+              "all-time": 0.8005
+            },
+            "geometric_border_support": [
+              0.9623,
+              0.0164,
+              0.0467,
+              0.1356
+            ],
+            "phase": "unknown",
+            "interior_regions": 127,
+            "capture_timestamp": 2728.1539470000002
+          }
+        },
+        {
+          "tick": 72,
+          "t": 64.58741275200009,
+          "status": "reacquiring",
+          "lost": 6,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.9988,
+            "hue_concentration": 0.665,
+            "occupied_hue_bins": 5,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.609,
+              "heroes": 0.7714,
+              "all-time": 0.7988
+            },
+            "geometric_border_support": [
+              0.9623,
+              0.0164,
+              0.0467,
+              0.1267
+            ],
+            "phase": "unknown",
+            "interior_regions": 129,
+            "capture_timestamp": 2729.87882
+          }
+        },
+        {
+          "tick": 73,
+          "t": 66.28360760100031,
+          "status": "reacquiring",
+          "lost": 7,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.9989,
+            "hue_concentration": 0.6631,
+            "occupied_hue_bins": 5,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.6089,
+              "heroes": 0.7715,
+              "all-time": 0.8002
+            },
+            "geometric_border_support": [
+              0.9623,
+              0.0164,
+              0.0467,
+              0.1267
+            ],
+            "phase": "unknown",
+            "interior_regions": 124,
+            "capture_timestamp": 2731.573432
+          }
+        },
+        {
+          "tick": 74,
+          "t": 67.77537452600018,
+          "status": "reacquiring",
+          "lost": 8,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 1,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0484,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8357,
+              "heroes": 0.5994,
+              "all-time": 0.5109
+            },
+            "geometric_border_support": [
+              1.0,
+              0.0,
+              0.08,
+              0.0867
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2733.116738
+          }
+        },
+        {
+          "tick": 75,
+          "t": 69.14839281000013,
+          "status": "reacquiring",
+          "lost": 9,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 2,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0442,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8347,
+              "heroes": 0.5992,
+              "all-time": 0.5095
+            },
+            "geometric_border_support": [
+              1.0,
+              0.0,
+              0.0822,
+              0.0867
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2734.508741
+          }
+        },
+        {
+          "tick": 76,
+          "t": 70.50808288500002,
+          "status": "reacquiring",
+          "lost": 10,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 3,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0434,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8352,
+              "heroes": 0.5982,
+              "all-time": 0.5094
+            },
+            "geometric_border_support": [
+              1.0,
+              0.0,
+              0.0844,
+              0.0844
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2735.870483
+          }
+        },
+        {
+          "tick": 77,
+          "t": 71.85348771100007,
+          "status": "reacquiring",
+          "lost": 11,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.0,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.0,
+              "heroes": 0.0,
+              "all-time": 0.0
+            },
+            "geometric_border_support": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "phase": "unknown",
+            "interior_regions": 0,
+            "capture_timestamp": 2737.232224
+          }
+        },
+        {
+          "tick": 78,
+          "t": 83.79678891699996,
+          "status": "control_challenge",
+          "lost": 12,
+          "confirmed": false,
+          "eligible": false,
+          "attempts": 0,
+          "not_gameplay_streak": null,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "unrecognized_striped_page",
+            "coverage": 0.5754,
+            "hue_concentration": 0.2309,
+            "occupied_hue_bins": 8,
+            "border_state": "not_gameplay",
+            "label_scores": {
+              "pregame": 0.3578,
+              "heroes": 0.3696,
+              "all-time": 0.4852
+            },
+            "geometric_border_support": [
+              0.4131,
+              0.1164,
+              0.2822,
+              0.2956
+            ],
+            "phase": "unknown",
+            "capture_timestamp": 2749.003724
+          }
+        },
+        {
+          "tick": 78,
+          "t": 83.86794083600034,
+          "status": "reacquiring",
+          "lost": 12,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "unrecognized_striped_page",
+            "coverage": 0.5754,
+            "hue_concentration": 0.2309,
+            "occupied_hue_bins": 8,
+            "border_state": "not_gameplay",
+            "label_scores": {
+              "pregame": 0.3578,
+              "heroes": 0.3696,
+              "all-time": 0.4852
+            },
+            "geometric_border_support": [
+              0.4131,
+              0.1164,
+              0.2822,
+              0.2956
+            ],
+            "phase": "unknown",
+            "capture_timestamp": 2749.003724
+          }
+        },
+        {
+          "tick": 79,
+          "t": 86.46122877900007,
+          "status": "reacquiring",
+          "lost": 13,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "unrecognized_striped_page",
+            "coverage": 0.4973,
+            "hue_concentration": 0.1344,
+            "occupied_hue_bins": 8,
+            "border_state": "not_gameplay",
+            "label_scores": {
+              "pregame": 0.3334,
+              "heroes": 0.3388,
+              "all-time": 0.4836
+            },
+            "geometric_border_support": [
+              0.3262,
+              0.0738,
+              0.3311,
+              0.3044
+            ],
+            "phase": "unknown",
+            "capture_timestamp": 2751.575903
+          }
+        },
+        {
+          "tick": 80,
+          "t": 88.60921379199999,
+          "status": "reacquiring",
+          "lost": 14,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 1,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0597,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8401,
+              "heroes": 0.6148,
+              "all-time": 0.0
+            },
+            "geometric_border_support": [
+              0.0,
+              0.0,
+              0.0,
+              0.02
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2753.966516
+          }
+        },
+        {
+          "tick": 81,
+          "t": 89.96768319500006,
+          "status": "reacquiring",
+          "lost": 15,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 2,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0604,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8387,
+              "heroes": 0.6137,
+              "all-time": 0.0
+            },
+            "geometric_border_support": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2755.328259
+          }
+        },
+        {
+          "tick": 82,
+          "t": 91.42737068700035,
+          "status": "reacquiring",
+          "lost": 16,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 3,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0612,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8401,
+              "heroes": 0.6169,
+              "all-time": 0.0
+            },
+            "geometric_border_support": [
+              0.0,
+              0.0,
+              0.0822,
+              0.08
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2756.780782
+          }
+        },
+        {
+          "tick": 83,
+          "t": 92.92978630000016,
+          "status": "reacquiring",
+          "lost": 17,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 4,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0623,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8424,
+              "heroes": 0.6194,
+              "all-time": 0.3003
+            },
+            "geometric_border_support": [
+              0.0,
+              1.0,
+              0.1622,
+              0.1622
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2758.263568
+          }
+        },
+        {
+          "tick": 84,
+          "t": 94.56584512400013,
+          "status": "reacquiring",
+          "lost": 18,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 5,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0639,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.842,
+              "heroes": 0.6198,
+              "all-time": 0.4836
+            },
+            "geometric_border_support": [
+              0.0,
+              1.0,
+              0.3178,
+              0.3222
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2759.867397
+          }
+        },
+        {
+          "tick": 85,
+          "t": 96.45892916999992,
+          "status": "reacquiring",
+          "lost": 19,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 6,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0631,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8411,
+              "heroes": 0.6197,
+              "all-time": 0.4805
+            },
+            "geometric_border_support": [
+              0.0,
+              1.0,
+              0.4022,
+              0.4044
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2761.713313
+          }
+        },
+        {
+          "tick": 86,
+          "t": 98.55856523200009,
+          "status": "reacquiring",
+          "lost": 20,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 7,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0636,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8407,
+              "heroes": 0.6163,
+              "all-time": 0.4857
+            },
+            "geometric_border_support": [
+              0.0,
+              1.0,
+              0.3289,
+              0.4511
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2763.771056
+          }
+        },
+        {
+          "tick": 87,
+          "t": 101.02976606300035,
+          "status": "reacquiring",
+          "lost": 21,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 8,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0646,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8433,
+              "heroes": 0.6201,
+              "all-time": 0.5031
+            },
+            "geometric_border_support": [
+              0.0,
+              1.0,
+              0.4844,
+              0.5867
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2766.19193
+          }
+        },
+        {
+          "tick": 88,
+          "t": 103.48137932999998,
+          "status": "reacquiring",
+          "lost": 22,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 9,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0648,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8428,
+              "heroes": 0.6205,
+              "all-time": 0.503
+            },
+            "geometric_border_support": [
+              0.0,
+              0.6344,
+              0.4822,
+              0.6333
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2768.643066
+          }
+        },
+        {
+          "tick": 89,
+          "t": 105.39965595900003,
+          "status": "reacquiring",
+          "lost": 23,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 10,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.052,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.8484,
+              "heroes": 0.6051,
+              "all-time": 0.0
+            },
+            "geometric_border_support": [
+              1.0,
+              0.0,
+              0.6333,
+              0.6333
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2770.761329
+          }
+        },
+        {
+          "tick": 90,
+          "t": 113.47968336600024,
+          "status": "control_challenge",
+          "lost": 24,
+          "confirmed": false,
+          "eligible": false,
+          "attempts": 0,
+          "not_gameplay_streak": null,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.0586,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.7299,
+              "heroes": 0.5044,
+              "all-time": 0.5119
+            },
+            "geometric_border_support": [
+              1.0,
+              1.0,
+              0.6356,
+              0.6511
+            ],
+            "phase": "unknown",
+            "interior_regions": 134,
+            "capture_timestamp": 2778.840998
+          }
+        },
+        {
+          "tick": 90,
+          "t": 113.55103647600026,
+          "status": "reacquiring",
+          "lost": 24,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.0586,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.7299,
+              "heroes": 0.5044,
+              "all-time": 0.5119
+            },
+            "geometric_border_support": [
+              1.0,
+              1.0,
+              0.6356,
+              0.6511
+            ],
+            "phase": "unknown",
+            "interior_regions": 134,
+            "capture_timestamp": 2778.840998
+          }
+        },
+        {
+          "tick": 91,
+          "t": 115.36612885900013,
+          "status": "reacquiring",
+          "lost": 25,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.0563,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.7366,
+              "heroes": 0.5143,
+              "all-time": 0.5276
+            },
+            "geometric_border_support": [
+              0.1525,
+              1.0,
+              0.7956,
+              0.8
+            ],
+            "phase": "unknown",
+            "interior_regions": 158,
+            "capture_timestamp": 2780.626393
+          }
+        },
+        {
+          "tick": 92,
+          "t": 117.26985872200021,
+          "status": "reacquiring",
+          "lost": 26,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 1,
+          "screen_state": {
+            "state": "not_gameplay",
+            "reason": "recorded_robotron_instruction_heading",
+            "coverage": 0.0522,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.7488,
+              "heroes": 0.5164,
+              "all-time": 0.5335
+            },
+            "geometric_border_support": [
+              1.0,
+              1.0,
+              0.6422,
+              0.6422
+            ],
+            "phase": "startable",
+            "capture_timestamp": 2782.50257
+          }
+        },
+        {
+          "tick": 93,
+          "t": 119.15523718600025,
+          "status": "reacquiring",
+          "lost": 27,
+          "confirmed": null,
+          "eligible": null,
+          "attempts": null,
+          "not_gameplay_streak": 0,
+          "screen_state": {
+            "state": "unknown",
+            "reason": "insufficient_screen_phase_evidence",
+            "coverage": 0.0504,
+            "border_state": "unknown",
+            "label_scores": {
+              "pregame": 0.7295,
+              "heroes": 0.5066,
+              "all-time": 0.5336
+            },
+            "geometric_border_support": [
+              0.0869,
+              1.0,
+              0.7956,
+              0.8044
+            ],
+            "phase": "unknown",
+            "interior_regions": 165,
+            "capture_timestamp": 2784.43927
+          }
+        }
+      ]
+    }
+  ],
+  "offline_regression": {
+    "wall_seconds": 14.673268165000081,
+    "stage_seconds": {
+      "import": 1.6729556330001287,
+      "resolve_experiment": 0.00037429200074257096,
+      "derive": 9.582892227999764,
+      "reflection": 1.5772575169994525,
+      "meditation": 1.545417524000186
+    },
+    "resolutions": {
+      "contradicted": 880,
+      "unresolved": 1103,
+      "supported": 8829
+    },
+    "ordered_resolution_count": 10812,
+    "verdict_time_reason_error_exact_match": true,
+    "note": "different host from Pi; does not establish Pi processing time",
+    "meditation_history_merges_quality_exact_match": true,
+    "meditation_merge_count": 372
+  }
+}

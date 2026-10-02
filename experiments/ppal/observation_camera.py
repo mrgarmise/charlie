@@ -4,7 +4,8 @@ import time
 
 class ObservedCamera:
     """Retain the full camera frame without changing calibration/capture callers."""
-    def __init__(self, source, *, require_fresh=False, publisher=None):
+    def __init__(self, source, *, require_fresh=False, publisher=None, progress=None):
+        self.progress = progress
         self.source = source
         self.require_fresh = require_fresh
         self.capture = None
@@ -12,10 +13,22 @@ class ObservedCamera:
         self.timestamp = None
         self.publisher = publisher
         self.viewer_state = None
+        self.read_failures = 0
 
     def read(self):
+        if self.progress: self.progress.enter('camera')
         read = getattr(self.source, 'read_fresh', None) if self.require_fresh else None
-        self.raw = read() if read is not None else self.source.read()
+        for attempt in range(3):
+            try:
+                self.raw = read() if read is not None else self.source.read()
+                break
+            except OSError as exc:
+                self.read_failures += 1
+                if self.progress: self.progress.update(read_failures=self.read_failures)
+                if attempt == 2:
+                    from .progress_supervision import ObservationFailure
+                    raise ObservationFailure('camera failed three reads; evidence retained') from exc
+                time.sleep(.05)
         self.capture = getattr(self.source, 'last_capture', None) if read is not None else None
         # Pixel/exposure timestamp is shared with score evidence. Non-Pi mocks
         # and portable sources explicitly use read completion without claiming
@@ -24,6 +37,7 @@ class ObservedCamera:
                           if self.capture else None)
         if self.timestamp is None:
             self.timestamp = time.monotonic()
+        if self.progress: self.progress.fresh(self.timestamp)
         if self.publisher is not None:
             self.viewer_state = {'attached':self.publisher.attached,
                                  'checked_at':self.publisher.demand_checked_at}

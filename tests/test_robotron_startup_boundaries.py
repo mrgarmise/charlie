@@ -21,7 +21,7 @@ def test_failed_prestart_calibration_never_constructs_controller(monkeypatch,tmp
     monkeypatch.setattr(play,'prepare',prepare)
     def controller(*a,**kw):pytest.fail('No controller or START before successful geometry')
     monkeypatch.setattr(play,'ArcadeController',controller)
-    monkeypatch.setattr(sys,'argv',['play','--arm','--recalibrate','--output',str(tmp_path/'run')])
+    monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--recalibrate','--output',str(tmp_path/'run')])
     with pytest.raises(ValueError,match='no stable geometry'):play.main()
     report=json.loads((tmp_path/'run/report.json').read_text())
     assert 'start_requested' not in report['session_timing']

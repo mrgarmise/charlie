@@ -29,7 +29,8 @@ def reflect_actuator_evidence(root, journal, episode, gateway):
     Directions, settings and expected verdicts are data, never selected constants.
     Existing Experience/Evaluator remain the hypothesis and ranking machinery.
     """
-    from memory.evidence import canonical, read_artifact, digest
+    from memory.evidence import canonical, ArtifactReader, digest
+    read_verified = ArtifactReader(root)
     from .hands import AXES
     from collections import Counter
     groups = {}
@@ -40,7 +41,7 @@ def reflect_actuator_evidence(root, journal, episode, gateway):
     for record in journal.records('observation'):
         if record.data['episode'] != episode or record.data['payload'].get('category') != 'agency_tracking_observation':
             continue
-        row = read_artifact(root, record.data['payload']['artifact'])
+        row = read_verified(record.data['payload']['artifact'])
         control = row.get('control_execution') or {}
         fire = control.get('fire')
         if control and fire in AXES and fire != 'STAY' and digest(control) not in executions:

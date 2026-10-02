@@ -14,7 +14,7 @@ from experiments.ppal.robotron_agency import VECTORS
                           (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
                           (False,False,False,False,False,False,False,True)])
 
-def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay):
+def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
     from experiments.ppal import play_robotron as play
     clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
     image=Image.new('RGB',(100,100))
@@ -30,6 +30,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
                     pending[0] = None
             if respawn and reads[0] == 25: points[0]=(80.,80.)
             if fail_during_play and reads[0]>28: raise RuntimeError('camera disconnected')
+            if extended and reads[0]>600: raise KeyboardInterrupt
             return image
         def close(self): closed.append('camera')
     class Recognizer:
@@ -71,6 +72,9 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
                         attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
         monkeypatch.setattr(play,'_control_challenge',reject)
         monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+    if terminal:
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+            'phase':'terminal' if reads[0]>28 else 'gameplay' if 'START' in commands else 'startable'})
     if recalibrate:
         def prepare(source,output,**kwargs):
             assert 'START' not in commands
@@ -98,7 +102,8 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
         plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
         (tmp_path/'plan.json').write_text(json.dumps(plan))
-    monkeypatch.setattr(sys,'argv',['play','--arm','--seconds','3' if rejected_challenge else '1','--output',str(tmp_path/'run')]
+    monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                        + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
                         + (['--bootstrap-body-fire'] if bootstrap else [])
                         + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
                         + (['--recalibrate'] if recalibrate else []))
@@ -118,7 +123,10 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
             t['first_ordinary_execution']['started_at']-t['start_transport']['write_completed_at'])
     assert t['self_discovery_started'] < t['self_discovery_finished'] <= t['gameplay_timer_started_at']
     assert t['first_ordinary_action_requested'] >= t['gameplay_timer_started_at']
-    assert t['gameplay_deadline']-t['gameplay_timer_started_at']==pytest.approx(3. if rejected_challenge else 1.)
+    if extended or terminal:
+        assert t['gameplay_deadline'] is None
+    else:
+        assert t['gameplay_deadline']-t['gameplay_timer_started_at']==pytest.approx(3. if rejected_challenge else 1.)
     telemetry_events=list(map(json.loads,(tmp_path/'run/events.jsonl').read_text().splitlines()))
     assert any(e['kind']=='state_transition' and e['new']=='playing' for e in telemetry_events)
     assert t['first_life_lost_at'] is None
@@ -131,7 +139,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         assert any(r.get('status')=='player_reacquired' for r in report['steps'])
         assert any(r['player'][0]>60 for r in actions)
     else:
-        assert all(r['player'][0]<40 for r in actions)
+        if not extended:assert all(r['player'][0]<40 for r in actions)
     assert all(r['agency']['controlled_track_id'] is not None for r in actions)
     assert closed==['controller','camera']
     assert (tmp_path/'run/agency.jsonl').exists()
@@ -157,8 +165,26 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         resolution=resolve_experiment(tmp_path/'run',evidence,next_episode,commitments,plan,gateway)
         assert resolution['result']=='supported'
         evidence.close();commitments.close();journal.close()
-    if rejected_challenge:
+    if rejected_challenge and not terminal:
         assert challenges and report['episode_end']['confirmed'] is False
         assert any(r.get('status')=='control_challenge' for r in report['steps'])
-        assert report['result']=='TIME LIMIT'
-    assert report['result'].startswith('ERROR:') if fail_during_play else report['result']=='TIME LIMIT'
+        assert report['result']=='DIAGNOSTIC LIMIT'
+    if extended:
+        assert report['result']=='INTERRUPTED'
+        assert t['stopped_at']-t['gameplay_timer_started_at'] > 20.
+        assert len(actions)>100
+    elif terminal:
+        from experiments.ppal.marathon_robotron import safe_to_restart
+        assert safe_to_restart(report)
+    else:
+        assert report['result'].startswith('ERROR:') if fail_during_play else report['result']=='DIAGNOSTIC LIMIT'
+
+
+def test_real_player_loop_has_no_default_duration_limit(monkeypatch,tmp_path):
+    test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+        False,False,False,False,False,False,False,False,extended=True)
+
+
+def test_real_player_confirmed_terminal_completion(monkeypatch,tmp_path):
+    test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+        False,False,False,False,False,False,True,False,terminal=True)

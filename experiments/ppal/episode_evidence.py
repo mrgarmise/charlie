@@ -22,16 +22,19 @@ ADAPTER = 'robotron-artifact-adapter-v1'
 def import_episode(root, journal):
     root = Path(root)
     report_path = root / 'report.json'
-    report = json.loads(report_path.read_text())
-    report_hash = hashlib.sha256(report_path.read_bytes()).hexdigest()
-    episode = 'episode:' + report_hash
+    report = json.loads(report_path.read_text()) if report_path.exists() else {}
     provenance = report.get('provenance', {})
     refs = {}
     for path in sorted(root.rglob('*')):
         if path.is_file() and path.suffix.lower() in ('.json', '.jsonl', '.png', '.jpg', '.jpeg'):
             refs[path.relative_to(root).as_posix()] = dict(
                 path=path.relative_to(root).as_posix(), sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+    # Interrupted children may retain logs without a finalized report. Their
+    # manifest identifies a partial specimen, never a fabricated complete game.
+    episode = ('episode:' + refs['report.json']['sha256'] if report_path.exists()
+               else 'partial-episode:' + digest(refs))
     start = journal.append('episode', dict(artifacts=refs, outcome=report.get('result'),
+                           completeness='report_present' if report_path.exists() else 'partial; boundary unknown',
                            configuration={k:report.get(k) for k in ('armed','seconds','pulse_ms','bootstrap_body_fire')},
                            wall_time=None, wall_time_status='not recorded; filename is not a clock anchor'),
                            episode=episode, producer=ADAPTER, version='1', provenance=provenance)
@@ -41,16 +44,25 @@ def import_episode(root, journal):
                               episode=episode, at=at, sources=(start.id,), producer=subsystem or ADAPTER,
                               version='1', provenance=provenance)
     # Partial runs without agency/score remain first-class episodes.
-    add('session_report', refs['report.json'])
+    if 'report.json' in refs:
+        add('session_report', refs['report.json'])
     executions = set()
     for name, category in (('agency.jsonl','agency_tracking_observation'), ('score.jsonl','score_observation'),
-                           ('events.jsonl','session_event_observation')):
+                           ('events.jsonl','session_event_observation'), ('steps.jsonl','partial_planning_observation')):
         if name not in refs:
             continue
+        if name == 'steps.jsonl' and report_path.exists():
+            continue  # completed report already references those same steps
         for line, text in enumerate((root/name).read_text().splitlines(), 1):
             if not text.strip():
                 continue
-            row = json.loads(text)
+            try:
+                row = json.loads(text)
+            except ValueError:
+                # A killed writer may leave a torn final line. It remains in the
+                # hashed artifact; do not reinterpret it as an observation.
+                add('unreadable_artifact_line', {**refs[name], 'line':line})
+                continue
             at = row.get('capture_timestamp', row.get('timestamp'))
             if name == 'events.jsonl':
                 at = row.get('at', at)  # Existing diary's explicit monotonic phase timestamps.
@@ -88,6 +100,8 @@ def derive_episode(root, journal, episode, *, window=3, tolerance=2.0):
     completed = [r for r in journal.records('derivation_complete') if r.data['episode']==episode and r.data['version']==version]
     if completed:
         return [r for r in journal.records() if r.data['version']==version and r.data['kind'] in ('event','resolution_reference')]
+    from memory.evidence import ArtifactReader
+    read_verified = ArtifactReader(root)
     history = {}
     previous_agency = None
     previous_score = None
@@ -99,7 +113,7 @@ def derive_episode(root, journal, episode, *, window=3, tolerance=2.0):
         payload = doc['payload']
         if payload['category'] not in ('agency_tracking_observation','score_observation'):
             continue
-        row = read_artifact(root, payload['artifact'])
+        row = read_verified(payload['artifact'])
         if payload['category'] == 'score_observation':
             if previous_score:
                 changes = {channel:row.get(channel,{}).get('delta') for channel in ('p1','p2')
@@ -121,7 +135,7 @@ def derive_episode(root, journal, episode, *, window=3, tolerance=2.0):
                     report=event, physical_birth_death='unknown'), episode=episode, at=doc['at'],
                     sources=(record.id,), producer='SpriteTracker-report-adapter', version=version))
         if previous_agency:
-            old = read_artifact(root,previous_agency.data['payload']['artifact'])
+            old = read_verified(previous_agency.data['payload']['artifact'])
             before = old.get('identity_status', 'confirmed' if old.get('self_track_id') is not None else 'unknown')
             after = row.get('identity_status', 'confirmed' if row.get('self_track_id') is not None else 'unknown')
             if before != after or old.get('self_track_id') != row.get('self_track_id'):
@@ -138,7 +152,7 @@ def derive_episode(root, journal, episode, *, window=3, tolerance=2.0):
     replay_path = journal.path.with_name(journal.path.stem + f'.{version}.replay.sqlite3')
     if replay_path.exists():
         raise ValueError('incomplete replay derivation exists; retain it and use a new output/version')
-    replay = EvidenceJournal(replay_path)
+    replay = EvidenceJournal(replay_path, on_progress=journal.on_progress)
     pending = {}
     past = {}
     by_record = {}

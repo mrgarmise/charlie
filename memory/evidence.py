@@ -43,8 +43,9 @@ class EvidenceRecord:
 class EvidenceJournal:
     """One bounded episode's lab notebook, separate from selective MARM stores."""
 
-    def __init__(self, path):
+    def __init__(self, path, on_progress=None):
         self.path = Path(path)
+        self.on_progress = on_progress
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(self.path)
         self.conn.execute("PRAGMA foreign_keys=ON")
@@ -58,6 +59,10 @@ class EvidenceJournal:
             CREATE TRIGGER IF NOT EXISTS immutable_delete BEFORE DELETE ON records
             BEGIN SELECT RAISE(ABORT, 'evidence is append-only'); END;
             CREATE INDEX IF NOT EXISTS evidence_kind ON records(json_extract(document,'$.kind'));
+            CREATE INDEX IF NOT EXISTS evidence_resolution_prediction ON records(
+                json_extract(document,'$.kind'), json_extract(document,'$.payload.prediction_id'));
+            CREATE INDEX IF NOT EXISTS evidence_observation_time ON records(
+                json_extract(document,'$.kind'), json_extract(document,'$.episode'), json_extract(document,'$.at'));
         """)
         self.conn.commit()
         self.verify()
@@ -111,6 +116,8 @@ class EvidenceJournal:
         with self.conn:
             self.conn.execute("INSERT OR IGNORE INTO records(id,document,committed_at) VALUES (?,?,?)",
                               (identifier, canonical(doc), datetime.now(timezone.utc).isoformat()))
+        if self.on_progress:
+            self.on_progress()
         return self.get(identifier)
 
     def predict(self, expected, *, episode, at, deadline, sources, producer,
@@ -174,3 +181,33 @@ def read_artifact(root, reference):
     for part in reference.get('pointer', []):
         value = value[part]
     return value
+
+
+class ArtifactReader:
+    """Phase-local verified file snapshot; hash each immutable artifact once.
+
+    Never cached across episodes/processes. Stat changes are rejected; returned
+    values are newly decoded so an interpretation cannot alter canonical bytes.
+    """
+    def __init__(self, root):
+        self.root = Path(root).resolve()
+        self.files = {}
+
+    def __call__(self, reference):
+        path = (self.root/reference['path']).resolve()
+        if not path.is_relative_to(self.root):
+            raise ValueError('artifact escapes episode directory')
+        stat = path.stat()
+        stamp = (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
+        if path not in self.files:
+            raw = path.read_bytes()
+            if hashlib.sha256(raw).hexdigest() != reference['sha256']:
+                raise ValueError('source artifact changed')
+            self.files[path] = (stamp, reference['sha256'], raw, raw.splitlines())
+        saved, digest_value, raw, lines = self.files[path]
+        if stamp != saved or reference['sha256'] != digest_value:
+            raise ValueError('source artifact changed during evidence processing')
+        value = json.loads(lines[reference['line']-1] if reference.get('line') is not None else raw)
+        for part in reference.get('pointer', []):
+            value = value[part]
+        return value

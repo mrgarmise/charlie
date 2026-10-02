@@ -1,6 +1,7 @@
 """Small live Robotron runner using Charlie's taught eyes and PPAL brain.
 
-This is deliberately bounded: gameplay time defaults to 20 seconds and the
+Healthy gameplay continues to a confirmed terminal state. Diagnostic duration
+limits are opt-in, and the
 controller is neutralized on every pulse, during vision uncertainty, and on exit.
 Normal play reuses the promoted playfield calibration for fast startup. Charlie
 may start Robotron himself after the camera is ready, then waits for visual proof
@@ -377,7 +378,11 @@ def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--seconds", type=float, default=20.0)
+    parser.add_argument("--seconds", "--diagnostic-seconds", dest="seconds", type=float, default=None,
+                        help="opt-in diagnostic duration limit; not normal game completion")
+    parser.add_argument("--uncertainty-seconds", type=float, default=60.,
+                        help="stop after sustained inability to demonstrate controlled SELF; never authorize START")
+    parser.add_argument("--supervised-child", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--host", default="charlie-arcade.local")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--pulse-ms", type=int, default=80)
@@ -406,8 +411,10 @@ def main():
     parser.add_argument('--observer-context', type=Path, help='optional display-only project context; never policy input')
     args = parser.parse_args()
 
-    if not 1 <= args.seconds <= 3600:
+    if args.seconds is not None and (not math.isfinite(args.seconds) or not 1 <= args.seconds <= 3600):
         parser.error("--seconds must be 1..3600")
+    if not math.isfinite(args.uncertainty_seconds) or not 10 <= args.uncertainty_seconds <= 300:
+        parser.error("--uncertainty-seconds must be 10..300")
     if not 30 <= args.pulse_ms <= 200:
         parser.error("--pulse-ms must be 30..200")
     if not 1.0 <= args.start_wait <= 10.0:
@@ -415,6 +422,16 @@ def main():
     if args.output is None:
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         args.output = Path(f"robotron-runs/play-{stamp}")
+    if args.arm and not args.supervised_child:
+        import sys
+        from .progress_supervision import supervise
+        # Parent remains independent of camera/perception/controller operations.
+        command = [sys.executable, "-m", "experiments.ppal.play_robotron", *sys.argv[1:]]
+        if "--output" not in sys.argv[1:]:
+            command.extend(["--output", str(args.output)])
+        command.append("--supervised-child")
+        rc = supervise(command, args.output.parent/(args.output.name+"-progress.json"), processing=90.)
+        raise SystemExit(rc)
     if args.output.exists():
         parser.error(f"output already exists: {args.output}")
     args.output.mkdir(parents=True)
@@ -452,8 +469,13 @@ def main():
     def phase(state, reason):
         if session.state != state:
             diary.transition(session.transition(state, reason))
+            if progress:
+                progress.update(mode=state.value, mode_started_at=time.monotonic())
+    from .progress_supervision import Progress, SupervisedController, ObservationFailure, UncertaintyWindow
+    progress = Progress(args.output.parent/(args.output.name+"-progress.json")) if args.arm else None
+    if progress: progress.enter("camera")
     mark('camera_initialization_started')
-    source = ObservedCamera(PiCameraSource(), require_fresh=args.arm)
+    source = ObservedCamera(PiCameraSource(), require_fresh=args.arm, progress=progress)
     publisher = None
     try:
         from .eyes.passive import PassivePublisher
@@ -472,14 +494,16 @@ def main():
         pass  # Optional visual observation must not gate camera or gameplay.
     score_observer = None
     preceding_action = None
-    rows = []
+    from .progress_evidence import DurableRows
+    rows = DurableRows(args.output/"steps.jsonl")
     review_frames = []
-    agency_rows = []
+    agency_samples = 0
     agency_frames = []
     latest_agency_frame = None
     buffered_frames = []
     raw_frames = []
     def record_agency(snapshot):
+        nonlocal agency_samples
         execution = getattr(controller, 'last_execution', None) or {}
         if session.state == SessionState.ACQUIRING and execution.get('move') not in (None,'STAY') and 'first_body_probe_at' not in timing:
             timing['first_body_probe_at'] = execution.get('started_at')
@@ -518,7 +542,8 @@ def main():
             row["frame"] = name
             agency_frames.append({"sample": visual_agency.tick, "path": name,
                                   "candidates": _pair_evidence(visual_agency.pairs)})
-        agency_rows.append(row)
+        if progress: progress.perception()
+        agency_samples += 1
         with (args.output / "agency.jsonl").open("a") as stream:
             stream.write(json.dumps(row) + "\n")
         if snapshot["event"]:
@@ -556,6 +581,13 @@ def main():
         revision,dirty = None,None
     provenance = {'git_commit':revision,'dirty_worktree':dirty,
                   'knowledge_sha256':hashlib.sha256(args.knowledge.read_bytes()).hexdigest()}
+    def new_controller():
+        if progress: progress.enter('controller')
+        instance = ArcadeController(args.host, args.port, protocol="positions")
+        if progress:
+            progress.enter('perception')
+            return SupervisedController(instance, progress)
+        return instance
     controller = None
     result = "not started"
     episode_end = {"state": "unknown", "confirmed": False, "evidence": None}
@@ -616,7 +648,7 @@ def main():
             decision = {'action':'attach' if args.arm else 'observe', 'reason':'explicit --no-start-game or unarmed observation'}
             mark('start_decision', decision=decision)
         if auto_start:
-            controller = ArcadeController(args.host, args.port, protocol="positions")
+            controller = new_controller()
             phase(SessionState.STARTING, 'stable recognized pregame plus explicit --arm')
             print('CAMERA READY; tapping Robotron START')
             mark('start_requested')
@@ -656,7 +688,7 @@ def main():
         # Appearance/center are proposals. Armed play requires direct agency.
         if args.arm:
             if controller is None:
-                controller = ArcadeController(args.host, args.port, protocol="positions")
+                controller = new_controller()
             print("DISCOVERING SELF: short movement/neutral probes over all visual candidates")
             mark('self_discovery_started')
             player = visual_agency.discover(read_agency_pairs, controller, record=record_agency,
@@ -691,12 +723,14 @@ def main():
             return
 
         if controller is None:
-            controller = ArcadeController(args.host, args.port, protocol="positions")
+            controller = new_controller()
         started = time.monotonic()
-        deadline = started + args.seconds
-        timing.update(gameplay_timer_started_at=started, gameplay_deadline=deadline)
+        deadline = started + args.seconds if args.seconds is not None else float("inf")
+        timing.update(gameplay_timer_started_at=started, gameplay_deadline=deadline if args.seconds else None,
+                      duration_limit_kind="diagnostic" if args.seconds else "none")
+        uncertainty = UncertaintyWindow(args.uncertainty_seconds)
         phase(SessionState.PLAYING, 'ordinary policy enabled with acquired or provisional SELF')
-        diary.event('gameplay_timer_started', at=started, deadline=deadline, identity=acquisition)
+        diary.event('gameplay_timer_started', at=started, deadline=deadline if args.seconds else None, identity=acquisition)
         tick = 0
         lost = 0
         pending_move = None
@@ -704,7 +738,7 @@ def main():
         pending_origin = None
         pending_origin_at = None
         episode_observer = EpisodeEndObserver(required_not_gameplay=8)
-        print(f"CHARLIE LOOSE: {args.seconds:.1f}s hard gameplay limit")
+        print(f"CHARLIE LOOSE: diagnostic limit {args.seconds:.1f}s" if args.seconds else "CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state")
 
         while time.monotonic() < deadline:
             raw = source.read()
@@ -724,7 +758,7 @@ def main():
                 latest_agency_frame = playfield
                 record_agency(early)
                 if time.monotonic() >= deadline:
-                    result = "TIME LIMIT"
+                    result = "DIAGNOSTIC LIMIT"
                     break
                 raw = source.read()
                 observed_at = time.monotonic()-started
@@ -776,7 +810,7 @@ def main():
                     source, calibration, recognizer, count=4, interval=0.025,
                     on_observation=observe_unmeasured, deadline=deadline)
                 if time.monotonic() >= deadline:
-                    result = 'TIME LIMIT'
+                    result = 'DIAGNOSTIC LIMIT'
                     break
                 recovered = None  # Global resemblance is not proof of a new SELF.
 
@@ -875,6 +909,12 @@ def main():
                     break
 
                 if recovered is None:
+                    if uncertainty.observe(False, time.monotonic()):
+                        result = 'OBSERVATION UNCERTAIN'
+                        diary.event('observation_uncertainty_stop', screen=screen, boundary='unverified',
+                                    duration=time.monotonic()-uncertainty.since)
+                        break
+                    if progress: progress.cycle()  # completed neutral observation/recovery, not ordinary play
                     rows.append({
                         "tick": tick,
                         "t": time.monotonic() - started,
@@ -979,14 +1019,15 @@ def main():
             if action.fire == "STAY":
                 action = Action(action.move, "NONE", action.reason)
 
-            remaining_ms = int(max(0.0, deadline-time.monotonic()) * 1000)
+            remaining_ms = int(max(0.0, deadline-time.monotonic()) * 1000) if args.seconds else args.pulse_ms
             if remaining_ms < 30:
-                result = "TIME LIMIT"
+                result = "DIAGNOSTIC LIMIT"
                 break
             pulse_ms = min(args.pulse_ms, remaining_ms)
             if pulse_ms < 30:
-                result = "TIME LIMIT"
+                result = "DIAGNOSTIC LIMIT"
                 break
+            uncertainty.observe(True, time.monotonic())
             pending_origin = dict(visual_agency.positions)
             pending_origin_at = source.timestamp
             pending_at = time.monotonic()
@@ -1045,9 +1086,10 @@ def main():
                     ),
                 },
             })
+            if progress: progress.cycle()
             tick += 1
         else:
-            result = "TIME LIMIT"
+            result = "DIAGNOSTIC LIMIT"
 
         print(f"RUN COMPLETE: {result}; ticks={tick}")
     except KeyboardInterrupt:
@@ -1055,8 +1097,16 @@ def main():
         print("INTERRUPTED; neutralizing")
     except Exception as exc:
         result = f'ERROR: {type(exc).__name__}: {exc}'
+        if isinstance(exc, ObservationFailure) or (progress and progress.data['phase'] == 'camera'):
+            failure_kind = 'observation_failure'
+        elif progress:
+            failure_kind = progress.data.get('failure_kind',
+                'controller_failure' if progress.data['phase'] == 'controller' else 'player_failure')
+        else:
+            failure_kind = 'player_failure'
         raise
     finally:
+        if progress: progress.enter('finalizing')
         timing['stopped_at'] = time.monotonic()
         start_transport = timing.get('start_transport') or {}
         ordinary = timing.get('first_ordinary_execution') or {}
@@ -1071,6 +1121,7 @@ def main():
             except (OSError, ConnectionError):
                 pass
         source.close()
+        if progress: progress.enter('finalizing')
         if publisher is not None:
             publisher.close()
         if score_observer is not None:
@@ -1086,6 +1137,9 @@ def main():
         tracks = self_tracker.tracks() if args.arm else []
         (args.output / "tracks.json").write_text(json.dumps({"tracks":tracks}, indent=2)+"\n")
         report = {"session_timing":timing, "session_transitions":[vars(r) for r in session.transitions], "session_events":"events.jsonl", "provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
+                  "failure_kind": locals().get("failure_kind"),
+                  "progress": dict(progress.data, publication_seconds=progress.cost_seconds) if progress else None,
+                  "partial_action_evidence":"steps.jsonl",
                   "pulse_ms": args.pulse_ms, "ticks": len(rows),
                   "episode_end": episode_end,
                   "score": score_summary["self_score"], "score_status": score_summary["status"],
@@ -1113,7 +1167,7 @@ def main():
                   "fire_agency_status": "exploratory evidence only; projectile/origin interpretation unvalidated",
                   "experiment_status": experiment_status,
                   "tracks": "tracks.json",
-                  "agency_samples": len(agency_rows),
+                  "agency_samples": agency_samples,
                   "agency_log": "agency.jsonl",
                   "steps": rows}
         (args.output / "report.json").write_text(json.dumps(report, indent=2) + "\n")

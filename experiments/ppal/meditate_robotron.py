@@ -9,6 +9,7 @@ This is meditation only: no controller, no live policy changes.
 from __future__ import annotations
 
 import argparse
+from bisect import bisect_right
 from collections import Counter
 import json
 import math
@@ -114,11 +115,19 @@ def _clone_raw(tracks):
 
 
 def reconstruct_once(tracks, window=3, max_gap=5,
-                     base_radius=2.0, radius_per_gap=1.8):
+                     base_radius=2.0, radius_per_gap=1.8, on_progress=None):
     """Conservative mutual-best predicted matching for one iteration."""
     candidates = []
+    # Only future onsets inside max_gap can link. Preserve original j order,
+    # including tie-breaking, while avoiding quadratic impossible pairs.
+    onsets = sorted((int(t['first_tick']), j) for j,t in enumerate(tracks))
+    times = [at for at,_ in onsets]
     for i, left in enumerate(tracks):
-        for j, right in enumerate(tracks):
+        if on_progress: on_progress()
+        end = int(left['last_tick'])
+        start, stop = bisect_right(times,end), bisect_right(times,end+max_gap)
+        for j in sorted(j for _,j in onsets[start:stop]):
+            right = tracks[j]
             if i == j:
                 continue
             info = predicted_link(left, right, window, max_gap,
@@ -187,7 +196,7 @@ def quality(tracks, window=3, max_gap=5):
 
 
 def meditate(raw_tracks, iterations=6, window=3, max_gap=5,
-             base_radius=2.0, radius_per_gap=1.8):
+             base_radius=2.0, radius_per_gap=1.8, on_progress=None):
     tracks = _clone_raw(raw_tracks)
     history = []
     all_merges = []
@@ -195,7 +204,7 @@ def meditate(raw_tracks, iterations=6, window=3, max_gap=5,
     for iteration in range(1, iterations + 1):
         before = len(tracks)
         rebuilt, merges = reconstruct_once(
-            tracks, window, max_gap, base_radius, radius_per_gap)
+            tracks, window, max_gap, base_radius, radius_per_gap, on_progress=on_progress)
         q = quality(rebuilt, window, max_gap)
         history.append({
             "iteration": iteration,

@@ -4,12 +4,14 @@ import time
 
 class ObservedCamera:
     """Retain the full camera frame without changing calibration/capture callers."""
-    def __init__(self, source, *, require_fresh=False):
+    def __init__(self, source, *, require_fresh=False, publisher=None):
         self.source = source
         self.require_fresh = require_fresh
         self.capture = None
         self.raw = None
         self.timestamp = None
+        self.publisher = publisher
+        self.viewer_state = None
 
     def read(self):
         read = getattr(self.source, 'read_fresh', None) if self.require_fresh else None
@@ -22,6 +24,11 @@ class ObservedCamera:
                           if self.capture else None)
         if self.timestamp is None:
             self.timestamp = time.monotonic()
+        if self.publisher is not None:
+            self.viewer_state = {'attached':self.publisher.attached,
+                                 'checked_at':self.publisher.demand_checked_at}
+            self.publisher.submit(self.raw, timestamp=self.timestamp,
+                                  metadata={'phase':'capture/preflight', 'identity_status':'unknown'})
         return self.raw
 
     def __getattr__(self, name):

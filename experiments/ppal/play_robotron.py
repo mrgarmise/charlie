@@ -403,6 +403,7 @@ def main():
                         help="experimental provisional BODY identity with independent and simultaneous FIRE exploration")
     parser.add_argument('--experiment-plan', type=Path,
                         help='one precommitted developmental actuator experiment')
+    parser.add_argument('--observer-context', type=Path, help='optional display-only project context; never policy input')
     args = parser.parse_args()
 
     if not 1 <= args.seconds <= 3600:
@@ -453,6 +454,22 @@ def main():
             diary.transition(session.transition(state, reason))
     mark('camera_initialization_started')
     source = ObservedCamera(PiCameraSource(), require_fresh=args.arm)
+    publisher = None
+    try:
+        from .eyes.passive import PassivePublisher
+        observer_context = {'episode':str(args.output.resolve()), 'project':None}
+        if args.observer_context:
+            try:
+                supplied=json.loads(args.observer_context.read_text())
+                if supplied.get('episode')==observer_context['episode']:
+                    observer_context['project']=supplied.get('project')
+            except (OSError,ValueError,TypeError):pass
+        elif experiment_plan and experiment_plan.get('project_id'):
+            observer_context['project']={'id':experiment_plan['project_id'],'goal':experiment_plan.get('project_objective')}
+        publisher = PassivePublisher(context=observer_context)
+        source.publisher = publisher
+    except Exception:
+        pass  # Optional visual observation must not gate camera or gameplay.
     score_observer = None
     preceding_action = None
     rows = []
@@ -473,7 +490,13 @@ def main():
             mark(f'first_{status}_self_recorded', capture_timestamp=source.timestamp,
                  track_id=snapshot.get('controlled_track_id'), identity_status=status)
         row = {"sample": visual_agency.tick, "capture_timestamp": source.timestamp, "capture": source.capture,
+               "viewer_state":source.viewer_state,
                "control_execution": getattr(controller, "last_execution", None), "session_phase":session.state.value, **snapshot}
+        if publisher is not None and source.raw is not None:
+            publisher.submit(source.raw, timestamp=source.timestamp, playfield=latest_agency_frame,
+                metadata={'phase':session.state.value, 'agency':snapshot,
+                          'control_execution':getattr(controller,'last_execution',None),
+                          'preceding_action':preceding_action, 'experiment':experiment_plan})
         # Encoding PNGs between pulses lengthened unseen intervals substantially.
         # Buffer a bounded set of originals; write images only after controls close.
         if latest_agency_frame is not None and len(raw_frames) < 96:
@@ -979,12 +1002,19 @@ def main():
             if experiment_context is not None:
                 experiment_status.update(status='executed',attempted=True,reason=experiment_plan['reason'])
                 print(f"EXPERIMENT: BODY={action.move} FIRE={action.fire}; prediction={experiment_plan['prediction_id'][:12]}")
+            if publisher is not None:
+                publisher.submit(source.raw, timestamp=source.timestamp, playfield=latest_agency_frame,
+                    metadata={'phase':'ordinary_action_completed', 'agency':agency_snapshot,
+                              'action':action_dict(action), 'intent':{'kind':intent.kind,'target_id':intent.target_id},
+                              'control_execution':getattr(controller,'last_execution',None), 'experiment':experiment_plan})
             pending_move = action.move
             rows.append({
                 "tick": tick, "observed_at": observed_at, "t": time.monotonic()-started,
                 "capture_timestamp": source.timestamp,
                 "capture": source.capture,
                 "action_timestamp": pending_at,
+                "control_execution":getattr(controller,'last_execution',None),
+                "viewer_state":source.viewer_state,
                 "player": list(player),
                 "self_track_id": self_tracker.player_track_id,
                 "identity_status": agency_snapshot.get("identity_status"),
@@ -1041,6 +1071,8 @@ def main():
             except (OSError, ConnectionError):
                 pass
         source.close()
+        if publisher is not None:
+            publisher.close()
         if score_observer is not None:
             score_observer.close()
         if score_observer is not None and not score_observer.thread.is_alive():
@@ -1073,6 +1105,8 @@ def main():
                   "tracking_log": "agency.jsonl",
                   "tracking_schema": "sprite-tracking-v3",
                   "capture_mode": "fresh_exposure" if args.arm else "read_completion",
+                  "passive_observer": publisher.report() if publisher is not None else {'status':'unavailable'},
+                  "camera_lease_handoff_seconds": getattr(getattr(getattr(source,'camera',None),'lease',None),'handoff_seconds',None),
                   "agency_acquisition_protocol": "two_fresh_endpoints_then_independent_neutral",
                   "planning_mode": "rescue_with_open_space_fallback",
                   "bootstrap_body_fire": args.bootstrap_body_fire,

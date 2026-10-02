@@ -9,18 +9,29 @@ from picamera2 import Picamera2
 
 
 class Camera:
-    def __init__(self, width=1280, height=720):
-        self.picam2 = Picamera2()
-
-        config = self.picam2.create_preview_configuration(
-            main={
-                "size": (width, height),
-                "format": "RGB888",
-            }
-        )
-
-        self.picam2.configure(config)
-        self.picam2.start()
+    def __init__(self, width=1280, height=720, *, purpose='active'):
+        from experiments.ppal.eyes.camera_lease import CameraLease
+        self.lease_error = None
+        try:self.lease = CameraLease(purpose)
+        except OSError as exc:
+            if purpose=='preview':raise  # preview never bypasses ownership
+            # Optional observer storage failure cannot gate Charlie. libcamera
+            # remains the authoritative device owner; no preview can take a
+            # cooperative lease in this unavailable runtime directory.
+            self.lease=None;self.lease_error=str(exc)
+        self.closed = False
+        try:
+            self.picam2 = Picamera2()
+            config = self.picam2.create_preview_configuration(
+                main={"size": (width, height), "format": "RGB888"})
+            self.picam2.configure(config)
+            self.picam2.start()
+        except Exception:
+            try:
+                if hasattr(self, 'picam2'):self.picam2.close()
+            finally:
+                if self.lease:self.lease.close()
+            raise
 
     def read(self):
         return self.picam2.capture_array()
@@ -50,4 +61,10 @@ class Camera:
         return dict(self.picam2.capture_metadata())
 
     def close(self):
-        self.picam2.stop()
+        if self.closed:return
+        self.closed = True
+        try:
+            try:self.picam2.stop()
+            finally:self.picam2.close()
+        finally:
+            if self.lease:self.lease.close()

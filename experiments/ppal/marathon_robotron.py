@@ -124,6 +124,10 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             cmd=[sys.executable,'-m','experiments.ppal.play_robotron','--arm','--bootstrap-body-fire',
                  '--seconds',str(args.game_seconds),'--focus',str(args.focus),'--recalibrate','--output',str(game)]
             if plan:cmd.extend(['--experiment-plan',str(plan_path)])
+            if executive:
+                viewer_context = session/f'game-{index:02d}-observer-context.json'
+                write_session(viewer_context, {'episode':str(game.resolve()), 'project':selection['project']})
+                cmd.extend(['--observer-context', str(viewer_context)])
             rc=driver(cmd,args.game_seconds+120.)
             report=load_report(game/'report.json')
             entry={'path':str(game),'returncode':rc,'result':report.get('result') if report else 'missing report',

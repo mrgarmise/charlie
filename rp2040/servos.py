@@ -30,6 +30,7 @@ class Servo:
         self.position = 90.0
         self.target = 90.0
         self.velocity = 0.0
+        self.speed_limit = MAX_SPEED
 
         self.write(self.position)
 
@@ -57,11 +58,17 @@ class Servo:
 
     # ---------------------------------
 
-    def move_to(self, angle):
+    def move_to(self, angle, rate=None):
 
+        self.speed_limit = (MAX_SPEED if rate is None else
+                            min(MAX_SPEED, max(1.0, rate) / UPDATE_RATE_HZ))
         self.target = max(0, min(180, angle))
 
     # ---------------------------------
+
+    def stop(self):
+        self.target = self.position
+        self.velocity = 0.0
 
     def update(self):
 
@@ -71,15 +78,17 @@ class Servo:
 
         self.velocity *= 0.82
 
-        if self.velocity > MAX_SPEED:
-            self.velocity = MAX_SPEED
+        if self.velocity > self.speed_limit:
+            self.velocity = self.speed_limit
 
-        if self.velocity < -MAX_SPEED:
-            self.velocity = -MAX_SPEED
+        if self.velocity < -self.speed_limit:
+            self.velocity = -self.speed_limit
 
-        self.position += self.velocity
-
-        self.write(self.position)
+        next_position = self.position + self.velocity
+        if (self.target - self.position) * (self.target - next_position) <= 0:
+            next_position = self.target
+            self.velocity = 0.0
+        self.write(max(0, min(180, next_position)))
 
 
 class ServoController:
@@ -100,32 +109,36 @@ class ServoController:
 
     # -----------------------------
 
-    def look(self, pan, tilt):
+    def look(self, pan, tilt, rate=None):
 
         pan = max(PAN_MIN, min(PAN_MAX, pan))
         tilt = max(TILT_MIN, min(TILT_MAX, tilt))
 
-        self.a_pan.move_to(pan)
-        self.a_tilt.move_to(tilt)
+        self.a_pan.move_to(pan, rate)
+        self.a_tilt.move_to(tilt, rate)
 
-        self.b_pan.move_to(pan)
-        self.b_tilt.move_to(tilt)
-
-    # -----------------------------
-
-    def head_a(self, pan, tilt):
-
-        self.a_pan.move_to(pan)
-        self.a_tilt.move_to(tilt)
+        self.b_pan.move_to(pan, rate)
+        self.b_tilt.move_to(tilt, rate)
 
     # -----------------------------
 
-    def head_b(self, pan, tilt):
+    def head_a(self, pan, tilt, rate=None):
 
-        self.b_pan.move_to(pan)
-        self.b_tilt.move_to(tilt)
+        self.a_pan.move_to(pan, rate)
+        self.a_tilt.move_to(tilt, rate)
 
     # -----------------------------
+
+    def head_b(self, pan, tilt, rate=None):
+
+        self.b_pan.move_to(pan, rate)
+        self.b_tilt.move_to(tilt, rate)
+
+    # -----------------------------
+
+    def stop(self):
+        for servo in (self.a_pan, self.a_tilt, self.b_pan, self.b_tilt):
+            servo.stop()
 
     def update(self):
 

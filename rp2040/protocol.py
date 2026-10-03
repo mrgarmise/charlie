@@ -99,6 +99,7 @@ VALID_COMMANDS = {
     "TX",
 
     "STATUS",
+    "VIEWPOINT",
 }
 
 

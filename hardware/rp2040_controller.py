@@ -209,15 +209,10 @@ class RP2040Controller:
             "STOP"
         )
 
-    def look(
-        self,
-        pan,
-        tilt
-    ):
-
-        return self.send(
-            f"LOOK {pan} {tilt}"
-        )
+    def look(self, pan, tilt, *, rate=None):
+        # Optional slew rate is executed by the existing RP2040 servos.
+        suffix = "" if rate is None else f" {float(rate)}"
+        return self.send(f"LOOK {pan} {tilt}{suffix}")
 
     def track(
         self,
@@ -228,6 +223,36 @@ class RP2040Controller:
         return self.send(
             f"TRACK {pan} {tilt}"
         )
+
+    def viewpoint_status(self, timeout=1.0):
+        """Query measured firmware servo state; never infer pose from LOOK.
+
+        The same transport lock excludes heartbeat writes. STOP_HOLD identifies
+        firmware that actually freezes servo targets and velocities on STOP.
+        """
+        if not self.connected:
+            return None
+        try:
+            with self.lock:
+                self.serial.write(b"VIEWPOINT\n")
+                self.last_tx = time.monotonic()
+                deadline = self.last_tx + timeout
+                old_timeout = self.serial.timeout
+                try:
+                    self.serial.timeout = min(.1, timeout)
+                    while time.monotonic() < deadline:
+                        parts = self.serial.readline().decode(errors="replace").split()
+                        if len(parts) == 8 and parts[0] == "VIEWPOINT":
+                            return dict(pan=float(parts[1]), tilt=float(parts[2]),
+                                        b_pan=float(parts[3]), b_tilt=float(parts[4]),
+                                        moving=bool(int(parts[5])),
+                                        mode=parts[6], stop_hold=parts[7] == "STOP_HOLD")
+                finally:
+                    self.serial.timeout = old_timeout
+            return None
+        except Exception:
+            self._mark_disconnected()
+            return None
 
     # --------------------------------------------------
     # DISPLAY

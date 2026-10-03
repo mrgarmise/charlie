@@ -7,6 +7,7 @@ pre{background:#222633;padding:15px;white-space:pre-wrap;overflow-wrap:anywhere;
 .muted{color:#afb6c4}.warning{color:#ffc65c}button{padding:7px 12px}
 </style>
 <h1>Charlie Eyes</h1><p id="status" role="status">Connecting…</p>
+<p id="viewpoint" class="muted"></p>
 <p class="muted">Raw RGB evidence · solid green: confirmed SELF · dashed amber: provisional SELF · blue: physical tracks. UNKNOWN remains UNKNOWN.</p>
 <div class="views"><section class="view"><h2>Raw frame</h2><img id="raw" alt="Charlie's full captured frame"></section>
 <section class="view"><h2>Tracking evidence</h2><div id="tracked"><img id="crop" alt="Observed playfield"><svg id="boxes"></svg></div></section></div>
@@ -19,6 +20,8 @@ async function poll(){
   const p=await r.json();last=performance.now();
   $('status').textContent=p.status+(p.reason?' — '+p.reason:'')+(p.capture_timestamp?' · captured at '+p.capture_timestamp.toFixed(3)+' monotonic seconds':'');
   $('status').className=p.status==='unavailable'?'warning':'';
+  const v=p.active_vision||(p.evidence||{}).active_vision;
+  $('viewpoint').textContent=v?('Viewpoint '+(v.current===false?'last recorded: ':'')+v.state+' · confidence '+(v.confidence??'unknown')+' · '+(typeof v.decision==='string'?v.decision:'')):'';
   $('boxes').replaceChildren();
   if(!p.raw){$('raw').removeAttribute('src');$('crop').removeAttribute('src');$('evidence').textContent=JSON.stringify(p,null,2);return;}
   $('raw').src='data:image/jpeg;base64,'+p.raw.image;

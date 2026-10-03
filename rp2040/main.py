@@ -89,8 +89,8 @@ print(
 # MAIN LOOP
 # ==================================================
 
+link_lost = False
 while True:
-    link_lost = False
 
     # --------------------------
     # Check serial commands
@@ -133,6 +133,9 @@ while True:
         if not link_lost:
 
             link_lost = True
+
+            # Freeze in-flight servo travel as well as autonomous scanning.
+            servos.stop()
 
             # Safe physical state.
             if behaviors.mode != behaviors.IDLE:

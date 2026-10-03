@@ -42,6 +42,16 @@ class CommandHandler:
 
         # ----------------------------------
 
+        if name == "VIEWPOINT":
+            servos = self.behaviors.servos
+            if servos:
+                moving = any(abs(s.target - s.position) > 0.05 or abs(s.velocity) > 0.05
+                             for s in (servos.a_pan, servos.a_tilt,
+                                       servos.b_pan, servos.b_tilt))
+                print("VIEWPOINT", servos.a_pan.position, servos.a_tilt.position,
+                      servos.b_pan.position, servos.b_tilt.position, int(moving), self.behaviors.mode, "STOP_HOLD")
+            return
+
         if name == "STATUS":
 
             print(
@@ -73,6 +83,9 @@ class CommandHandler:
 
         if name == "STOP":
 
+            if self.behaviors.servos:
+                self.behaviors.servos.stop()
+
             self.behaviors.set_mode(
                 self.behaviors.IDLE
             )
@@ -103,25 +116,27 @@ class CommandHandler:
 
         if name == "LOOK":
 
-            pan = cmd.arg_int(
+            pan = cmd.arg_float(
                 0,
                 90
             )
 
-            tilt = cmd.arg_int(
+            tilt = cmd.arg_float(
                 1,
                 90
             )
 
             self.behaviors.gaze(
                 pan,
-                tilt
+                tilt,
+                cmd.arg_float(2, 150.0)
             )
 
             print(
                 "OK LOOK",
                 pan,
-                tilt
+                tilt,
+                cmd.arg_float(2, 150.0)
             )
 
             return

@@ -116,7 +116,7 @@ class BehaviorManager:
     # --------------------------------
 
                 
-    def gaze(self, pan, tilt):
+    def gaze(self, pan, tilt, rate=None):
         """
         Move gaze without changing behavioral mode.
         """
@@ -124,7 +124,8 @@ class BehaviorManager:
         if self.servos:
             self.servos.look(
                 pan,
-                tilt
+                tilt,
+                rate=rate
             )
 
     # --------------------------------

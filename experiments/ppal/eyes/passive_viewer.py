@@ -29,10 +29,15 @@ class Viewer:
         atomic_json(self.directory/'demand.json',dict(at=time.monotonic(),viewer=self.token))
         packet=read_json(self.directory/'latest.json')
         owner=camera_owner(self.directory)
+        viewpoint=read_json(self.directory/'active-vision.json')
+        if viewpoint:
+            viewpoint=dict(viewpoint, current=bool(owner.get('pid')==viewpoint.get('producer_pid')
+                and time.monotonic()-viewpoint.get('at',0)<=2))
         fresh=packet and time.monotonic()-packet['published_at'] <= 2 and time.monotonic()-packet.get('capture_timestamp',0) <= 2
         if fresh and packet['producer_pid']==owner.get('pid'):
+            packet=dict(packet, active_vision=viewpoint)
             return dict(status='idle preview' if owner.get('purpose')=='preview' else 'passive', **packet)
-        return dict(status='unavailable', reason=self.error or (
+        return dict(status='unavailable', active_vision=viewpoint, reason=self.error or (
             'Charlie owns the camera; no fresh passive evidence published' if owner else
             'Waiting for idle preview' if self.idle else 'Charlie is idle; idle preview disabled'),
             evidence={'identity_status':'unknown'}, age_seconds=time.monotonic()-packet['published_at'] if packet else None)

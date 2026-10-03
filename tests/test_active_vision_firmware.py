@@ -12,7 +12,15 @@ ROOT=Path(__file__).resolve().parents[1]
 PROFILE=dict(assembled_head_verified=True,calibration_id='SIMULATED_001',pins=[4,5],
     pan=dict(min=85,max=95,min_us=1000,max_us=2000),
     tilt=dict(min=85,max=95,min_us=1000,max_us=2000),
-    confirmed_arm_pose=[90,90],home_pose=[90,90],max_rate=5,max_step=2)
+    confirmed_arm_pose=[90,90],home_pose=[90,90],max_rate=5,max_step=2,
+    schema='charlie-neck-profile-v1',validation_status='QUALIFIED',simulated=False,
+    hardware=dict(controller='rp2040',head_a=[4,5],head_b_disabled=[14,15],calibration_input=10,calibration_input_only=True),
+    pose_source='operator_confirmed_estimate',measured_position=None,created_at='FAKE_TIME',qualified_at='FAKE_TIME',
+    evidence_sha256='0'*64,supersedes=[],clearance_margin=.25,
+    clearance_polygon=[[85,85],[95,85],[95,95],[85,95]],
+    visual_response=dict(pan=[4,0],tilt=[0,4]),
+    observation_size=[480,360],
+    independent_review=dict(operator='fake_operator',reviewer='fake_reviewer',evidence='fake_evidence',physical_validation=True))
 
 
 def load(name,path):
@@ -36,8 +44,11 @@ def board(monkeypatch):
     profile=load('motion_profile','rp2040/motion_profile.py')
     monkeypatch.setitem(sys.modules,'config',config)
     monkeypatch.setitem(sys.modules,'motion_profile',profile)
+    monkeypatch.setitem(sys.modules,'motion_geometry',load('motion_geometry_test','rp2040/motion_geometry.py'))
+    monkeypatch.setitem(sys.modules,'neck_profile_schema',load('schema_test','rp2040/neck_profile_schema.py'))
     module=load('authority_test','rp2040/servos.py')
     monkeypatch.setitem(sys.modules,'servos',module)
+    monkeypatch.setitem(sys.modules,'calibration',load('calibration_test','rp2040/calibration.py'))
     monkeypatch.setitem(sys.modules,'protocol',load('actual_protocol','rp2040/protocol.py'))
     scanner=load('scanner_test','rp2040/scanner.py')
     behaviors=load('behavior_test','rp2040/behaviors.py')
@@ -52,6 +63,11 @@ def board(monkeypatch):
         handler=commands.CommandHandler(behavior,None,heartbeat)
         return authority,behavior,handler,heartbeat
     def press(authority):
+        if authority.envelope is not None and authority._session is not None and not authority._armed:
+            authority.confirm_start_pose(authority._session,authority._epoch,[90,90],
+                dict(operator='fake_operator',evidence='fake_evidence',pose_verified=True,
+                     pulse_mapping_verified=True,clearance_verified=True,cutoff_verified=True,
+                     external_power_off=True))
         pressed[0]=False
         for _ in range(3):now[0]+=20;authority.update()
         pressed[0]=True

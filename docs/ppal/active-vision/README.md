@@ -2,6 +2,11 @@
 
 ## Current recovery successor: permanent safe motion authority
 
+CAL-1 extends this authority with reusable supervised calibration, immutable
+profiles and neck-health quarantine. See [CAL-1.md](CAL-1.md) for current
+deployment, GP10 supervision, qualification, normal autonomous activation and
+rollback. Its startup/qualification rules supersede earlier arming instructions.
+
 The current implementation starts from published recovery `8777955`. See
 [safe-motion-authority.md](safe-motion-authority.md) for the authoritative safety
 contract, code-only Pi deployment, gated firmware procedure and rollback.

@@ -52,6 +52,23 @@ class CommandHandler:
             elif name=='MOTION_STATUS':
                 arguments(cmd,(0,))
                 print('MOTION_STATUS',json.dumps(servos.status()))
+            elif name=='CAL_STATUS':
+                arguments(cmd,(0,)); print('CAL_STATUS',json.dumps(servos.calibration.status()))
+            elif name in ('CAL','START_VERIFY'):
+                values=cmd.raw.split(None,3)
+                if len(values)!=4: raise MotionError('MALFORMED_COMMAND')
+                session,revision=values[1:3];data=json.loads(values[3])
+                if not isinstance(data,dict): raise MotionError('INVALID_CAL_REQUEST')
+                if name=='CAL': servos.calibration.request(session,epoch(revision),data)
+                else: servos.confirm_start_pose(session,epoch(revision),data.get('pose'),data)
+                print('OK',name)
+            elif name=='AUTOSTART':
+                session,revision=arguments(cmd,(2,))
+                servos.activate_autonomous(session,epoch(revision));print('OK AUTOSTART')
+            elif name=='NECK_UNCERTAIN':
+                session,revision,reason=arguments(cmd,(3,))
+                servos.validate_control(session,epoch(revision))
+                servos.invalidate_profile(reason);print('OK NECK_UNCERTAIN')
             elif name=='VIEWPOINT':
                 arguments(cmd,(0,));s=servos.status()
                 print('VIEWPOINT',s['pan'],s['tilt'],90.0,90.0,int(s['moving']),

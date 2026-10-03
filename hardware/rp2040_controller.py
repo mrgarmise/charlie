@@ -285,6 +285,10 @@ class RP2040Controller:
                     self.serial.timeout = min(.1, timeout)
                     while time.monotonic() < deadline:
                         line = self.serial.readline().decode(errors="replace").strip()
+                        if line.startswith('CAL_EVENT '):
+                            sink = getattr(self, 'calibration_sink', None)
+                            if sink is not None: sink(json.loads(line.split(' ',1)[1]))
+                            continue
                         if line.startswith(prefix):return line
                         if prefix.startswith("OK ") and line.startswith("ERR "):
                             return line
@@ -328,6 +332,14 @@ class RP2040Controller:
         if not status or status.get("session") != self.link_session:return False
         accepted = self._accepted(f"PRIMARY {self.link_session} {status['epoch']}","PRIMARY")
         self.motion_epoch = self.motion_owner = None
+        return accepted
+
+    def neck_uncertain(self, reason='visual_discrepancy'):
+        status=self.motion_status()
+        if not status or not status.get('armed'):
+            self.stop(); return False
+        accepted=self._accepted(f"NECK_UNCERTAIN {self.link_session} {status['epoch']} {reason}",'NECK_UNCERTAIN')
+        self.motion_epoch=self.motion_owner=None
         return accepted
 
     # --------------------------------------------------

@@ -106,12 +106,20 @@ VALID_COMMANDS = {
     "PRIMARY",
     "MOVE",
     "ARM",
+    "CAL",
+    "CAL_STATUS",
+    "START_VERIFY",
+    "AUTOSTART",
+    "NECK_UNCERTAIN",
 }
 
 
 def parse(line):
 
-    if not isinstance(line, str) or not line.strip() or len(line) > COMMAND_BUFFER:
+    if not isinstance(line, str) or not line.strip():
+        return None
+    limit = 2048 if line.startswith(('CAL ', 'START_VERIFY ')) else COMMAND_BUFFER
+    if len(line) > limit:
         return None
     cmd = Command(line)
 

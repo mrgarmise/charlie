@@ -68,7 +68,7 @@ class Config:
         if not (0 <= self.pan_min < self.pan_max <= 180 and
                 0 <= self.tilt_min < self.tilt_max <= 180):
             raise ValueError('travel bounds exceed firmware limits')
-        if not (0 < self.step <= 12 and 1 <= self.rate <= 30 and self.settle >= .1
+        if not (0 < self.step <= 12 and 0 < self.rate <= 30 and self.settle >= .1
                 and self.experiments > 0 and self.acquisition_moves > 0
                 and self.validation_views >= 3 and self.jitter > 0):
             raise ValueError('invalid motion/validation limits')
@@ -161,7 +161,7 @@ class ActiveVision:
     """
     def __init__(self, source_factory, controller, output, *, initial_pose,
                  authorized=False, simulated=False, detector=discover,
-                 config=None, publisher_factory=None, journal=None, reacquisition=None, wait=time.sleep):
+                 config=None, publisher_factory=None, journal=None, reacquisition=None, neck_health=None, wait=time.sleep):
         self.source_factory = source_factory
         self.controller = controller
         self.output = Path(output)
@@ -176,6 +176,9 @@ class ActiveVision:
         self.publisher_factory = publisher_factory
         self.wait = wait
         self.journal = journal
+        self.neck_health = neck_health
+        self._last_corners = None
+        self._health_observation_size = None
         self.state = State.ACQUIRE
         self.cancelled = False
         self.source = self.publisher = None
@@ -212,6 +215,8 @@ class ActiveVision:
                 episode=str(self.output.resolve()), producer='ActiveVision', version='1')
 
     def check(self):
+        if self.neck_health is not None and self.neck_health.quarantined:
+            raise PermissionError('neck safety uncertain; supervised recalibration required')
         if self.cancelled:
             raise InterruptedError('Active Vision interrupted')
         if not self.controller.connected:
@@ -236,6 +241,8 @@ class ActiveVision:
         distance = sum(abs(a-b) for a,b in zip(pose, self.pose))
         if distance > self.cfg.step+1e-6:
             raise ValueError('unbounded movement')
+        if self.neck_health is not None:
+            self.neck_health.prepare(self.pose,pose,self._last_corners)
         if not self.controller.look(*pose, rate=self.cfg.rate):
             raise ConnectionError('RP2040 rejected movement')
         self.pose = tuple(pose)
@@ -247,7 +254,7 @@ class ActiveVision:
             # estimate of actual completion time. Poll the existing
             # controller's reported state, with a finite deadline.
             deadline = time.monotonic() + max(
-                3.0, distance/max(1.0, self.cfg.rate)*5 + self.cfg.settle
+                3.0, distance/max(.001, self.cfg.rate)*5 + self.cfg.settle
             )
             settled = False
             while time.monotonic() < deadline:
@@ -277,7 +284,17 @@ class ActiveVision:
             target = self.detector(frame)
         except ValueError as exc:
             self.event('target unavailable', reason=str(exc), raw=f'raw_{stem}.png')
+            if self.neck_health is not None:
+                self.neck_health.observe(None,telemetry=self.controller.motion_status())
+                self.check()
             return None
+        # Existing calibration corners are normalized; CAL-1 response evidence
+        # is in raw-image pixels. Never compare those units directly.
+        width,height=self._health_observation_size or frame.size
+        self._last_corners = [[x*width,y*height] for x,y in target.calibration.corners]
+        if self.neck_health is not None:
+            self.neck_health.observe(self._last_corners,telemetry=self.controller.motion_status())
+            self.check()
         self.confidence = target.confidence
         corrected = target.calibration.apply(frame)
         corrected.save(self.output/f'corrected_{stem}.png')
@@ -318,6 +335,12 @@ class ActiveVision:
                         or not status.get('electrical_gate_cleared')):
                     raise ConnectionError('RP2040 local physical arm and assembled calibration required')
                 envelope = status['envelope']
+                self._health_observation_size=envelope.get('observation_size')
+                if status.get('neck_health_required') and self.neck_health is None:
+                    from hardware.neck_health import NeckHealth
+                    self.neck_health = NeckHealth(self.controller,envelope['calibration_id'],
+                        lambda record:self.event('neck health evidence',record=record),
+                        response_model=envelope.get('visual_response'))
                 if not self._config_supplied:
                     self.cfg = Config(pan_min=envelope['pan']['min'],pan_max=envelope['pan']['max'],
                         tilt_min=envelope['tilt']['min'],tilt_max=envelope['tilt']['max'],

@@ -33,6 +33,9 @@ class CapabilityRegistry:
         if identifier in ('model-diagnostics','evidence-review'):
             from .diagnostics import execute
             return execute(**inputs)
+        if identifier=='meditation-motion':
+            from .meditation import execute
+            return execute(**inputs)
         if identifier=='collect-examples':
             from .acquisition import collect_crops
             return collect_crops(**inputs)
@@ -45,6 +48,7 @@ class CapabilityRegistry:
 def default_registry():
     registry=CapabilityRegistry()
     for item in (
+        Capability('meditation-motion','Generate executable temporal planning candidates from preserved meditation',('meditation-evidence',),('candidate','evidence-gate-result'),.1,('unverified retrospective tracks cannot qualify evaluation','no physical activation adapter'),'fresh independently verified trajectories required'),
         Capability('evidence-review','Search frozen experience references for recurring unresolved questions',('context-evidence',),('retrieval-resolution',),.05,('reported questions are not established causal facts',),'distinct source episodes; unknown provenance abstains'),
         Capability('model-diagnostics','Retrieve discriminating training-history evidence for competing failure explanations',('model-evaluation',),('diagnostic-resolution',),.05,('compatibility is not causal identification','no test pixels are opened'),'frozen training-history predicates'),
         Capability('collect-examples','Retrieve unlabeled recorded candidate crops without a new vision pass',('evidence-gap',),('examples','dataset-request'),.2,('saved subset is biased','replay is not another independent physical experiment'),'hashes and capture/track provenance'),

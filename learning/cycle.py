@@ -193,6 +193,9 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
     opportunities=([] if diagnostics_only or refinement_only else reflect_perceptual_opportunities(dataset,gateway,registry))+([] if refinement_only else reflect_model_investigations(dataset,gateway,registry))
     if not diagnostics_only:opportunities+=reflect_training_extensions(dataset,gateway,registry)
     if review_questions: opportunities+=reflect_question_investigations(dataset,gateway,registry)
+    if not refinement_only:
+        from .meditation import reflect
+        opportunities+=reflect(dataset,gateway,registry)
     for item in opportunities:
         identifier=executive.propose(item['proposal'],dataset.journal,[item['evidence_id']])
         project=executive.projects()[identifier]
@@ -204,16 +207,16 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
     for _ in range(max_jobs):
         remaining=budget_seconds-(time.monotonic()-started)
         if remaining<1: break
-        available = {'model-diagnostics'} | ({'evidence-review'} if review_questions else set()) | ({'cnn-reconstruction','cnn-classification','cnn-validation-extension'} if not diagnostics_only and torch_available else set())
+        available = {'model-diagnostics','meditation-motion'} | ({'evidence-review'} if review_questions else set()) | ({'cnn-reconstruction','cnn-classification','cnn-validation-extension'} if not diagnostics_only and torch_available else set())
         if refinement_only:available={'cnn-validation-extension'} if torch_available else set()
         selection=executive.select(methods=available,
-            resources={'offline-slot','RGB-examples','torch','model-evaluation','context-evidence'},authorized_methods=available)
+            resources={'offline-slot','RGB-examples','torch','model-evaluation','context-evidence','meditation-evidence'},authorized_methods=available)
         if not selection['project']: break
         project=selection['project']; context=executive.chooser_context(project['id'])
         plan=select_offline_experiment(gateway,dataset.journal,context,budget_seconds=remaining)
         if plan is None or plan['prediction_id'] in seen: break
         seen.add(plan['prediction_id'])
-        result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups','model-evaluation','context-evidence'},
+        result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups','model-evaluation','context-evidence','meditation-evidence'},
             authorized={project['method']},plan=plan,dataset=dataset,output=dataset.artifacts.parent/'models',driver=driver,on_progress=on_progress)
         if result['status'] in ('resolved','already_resolved'):
             if result['status']=='already_resolved':
@@ -225,7 +228,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
                 source='learning:foundry-resolution',subject=project['id'],goal=project['goal'],
                 outcome=json.dumps(result.get('metrics',{})),significant=True,
                 tags=('offline','diagnostic','uncertain'),evidence=result['resolution_id']))
-        if result['status'] in ('resolved','already_resolved') and result.get('evaluation_id') and project['method'] not in ('model-diagnostics','evidence-review'):
+        if result['status'] in ('resolved','already_resolved') and result.get('evaluation_id') and project['method'] not in ('model-diagnostics','evidence-review','meditation-motion'):
             from experiments.ppal.reflect_robotron import reflect_model_outcome
             result['reflection']=reflect_model_outcome(dataset.journal,plan,result,gateway)
             from .deployment import CapabilityDeployment

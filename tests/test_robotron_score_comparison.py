@@ -11,7 +11,11 @@ def setup(tmp_path,pairs=2):
     plan=Plan('Evidence-originated candidate changes official score','fixed physical conditions','test',
               'baseline-version','candidate-version',Metric('official_game_score',0,10000),pairs=pairs)
     conditions=dict(camera={'focus':1.3},game={'configuration':'same'},system={'revision':'frozen'},measurement={'version':'qualified-method'})
-    protocol=commit(j,plan,conditions=conditions,sources=[learning.id],episode=episode)
+    # Simulate a preserved v1 record. New commit() calls cannot disable gates.
+    fresh=commit(j,plan,conditions=conditions,sources=[learning.id],episode=episode)
+    payload=fresh.data['payload'];payload.pop('require_certificates')
+    protocol=j.append('event',payload,episode=episode,sources=[learning.id],
+        producer='recorded-v1-fixture',version='robotron-score-comparison-v1')
     return j,plan,protocol
 
 

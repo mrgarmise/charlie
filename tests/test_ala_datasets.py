@@ -60,7 +60,8 @@ def test_registry_is_optional_and_inspectable():
     registry=default_registry()
     assert registry.get('cnn-reconstruction').execution=='offline'
     assert registry.get('cnn-validation-extension').execution=='offline'
-    assert len(registry.describe())==7
+    assert registry.get('meditation-motion').execution=='offline'
+    assert len(registry.describe())==8
 
 
 def test_verified_relocation_preserves_original_records_and_partitions(tmp_path):

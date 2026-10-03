@@ -184,7 +184,7 @@ def select_offline_experiment(gateway, journal, project_context, *, budget_secon
     """Offline method extension of the existing Evaluator-first tactical chooser."""
     from learning.datasets import SCOPE
     from memory.evidence import digest
-    if project_context['method'] in ('model-diagnostics','evidence-review'):
+    if project_context['method'] in ('model-diagnostics','evidence-review','meditation-motion'):
         return select_diagnostic_experiment(gateway,journal,project_context,budget_seconds=budget_seconds)
     if project_context['method'] not in ('cnn-reconstruction','cnn-classification','cnn-validation-extension'): return None
     choices=[]

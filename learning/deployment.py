@@ -26,6 +26,22 @@ class CapabilityDeployment:
         candidate=measured['candidate']
         if sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']: raise ValueError('candidate weights changed')
         contract=None;readiness=None;sources=[proposal_id]
+        if candidate.get('spec',{}).get('adapter')=='meditation-motion-v1':
+            if target!='offline-shadow': raise ValueError('motion candidate has no physical activation authority')
+            resolution=self.journal.resolution_for(p.get('prediction_id'))
+            if not resolution or resolution.data['payload']['result']!='supported':
+                raise ValueError('supported committed motion resolution required')
+            if any(r.data['payload'].get('revoked_proposal')==proposal_id for r in self.journal.records('event')):
+                raise ValueError('rollback revoked motion proposal; new evaluation required')
+            if not shadow_id: raise ValueError('candidate-specific motion shadow required')
+            s=self.journal.get(shadow_id)
+            payload=s.data['payload']
+            if (s.data['producer']!='controlled-motion-adapter' or payload.get('category')!='motion_operational_shadow'
+                    or payload.get('proposal_id')!=proposal_id or not payload.get('passed')
+                    or payload.get('candidate_id')!=candidate['identifier']
+                    or payload.get('checkpoint_sha256')!=candidate['checkpoint_sha256']):
+                raise ValueError('candidate-specific motion shadow required')
+            sources.append(shadow_id)
         if target=='ppal-semantics':
             contract=measured['metrics'].get('operational')
             if not contract or not contract.get('eligible') or p.get('contract')!=contract:
@@ -108,6 +124,8 @@ class CapabilityDeployment:
         active=self.active(target)
         if not active or active.get('candidate') is None: return {'status':'unavailable'}
         candidate=active['candidate']
+        if candidate.get('spec',{}).get('adapter')=='meditation-motion-v1':
+            raise ValueError('motion candidate requires the offline planning adapter')
         if sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']: raise ValueError('candidate weights changed')
         import torch
         import numpy as np
@@ -126,3 +144,19 @@ class CapabilityDeployment:
             error=float(torch.nn.functional.mse_loss(value,x))
             return dict(status='unverified_representation',reconstruction_mse=error,
                 candidate_id=candidate['identifier'],activation=active['activation_key'],semantic_label=None)
+
+    def planning_adapter(self):
+        """Load an authorized offline motion version. Never install physical policy."""
+        from .cycle import gameplay_active
+        from .meditation import PlanningCandidate
+        import json
+        from pathlib import Path
+        if gameplay_active(): raise RuntimeError('offline motion unavailable during gameplay')
+        active=self.active('offline-shadow')
+        if not active or not active.get('candidate'): return None
+        candidate=active['candidate']
+        if sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']:
+            raise ValueError('candidate artifact changed')
+        spec=json.loads(Path(candidate['checkpoint']).read_text())
+        if spec!=candidate['spec']: raise ValueError('candidate specification changed')
+        return PlanningCandidate(spec)

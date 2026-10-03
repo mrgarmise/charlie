@@ -246,7 +246,10 @@ class RP2040Controller:
                             return dict(pan=float(parts[1]), tilt=float(parts[2]),
                                         b_pan=float(parts[3]), b_tilt=float(parts[4]),
                                         moving=bool(int(parts[5])),
-                                        mode=parts[6], stop_hold=parts[7] == "STOP_HOLD")
+                                        mode=parts[6],
+                                        stop_hold=parts[7] == "STOP_HOLD",
+                                        disarmed=parts[7] == "DISARMED",
+                                        pose_verified=False)
                 finally:
                     self.serial.timeout = old_timeout
             return None

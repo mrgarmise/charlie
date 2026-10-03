@@ -33,6 +33,11 @@ class CommandHandler:
 
         name = cmd.name
 
+        # Reject physical movement while recovery lockout is active.
+        if name in ("LOOK", "TRACK", "HOME", "SCAN"):
+            print("ERR HEAD_MOTION_DISARMED")
+            return
+
         # ----------------------------------
 
         if name == "PING":
@@ -49,7 +54,7 @@ class CommandHandler:
                              for s in (servos.a_pan, servos.a_tilt,
                                        servos.b_pan, servos.b_tilt))
                 print("VIEWPOINT", servos.a_pan.position, servos.a_tilt.position,
-                      servos.b_pan.position, servos.b_tilt.position, int(moving), self.behaviors.mode, "STOP_HOLD")
+                      servos.b_pan.position, servos.b_tilt.position, int(moving), self.behaviors.mode, "DISARMED")
             return
 
         if name == "STATUS":

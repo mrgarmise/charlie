@@ -221,3 +221,38 @@ def test_physical_cli_refuses_before_serial_access(tmp_path):
         '--output',str(tmp_path/'physical')],capture_output=True,text=True)
     assert completed.returncode==2 and 'authorization' in completed.stderr
     assert not (tmp_path/'physical').exists()
+
+
+def test_physical_move_waits_for_delayed_settlement(tmp_path):
+    """A moving servo must not fail merely because the nominal wait elapsed."""
+    av, controller, source = make(tmp_path)
+    av.simulated = False
+    av.authorized = True
+    av.output.mkdir()
+
+    readings = iter([
+        dict(pan=91, tilt=90, moving=True),
+        dict(pan=93, tilt=90, moving=True),
+        dict(pan=96, tilt=90, moving=False),
+    ])
+    controller.viewpoint_status = lambda timeout=1.0: next(readings)
+    av.wait = lambda _: None
+
+    av.move((96, 90))
+
+    assert av.pose == (96, 90)
+    assert av.events[-1]['decision'] == 'bounded physical experiment'
+
+
+def test_physical_move_rejects_missing_viewpoint(tmp_path):
+    """A missing firmware response must never count as settled movement."""
+    av, controller, source = make(tmp_path)
+    av.simulated = False
+    av.authorized = True
+    av.output.mkdir()
+
+    controller.viewpoint_status = lambda timeout=1.0: None
+    av.wait = lambda _: None
+
+    with pytest.raises(ConnectionError, match='viewpoint response unavailable'):
+        av.move((96, 90))

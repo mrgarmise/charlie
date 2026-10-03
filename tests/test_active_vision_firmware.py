@@ -59,7 +59,7 @@ def test_stationary_status_reports_stop_capability(firmware,capsys):
     servos,handler=firmware
     handler.handle(SimpleNamespace(name='STOP'))
     handler.handle(SimpleNamespace(name='VIEWPOINT'))
-    assert 'VIEWPOINT 90.0 90.0 90.0 90.0 0 IDLE STOP_HOLD' in capsys.readouterr().out
+    assert 'VIEWPOINT 90.0 90.0 90.0 90.0 0 IDLE DISARMED' in capsys.readouterr().out
 
 
 def test_slew_limit_executed_in_firmware(firmware):
@@ -129,3 +129,37 @@ def test_actual_watchdog_loop_stops_once_and_does_not_resume_scan():
     with pytest.raises(StopIteration):
         exec(compile(ast.Module(body=[loop],type_ignores=[]),'<actual firmware loop>','exec'),environment)
     assert calls==['stop','NO_BRAIN','IDLE'] and behavior.mode=='IDLE'
+
+
+def test_disarmed_viewpoint_is_not_motion_authorization():
+    """Recovery firmware must be recognized but never treated as motion-ready."""
+    from hardware.rp2040_controller import RP2040Controller
+    import threading
+
+    class Serial:
+        timeout = 1
+
+        def __init__(self):
+            self.lines = iter([
+                b'VIEWPOINT 138.0 90.0 138.0 90.0 0 IDLE DISARMED\n'
+            ])
+
+        def write(self, data):
+            assert data == b'VIEWPOINT\n'
+
+        def readline(self):
+            return next(self.lines)
+
+    controller = RP2040Controller.__new__(RP2040Controller)
+    controller.serial = Serial()
+    controller.lock = threading.Lock()
+    controller.connected = True
+
+    status = controller.viewpoint_status()
+
+    assert status is not None
+    assert status['disarmed'] is True
+    assert status['stop_hold'] is False
+    assert status['pose_verified'] is False
+    assert status['pan'] == 138.0
+    assert status['moving'] is False

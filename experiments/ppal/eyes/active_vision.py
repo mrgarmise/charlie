@@ -204,16 +204,30 @@ class ActiveVision:
         if not self.controller.look(*pose, rate=self.cfg.rate):
             raise ConnectionError('RP2040 rejected movement')
         self.pose = tuple(pose)
-        remaining = distance/self.cfg.rate+self.cfg.settle
-        while remaining > 0:
-            self.wait(min(.05, remaining))
-            remaining -= .05
+        if self.simulated:
+            self.wait(distance/self.cfg.rate+self.cfg.settle)
             self.check()
-        if not self.simulated:
-            status = self.controller.viewpoint_status()
-            if (not status or status['moving'] or
-                    abs(status['pan']-pose[0]) > 1 or abs(status['tilt']-pose[1]) > 1):
-                raise ConnectionError('physical pose did not settle at requested viewpoint')
+        else:
+            # Firmware acceleration makes requested rate an unreliable
+            # estimate of actual completion time. Poll the existing
+            # controller's reported state, with a finite deadline.
+            deadline = time.monotonic() + max(
+                3.0, distance/max(1.0, self.cfg.rate)*5 + self.cfg.settle
+            )
+            settled = False
+            while time.monotonic() < deadline:
+                self.check()
+                status = self.controller.viewpoint_status(timeout=1.0)
+                if status is None:
+                    raise ConnectionError('RP2040 viewpoint response unavailable')
+                if (not status['moving'] and
+                        abs(status['pan']-pose[0]) <= 1 and
+                        abs(status['tilt']-pose[1]) <= 1):
+                    settled = True
+                    break
+                self.wait(.1)
+            if not settled:
+                raise ConnectionError('physical pose did not settle before deadline')
         self.event('bounded physical experiment', distance=distance)
 
     def observe(self):
@@ -266,9 +280,9 @@ class ActiveVision:
                 status = self.controller.viewpoint_status()
                 if not status or not status['stop_hold'] or status['moving'] or status['mode'] != 'IDLE':
                     raise ConnectionError('firmware STOP_HOLD and measured stationary pose required')
-                if (abs(status['pan']-status['b_pan']) > 1e-6 or
-                        abs(status['tilt']-status['b_tilt']) > 1e-6):
-                    raise ValueError('dual heads must be aligned before bounded shared LOOK')
+                # The camera is mounted on physical head A (GP4/GP5).
+                # Head B may be disconnected; its reported positions are
+                # firmware estimates, not evidence of physical movement.
                 self.pose = (status['pan'], status['tilt'])
                 self._bounds(self.pose)
             self.source = self.source_factory()
@@ -288,6 +302,9 @@ class ActiveVision:
                 pan, tilt = self.pose
                 next_pan = pan+direction*self.cfg.step
                 if not self.cfg.pan_min <= next_pan <= self.cfg.pan_max:
+                    if not self.simulated:
+                        self.event('physical acquisition boundary reached')
+                        break
                     direction *= -1
                     next_tilt = tilt+self.cfg.step
                     if next_tilt > self.cfg.tilt_max:

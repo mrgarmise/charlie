@@ -24,15 +24,17 @@ class Servo:
 
     def __init__(self, pin):
 
-        self.pwm = PWM(Pin(pin))
-        self.pwm.freq(PWM_FREQUENCY)
+        # SAFE STARTUP: do not energize a servo at an assumed angle.
+        # PWM activation requires a separate calibrated implementation.
+        self.pwm = None
+        self.pin = pin
 
         self.position = 90.0
         self.target = 90.0
         self.velocity = 0.0
         self.speed_limit = MAX_SPEED
 
-        self.write(self.position)
+        # No startup position command.
 
     # ---------------------------------
 
@@ -54,7 +56,8 @@ class Servo:
 
         duty = int(us * 65535 / 20000)
 
-        self.pwm.duty_u16(duty)
+        if self.pwm is not None:
+            self.pwm.duty_u16(duty)
 
     # ---------------------------------
 
@@ -105,11 +108,13 @@ class ServoController:
 
     def home(self):
 
+        raise RuntimeError("HEAD_MOTION_DISARMED")
         self.look(HOME_PAN, HOME_TILT)
 
     # -----------------------------
 
     def look(self, pan, tilt, rate=None):
+        raise RuntimeError("HEAD_MOTION_DISARMED")
 
         pan = max(PAN_MIN, min(PAN_MAX, pan))
         tilt = max(TILT_MIN, min(TILT_MAX, tilt))
@@ -122,12 +127,14 @@ class ServoController:
 
     # -----------------------------
 
+        raise RuntimeError("HEAD_MOTION_DISARMED")
     def head_a(self, pan, tilt, rate=None):
 
         self.a_pan.move_to(pan, rate)
         self.a_tilt.move_to(tilt, rate)
 
     # -----------------------------
+        raise RuntimeError("HEAD_MOTION_DISARMED")
 
     def head_b(self, pan, tilt, rate=None):
 
@@ -140,7 +147,15 @@ class ServoController:
         for servo in (self.a_pan, self.a_tilt, self.b_pan, self.b_tilt):
             servo.stop()
 
+        for servo in (self.a_pan, self.a_tilt, self.b_pan, self.b_tilt):
+            if servo.pwm is not None:
+                servo.pwm.deinit()
+                servo.pwm = None
+
     def update(self):
+
+        # Motion remains locked until calibrated arming is implemented.
+        return
 
         self.a_pan.update()
         self.a_tilt.update()

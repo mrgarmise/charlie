@@ -1,0 +1,9 @@
+# Archived retrospective execution — 2026-10-03
+
+Charlie processed four preserved games through the existing Reflection, Evaluator, memory, Learning Executive, chooser and capability pipeline. The preserved notebook has 177 records, retaining 33 previous records; eight new investigations ran. An identical retry ran zero new investigations. The actual generated findings are preserved alongside this status.
+
+All operational candidates remained blocked by lack of independent trajectories, fresh sealed final evaluation and operational shadow qualification. No complete-game score was independently qualified. No physical activation occurred. ALA-2 remains open.
+
+The implementation passed 487 tests with 19 skips without Torch and 508 tests with Torch on the host, but before publication the workspace runtime disconnected and restored the repository to bb40d02, losing the unpublished implementation. Consequently these results do not certify new runnable code in this commit. This checkpoint publishes surviving machine-generated evidence only. The persistent notebook archive was recovered without rerunning or regenerating findings. Reusable-command publication and new Pi validation remain incomplete. Do not attempt `python -m learning.retrospective` at this checkpoint: that module is not present.
+
+Keep the physical Pi baseline and original archives unchanged. Next implementation work must recover or restore the lost retrospective code around the preserved notebook, independently test it, and publish it before issuing a Pi update. Then independently qualify identity/role/action-response/life-boundary/score observations on segregated evidence, obtain fresh sealed candidate evaluation, verify candidate-specific ARM64 cadence, ownership, recovery and rollback, and seek separate authorization for the preregistered prospective complete-game score comparison. Previously consulted final evidence remains consulted.

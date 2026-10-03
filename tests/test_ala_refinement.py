@@ -41,6 +41,7 @@ def test_retrieved_failure_generates_intervention_without_reopening_test(tmp_pat
 
 
 def test_cnn_unknown_clock_preserves_checkpoint_without_false_resolution(tmp_path,monkeypatch):
+    pytest.importorskip('torch')
     ds,g=make(tmp_path)
     report=investigate(ds,g,budget_seconds=8,max_jobs=1,driver=lambda *a,**kw:75)
     plan=report['results'][0]['plan']

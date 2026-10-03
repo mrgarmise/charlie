@@ -44,10 +44,15 @@ class EvidenceRecord:
 class EvidenceJournal:
     """One bounded episode's lab notebook, separate from selective MARM stores."""
 
-    def __init__(self, path, on_progress=None):
+    def __init__(self, path, on_progress=None, *, read_only=False):
         self.path = Path(path)
         self.on_progress = on_progress
         self._batch_depth = 0
+        if read_only:
+            self.conn = sqlite3.connect(self.path.resolve().as_uri()+'?mode=ro', uri=True)
+            self.conn.execute('PRAGMA query_only=ON')
+            self.verify()
+            return
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(self.path)
         self.conn.execute("PRAGMA foreign_keys=ON")

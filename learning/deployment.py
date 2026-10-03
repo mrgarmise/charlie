@@ -21,6 +21,8 @@ class CapabilityDeployment:
         measured=evaluation.data['payload']
         if evaluation.data['producer']!='ModelFoundry' or measured.get('category')!='offline_model_evaluation' or not measured.get('metrics',{}).get('improved') or not measured['metrics'].get('independence_groups'):
             raise ValueError('independent model evaluation required')
+        if measured['metrics'].get('fresh_final_evidence') is False:
+            raise ValueError('fresh independent final evidence required; repeated test groups cannot deploy')
         candidate=measured['candidate']
         if sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']: raise ValueError('candidate weights changed')
         contract=None;readiness=None;sources=[proposal_id]
@@ -51,11 +53,11 @@ class CapabilityDeployment:
             previous_activation=previous['activation_key'] if previous else None,
             activation_key=digest(dict(proposal=proposal_id,authorization=authorization))),episode=scope,
             sources=sources,producer='authorized-capability-deployment',version='ala-2')
-    def rollback(self, target, *, reason, authorization):
+    def rollback(self, target, *, reason, authorization, to_baseline=False):
         current=self.active(target)
         if not current or not reason or not authorization or authorization.get('target')!=target or not authorization.get('source'): raise ValueError('explicit rollback required')
         prior=None
-        if current['previous_activation']:
+        if current['previous_activation'] and not to_baseline:
             prior=next(r.data['payload'] for r in self.journal.records('event') if r.data['payload'].get('activation_key')==current['previous_activation'])
             if sha(prior['candidate']['checkpoint'])!=prior['candidate']['checkpoint_sha256']: raise ValueError('rollback weights changed')
         return self.journal.append('event',dict(category='capability_activation',target=target,

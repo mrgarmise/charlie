@@ -124,6 +124,29 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
                 test_consulted=False,limitations=['reused validation is correlated, not independent confirmation','not eligible for deployment','no score claim'])
         else:
             metric=evaluate(snapshot,candidate)
+            # A new dataset version or model does not make previously consulted
+            # final evidence fresh. Preserve diagnostic measurements, but deny
+            # another deployment admission on overlapping physical test groups.
+            test_rows=[r for r in snapshot['examples'] if r['partition']=='test']
+            current_units={r['source_episode'] for r in test_rows}
+            current_hashes={r[k] for r in test_rows for k in ('original_sha256','pixel_sha256')}
+            snapshots={digest(r.data['payload']):r.data['payload'] for r in journal.records('event')
+                       if r.data['payload'].get('category')=='experience_dataset_snapshot'}
+            reused=[]
+            for earlier in journal.records('observation'):
+                payload=earlier.data['payload']
+                if payload.get('category')!='offline_model_evaluation' or not payload.get('metrics',{}).get('independence_groups'):continue
+                historical=snapshots.get(payload.get('candidate',{}).get('dataset_digest'))
+                old_rows=[r for r in historical['examples'] if r['partition']=='test'] if historical else []
+                overlap=(current_units & {r['source_episode'] for r in old_rows} or
+                         current_hashes & {r[k] for r in old_rows for k in ('original_sha256','pixel_sha256')} or
+                         set(metric['independence_groups']) & set(payload['metrics']['independence_groups']))
+                if overlap or historical is None:reused.append(earlier.id)
+            metric['fresh_final_evidence']=not reused
+            metric['prior_final_evaluations']=reused
+            if reused:
+                metric['limitations'].append('final evidence previously consulted or its isolation unverifiable; diagnostic reuse cannot admit deployment')
+                if metric.get('operational'):metric['operational']=dict(metric['operational'],eligible=False)
             groups=discover_groups(snapshot,candidate,output)
             journal.append('event',dict(category='opaque_visual_groups',interpretation=groups),episode=scope,
                 sources=[selected.id,dataset_reference],producer='Meditation:learned-representation',version='ala-1')
@@ -141,8 +164,8 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
     resolution=resolved or journal.resolve(plan['prediction_id'],sources=[outcome.id] if outcome.data['at']>forecast['at'] else [],result=verdict,reason=reason)
     verdict=resolution.data['payload']['result'];reason=resolution.data['payload']['reason']
     proposal=journal.append('event',dict(category='model_deployment_proposal',candidate_id=candidate['identifier'],
-        evaluation_id=outcome.id,eligible=metric['improved'] and plan.get('evaluation_mode')!='validation-only',target='offline-shadow',
-        production=False,reason='correlated validation-only result; independent evaluation still required' if plan.get('evaluation_mode')=='validation-only' else 'independent diagnostic improvement' if metric['improved'] else 'candidate failed diagnostic baseline',
+        evaluation_id=outcome.id,eligible=metric['improved'] and metric.get('fresh_final_evidence',True) and plan.get('evaluation_mode')!='validation-only',target='offline-shadow',
+        production=False,reason='correlated validation-only result; independent evaluation still required' if plan.get('evaluation_mode')=='validation-only' else 'previously consulted final evidence; fresh independent evaluation required' if metric.get('fresh_final_evidence') is False else 'independent diagnostic improvement' if metric['improved'] else 'candidate failed diagnostic baseline',
         limitations=metric['limitations']),episode=scope,sources=[resolution.id,outcome.id],producer='Reflection',version='ala-1')
     operational_proposal=None
     contract=metric.get('operational')
@@ -166,6 +189,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
     from experiments.ppal.reflect_robotron import reflect_perceptual_opportunities, reflect_model_investigations, reflect_question_investigations, reflect_training_extensions
     from experiments.ppal.experiment_return import select_offline_experiment
     registry=default_registry(); executive=executive or LearningExecutive(dataset.journal,gateway)
+    torch_available=importlib.util.find_spec('torch') is not None
     opportunities=([] if diagnostics_only or refinement_only else reflect_perceptual_opportunities(dataset,gateway,registry))+([] if refinement_only else reflect_model_investigations(dataset,gateway,registry))
     if not diagnostics_only:opportunities+=reflect_training_extensions(dataset,gateway,registry)
     if review_questions: opportunities+=reflect_question_investigations(dataset,gateway,registry)
@@ -180,8 +204,8 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
     for _ in range(max_jobs):
         remaining=budget_seconds-(time.monotonic()-started)
         if remaining<1: break
-        available = {'model-diagnostics'} | ({'evidence-review'} if review_questions else set()) | ({'cnn-reconstruction','cnn-classification','cnn-validation-extension'} if not diagnostics_only and importlib.util.find_spec('torch') else set())
-        if refinement_only:available={'cnn-validation-extension'} if importlib.util.find_spec('torch') else set()
+        available = {'model-diagnostics'} | ({'evidence-review'} if review_questions else set()) | ({'cnn-reconstruction','cnn-classification','cnn-validation-extension'} if not diagnostics_only and torch_available else set())
+        if refinement_only:available={'cnn-validation-extension'} if torch_available else set()
         selection=executive.select(methods=available,
             resources={'offline-slot','RGB-examples','torch','model-evaluation','context-evidence'},authorized_methods=available)
         if not selection['project']: break
@@ -219,6 +243,9 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         capabilities=registry.describe(),elapsed=time.monotonic()-started,
         autonomy='bounded rule-based evidence-to-experiment control, not general intelligence',
         physical_gameplay_improvement='not demonstrated')
+    report['resources']=dict(torch_available=torch_available,
+        unavailable_methods=[] if torch_available else ['cnn-reconstruction','cnn-classification','cnn-validation-extension'],
+        inference='portable NumPy classifier available only with verified export and separate deployment authority')
     atomic_json(dataset.artifacts.parent/'ala-report.json',report)
     lines=['ALA-1 offline learning report','',report['autonomy'],'']
     for item in results:
@@ -231,6 +258,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
             'Next: '+(report['projects'][item['project_id']].get('completion_rationale') or 'Resume the checkpointed investigation; prediction unresolved'),
             'Physical task improvement: UNKNOWN',''])
     if not results: lines.append('No justified executable experiment under current evidence and resources.')
+    if not torch_available:lines.append('Torch unavailable: CNN training/refinement deferred; metadata diagnostics remain available. No learned model activated.')
     (dataset.artifacts.parent/'ala-report.md').write_text('\n'.join(lines)+'\n')
     return report
 

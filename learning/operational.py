@@ -72,11 +72,23 @@ def load_manifest(path,*,physical=False):
         raise ValueError('authorized semantic activation required')
     from memory.evidence import EvidenceJournal
     from .deployment import CapabilityDeployment
-    journal=EvidenceJournal(payload['journal'])
-    try:active=CapabilityDeployment(journal).active('ppal-semantics')
+    location=Path(payload['journal'])
+    if not location.is_absolute():location=Path(path).resolve().parent/location
+    if not location.is_file():raise ValueError('activation journal unavailable; baseline required')
+    journal=EvidenceJournal(location,read_only=True)
+    try:
+        active=CapabilityDeployment(journal).active('ppal-semantics')
+        if active is None or dict(active,journal=payload['journal'])!=payload:
+            raise ValueError('manifest is not the current authorized activation; rollback or tampering detected')
+        if physical and (payload['contract']['domains']!=['robotron-camera'] or not payload.get('physical_readiness')):
+            raise ValueError('Robotron-domain validation and explicit offline physical readiness required')
+        if physical and value.get('runtime'):
+            readiness=payload['physical_readiness']
+            if readiness.get('runtime')!=value['runtime'].get('version') or readiness.get('portable_sha256')!=value['runtime'].get('sha256'):
+                raise ValueError('portable runtime-specific physical readiness required')
+        if value.get('runtime'):
+            from .portable import load_runtime
+            model=load_runtime(value,journal,active,path)
+        else:model=OperationalClassifier(payload['candidate'],payload['contract'])
+        return payload,model
     finally:journal.close()
-    if active is None or dict(active,journal=payload['journal'])!=payload:
-        raise ValueError('manifest is not the current authorized activation; rollback or tampering detected')
-    if physical and (payload['contract']['domains']!=['robotron-camera'] or not payload.get('physical_readiness')):
-        raise ValueError('Robotron-domain validation and explicit offline physical readiness required')
-    return payload,OperationalClassifier(payload['candidate'],payload['contract'])

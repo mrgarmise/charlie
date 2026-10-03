@@ -71,6 +71,7 @@ def test_no_gap_no_proposal_and_no_live_training(tmp_path,monkeypatch):
 
 
 def test_productive_worker_deferred_not_resolved(tmp_path):
+    pytest.importorskip('torch')
     ds,g=make(tmp_path)
     report=investigate(ds,g,budget_seconds=8,driver=lambda *a,**kw:75)
     result=report['results'][0]
@@ -123,6 +124,7 @@ def test_new_evidence_releases_wait_without_independent_confirmation(tmp_path):
 
 
 def test_mutated_chooser_plan_cannot_execute(tmp_path):
+    pytest.importorskip('torch')
     ds,g=make(tmp_path)
     report=investigate(ds,g,budget_seconds=8,driver=lambda *a,**kw:75)
     plan=report['results'][0]['plan']; plan['candidates'][0]['lr']=.02

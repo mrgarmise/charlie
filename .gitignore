@@ -17,3 +17,7 @@ __pycache__/
 
 # Logs
 *.log
+
+# Robotron local environment and hardware recordings
+.venv-robotron/
+robotron-runs/

@@ -13,9 +13,10 @@ class Memory:
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
     def record(self, before: WorldState, goal: Goal, intent: Intent,
-               action: Action, after: WorldState) -> None:
+               action: Action, after: WorldState, *, reward: int | None = None,
+               source: str = "scripted", events: tuple[str, ...] = ()) -> None:
         entry = {"before": asdict(before), "goal": asdict(goal), "intent": asdict(intent),
                  "action": asdict(action), "after": asdict(after),
-                 "source": "scripted", "reward": None}
+                 "source": source, "reward": reward, "events": events}
         with self.path.open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(entry) + "\n")

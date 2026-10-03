@@ -1,0 +1,8 @@
+{
+  "description": "Only for the generated colored-marker demo; not calibrated to Robotron",
+  "rules": [
+    {"kind": "player", "h_min": 0, "h_max": 8, "s_min": 180, "v_min": 180, "min_area": 50},
+    {"kind": "human", "h_min": 78, "h_max": 92, "s_min": 180, "v_min": 180, "min_area": 50},
+    {"kind": "threat", "h_min": 206, "h_max": 220, "s_min": 180, "v_min": 180, "min_area": 50}
+  ]
+}

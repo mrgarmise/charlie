@@ -1,6 +1,8 @@
 import serial
 import time
 import threading
+import json
+import uuid
 
 
 class RP2040Controller:
@@ -34,6 +36,9 @@ class RP2040Controller:
 
         self.connected = False
 
+        self.motion_epoch = None
+        self.motion_owner = None
+        self.link_session = None
         self.last_tx = 0.0
         self.running = True
 
@@ -74,6 +79,12 @@ class RP2040Controller:
             time.sleep(2)
 
             self.connected = True
+            self.motion_epoch = self.motion_owner = None
+            self.link_session = uuid.uuid4().hex
+            # Reconnection never preserves queued motion or control grants.
+            if not self.send("STOP") or not self.send("SESSION " + self.link_session):
+                self._mark_disconnected()
+                return False
             self.last_tx = time.monotonic()
 
             print(
@@ -95,6 +106,8 @@ class RP2040Controller:
     def _mark_disconnected(self):
 
         self.connected = False
+        self.motion_epoch = self.motion_owner = None
+        self.link_session = None
 
         try:
 
@@ -204,14 +217,15 @@ class RP2040Controller:
         )
 
     def stop(self):
-
-        return self.send(
-            "STOP"
-        )
+        self.motion_epoch = self.motion_owner = None
+        return self.send("STOP")
 
     def look(self, pan, tilt, *, rate=None):
         # Optional slew rate is executed by the existing RP2040 servos.
         suffix = "" if rate is None else f" {float(rate)}"
+        if getattr(self, 'motion_owner', None) == 'ACTIVE_VISION':
+            if rate is None:return False
+            return self._accepted(f"MOVE {self.link_session} {self.motion_epoch} {pan} {tilt} {rate}", "MOVE")
         return self.send(f"LOOK {pan} {tilt}{suffix}")
 
     def track(
@@ -225,10 +239,10 @@ class RP2040Controller:
         )
 
     def viewpoint_status(self, timeout=1.0):
-        """Query measured firmware servo state; never infer pose from LOOK.
+        """Query commanded firmware pose estimates, never measured positions.
 
-        The same transport lock excludes heartbeat writes. STOP_HOLD identifies
-        firmware that actually freezes servo targets and velocities on STOP.
+        The same transport lock excludes heartbeat writes. Legacy STOP_HOLD
+        replies are recognized for telemetry compatibility, not authority.
         """
         if not self.connected:
             return None
@@ -249,6 +263,8 @@ class RP2040Controller:
                                         mode=parts[6],
                                         stop_hold=parts[7] == "STOP_HOLD",
                                         disarmed=parts[7] == "DISARMED",
+                                        armed=parts[7] == "ARMED", pose_source="commanded_estimate",
+                                        measured_position=None,
                                         pose_verified=False)
                 finally:
                     self.serial.timeout = old_timeout
@@ -256,6 +272,63 @@ class RP2040Controller:
         except Exception:
             self._mark_disconnected()
             return None
+
+    def _exchange(self, command, prefix, timeout=1.0):
+        if not self.connected:return None
+        try:
+            with self.lock:
+                self.serial.write((command + "\n").encode())
+                self.last_tx = time.monotonic()
+                deadline = self.last_tx + timeout
+                old_timeout = self.serial.timeout
+                try:
+                    self.serial.timeout = min(.1, timeout)
+                    while time.monotonic() < deadline:
+                        line = self.serial.readline().decode(errors="replace").strip()
+                        if line.startswith(prefix):return line
+                        if prefix.startswith("OK ") and line.startswith("ERR "):
+                            return line
+                finally:self.serial.timeout = old_timeout
+        except Exception:
+            self._mark_disconnected()
+        return None
+
+    def _accepted(self, command, name):
+        answer = self._exchange(command, "OK " + name)
+        accepted = answer == "OK " + name
+        if not accepted:
+            self.motion_epoch = self.motion_owner = None
+        return accepted
+
+    def motion_status(self):
+        answer = self._exchange("MOTION_STATUS", "MOTION_STATUS ")
+        if not answer:return None
+        try:
+            status = json.loads(answer.split(" ",1)[1])
+            if status.get("schema") != "charlie-motion-authority-v1":return None
+            return status
+        except (ValueError,TypeError):return None
+
+    def request_active_vision(self, transition="INITIAL"):
+        # Requests control only. There is intentionally no host physical-arm API.
+        status = self.motion_status()
+        if (not status or not status.get("armed") or not status.get("envelope")
+                or not status.get("electrical_gate_cleared")
+                or not status.get("local_arm_available")
+                or status.get("session") != self.link_session):
+            return False
+        revision = status["epoch"]
+        if not self._accepted(f"AUTHORIZE ACTIVE_VISION {self.link_session} {revision} {transition}","AUTHORIZE"):
+            return False
+        self.motion_epoch, self.motion_owner = revision, "ACTIVE_VISION"
+        return True
+
+    def primary_ownership(self):
+        status = self.motion_status()
+        if not status or status.get("session") != self.link_session:return False
+        accepted = self._accepted(f"PRIMARY {self.link_session} {status['epoch']}","PRIMARY")
+        self.motion_epoch = self.motion_owner = None
+        return accepted
 
     # --------------------------------------------------
     # DISPLAY

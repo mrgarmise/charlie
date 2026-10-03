@@ -26,6 +26,8 @@ from display import Display
 from behaviors import BehaviorManager
 
 from commands import CommandHandler
+from servos import MotionError
+from motion_profile import LOCAL_ARM_PIN, LOCAL_ARM_ACTIVE_LEVEL, ELECTRICAL_GATE_CLEARED, CALIBRATED_ENVELOPE
 
 
 
@@ -42,9 +44,18 @@ print()
 
 display = Display()
 
-servos = ServoController()
+# No default GPIO/PWM construction. A future reviewed deployment may provide
+# a separate local arming input; actuator pins and Head B pins are forbidden.
+arm_input = None
+if LOCAL_ARM_PIN is not None and ELECTRICAL_GATE_CLEARED and CALIBRATED_ENVELOPE is not None:
+    if LOCAL_ARM_PIN in (4,5,14,15):
+        raise RuntimeError('ARM_INPUT_CONFLICT')
+    from machine import Pin
+    arm_pin = Pin(LOCAL_ARM_PIN, Pin.IN, Pin.PULL_UP)
+    arm_input = lambda: arm_pin.value() == LOCAL_ARM_ACTIVE_LEVEL
+servos = ServoController(arm_input=arm_input)
 
-scanner = Scanner()
+scanner = Scanner(servos)
 
 heartbeat = Heartbeat()
 
@@ -91,81 +102,29 @@ print(
 
 link_lost = False
 while True:
-
-    # --------------------------
-    # Check serial commands
-    # --------------------------
+    # Check expiry BEFORE processing an arriving command or running behaviors.
+    # PING/reconnection may renew communications, never old motion authority.
+    expired = servos.expire() or not heartbeat.alive()
+    if expired:
+        if not link_lost:
+            link_lost = True
+            servos.stop('WATCHDOG_EXPIRED')
+            behaviors.set_mode(behaviors.IDLE)
+            display.status(display.NO_BRAIN)
+    elif link_lost:
+        link_lost = False
+        display.status(behaviors.mode)
 
     if poll.poll(0):
-
         line = sys.stdin.readline()
+        commands.handle(protocol.parse(line))
 
-
-        cmd = protocol.parse(
-            line
-        )
-
-
-        commands.handle(
-            cmd
-        )
-
-
-    # --------------------------
-    # Update systems
-    # --------------------------
-
-    behaviors.update()
-
-
-    servos.update()
-
-
+    try:
+        behaviors.update()
+        servos.update()
+    except MotionError:
+        servos.stop('SCHEDULER_SAFETY_FAILURE')
+        behaviors.set_mode(behaviors.IDLE)
     display.update()
-
-
-    # --------------------------
-    # Communication watchdog
-    # --------------------------
-
-    if not heartbeat.alive():
-
-        if not link_lost:
-
-            link_lost = True
-
-            # Freeze in-flight servo travel as well as autonomous scanning.
-            servos.stop()
-
-            # Safe physical state.
-            if behaviors.mode != behaviors.IDLE:
-
-                behaviors.set_mode(
-                    behaviors.IDLE
-                )
-
-            # Distinct diagnostic display.
-            display.status(
-                display.NO_BRAIN
-            )
-
-    else:
-
-        if link_lost:
-
-            link_lost = False
-
-            # Communication has returned.
-            #
-            # We deliberately resume at the current safe
-            # behavior state rather than restoring an old
-            # TRACK/SCAN operation.
-            display.status(
-                behaviors.mode
-            )
-
-
     gc.collect()
-
-
     time.sleep_ms(20)

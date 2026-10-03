@@ -27,11 +27,13 @@ SERVO_MAX_US = 2500
 
 # Degrees
 
-PAN_MIN = 0
-PAN_MAX = 180
+# No assembled-head travel is calibrated in this checkpoint.
+# Motion authority uses only motion_profile.CALIBRATED_ENVELOPE.
+PAN_MIN = None
+PAN_MAX = None
 
-TILT_MIN = 20
-TILT_MAX = 160
+TILT_MIN = None
+TILT_MAX = None
 
 HOME_PAN = 90
 HOME_TILT = 90

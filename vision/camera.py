@@ -9,10 +9,10 @@ from picamera2 import Picamera2
 
 
 class Camera:
-    def __init__(self, width=1280, height=720, *, purpose='active'):
+    def __init__(self, width=1280, height=720, *, purpose='active', role=None):
         from experiments.ppal.eyes.camera_lease import CameraLease
         self.lease_error = None
-        try:self.lease = CameraLease(purpose)
+        try:self.lease = CameraLease(purpose) if role is None else CameraLease(purpose, role=role)
         except OSError as exc:
             if purpose=='preview':raise  # preview never bypasses ownership
             # Optional observer storage failure cannot gate Charlie. libcamera

@@ -127,7 +127,7 @@ def test_rotated_discovery_and_clipping():
 
 def test_travel_and_rate_guard(tmp_path):
     with pytest.raises(ValueError):Config(rate=40)
-    with pytest.raises(ValueError):Config(tilt_min=0)
+    with pytest.raises(ValueError):Config(tilt_min=-1)
     av,c,s=make(tmp_path)
     with pytest.raises(ValueError):av.move((120,90))
     assert not c.moves
@@ -228,6 +228,9 @@ def test_physical_move_waits_for_delayed_settlement(tmp_path):
     av, controller, source = make(tmp_path)
     av.simulated = False
     av.authorized = True
+    av._control_claimed = True
+    controller.motion_epoch = 2
+    controller.motion_status = lambda:dict(armed=True,owner='ACTIVE_VISION',epoch=2)
     av.output.mkdir()
 
     readings = iter([
@@ -249,6 +252,9 @@ def test_physical_move_rejects_missing_viewpoint(tmp_path):
     av, controller, source = make(tmp_path)
     av.simulated = False
     av.authorized = True
+    av._control_claimed = True
+    controller.motion_epoch = 2
+    controller.motion_status = lambda:dict(armed=True,owner='ACTIVE_VISION',epoch=2)
     av.output.mkdir()
 
     controller.viewpoint_status = lambda timeout=1.0: None
@@ -256,3 +262,51 @@ def test_physical_move_rejects_missing_viewpoint(tmp_path):
 
     with pytest.raises(ConnectionError, match='viewpoint response unavailable'):
         av.move((96, 90))
+
+
+def test_primary_camera_preemption_terminates_optimizer_before_handoff(tmp_path):
+    import threading,time
+    from types import SimpleNamespace
+    from experiments.ppal.eyes.active_vision import PrimaryOwnership
+    controller=Controller()
+    ready=threading.Event();allow_capture=threading.Event();outcome=[]
+    class OwnedSource(Source):
+        def __init__(self):
+            super().__init__(controller)
+            self.camera=SimpleNamespace(lease=CameraLease(directory=tmp_path,role='active_vision'))
+        def read(self):
+            ready.set();allow_capture.wait(timeout=1)
+            return super().read()
+        read_fresh=read
+        def close(self):
+            super().close();self.camera.lease.close()
+    source=OwnedSource()
+    av=ActiveVision(lambda:source,controller,tmp_path/'preempted',initial_pose=(90,90),
+        simulated=True,wait=lambda _:None)
+    def run():
+        try:av.run()
+        except PrimaryOwnership:outcome.append('yielded')
+    worker=threading.Thread(target=run);worker.start();assert ready.wait(timeout=1)
+    def unblock():
+        while not source.camera.lease.should_yield():time.sleep(.001)
+        allow_capture.set()
+    releaser=threading.Thread(target=unblock);releaser.start()
+    primary=CameraLease(directory=tmp_path)
+    worker.join(timeout=2);releaser.join(timeout=2)
+    assert not worker.is_alive() and not releaser.is_alive()
+    assert av.state==State.YIELDED and outcome==['yielded'] and source.closed
+    assert av.samples==0 and not controller.moves
+    assert not (tmp_path/'preempted/view.json').exists()
+    primary.close()
+
+
+def test_degradation_ticket_is_one_use_and_not_issued_for_scene_activity():
+    gate=DegradationGate(persistence=3,severe=5)
+    ref=np.array([[.1,.1],[.9,.1],[.9,.9],[.1,.9]])
+    with pytest.raises(PermissionError):gate.reacquisition_permit()
+    for now in range(1,4):gate.observe(ref,ref+.1,now=now,authorized=True)
+    ticket=gate.reacquisition_permit()
+    assert ticket.consume()=='DEGRADATION'
+    with pytest.raises(PermissionError):ticket.consume()
+    gate.observe(ref,ref,now=4,authorized=True,requested=True)
+    with pytest.raises(PermissionError):gate.reacquisition_permit()

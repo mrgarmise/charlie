@@ -1,5 +1,19 @@
 # Active Vision — physical before digital
 
+## Current recovery successor: permanent safe motion authority
+
+The current implementation starts from published recovery `8777955`. See
+[safe-motion-authority.md](safe-motion-authority.md) for the authoritative safety
+contract, code-only Pi deployment, gated firmware procedure and rollback.
+Physical authorization remains false; no assembled-head envelope or cleared
+electrical gate is shipped. Telemetry reports commanded estimates, never
+measured servo positions. Primary ownership terminates optimization; returning
+requires a degradation permit and independent local physical arming.
+
+The remainder records the earlier Active Vision checkpoint and its historical
+validation. Its old physical integration/deployment instructions are superseded
+by the permanent authority document above. Existing evidence is retained.
+
 This branch is independent of ALA-2. Its verified base is
 `bae659f60b0e396999caa85b763ce0f1622bd540`. It does not deploy to the Pi,
 change ALA-2 operational policy, arm gameplay, or initiate hardware motion.
@@ -12,7 +26,7 @@ enters STOPPED. A run cannot be restarted. Reacquisition uses a new instance
 and a new evidence directory.
 
 Acquisition starts with the current full camera image and, for hardware, the
-current measured servo pose. It assumes neither a crop nor a winning angle.
+current commanded servo pose estimate. It assumes neither a crop nor a winning angle.
 A bounded serpentine search explores when no complete target is found. Search
 budgets are finite: exhaustion fails without handing an invalid view to a task.
 The rectangle detector handles rotated quadrilaterals; the Robotron adapter

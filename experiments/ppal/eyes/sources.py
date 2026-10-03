@@ -9,9 +9,9 @@ from PIL import Image, ImageDraw
 class PiCameraSource:
     """Reuses Charlie's Picamera2 Camera wrapper on the Pi."""
 
-    def __init__(self, width: int = 1280, height: int = 720) -> None:
+    def __init__(self, width: int = 1280, height: int = 720, *, role=None) -> None:
         from vision.camera import Camera
-        self.camera = Camera(width=width, height=height)
+        self.camera = Camera(width=width, height=height) if role is None else Camera(width=width, height=height, role=role)
         try:
             if "AfMode" in self.camera.picam2.camera_controls:
                 from libcamera import controls

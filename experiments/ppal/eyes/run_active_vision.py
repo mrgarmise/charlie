@@ -1,11 +1,13 @@
 """Explicitly authorized physical preflight, never gameplay or deployment.
 
 Use simulate_active_vision for hardware-free experiments. This entrypoint refuses
-before constructing serial/camera objects unless head motion is authorized.
+before constructing serial/camera objects unless scoped control is requested.
+That request cannot physically arm the RP2040 or override its calibration/gate.
 """
 import argparse
 from pathlib import Path
 import signal
+import time
 from .active_vision import ActiveVision, Config, discover, robotron_target
 
 
@@ -17,7 +19,10 @@ def main():
     parser.add_argument('--authorize-head-motion', action='store_true')
     for name in ('pan-min', 'pan-max', 'tilt-min', 'tilt-max'):
         parser.add_argument('--' + name, type=float)
+    parser.add_argument('--wait-for-local-arm', type=float, default=0)
     args = parser.parse_args()
+    if not 0 <= args.wait_for_local_arm <= 60:
+        parser.error('local arming wait must be 0..60 seconds')
     if not args.authorize_head_motion:
         parser.error('explicit head-motion authorization is required; use simulate_active_vision instead')
     if any(getattr(args, name) is None for name in
@@ -44,14 +49,16 @@ def main():
     controller = RP2040Controller(port=args.port)
     handlers = {}
     try:
-        status = controller.viewpoint_status()
-        if status and status.get('disarmed'):
-            raise RuntimeError(
-                'RP2040 head is DISARMED; physical Active Vision is prohibited'
-            )
-        if not status or not status['stop_hold']:
-            raise RuntimeError('tested STOP_HOLD firmware required before Active Vision')
-        optimizer = ActiveVision(PiCameraSource, controller, args.output,
+        deadline=time.monotonic()+args.wait_for_local_arm
+        while True:
+            status=controller.motion_status()
+            if not status or not status.get('envelope') or not status.get('electrical_gate_cleared'):
+                raise RuntimeError('RP2040 assembled calibration/electrical gate is blocked')
+            if status.get('armed'):break
+            if time.monotonic()>=deadline:
+                raise RuntimeError('RP2040 is DISARMED; Pi authorization cannot physically arm it')
+            time.sleep(.1)
+        optimizer = ActiveVision(lambda:PiCameraSource(role='active_vision'), controller, args.output,
             initial_pose=(status['pan'],status['tilt']), authorized=True,
             detector=robotron_target if args.target=='robotron' else discover,
             publisher_factory=PassivePublisher, config=cfg)

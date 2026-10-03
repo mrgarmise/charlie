@@ -1,192 +1,63 @@
-"""
-behaviors.py
-
-High-level cyberdeck behaviors.
-
-Controls intent, not hardware.
-
-The servo controller,
-display,
-and sensors plug into this.
-
-"""
-
+"""Behavior intent; every actuator request crosses ServoController authority."""
 import time
-import random
+from servos import MotionError
 
 
 class BehaviorManager:
+    IDLE='IDLE'; SCAN='SCAN'; TRACK='TRACK'; HOME='HOME'; SLEEP='SLEEP'; ERROR='ERROR'
 
-
-    IDLE = "IDLE"
-    SCAN = "SCAN"
-    TRACK = "TRACK"
-    HOME = "HOME"
-    SLEEP = "SLEEP"
-    ERROR = "ERROR"
-
-
-    def __init__(
-        self,
-        display=None,
-        servos=None,
-        scanner=None
-    ):
-
-        self.display = display
-
-        self.servos = servos
-
-        self.scanner = scanner
-
-        self.mode = self.IDLE
-
-        self.last_action = time.ticks_ms()
-
-
-    # --------------------------------
-
-
-    def set_mode(self,mode):
-
-        self.mode = mode
-
+    def __init__(self, display=None, servos=None, scanner=None):
+        self.display,self.servos,self.scanner=display,servos,scanner
+        self.mode=self.IDLE
+        self._scan_authorization=None
         self.last_action=time.ticks_ms()
 
+    def set_mode(self, mode):
+        if mode==self.SCAN:
+            if self._scan_authorization is None:
+                raise MotionError('CONTROL_AUTHORIZATION_REQUIRED')
+            self.servos.validate_control(**self._scan_authorization)
+        self.mode=mode
+        if mode!=self.SCAN:self._scan_authorization=None
+        self.last_action=time.ticks_ms()
+        if self.display:self.display.status(mode)
 
-        if self.display:
-
-            self.display.status(mode)
-
-
-
-    # --------------------------------
-
-
-    def look(self,pan,tilt):
-
+    def look(self, pan, tilt, rate=None, **authorization):
+        self.servos.look(pan,tilt,rate,**authorization)
         self.set_mode(self.TRACK)
 
+    def gaze(self, pan, tilt, rate=None, **authorization):
+        self.servos.look(pan,tilt,rate,**authorization)
 
-        if self.servos:
-
-            self.servos.look(
-                pan,
-                tilt
-            )
-
-
-    # --------------------------------
-
-
-    def home(self):
-
+    def home(self, **authorization):
+        self.servos.home(**authorization)
         self.set_mode(self.HOME)
 
-
-        if self.servos:
-
-            self.servos.home()
-
-
-
-    # --------------------------------
-
-
-    def scan(self):
-
+    def scan(self, **authorization):
+        self.servos.validate_control(**authorization)
+        if self.scanner is None:raise MotionError('SCANNER_UNAVAILABLE')
+        self._scan_authorization=authorization
         self.set_mode(self.SCAN)
 
-
-
-    # --------------------------------
-
+    def stop(self):
+        self.servos.stop()
+        self.set_mode(self.IDLE)
 
     def sleep(self):
-
+        self.stop()
         self.set_mode(self.SLEEP)
+        if self.display:self.display.show_text('SLEEP')
 
-
-        if self.display:
-
-            self.display.show_text(
-                "SLEEP"
-            )
-
-    # --------------------------------
-
-                
-    def gaze(self, pan, tilt, rate=None):
-        """
-        Move gaze without changing behavioral mode.
-        """
-
-        if self.servos:
-            self.servos.look(
-                pan,
-                tilt,
-                rate=rate
-            )
-
-    # --------------------------------
-
-
-    def error(self,message):
-
+    def error(self, message):
+        self.stop()
         self.set_mode(self.ERROR)
-
-
-        if self.display:
-
-            self.display.error(
-                message
-            )
-
-
-    # --------------------------------
-
+        if self.display:self.display.error(message)
 
     def update(self):
-
-        """
-        Called continuously.
-
-        Runs autonomous behaviors.
-        """
-
-
-        if self.mode == self.SCAN:
-
-
-            if self.scanner and self.servos:
-
-
-                pan,tilt = self.scanner.update()
-
-                self.servos.look(
-                    pan,
-                    tilt
-                )
-
-
-        elif self.mode == self.IDLE:
-
-
-            # Later:
-            #
-            # random curiosity movements
-            # breathing motion
-            # micro adjustments
-
-            pass
-
-
-        elif self.mode == self.TRACK:
-
-            # Waiting for vision updates
-            pass
-
-
-        elif self.mode == self.SLEEP:
-
-            pass
+        if self.mode==self.SCAN:
+            try:
+                self.servos.validate_control(**(self._scan_authorization or {}))
+                if not self.servos.moving():
+                    self.servos.look(*self.scanner.update(),**self._scan_authorization)
+            except MotionError:
+                self.stop()

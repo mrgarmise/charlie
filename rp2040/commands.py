@@ -1,296 +1,114 @@
-"""
-commands.py
+"""Strict RP2040 protocol. No serial command can physically arm or calibrate."""
+try:
+    import ujson as json
+except ImportError:
+    import json
+from servos import MotionError, number
 
-Converts incoming serial commands into
-Charlie RP2040 actions.
 
-The Pi sends intent.
-The RP2040 decides how to execute/render it.
-"""
+def arguments(cmd, counts):
+    values=getattr(cmd,'args',[])
+    if len(values) not in counts:raise MotionError('MALFORMED_COMMAND')
+    return values
 
-from protocol import Command
+
+def epoch(value):
+    if not isinstance(value,str) or not value.isdigit():
+        raise MotionError('INVALID_EPOCH')
+    return int(value)
 
 
 class CommandHandler:
-
-    def __init__(
-        self,
-        behaviors,
-        display,
-        heartbeat
-    ):
-
-        self.behaviors = behaviors
-        self.display = display
-        self.heartbeat = heartbeat
+    def __init__(self, behaviors, display, heartbeat):
+        self.behaviors,self.display,self.heartbeat=behaviors,display,heartbeat
 
     def handle(self, cmd):
-
         if cmd is None:
+            print('ERR MALFORMED_COMMAND')
             return
-
-        self.heartbeat.beat()
-
-        name = cmd.name
-
-        # Reject physical movement while recovery lockout is active.
-        if name in ("LOOK", "TRACK", "HOME", "SCAN"):
-            print("ERR HEAD_MOTION_DISARMED")
-            return
-
-        # ----------------------------------
-
-        if name == "PING":
-
-            print("ALIVE")
-            return
-
-        # ----------------------------------
-
-        if name == "VIEWPOINT":
-            servos = self.behaviors.servos
-            if servos:
-                moving = any(abs(s.target - s.position) > 0.05 or abs(s.velocity) > 0.05
-                             for s in (servos.a_pan, servos.a_tilt,
-                                       servos.b_pan, servos.b_tilt))
-                print("VIEWPOINT", servos.a_pan.position, servos.a_tilt.position,
-                      servos.b_pan.position, servos.b_tilt.position, int(moving), self.behaviors.mode, "DISARMED")
-            return
-
-        if name == "STATUS":
-
-            print(
-                "MODE",
-                self.behaviors.mode
-            )
-
-            return
-
-        # ----------------------------------
-
-        if name == "HOME":
-
-            self.behaviors.home()
-
-            print("OK HOME")
-            return
-
-        # ----------------------------------
-
-        if name == "SCAN":
-
-            self.behaviors.scan()
-
-            print("OK SCAN")
-            return
-
-        # ----------------------------------
-
-        if name == "STOP":
-
-            if self.behaviors.servos:
-                self.behaviors.servos.stop()
-
-            self.behaviors.set_mode(
-                self.behaviors.IDLE
-            )
-
-            print("OK STOP")
-            return
-
-        # ----------------------------------
-
-        if name == "SLEEP":
-
-            self.behaviors.sleep()
-
-            print("OK SLEEP")
-            return
-
-        # ----------------------------------
-        if name == "IDLE":
-
-            self.behaviors.set_mode(
-                self.behaviors.IDLE
-            )
-
-            print("OK IDLE")
-            return
-
-        # ----------------------------------
-
-        if name == "LOOK":
-
-            pan = cmd.arg_float(
-                0,
-                90
-            )
-
-            tilt = cmd.arg_float(
-                1,
-                90
-            )
-
-            self.behaviors.gaze(
-                pan,
-                tilt,
-                cmd.arg_float(2, 150.0)
-            )
-
-            print(
-                "OK LOOK",
-                pan,
-                tilt,
-                cmd.arg_float(2, 150.0)
-            )
-
-            return
-
-        # ----------------------------------
-
-        if name == "TRACK":
-
-            pan = cmd.arg_int(
-                0,
-                90
-            )
-
-            tilt = cmd.arg_int(
-                1,
-                90
-            )
-
-            self.behaviors.look(
-                pan,
-                tilt
-            )
-
-            print(
-                "OK TRACK",
-                pan,
-                tilt
-            )
-
-            return
-
-        # ----------------------------------
-        # TRANSIENT FEEDBACK
-        # ----------------------------------
-
-        if name == "THINK":
-
-            if self.display:
-                self.display.feedback(
-                    self.display.THINK,
-                    1800
-                )
-
-            print("OK THINK")
-            return
-
-        # ----------------------------------
-
-        if name == "HAPPY":
-
-            if self.display:
-                self.display.feedback(
-                    self.display.HAPPY,
-                    1500
-                )
-
-            print("OK HAPPY")
-            return
-
-        # ----------------------------------
-
-        if name == "ERROR":
-
-            if self.display:
-                self.display.feedback(
-                    self.display.ERROR,
-                    2500
-                )
-
-            print("OK ERROR")
-            return
-
-        # ----------------------------------
-        # PROGRESS
-        # ----------------------------------
-
-        if name == "PROGRESS":
-
-            value = cmd.arg_int(
-                0,
-                0
-            )
-
-            if self.display:
-                self.display.set_progress(
-                    value
-                )
-
-            print(
-                "OK PROGRESS",
-                value
-            )
-
-            return
-
-        # ----------------------------------
-
-        if name == "PROGRESS_CLEAR":
-
-            if self.display:
-                self.display.clear_progress()
-
-            print(
-                "OK PROGRESS_CLEAR"
-            )
-
-            return
-
-        # ----------------------------------
-        # TEXT / ACTIVITY
-        # ----------------------------------
-
-        if name == "MESSAGE":
-
-            text = cmd.arg_text(
-                0,
-                ""
-            )
-
-            if self.display:
-                self.display.show_text(
-                    text
-                )
-
-            print("OK MESSAGE")
-            return
-
-        # ----------------------------------
-
-        if name == "RX":
-
-            if self.display:
-                self.display.rx_activity()
-
-            print("OK RX")
-            return
-
-        # ----------------------------------
-
-        if name == "TX":
-
-            if self.display:
-                self.display.tx_activity()
-
-            print("OK TX")
-            return
-
-        # ----------------------------------
-
-        print(
-            "ERR UNKNOWN"
-        )
+        servos=self.behaviors.servos
+        try:
+            servos.expire()
+            name=cmd.name
+            if name in ('LOOK','TRACK','HOME','SCAN','MOVE') and not servos.status()['armed']:
+                raise MotionError('HEAD_MOTION_DISARMED')
+            if name=='ARM':
+                raise MotionError('LOCAL_PHYSICAL_ARM_REQUIRED')
+            if name=='PING':
+                arguments(cmd,(0,)); print('ALIVE')
+            elif name=='SESSION':
+                values=arguments(cmd,(1,));servos.establish_session(values[0])
+                self.behaviors.set_mode(self.behaviors.IDLE)
+                print('OK SESSION')
+            elif name=='AUTHORIZE':
+                owner,session,revision,transition=arguments(cmd,(4,))
+                servos.authorize(owner,session,epoch(revision),transition)
+                print('OK AUTHORIZE')
+            elif name=='PRIMARY':
+                session,revision=arguments(cmd,(2,))
+                servos.primary_acquire(session,epoch(revision))
+                self.behaviors.set_mode(self.behaviors.IDLE)
+                print('OK PRIMARY')
+            elif name=='MOTION_STATUS':
+                arguments(cmd,(0,))
+                print('MOTION_STATUS',json.dumps(servos.status()))
+            elif name=='VIEWPOINT':
+                arguments(cmd,(0,));s=servos.status()
+                print('VIEWPOINT',s['pan'],s['tilt'],90.0,90.0,int(s['moving']),
+                      self.behaviors.mode,s['state'])
+            elif name=='STATUS':
+                arguments(cmd,(0,));print('MODE',self.behaviors.mode,servos.status()['state'])
+            elif name in ('STOP','IDLE','SLEEP'):
+                arguments(cmd,(0,))
+                # IDLE and SLEEP must not leave a pending servo target alive.
+                servos.stop(name)
+                self.behaviors.set_mode(self.behaviors.SLEEP if name=='SLEEP' else self.behaviors.IDLE)
+                print('OK',name)
+            elif name=='MOVE':
+                session,revision,pan,tilt,rate=arguments(cmd,(5,))
+                self.behaviors.gaze(number(pan),number(tilt),number(rate),
+                                    session=session,epoch=epoch(revision))
+                print('OK MOVE')
+            elif name in ('LOOK','TRACK'):
+                # Familiar names retained, but no default angle or implicit
+                # authorization. Unscoped legacy requests are rejected.
+                values=arguments(cmd,(4,5))
+                pan,tilt=number(values[0]),number(values[1])
+                if len(values)==5:rate=number(values[2]);session,revision=values[3:]
+                else:rate=None;session,revision=values[2:]
+                method=self.behaviors.gaze if name=='LOOK' else self.behaviors.look
+                method(pan,tilt,rate,session=session,epoch=epoch(revision))
+                print('OK',name)
+            elif name in ('HOME','SCAN'):
+                session,revision=arguments(cmd,(2,))
+                method=self.behaviors.home if name=='HOME' else self.behaviors.scan
+                method(session=session,epoch=epoch(revision))
+                print('OK',name)
+            elif name in ('THINK','HAPPY','ERROR'):
+                arguments(cmd,(0,))
+                if self.display:self.display.feedback(getattr(self.display,name),1800)
+                print('OK',name)
+            elif name=='PROGRESS':
+                values=arguments(cmd,(1,));value=number(values[0])
+                if value != int(value) or not 0<=value<=100:
+                    raise MotionError('INVALID_PROGRESS')
+                if self.display:self.display.set_progress(int(value))
+                print('OK PROGRESS')
+            elif name=='PROGRESS_CLEAR':
+                arguments(cmd,(0,))
+                if self.display:self.display.clear_progress()
+                print('OK PROGRESS_CLEAR')
+            elif name=='MESSAGE':
+                values=arguments(cmd,tuple(range(1,33)))
+                if self.display:self.display.show_text(' '.join(values))
+                print('OK MESSAGE')
+            elif name in ('RX','TX'):
+                arguments(cmd,(0,))
+                if self.display:getattr(self.display,name.lower()+'_activity')()
+                print('OK',name)
+            else:
+                raise MotionError('UNKNOWN_COMMAND')
+            servos.contact()
+            self.heartbeat.beat()
+        except (MotionError, ValueError, TypeError) as exc:
+            print('ERR',str(exc))

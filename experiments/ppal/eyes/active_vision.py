@@ -25,6 +25,25 @@ class State(str, Enum):
     LOCKED = 'LOCKED'
     STOPPED = 'STOPPED'
     FAILED = 'FAILED'
+    YIELDED = 'YIELDED'
+
+
+class PrimaryOwnership(InterruptedError):
+    pass
+
+
+class ReacquisitionPermit:
+    """One-use evidence ticket issued only by a DegradationGate."""
+    def __init__(self, gate, at):
+        self.gate, self.at, self.used = gate, at, False
+        self.created_at = time.monotonic()
+
+    def consume(self):
+        if self.used or self.gate._permit is not self or time.monotonic()-self.created_at > 5:
+            raise PermissionError('fresh degradation transition required')
+        self.used = True
+        self.gate._permit = None
+        return 'DEGRADATION'
 
 
 @dataclass(frozen=True)
@@ -47,7 +66,7 @@ class Config:
 
     def __post_init__(self):
         if not (0 <= self.pan_min < self.pan_max <= 180 and
-                20 <= self.tilt_min < self.tilt_max <= 160):
+                0 <= self.tilt_min < self.tilt_max <= 180):
             raise ValueError('travel bounds exceed firmware limits')
         if not (0 < self.step <= 12 and 1 <= self.rate <= 30 and self.settle >= .1
                 and self.experiments > 0 and self.acquisition_moves > 0
@@ -142,7 +161,7 @@ class ActiveVision:
     """
     def __init__(self, source_factory, controller, output, *, initial_pose,
                  authorized=False, simulated=False, detector=discover,
-                 config=None, publisher_factory=None, journal=None, wait=time.sleep):
+                 config=None, publisher_factory=None, journal=None, reacquisition=None, wait=time.sleep):
         self.source_factory = source_factory
         self.controller = controller
         self.output = Path(output)
@@ -151,6 +170,9 @@ class ActiveVision:
         self.simulated = simulated
         self.detector = detector
         self.cfg = config or Config()
+        self._config_supplied = config is not None
+        self.reacquisition = reacquisition
+        self._control_claimed = self._motion_released = False
         self.publisher_factory = publisher_factory
         self.wait = wait
         self.journal = journal
@@ -194,8 +216,21 @@ class ActiveVision:
             raise InterruptedError('Active Vision interrupted')
         if not self.controller.connected:
             raise ConnectionError('RP2040 disconnected')
+        camera = getattr(self.source, 'camera', None)
+        lease = getattr(camera, 'lease', None)
+        if lease is not None and lease.should_yield():
+            raise PrimaryOwnership('primary task requested camera ownership')
+        if not self.simulated and self._control_claimed and not self._motion_released:
+            status = self.controller.motion_status()
+            if status and status.get('task') == 'PRIMARY':
+                raise PrimaryOwnership('primary task acquired RP2040 ownership')
+            if (not status or not status.get('armed') or status.get('owner') != 'ACTIVE_VISION'
+                    or status.get('epoch') != self.controller.motion_epoch):
+                raise ConnectionError('RP2040 control grant expired or revoked')
 
     def move(self, pose):
+        if not self.simulated and (not self.authorized or not self._control_claimed):
+            raise PermissionError('scoped Active Vision control required')
         self.check()
         self._bounds(pose)
         distance = sum(abs(a-b) for a,b in zip(pose, self.pose))
@@ -234,6 +269,7 @@ class ActiveVision:
         self.check()
         # Fresh post-command exposure for Pi; replay sources may provide read().
         frame = getattr(self.source, 'read_fresh', self.source.read)()
+        self.check()  # Preemption after capture prevents any further inference.
         self.samples += 1
         stem = f'{self.samples:05d}'
         frame.save(self.output/f'raw_{stem}.png')
@@ -274,22 +310,33 @@ class ActiveVision:
         result = None
         try:
             self.check()
-            if not self.controller.stop():
-                raise ConnectionError('could not stop existing scan')
-            if not self.simulated:
-                status = self.controller.viewpoint_status()
-                if not status or not status['stop_hold'] or status['moving'] or status['mode'] != 'IDLE':
-                    raise ConnectionError('firmware STOP_HOLD and measured stationary pose required')
-                # The camera is mounted on physical head A (GP4/GP5).
-                # Head B may be disconnected; its reported positions are
-                # firmware estimates, not evidence of physical movement.
-                self.pose = (status['pan'], status['tilt'])
+            if self.simulated:
+                if not self.controller.stop():raise ConnectionError('could not stop existing scan')
+            else:
+                status = getattr(self.controller, 'motion_status', lambda:None)()
+                if (not status or not status.get('armed') or not status.get('envelope')
+                        or not status.get('electrical_gate_cleared')):
+                    raise ConnectionError('RP2040 local physical arm and assembled calibration required')
+                envelope = status['envelope']
+                if not self._config_supplied:
+                    self.cfg = Config(pan_min=envelope['pan']['min'],pan_max=envelope['pan']['max'],
+                        tilt_min=envelope['tilt']['min'],tilt_max=envelope['tilt']['max'],
+                        step=min(2,envelope['max_step']),rate=min(5,envelope['max_rate']))
+                if (self.cfg.pan_min < envelope['pan']['min'] or self.cfg.pan_max > envelope['pan']['max']
+                        or self.cfg.tilt_min < envelope['tilt']['min'] or self.cfg.tilt_max > envelope['tilt']['max']
+                        or self.cfg.step > envelope['max_step'] or self.cfg.rate > envelope['max_rate']):
+                    raise ValueError('Pi configuration exceeds RP2040 calibration')
+                self.pose = (status['pan'],status['tilt'])
                 self._bounds(self.pose)
             self.source = self.source_factory()
             if not self.simulated:
                 camera = getattr(self.source, 'camera', None)
-                if camera is None or camera.lease is None:
-                    raise RuntimeError('Active Vision requires the existing camera lease')
+                if camera is None or camera.lease is None or camera.lease.role != 'active_vision':
+                    raise RuntimeError('Active Vision requires the existing active_vision camera lease')
+                transition = 'INITIAL' if self.reacquisition is None else self.reacquisition.consume()
+                if not self.controller.request_active_vision(transition):
+                    raise ConnectionError('RP2040 refused scoped Active Vision control')
+                self._control_claimed = True
             if self.publisher_factory:
                 self.publisher = self.publisher_factory()
             self.event('discover from current full field of view')
@@ -385,9 +432,18 @@ class ActiveVision:
             if not self.controller.stop():
                 raise ConnectionError('STOP failed before lock')
             if not self.simulated:
-                status = self.controller.viewpoint_status()
-                if not status or status['moving'] or not status['stop_hold']:
-                    raise ConnectionError('physical STOP not confirmed')
+                status = self.controller.motion_status()
+                if not status or status.get('armed') or status.get('pwm_active') or status.get('moving'):
+                    raise ConnectionError('PWM-off STOP not confirmed')
+                self._motion_released = True
+                # A de-energized assembled head may settle or sag. Never label
+                # the held-PWM viewpoint as validated after releasing torque.
+                views = [self.observe() for _ in range(self.cfg.validation_views)]
+                if not all(self.usable(t) and t.sharpness >= self.cfg.min_sharpness for t in views):
+                    raise ValueError('released-head viewpoint validation failed')
+                points = np.array([t.calibration.corners for t in views])
+                jitter = float(np.max(np.linalg.norm(points-np.median(points,axis=0),axis=2)))
+                if jitter > self.cfg.jitter:raise ValueError('released-head view unstable')
             self.state = State.LOCKED
             result = dict(schema='charlie-active-vision-v1', state=self.state.value,
                 simulated=self.simulated, resources_released=False, pose=self.pose, focus=asdict(focus),
@@ -397,12 +453,16 @@ class ActiveVision:
             atomic_json(self.output/'view.json', result)
             return result
         except BaseException as exc:
-            self.state = State.STOPPED if isinstance(exc, (InterruptedError, KeyboardInterrupt)) else State.FAILED
+            self.state = (State.YIELDED if isinstance(exc, PrimaryOwnership) else
+                State.STOPPED if isinstance(exc, (InterruptedError, KeyboardInterrupt)) else State.FAILED)
             self.event('terminate without validated view', reason=str(exc))
             raise
         finally:
             try:
-                try:self.controller.stop()
+                try:
+                    if self.state == State.YIELDED and not self.simulated:
+                        self.controller.primary_ownership()
+                    self.controller.stop()
                 finally:
                     try:
                         if self.publisher:
@@ -437,6 +497,7 @@ class DegradationGate:
         self.bad = self.missing = 0
         self.last = -math.inf
         self.observed_at = -math.inf
+        self._permit = None
 
     def observe(self, reference, current, *, now, expected_transition=False,
                 authorized=False, requested=False):
@@ -448,6 +509,7 @@ class DegradationGate:
             if points.shape != (4,2) or not np.isfinite(points).all():
                 current = None
         if expected_transition and not requested:
+            self._permit = None
             self.bad = self.missing = 0
             return 'continue'
         if current is None:
@@ -455,6 +517,7 @@ class DegradationGate:
             self.bad = max(0, self.bad-1)
         else:
             delta = float(np.max(np.linalg.norm(np.asarray(current)-np.asarray(reference), axis=1)))
+            if delta <= self.displacement:self._permit = None
             self.bad = self.bad+1 if delta > self.displacement else max(0, self.bad-1)
             self.missing = 0
         severe = self.missing >= self.severe
@@ -462,10 +525,17 @@ class DegradationGate:
         if needed and (requested or now-self.last >= self.cooldown):
             if authorized:
                 self.last = now
+                if self.bad >= self.persistence or severe:
+                    self._permit = ReacquisitionPermit(self, now)
                 self.bad = self.missing = 0
                 return 'reacquire'
             return 'suspend_and_request' if severe else 'request_permission'
         return 'suspend_and_request' if severe else 'continue'
+
+    def reacquisition_permit(self):
+        if self._permit is None:
+            raise PermissionError('persistent viewpoint degradation has not authorized a transition')
+        return self._permit
 
 
 def apply_validated_view(source, record):

@@ -169,6 +169,9 @@ class LearningExecutive:
                 projects[p['project_id']].update(status=p['status'],
                     completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
                     hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'operational_feedback':
+                projects[p['project_id']].update(next_direction=p['next_direction'],
+                    operational_outcome=p['outcome_id'])
             elif op == 'evidence_continuation':
                 projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
         return projects
@@ -437,4 +440,62 @@ class LearningExecutive:
             servo_authorization=False,required_evidence=needed,
             next_direction='Await separately authorized acquisition; resume this project only after new qualified evidence',
             rollback='Keep baseline; no candidate activation or final-test reuse'),[r.id for r in refs])
+        return event
+
+    def develop(self, lifecycle):
+        """One normal-operation turn, owned by this Executive, no second scheduler.
+
+        Acquisition discovers availability; Reflection originates proposals;
+        existing selection/chooser commissions only justified bounded work.
+        """
+        from learning.cycle import gameplay_active, investigate
+        if lifecycle.executive is not self:
+            raise ValueError('development adapter must use this Executive')
+        if gameplay_active():
+            lifecycle._phase('experiencing')
+            return
+        lifecycle._phase('reflecting')
+        lifecycle.acquire()
+        # The Executive chooses eligible new experience for bounded reflection.
+        # A completed result is a durable checkpoint, not another experience.
+        contexts=[r for r in self.journal.records('observation') if
+            r.data['payload'].get('category')=='learning_context_reference' and r.data['payload'].get('source_episode')]
+        completed={r.data['payload']['context_id'] for r in self.journal.records('observation') if
+            r.data['payload'].get('category')=='normal_meditation_result'}
+        for context in contexts:
+            if context.id in completed:
+                continue
+            commission=self.journal.append('event',dict(category='reflection_commission',context_id=context.id,
+                physical_authorization=False,reason='New preserved experience warrants bounded retrospective reflection'),
+                episode=context.data['episode'],sources=[context.id],producer='LearningExecutive',version='normal-lifecycle-v1')
+            lifecycle.reflect_experience(context.id,commission.id)
+            break  # One bounded meditation per turn; existing portfolio gets time.
+        # Held projects and identical imports cannot create new trials. Continue
+        # any committed interruption before considering fresh opportunities.
+        lifecycle._phase('investigating')
+        report = investigate(lifecycle.dataset,lifecycle.gateway,executive=self,
+            budget_seconds=lifecycle.budget,max_jobs=1,review_questions=True,
+            diagnostics_only=False)
+        lifecycle.requests()
+        lifecycle.operational_feedback()
+        projects=self.projects()
+        eligible=any(p['status'] in ('active','candidate') and not p.get('hold') for p in projects.values())
+        lifecycle._phase('idle' if eligible or not projects else 'waiting for evidence')
+        return report
+
+    def receive_operational_outcome(self, identifier):
+        """Durable diagnostic feedback, never credit offline motion as game score."""
+        record=self.journal.get(identifier);payload=record.data['payload']
+        if record.data['producer']!='existing-planner-offline-outcome' or payload.get('category')!='offline_operational_outcome' or payload.get('controller_writes')!=0:
+            raise ValueError('actual offline planner outcome required')
+        project=next((p for p in self.projects().values() if any(h['prediction_id']==payload['prediction_id'] for h in p['experiment_history'])),None)
+        if not project:
+            raise ValueError('operational outcome must belong to existing investigation')
+        ref=self._reference(self.journal,identifier)
+        event=self._event(dict(op='operational_feedback',project_id=project['id'],outcome_id=identifier,
+            next_direction='Seek fresh task-outcome evidence; offline temporal accuracy does not establish score utility',
+            physical_authorization=False),[ref.id])
+        self.gateway.remember(Experience(kind='outcome',source='learning-project:operational-feedback',
+            subject=project['id'],goal=project['goal'],summary='Offline activated candidate measured through existing planner',
+            outcome=str(payload['metrics']),significant=True,evidence=event.id,tags=('offline','diagnostic','score-unknown')))
         return event

@@ -1206,7 +1206,8 @@ def main():
                   "agency_samples": agency_samples,
                   "agency_log": "agency.jsonl",
                   "steps": rows}
-        (args.output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
+        from learning.foundry import atomic_json
+        atomic_json(args.output / "report.json", report)
         print(f"Evidence: {args.output}/report.json")
 
 

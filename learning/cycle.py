@@ -195,6 +195,18 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
     from experiments.ppal.reflect_robotron import reflect_perceptual_opportunities, reflect_model_investigations, reflect_question_investigations, reflect_training_extensions
     from experiments.ppal.experiment_return import select_offline_experiment
     registry=default_registry(); executive=executive or LearningExecutive(dataset.journal,gateway)
+    # Recover an interruption after Executive outcome delivery but before the
+    # ordinary pause handoff. Never commission that completed prediction again.
+    for identifier, project in executive.projects().items():
+        history=project['experiment_history']
+        if project['status']=='active' and history:
+            pending=[r for r in dataset.journal.records('event') if
+                r.data['payload'].get('category')=='offline_experiment_plan' and
+                r.data['payload']['plan'].get('project_id')==identifier and
+                not any(h['prediction_id']==r.data['payload']['plan']['prediction_id'] for h in history)]
+            if not pending:
+                executive.transition(identifier,'paused','Recorded outcome recovered after interruption; await new evidence',
+                    dataset.journal,[history[-1]['resolution_id']])
     torch_available=importlib.util.find_spec('torch') is not None
     opportunities=([] if diagnostics_only or refinement_only else reflect_perceptual_opportunities(dataset,gateway,registry))+([] if refinement_only else reflect_model_investigations(dataset,gateway,registry))
     if not diagnostics_only:opportunities+=reflect_training_extensions(dataset,gateway,registry)
@@ -240,7 +252,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
             result['reflection']=reflect_model_outcome(dataset.journal,plan,result,gateway)
             from .deployment import CapabilityDeployment
             result['deployment']=CapabilityDeployment(dataset.journal).apply_authority(result,deployment_authority,dataset.artifacts.parent/'semantic-activation.json')
-        elif result['status']=='resolved':
+        elif result['status'] in ('resolved','already_resolved'):
             from experiments.ppal.reflect_robotron import reflect_retrieval_outcome
             result['reflection']=reflect_retrieval_outcome(dataset.journal,plan,result,gateway)
         results.append(dict(project_id=project['id'],selection=selection,commission=commission,plan=plan,result=result))

@@ -140,7 +140,7 @@ def reflect(dataset, gateway, registry):
     """Charlie proposes temporal estimation work only when his finding supports it."""
     output = []
     corpora=[r for r in dataset.journal.records('observation') if r.data['payload'].get('category')=='independent_motion_corpus']
-    corpus_id=corpora[0].id if len(corpora)==1 else None
+    corpus_id=corpora[-1].id if corpora else None
     for record in dataset.journal.records('observation'):
         p = record.data['payload']
         if p.get('category') != 'preserved_meditation':

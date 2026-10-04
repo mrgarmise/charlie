@@ -249,7 +249,7 @@ def select_diagnostic_experiment(gateway,journal,context,*,budget_seconds):
         if row['status']!='promoted' or row.get('source')!='ppal:perceptual-reflection': continue
         try: spec=json.JSONDecoder().raw_decode(row['text'][len('Perceptual experiment hypothesis: '):])[0]
         except (ValueError,TypeError): continue
-        if spec.get('method')==context['method'] and spec.get('scope')==context['scope'] and spec.get('expected')==context['expected']:
+        if spec.get('method')==context['method'] and spec.get('scope') in context.get('agenda_scopes',[context['scope']]) and spec.get('expected')==context['expected']:
             choices.append((row,spec))
     if not choices:return None
     used={h.get('dataset_id') for h in context['experiment_history']}

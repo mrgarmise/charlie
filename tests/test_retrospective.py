@@ -49,7 +49,11 @@ def test_copy_recovery_preserves_ids_and_rejects_other_output(tmp_path):
 def test_modified_archive_and_overlapping_output_fail_closed(tmp_path):
     root=episode(tmp_path);out=tmp_path/'output';run([root],out)
     (root/'agency.jsonl').write_text('{}\n')
-    with pytest.raises(ValueError,match='changed'):run([root],out)
+    result=run([root],out)
+    report=json.loads(Path(result['report']).read_text())
+    assert report['ingestion'][0]['status']=='quarantined'
+    assert 'changed' in report['ingestion'][0]['reason']
+    assert result['new_investigations']==0
     with pytest.raises(ValueError,match='separate'):run([root],root/'analysis')
 
 
@@ -110,7 +114,8 @@ def test_legacy_observation_ingestion_marker_is_recovered(tmp_path):
         episode='autonomous-learning-v1',sources=[ref.id],producer='existing-evidence-consolidation',version='legacy')
     count=len(j.records())
     assert ingest(root,ds)['record_id']==marker.id
-    assert len(j.records())==count
+    assert [r.id for r in j.records()][:count]==[ref.id,marker.id]
+    assert all(r.data['payload'].get('category','').startswith('episode_identity_') for r in j.records()[count:])
     j.close()
 
 
@@ -146,7 +151,10 @@ def test_normal_cycle_and_retrospective_share_one_episode_import(tmp_path):
     assert len(ds.examples())==1
     relocated=tmp_path/'copy';shutil.copytree(root,relocated)
     assert ingest_episode(relocated,ds,None)['ingestion_status']=='preserved'
-    assert [r.id for r in j.records()]==before
+    assert [r.id for r in j.records()][:len(before)]==before
+    assert all(r.data['payload'].get('category')=='episode_identity_location' for r in j.records()[len(before):])
+    assert len(ds.examples())==1
+    count=len(j.records());ingest_episode(relocated,ds,None);assert len(j.records())==count
     j.close()
 
 

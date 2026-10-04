@@ -1208,6 +1208,8 @@ def main():
                   "steps": rows}
         from learning.foundry import atomic_json
         atomic_json(args.output / "report.json", report)
+        from memory.episode_identity import finalize_capture
+        finalize_capture(args.output)
         print(f"Evidence: {args.output}/report.json")
 
 

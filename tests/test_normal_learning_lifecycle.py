@@ -149,8 +149,11 @@ def test_meditation_checkpoint_retry_and_source_integrity(tmp_path,monkeypatch):
     assert sum(r.data['payload'].get('category')=='normal_meditation_result' for r in records)==1
     (root/'tracks.json').write_text('{}')
     p=startup(state,[root],turns=1)
-    assert p.returncode!=0 and 'changed' in p.stderr
-    assert json.loads((state/'development-status.json').read_text())['error']
+    assert p.returncode==0,p.stderr
+    conflicts=[r for r in rows(state) if r.data['payload'].get('category')=='episode_identity_quarantine']
+    assert conflicts and 'changed' in conflicts[-1].data['payload']['reason']
+    assert sum(r.data['payload'].get('category')=='normal_meditation_result' for r in rows(state))==1
+    assert json.loads((state/'development-status.json').read_text())['identity_conflicts']
 
 
 def test_surviving_legacy_context_preserved_without_inventing_tracks(tmp_path):

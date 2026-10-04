@@ -66,6 +66,7 @@ class DevelopmentLifecycle:
         if summary!=getattr(self,'last_summary',None):
             print('Development:',self.phase,'|',summary[1] or 'no project','|',self.error or '',flush=True)
             self.last_summary=summary
+        from .episode_identity import current_conflicts
         atomic_json(self.output/'development-status.json', dict(schema='charlie-development-status-v1',
             phase=self.phase, last_activity=getattr(self,'last_activity',self.phase), current_project=current['id'] if current else None,
             current_question=current['goal'] if current else None,
@@ -73,7 +74,7 @@ class DevelopmentLifecycle:
             latest_findings=[dict(id=r.id,**r.data['payload']) for r in findings[-3:]],
             latest_operational_outcome=next((dict(id=r.id,metrics=r.data['payload']['metrics'],changed_decisions=r.data['payload']['changed_decisions'])
                 for r in reversed(rows) if r.data['payload'].get('category')=='offline_operational_outcome'),None),
-            evidence_requests=requests, activation=active,
+            evidence_requests=requests, identity_conflicts=current_conflicts(self.journal), activation=active,
             physical_authorization=False, physical_score_improvement='UNKNOWN', error=self.error,
             provenance=self.provenance,
             authorization_requests=[r.data['payload'] for r in rows if r.data['payload'].get('category')=='offline_authorization_request'
@@ -89,6 +90,8 @@ class DevelopmentLifecycle:
         from .cycle import ingest_episode
         from .archive_audit import audit, ingest as qualification
         from .meditation import qualify_corpus
+        from .acquisition import maintain_episode_identity
+        from .episode_identity import verified_tracks
         changed = False
         self.available_tracks = {}
         for source in self.history_roots:
@@ -104,14 +107,15 @@ class DevelopmentLifecycle:
                 if not any(path.is_file() and sha(path)==p['result_sha256'] for path in candidates):
                     raise ValueError('durable meditation result changed or unavailable')
         for root in discover_episodes(self.roots):
-            # Report files are the legacy finalization boundary. The player now
-            # publishes report bytes atomically, so discovery cannot see a torn report.
-            if (root/'tracks.json').is_file():
-                self.available_tracks['episode:'+sha(root/'report.json')]=root/'tracks.json'
             before = len(self.journal.records())
+            identity=maintain_episode_identity(root,self.journal)
+            if identity['status']!='verified':
+                changed |= len(self.journal.records()) != before
+                continue
             ingest_episode(root, self.dataset, self.gateway)
-            qualification(self.journal, audit(root))
+            qualification(self.journal, audit(root,identity=identity))
             changed |= len(self.journal.records()) != before
+        self.available_tracks = verified_tracks(self.journal)
         # Independent acquisition owners deliver hash-bound qualifications here.
         # This adapter validates them; it never generates labels or authority.
         inbox = self.output/'acquisition-inbox'
@@ -140,12 +144,7 @@ class DevelopmentLifecycle:
         episode = context['source_episode']
         marker = next((r.data['payload'] for r in self.journal.records('event') if
             r.data['payload'].get('category')=='retrospective_ingestion' and r.data['payload']['context_id']==context_id), None)
-        source = None
-        from .retrospective import discover_episodes
-        for root in discover_episodes(self.roots):
-            if 'episode:'+sha(root/'report.json')==episode:
-                source=root/'tracks.json'
-                break
+        source = self.available_tracks.get(episode)
         result_path=self.output/'meditations'/context_id/'result.json'
         if result_path.exists() and json.loads(result_path.read_text()).get('status')=='unavailable' and source is not None and source.is_file():
             result_path=result_path.parent/sha(source)/'result.json'
@@ -198,12 +197,18 @@ class DevelopmentLifecycle:
             result_sha256=sha(result_path),status=result['status']),episode=SCOPE,sources=sources,
             producer='Reflection',version='normal-lifecycle-v1',provenance=self.provenance)
 
+    def evidence_eligible(self, payload):
+        from .episode_identity import eligible
+        return eligible(self.journal,payload)
+
     def requests(self):
         qualifications = [r for r in self.journal.records('observation') if
-            r.data['payload'].get('category')=='observation_qualification']
+            r.data['payload'].get('category')=='observation_qualification' and self.evidence_eligible(r.data['payload'])]
         plans = {r.data['payload']['plan']['prediction_id']:r.data['payload']['plan']
             for r in self.journal.records('event') if r.data['payload'].get('category')=='offline_experiment_plan'}
         for identifier, project in self.executive.projects().items():
+            if project['method']=='meditation-motion' and project['status'] in ('paused','blocked'):
+                self.executive.retain_developmental_request(identifier)
             if project['method'] not in ('meditation-motion','evidence-review') or project['status'] not in ('paused','blocked') or not project['experiment_history']:
                 continue
             outcome = project['experiment_history'][-1]
@@ -214,7 +219,7 @@ class DevelopmentLifecycle:
                 continue
             origins = {self.journal.get(i).data['payload'].get('source_episode') for i in plan['source_evidence']}
             matching = [r.id for r in qualifications if r.data['payload']['source_episode'] in origins]
-            if matching:
+            if matching and project['method']!='meditation-motion':
                 self.executive.retain_evidence_request(identifier,self.journal,matching)
 
     def operational_feedback(self):

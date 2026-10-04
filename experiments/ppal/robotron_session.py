@@ -177,6 +177,8 @@ class GameDiary:
     def __init__(self, output: Path, clock=time.monotonic) -> None:
         self.output = Path(output)
         self.output.mkdir(parents=True, exist_ok=True)
+        from memory.episode_identity import begin_capture
+        self.capture_origin = begin_capture(self.output)
         self.clock = clock
         self.started = clock()
         self.events_path = self.output / "events.jsonl"

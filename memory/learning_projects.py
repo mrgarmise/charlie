@@ -172,9 +172,59 @@ class LearningExecutive:
             elif op == 'operational_feedback':
                 projects[p['project_id']].update(next_direction=p['next_direction'],
                     operational_outcome=p['outcome_id'])
+            elif op == 'agenda_relationship':
+                for identifier in p['members']:
+                    projects[identifier]['agenda_representative']=p['representative']
+                    projects[identifier]['agenda_members']=p['members']
+                    projects[identifier]['agenda_equivalence_evidence']=record.id
+            elif op == 'agenda_scope_added':
+                project=projects[p['project_id']]
+                project.setdefault('agenda_scopes',[project['scope']])
+                if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
             elif op == 'evidence_continuation':
                 projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
         return projects
+
+    def _agenda_contract(self, project):
+        # Typed temporal method/target/adapter and preserved hypotheses establish
+        # agenda equivalence. A shared sentence alone is never sufficient.
+        if project.get('method')!='meditation-motion' or set(project.get('scope',{}))!={'meditation_id','corpus_id'}:
+            return None
+        contracts=[]
+        for identifier in project.get('tactical_hypothesis_evidence',[]):
+            try: spec=self.journal.get(identifier).data['payload']['proposal']
+            except (KeyError,TypeError): return None
+            if spec.get('method')!='meditation-motion' or spec.get('predicate')!='independent_motion_improvement':
+                return None
+            try: finding=self.journal.get(spec['scope']['meditation_id']).data['payload']
+            except (KeyError,TypeError): return None
+            if finding.get('category')!='preserved_meditation': return None
+            contracts.append(dict(method=spec['method'],predicate=spec['predicate'],expected=spec['expected']))
+        if not contracts or any(c!=contracts[0] for c in contracts): return None
+        return digest(dict(contract=contracts[0],revision=project.get('revision'),
+            objective=project.get('established_objective'),criteria=project.get('success_criteria',asdict(CompletionCriteria()))))
+
+    def reconcile_agenda(self):
+        groups={}
+        projects=self.projects()
+        for identifier,p in projects.items():
+            key=self._agenda_contract(p)
+            if key: groups.setdefault(key,[]).append(identifier)
+        for key,members in groups.items():
+            if len(members)<2: continue
+            representative=members[0] # original journal creation order, not lexical ID
+            origins=[dict(project_id=i,origins=projects[i]['origins'],
+                hypothesis_evidence=projects[i]['hypothesis_evidence']) for i in members]
+            self._event(dict(op='agenda_relationship',contract=key,members=members,
+                representative=representative,original_provenance=origins,
+                basis='related developmental objective established by typed method, predicate, adapter revision, objective and criteria; investigation scopes and evidence partitions remain distinct',
+                merge_experiment_histories=False))
+        return self.projects()
+
+    def agenda_history(self, project_id):
+        projects=self.projects();p=projects[project_id]
+        members=p.get('agenda_members',[project_id])
+        return [h for i in members for h in projects[i]['experiment_history']]
 
     def propose(self, proposal, source_journal, source_ids, *, criteria=None):
         """Accept typed Reflection output with preserved origin, never remote prose.
@@ -198,7 +248,14 @@ class LearningExecutive:
         criteria = criteria or CompletionCriteria()
         identifier = digest(dict(method=proposal['method'], scope=proposal['scope'],
                                  expected=proposal['expected'], revision=proposal.get('revision', '1'), version=VERSION))
-        existing = self.projects().get(identifier)
+        projects=self.reconcile_agenda()
+        contract=self._agenda_contract(dict(proposal,success_criteria=asdict(criteria)))
+        if contract:
+            match=next((p for p in projects.values() if self._agenda_contract(p)==contract
+                and p['status'] not in FINAL),None)
+            if match:
+                identifier=match.get('agenda_representative',match['id'])
+        existing = projects.get(identifier)
         old = set(existing['hypothesis_evidence']) if existing else set()
         fresh = [r for r in rows if r.id not in old]
         if not fresh:
@@ -207,6 +264,8 @@ class LearningExecutive:
         origins = [dict(evidence_id=r.id, journal=str(source_journal.path.resolve()),
                         episode=r.data['episode']) for r in fresh]
         if existing:
+            if proposal['scope']!=existing['scope']:
+                self._event(dict(op='agenda_scope_added',project_id=identifier,scope=proposal['scope']),[r.id for r in refs])
             self._event(dict(op='evidence_added', project_id=identifier, origins=origins,
                              hypothesis_evidence=[r.id for r in fresh],
                              tactical_hypothesis_evidence=proposal.get('tactical_hypothesis_evidence', [])), [r.id for r in refs])
@@ -288,8 +347,9 @@ class LearningExecutive:
         condition = plan.get('condition')
         if condition is None:
             condition = dict(body=plan['body'], fire=plan['fire'])
-        if plan.get('expected') != project['expected'] or any(
-                condition.get(k) != v for k, v in project['scope'].items()):
+        scopes=self.chooser_context(project_id).get('agenda_scopes',[project['scope']]) if project['status']=='active' else project.get('agenda_scopes',[project['scope']])
+        if plan.get('expected') != project['expected'] or not any(all(
+                condition.get(k)==v for k,v in scope.items()) for scope in scopes):
             raise ValueError('experiment escaped project question')
         outcome = dict(prediction_id=plan['prediction_id'], resolution_id=record.id,
             episode=episode, condition=condition,
@@ -325,7 +385,8 @@ class LearningExecutive:
         """
         projects = self.projects(); alternatives = []
         for p in projects.values():
-            if p['status'] in FINAL or p.get('disposition') == 'budget_exhausted':
+            if (p['status'] in FINAL or p.get('disposition') == 'budget_exhausted'
+                    or p.get('agenda_representative',p['id'])!=p['id']):
                 continue
             missing = sorted(set(p.get('requires', [])) - set(resources))
             unmet = [d for d in p.get('dependencies', [])
@@ -363,7 +424,10 @@ class LearningExecutive:
                   else 'resume interrupted project' if resume else 'generic value/uncertainty minus cost/risk policy')
         interrupted = [p['id'] for p in projects.values()
                        if p['status'] == 'active' and p['id'] != chosen['project_id']]
-        self._event(dict(op='selected', project_id=chosen['project_id'], alternatives=alternatives,
+        resume_from=next((r.id for r in reversed(self.journal.records('event'))
+            if r.data['payload'].get('project_id')==chosen['project_id']
+            and r.data['payload'].get('op') in ('lifecycle','assessment')),None)
+        self._event(dict(op='selected', project_id=chosen['project_id'], resume_from=resume_from, alternatives=alternatives,
                          interrupted_projects=interrupted, reason=reason))
         return dict(project=self.projects()[chosen['project_id']], alternatives=alternatives, reason=reason)
 
@@ -371,13 +435,20 @@ class LearningExecutive:
         project = self.projects()[project_id]
         if project['status'] != 'active':
             raise ValueError('only an active project can delegate')
+        projects=self.projects()
+        members=project.get('agenda_members',[project_id])
+        scopes=list(project.get('agenda_scopes',[project['scope']]))
+        for i in members:
+            for scope in projects[i].get('agenda_scopes',[projects[i]['scope']]):
+                if scope not in scopes: scopes.append(scope)
+        hypotheses=list(dict.fromkeys(h for i in members for h in projects[i].get('tactical_hypothesis_evidence',[])))
         return dict(project_id=project_id, objective=project['goal'], method=project['method'],
                     scope=project['scope'], expected=project['expected'],
                     criteria=project['success_criteria'],
                     evidence_notebook=str(self.journal.path.resolve()),
                     established_objective=project.get('established_objective'),
-                    experiment_history=project['experiment_history'],
-                    hypothesis_evidence=project.get('tactical_hypothesis_evidence', []))
+                    agenda_scopes=scopes,experiment_history=self.agenda_history(project_id),
+                    hypothesis_evidence=hypotheses)
 
     def commission(self, plan, source_journal):
         """Executive-owned durable bookmark and offline meditation dispatch.
@@ -442,6 +513,31 @@ class LearningExecutive:
             rollback='Keep baseline; no candidate activation or final-test reuse'),[r.id for r in refs])
         return event
 
+    def retain_developmental_request(self, project_id):
+        """Resume from actual unresolved finding; acquisition owns measurements."""
+        p=self.projects()[project_id]
+        if p['method']!='meditation-motion' or not p['experiment_history']:
+            return None
+        outcome=p['experiment_history'][-1]
+        if outcome['result']!='unresolved': return None
+        return self._event(dict(op='evidence_continuation',project_id=project_id,
+            prediction_id=outcome['prediction_id'],resolution_id=outcome['resolution_id'],
+            original_question=p['goal'],status='AWAITING_QUALIFIED_EVIDENCE',
+            request_kind='evidence_acquisition_only',physical_authorization=False,
+            servo_authorization=False,firmware_authorization=False,candidate_admitted=False,
+            uncertainty='Retrospective track links remain unverified; temporal or association error unresolved',
+            required_evidence=['Hash-bound independently verified persistent identities and measured board trajectories',
+                'Observed 150ms +/-25ms adjacent horizons, at least three frames per episode',
+                'One validation and at least three distinct unconsulted final experience groups',
+                'Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies'],
+            acceptance_criteria=dict(interface='existing independent_motion_corpus acquisition inbox',
+                source_kinds=['independent_measurement','external_annotation'],minimum_validation=1,
+                minimum_fresh_final=3,identity_status='independently_verified',
+                duplicate_capture_overlap='reject',physical_score_improvement='UNKNOWN'),
+            next_direction='Acquisition verifies incoming evidence; existing Reflection selects new comparison and resumes this agenda',
+            rollback='Retain baseline and every prior attempt; no physical activation'),
+            [self._reference(self.journal,outcome['resolution_id']).id])
+
     def develop(self, lifecycle):
         """One normal-operation turn, owned by this Executive, no second scheduler.
 
@@ -456,10 +552,11 @@ class LearningExecutive:
             return
         lifecycle._phase('reflecting')
         lifecycle.acquire()
+        self.reconcile_agenda()
         # The Executive chooses eligible new experience for bounded reflection.
         # A completed result is a durable checkpoint, not another experience.
         contexts=[r for r in self.journal.records('observation') if
-            r.data['payload'].get('category')=='learning_context_reference' and r.data['payload'].get('source_episode')]
+            r.data['payload'].get('category')=='learning_context_reference' and r.data['payload'].get('source_episode') and lifecycle.evidence_eligible(r.data['payload'])]
         results=[r.data['payload'] for r in self.journal.records('observation') if
             r.data['payload'].get('category')=='normal_meditation_result']
         completed_episodes={r['source_episode'] for r in results if r['status']=='completed'}

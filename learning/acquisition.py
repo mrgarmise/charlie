@@ -146,3 +146,9 @@ def main():
 
 
 if __name__=='__main__':main()
+
+
+def maintain_episode_identity(root, journal):
+    """Permanent automatic acquisition capability; never an operator repair step."""
+    from .episode_identity import reconcile
+    return reconcile(root, journal)

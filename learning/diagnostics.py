@@ -52,13 +52,14 @@ def retrieve_questions(journal, plan):
             qualified_identities=0,fresh_final_evidence=False,
             finding='Independent capture-availability audit; no motion accuracy or score evaluation',
             missing_evidence=sorted({reason for r in results for reason in r['reasons']}))
+    from .episode_identity import canonical_experience, eligible
     episodes=set(); matching=[]
     for identifier in plan['source_evidence']:
         record=journal.get(identifier);p=record.data['payload']
         if p.get('category')!='learning_context_reference':raise ValueError('context reference required')
         if any(q.get('category')==plan['question_category'] for q in p['context'].get('questions',[])):
             # Missing source identity cannot count as independent recurrence.
-            if p.get('source_episode'):episodes.add(p['source_episode'])
+            if p.get('source_episode') and eligible(journal,p):episodes.add(canonical_experience(journal,p['source_episode']))
             matching.append(identifier)
     known=all(journal.get(i).data['payload'].get('source_episode') for i in matching)
     return dict(recurrent_context_gap=len(episodes)>1 if known else None,

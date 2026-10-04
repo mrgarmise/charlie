@@ -81,12 +81,14 @@ def cadence(bindings):
         qualification='timing availability only; identities remain unqualified')
 
 
-def audit(root):
+def audit(root, *, identity=None):
     root = Path(root).resolve()
     game = root/'game-01' if (root/'game-01').is_dir() else root
     before = inventory(root)
     report = json.loads((game/'report.json').read_text()) if (game/'report.json').is_file() else {}
-    episode = 'episode:'+sha(game/'report.json') if (game/'report.json').is_file() else 'partial-episode:'+digest(before)
+    from memory.episode_identity import inspect_capture
+    identity = identity or inspect_capture(game)
+    episode = identity.get('source_episode',identity['legacy_episode_id'])
     history = json.loads((Path(__file__).resolve().parents[1]/'docs/ppal/ala-1-demonstration.json').read_text())['snapshot_split']
     prior = history.get(episode, 'unknown')
     agency, agency_torn = _rows(game,'agency.jsonl'); scores, score_torn = _rows(game,'score.jsonl')
@@ -117,7 +119,9 @@ def audit(root):
     if prior != 'unknown': reasons.append('Published prior partition use excludes fresh final admission')
     if inventory(root)!=before: raise ValueError('archive changed during read-only audit')
     return dict(schema=VERSION,source_root=str(root),game_relative=str(game.relative_to(root)),
-        source_episode=episode,inventory=before,inventory_digest=digest(before),
+        source_episode=episode,capture_id=identity['capture_id'],manifest_id=identity['manifest_id'],
+        content_id=identity['content_id'],experience_id=identity['experience_id'],
+        observation_id=identity['observation_id'],independent_gameplay=identity['independent_gameplay'],inventory=before,inventory_digest=digest(before),
         preserved_bytes_unchanged=True,prior_partition=prior,final_already_consulted=prior=='test',
         journals=journals,learning_mode=report.get('learning_mode'),result=report.get('result'),
         recorded_score=report.get('score'),last_score_observation=final,score_rows=len(scores),

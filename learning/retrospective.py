@@ -138,11 +138,16 @@ def ingest(root, dataset):
     """Preserve saved findings and exact source manifests, with retry dedup."""
     from experiments.ppal.episode_evidence import import_episode
     from .meditation import consume
+    from .acquisition import maintain_episode_identity
+    from memory.episode_identity import IdentityIntegrityError
     root = Path(root).resolve()
+    identity = maintain_episode_identity(root, dataset.journal)
+    if identity['status']=='quarantined':
+        raise IdentityIntegrityError(identity['reason'])
     before = inventory(root)
     if not before:
         raise ValueError('empty archive')
-    episode = 'episode:'+before['report.json'] if 'report.json' in before else 'partial-episode:'+digest(before)
+    episode = identity['source_episode']
     journal = dataset.journal
     existing = [r for r in journal.records() if r.data['payload'].get('category') == 'retrospective_ingestion'
                 and r.data['payload'].get('source_episode') == episode]
@@ -152,33 +157,23 @@ def ingest(root, dataset):
         if marker.get('meditation_id'):
             saved = root.parent/(root.name+'-evidence')/'meditation.json'
             expected = journal.get(marker['meditation_id']).data['payload']['artifact_sha256']
-            if not saved.is_file() or sha(saved) != expected:
-                raise ValueError('preserved meditation artifact changed or missing')
-        frozen = context.get('inventory')
-        if frozen is not None and frozen != before:
-            raise ValueError('preserved source artifacts changed')
-        # Older notebooks locate the original episode manifest in a separate
-        # journal. Relocation changes paths, never its capture hashes.
-        if frozen is None:
-            source_path = dataset.artifacts.parent/'episodes'/Path(context['source_journal']).name
-            source = EvidenceJournal(source_path, read_only=True)
-            try:
-                manifests = [r.data['payload']['artifacts'] for r in source.records('episode')
-                             if r.data['episode'] == episode]
-                if not manifests or any(before.get(name) != ref['sha256']
-                    for name, ref in manifests[0].items()):
-                    raise ValueError('preserved source artifacts changed')
-            finally:
-                source.close()
+            # An exported source copy may omit sibling derivations. A supplied
+            # artifact must match; absence never destroys a journaled finding.
+            if saved.is_file() and sha(saved) != expected:
+                raise ValueError('preserved meditation artifact changed')
+        # Package verification and conservative legacy alias reconciliation are
+        # acquisition-owned, not report-hash equality or path equality.
         return dict(status='preserved', source_episode=episode, record_id=existing[-1].id,
                     relocated_inventory_digest=digest(before))
     source = EvidenceJournal(dataset.artifacts.parent/'episodes'/(digest(episode)+'.sqlite3'))
     try:
-        imported = import_episode(root, source)
+        imported = import_episode(root, source, identity=identity)
         context = discover(root)
         # Durable consolidated context is an interpretation, not independent truth.
         ref = journal.append('observation', dict(category='learning_context_reference',
             source_episode=episode, source_journal=str(source.path.resolve()),
+            source_root=str(root), capture_id=identity['capture_id'], manifest_id=identity['manifest_id'],
+            content_id=identity['content_id'], experience_id=identity['experience_id'],
             context=context, inventory=before, prior_use='diagnostic'), episode=SCOPE,
             producer='existing-evidence-consolidation', version=VERSION)
         saved = root.parent/(root.name+'-evidence')/'meditation.json'
@@ -218,11 +213,15 @@ def run(roots, output, *, budget_seconds=60., max_jobs=8, qualify_observations=F
             gateway = MemoryGateway(store=JsonlStore(output/'memory.jsonl'), evaluator=evaluator)
             try:
                 dataset = ExperienceDataset(journal, output/'pixels')
-                imports = [ingest(r, dataset) for r in roots]
+                from .acquisition import maintain_episode_identity
+                identities = [(r,maintain_episode_identity(r,journal)) for r in roots]
+                valid = [r for r,i in identities if i['status']=='verified']
+                imports = [ingest(r, dataset) for r in valid]
+                imports += [dict(source_root=str(r),**i) for r,i in identities if i['status']=='quarantined']
                 qualifications = []
                 if qualify_observations:
                     from .archive_audit import audit, ingest as ingest_qualification
-                    qualifications = [ingest_qualification(journal,audit(r.parent if r.name=='game-01' else r)) for r in roots]
+                    qualifications = [ingest_qualification(journal,audit(r.parent if r.name=='game-01' else r)) for r in valid]
                 result = investigate(dataset, gateway, diagnostics_only=True, review_questions=True,
                     budget_seconds=budget_seconds, max_jobs=max_jobs)
                 requests = []

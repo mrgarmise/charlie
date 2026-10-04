@@ -138,12 +138,13 @@ def consume(dataset, path, *, source_episode, prior_use):
 
 def reflect(dataset, gateway, registry):
     """Charlie proposes temporal estimation work only when his finding supports it."""
+    from .episode_identity import eligible
     output = []
-    corpora=[r for r in dataset.journal.records('observation') if r.data['payload'].get('category')=='independent_motion_corpus']
+    corpora=[r for r in dataset.journal.records('observation') if r.data['payload'].get('category')=='independent_motion_corpus' and eligible(dataset.journal,r.data['payload'])]
     corpus_id=corpora[-1].id if corpora else None
     for record in dataset.journal.records('observation'):
         p = record.data['payload']
-        if p.get('category') != 'preserved_meditation':
+        if p.get('category') != 'preserved_meditation' or not eligible(dataset.journal,p):
             continue
         q = p['finding']['quality']
         if q['gaps']['mean_error'] <= q['adjacent']['mean_error']:

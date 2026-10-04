@@ -90,7 +90,9 @@ class ExperienceDataset:
                 row=rows[p['example']]
                 row['historical_pixel_path']=row.get('historical_pixel_path',row['pixel_path'])
                 row['pixel_path']=p['path'];row['artifact_location_id']=record.id
-        return list(rows.values())
+        from .episode_identity import eligible, canonical_experience
+        return [dict(r,source_episode=canonical_experience(self.journal,r['source_episode']))
+                for r in rows.values() if eligible(self.journal,r)]
 
     def locate_artifacts(self,directory):
         """Append verified locations; never edit historical records after relocation."""

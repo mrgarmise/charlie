@@ -19,22 +19,22 @@ from .predict_robotron import predict_next
 ADAPTER = 'robotron-artifact-adapter-v1'
 
 
-def import_episode(root, journal):
+def import_episode(root, journal, *, identity=None):
     root = Path(root)
     report_path = root / 'report.json'
     report = json.loads(report_path.read_text()) if report_path.exists() else {}
     provenance = report.get('provenance', {})
-    refs = {}
-    for path in sorted(root.rglob('*')):
-        if path.name=='external-observations.json':continue # annotations do not change captured manifest
-        if path.is_file() and path.suffix.lower() in ('.json', '.jsonl', '.png', '.jpg', '.jpeg'):
-            refs[path.relative_to(root).as_posix()] = dict(
-                path=path.relative_to(root).as_posix(), sha256=hashlib.sha256(path.read_bytes()).hexdigest())
-    # Interrupted children may retain logs without a finalized report. Their
-    # manifest identifies a partial specimen, never a fabricated complete game.
-    episode = ('episode:' + refs['report.json']['sha256'] if report_path.exists()
-               else 'partial-episode:' + digest(refs))
-    start = journal.append('episode', dict(artifacts=refs, outcome=report.get('result'),
+    from learning.acquisition import maintain_episode_identity
+    from memory.episode_identity import IdentityIntegrityError
+    identity = identity or maintain_episode_identity(root,journal)
+    if identity['status']=='quarantined':
+        raise IdentityIntegrityError(identity['reason'])
+    refs = {name:dict(path=name,sha256=value) for name,value in identity['artifacts'].items()}
+    episode = identity['source_episode']
+    start = journal.append('episode', dict(artifacts=refs, capture_id=identity['capture_id'], manifest_id=identity['manifest_id'],
+                           content_id=identity['content_id'], experience_id=identity['experience_id'],
+                           observation_id=identity['observation_id'], independent_gameplay=identity['independent_gameplay'],
+                           outcome=report.get('result'),
                            completeness='report_present' if report_path.exists() else 'partial; boundary unknown',
                            configuration={k:report.get(k) for k in ('armed','seconds','pulse_ms','bootstrap_body_fire')},
                            wall_time=None, wall_time_status='not recorded; filename is not a clock anchor'),

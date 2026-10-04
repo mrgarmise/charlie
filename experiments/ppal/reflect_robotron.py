@@ -422,7 +422,8 @@ def reflect_perceptual_opportunities(dataset, gateway, registry):
     from learning.datasets import SCOPE
     from memory.evidence import canonical, digest
     rows=dataset.examples()
-    contexts=[r for r in dataset.journal.records('observation') if r.data['payload'].get('category')=='learning_context_reference']
+    from learning.episode_identity import eligible
+    contexts=[r for r in dataset.journal.records('observation') if r.data['payload'].get('category')=='learning_context_reference' and eligible(dataset.journal,r.data['payload'])]
     gaps=[]
     for r in contexts:
         p=r.data['payload']['context']; counts=p.get('identity_samples',{})
@@ -599,16 +600,17 @@ def reflect_question_investigations(dataset,gateway,registry):
     """Use any existing question category, without assigning a gameplay remedy."""
     from learning.datasets import SCOPE
     from memory.evidence import digest,canonical
+    from learning.episode_identity import eligible, canonical_experience
     grouped={}
     for record in dataset.journal.records('observation'):
         p=record.data['payload']
-        if p.get('category')!='learning_context_reference':continue
+        if p.get('category')!='learning_context_reference' or not eligible(dataset.journal,p):continue
         for q in p['context'].get('questions',[]):
             if isinstance(q.get('category'),str) and q['category']:
-                grouped.setdefault(q['category'],{})[record.id]=record
+                grouped.setdefault(q['category'],{}).setdefault(canonical_experience(dataset.journal,p.get('source_episode')),record)
     output=[]
     for category,records in sorted(grouped.items()):
-        sources=list(records)
+        sources=[r.id for r in records.values()]
         alternatives=[dict(explanation='The unresolved question may recur in independent experience',predicate='recurrent_context_gap'),
                       dict(explanation='The recorded gap may be confined to one source episode',predicate='isolated_context_gap')]
         # Generate alternatives before retrieval; source count does not select an answer.
@@ -637,7 +639,7 @@ def reflect_question_investigations(dataset,gateway,registry):
     # Measurement services report availability; Reflection supplies the
     # hypothesis and the existing Executive/chooser owns its investigation.
     qualified = [r for r in dataset.journal.records('observation')
-        if r.data['payload'].get('category')=='observation_qualification']
+        if r.data['payload'].get('category')=='observation_qualification' and eligible(dataset.journal,r.data['payload'])]
     if qualified:
         sources = [r.id for r in qualified]
         predicate = 'capture_horizon_supported'

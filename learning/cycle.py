@@ -35,6 +35,10 @@ def ingest_episode(root, dataset, gateway):
     """Reuse existing immutable import and context Reflection; no tracker pass."""
     from .retrospective import ingest
     root = Path(root)
+    from .acquisition import maintain_episode_identity
+    identity = maintain_episode_identity(root,dataset.journal)
+    if identity['status']=='quarantined':
+        return dict(episode=None,context_id=None,examples=[],ingestion_status='quarantined',identity=identity)
     marker = ingest(root, dataset)
     record = dataset.journal.get(marker['record_id'])
     reference = dataset.journal.get(record.data['payload']['context_id'])
@@ -219,7 +223,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         project=executive.projects()[identifier]
         spec=dataset.journal.get(item['hypothesis_id']).data['payload']['proposal']
         from .datasets import scientific_content
-        if project.get('hold') and project['status'] in ('paused','blocked') and project['experiment_history'] and project.get('disposition')!='budget_exhausted' and not any(scientific_content(dataset.journal,h.get('dataset_id'))==scientific_content(dataset.journal,spec['dataset_id']) for h in project['experiment_history']):
+        if project.get('hold') and project['status'] in ('paused','blocked') and project['experiment_history'] and project.get('disposition')!='budget_exhausted' and (project['method']!='meditation-motion' or spec.get('scope',{}).get('corpus_id')) and not any(scientific_content(dataset.journal,h.get('dataset_id'))==scientific_content(dataset.journal,spec['dataset_id']) for h in executive.agenda_history(identifier)):
             executive.transition(identifier,'candidate','New versioned evidence permits reassessment; no independent confirmation assumed',dataset.journal,[item['evidence_id']])
     started=time.monotonic(); results=[]; seen=set()
     for _ in range(max_jobs):

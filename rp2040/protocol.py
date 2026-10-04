@@ -118,7 +118,7 @@ def parse(line):
 
     if not isinstance(line, str) or not line.strip():
         return None
-    limit = 2048 if line.startswith(('CAL ', 'START_VERIFY ')) else COMMAND_BUFFER
+    limit = 2048 if (line.startswith('CAL ') or line.startswith('START_VERIFY ')) else COMMAND_BUFFER
     if len(line) > limit:
         return None
     cmd = Command(line)

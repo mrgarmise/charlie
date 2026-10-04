@@ -18,6 +18,7 @@ class ScoreObserver:
         self.errors = 0
         self.frames = []
         self.latest_frame = None
+        self.final_observation = None
         self.late_change_frames = 0
         self.omitted_change_frames = 0
         self.accepted_confidence = {1:None, 2:None}
@@ -77,6 +78,13 @@ class ScoreObserver:
                            processing_seconds=elapsed, enqueue_copy_seconds=copy_seconds,
                            error=error, reward_evidence=channels.self_delta,
                            attribution='temporal_association_only')
+                # The final image is retained at close even when this row did
+                # not trigger retention. Bind it explicitly without rewriting
+                # the append-only historical score row.
+                self.final_observation = dict(sample=sample, timestamp=timestamp,
+                    raw_frame=name, observed_score=channels.player1.observed_score,
+                    retained_score=channels.player1.score,
+                    status=channels.player1.status, error=error)
                 with self.log.path.open('a', encoding='utf-8') as stream:
                     stream.write(json.dumps(row)+'\n')
                 for player, observation in ((1, channels.player1), (2, channels.player2)):
@@ -110,6 +118,7 @@ class ScoreObserver:
         return {**self.system.report(), 'log':'score.jsonl', 'samples':len(self.costs),
                 'dropped_samples':self.dropped, 'errors':self.errors,
                 'worker_finished':not self.thread.is_alive(),
+                'final_observation':self.final_observation if not self.thread.is_alive() else None,
                 'processing_seconds_total':sum(self.costs),
                 'processing_seconds_max':max(self.costs, default=0.),
                 'raw_frames':[name for name, _ in self.frames],

@@ -41,3 +41,19 @@ def test_slow_reader_drops_samples_without_waiting(tmp_path):
     release.set()
     observer.close()
     assert observer.report()['samples'] == 3
+
+
+def test_final_unreadable_capture_binds_sample_without_rewriting_score_log(tmp_path):
+    observer = ScoreObserver(Calibration(((0, .2), (1, .2), (1, 1), (0, 1))), tmp_path/'score.jsonl')
+    observer.submit(Image.new('RGB',(100,100)),timestamp=99.,sample=32,preceding_action=None)
+    observer.queue.join()
+    original=(tmp_path/'score.jsonl').read_bytes()
+    assert 'raw_frame' not in json.loads(original)
+    observer.close()
+    assert (tmp_path/'score.jsonl').read_bytes()==original
+    final=observer.report()['final_observation']
+    assert final['raw_frame']=='score-raw-0032.png'
+    assert final['timestamp']==99. and final['sample']==32
+    assert final['observed_score'] is None
+    assert final['status']=='absent_or_unreadable'
+    assert observer.frames[-1][0]==final['raw_frame']

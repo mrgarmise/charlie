@@ -634,6 +634,37 @@ def reflect_question_investigations(dataset,gateway,registry):
             record=dataset.journal.append('event',dict(category='learning_project_proposal',proposal=proposal),
                 episode=SCOPE,sources=[hypothesis.id],producer='Reflection',version='ala-2-question-review')
             output.append(dict(proposal=proposal,evidence_id=record.id,hypothesis_id=hypothesis.id,alternatives=alternatives))
+    # Measurement services report availability; Reflection supplies the
+    # hypothesis and the existing Executive/chooser owns its investigation.
+    qualified = [r for r in dataset.journal.records('observation')
+        if r.data['payload'].get('category')=='observation_qualification']
+    if qualified:
+        sources = [r.id for r in qualified]
+        predicate = 'capture_horizon_supported'
+        alternatives = [dict(explanation='Preserved captures may support the frozen motion-evaluation horizon',predicate=predicate),
+            dict(explanation='Capture spacing or provenance may require new observations')]
+        scope = dict(question_category='motion_evidence_availability',predicate=predicate)
+        spec = dict(method='evidence-review',scope=scope,question_category=scope['question_category'],
+            predicate=predicate,expected='Preserved captures support the frozen motion-evaluation horizon',
+            dataset_id=digest(sorted(r.data['payload']['qualification_key'] for r in qualified)),
+            source_evidence=sources,alternatives=alternatives,rank=[1],
+            independence_unit=digest(sources),evidence_groups=sorted({r.data['payload']['source_episode'] for r in qualified}))
+        hypothesis = dataset.journal.append('event',dict(category='perceptual_experiment_proposal',proposal=spec),
+            episode=SCOPE,sources=sources,producer='Reflection',version='ala-2-capture-qualification')
+        gateway.remember(Experience(kind='observation',summary='Perceptual experiment hypothesis: '+canonical(spec),
+            source='ppal:perceptual-reflection',subject=scope['question_category'],confidence=.5,
+            significant=True,novelty=True,tags=('hypothesis','offline','uncertain'),evidence=hypothesis.id))
+        proposal = dict(originator='Reflection',method='evidence-review',scope=scope,expected=spec['expected'],
+            goal='Can preserved observations support the existing motion candidates?',
+            motivation='Check measurement eligibility before repeating blocked candidate experiments',
+            open_questions=[a['explanation'] for a in alternatives],requires=['offline-slot','context-evidence'],
+            dependencies=[],established_objective='official_game_score',objective_contribution=.5,
+            learning_value=.6,uncertainty=1.,cost=registry.get('evidence-review').cost,risk=.05,
+            priority_provenance='bounded measurement qualification; no score utility inferred',
+            tactical_hypothesis_evidence=[hypothesis.id],conditions=[],revision='1')
+        event = dataset.journal.append('event',dict(category='learning_project_proposal',proposal=proposal),
+            episode=SCOPE,sources=[hypothesis.id],producer='Reflection',version='ala-2-capture-qualification')
+        output.append(dict(proposal=proposal,evidence_id=event.id,hypothesis_id=hypothesis.id))
     return output
 
 
@@ -642,6 +673,10 @@ def reflect_retrieval_outcome(journal,plan,result,gateway):
     from memory.evidence import digest
     if result['result']=='unresolved':
         question='Which missing provenance or observations could resolve this distinction?'
+    elif plan.get('predicate')=='capture_horizon_supported':
+        question=('Which independent identities and fresh final partitions qualify the time-compatible captures?'
+                  if result['result']=='supported' else
+                  'Which new hash-bound observations supply the frozen 150ms horizon and independently verified identities?')
     elif plan['method']=='evidence-review':
         question=('Which independently observed conditions distinguish the recurring '+plan['question_category']+' question?'
                   if result['result']=='supported' else

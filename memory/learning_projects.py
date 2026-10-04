@@ -169,6 +169,8 @@ class LearningExecutive:
                 projects[p['project_id']].update(status=p['status'],
                     completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
                     hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'evidence_continuation':
+                projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
         return projects
 
     def propose(self, proposal, source_journal, source_ids, *, criteria=None):
@@ -395,3 +397,44 @@ class LearningExecutive:
             prediction_id=plan['prediction_id'], bookmark_id=bookmark.id,
             method=plan['method'], execution='offline'), [bookmark.id])
         return dict(bookmark_id=bookmark.id, dispatch_id=dispatch.id)
+
+    def retain_evidence_request(self, project_id, source_journal, qualification_ids):
+        """Bookmark the existing unresolved investigation at the hardware boundary.
+
+        The request reports measured acquisition gaps, never authorizes a game
+        or declares a candidate ready for deployment. Retry/reboot reuses it.
+        """
+        project = self.projects()[project_id]
+        if (project['method'] not in ('meditation-motion','evidence-review')
+                or project['status'] not in ('paused','blocked') or not project['experiment_history']):
+            raise ValueError('existing paused investigation required')
+        outcome = project['experiment_history'][-1]
+        if outcome['result'] not in ('unresolved','contradicted'):
+            raise ValueError('missing-evidence outcome required')
+        qualification = []
+        for identifier in qualification_ids:
+            p = source_journal.get(identifier).data['payload']
+            if p.get('category')!='observation_qualification':
+                raise ValueError('actual observation qualification required')
+            qualification.append(p)
+        if not qualification:
+            raise ValueError('qualification evidence required')
+        # Require overlap with the investigation rather than attaching an
+        # unrelated report or another candidate's gaps to this bookmark.
+        plan = next(r.data['payload']['plan'] for r in source_journal.records('event')
+            if r.data['payload'].get('category')=='offline_experiment_plan'
+            and r.data['payload']['plan']['prediction_id']==outcome['prediction_id'])
+        origins = {source_journal.get(i).data['payload'].get('source_episode') for i in plan['source_evidence']}
+        if not origins.intersection(p['source_episode'] for p in qualification):
+            raise ValueError('qualification must address this investigation evidence')
+        needed = sorted({item for p in qualification for item in p['report']['required_new_evidence']})
+        refs = [self._reference(source_journal,i) for i in [outcome['resolution_id'],*qualification_ids]]
+        event = self._event(dict(op='evidence_continuation',project_id=project_id,
+            prediction_id=outcome['prediction_id'],resolution_id=outcome['resolution_id'],
+            original_question=project['goal'],qualification_keys=sorted(p['qualification_key'] for p in qualification),
+            status='READY_FOR_PLAY',request_kind='evidence_acquisition_only',
+            candidate_admitted=False,physical_authorization=False,firmware_authorization=False,
+            servo_authorization=False,required_evidence=needed,
+            next_direction='Await separately authorized acquisition; resume this project only after new qualified evidence',
+            rollback='Keep baseline; no candidate activation or final-test reuse'),[r.id for r in refs])
+        return event

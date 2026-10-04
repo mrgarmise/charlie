@@ -1,0 +1,1396 @@
+{
+  "schema": "ala-2-evidence-qualification-progress-v1",
+  "start_sha": "5212a7e45a02a34851ff92121a737d26f68ab19d",
+  "source_archives": {
+    "Charlie-ALA2-retrospective-20261003.tar.gz": "33c823d95fed394f0ed2a2e6d3f56e775ad27390d94198e2712d1c87ede8aa70",
+    "CV/development-20261002-005944.tar(1).gz": "68ba09254926ee13d7cbc7813d82f52f139e79f8279505f3f888fddab9d49137",
+    "CV/development-20261002-003511.tar(1).gz": "0ec32e4ab56c9fe2a4f73c31fc0822d48e816e94965f64c36bf137cb06a831ec",
+    "CV/development-20261002-012801.tar.gz": "43059f380110ea979fe7a570bd04f1ee512f5d429ca82091078c9102b1fb325f",
+    "CV/development-20261002-015817.tar.gz": "7e348d98e89526cfe72f979ed0801599b51969490a25de4116ad551679bfa85f"
+  },
+  "notebook": {
+    "start_sha": "5212a7e45a02a34851ff92121a737d26f68ab19d",
+    "original_notebook_records": 177,
+    "original_content_ids_preserved": true,
+    "original_journal_sha256": "d26d7384f922f9024d51ff99e705989f961682930ab2f6979024ddee3831cc45",
+    "continued_records": 215,
+    "new_investigations": 1,
+    "restart_records_before_correction": 214,
+    "restart_new_investigations": 0,
+    "interpretation_correction_id": "5322e4a18538ea56a0b4ea05fdeea293492fde6ac76f38ed381d8895cc38b09a",
+    "evidence_requests": [
+      {
+        "id": "edbd2a4b10c3a349385cda63e2cbbee11c5a78cc193e8f4f3ca4de6159bc05d8",
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Await separately authorized acquisition; resume this project only after new qualified evidence",
+        "op": "evidence_continuation",
+        "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+        "physical_authorization": false,
+        "prediction_id": "3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019",
+        "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+        "qualification_keys": [
+          "dddc63ea46d53f66810bac81100e9c42a68984928d9b8eb4ad30a04d4cd4bd64"
+        ],
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+          "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+          "Independent persistent player/object identities and board coordinates",
+          "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+        ],
+        "resolution_id": "20e7a3dee0e02357dcc2912b994244892077343f6c6e6a24fbe7f277c91c73d5",
+        "rollback": "Keep baseline; no candidate activation or final-test reuse",
+        "servo_authorization": false,
+        "status": "READY_FOR_PLAY"
+      },
+      {
+        "id": "325df4f383c8702928951f4effa7824c3211cbe6e275070b958fad0e97c7d222",
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Await separately authorized acquisition; resume this project only after new qualified evidence",
+        "op": "evidence_continuation",
+        "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+        "physical_authorization": false,
+        "prediction_id": "ab443d5418272e3cb765532f2a2549e581f9c329aab789355da52075bf10aef3",
+        "project_id": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+        "qualification_keys": [
+          "ae2770f61b4eb082f3ec3eb90751d008e204cb31b5c3a43489d27d5776d84d63"
+        ],
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+          "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+          "Independent persistent player/object identities and board coordinates",
+          "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+        ],
+        "resolution_id": "ee787ba1c4a37696ab77d2358559f2fccd7d7b81a8f4f322adb0b2bfab582efd",
+        "rollback": "Keep baseline; no candidate activation or final-test reuse",
+        "servo_authorization": false,
+        "status": "READY_FOR_PLAY"
+      },
+      {
+        "id": "e8b4c499cfb9bd4af3028c54baebf7c29b5787811c5642c3dbe26ab660aa5d02",
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Await separately authorized acquisition; resume this project only after new qualified evidence",
+        "op": "evidence_continuation",
+        "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+        "physical_authorization": false,
+        "prediction_id": "81ac3dbee03e461066de5aa4396685f6cbd74b793dfb11dd5d1b9cfa33a58e91",
+        "project_id": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+        "qualification_keys": [
+          "a46d4f4b27c1a2dce7dcc474a07a69b7216e388ba6f641ac34841767e7206158"
+        ],
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+          "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+          "Independent persistent player/object identities and board coordinates",
+          "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+        ],
+        "resolution_id": "27a53fd2f0cf98f1db8429d9d5b16f66fe1216a9b78fecada158eb034d1f2cdf",
+        "rollback": "Keep baseline; no candidate activation or final-test reuse",
+        "servo_authorization": false,
+        "status": "READY_FOR_PLAY"
+      },
+      {
+        "id": "2f18a309a8758d0100ccfd007d3446248c39c49b172a90d21a254780389a53c1",
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Await separately authorized acquisition; resume this project only after new qualified evidence",
+        "op": "evidence_continuation",
+        "original_question": "Can preserved observations support the existing motion candidates?",
+        "physical_authorization": false,
+        "prediction_id": "ac6e1fe53e86821cdaa28f5eb112ade1ad4dd6738e1265089982f0631dfbe02a",
+        "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+        "qualification_keys": [
+          "a46d4f4b27c1a2dce7dcc474a07a69b7216e388ba6f641ac34841767e7206158",
+          "aa63dd770444d5ba4f4cfc3cabaecc702e170e4c2ce7db9c9b724b76eda6f736",
+          "ae2770f61b4eb082f3ec3eb90751d008e204cb31b5c3a43489d27d5776d84d63",
+          "dddc63ea46d53f66810bac81100e9c42a68984928d9b8eb4ad30a04d4cd4bd64"
+        ],
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+          "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+          "Independent persistent player/object identities and board coordinates",
+          "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+        ],
+        "resolution_id": "6e801e341be7578de587e786009797a3e25663d0a857fe85078465b5ad04706b",
+        "rollback": "Keep baseline; no candidate activation or final-test reuse",
+        "servo_authorization": false,
+        "status": "READY_FOR_PLAY"
+      }
+    ],
+    "original_candidate_investigations": 3,
+    "original_candidate_result": "unresolved",
+    "candidate_admitted": false,
+    "physical_authorization": false,
+    "all_original_game_artifacts_unchanged": true,
+    "archive_sha256": {
+      "Charlie-ALA2-retrospective-20261003.tar.gz": "33c823d95fed394f0ed2a2e6d3f56e775ad27390d94198e2712d1c87ede8aa70",
+      "CV/development-20261002-005944.tar(1).gz": "68ba09254926ee13d7cbc7813d82f52f139e79f8279505f3f888fddab9d49137",
+      "CV/development-20261002-003511.tar(1).gz": "0ec32e4ab56c9fe2a4f73c31fc0822d48e816e94965f64c36bf137cb06a831ec",
+      "CV/development-20261002-012801.tar.gz": "43059f380110ea979fe7a570bd04f1ee512f5d429ca82091078c9102b1fb325f",
+      "CV/development-20261002-015817.tar.gz": "7e348d98e89526cfe72f979ed0801599b51969490a25de4116ad551679bfa85f"
+    },
+    "arm64_software_check": {
+      "native_execution": false,
+      "emulation": false,
+      "reason": "x86_64 host; no qemu or docker, no charlie DNS or SSH credential/agent",
+      "wheel_abi": "cp313",
+      "wheels": [
+        {
+          "name": "pillow-11.1.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+          "sha256": "758e9d4ef15d3560214cddbc97b8ef3ef86ce04d62ddac17ad39ba87e89bd3b1",
+          "elf_machine": 183,
+          "architecture": "AArch64",
+          "executed": false
+        },
+        {
+          "name": "numpy-2.2.4-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+          "sha256": "6f527d8fdb0286fd2fd97a2a96c6be17ba4232da346931d967a0630050dfd298",
+          "elf_machine": 183,
+          "architecture": "AArch64",
+          "executed": false
+        }
+      ]
+    }
+  },
+  "episodes": [
+    {
+      "source_episode": "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+      "inventory_digest": "35d6146079b0da3a25c1ca9768fc0d90376b5e6c3dc7462295ecfdd705174ea4",
+      "prior_partition": "validation",
+      "cadence": {
+        "captures": 81,
+        "adjacent_pairs": 80,
+        "median_seconds": 0.33448950000001787,
+        "minimum_seconds": 0.21285699999998542,
+        "maximum_seconds": 0.790614000000005,
+        "frozen_horizon_seconds": 0.15,
+        "tolerance_seconds": 0.025,
+        "compatible_pairs": [],
+        "qualification": "timing availability only; identities remain unqualified"
+      },
+      "score_rows": 81,
+      "score_current_observations": 16,
+      "score_retained_without_observation": 60,
+      "binding_issues": [],
+      "terminal": {
+        "state": "unknown",
+        "confirmed": false,
+        "evidence": null
+      },
+      "recorded_score": 1000,
+      "admissibility": {
+        "diagnostic": true,
+        "unlabeled_training": true,
+        "independently_verified_training": false,
+        "fresh_final_evaluation": false,
+        "complete_game_score": false,
+        "physical_score_improvement": false
+      },
+      "reasons": [
+        "Independent identity/role/trajectory annotations are not supplied",
+        "Controller transport is not proof of physical effects",
+        "Start/termination captures do not independently certify a complete-game boundary",
+        "Retained scores are historical reader state, not fresh score observations",
+        "No preserved playfield pairs match frozen 150ms +/-25ms motion evaluation",
+        "Published prior partition use excludes fresh final admission"
+      ],
+      "recoverable_existing": [
+        "Hash/timestamp-bound early playfield captures and recorded command windows for independent annotation",
+        "Retained final camera HUD capture for score/phase review; no terminal claim",
+        "Historical score proposals, abstentions and conflicts for segregated reader qualification"
+      ],
+      "required_new_evidence": [
+        "Independent persistent player/object identities and board coordinates",
+        "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+        "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader",
+        "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification"
+      ]
+    },
+    {
+      "source_episode": "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da",
+      "inventory_digest": "173aaf611a49fb7dfa52a9f4d3b41c6653b67b2ec77cb4666b3f9db7023e8ffc",
+      "prior_partition": "test",
+      "cadence": {
+        "captures": 96,
+        "adjacent_pairs": 95,
+        "median_seconds": 0.3328679999999622,
+        "minimum_seconds": 0.21182599999974627,
+        "maximum_seconds": 0.6657409999997981,
+        "frozen_horizon_seconds": 0.15,
+        "tolerance_seconds": 0.025,
+        "compatible_pairs": [],
+        "qualification": "timing availability only; identities remain unqualified"
+      },
+      "score_rows": 380,
+      "score_current_observations": 93,
+      "score_retained_without_observation": 286,
+      "binding_issues": [],
+      "terminal": {
+        "state": "unknown",
+        "confirmed": false,
+        "evidence": null
+      },
+      "recorded_score": 1200,
+      "admissibility": {
+        "diagnostic": true,
+        "unlabeled_training": true,
+        "independently_verified_training": false,
+        "fresh_final_evaluation": false,
+        "complete_game_score": false,
+        "physical_score_improvement": false
+      },
+      "reasons": [
+        "Independent identity/role/trajectory annotations are not supplied",
+        "Controller transport is not proof of physical effects",
+        "Start/termination captures do not independently certify a complete-game boundary",
+        "Retained scores are historical reader state, not fresh score observations",
+        "No preserved playfield pairs match frozen 150ms +/-25ms motion evaluation",
+        "Published prior partition use excludes fresh final admission"
+      ],
+      "recoverable_existing": [
+        "Hash/timestamp-bound early playfield captures and recorded command windows for independent annotation",
+        "Retained final camera HUD capture for score/phase review; no terminal claim",
+        "Historical score proposals, abstentions and conflicts for segregated reader qualification"
+      ],
+      "required_new_evidence": [
+        "Independent persistent player/object identities and board coordinates",
+        "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+        "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader",
+        "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification"
+      ]
+    },
+    {
+      "source_episode": "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+      "inventory_digest": "eb9bf84037e806a6cf35392929d3c9b2105d5366e6326fc8a5c1dddcee8e0650",
+      "prior_partition": "train",
+      "cadence": {
+        "captures": 96,
+        "adjacent_pairs": 95,
+        "median_seconds": 0.34128599999985454,
+        "minimum_seconds": 0.2047759999995833,
+        "maximum_seconds": 0.7167049999998198,
+        "frozen_horizon_seconds": 0.15,
+        "tolerance_seconds": 0.025,
+        "compatible_pairs": [],
+        "qualification": "timing availability only; identities remain unqualified"
+      },
+      "score_rows": 347,
+      "score_current_observations": 90,
+      "score_retained_without_observation": 256,
+      "binding_issues": [],
+      "terminal": {
+        "state": "unknown",
+        "confirmed": false,
+        "evidence": null
+      },
+      "recorded_score": 3500,
+      "admissibility": {
+        "diagnostic": true,
+        "unlabeled_training": true,
+        "independently_verified_training": false,
+        "fresh_final_evaluation": false,
+        "complete_game_score": false,
+        "physical_score_improvement": false
+      },
+      "reasons": [
+        "Independent identity/role/trajectory annotations are not supplied",
+        "Controller transport is not proof of physical effects",
+        "Start/termination captures do not independently certify a complete-game boundary",
+        "Retained scores are historical reader state, not fresh score observations",
+        "No preserved playfield pairs match frozen 150ms +/-25ms motion evaluation",
+        "Published prior partition use excludes fresh final admission"
+      ],
+      "recoverable_existing": [
+        "Hash/timestamp-bound early playfield captures and recorded command windows for independent annotation",
+        "Retained final camera HUD capture for score/phase review; no terminal claim",
+        "Historical score proposals, abstentions and conflicts for segregated reader qualification"
+      ],
+      "required_new_evidence": [
+        "Independent persistent player/object identities and board coordinates",
+        "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+        "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader",
+        "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification"
+      ]
+    },
+    {
+      "source_episode": "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+      "inventory_digest": "ecc9ff65ed33154d2e92b2b70c7f0b1782a245770e8de4ffcd3ade5892bf9358",
+      "prior_partition": "train",
+      "cadence": {
+        "captures": 96,
+        "adjacent_pairs": 95,
+        "median_seconds": 0.334487000000081,
+        "minimum_seconds": 0.21285600000010163,
+        "maximum_seconds": 0.6689769999993587,
+        "frozen_horizon_seconds": 0.15,
+        "tolerance_seconds": 0.025,
+        "compatible_pairs": [],
+        "qualification": "timing availability only; identities remain unqualified"
+      },
+      "score_rows": 365,
+      "score_current_observations": 109,
+      "score_retained_without_observation": 249,
+      "binding_issues": [],
+      "terminal": {
+        "state": "unknown",
+        "confirmed": false,
+        "evidence": null
+      },
+      "recorded_score": 3300,
+      "admissibility": {
+        "diagnostic": true,
+        "unlabeled_training": true,
+        "independently_verified_training": false,
+        "fresh_final_evaluation": false,
+        "complete_game_score": false,
+        "physical_score_improvement": false
+      },
+      "reasons": [
+        "Independent identity/role/trajectory annotations are not supplied",
+        "Controller transport is not proof of physical effects",
+        "Start/termination captures do not independently certify a complete-game boundary",
+        "Retained scores are historical reader state, not fresh score observations",
+        "No preserved playfield pairs match frozen 150ms +/-25ms motion evaluation",
+        "Published prior partition use excludes fresh final admission"
+      ],
+      "recoverable_existing": [
+        "Hash/timestamp-bound early playfield captures and recorded command windows for independent annotation",
+        "Retained final camera HUD capture for score/phase review; no terminal claim",
+        "Historical score proposals, abstentions and conflicts for segregated reader qualification"
+      ],
+      "required_new_evidence": [
+        "Independent persistent player/object identities and board coordinates",
+        "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+        "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader",
+        "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification"
+      ]
+    }
+  ],
+  "final_capture_reviews": [
+    {
+      "source_episode": "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+      "capture": "score-raw-0081.png",
+      "capture_sha256": "332ef4487aab856af0a69bfe37b289d4420fdefc1afaf4ad8fa7154895435dc2",
+      "timestamp": 1225.837994,
+      "reviewed_p1": 1000,
+      "phase_review": "gameplay-looking; terminal unknown",
+      "reviewer": "assistant visual inspection of original image and enlarged HUD",
+      "qualification": "uncertified visual review; external validation still required",
+      "prior_use": "validation",
+      "final_evaluation_eligible": false,
+      "complete_game_score": false
+    },
+    {
+      "source_episode": "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da",
+      "capture": "score-raw-0380.png",
+      "capture_sha256": "9a82b4e00f634dc01ff562622603e067122033dd47ffbeaf4f32a24a5d98b77a",
+      "timestamp": 2785.558924,
+      "reviewed_p1": 1300,
+      "phase_review": "instruction/attract page",
+      "reviewer": "assistant visual inspection of original image and enlarged HUD",
+      "qualification": "uncertified visual review; external validation still required",
+      "prior_use": "test",
+      "final_evaluation_eligible": false,
+      "complete_game_score": false
+    },
+    {
+      "source_episode": "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+      "capture": "score-raw-0347.png",
+      "capture_sha256": "3d726782872e4cde26c0adbbb5c30f9c008b314c469662bbada7825dec63b0bd",
+      "timestamp": 4475.5825620000005,
+      "reviewed_p1": 2400,
+      "phase_review": "demonstration/attract page",
+      "reviewer": "assistant visual inspection of original image and enlarged HUD",
+      "qualification": "uncertified visual review; external validation still required",
+      "prior_use": "train",
+      "final_evaluation_eligible": false,
+      "complete_game_score": false
+    },
+    {
+      "source_episode": "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+      "capture": "score-raw-0365.png",
+      "capture_sha256": "bf5d6abfa9775b6cbba44f7935063f0c9fa64860bcb8a56a9a2eb99a72053d7d",
+      "timestamp": 6297.656181,
+      "reviewed_p1": 1300,
+      "phase_review": "instruction/attract page",
+      "reviewer": "assistant visual inspection of original image and enlarged HUD",
+      "qualification": "uncertified visual review; external validation still required",
+      "prior_use": "train",
+      "final_evaluation_eligible": false,
+      "complete_game_score": false
+    }
+  ],
+  "score_reader_replay": {
+    "readable_proposals": 49,
+    "retained_captures": 96,
+    "accuracy": "UNKNOWN: no externally qualified annotation corpus supplied",
+    "final_captures_readable": 0,
+    "fresh_final_evidence": false
+  },
+  "new_executive_investigation": {
+    "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+    "selection": {
+      "project": {
+        "completion_rationale": null,
+        "conditions": [],
+        "cost": 0.05,
+        "current_understanding": "tentative; no confirmed physical identity or causal score claim",
+        "dependencies": [],
+        "established_objective": "official_game_score",
+        "expected": "Preserved captures support the frozen motion-evaluation horizon",
+        "experiment_history": [],
+        "goal": "Can preserved observations support the existing motion candidates?",
+        "hypothesis_evidence": [
+          "2a798b35dba6ed4c2c49ecddabc14a3b390dad95b46604c56074aaae293ed8ad"
+        ],
+        "id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+        "learning_value": 0.6,
+        "method": "evidence-review",
+        "motivation": "Check measurement eligibility before repeating blocked candidate experiments",
+        "next_direction": "ask existing chooser for a scoped experiment",
+        "objective_contribution": 0.5,
+        "open_questions": [
+          "Preserved captures may support the frozen motion-evaluation horizon",
+          "Capture spacing or provenance may require new observations"
+        ],
+        "originator": "Reflection",
+        "origins": [
+          {
+            "episode": "autonomous-learning-v1",
+            "evidence_id": "2a798b35dba6ed4c2c49ecddabc14a3b390dad95b46604c56074aaae293ed8ad",
+            "journal": "/workspace/scratch/2933676dd55d/continued-notebook/learning-evidence.sqlite3"
+          }
+        ],
+        "priority_provenance": "bounded measurement qualification; no score utility inferred",
+        "progress": {},
+        "requires": [
+          "offline-slot",
+          "context-evidence"
+        ],
+        "revision": "1",
+        "risk": 0.05,
+        "scope": {
+          "predicate": "capture_horizon_supported",
+          "question_category": "motion_evidence_availability"
+        },
+        "status": "active",
+        "success_criteria": {
+          "max_attempts": 8,
+          "min_conditions": 2,
+          "min_episodes": 2,
+          "min_resolved": 3,
+          "stagnation_window": 3,
+          "support_fraction": 0.8
+        },
+        "tactical_hypothesis_evidence": [
+          "51a69e30711402fdd1bfd4a33e25c61d4b46167a101c6efdb8b4561e20092bbb"
+        ],
+        "uncertainty": 1.0,
+        "selection": {
+          "alternatives": [
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+              "score": 2.0999999999999996,
+              "status": "paused",
+              "terms": {
+                "cost": 0.1,
+                "learning_value": 0.8,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 1.0,
+                "risk": 0.1
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+              "score": 2.0999999999999996,
+              "status": "paused",
+              "terms": {
+                "cost": 0.1,
+                "learning_value": 0.8,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 1.0,
+                "risk": 0.1
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+              "score": 1.5,
+              "status": "paused",
+              "terms": {
+                "cost": 0.05,
+                "learning_value": 0.6,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 0.5,
+                "risk": 0.05
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+              "score": 1.5,
+              "status": "paused",
+              "terms": {
+                "cost": 0.05,
+                "learning_value": 0.6,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 0.5,
+                "risk": 0.05
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+              "score": 1.5,
+              "status": "paused",
+              "terms": {
+                "cost": 0.05,
+                "learning_value": 0.6,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 0.5,
+                "risk": 0.05
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+              "score": 1.5,
+              "status": "paused",
+              "terms": {
+                "cost": 0.05,
+                "learning_value": 0.6,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 0.5,
+                "risk": 0.05
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+              "score": 1.5,
+              "status": "paused",
+              "terms": {
+                "cost": 0.05,
+                "learning_value": 0.6,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 0.5,
+                "risk": 0.05
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+              "score": 1.5,
+              "status": "paused",
+              "terms": {
+                "cost": 0.05,
+                "learning_value": 0.6,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 0.5,
+                "risk": 0.05
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+              "score": 1.5,
+              "status": "paused",
+              "terms": {
+                "cost": 0.05,
+                "learning_value": 0.6,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 0.5,
+                "risk": 0.05
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": true,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+              "score": 2.0999999999999996,
+              "status": "paused",
+              "terms": {
+                "cost": 0.1,
+                "learning_value": 0.8,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 1.0,
+                "risk": 0.1
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            },
+            {
+              "authorized": true,
+              "blocked": false,
+              "method_available": true,
+              "missing_resources": [],
+              "opportunity_cost": "foregone eligible alternatives shown in this selection",
+              "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+              "score": 2.0000000000000004,
+              "status": "candidate",
+              "terms": {
+                "cost": 0.05,
+                "learning_value": 0.6,
+                "objective_contribution": 0.5,
+                "remaining_uncertainty": 1.0,
+                "risk": 0.05
+              },
+              "unmet_dependencies": [],
+              "urgent": false
+            }
+          ],
+          "interrupted_projects": [],
+          "op": "selected",
+          "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+          "reason": "generic value/uncertainty minus cost/risk policy"
+        }
+      },
+      "alternatives": [
+        {
+          "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+          "score": 2.0999999999999996,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.8,
+            "remaining_uncertainty": 1.0,
+            "cost": 0.1,
+            "risk": 0.1
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+          "score": 2.0999999999999996,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.8,
+            "remaining_uncertainty": 1.0,
+            "cost": 0.1,
+            "risk": 0.1
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "score": 1.5,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.6,
+            "remaining_uncertainty": 0.5,
+            "cost": 0.05,
+            "risk": 0.05
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+          "score": 1.5,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.6,
+            "remaining_uncertainty": 0.5,
+            "cost": 0.05,
+            "risk": 0.05
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "score": 1.5,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.6,
+            "remaining_uncertainty": 0.5,
+            "cost": 0.05,
+            "risk": 0.05
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "score": 1.5,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.6,
+            "remaining_uncertainty": 0.5,
+            "cost": 0.05,
+            "risk": 0.05
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "score": 1.5,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.6,
+            "remaining_uncertainty": 0.5,
+            "cost": 0.05,
+            "risk": 0.05
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "score": 1.5,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.6,
+            "remaining_uncertainty": 0.5,
+            "cost": 0.05,
+            "risk": 0.05
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "score": 1.5,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.6,
+            "remaining_uncertainty": 0.5,
+            "cost": 0.05,
+            "risk": 0.05
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+          "score": 2.0999999999999996,
+          "blocked": true,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.8,
+            "remaining_uncertainty": 1.0,
+            "cost": 0.1,
+            "risk": 0.1
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "paused"
+        },
+        {
+          "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+          "score": 2.0000000000000004,
+          "blocked": false,
+          "terms": {
+            "objective_contribution": 0.5,
+            "learning_value": 0.6,
+            "remaining_uncertainty": 1.0,
+            "cost": 0.05,
+            "risk": 0.05
+          },
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "missing_resources": [],
+          "unmet_dependencies": [],
+          "method_available": true,
+          "authorized": true,
+          "urgent": false,
+          "status": "candidate"
+        }
+      ],
+      "reason": "generic value/uncertainty minus cost/risk policy"
+    },
+    "commission": {
+      "bookmark_id": "e2424e543e770c6b396cfb98343f0c20dcc8b54bcff4ece62aa34fc6e1a33b7b",
+      "dispatch_id": "f21ce12351e511d86526dc8a9fb80214bbfb6f7aebd364b5b3c2ce007ecfa725"
+    },
+    "plan": {
+      "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+      "prediction_id": "ac6e1fe53e86821cdaa28f5eb112ade1ad4dd6738e1265089982f0631dfbe02a",
+      "memory_id": "95429bb3ff77664927e55116a56bd953fecce8671a035334f7c85a80e43c9de8",
+      "method": "evidence-review",
+      "episode": "autonomous-learning-v1:boot-608eaa29-8b07-4b0c-b4e9-9e83f08b17ec",
+      "clock_domain": "boot-608eaa29-8b07-4b0c-b4e9-9e83f08b17ec",
+      "evaluation_id": null,
+      "predicate": "capture_horizon_supported",
+      "dataset_id": "c048eb2d2d7b021293fb370aaeb227538775f2d21bc44ce1592e971d22857f6a",
+      "expected": "Preserved captures support the frozen motion-evaluation horizon",
+      "question_category": "motion_evidence_availability",
+      "condition": {
+        "predicate": "capture_horizon_supported",
+        "question_category": "motion_evidence_availability"
+      },
+      "budget_seconds": 59.99999797700002,
+      "experiment_kind": "offline",
+      "independence_unit": "1805c0a0550422e4e49ea83e1ff095f565276574815d6990d2a7ed100887bded",
+      "evidence_groups": [
+        "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+        "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+        "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+        "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+      ],
+      "source_evidence": [
+        "3a134e4d15d78a7314b8189380ef8c677c49ba45c15359c449d598e029af986a",
+        "f54f31de70d6233cc15e7dbbbc79e536998140febef6aa1d3e9693e6d71ec640",
+        "feb501b2859a651831f1fe081c7ce9db59f937826ee33f8ccc1cf3a69f0aedd0",
+        "8ae4c6d0c0e7f52436f0a4e1d60888d61d756ded9b49ce6d4d30d63bb2a79228"
+      ],
+      "competing_explanations": [
+        {
+          "explanation": "Preserved captures may support the frozen motion-evaluation horizon",
+          "predicate": "capture_horizon_supported"
+        },
+        {
+          "explanation": "Capture spacing or provenance may require new observations"
+        }
+      ],
+      "alternatives": [
+        {
+          "memory_id": "95429bb3ff77664927e55116a56bd953fecce8671a035334f7c85a80e43c9de8",
+          "evaluator_priority": 0.9222222222222222,
+          "rank": [
+            1
+          ]
+        }
+      ],
+      "reason": "Existing Evaluator priority; retrieve discriminating evidence before expensive new fitting",
+      "stopping": "one committed retrieval; no automatic retest or production deployment"
+    },
+    "result": {
+      "status": "resolved",
+      "result": "contradicted",
+      "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+      "resolution_id": "6e801e341be7578de587e786009797a3e25663d0a857fe85078465b5ad04706b",
+      "evaluation_id": "f4d88f6bfb21d15ce30dfc4ad8db66815512da4889456fc8d404e26f462cb977",
+      "metrics": {
+        "capture_horizon_supported": false,
+        "compatible_pairs": 0,
+        "distinct_source_episodes": 4,
+        "finding": "Independent capture-availability audit; no motion accuracy or score evaluation",
+        "fresh_final_evidence": false,
+        "missing_evidence": [
+          "Controller transport is not proof of physical effects",
+          "Independent identity/role/trajectory annotations are not supplied",
+          "No preserved playfield pairs match frozen 150ms +/-25ms motion evaluation",
+          "Published prior partition use excludes fresh final admission",
+          "Retained scores are historical reader state, not fresh score observations",
+          "Start/termination captures do not independently certify a complete-game boundary"
+        ],
+        "qualified_identities": 0
+      },
+      "reflection": {
+        "evidence_id": "2f636da7ca4ee0d5bc7fa568043e4faeaef88f91ad9fea09d68f67d00d38afc5",
+        "question": "Which new hash-bound observations supply the frozen 150ms horizon and independently verified identities?",
+        "operational_change": null
+      }
+    }
+  },
+  "candidate_transport": {
+    "candidates": [
+      {
+        "candidate_id": "ff934a962b96d937ebaa1dc5c9830b234dcf31cdb6f6d9215ced223be5228e7c",
+        "source_evaluation": "6aa5ee3cd0e1b1554dd23f0180faadd5288a8cca6e40bc0669cf1da10b9d5cf8",
+        "prediction_id": "3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019",
+        "source_evidence": [
+          "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5"
+        ],
+        "artifact_sha256": "8de707093fe770a4aa2306478fb9d6e6c3dab87f5d07ee89aefc652b3651a7de",
+        "relative_path": "models/3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019/ff934a962b96d937ebaa1dc5c9830b234dcf31cdb6f6d9215ced223be5228e7c.json",
+        "transport": "exact recorded canonical spec bytes restored; matching original hash",
+        "host_software_compatibility": true,
+        "controlled_steps": [
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          }
+        ],
+        "seconds": 0.00021657899992533203,
+        "controller_writes": 0,
+        "physical_ready": false,
+        "admission": "unresolved",
+        "missing_evidence": [
+          "No independently verified player/target/threat trajectories supplied",
+          "Meditation associations and error summaries are not independent ground truth",
+          "No fresh sealed final motion evaluation or operational shadow qualification",
+          "Source episode already used as consulted-test; not fresh final evidence"
+        ]
+      },
+      {
+        "candidate_id": "531d952746dde4f0fbbce325ea9061efc5d9ff13efa25fcfb6b490c665b06bad",
+        "source_evaluation": "6aa5ee3cd0e1b1554dd23f0180faadd5288a8cca6e40bc0669cf1da10b9d5cf8",
+        "prediction_id": "3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019",
+        "source_evidence": [
+          "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5"
+        ],
+        "artifact_sha256": "e479616930c0db271f756361ef453423decf2217063d97a35aafc2fa98531239",
+        "relative_path": "models/3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019/531d952746dde4f0fbbce325ea9061efc5d9ff13efa25fcfb6b490c665b06bad.json",
+        "transport": "exact recorded canonical spec bytes restored; matching original hash",
+        "host_software_compatibility": true,
+        "controlled_steps": [
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          }
+        ],
+        "seconds": 0.00017291399990426726,
+        "controller_writes": 0,
+        "physical_ready": false,
+        "admission": "unresolved",
+        "missing_evidence": [
+          "No independently verified player/target/threat trajectories supplied",
+          "Meditation associations and error summaries are not independent ground truth",
+          "No fresh sealed final motion evaluation or operational shadow qualification",
+          "Source episode already used as consulted-test; not fresh final evidence"
+        ]
+      },
+      {
+        "candidate_id": "b575a671d64812a6993329902d783eb3db88fdac64f9c5459f0b65d4054f4d5c",
+        "source_evaluation": "6aa5ee3cd0e1b1554dd23f0180faadd5288a8cca6e40bc0669cf1da10b9d5cf8",
+        "prediction_id": "3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019",
+        "source_evidence": [
+          "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5"
+        ],
+        "artifact_sha256": "e4a9fa75a07b1bcafc7865074480a7ec76eb63c83651ad6381df9be3ae18964c",
+        "relative_path": "models/3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019/b575a671d64812a6993329902d783eb3db88fdac64f9c5459f0b65d4054f4d5c.json",
+        "transport": "exact recorded canonical spec bytes restored; matching original hash",
+        "host_software_compatibility": true,
+        "controlled_steps": [
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          }
+        ],
+        "seconds": 0.00016678599990882503,
+        "controller_writes": 0,
+        "physical_ready": false,
+        "admission": "unresolved",
+        "missing_evidence": [
+          "No independently verified player/target/threat trajectories supplied",
+          "Meditation associations and error summaries are not independent ground truth",
+          "No fresh sealed final motion evaluation or operational shadow qualification",
+          "Source episode already used as consulted-test; not fresh final evidence"
+        ]
+      },
+      {
+        "candidate_id": "b144c1abc1de87c7cc313104b9229eabc8fd5f09579b22f7e8c4138fe2bef2ca",
+        "source_evaluation": "a76b46c8e821b9d61c61b0918fa3b2b1543d6d3e8a0f61c19e825d90402e0c62",
+        "prediction_id": "ab443d5418272e3cb765532f2a2549e581f9c329aab789355da52075bf10aef3",
+        "source_evidence": [
+          "3fa39aefed01ea8fae9b9a0d97b95e52f3d6552284950f4e8c0976c471f8bde6"
+        ],
+        "artifact_sha256": "8de707093fe770a4aa2306478fb9d6e6c3dab87f5d07ee89aefc652b3651a7de",
+        "relative_path": "models/ab443d5418272e3cb765532f2a2549e581f9c329aab789355da52075bf10aef3/b144c1abc1de87c7cc313104b9229eabc8fd5f09579b22f7e8c4138fe2bef2ca.json",
+        "transport": "exact recorded canonical spec bytes restored; matching original hash",
+        "host_software_compatibility": true,
+        "controlled_steps": [
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          }
+        ],
+        "seconds": 0.00011846400002468727,
+        "controller_writes": 0,
+        "physical_ready": false,
+        "admission": "unresolved",
+        "missing_evidence": [
+          "No independently verified player/target/threat trajectories supplied",
+          "Meditation associations and error summaries are not independent ground truth",
+          "No fresh sealed final motion evaluation or operational shadow qualification",
+          "Source episode already used as train; not fresh final evidence"
+        ]
+      },
+      {
+        "candidate_id": "f4dee602152c5087c3acd90356634913f57e1ace04e800b2927672582543273c",
+        "source_evaluation": "a76b46c8e821b9d61c61b0918fa3b2b1543d6d3e8a0f61c19e825d90402e0c62",
+        "prediction_id": "ab443d5418272e3cb765532f2a2549e581f9c329aab789355da52075bf10aef3",
+        "source_evidence": [
+          "3fa39aefed01ea8fae9b9a0d97b95e52f3d6552284950f4e8c0976c471f8bde6"
+        ],
+        "artifact_sha256": "e479616930c0db271f756361ef453423decf2217063d97a35aafc2fa98531239",
+        "relative_path": "models/ab443d5418272e3cb765532f2a2549e581f9c329aab789355da52075bf10aef3/f4dee602152c5087c3acd90356634913f57e1ace04e800b2927672582543273c.json",
+        "transport": "exact recorded canonical spec bytes restored; matching original hash",
+        "host_software_compatibility": true,
+        "controlled_steps": [
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          }
+        ],
+        "seconds": 0.00012005600001430139,
+        "controller_writes": 0,
+        "physical_ready": false,
+        "admission": "unresolved",
+        "missing_evidence": [
+          "No independently verified player/target/threat trajectories supplied",
+          "Meditation associations and error summaries are not independent ground truth",
+          "No fresh sealed final motion evaluation or operational shadow qualification",
+          "Source episode already used as train; not fresh final evidence"
+        ]
+      },
+      {
+        "candidate_id": "69f37a265d80ac93c0c8d8b62f04de3211746f6a5be6be7c58c4752f2adfae12",
+        "source_evaluation": "a76b46c8e821b9d61c61b0918fa3b2b1543d6d3e8a0f61c19e825d90402e0c62",
+        "prediction_id": "ab443d5418272e3cb765532f2a2549e581f9c329aab789355da52075bf10aef3",
+        "source_evidence": [
+          "3fa39aefed01ea8fae9b9a0d97b95e52f3d6552284950f4e8c0976c471f8bde6"
+        ],
+        "artifact_sha256": "e4a9fa75a07b1bcafc7865074480a7ec76eb63c83651ad6381df9be3ae18964c",
+        "relative_path": "models/ab443d5418272e3cb765532f2a2549e581f9c329aab789355da52075bf10aef3/69f37a265d80ac93c0c8d8b62f04de3211746f6a5be6be7c58c4752f2adfae12.json",
+        "transport": "exact recorded canonical spec bytes restored; matching original hash",
+        "host_software_compatibility": true,
+        "controlled_steps": [
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          }
+        ],
+        "seconds": 0.0001568410000345466,
+        "controller_writes": 0,
+        "physical_ready": false,
+        "admission": "unresolved",
+        "missing_evidence": [
+          "No independently verified player/target/threat trajectories supplied",
+          "Meditation associations and error summaries are not independent ground truth",
+          "No fresh sealed final motion evaluation or operational shadow qualification",
+          "Source episode already used as train; not fresh final evidence"
+        ]
+      },
+      {
+        "candidate_id": "329b4d449ecb420150110ffc6e4019c21598a723eb2c659c1c10935af8bc434b",
+        "source_evaluation": "ddd99db61c7b8d0e9ad1da10d1e301b430c9135493a3bac57d2e62cf93909336",
+        "prediction_id": "81ac3dbee03e461066de5aa4396685f6cbd74b793dfb11dd5d1b9cfa33a58e91",
+        "source_evidence": [
+          "9f48390757f38d41e39a844905fc8457bce6e4fd7b9d075d06bf9b38d4c7344c"
+        ],
+        "artifact_sha256": "8de707093fe770a4aa2306478fb9d6e6c3dab87f5d07ee89aefc652b3651a7de",
+        "relative_path": "models/81ac3dbee03e461066de5aa4396685f6cbd74b793dfb11dd5d1b9cfa33a58e91/329b4d449ecb420150110ffc6e4019c21598a723eb2c659c1c10935af8bc434b.json",
+        "transport": "copied original bytes",
+        "host_software_compatibility": true,
+        "controlled_steps": [
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          }
+        ],
+        "seconds": 0.00014216899990060483,
+        "controller_writes": 0,
+        "physical_ready": false,
+        "admission": "unresolved",
+        "missing_evidence": [
+          "No independently verified player/target/threat trajectories supplied",
+          "Meditation associations and error summaries are not independent ground truth",
+          "No fresh sealed final motion evaluation or operational shadow qualification",
+          "Source episode already used as validation; not fresh final evidence"
+        ]
+      },
+      {
+        "candidate_id": "1e5e89fe4adb03ce7de1c82eb40058ff1ab2e5a0bd198d1451fd5e52f563436c",
+        "source_evaluation": "ddd99db61c7b8d0e9ad1da10d1e301b430c9135493a3bac57d2e62cf93909336",
+        "prediction_id": "81ac3dbee03e461066de5aa4396685f6cbd74b793dfb11dd5d1b9cfa33a58e91",
+        "source_evidence": [
+          "9f48390757f38d41e39a844905fc8457bce6e4fd7b9d075d06bf9b38d4c7344c"
+        ],
+        "artifact_sha256": "e479616930c0db271f756361ef453423decf2217063d97a35aafc2fa98531239",
+        "relative_path": "models/81ac3dbee03e461066de5aa4396685f6cbd74b793dfb11dd5d1b9cfa33a58e91/1e5e89fe4adb03ce7de1c82eb40058ff1ab2e5a0bd198d1451fd5e52f563436c.json",
+        "transport": "copied original bytes",
+        "host_software_compatibility": true,
+        "controlled_steps": [
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          }
+        ],
+        "seconds": 0.0001428499999747146,
+        "controller_writes": 0,
+        "physical_ready": false,
+        "admission": "unresolved",
+        "missing_evidence": [
+          "No independently verified player/target/threat trajectories supplied",
+          "Meditation associations and error summaries are not independent ground truth",
+          "No fresh sealed final motion evaluation or operational shadow qualification",
+          "Source episode already used as validation; not fresh final evidence"
+        ]
+      },
+      {
+        "candidate_id": "597e6fc739326419dc987becdb2d9fe1f3853726102d18a12a4cbe5146dffb59",
+        "source_evaluation": "ddd99db61c7b8d0e9ad1da10d1e301b430c9135493a3bac57d2e62cf93909336",
+        "prediction_id": "81ac3dbee03e461066de5aa4396685f6cbd74b793dfb11dd5d1b9cfa33a58e91",
+        "source_evidence": [
+          "9f48390757f38d41e39a844905fc8457bce6e4fd7b9d075d06bf9b38d4c7344c"
+        ],
+        "artifact_sha256": "e4a9fa75a07b1bcafc7865074480a7ec76eb63c83651ad6381df9be3ae18964c",
+        "relative_path": "models/81ac3dbee03e461066de5aa4396685f6cbd74b793dfb11dd5d1b9cfa33a58e91/597e6fc739326419dc987becdb2d9fe1f3853726102d18a12a4cbe5146dffb59.json",
+        "transport": "copied original bytes",
+        "host_software_compatibility": true,
+        "controlled_steps": [
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          },
+          {
+            "intent": "explore",
+            "move": "SE",
+            "fire": "NONE"
+          }
+        ],
+        "seconds": 0.000126736000083838,
+        "controller_writes": 0,
+        "physical_ready": false,
+        "admission": "unresolved",
+        "missing_evidence": [
+          "No independently verified player/target/threat trajectories supplied",
+          "Meditation associations and error summaries are not independent ground truth",
+          "No fresh sealed final motion evaluation or operational shadow qualification",
+          "Source episode already used as validation; not fresh final evidence"
+        ]
+      }
+    ],
+    "distinct_specs": 3,
+    "real_evaluations": 0,
+    "physical_authorization": false,
+    "limitations": [
+      "Controlled host software execution only; no real motion accuracy, native ARM64 or hardware qualification"
+    ]
+  },
+  "host_tests": {
+    "baseline": "485 passed, 19 skipped in 32.96s",
+    "final": "492 passed, 19 skipped in 33.68s",
+    "targeted": "73 passed in 1.77s",
+    "torch_available": false
+  },
+  "boundaries": {
+    "physical_authorization": false,
+    "firmware_deployment": false,
+    "servo_movement": false,
+    "policy_activation": false,
+    "cal1_branch_modified": false
+  },
+  "complete_offline_developmental_cycle": {
+    "real_history": "Three preserved meditation\u2192candidate\u2192unresolved evaluation\u2192Executive outcomes, independently verified without rerunning",
+    "new_real_cycle": "Capture evidence\u2192Reflection hypothesis\u2192Executive selection/bookmark/meditation dispatch\u2192independent timing retrieval\u2192contradicted finding\u2192follow-up/acquisition bookmark; no new candidate justified",
+    "successful_candidate_admission": "Controlled fixture regression only; not Robotron learning or score improvement",
+    "legacy_bookmarks": "Original 177-record notebook predates Executive commissions; no bookmarks backdated"
+  },
+  "verified_game_journals": {
+    "files": 12,
+    "canonical_records": 122510,
+    "interpretation": "record count, not independent experience count"
+  }
+}

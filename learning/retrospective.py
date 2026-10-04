@@ -163,7 +163,7 @@ def ingest(root, dataset):
         source.close()
 
 
-def run(roots, output, *, budget_seconds=60., max_jobs=8):
+def run(roots, output, *, budget_seconds=60., max_jobs=8, qualify_observations=False):
     from .cycle import gameplay_active, investigate
     if gameplay_active():
         raise RuntimeError('offline only: active gameplay')
@@ -182,15 +182,41 @@ def run(roots, output, *, budget_seconds=60., max_jobs=8):
             try:
                 dataset = ExperienceDataset(journal, output/'pixels')
                 imports = [ingest(r, dataset) for r in roots]
+                qualifications = []
+                if qualify_observations:
+                    from .archive_audit import audit, ingest as ingest_qualification
+                    qualifications = [ingest_qualification(journal,audit(r.parent if r.name=='game-01' else r)) for r in roots]
                 result = investigate(dataset, gateway, diagnostics_only=True, review_questions=True,
                     budget_seconds=budget_seconds, max_jobs=max_jobs)
+                requests = []
+                if qualifications:
+                    from memory.learning_projects import LearningExecutive
+                    executive = LearningExecutive(journal,gateway)
+                    for identifier,project in executive.projects().items():
+                        if (project['method'] not in ('meditation-motion','evidence-review')
+                                or project['status'] not in ('paused','blocked') or not project['experiment_history']):
+                            continue
+                        outcome=project['experiment_history'][-1]
+                        if outcome['result'] not in ('unresolved','contradicted'):
+                            continue
+                        plan=next(r.data['payload']['plan'] for r in journal.records('event')
+                            if r.data['payload'].get('category')=='offline_experiment_plan'
+                            and r.data['payload']['plan']['prediction_id']==outcome['prediction_id'])
+                        if project['method']=='evidence-review' and plan.get('predicate')!='capture_horizon_supported':
+                            continue
+                        origins={journal.get(i).data['payload'].get('source_episode') for i in plan['source_evidence']}
+                        matching=[r.id for r in qualifications if r.data['payload']['source_episode'] in origins]
+                        if matching:
+                            requests.append(executive.retain_evidence_request(identifier,journal,matching).id)
+                    result['projects']=executive.projects()
                 journal.verify()
                 report = dict(schema=VERSION, ingestion=imports, new_investigations=result['results'],
                     projects=result['projects'], physical_authorization=False, physical_policy_activated=False,
                     acceptance='ALA-2 incomplete; verified complete-game improvement unproven',
                     journal_content_ids=[r.id for r in journal.records()],
                     contexts=[r.data['payload'] for r in journal.records('observation')
-                              if r.data['payload'].get('category') == 'learning_context_reference'])
+                              if r.data['payload'].get('category') == 'learning_context_reference'],
+                    qualification_ids=[r.id for r in qualifications],evidence_request_ids=requests)
                 target = output/'reports'/(digest(report)+'.json')
                 target.parent.mkdir(exist_ok=True)
                 if not target.exists():
@@ -208,10 +234,13 @@ def main():
     parser.add_argument('--recover-notebook', type=Path)
     parser.add_argument('--budget-seconds', type=float, default=60.)
     parser.add_argument('--max-jobs', type=int, default=8)
+    parser.add_argument('--qualify-observations',action='store_true',
+        help='audit preserved capture availability and retain Executive acquisition bookmarks; no hardware access')
     args = parser.parse_args()
     if args.recover_notebook:
         recover_notebook(args.recover_notebook, args.output)
-    print(json.dumps(run(args.episode, args.output, budget_seconds=args.budget_seconds, max_jobs=args.max_jobs)))
+    print(json.dumps(run(args.episode, args.output, budget_seconds=args.budget_seconds, max_jobs=args.max_jobs,
+        qualify_observations=args.qualify_observations)))
 
 
 if __name__ == '__main__':

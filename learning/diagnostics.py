@@ -31,6 +31,27 @@ def measurements(journal, evaluation_id):
 
 
 def retrieve_questions(journal, plan):
+    if plan.get('predicate') == 'capture_horizon_supported':
+        # Independently reconstruct availability from hash-bound originals.
+        # The service report is evidence to inspect, not its own ground truth.
+        from .archive_audit import audit
+        results = []; episodes = set()
+        for identifier in plan['source_evidence']:
+            p = journal.get(identifier).data['payload']
+            if p.get('category') != 'observation_qualification':
+                raise ValueError('capture qualification reference required')
+            saved = p['report']; actual = audit(saved['source_root'])
+            if actual != saved:
+                raise ValueError('qualified archive or measurement changed')
+            episodes.add(actual['source_episode'])
+            results.append(actual)
+        known = bool(results) and not any(r['binding_issues'] or any(r['torn_lines'].values()) for r in results)
+        supported = all(len(r['cadence']['compatible_pairs']) > 0 for r in results) if known else None
+        return dict(capture_horizon_supported=supported,distinct_source_episodes=len(episodes),
+            compatible_pairs=sum(len(r['cadence']['compatible_pairs']) for r in results),
+            qualified_identities=0,fresh_final_evidence=False,
+            finding='Independent capture-availability audit; no motion accuracy or score evaluation',
+            missing_evidence=sorted({reason for r in results for reason in r['reasons']}))
     episodes=set(); matching=[]
     for identifier in plan['source_evidence']:
         record=journal.get(identifier);p=record.data['payload']
@@ -84,7 +105,9 @@ def execute(plan, dataset, output=None, **unused):
     forecast = journal.get(plan['prediction_id']).data
     timely = forecast['at'] < observed.data['at'] <= forecast['payload']['deadline']
     result = 'unresolved' if value is None or not timely else 'supported' if value else 'contradicted'
-    reason = ('Retrieved frozen experience references; question recurrence only, causal explanation remains tentative'
+    reason = ('Reconstructed hash-bound capture timing; frozen-horizon availability only, identities and performance remain unqualified'
+              if plan.get('predicate')=='capture_horizon_supported' else
+              'Retrieved frozen experience references; question recurrence only, causal explanation remains tentative'
               if plan['method']=='evidence-review' else
               'Retrieved frozen training history; diagnostic signature only, causal explanation remains tentative')
     resolution = journal.resolve(plan['prediction_id'], sources=[observed.id], result=result, reason=reason)

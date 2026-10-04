@@ -216,6 +216,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         plan=select_offline_experiment(gateway,dataset.journal,context,budget_seconds=remaining)
         if plan is None or plan['prediction_id'] in seen: break
         seen.add(plan['prediction_id'])
+        commission=executive.commission(plan,dataset.journal)
         result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups','model-evaluation','context-evidence','meditation-evidence'},
             authorized={project['method']},plan=plan,dataset=dataset,output=dataset.artifacts.parent/'models',driver=driver,on_progress=on_progress)
         if result['status'] in ('resolved','already_resolved'):
@@ -236,7 +237,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         elif result['status']=='resolved':
             from experiments.ppal.reflect_robotron import reflect_retrieval_outcome
             result['reflection']=reflect_retrieval_outcome(dataset.journal,plan,result,gateway)
-        results.append(dict(project_id=project['id'],selection=selection,plan=plan,result=result))
+        results.append(dict(project_id=project['id'],selection=selection,commission=commission,plan=plan,result=result))
         if result['status']=='deferred': break
         # Serial offline jobs can serve additional projects; no second physical
         # actuator experiment is smuggled into the ordinary action hook.

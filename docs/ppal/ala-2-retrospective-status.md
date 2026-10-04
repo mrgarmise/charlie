@@ -1,5 +1,10 @@
 # Archived retrospective execution — 2026-10-03
 
+**Recovery update:** The command missing at this checkpoint has now been restored
+and independently tested. See [the recovery handoff](ala-2-recovery-handoff.md).
+The original status below remains historical; its unpublished test counts are
+not the validation results for the restored code.
+
 Charlie processed four preserved games through the existing Reflection, Evaluator, memory, Learning Executive, chooser and capability pipeline. The preserved notebook has 177 records, retaining 33 previous records; eight new investigations ran. An identical retry ran zero new investigations. The actual generated findings are preserved alongside this status.
 
 All operational candidates remained blocked by lack of independent trajectories, fresh sealed final evaluation and operational shadow qualification. No complete-game score was independently qualified. No physical activation occurred. ALA-2 remains open.

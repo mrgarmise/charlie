@@ -373,3 +373,25 @@ class LearningExecutive:
                     established_objective=project.get('established_objective'),
                     experiment_history=project['experiment_history'],
                     hypothesis_evidence=project.get('tactical_hypothesis_evidence', []))
+
+    def commission(self, plan, source_journal):
+        """Executive-owned durable bookmark and offline meditation dispatch.
+
+        Discovery reports evidence; only a selected project can commission it.
+        This records authority over investigation, never physical authority.
+        """
+        project = self.projects()[plan['project_id']]
+        committed = [r.data['payload']['plan'] for r in source_journal.records('event')
+                     if r.data['payload'].get('category') == 'offline_experiment_plan'
+                     and r.data['payload']['plan']['prediction_id'] == plan['prediction_id']]
+        if committed != [plan] or project['status'] != 'active' or plan['method'] != project['method']:
+            raise ValueError('selected project and exact committed plan required')
+        refs = [self._reference(source_journal, i) for i in plan['source_evidence']]
+        bookmark = self._event(dict(op='investigation_bookmark', project_id=project['id'],
+            prediction_id=plan['prediction_id'], question=project['goal'],
+            evidence=list(plan['source_evidence']), method=plan['method'],
+            physical_authorization=False), [r.id for r in refs])
+        dispatch = self._event(dict(op='meditation_dispatch', project_id=project['id'],
+            prediction_id=plan['prediction_id'], bookmark_id=bookmark.id,
+            method=plan['method'], execution='offline'), [bookmark.id])
+        return dict(bookmark_id=bookmark.id, dispatch_id=dispatch.id)

@@ -44,12 +44,27 @@ def retrieve_questions(journal, plan):
             saved = p['report']
             from pathlib import Path
             root=Path(saved['source_root'])
+            # Original audit paths survive restoration. Resolve a verified copy
+            # through acquisition's immutable association, never by filename.
+            from .episode_identity import bindings, _events
+            from memory.episode_identity import inspect_capture
+            bound=None
+            for candidate in bindings(journal):
+                if candidate['manifest_id']!=saved.get('manifest_id'):continue
+                for location in _events(journal,'episode_identity_location'):
+                    loc=location.data['payload'];copy=Path(loc['source_root'])
+                    if loc['status']!='verified' or loc['manifest_id']!=candidate['manifest_id'] or not copy.is_dir():continue
+                    try:
+                        if inspect_capture(copy)['manifest_id']!=candidate['manifest_id']:continue
+                    except (ValueError,OSError):continue
+                    root=copy;bound=candidate;break
+                if bound:break
             if not eligible(journal,p) or not root.is_dir():
                 unavailable.append(dict(reference=identifier,reason='Original audit location unavailable or quarantined; retained finding is not erased'))
                 continue
-            actual = audit(root)
+            actual = audit(root,identity=bound)
             # Historical reports did not contain the new identity fields.
-            if any(actual.get(k)!=v for k,v in saved.items() if k!='schema'):
+            if any(actual.get(k)!=v for k,v in saved.items() if k not in ('schema','source_root','game_relative')):
                 from .acquisition import maintain_episode_identity
                 maintain_episode_identity(root/saved.get('game_relative','.'),journal)
                 raise ValueError('qualified archive or measurement changed; excluded from retrieval')

@@ -320,3 +320,17 @@ def test_motion_qualification_uses_capture_occurrence_not_report_alone(tmp_path)
     source.write_text(json.dumps(document))
     with pytest.raises(ValueError,match='unique'):qualify_corpus(ds,source)
     j.close()
+
+
+def test_audit_retrieval_preserves_verified_copy_during_source_quarantine(tmp_path):
+    from learning.archive_audit import audit,ingest
+    from learning.diagnostics import retrieve_questions
+    root=package(tmp_path);j=EvidenceJournal(tmp_path/'j.sqlite3')
+    identity=reconcile(root,j);q=ingest(j,audit(root,identity=identity))
+    copy=tmp_path/'relocated-copy';shutil.copytree(root,copy);reconcile(copy,j)
+    (root/'diagnostic.bin').write_bytes(b'altered');assert reconcile(root,j)['status']=='quarantined'
+    actual=retrieve_questions(j,dict(predicate='capture_horizon_supported',source_evidence=[q.id]))
+    assert actual['unavailable_references']==[]
+    assert actual['capture_horizon_supported'] is False # no compatible frames; evidence still available
+    assert actual['distinct_source_episodes']==1
+    j.close()

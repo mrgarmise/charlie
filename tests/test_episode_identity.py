@@ -199,3 +199,124 @@ def test_actual_october1_collision_normal_discovery(tmp_path):
     assert startup(state,roots,authorize=False,turns=12).returncode==0
     assert [r.id for r in rows(state)]==[r.id for r in records]
     assert {str(r):inventory(r) for r in roots}==before
+
+
+def original_notebook(tmp_path):
+    """Restore actual journal documents/IDs/times, never reconstructed summaries."""
+    import gzip
+    fixture=json.loads(gzip.decompress((Path(__file__).parent/'fixtures/ala2-original-history.json.gz').read_bytes()))
+    source=tmp_path/'original-notebook';j=EvidenceJournal(source/'learning-evidence.sqlite3')
+    with j.batch():
+        for r in fixture['records']:
+            j.conn.execute('INSERT INTO records(id,document,committed_at) VALUES (?,?,?)',
+                (r['id'],r['document'],r['committed_at']))
+    j.verify();j.close()
+    return source,fixture['records']
+
+
+def test_original_distinct_temporal_projects_restore_defer_and_resume(tmp_path):
+    from learning.lifecycle import DevelopmentLifecycle
+    from learning.retrospective import merge_history
+    from memory.learning_projects import LearningExecutive
+    source,original=original_notebook(tmp_path)
+    state=tmp_path/'state';merge_history(source,state)
+    root=experience(tmp_path)
+    ids=['aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c',
+         '63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343']
+    j=EvidenceJournal(state/'learning-evidence.sqlite3');before=LearningExecutive(j,None).projects()
+    assert before[ids[0]]['scope']['meditation_id']!=before[ids[1]]['scope']['meditation_id']
+    assert [j.get(before[i]['scope']['meditation_id']).data['payload']['prior_use'] for i in ids]==['consulted-test','train']
+    assert all(p['status']=='paused' and len(p['experiment_history'])==1 for p in (before[i] for i in ids))
+    j.close()
+    process=startup(state,[root],authorize=False,turns=12);assert process.returncode==0,process.stderr
+    j=EvidenceJournal(state/'learning-evidence.sqlite3');executive=LearningExecutive(j,None)
+    after=executive.projects()
+    assert all(after[i]['experiment_history']==before[i]['experiment_history'] for i in ids)
+    assert all(after[i]['scope']==before[i]['scope'] and after[i]['origins'][:len(before[i]['origins'])]==before[i]['origins'] for i in ids)
+    assert all(after[i]['developmental_bookmark']['required_evidence'] for i in ids)
+    assert all(after[i]['agenda_representative']==ids[0] for i in ids)
+    assert [(r.id,r.document,r.committed_at) for r in j.records()][:len(original)]==[
+        (r['id'],r['document'],r['committed_at']) for r in original]
+    count=len(j.records());j.close()
+    assert startup(state,[root],authorize=False,turns=12).returncode==0
+    assert len(rows(state))==count
+    delivered_corpus(tmp_path,state)
+    process=startup(state,[root],authorize=False,turns=12);assert process.returncode==0,process.stderr
+    j=EvidenceJournal(state/'learning-evidence.sqlite3');projects=LearningExecutive(j,None).projects()
+    assert len(projects[ids[0]]['experiment_history'])==2
+    assert projects[ids[0]]['experiment_history'][0]==before[ids[0]]['experiment_history'][0]
+    assert projects[ids[1]]['experiment_history']==before[ids[1]]['experiment_history']
+    assert any(r.data['payload'].get('category')=='meditation_candidate_evaluation'
+        and r.data['payload']['result']['result']=='supported' for r in j.records())
+    assert len([p for p in projects.values() if p['method']=='meditation-motion'])==2 # both original investigations remain distinct
+    count=len(j.records());j.close()
+    assert startup(state,[root],authorize=False,turns=12).returncode==0
+    assert len(rows(state))==count
+
+
+def test_standalone_content_adapter_imports_shared_experience_once(tmp_path):
+    from experiments.ppal.episode_evidence import import_episode
+    a=package(tmp_path,'a');b=package(tmp_path,'b',image=b'new-package')
+    j=EvidenceJournal(tmp_path/'j.sqlite3')
+    x=import_episode(a,j);y=import_episode(b,j)
+    assert x==y and len(j.records('episode'))==1
+    assert len(bindings(j))==2
+    assert len([r for r in j.records('observation') if r.data['payload'].get('category')=='session_report'])==1
+    j.close()
+
+
+def test_safe_malformed_derived_alias_repair_preserves_original_journal(tmp_path):
+    from learning.retrospective import ingest, discover, inventory
+    from learning.datasets import ExperienceDataset,SCOPE
+    root=package(tmp_path);j=EvidenceJournal(tmp_path/'state'/'learning-evidence.sqlite3')
+    ds=ExperienceDataset(j,tmp_path/'state'/'pixels')
+    original=j.append('observation',dict(category='learning_context_reference',source_episode='broken-legacy-id',
+        inventory=inventory(root),context=discover(root)),episode=SCOPE,producer='original-producer',version='legacy')
+    marker=j.append('observation',dict(category='retrospective_ingestion',source_episode='broken-legacy-id',context_id=original.id),
+        episode=SCOPE,producer='original-producer',version='legacy')
+    documents=[(r.id,r.document,r.committed_at) for r in j.records()]
+    repaired=ingest(root,ds)
+    assert repaired['record_id']==marker.id and repaired['status']=='preserved'
+    assert [(r.id,r.document,r.committed_at) for r in j.records()][:2]==documents
+    aliases=j.category_records('event','episode_identity_alias')
+    assert len(aliases)==1 and aliases[0].data['payload']['original_identifier']=='broken-legacy-id'
+    count=len(j.records());ingest(root,ds);assert len(j.records())==count;j.close()
+
+
+def test_normal_finalized_capture_restart_and_mutation_quarantine(tmp_path):
+    root=experience(tmp_path);origin=begin_capture(root);manifest=finalize_capture(root)
+    state=tmp_path/'state'
+    first=startup(state,[root],authorize=False,turns=12);assert first.returncode==0,first.stderr
+    original=rows(state)
+    assert startup(state,[root],authorize=False,turns=12).returncode==0
+    assert [r.id for r in rows(state)]==[r.id for r in original]
+    assert json.loads((root/ORIGIN).read_text())==origin and json.loads((root/MANIFEST).read_text())==manifest
+    (root/'unregistered.bin').write_bytes(b'unregistered source change')
+    process=startup(state,[root],authorize=False,turns=12);assert process.returncode==0,process.stderr
+    status=json.loads((state/'development-status.json').read_text())
+    assert status['identity_conflicts'] and status['identity_conflicts'][0]['excluded_from_evaluation']
+
+
+def test_motion_qualification_uses_capture_occurrence_not_report_alone(tmp_path):
+    from learning.datasets import ExperienceDataset
+    from learning.meditation import qualify_corpus
+    from test_meditation_candidate import corpus
+    j=EvidenceJournal(tmp_path/'state'/'learning-evidence.sqlite3');ds=ExperienceDataset(j,tmp_path/'state'/'pixels')
+    source=corpus(None,tmp_path);document=json.loads(source.read_text())
+    # Four genuinely distinct controlled occurrences with byte-identical reports.
+    for n,e in enumerate(document['episodes']):
+        root=tmp_path/f'capture-{n}';root.mkdir();(root/'report.json').write_text('{}')
+        for k in ('start','terminal'):(root/(k+'.bin')).write_bytes(f'{n}-{k}'.encode())
+        begin_capture(root);finalize_capture(root);identity=inspect_capture(root)
+        witness(root,identity,str(n));verified=reconcile(root,j)
+        e['source_episode']=verified['source_episode'];e['source_capture_root']=str(root)
+        e['source_report']=dict(path=str(root/'report.json'),sha256=sha(root/'report.json'))
+    source.write_text(json.dumps(document));record=qualify_corpus(ds,source)
+    refs=record.data['payload']['identity_references']
+    assert len({r['experience_id'] for r in refs})==4 and all(r['observation_id'] for r in refs)
+    document['episodes'][1]['source_episode']=document['episodes'][0]['source_episode']
+    document['episodes'][1]['source_capture_root']=document['episodes'][0]['source_capture_root']
+    document['episodes'][1]['source_report']=document['episodes'][0]['source_report']
+    source.write_text(json.dumps(document))
+    with pytest.raises(ValueError,match='unique'):qualify_corpus(ds,source)
+    j.close()

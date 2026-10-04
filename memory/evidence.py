@@ -111,6 +111,13 @@ class EvidenceJournal:
             args = (kind,)
         return [EvidenceRecord(*r) for r in self.conn.execute(query+" ORDER BY sequence",args)]
 
+    def category_records(self, kind, category):
+        """Project acquisition indexes without decoding unrelated large findings."""
+        return [EvidenceRecord(*r) for r in self.conn.execute(
+            "SELECT sequence,id,document,committed_at FROM records WHERE "
+            "json_extract(document,'$.kind')=? AND json_extract(document,'$.payload.category')=? ORDER BY sequence",
+            (kind,category))]
+
     def get(self, identifier):
         row = self.conn.execute("SELECT sequence,id,document,committed_at FROM records WHERE id=?",
                                 (identifier,)).fetchone()

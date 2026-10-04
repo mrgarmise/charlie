@@ -10,6 +10,7 @@ from pathlib import Path
 import secrets
 from datetime import datetime, timezone
 import hashlib
+import re
 from .evidence import digest, canonical
 
 ORIGIN = 'capture-origin.json'
@@ -76,7 +77,7 @@ def begin_capture(root, *, provenance=None):
 def validate_origin(origin):
     body = {k:v for k,v in origin.items() if k!='capture_id'}
     if (origin.get('schema') != SCHEMA or not isinstance(origin.get('nonce'), str)
-            or len(origin['nonce']) != 64 or origin.get('capture_id') != 'capture:'+digest(body)):
+            or re.fullmatch('[0-9a-f]{64}',origin['nonce']) is None or origin.get('capture_id') != 'capture:'+digest(body)):
         raise IdentityIntegrityError('malformed capture origin identifier')
 
 
@@ -130,7 +131,13 @@ def inspect_capture(root):
     legacy = ('episode:'+artifacts['report.json'] if 'report.json' in artifacts
               else 'partial-episode:'+digest(artifacts))
     capture = origin['capture_id'] if origin else 'legacy-package:'+digest(artifacts)
-    return dict(capture_id=capture, manifest_id=manifest['manifest_id'], content_id=content,
+    report=json.loads((root/'report.json').read_text()) if (root/'report.json').exists() else {}
+    declared=report.get('episode_id')
+    diagnostics=('missing legacy identifier; content mapping derived' if declared is None else
+                 'legacy identifier verified' if declared==legacy else
+                 'malformed/conflicting reported identifier retained; derived alias repaired')
+    return dict(declared_episode_id=declared,identifier_diagnostics=diagnostics,
+                capture_id=capture, manifest_id=manifest['manifest_id'], content_id=content,
                 experience_id=content, observation_id=None, independent_gameplay=False,
                 legacy_episode_id=legacy, artifacts=artifacts, capture_status=status,
                 provenance=origin.get('provenance', {}) if origin else (

@@ -15,3 +15,38 @@ Authentic October 1 originals recovered from two independently retained archives
 Native Pi acceptance is pending. Work runs on x86_64; `/home/five` checkout is absent and `charlie`/`charlie.local` do not resolve. Existing Pi notebooks and original artifacts have not been modified. No physical gameplay, movement, firmware deployment or physical policy activation occurred. ALA-2 remains open pending independently verified learning-derived complete-game Robotron score improvement.
 
 First checkpoint validation: **70 passed in 22.70s**, including authentic October 1 normal-application discovery, shared-content deduplication, a complete eligible learning turn, twelve-turn restart, isolated quarantine continuity, deferred-project resumption after controlled independent evidence delivery, immutable-source verification and historical journal preservation. `milestone1.xml.gz` is the raw host report. Native acceptance remains pending.
+
+## Final host recovery and developmental acceptance
+
+The authentic notebook now contains **455 records**. Every original document, identifier and commitment timestamp from the **177-record original** and **319-record continuation** is retained exactly. Twelve-turn host resumption and two further twelve-turn restarts succeeded with the same 455 records; no completed finding or investigation was repeated. Original October 1 and October 4 source bytes remain unchanged. The final original-history regression fixture is an exact **33-record causal prefix** through the first deferred portfolio, extracted from the authoritative 177-record journal; it includes both original temporal investigations and their full causal ancestors, not a summary or invented native observation. The full originals remain verified in the authentic recovery execution.
+
+| Original investigation | Creation order and original commitment | Meditation | Original use | Preserved attempt |
+| --- | --- | --- | --- | --- |
+| `aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c` | sequence 8; 2026-10-03T02:50:33.269219+00:00 | `e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5` | consulted-test | unresolved; fresh trajectories and final evidence absent |
+| `63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343` | sequence 10; 2026-10-03T02:50:33.270598+00:00 | `3fa39aefed01ea8fae9b9a0d97b95e52f3d6552284950f4e8c0976c471f8bde6` | train | unresolved; fresh trajectories and final evidence absent |
+
+The journal proves separate Reflection origins and source partitions. They are related investigations, not duplicate experiments. All original histories, references and attempts survive; an additional validation investigation from the larger archive also survives. No original project is deleted or relabeled as an independent new game. Original unavailable tracks remain explicit historical gaps; valid available source tracks and new meditation checkpoints remain usable beside quarantine.
+
+Charlie completed three new diagnostic resolutions during authentic recovery, including capture availability and context-gap recurrence; causal explanations remain unknown. The normal Executive commissioned October 4 and shared October 1 track meditation and retained new hypotheses/findings. The temporal comparison cannot defensibly admit these unverified tracks into independent evaluation. Each unresolved temporal investigation now has a durable, actionable acquisition request for independently qualified persistent identities, measured board trajectories, observed 150ms +/-25ms horizons, one validation and three distinct unconsulted final experience groups. Requests explicitly retain uncertainty and require separately authorized acquisition. No physical execution permission is inferred.
+
+The normal-application regression restores the exact original projects, retains both unresolved attempts, reaches deferred/waiting state, delivers independent **controlled software** trajectories through the existing acquisition inbox, and lets Reflection/Executive/chooser select, implement and independently evaluate a new bounded temporal comparison. The oldest project receives the new outcome; the other original attempt remains intact. No competing project is created. Restart preserves results. This demonstrates a functional continuation capability, not a real Robotron learning-derived score improvement or a manually supplied strategy. Controlled inputs never enter the authentic notebook.
+
+Final broad host suite: **523 passed, 19 Torch-dependent skips in 100.54s**. After trimming only the fixture to the exact two-investigation causal prefix, its normal-application recovery/resumption regression passed again (**1 passed in 11.28s**). Compilation, shell syntax and whitespace checks pass. Raw reports include prior failed attempts; external annotation delivery after an already-complete capture import was restored while keeping captured experience deduplicated. The authentic host attempt that ended early without a traceback remains preserved; its cause is not established. Its partial notebook was resumed instead of discarded.
+
+`execution.json` binds original source inventories, all recovered IDs, project provenance, new findings, immutable journal state and functional source hashes. Raw console and JUnit reports are retained alongside it. Future physical gameplay behavior has not been changed or independently tested. Score 100 from October 4 remains an unverified subsystem report. Native Pi acceptance remains pending.
+
+## Exact guarded Pi procedure
+
+Use the exact release SHA supplied with this handoff. The existing updater refuses tracked modifications and non-fast-forward history, preserves untracked files/checkouts, runs unarmed tests, and never deploys firmware or starts hardware. The acceptance script requires an existing persistent notebook, exports it through the existing acquisition owner before learning, runs the authentic collision regression, performs the original **twelve normal-application turns**, restarts for twelve more, and verifies identical journal IDs/documents/commitment times. It adds no offline or physical activation grant.
+
+```bash
+cd /home/five/charlie-ala2-bae659f60b0e
+RELEASE='<exact published 40-character SHA>'
+git fetch origin feature/agency-first-self
+git show "$RELEASE:tools/update_existing_ala2_pi.sh" | bash -s -- "$RELEASE"
+CHARLIE_LEARNING_STATE=/home/five/.local/share/charlie/development   bash tools/accept_episode_identity_pi.sh "$RELEASE"
+```
+
+`CHARLIE_LEARNING_STATE` must be the same persistent state directory used by the previous native normal startup. The script fails if its journal is absent, rather than silently creating a replacement. Both original `/home/five/charlie-meditation-20261003-01` and `/home/five/charlie-offline-learning` are additive read-only history roots. If later source evidence arrives or more than twelve eligible turns remain, the script retains both logs and reports the changed state instead of falsely claiming exact restart deduplication. Inspect those recorded distinctions and continue the same normal application.
+
+Acquisition-owned transfer packages and hash manifests remain under `STATE/exports/evidence/<inventory-digest>/`. Native acceptance logs are under `STATE/native-identity-acceptance-*`. Original Robotron captures remain under `/home/five/Projects/charlie/robotron-runs`. No archive or notebook is overwritten. The authentic Work recovery notebook is `/workspace/scratch/1e5a01e5b074/identity-authentic-final`; its exported copy is restoration material, not another game.

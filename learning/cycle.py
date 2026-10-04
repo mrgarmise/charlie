@@ -223,6 +223,12 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         project=executive.projects()[identifier]
         spec=dataset.journal.get(item['hypothesis_id']).data['payload']['proposal']
         from .datasets import scientific_content
+        if (project['status']=='blocked' and not project['experiment_history']
+                and 'Source identity quarantined' in (project.get('completion_rationale') or '')):
+            from .episode_identity import eligible
+            if all(eligible(dataset.journal,dataset.journal.get(i).data['payload']) for i in spec['source_evidence']):
+                executive.transition(identifier,'candidate','Acquisition restored verified association; resume preserved experiment',
+                    dataset.journal,[item['evidence_id']])
         if project.get('hold') and project['status'] in ('paused','blocked') and project['experiment_history'] and project.get('disposition')!='budget_exhausted' and (project['method']!='meditation-motion' or spec.get('scope',{}).get('corpus_id')) and not any(scientific_content(dataset.journal,h.get('dataset_id'))==scientific_content(dataset.journal,spec['dataset_id']) for h in executive.agenda_history(identifier)):
             executive.transition(identifier,'candidate','New versioned evidence permits reassessment; no independent confirmation assumed',dataset.journal,[item['evidence_id']])
     started=time.monotonic(); results=[]; seen=set()
@@ -243,6 +249,17 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         if plan['prediction_id'] in seen: break
         seen.add(plan['prediction_id'])
         commission=executive.commission(plan,dataset.journal)
+        from .episode_identity import eligible
+        evidence_payloads=[dataset.journal.get(i).data['payload'] for i in plan['source_evidence']]
+        try:
+            evidence_payloads.append(dataset.journal.get(plan['dataset_id']).data['payload'])
+        except KeyError:
+            pass # aggregate content key; exact contributing records checked above
+        if not all(eligible(dataset.journal,p) for p in evidence_payloads):
+            executive.transition(project['id'],'blocked',
+                'Source identity quarantined; preserve experiment and bookmark, await verified association',
+                dataset.journal,plan['source_evidence'])
+            continue
         result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups','model-evaluation','context-evidence','meditation-evidence'},
             authorized={project['method']},plan=plan,dataset=dataset,output=dataset.artifacts.parent/'models',driver=driver,on_progress=on_progress)
         if result['status'] in ('resolved','already_resolved'):

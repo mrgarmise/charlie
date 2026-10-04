@@ -19,6 +19,19 @@ from .predict_robotron import predict_next
 ADAPTER = 'robotron-artifact-adapter-v1'
 
 
+def _external_observations(root,journal,episode,start_id,provenance):
+    """Acquisition overlays can arrive after capture import without new gameplay."""
+    path=root/'external-observations.json'
+    if not path.is_file():return
+    reference=dict(path=path.name,sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+    for index,row in enumerate(json.loads(path.read_text())):
+        if not isinstance(row,dict) or not row.get('source') or 'value' not in row:
+            raise ValueError('external observation needs source and value')
+        journal.append('observation',dict(category='external_observation',
+            artifact={**reference,'pointer':[index]},epistemic_status='subsystem report, not environmental truth'),
+            episode=episode,at=row.get('timestamp'),sources=[start_id],producer=ADAPTER,version='1',provenance=provenance)
+
+
 def import_episode(root, journal, *, identity=None):
     root = Path(root)
     report_path = root / 'report.json'
@@ -31,6 +44,14 @@ def import_episode(root, journal, *, identity=None):
         raise IdentityIntegrityError(identity['reason'])
     refs = {name:dict(path=name,sha256=value) for name,value in identity['artifacts'].items()}
     episode = identity['source_episode']
+    # Acquisition preserves every package independently. The content adapter
+    # observes shared experience once; copies are not another observation.
+    complete = [r for r in journal.records('event') if r.data['payload'].get('category')=='episode_import_complete'
+                and r.data['episode']==episode]
+    if complete:
+        start=next(r for r in journal.records('episode') if r.data['episode']==episode)
+        _external_observations(root,journal,episode,start.id,provenance)
+        return episode
     start = journal.append('episode', dict(artifacts=refs, capture_id=identity['capture_id'], manifest_id=identity['manifest_id'],
                            content_id=identity['content_id'], experience_id=identity['experience_id'],
                            observation_id=identity['observation_id'], independent_gameplay=identity['independent_gameplay'],
@@ -83,17 +104,13 @@ def import_episode(root, journal, *, identity=None):
             add('action_issued', ref, step.get('action_timestamp'))
         if 'shadow' in step:
             add('reported_forecast', {**ref,'pointer':ref['pointer']+['shadow']}, step.get('observed_at'))
-    external_path=root/'external-observations.json'
-    if external_path.is_file():
-        reference=dict(path=external_path.name,sha256=hashlib.sha256(external_path.read_bytes()).hexdigest())
-        for index,row in enumerate(json.loads(external_path.read_text())):
-            if not isinstance(row,dict) or not row.get('source') or 'value' not in row:
-                raise ValueError('external observation needs source and value')
-            add('external_observation',{**reference,'pointer':[index]},row.get('timestamp'))
+    _external_observations(root,journal,episode,start.id,provenance)
     # Index preflight/failure context without inventing transition timestamps.
     for field in ('startup_watch','exposure_preflight','episode_end','calibration','acquisition'):
         if field in report:
             add('session_'+field,{**refs['report.json'],'pointer':[field]})
+    journal.append('event',dict(category='episode_import_complete',content_id=identity['content_id']),
+        episode=episode,sources=[start.id],producer=ADAPTER,version='2')
     return episode
 
 

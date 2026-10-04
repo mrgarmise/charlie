@@ -35,19 +35,21 @@ def qualify_corpus(dataset, path):
     known = json.loads((Path(__file__).resolve().parents[1]/'docs/ppal/ala-1-demonstration.json').read_text())
     # Known published use must survive a new root, host or copied notebook.
     used = set(known['snapshot_split'])
-    ids=set(); captures={}; final=0; validation=0
+    from .episode_identity import qualified_reference
+    ids=set(); captures={}; final=0; validation=0; identities=[]
     for episode in episodes:
         identity=episode.get('source_episode')
         partition=episode.get('partition')
         report=episode.get('source_report',{})
-        if not report.get('path') or sha(report['path'])!=report.get('sha256') or identity!='episode:'+report['sha256']:
-            raise ValueError('episode identity must bind its preserved report bytes')
-        if not identity or identity in ids or partition not in ('validation','test'):
+        receipt=qualified_reference(dataset.journal,identity,report,capture_root=episode.get('source_capture_root'))
+        identities.append(receipt)
+        group=receipt['experience_id']
+        if not identity or group in ids or partition not in ('validation','test'):
             raise ValueError('unique physical episode and frozen partition required')
-        ids.add(identity)
+        ids.add(group)
         if partition=='test':
             final+=1
-            if identity in used or episode.get('prior_use')!='unconsulted':
+            if identity in used or 'episode:'+report['sha256'] in used or episode.get('prior_use')!='unconsulted':
                 raise ValueError('fresh final episodes required; published/declared prior use blocks reuse')
         else: validation+=1
         frames=episode.get('frames',[])
@@ -70,7 +72,7 @@ def qualify_corpus(dataset, path):
             world_from_frame(frame)  # Validate coordinates and role identities before committing.
     if final<3 or validation<1: raise ValueError('validation and three final episodes required')
     return dataset.journal.append('observation',dict(category='independent_motion_corpus',
-        corpus=corpus,artifact_sha256=sha(p)),episode=SCOPE,
+        corpus=corpus,identity_references=identities,artifact_sha256=sha(p)),episode=SCOPE,
         producer='external-motion-qualification',version=VERSION)
 
 

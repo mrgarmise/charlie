@@ -35,23 +35,34 @@ def retrieve_questions(journal, plan):
         # Independently reconstruct availability from hash-bound originals.
         # The service report is evidence to inspect, not its own ground truth.
         from .archive_audit import audit
-        results = []; episodes = set()
+        from .episode_identity import eligible, canonical_experience
+        results = []; episodes = set(); unavailable=[]
         for identifier in plan['source_evidence']:
             p = journal.get(identifier).data['payload']
             if p.get('category') != 'observation_qualification':
                 raise ValueError('capture qualification reference required')
-            saved = p['report']; actual = audit(saved['source_root'])
-            if actual != saved:
-                raise ValueError('qualified archive or measurement changed')
-            episodes.add(actual['source_episode'])
+            saved = p['report']
+            from pathlib import Path
+            root=Path(saved['source_root'])
+            if not eligible(journal,p) or not root.is_dir():
+                unavailable.append(dict(reference=identifier,reason='Original audit location unavailable or quarantined; retained finding is not erased'))
+                continue
+            actual = audit(root)
+            # Historical reports did not contain the new identity fields.
+            if any(actual.get(k)!=v for k,v in saved.items() if k!='schema'):
+                from .acquisition import maintain_episode_identity
+                maintain_episode_identity(root/saved.get('game_relative','.'),journal)
+                raise ValueError('qualified archive or measurement changed; excluded from retrieval')
+            episodes.add(canonical_experience(journal,actual['source_episode']))
             results.append(actual)
-        known = bool(results) and not any(r['binding_issues'] or any(r['torn_lines'].values()) for r in results)
+        known = bool(results) and not unavailable and not any(r['binding_issues'] or any(r['torn_lines'].values()) for r in results)
         supported = all(len(r['cadence']['compatible_pairs']) > 0 for r in results) if known else None
         return dict(capture_horizon_supported=supported,distinct_source_episodes=len(episodes),
             compatible_pairs=sum(len(r['cadence']['compatible_pairs']) for r in results),
             qualified_identities=0,fresh_final_evidence=False,
+            unavailable_references=unavailable,
             finding='Independent capture-availability audit; no motion accuracy or score evaluation',
-            missing_evidence=sorted({reason for r in results for reason in r['reasons']}))
+            missing_evidence=sorted({reason for r in results for reason in r['reasons']} | {u['reason'] for u in unavailable}))
     from .episode_identity import canonical_experience, eligible
     episodes=set(); matching=[]
     for identifier in plan['source_evidence']:
@@ -95,10 +106,18 @@ def execute(plan, dataset, output=None, **unused):
     references=[journal.append('observation',dict(category='consolidated_evidence_reference',
         record_id=i,source_episode=journal.get(i).data['episode'],journal=str(journal.path.resolve())),
         episode=plan['episode'],producer='existing-evidence-consolidation',version='ala-2').id for i in plan['source_evidence']]
+    def retrieve():
+        try:
+            return retrieve_questions(journal,plan) if plan['method']=='evidence-review' else measurements(journal,plan['evaluation_id'])
+        except (ValueError,OSError) as exc:
+            # A sealed retrieval cannot certify inconsistent bytes. Preserve the
+            # finding as inconclusive, freeing unrelated portfolio work.
+            return {plan['predicate']:None,'evidence_integrity_conflict':str(exc),
+                'independent_measurements':0,'physical_score_improvement':'UNKNOWN'}
     observed = prior[0] if prior else journal.append('observation',
         dict(category='model_diagnostic_retrieval', prediction_id=plan['prediction_id'],
              ee_episode=SCOPE,
-             measurements=(retrieve_questions(journal,plan) if plan['method']=='evidence-review' else measurements(journal, plan['evaluation_id'])),
+             measurements=retrieve(),
              interpretation='compatible signatures do not establish cause'),
         episode=plan['episode'], at=time.monotonic(), sources=[plan['prediction_id'], *references],
         producer='CapabilityRegistry:'+plan['method'], version='ala-2')

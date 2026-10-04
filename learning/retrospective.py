@@ -150,7 +150,8 @@ def ingest(root, dataset):
     episode = identity['source_episode']
     journal = dataset.journal
     existing = [r for r in journal.records() if r.data['payload'].get('category') == 'retrospective_ingestion'
-                and r.data['payload'].get('source_episode') == episode]
+                and (r.data['payload'].get('source_episode') == episode
+                     or r.data['payload'].get('context_id') in identity['historical_context_ids'])]
     if existing:
         marker = existing[-1].data['payload']
         context = journal.get(marker['context_id']).data['payload']

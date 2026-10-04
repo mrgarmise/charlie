@@ -45,8 +45,12 @@ def evaluate(journal, protocol_id, plan, episode_records):
         slot=row.get('slot');episode=row.get('source_episode')
         if type(slot) is not int or not 0<=slot<len(p['schedule']) or not episode:
             raise ValueError('scheduled slot and physical episode identity required')
-        if slot in slots or episode in episodes:raise ValueError('repeated games are not independent trials')
-        episodes.add(episode);slots[slot]=None
+        from learning.episode_identity import canonical_experience, eligible
+        group=canonical_experience(journal,episode)
+        if slot in slots or group in episodes:raise ValueError('repeated games are not independent trials')
+        episodes.add(group);slots[slot]=None
+        if not eligible(journal,row):
+            failures.append(dict(slot=slot,reason='source identity association quarantined'));continue
         scheduled=p['schedule'][slot]
         if row.get('policy')!=scheduled['policy'] or row.get('conditions')!=p['conditions']:
             failures.append(dict(slot=slot,reason='policy or environmental conditions differ'));continue
@@ -112,8 +116,8 @@ def validate_certificates(journal,row,*,protocol=None):
                                 or boundary.get('policy')!=row['policy']):
         raise ValueError('boundary must bind the preregistered slot and frozen policy')
     report=boundary.get('source_report',{})
-    if not report.get('path') or sha(report['path'])!=report.get('sha256') or row['source_episode']!='episode:'+report['sha256']:
-        raise ValueError('physical episode must bind the preserved report bytes')
+    from learning.episode_identity import qualified_reference
+    qualified_reference(journal,row['source_episode'],report,capture_root=boundary.get('source_capture_root'))
     if boundary.get('complete_game') is not True or boundary.get('end_reason') not in ('GAME OVER','terminal'):
         raise ValueError('complete GAME OVER boundary required')
     start=boundary.get('start_frame',{})

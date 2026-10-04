@@ -288,21 +288,26 @@ class LearningExecutive:
         # correlated trials; they cannot supply independent replication.
         offline = [h for h in resolved if h.get('experiment_kind') == 'offline']
         physical = [h for h in resolved if h.get('experiment_kind', 'physical') == 'physical']
+        from learning.episode_identity import canonical_experience, bindings
         units=[]
         for h in offline:
-            group=set(h.get('evidence_groups') or [h.get('independence_unit',h['episode'])])
+            group={canonical_experience(self.journal,value) for value in
+                   (h.get('evidence_groups') or [h.get('independence_unit',h['episode'])])}
             overlaps=[existing for existing in units if existing & group]
             for existing in overlaps:
                 group.update(existing); units.remove(existing)
             units.append(group)
-        effective_resolved = len(physical) + len(units)
+        physical_groups={canonical_experience(self.journal,h['episode']) for h in physical}
+        effective_resolved = len(physical_groups) + len(units)
         counts = Counter(h['result'] for h in history)
-        episodes = {h['episode'] for h in physical} | {digest(sorted(unit)) for unit in units}
+        episodes = physical_groups | {digest(sorted(unit)) for unit in units}
         conditions = {digest(h['condition']) for h in resolved}
         fraction = counts['supported'] / len(resolved) if resolved else None
         progress = dict(attempts=len(history), resolved=len(resolved), results=dict(counts),
                         episodes=len(episodes), conditions=len(conditions), support_fraction=fraction,
-                        independent_physical_episodes=len({h['episode'] for h in physical}),
+                        independent_physical_episodes=len(physical_groups),
+                        qualified_gameplay_experiences=len({b['experience_id'] for b in bindings(self.journal)
+                            if b['independent_gameplay'] and b['experience_id'] in physical_groups}),
                         offline_trials=len(offline), independent_offline_evidence_units=len(units))
         status = project['status']; rationale = None; disposition = None
         # A single success/failure is never project completion.

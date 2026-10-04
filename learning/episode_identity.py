@@ -5,7 +5,7 @@ unchanged; source locators enforce integrity, never establish independence.
 """
 import json
 from pathlib import Path
-from memory.episode_identity import inspect_capture, IdentityIntegrityError, CORE
+from memory.episode_identity import inspect_capture, IdentityIntegrityError, CORE, OVERLAYS, MANIFEST
 from memory.evidence import digest
 from .datasets import SCOPE, sha
 
@@ -13,7 +13,7 @@ VERSION = 'episode-identity-v1'
 
 
 def _events(journal, category):
-    return [r for r in journal.records('event') if r.data['payload'].get('category')==category]
+    return journal.category_records('event',category)
 
 
 def _append(journal, category, payload):
@@ -92,9 +92,9 @@ def reconcile(root, journal):
             raise IdentityIntegrityError('previously verified source locator artifacts changed')
         # Original journal manifests are authoritative even before migration.
         legacy = identity['legacy_episode_id']
-        originals = [r for r in journal.records('observation') if
-            r.data['payload'].get('category')=='learning_context_reference'
-            and r.data['payload'].get('source_episode')==legacy]
+        contexts=journal.category_records('observation','learning_context_reference')
+        originals = [r for r in contexts if r.data['payload'].get('source_episode')==legacy
+            or r.data['payload'].get('inventory')==artifacts]
         frozen = []
         for r in originals:
             p=r.data['payload']
@@ -122,7 +122,8 @@ def reconcile(root, journal):
         for r,a in frozen:
             p=r.data['payload']
             recorded=p.get('source_root')
-            if recorded==str(root) and a!=artifacts:
+            captured={k:v for k,v in a.items() if k not in OVERLAYS | {MANIFEST}}
+            if recorded==str(root) and captured!=artifacts:
                 raise IdentityIntegrityError('historically recorded source artifacts changed')
         # Keep legacy developmental identity where unambiguous. Separate qualified
         # occurrences sharing a report use their externally supported identity.
@@ -132,6 +133,13 @@ def reconcile(root, journal):
         payload=dict(identity,source_episode=episode,
                      alias_status='legacy alias retained; source occurrence not inferred from report',
                      historical_context_ids=[r.id for r in originals if not r.data['payload'].get('manifest_id')],new_physical_experience=False)
+        for original in originals:
+            old=original.data['payload']
+            if old.get('inventory')==artifacts and old.get('source_episode')!=episode:
+                _append(journal,'episode_identity_alias',dict(original_context_id=original.id,
+                    original_identifier=old.get('source_episode'),source_episode=episode,
+                    experience_id=identity['experience_id'],manifest_id=identity['manifest_id'],
+                    reason='Exact original complete inventory establishes unambiguous derived alias; original identifier retained'))
         binding=_append(journal,'episode_identity_binding',payload)
         location=_append(journal,'episode_identity_location',dict(source_root=str(root),status='verified',
             manifest_id=identity['manifest_id'],binding_id=binding.id))
@@ -144,13 +152,20 @@ def bindings(journal):
     return [r.data['payload'] for r in _events(journal,'episode_identity_binding')]
 
 
-def canonical_experience(journal, episode):
+def canonical_experience(journal, episode, *, record_id=None):
+    aliases=[r.data['payload'] for r in _events(journal,'episode_identity_alias')
+             if (record_id is not None and r.data['payload']['original_context_id']==record_id)
+             or (episode is not None and r.data['payload']['original_identifier']==episode)]
+    alias_values={a['experience_id'] for a in aliases}
+    if len(alias_values)==1: return next(iter(alias_values))
     values={b['experience_id'] for b in bindings(journal) if b['source_episode']==episode}
     return next(iter(values)) if len(values)==1 else episode
 
 
 def eligible(journal, payload):
     """A quarantined locator does not invalidate a verified copy or other source."""
+    if payload.get('category')=='independent_motion_corpus':
+        return all(eligible(journal,ref) for ref in payload.get('identity_references',[]))
     locations={}
     for r in _events(journal,'episode_identity_location'):
         locations[r.data['payload']['source_root']]=r.data['payload']
@@ -181,3 +196,37 @@ def current_conflicts(journal):
     locations={r.data['payload']['source_root']:r.data['payload'] for r in _events(journal,'episode_identity_location')}
     return [dict(case_id=l['case_id'],**journal.get(l['case_id']).data['payload'])
             for l in locations.values() if l['status']=='quarantined']
+
+
+def qualified_reference(journal, declared, report, *, capture_root=None):
+    """Verify identity and bytes for existing external evaluation interfaces.
+
+    Historical certificate schemas remain readable. Their legacy alias is
+    projected to correlated content, never counted as a new capture occurrence.
+    New occurrence identities require acquisition's verified manifest/witness.
+    """
+    if not report.get('path') or sha(report['path'])!=report.get('sha256'):
+        raise IdentityIntegrityError('preserved report bytes changed')
+    legacy='episode:'+report['sha256']
+    if capture_root is not None:
+        identity=reconcile(capture_root,journal)
+        if identity['status']!='verified' or identity['artifacts'].get('report.json')!=report['sha256']:
+            raise IdentityIntegrityError('capture association quarantined or report outside immutable manifest')
+        if declared not in (identity['source_episode'],identity['legacy_episode_id']):
+            raise IdentityIntegrityError('declared evaluation identity disagrees with capture provenance')
+        if identity['independent_gameplay'] and declared==legacy:
+            # Ambiguous legacy aliases cannot select one qualified occurrence.
+            raise IdentityIntegrityError('qualified distinct occurrence requires its explicit experience identity')
+        return dict(source_episode=identity['source_episode'],experience_id=identity['experience_id'],
+            manifest_id=identity['manifest_id'],capture_id=identity['capture_id'],
+            observation_id=identity['observation_id'],independent_gameplay=identity['independent_gameplay'])
+    if declared!=legacy:
+        raise IdentityIntegrityError('identity must bind preserved report bytes; new identity requires verified complete capture association')
+    candidates=[b for b in bindings(journal) if b['legacy_episode_id']==legacy]
+    groups={b['experience_id'] for b in candidates}
+    if len(groups)>1:
+        raise IdentityIntegrityError('legacy evaluation identity is ambiguous across experience occurrences')
+    if candidates and not any(eligible(journal,b) for b in candidates):
+        raise IdentityIntegrityError('source association quarantined; excluded from qualification')
+    return dict(source_episode=legacy,experience_id=next(iter(groups)) if groups else legacy,
+                observation_id=None,legacy_identity=True,independent_gameplay=False)

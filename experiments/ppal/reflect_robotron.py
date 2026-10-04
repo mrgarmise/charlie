@@ -607,7 +607,7 @@ def reflect_question_investigations(dataset,gateway,registry):
         if p.get('category')!='learning_context_reference' or not eligible(dataset.journal,p):continue
         for q in p['context'].get('questions',[]):
             if isinstance(q.get('category'),str) and q['category']:
-                grouped.setdefault(q['category'],{}).setdefault(canonical_experience(dataset.journal,p.get('source_episode')),record)
+                grouped.setdefault(q['category'],{}).setdefault(canonical_experience(dataset.journal,p.get('source_episode'),record_id=record.id),record)
     output=[]
     for category,records in sorted(grouped.items()):
         sources=[r.id for r in records.values()]

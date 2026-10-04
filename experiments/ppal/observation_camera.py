@@ -4,7 +4,8 @@ import time
 
 class ObservedCamera:
     """Retain the full camera frame without changing calibration/capture callers."""
-    def __init__(self, source, *, require_fresh=False, publisher=None, progress=None):
+    def __init__(self, source, *, require_fresh=False, publisher=None, progress=None,
+                 neck_service=None):
         self.progress = progress
         self.source = source
         self.require_fresh = require_fresh
@@ -14,6 +15,7 @@ class ObservedCamera:
         self.publisher = publisher
         self.viewer_state = None
         self.read_failures = 0
+        self.neck_service = neck_service
 
     def read(self):
         if self.progress: self.progress.enter('camera')
@@ -38,6 +40,12 @@ class ObservedCamera:
         if self.timestamp is None:
             self.timestamp = time.monotonic()
         if self.progress: self.progress.fresh(self.timestamp)
+        if self.neck_service is not None:
+            # Share capture cadence; no extra capture, inference, or threads.
+            self.neck_service.observe_primary(observation_evidence=dict(
+                capture_timestamp=self.timestamp, capture=self.capture,
+                frame_available=self.raw is not None,
+                fixed_scene_displacement='unavailable; saved geometry is not a fresh measurement'))
         if self.publisher is not None:
             self.viewer_state = {'attached':self.publisher.attached,
                                  'checked_at':self.publisher.demand_checked_at}

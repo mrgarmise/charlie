@@ -132,8 +132,17 @@ class Calibration:
             self.check(session,epoch,current_run=False)
             if self.state not in (self.READY,self.CLOSED,self.ABORTED) or self.a._armed or self.a._task=='PRIMARY':
                 raise MotionError('CALIBRATION_OWNER_CONFLICT')
-            if len(self.events) > 160: raise MotionError('REBOOT_AND_ARCHIVE_REQUIRED')
-            self.run_id = token(data.get('run_id'))
+            next_run = token(data.get('run_id'))
+            if self.run_id == next_run:
+                raise MotionError('FRESH_CAL_RUN_REQUIRED')
+            # Host acknowledges a durably archived terminal run. Keep each
+            # installed session bounded without requiring a firmware reinstall
+            # or throwing away evidence that has not been acknowledged.
+            if (self.state in (self.CLOSED,self.ABORTED) and self.events
+                    and data.get('archived_run_id') == self.run_id and self.sink is not None):
+                self.events = []
+            if len(self.events) > 160: raise MotionError('ARCHIVE_PREVIOUS_RUN_REQUIRED')
+            self.run_id = next_run
             self.initial = self.pending = None
             self.used_steps = set()
             self.expected_epoch = epoch

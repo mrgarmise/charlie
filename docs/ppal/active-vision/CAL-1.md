@@ -4,6 +4,10 @@ Independent interrupted-session recovery and malformed-telemetry correction:
 [CAL-1-recovery-validation.md](CAL-1-recovery-validation.md). Physical acceptance
 remains pending; this software validation does not authorize deployment.
 
+Permanent application integration, durable Executive requests, primary-task
+monitoring and controlled upgrade/rollback:
+[CAL-1-integration-acceptance.md](CAL-1-integration-acceptance.md).
+
 Base: `b29ee2b3dc9b2a5c5eb353ee296c270f02601472`, branch
 `feature/active-vision`. Physical authorization remains **false**. Implementation
 and tests use fake hardware. No firmware was flashed, servo PWM physically
@@ -80,8 +84,10 @@ stage and the next-step readiness window has a 30-second deadline; heartbeat
 cannot prolong it. The existing communication watchdog remains effective.
 Timeout, STOP, reconnect, primary takeover, input failure or evidence failure
 revokes permits and disables both PWMs. Re-entry requires new verification;
-reboot never restores a run, step or grant. Evidence capacity is bounded; full
-logs require archival/reboot rather than losing prior entries or continuing.
+reboot never restores a run, step or grant. Evidence capacity is bounded per
+run. A fresh run can reset a terminal buffer only after the Pi acknowledges a
+durably archived predecessor; otherwise full logs block further sessions.
+No firmware reinstallation or reboot is required between archived sessions.
 
 Events record run/session/epoch, direction, requested and commanded pose,
 operator evidence references, visual displacement, permits, completion and
@@ -179,7 +185,10 @@ electrical clearance and separately authorized physical methods. It cannot
 clear quarantine or arm motion. No ALA-2 branch or unfinished implementation
 is modified. Your additional criterion ended at “Expose”; these interfaces and
 an independently tested blocked Executive proposal implement the visible
-integration requirement.
+integration requirement. The permanent `CalibrationService` now connects this
+capability to normal Pi application observations and reconstructs pending
+requests after restart. See the integration acceptance report above for exact
+resource ownership and observation limitations.
 
 ## Pi staging now — code only, no hardware access
 

@@ -1,4 +1,4 @@
-"""Strict RP2040 protocol. No serial command can physically arm or calibrate."""
+"""Strict RP2040 protocol. UART requests cannot grant physical permission."""
 try:
     import ujson as json
 except ImportError:
@@ -59,7 +59,9 @@ class CommandHandler:
                 if len(values)!=4: raise MotionError('MALFORMED_COMMAND')
                 session,revision=values[1:3];data=json.loads(values[3])
                 if not isinstance(data,dict): raise MotionError('INVALID_CAL_REQUEST')
-                if name=='CAL': servos.calibration.request(session,epoch(revision),data)
+                if name=='CAL':
+                    servos.calibration.request(session,epoch(revision),data)
+                    self.behaviors.set_mode(self.behaviors.IDLE)
                 else: servos.confirm_start_pose(session,epoch(revision),data.get('pose'),data)
                 print('OK',name)
             elif name=='AUTOSTART':

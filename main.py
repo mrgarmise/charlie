@@ -1,4 +1,6 @@
 import time
+import os
+from pathlib import Path
 
 from motion.controller import Deck
 from attention.manager import AttentionManager
@@ -14,6 +16,11 @@ from vision.stimulus import VisionStimulus
 
 
 deck = Deck()
+from hardware.calibration_service import CalibrationService
+neck = CalibrationService.open(deck.body, Path(os.environ.get(
+    'CHARLIE_NECK_STATE', str(Path.home() / '.local/share/charlie/neck'))))
+deck.calibration = neck
+neck.refresh()
 
 bus = StimulusBus()
 attention = AttentionManager(bus)
@@ -30,7 +37,8 @@ detector = ColorDetector(
 vision = VisionStimulus(
     camera,
     detector,
-    bus
+    bus,
+    neck_observer=deck.observe_neck
 )
 
 # Start idle explicitly.
@@ -45,3 +53,10 @@ try:
 finally:
     attention.close()
     camera.close()
+    try:
+        neck.close()
+    finally:
+        try:
+            deck.stop()
+        finally:
+            deck.body.close()

@@ -8,9 +8,19 @@ class Deck:
     This class intentionally knows nothing about the ELEGOO car.
     """
 
-    def __init__(self):
+    def __init__(self, *, body=None, calibration=None):
 
-        self.body = RP2040Controller()
+        self.body = body if body is not None else RP2040Controller()
+        self.calibration = calibration
+
+    def request_calibration(self, reason, evidence):
+        if self.calibration is None:
+            raise RuntimeError('CAL-1 service not attached')
+        return self.calibration.request(reason, evidence)
+
+    def observe_neck(self, **observation):
+        if self.calibration is not None:
+            return self.calibration.observe_primary(**observation)
 
     # --------------------------------------------------
     # MOTION

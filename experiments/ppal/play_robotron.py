@@ -19,6 +19,7 @@ from pathlib import Path
 import time
 import hashlib
 import subprocess
+import os
 
 from .arcade_transport import ArcadeController
 from .forebrain import Forebrain
@@ -409,6 +410,9 @@ def main():
     parser.add_argument('--experiment-plan', type=Path,
                         help='one precommitted developmental actuator experiment')
     parser.add_argument('--observer-context', type=Path, help='optional display-only project context; never policy input')
+    parser.add_argument('--neck-state-directory', type=Path,
+                        default=os.environ.get('CHARLIE_NECK_STATE'),
+                        help='installed CAL-1 durable state; monitor only, never authorize neck motion')
     parser.add_argument('--learned-semantics',type=Path,help='separately authorized, independently validated candidate-crop activation manifest')
     args = parser.parse_args()
 
@@ -602,8 +606,19 @@ def main():
     controller = None
     result = "not started"
     episode_end = {"state": "unknown", "confirmed": False, "evidence": None}
+    neck = None
+    neck_controller = None
 
     try:
+        if args.neck_state_directory is not None:
+            from hardware.rp2040_controller import RP2040Controller
+            from hardware.calibration_service import CalibrationService
+            neck_controller = RP2040Controller()
+            neck = CalibrationService.open(neck_controller, args.neck_state_directory)
+            neck.refresh()
+            if not neck_controller.primary_ownership():
+                raise ConnectionError('CAL-1 primary ownership unavailable; no neck activation attempted')
+            source.neck_service = neck
         # Start the camera first. In normal operation this happens while Robotron
         # is still in attract/demo mode, giving exposure/AF time without costing
         # any gameplay. No demo-screen calibration is attempted.
@@ -1154,6 +1169,15 @@ def main():
             except (OSError, ConnectionError):
                 pass
         source.close()
+        if neck is not None:
+            try:
+                neck.close()
+            finally:
+                neck_controller.stop()
+                neck_controller.close()
+        elif neck_controller is not None:
+            neck_controller.stop()
+            neck_controller.close()
         if progress: progress.enter('finalizing')
         if publisher is not None:
             publisher.close()

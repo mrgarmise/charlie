@@ -161,7 +161,8 @@ class ActiveVision:
     """
     def __init__(self, source_factory, controller, output, *, initial_pose,
                  authorized=False, simulated=False, detector=discover,
-                 config=None, publisher_factory=None, journal=None, reacquisition=None, neck_health=None, wait=time.sleep):
+                 config=None, publisher_factory=None, journal=None, reacquisition=None, neck_health=None,
+                 calibration_service=None, wait=time.sleep):
         self.source_factory = source_factory
         self.controller = controller
         self.output = Path(output)
@@ -177,6 +178,7 @@ class ActiveVision:
         self.wait = wait
         self.journal = journal
         self.neck_health = neck_health
+        self.calibration_service = calibration_service
         self._last_corners = None
         self._health_observation_size = None
         self.state = State.ACQUIRE
@@ -336,6 +338,11 @@ class ActiveVision:
                     raise ConnectionError('RP2040 local physical arm and assembled calibration required')
                 envelope = status['envelope']
                 self._health_observation_size=envelope.get('observation_size')
+                if self.calibration_service is not None:
+                    profile=self.calibration_service.refresh()
+                    if profile is None or profile['calibration_id']!=envelope['calibration_id']:
+                        raise PermissionError('durable Pi/RP2040 qualified profile agreement required')
+                    self.neck_health=self.calibration_service.health
                 if status.get('neck_health_required') and self.neck_health is None:
                     from hardware.neck_health import NeckHealth
                     self.neck_health = NeckHealth(self.controller,envelope['calibration_id'],

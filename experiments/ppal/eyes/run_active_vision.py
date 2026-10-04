@@ -8,6 +8,7 @@ import argparse
 from pathlib import Path
 import signal
 import time
+import os
 from .active_vision import ActiveVision, Config, discover, robotron_target
 
 
@@ -16,6 +17,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--target', choices=('rectangle','robotron'), default='rectangle')
     parser.add_argument('--port', default='/dev/ttyACM0')
+    parser.add_argument('--neck-state-directory', type=Path,
+        default=Path(os.environ.get('CHARLIE_NECK_STATE', str(Path.home()/'.local/share/charlie/neck'))))
     parser.add_argument('--authorize-head-motion', action='store_true')
     for name in ('pan-min', 'pan-max', 'tilt-min', 'tilt-max'):
         parser.add_argument('--' + name, type=float)
@@ -47,8 +50,11 @@ def main():
     from .sources import PiCameraSource
     from .passive import PassivePublisher
     controller = RP2040Controller(port=args.port)
+    neck = None
     handlers = {}
     try:
+        from hardware.calibration_service import CalibrationService
+        neck = CalibrationService.open(controller, args.neck_state_directory)
         deadline=time.monotonic()+args.wait_for_local_arm
         while True:
             status=controller.motion_status()
@@ -61,7 +67,8 @@ def main():
         optimizer = ActiveVision(lambda:PiCameraSource(role='active_vision'), controller, args.output,
             initial_pose=(status['pan'],status['tilt']), authorized=True,
             detector=robotron_target if args.target=='robotron' else discover,
-            publisher_factory=PassivePublisher, config=cfg)
+            publisher_factory=PassivePublisher, config=cfg,
+            journal=neck.journal, calibration_service=neck)
         def interrupt(signum, frame):
             optimizer.interrupt()
             raise InterruptedError(f'interrupted by signal {signum}')
@@ -72,8 +79,11 @@ def main():
     finally:
         for number, handler in handlers.items():
             signal.signal(number, handler)
-        try:controller.stop()
-        finally:controller.close()
+        try:
+            if neck is not None:neck.close()
+        finally:
+            try:controller.stop()
+            finally:controller.close()
 
 
 if __name__ == '__main__':

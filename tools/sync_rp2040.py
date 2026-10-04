@@ -97,9 +97,8 @@ class Synchronizer:
         )
         print()
 
-        files = sorted(
-            RP2040_DIR.glob("*.py")
-        )
+        # Publish the scheduler only after its application dependencies.
+        files = sorted(RP2040_DIR.glob("*.py"), key=lambda path: (path.name == 'main.py', path.name))
 
         if not files:
 
@@ -191,8 +190,8 @@ class Synchronizer:
 
     def synchronize(self):
 
-        self.synchronize_application()
         self.synchronize_libraries()
+        self.synchronize_application()
 
         print()
         print(

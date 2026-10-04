@@ -73,6 +73,7 @@ class ProfileRepository:
         result=json.loads(raw)
         from rp2040.neck_profile_schema import validate
         validate(result)
+        if result.get('calibration_id')!=name: raise ValueError('profile identifier mismatch')
         if result.get('validation_status')!='QUALIFIED' or result.get('simulated') is not False or result.get('hardware')!=HARDWARE:
             raise ValueError('unverified profile')
         return result
@@ -81,6 +82,7 @@ class ProfileRepository:
         document=self.read(name)
         from rp2040.neck_profile_schema import validate
         validate(document)
+        if document.get('calibration_id')!=name: raise ValueError('profile identifier mismatch')
         if (document.get('validation_status')!='QUALIFIED' or document.get('simulated') is not False
                 or document.get('hardware')!=HARDWARE or (self.directory/(name+'.quarantine.json')).exists()
                 or (self.directory/(name+'.running')).exists()):
@@ -218,12 +220,16 @@ def independently_qualify(candidate, *, name, reviewer, evidence, physical_valid
 
 class SupervisedCalibration:
     """Existing UART transport + durable log; never owns PWM or camera."""
-    def __init__(self, controller, evidence):
+    def __init__(self, controller, evidence, *, archived_run_id=None):
         self.controller,self.evidence=controller,evidence
+        self.archived_run_id=archived_run_id
         self.previous_sink=getattr(controller,'calibration_sink',None)
         controller.calibration_sink=evidence.append
 
     def request(self,data):
+        data=dict(data)
+        if data.get('op')=='begin' and self.archived_run_id is not None:
+            data['archived_run_id']=self.archived_run_id
         status=self.controller.motion_status()
         if not status or status.get('session')!=self.controller.link_session: raise ConnectionError('live session required')
         self.evidence.append(dict(kind='operator_request',request=data,epoch=status['epoch']))
@@ -238,7 +244,12 @@ class SupervisedCalibration:
 
     def close(self):
         try:
-            self.evidence.append(dict(kind='interruption_requested',reason='supervisor_closed'))
-            self.controller.stop()
-            self.poll()
-        finally: self.controller.calibration_sink=self.previous_sink
+            status=self.poll()
+            self.evidence.append(dict(kind='supervisor_closed',state=status['state'],
+                                     run_id=status['run_id']))
+        finally:
+            # A failed status read or journal write must still revoke PWM.
+            try:
+                self.controller.stop()
+                self.poll()
+            finally: self.controller.calibration_sink=self.previous_sink

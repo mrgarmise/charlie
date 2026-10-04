@@ -26,7 +26,7 @@ def cal(board):
         board.pressed[0]=contact
         for _ in range(count):board.now[0]+=20;a.update()
     def request(op,**kw):
-        data=dict(op=op,run_id='calibration_001',**kw)
+        data=dict(op=op,run_id='calibration_001');data.update(kw)
         return a.calibration.request(a._session,a._epoch,data)
     proof=dict(operator='operator_001',evidence='evidence_001',pose_verified=True,pulse_mapping_verified=True,
         clearance_verified=True,cutoff_verified=True,external_power_off=True,supervised=True,
@@ -123,7 +123,7 @@ def test_interruptions_revoke_pending_permit_disable_pwm_and_record(cal,interrup
 def test_reentry_requires_new_pose_verification_and_reboot_restores_no_grants(cal):
     cal.ready();cal.prepare();old=cal.a._epoch;cal.a.stop()
     with pytest.raises(RuntimeError):cal.a.calibration.request('session_1234',old,dict(op='prepare',run_id='calibration_001'))
-    cal.request('begin');cal.tick(True);cal.tick(False)
+    cal.request('begin',run_id='calibration_002');cal.tick(True);cal.tick(False)
     assert not cal.b.pwms
     new=cal.b.module.ServoController()
     assert not new.status()['armed'] and new.calibration.state=='DISABLED' and new._session is None
@@ -452,7 +452,14 @@ def test_qualified_autonomous_optimizer_with_health_uses_no_gp10(board,tmp_path,
     from experiments.ppal.eyes.simulate_active_vision import SimulatedCamera
     from experiments.ppal.eyes.camera_lease import CameraLease
     from PIL import ImageChops
+    from hardware.calibration_service import CalibrationService
+    from hardware.neck_calibration import ProfileRepository
+    from memory.evidence import EvidenceJournal
     host,a,_=transport(board)
+    repo=ProfileRepository(tmp_path/'profiles')
+    p=copy.deepcopy(PROFILE);p['visual_response']=dict(pan=[10,0],tilt=[0,2])
+    repo.save(p);repo.activate(p['calibration_id'])
+    service=CalibrationService(host,repo,EvidenceJournal(tmp_path/'neck.sqlite3'))
     a._input=None
     a.envelope.rate=rate
     a._autonomous_enabled=True;a._profile_operation=lambda _:None;a._quarantine=lambda _:None
@@ -473,12 +480,15 @@ def test_qualified_autonomous_optimizer_with_health_uses_no_gp10(board,tmp_path,
         source.camera=SimpleNamespace(lease=lease);original=source.close
         source.close=lambda:(original(),lease.close());return source
     def wait(seconds):board.now[0]+=int(seconds*1000);a.update()
-    optimizer=ActiveVision(factory,host,tmp_path/'autonomous',initial_pose=(90,90),authorized=True,wait=wait)
+    optimizer=ActiveVision(factory,host,tmp_path/'autonomous',initial_pose=(90,90),authorized=True,
+                           wait=wait,calibration_service=service)
     result=optimizer.run()
     assert result['state']=='LOCKED' and optimizer.neck_health is not None
     assert not optimizer.neck_health.quarantined and a._input is None
     # No button polling is needed: its fake state stays released throughout.
     assert board.pressed[0] is False and result['resources_released'] and not a.status()['pwm_active']
+    assert optimizer.neck_health is service.health and not service.requests()
+    service.close()
 
 
 @pytest.mark.parametrize('condition',['released','held','gp10_as_arm','missing_persistent'])

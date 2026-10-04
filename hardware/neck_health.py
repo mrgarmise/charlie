@@ -63,7 +63,12 @@ class NeckHealth:
             delta=float(np.mean(np.linalg.norm(np.asarray(corners)-np.asarray(pending['previous_corners']),axis=1)))
             degrees=sum(abs(a-b) for a,b in zip(pending['previous_pose'],pending['requested_pose']))
             commanded=[telemetry.get('pan'),telemetry.get('tilt')]
-            if (any(v is None for v in commanded) or any(abs(a-b)>.05 for a,b in zip(commanded,pending['requested_pose']))
+            # JSON telemetry must contain finite numeric position estimates.
+            # NaN comparisons are false and otherwise silently admit uncertainty.
+            if any(type(v) not in (int,float) or not math.isfinite(v) for v in commanded):
+                return self.unsafe('invalid commanded position telemetry',command=pending,
+                                   reported_positions=[repr(v) for v in commanded])
+            if (any(abs(a-b)>.05 for a,b in zip(commanded,pending['requested_pose']))
                     or delta<self.minimum*degrees or delta>self.maximum*degrees):
                 return self.unsafe('command-to-view discrepancy',visual_displacement=delta,command=pending,
                                    telemetry=telemetry)

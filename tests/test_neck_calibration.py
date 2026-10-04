@@ -324,6 +324,20 @@ def test_health_tracks_normal_moves_and_ordinary_scene_changes_without_fault(tmp
     assert not stops and not invalid and not h.quarantined
 
 
+@pytest.mark.parametrize('axis', ['pan', 'tilt'])
+@pytest.mark.parametrize('value', [float('nan'), float('inf'), float('-inf'), None, 'invalid', True])
+def test_health_invalid_commanded_position_revokes_and_quarantines(tmp_path, axis, value):
+    h,c,t,stops,invalid,events,repo=health_fixture(tmp_path)
+    h.prepare([90,90],[90.5,90],c)
+    t[axis]=value
+    h.observe([[x+2,y] for x,y in c],telemetry=t)
+    assert stops and invalid and h.quarantined
+    assert (repo.directory/'qualified_001.quarantine.json').exists()
+    assert all(not e['mechanical_fault_confirmed'] for e in events)
+    assert any(e.get('alternatives') for e in events)
+    with pytest.raises(PermissionError):h.prepare([90.5,90],[91,90],c)
+
+
 def test_health_persistent_uncommanded_camera_change_requires_recalibration(tmp_path):
     h,c,t,stops,*_=health_fixture(tmp_path);h.observe(c)
     moved=[[x+40,y] for x,y in c]

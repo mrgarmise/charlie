@@ -1,5 +1,9 @@
 # CAL-1 — reusable supervised neck calibration and health
 
+Independent interrupted-session recovery and malformed-telemetry correction:
+[CAL-1-recovery-validation.md](CAL-1-recovery-validation.md). Physical acceptance
+remains pending; this software validation does not authorize deployment.
+
 Base: `b29ee2b3dc9b2a5c5eb353ee296c270f02601472`, branch
 `feature/active-vision`. Physical authorization remains **false**. Implementation
 and tests use fake hardware. No firmware was flashed, servo PWM physically

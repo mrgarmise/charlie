@@ -6,6 +6,26 @@ from learning.datasets import ExperienceDataset
 from learning.acquisition import collect_crops,apply_annotations
 
 
+def test_history_transfer_has_verified_manifest_and_no_episode_credit(tmp_path):
+    import tarfile, hashlib
+    from pathlib import Path
+    from learning.acquisition import export_history
+    from memory.evidence import EvidenceJournal
+    output=tmp_path/'notebook'
+    j=EvidenceJournal(output/'learning-evidence.sqlite3')
+    row=j.append('observation',dict(example=True),episode='fixture',producer='test',version='1')
+    j.close()
+    exported=export_history(output)
+    assert Path(exported['package']).parent.parent==output/'exports'/'evidence'
+    manifest=json.loads(Path(exported['manifest']).read_text())
+    assert manifest['original_content_ids']==[row.id] and manifest['export_is_copy']
+    with tarfile.open(exported['package']) as archive:
+        for name,digest in manifest['files'].items():
+            assert hashlib.sha256(archive.extractfile('notebook/'+name).read()).hexdigest()==digest
+    assert export_history(output)==exported
+    assert exported['new_physical_experience'] is False
+
+
 def fixture(tmp_path):
     root=tmp_path/'game';root.mkdir();Image.new('RGB',(40,40),'red').save(root/'raw-1.png')
     (root/'report.json').write_text('{"result":"OBSERVATION UNCERTAIN"}')

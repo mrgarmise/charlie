@@ -77,6 +77,32 @@ class EvidenceJournal:
     def close(self):
         self.conn.close()
 
+    def merge_from(self, source):
+        """Add original records without changing their content or commitment time.
+
+        Source order and causal references are retained. This imports history;
+        it does not re-observe events, commission work or deliver semantic memory.
+        """
+        source.verify()
+        added = []
+        with self.batch():
+            for row in source.records():
+                try:
+                    existing = self.get(row.id)
+                except KeyError:
+                    existing = None
+                if existing is not None:
+                    if existing.document != row.document:
+                        raise ValueError('conflicting original evidence content')
+                    continue
+                for reference in row.data['sources']:
+                    self.get(reference)
+                self.conn.execute('INSERT INTO records(id,document,committed_at) VALUES (?,?,?)',
+                                  (row.id, row.document, row.committed_at))
+                added.append(row.id)
+            self.verify()
+        return added
+
     def records(self, kind=None):
         query = "SELECT sequence,id,document,committed_at FROM records"
         args = ()

@@ -5,6 +5,68 @@ from memory.evidence import digest
 from .datasets import sha,SCOPE
 
 
+def export_history(output):
+    """Evidence-owned immutable transfer; exported copies are not new episodes."""
+    import fcntl
+    import tarfile
+    from memory.evidence import EvidenceJournal
+    from .foundry import atomic_json
+    from .cycle import gameplay_active
+    if gameplay_active():
+        raise RuntimeError('offline export unavailable during gameplay')
+    output = Path(output).resolve()
+    if not (output/'learning-evidence.sqlite3').is_file():
+        raise ValueError('existing persistent notebook required')
+    with (output/'offline.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        journal = EvidenceJournal(output/'learning-evidence.sqlite3', read_only=True)
+        try:
+            ids = [r.id for r in journal.records()]
+        finally:
+            journal.close()
+        files = {p.relative_to(output).as_posix(): sha(p)
+                 for p in sorted(output.rglob('*')) if p.is_file()
+                 and 'exports' not in p.relative_to(output).parts
+                 and not p.name.endswith(('.lock', '-wal', '-shm'))}
+        if any(output.rglob('*-wal')):
+            raise ValueError('uncheckpointed notebook WAL; no incomplete export')
+        identity = digest(dict(files=files, original_content_ids=ids))
+        directory = output/'exports'/'evidence'/identity
+        directory.mkdir(parents=True, exist_ok=True)
+        package = directory/'meditation-history.tar.gz'
+        manifest = directory/'manifest.json'
+        if not package.exists():
+            temporary = directory/'transfer.partial'
+            with tarfile.open(temporary, 'w:gz') as archive:
+                for name in files:
+                    archive.add(output/name, arcname='notebook/'+name, recursive=False)
+                import io
+                raw = json.dumps(dict(schema='charlie-evidence-history-transfer-v1',
+                    files=files, original_content_ids=ids, export_is_copy=True,
+                    new_physical_experience=False, physical_authorization=False), sort_keys=True).encode()
+                metadata = tarfile.TarInfo('TRANSFER.json'); metadata.size = len(raw)
+                archive.addfile(metadata, io.BytesIO(raw))
+            # Source mutation or torn transfer never becomes a published package.
+            if any(sha(output/name) != value for name, value in files.items()):
+                raise ValueError('notebook changed during export')
+            with tarfile.open(temporary) as archive:
+                import hashlib
+                if {m.name.removeprefix('notebook/'): hashlib.sha256(archive.extractfile(m).read()).hexdigest()
+                    for m in archive.getmembers() if m.name.startswith('notebook/')} != files:
+                    raise ValueError('transfer bytes do not match notebook')
+            temporary.rename(package)
+        document = dict(schema='charlie-evidence-history-transfer-v1',
+            original_content_ids=ids, files=files, package_sha256=sha(package),
+            original_physical_episodes=False, export_is_copy=True, physical_authorization=False)
+        if manifest.exists():
+            if json.loads(manifest.read_text()) != document:
+                raise ValueError('existing export changed')
+        else:
+            atomic_json(manifest, document)
+        return dict(package=str(package), manifest=str(manifest), package_sha256=document['package_sha256'],
+                    records=len(ids), new_physical_experience=False)
+
+
 def collect_crops(root,dataset,*,max_crops=128):
     from .cycle import gameplay_active
     if gameplay_active():raise RuntimeError('offline acquisition unavailable during gameplay')
@@ -70,9 +132,14 @@ def main():
     from .cycle import gameplay_active
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--episode',type=Path);p.add_argument('--annotations',type=Path)
+    p.add_argument('--export-history',action='store_true')
     p.add_argument('--max-crops',type=int,default=128);a=p.parse_args()
     if gameplay_active():p.error('offline only')
-    if bool(a.episode)==bool(a.annotations):p.error('choose one extraction or annotation operation')
+    if sum((bool(a.episode), bool(a.annotations), a.export_history)) != 1:
+        p.error('choose one extraction, annotation or history export operation')
+    if a.export_history:
+        print(json.dumps(export_history(a.output)))
+        return
     j=EvidenceJournal(a.output/'learning-evidence.sqlite3');ds=ExperienceDataset(j,a.output/'pixels')
     try:print(json.dumps(collect_crops(a.episode,ds,max_crops=a.max_crops) if a.episode else {'annotations':apply_annotations(ds,a.annotations)}))
     finally:j.close()

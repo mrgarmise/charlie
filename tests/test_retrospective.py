@@ -131,3 +131,62 @@ def test_dispatch_interruption_resumes_without_duplicate_bookmark(tmp_path,monke
     assert sum(r.data['payload'].get('op')=='meditation_dispatch' for r in events)==1
     assert result['results'][0]['result']['result']=='unresolved'
     assert investigate(ds,g,diagnostics_only=True,max_jobs=1)['results']==[]
+
+
+def test_normal_cycle_and_retrospective_share_one_episode_import(tmp_path):
+    import shutil
+    from PIL import Image
+    from learning.cycle import ingest_episode
+    root=episode(tmp_path);out=tmp_path/'output'
+    Image.new('RGB',(16,16),'cyan').save(root/'review-001.jpg')
+    run([root],out)
+    j=EvidenceJournal(out/'learning-evidence.sqlite3');ds=ExperienceDataset(j,out/'pixels')
+    assert ingest_episode(root,ds,None)['ingestion_status']=='preserved'
+    before=[r.id for r in j.records()]
+    assert len(ds.examples())==1
+    relocated=tmp_path/'copy';shutil.copytree(root,relocated)
+    assert ingest_episode(relocated,ds,None)['ingestion_status']=='preserved'
+    assert [r.id for r in j.records()]==before
+    j.close()
+
+
+def test_original_history_merge_is_additive_and_repeat_safe(tmp_path):
+    from learning.retrospective import merge_history
+    source=tmp_path/'old';target=tmp_path/'new'
+    j=EvidenceJournal(source/'learning-evidence.sqlite3')
+    first=j.append('observation',dict(original=True),episode='original',producer='fixture',version='1')
+    j.append('event',dict(prior=True),episode='original',sources=[first.id],producer='fixture',version='1')
+    original=j.records();j.close();before=inventory(source)
+    receipt=merge_history(source,target)
+    assert receipt['added_records']==2 and inventory(source)==before
+    merged=EvidenceJournal(target/'learning-evidence.sqlite3',read_only=True)
+    for row in original:
+        assert merged.get(row.id).document==row.document
+        assert merged.get(row.id).committed_at==row.committed_at
+    count=len(merged.records());merged.close()
+    assert merge_history(source,target)['added_records']==0
+    merged=EvidenceJournal(target/'learning-evidence.sqlite3',read_only=True)
+    assert len(merged.records())==count;merged.close()
+    assert merge_history(tmp_path/'missing',target)['status']=='unavailable'
+
+
+def test_invalid_budget_does_not_ingest_or_create_notebook(tmp_path):
+    root=episode(tmp_path)
+    with pytest.raises(ValueError,match='bounded'):
+        run([root],tmp_path/'output',max_jobs=24)
+    assert not (tmp_path/'output').exists()
+
+
+def test_normal_cycle_resumes_the_same_executive_notebook(tmp_path,monkeypatch):
+    import sys
+    from learning.cycle import main
+    root=episode(tmp_path);out=tmp_path/'output';run([root],out)
+    j=EvidenceJournal(out/'learning-evidence.sqlite3',read_only=True)
+    before=[r.id for r in j.records()];j.close()
+    monkeypatch.setattr(sys,'argv',['cycle',str(root),'--output',str(out),
+        '--diagnostics-only','--review-questions'])
+    main()
+    j=EvidenceJournal(out/'learning-evidence.sqlite3',read_only=True)
+    assert [r.id for r in j.records()]==before;j.close()
+    assert (out/'evaluator.sqlite3').exists()
+    assert not (out/'learning-project-evidence.sqlite3').exists()

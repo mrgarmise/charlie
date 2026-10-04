@@ -33,28 +33,34 @@ def gameplay_active():
 
 def ingest_episode(root, dataset, gateway):
     """Reuse existing immutable import and context Reflection; no tracker pass."""
-    from experiments.ppal.episode_evidence import import_episode
-    from experiments.ppal.reflect_robotron import reflect_episode_context
-    root=Path(root)
-    source=EvidenceJournal(dataset.artifacts.parent/('import-'+digest(str(root.resolve()))[:16]+'.sqlite3'))
-    try:
-        episode=import_episode(root,source)
-        context=reflect_episode_context(root,source,episode,gateway)
-        reference=dataset.journal.append('observation',dict(category='learning_context_reference',
-            context=context,source_journal=str(source.path.resolve()),source_id=context['evidence_id'],
-            source_episode=episode,source_sha256=sha(root/'report.json') if (root/'report.json').exists() else None),
-            episode=SCOPE,producer='existing-evidence-consolidation',version='ala-1')
-        # Existing saved review frames are a deliberately selected, biased subset.
-        # This dataset contains all of that subset, never fictional capture frames.
-        examples=[]
-        for path in sorted(root.glob('review-*.jpg')):
-            examples.append(dataset.add(path,episode=episode,source=dict(journal=str(source.path.resolve()),
-                context_id=context['evidence_id'],artifact=str(path.resolve()),sha256=sha(path)),
-                metadata=dict(review_subset=True,identity_status='unknown',
-                    physical_experiment=episode,temporal_context='see original agency/action evidence',
-                    context_reference=reference.id)).id)
-        return dict(episode=episode,context_id=reference.id,examples=examples)
-    finally: source.close()
+    from .retrospective import ingest
+    root = Path(root)
+    marker = ingest(root, dataset)
+    record = dataset.journal.get(marker['record_id'])
+    reference = dataset.journal.get(record.data['payload']['context_id'])
+    source_path = reference.data['payload'].get('source_journal')
+    examples = []
+    for path in sorted(root.glob('review-*.jpg')):
+        original_hash = sha(path)
+        previous = [r for r in dataset.journal.records('observation')
+            if r.data['payload'].get('category') == 'experience_example'
+            and r.data['payload'].get('source_episode') == marker['source_episode']
+            and r.data['payload'].get('original_sha256') == original_hash
+            and Path(r.data['payload'].get('original_path', '')).name == path.name
+            and r.data['payload'].get('crop') is None
+            and r.data['payload'].get('metadata', {}).get('review_subset')]
+        if previous:
+            examples.append(previous[0].id)
+            continue
+        examples.append(dataset.add(path, episode=marker['source_episode'],
+            source=dict(journal=source_path, context_id=reference.id,
+                artifact=str(path.resolve()), sha256=original_hash),
+            metadata=dict(review_subset=True, identity_status='unknown',
+                physical_experiment=marker['source_episode'],
+                temporal_context='see original agency/action evidence',
+                context_reference=reference.id)).id)
+    return dict(episode=marker['source_episode'], context_id=reference.id,
+                examples=examples, ingestion_status=marker['status'])
 
 
 def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
@@ -270,9 +276,12 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
 def main():
     import argparse
     from memory.gateway import MemoryGateway
+    from memory.evaluator import MemoryEvaluator
+    from memory.store import JsonlStore
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('episodes',nargs='*',type=Path); parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--budget-seconds',type=float,default=60.); parser.add_argument('--max-jobs',type=int,default=2)
+    parser.add_argument('--episode-root',type=Path,action='append',default=[])
     parser.add_argument('--ingest-only',action='store_true')
     parser.add_argument('--diagnostics-only',action='store_true',help='retrieve existing failed-model evidence without opening pixel/model artifacts')
     parser.add_argument('--review-questions',action='store_true',help='also investigate unresolved questions by retrieving frozen experience references')
@@ -286,14 +295,18 @@ def main():
         try: fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError: parser.error('another offline worker owns these resources')
         journal=EvidenceJournal(args.output/'learning-evidence.sqlite3'); dataset=ExperienceDataset(journal,args.output/'pixels')
-        gateway=MemoryGateway()
+        gateway=MemoryGateway(store=JsonlStore(args.output/'memory.jsonl'),
+                              evaluator=MemoryEvaluator(args.output/'evaluator.sqlite3'))
         try:
             if args.resolve_artifacts:dataset.locate_artifacts(args.resolve_artifacts)
-            for episode in args.episodes: ingest_episode(episode,dataset,gateway)
+            from .retrospective import discover_episodes
+            for episode in args.episodes+discover_episodes(args.episode_root): ingest_episode(episode,dataset,gateway)
             if not args.ingest_only:
-                project_journal=EvidenceJournal(gateway.evaluator.path.with_name('learning-project-evidence.sqlite3'))
-                try: report=investigate(dataset,gateway,budget_seconds=args.budget_seconds,max_jobs=args.max_jobs,executive=LearningExecutive(project_journal,gateway),diagnostics_only=args.diagnostics_only,review_questions=args.review_questions,deployment_authority=json.loads(args.deployment_authority.read_text()) if args.deployment_authority else None,refinement_only=args.refinement_only)
-                finally: project_journal.close()
+                report=investigate(dataset,gateway,budget_seconds=args.budget_seconds,max_jobs=args.max_jobs,
+                    executive=LearningExecutive(journal,gateway),diagnostics_only=args.diagnostics_only,
+                    review_questions=args.review_questions,
+                    deployment_authority=json.loads(args.deployment_authority.read_text()) if args.deployment_authority else None,
+                    refinement_only=args.refinement_only)
                 print(json.dumps({k:report[k] for k in ('elapsed','autonomy','physical_gameplay_improvement')}))
         finally: journal.close()
 
@@ -308,14 +321,22 @@ def postgame_learning(root, source_journal, episode, context, gateway, executive
         journal=EvidenceJournal(output/'learning-evidence.sqlite3')
         dataset=ExperienceDataset(journal,output/'pixels')
         try:
-            reference=journal.append('observation',dict(category='learning_context_reference',context=context,
-                source_journal=str(source_journal.path.resolve()),source_id=context['evidence_id'],source_episode=episode),
-                episode=SCOPE,producer='existing-evidence-consolidation',version='ala-1')
-            for path in sorted(Path(root).glob('review-*.jpg')):
-                dataset.add(path,episode=episode,source=dict(journal=str(source_journal.path.resolve()),
-                    context_id=context['evidence_id'],artifact=str(path.resolve()),sha256=sha(path)),
-                    metadata=dict(review_subset=True,identity_status='unknown',physical_experiment=episode,
-                        temporal_context='see original agency/action evidence',context_reference=reference.id))
+            if (Path(root)/'report.json').is_file():
+                imported = ingest_episode(root, dataset, gateway)
+                if imported['episode'] != episode:
+                    raise ValueError('postgame source episode identity mismatch')
                 if on_progress: on_progress()
+            else:
+                # Existing unfinished postgame contexts retain their original
+                # journal identity; no fabricated finalized episode is imported.
+                reference=journal.append('observation',dict(category='learning_context_reference',context=context,
+                    source_journal=str(source_journal.path.resolve()),source_id=context['evidence_id'],source_episode=episode),
+                    episode=SCOPE,producer='existing-evidence-consolidation',version='ala-1')
+                for path in sorted(Path(root).glob('review-*.jpg')):
+                    dataset.add(path,episode=episode,source=dict(journal=str(source_journal.path.resolve()),
+                        context_id=context['evidence_id'],artifact=str(path.resolve()),sha256=sha(path)),
+                        metadata=dict(review_subset=True,identity_status='unknown',physical_experiment=episode,
+                            temporal_context='see original agency/action evidence',context_reference=reference.id))
+                    if on_progress: on_progress()
             return investigate(dataset,gateway,budget_seconds=budget_seconds,executive=executive,on_progress=on_progress,deployment_authority=deployment_authority)
         finally: journal.close()

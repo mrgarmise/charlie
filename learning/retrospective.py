@@ -67,6 +67,41 @@ def _rows(root, name):
     return rows, torn
 
 
+def merge_history(source, output):
+    """Preserve another notebook intact, then merge exact original record IDs."""
+    source, output = Path(source).resolve(), Path(output).resolve()
+    if source == output or source in output.parents or output in source.parents:
+        raise ValueError('history source must be separate from learning output')
+    if not (source/'learning-evidence.sqlite3').is_file():
+        return dict(source=str(source), status='unavailable', reason='original journal unavailable; no empty history inferred')
+    before = inventory(source)
+    snapshot = output/'recovered-history'/digest(before)
+    if not snapshot.exists():
+        snapshot.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, snapshot)
+    if inventory(snapshot) != before or inventory(source) != before:
+        raise ValueError('history changed during preservation')
+    original = EvidenceJournal(snapshot/'learning-evidence.sqlite3', read_only=True)
+    target = EvidenceJournal(output/'learning-evidence.sqlite3')
+    try:
+        ids = [r.id for r in original.records()]
+        added = target.merge_from(original)
+        receipt = dict(source=str(source), snapshot=str(snapshot), inventory_digest=digest(before),
+            original_ids=ids, history_import=True, new_physical_experience=False,
+            semantic_memory_delivery='not inferred from journal import')
+        target.append('event', dict(category='notebook_history_recovery', **receipt),
+            episode=SCOPE, producer='existing-evidence-consolidation', version=VERSION)
+        return dict(status='preserved', original_records=len(ids), added_records=len(added), **receipt)
+    finally:
+        original.close(); target.close()
+
+
+def discover_episodes(roots):
+    """Discover finalized archives only; ingestion validates/deduplicates copies."""
+    return sorted({p.parent.resolve() for root in roots
+                   for p in Path(root).rglob('report.json')})
+
+
 def discover(root):
     """Report gaps to Reflection; never select an agenda or certify outcomes."""
     root = Path(root)
@@ -167,6 +202,8 @@ def run(roots, output, *, budget_seconds=60., max_jobs=8, qualify_observations=F
     from .cycle import gameplay_active, investigate
     if gameplay_active():
         raise RuntimeError('offline only: active gameplay')
+    if not 1 <= max_jobs <= 8 or not 1 <= budget_seconds <= 3600:
+        raise ValueError('bounded offline resources required')
     output = Path(output).resolve()
     roots = [Path(r).resolve() for r in roots]
     if any(output == r or output in r.parents or r in output.parents for r in roots):
@@ -232,15 +269,30 @@ def main():
     parser.add_argument('--episode', type=Path, action='append', default=[])
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--recover-notebook', type=Path)
+    parser.add_argument('--merge-history', type=Path, action='append', default=[])
+    parser.add_argument('--episode-root', type=Path, action='append', default=[])
     parser.add_argument('--budget-seconds', type=float, default=60.)
     parser.add_argument('--max-jobs', type=int, default=8)
     parser.add_argument('--qualify-observations',action='store_true',
         help='audit preserved capture availability and retain Executive acquisition bookmarks; no hardware access')
     args = parser.parse_args()
+    from .cycle import gameplay_active
+    if gameplay_active():
+        parser.error('offline only: active gameplay')
+    if not 1 <= args.max_jobs <= 8 or not 1 <= args.budget_seconds <= 3600:
+        parser.error('bounded offline resources required')
     if args.recover_notebook:
         recover_notebook(args.recover_notebook, args.output)
-    print(json.dumps(run(args.episode, args.output, budget_seconds=args.budget_seconds, max_jobs=args.max_jobs,
-        qualify_observations=args.qualify_observations)))
+    # Same offline ownership as normal cycle execution; history merge itself
+    # does not select or repeat investigations.
+    args.output.mkdir(parents=True, exist_ok=True)
+    with (args.output/'offline.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        histories = [merge_history(p, args.output) for p in args.merge_history]
+    result = run(args.episode + discover_episodes(args.episode_root), args.output,
+        budget_seconds=args.budget_seconds, max_jobs=args.max_jobs,
+        qualify_observations=args.qualify_observations)
+    print(json.dumps(dict(result, histories=histories)))
 
 
 if __name__ == '__main__':

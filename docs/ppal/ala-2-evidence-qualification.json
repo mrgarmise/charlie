@@ -1392,5 +1392,10 @@
     "files": 12,
     "canonical_records": 122510,
     "interpretation": "record count, not independent experience count"
+  },
+  "cal1_remote_observations": {
+    "initial": "ff195c688e6aae98968d3fbe45908bb407beaa39",
+    "final": "6696a98f07f3f0c2b042d31c7d2df201d60176e0",
+    "modified_by_this_session": false
   }
 }

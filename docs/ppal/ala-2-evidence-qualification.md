@@ -3,8 +3,11 @@
 ALA-2 remains incomplete. This continuation independently started at published
 `5212a7e45a02a34851ff92121a737d26f68ab19d` on `feature/agency-first-self`.
 No physical gameplay, policy activation, firmware deployment or servo movement
-occurred. `feature/active-vision` remained at
-`ff195c688e6aae98968d3fbe45908bb407beaa39` and was not checked out or changed.
+occurred. `feature/active-vision` was observed at
+`ff195c688e6aae98968d3fbe45908bb407beaa39` during initial verification and at
+`6696a98f07f3f0c2b042d31c7d2df201d60176e0` during the final remote check.
+It advanced outside this session; this session neither checked out nor changed
+CAL-1.
 
 ## Substantive result
 

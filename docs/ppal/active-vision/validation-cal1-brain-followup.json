@@ -1,0 +1,27 @@
+{
+  "parent": "b1e72c888ecbc17c1a4748864ea6895c47dc1ddc",
+  "timestamp_utc": "2026-10-04T19:50:46.716614+00:00",
+  "physical_authorization": false,
+  "changes": [
+    "Fail closed on retained-session journal failure and missing camera/telemetry",
+    "Scale calibration response to reviewed reference pixels",
+    "Preserve powered-start review in derived candidate"
+  ],
+  "tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "127",
+    "time": "7.562",
+    "timestamp": "2026-10-04T15:50:17.938359-04:00",
+    "hostname": "3c1a37f27809"
+  },
+  "source_sha256": {
+    "hardware/calibration_behavior.py": "e6e48f00ad64e78db384584bb5d887031de0944d63bec8e6cb21bef36645da50",
+    "hardware/calibration_service.py": "d2033fe4dc6015d3ddaac8cd4383edb6172a7bf220e3500c8110d313c076459b",
+    "hardware/neck_calibration.py": "42cf7d369af5119c91387a9fa3666e2e5f05887d964eaceab71eb0b63a9d096e",
+    "rp2040/calibration.py": "23cf900972111c4fac95bedb7a69a96d640eb518e423fb10e3978c5a4ef4cbbe",
+    "tests/test_brain_calibration.py": "b293ad9f23764e03971f5501e046fdc91e6c136b2765c0626fbb667f199a0b24"
+  }
+}

@@ -261,3 +261,56 @@ def test_background_estimator_rejects_uniform_scene_and_local_target_motion():
     patch = blank.copy(); patch[20:80, 20:80] = texture[20:80, 20:80]
     moved = cv2.warpAffine(patch, np.float32([[1, 0, 3], [0, 1, -2]]), (480, 360))
     assert not observer.compare(observer.snapshot(patch), observer.snapshot(moved))['reliable']
+
+
+def test_candidate_preserves_powered_review_and_reference_pixel_units(integrated):
+    f = integrated
+    f.a.calibration.envelope.observation_size = [960, 720]
+    f.brain.maximum_steps = 24
+    f.brain.request(); f.tick(); f.brain.confirm_start(); f.tick(); f.tick()
+    f.tick(True); f.tick(False)
+    for _ in range(300):
+        f.tick()
+        if f.brain.session is None: break
+    assert not f.brain.blocked and f.brain.generated_candidate
+    candidate = json.loads(next((f.root/'profiles').glob('*_candidate.json')).read_text())
+    assert candidate['powered_start_review'] == f.profile['powered_start_review']
+    assert candidate['observation_size'] == [960, 720]
+    assert candidate['visual_response']['pan'] == pytest.approx([8, 0], abs=.3)
+    assert candidate['visual_response']['tilt'] == pytest.approx([0, 8], abs=.3)
+    evidence = f.brain.responses[0]['evidence']
+    assert evidence['reference_size'] == [960, 720]
+    assert evidence['raw_displacement'] != evidence['displacement']
+
+
+def test_retained_closure_evidence_failure_stops_and_restores_sink(integrated, monkeypatch):
+    f = integrated
+    sink = object()
+    closed = []
+    fake = SimpleNamespace(poll=lambda: dict(state='CLOSED', run_id='fake_closed'),
+        close=lambda: pytest.fail('qualified closure should not request another CAL operation'),
+        previous_sink=sink, evidence=SimpleNamespace(path=f.root/'fake.jsonl', close=lambda: closed.append(True)))
+    f.s.session = fake
+    monkeypatch.setattr(f.host, 'motion_status', lambda: dict(armed=True, profile_invalid=False,
+        envelope=dict(independently_qualified=True), owner=None, moving=False))
+    stops = []
+    monkeypatch.setattr(f.host, 'stop', lambda: stops.append(True))
+    monkeypatch.setattr(f.s, 'event', lambda *args, **kwargs: (_ for _ in ()).throw(OSError('disk full')))
+    with pytest.raises(OSError, match='disk full'):
+        f.s.close_session(retain_qualified=True)
+    assert stops and closed and f.host.calibration_sink is sink
+
+
+@pytest.mark.parametrize('loss', ['camera', 'telemetry'])
+def test_normal_observation_loss_revokes_without_retry(integrated, monkeypatch, loss):
+    f = integrated
+    stops = []
+    monkeypatch.setattr(f.host, 'stop', lambda: stops.append(True))
+    if loss == 'camera':
+        f.brain.update(None)
+    else:
+        monkeypatch.setattr(f.host, 'motion_status', lambda: None)
+        f.brain.update(f.frame())
+    assert f.brain.blocked and stops and not f.b.pwms
+    for _ in range(5): f.brain.update(f.frame())
+    assert len(stops) == 1

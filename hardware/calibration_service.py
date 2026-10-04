@@ -231,20 +231,23 @@ class CalibrationService:
         if self.session is None:
             return
         session, self.session = self.session, None
+        retain = False
         try:
             status = session.poll()
             motion = self.controller.motion_status() if retain_qualified else None
-            retain = bool(retain_qualified and status['state'] == 'CLOSED' and motion
+            eligible = bool(retain_qualified and status['state'] == 'CLOSED' and motion
                           and motion.get('armed') and not motion.get('profile_invalid')
                           and (motion.get('envelope') or {}).get('independently_qualified')
                           and motion.get('owner') is None and not motion.get('moving'))
-            if not retain:
+            if not eligible:
                 session.close()
             self.event('session_closed', run_id=status['run_id'], state=status['state'],
                        evidence_path=str(session.evidence.path.resolve()))
+            # Retain authority only after the closure is durably recorded.
+            retain = eligible
         finally:
             try:
-                if not locals().get('retain', False):
+                if not retain:
                     self.controller.stop()
                 self.controller.calibration_sink = session.previous_sink
             finally:

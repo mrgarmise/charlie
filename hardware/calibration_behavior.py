@@ -137,6 +137,8 @@ class CalibrationBehavior:
             if snapshot is None:
                 if self.session or self.tracking_pending:
                     self.fail('camera frame unavailable')
+                elif self.authorized:
+                    self.fail('normal neck camera frame unavailable; fault unconfirmed')
                 return
             if self.session:
                 self.calibrate(snapshot)
@@ -252,6 +254,14 @@ class CalibrationBehavior:
             self.message('OBSERVING')
             result = self.estimator.compare(self.before, snapshot)
             result['frames'] = [self.preserve_frame(self.before), self.preserve_frame(snapshot)]
+            # Keep raw flow evidence, but report displacement in the reviewed
+            # profile's reference pixels, just as normal health monitoring does.
+            raw_delta = result.get('displacement', [0, 0])
+            size = snapshot['size']
+            reference = status['constraints']['observation_size']
+            result['raw_displacement'] = list(raw_delta)
+            result['reference_size'] = list(reference)
+            result['displacement'] = [v*r/s for v, r, s in zip(raw_delta, reference, size)]
             delta = result.get('displacement', [0, 0])
             if not result.get('reliable') or not .0025 <= sum(v*v for v in delta) <= 40000:
                 self.fail('uncertain or unsuccessful camera response; no automatic retry')
@@ -426,6 +436,7 @@ class CalibrationBehavior:
     def track(self, snapshot, target):
         status = self.body.motion_status()
         if not status:
+            self.fail('normal neck telemetry unavailable; fault unconfirmed')
             self.message('BRAIN LINK LOST')
             return
         profile = self.service.refresh()

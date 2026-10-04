@@ -186,6 +186,15 @@ def derive_candidate(evidence_path, commissioning, *, name, margin, supersedes=(
         evidence_sha256=hashlib.sha256(raw).hexdigest(),evidence=str(Path(evidence_path).resolve()),
         commissioning_id=commissioning['calibration_id'])
     profile['observation_size']=commissioning['observation_size']
+    # Preserve the reviewed powered-start prerequisite with its provenance.
+    # Pulse conversion below preserves the commissioning mapping at this pose.
+    review = commissioning.get('powered_start_review')
+    if review is not None:
+        if (not isinstance(review, dict) or review.get('pose') != list(start)
+                or review.get('powered_initialization_verified') is not True
+                or not review.get('reviewer') or not review.get('evidence')):
+            raise ValueError('powered start review does not match candidate start')
+        profile['powered_start_review'] = json.loads(encode(review))
     import statistics
     model={}
     for axis,samples in responses.items():

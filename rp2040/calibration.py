@@ -69,6 +69,7 @@ class CommissioningEnvelope(Envelope):
                       provisional=True, powered_start_review=self.powered_start_review)
         for axis, name in enumerate(('pan', 'tilt')):
             result[name].update(min_us=self.axes[axis][2], max_us=self.axes[axis][3])
+        result['observation_size'] = self.observation_size
         return result
 
 

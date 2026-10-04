@@ -117,6 +117,7 @@ class Cal1Release(CharlieUpdater):
         self.python = self.checkout/'.venv/bin/python'
         self.dropin = Path('/etc/systemd/system/charlie.service.d/cal1-release.conf')
         self.created_service = False
+        self.transferred_names = set()
 
     def git(self, *arguments):
         return self.run_command('git', '-C', str(self.checkout), *arguments).stdout.strip()
@@ -130,7 +131,7 @@ class Cal1Release(CharlieUpdater):
 
     def pico_manifest(self, mp):
         # File reads only, inside maintenance raw REPL. No machine imports.
-        script = """import os, json
+        script = """import os, json, binascii
 try:
     import uhashlib as hashlib
 except ImportError:
@@ -143,7 +144,13 @@ def walk(directory):
             walk(path)
         else:
             with open(path, 'rb') as stream:
-                files[path.lstrip('/')] = hashlib.sha256(stream.read()).digest().hex()
+                digest = hashlib.sha256()
+                while True:
+                    block = stream.read(4096)
+                    if not block:
+                        break
+                    digest.update(block)
+                files[path.lstrip('/')] = binascii.hexlify(digest.digest()).decode()
 walk('/')
 print(json.dumps(files))
 """
@@ -173,6 +180,8 @@ print(json.dumps(files))
         for source in files:
             if source.name in self.PRESERVE:
                 continue
+            # Include partial/failed transfers in rollback's ownership set.
+            self.transferred_names.add(source.name)
             mp.copy(source, ':'+source.name)
             expected[source.name] = hashlib.sha256(source.read_bytes()).hexdigest()
         actual = self.pico_manifest(mp)
@@ -190,7 +199,8 @@ print(json.dumps(files))
                 raise UpdateError('Unsupported service path')
         return ('[Service]\nType=simple\n'
             'WorkingDirectory='+str(self.release)+'\nExecStart=\n'
-            'ExecStart="'+str(self.python)+'" -u "'+str(self.release/'main.py')+'"\n'
+            'ExecStart=/usr/bin/env CHARLIE_NECK_MOTION_AUTHORIZED=0 CHARLIE_NECK_SUPERVISED=0 '
+            '"'+str(self.python)+'" -u "'+str(self.release/'main.py')+'"\n'
             'Environment="CHARLIE_NECK_STATE='+str(self.root/'neck')+'"\n'
             'Environment="CHARLIE_NECK_MOTION_AUTHORIZED=0"\n'
             'Environment="CHARLIE_NECK_SUPERVISED=0"\n'
@@ -200,8 +210,15 @@ print(json.dumps(files))
         for name in sorted(manifest, key=lambda p: (p == 'main.py', p)):
             if '/' not in name and name.endswith('.py') and name not in self.PRESERVE:
                 mp.copy(self.backup/'pico'/name, ':'+name)
+        # Only remove new application files owned by this failed transfer.
+        # Unknown files, profiles and support libraries remain untouched.
         actual = self.pico_manifest(mp)
-        if any(actual.get(name) != digest for name, digest in manifest.items()):
+        for name in sorted(self.transferred_names - manifest.keys()):
+            if name in actual:
+                mp.remove(':'+name)
+        actual = self.pico_manifest(mp)
+        if (any(actual.get(name) != digest for name, digest in manifest.items())
+                or any(name in actual for name in self.transferred_names - manifest.keys())):
             raise UpdateError('Automatic rollback could not verify restored Pico files; service remains stopped')
         mp.reset()
         if had_dropin:
@@ -233,29 +250,39 @@ print(json.dumps(files))
         mp = MpRemote(); mp.require()
         self.backup.mkdir(parents=True, exist_ok=False)
         existing = subprocess.run(['sudo', 'systemctl', 'cat', 'charlie'], capture_output=True, text=True)
+        active = subprocess.run(['sudo', 'systemctl', 'is-active', '--quiet', 'charlie'],
+                                capture_output=True, text=True).returncode == 0
         had_dropin = self.dropin.exists()
         if had_dropin:
             self.run_command('sudo', 'cp', str(self.dropin), str(self.backup/'previous-service.conf'))
         (self.backup/'service-before.txt').write_text(existing.stdout)
-        if existing.returncode == 0:
+        if active:
             self.run_command('sudo', 'systemctl', 'stop', 'charlie')
         # Same Pi transport sends STOP before raw-REPL maintenance; no probing
         # movements or replacement calibration application is installed.
         from hardware.rp2040_controller import RP2040Controller
-        body = RP2040Controller()
         try:
-            if not body.connected or not body._accepted('STOP', 'STOP'):
-                raise UpdateError('Pico did not acknowledge maintenance STOP')
-        finally:
-            body.close()
+            body = RP2040Controller()
+            try:
+                if not body.connected or not body._accepted('STOP', 'STOP'):
+                    raise UpdateError('Pico did not acknowledge maintenance STOP')
+            finally:
+                body.close()
+        except Exception:
+            if active:
+                self.run_command('sudo', 'systemctl', 'start', 'charlie')
+            raise
         try:
             manifest = self.snapshot_pico(mp)
         except Exception:
             mp.reset()
-            if existing.returncode == 0:
+            if active:
                 self.run_command('sudo', 'systemctl', 'start', 'charlie')
             raise
         if not {'motion_profile.py', 'config.py', 'main.py'} <= manifest.keys():
+            mp.reset()
+            if active:
+                self.run_command('sudo', 'systemctl', 'start', 'charlie')
             raise UpdateError('Installed normal Pico configuration is missing; not reconstructing hardware assumptions')
         try:
             self.install_pico(mp)
@@ -274,7 +301,7 @@ print(json.dumps(files))
             self.run_command('sudo', 'systemctl', 'is-active', '--quiet', 'charlie')
         except Exception:
             self.run_command('sudo', 'systemctl', 'stop', 'charlie')
-            self.rollback(mp, manifest, had_dropin, existing_service=existing.returncode == 0)
+            self.rollback(mp, manifest, had_dropin, existing_service=active)
             raise
         (self.backup/'release.json').write_text(json.dumps(self.plan(), indent=2))
         print('Charlie normal brain started at '+self.revision+'. Motion authorization is off.')

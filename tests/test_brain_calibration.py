@@ -211,12 +211,14 @@ def test_existing_executive_selects_and_retains_calibration_project(integrated):
 def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, monkeypatch):
     import runpy
     import hardware.rp2040_controller
+    import motion.controller
     import vision.detector
     f = integrated
     camera = SimpleNamespace(read=f.frame, close=lambda: None)
     f.s.request('uncertain', dict(reason='simulated normal-brain calibration request'))
     monkeypatch.setitem(sys.modules, 'vision.camera', SimpleNamespace(Camera=lambda: camera))
     monkeypatch.setattr(hardware.rp2040_controller, 'RP2040Controller', lambda: f.host)
+    monkeypatch.setattr(motion.controller, 'RP2040Controller', lambda: f.host)
     f.host.close = lambda: None
     monkeypatch.setattr(CalibrationService, 'open', classmethod(lambda cls, *args: f.s))
     attach = f.s.attach_brain
@@ -243,7 +245,7 @@ def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, mo
         if ticks[0] > 150: pytest.fail('normal application failed to complete calibration')
     monkeypatch.setattr('time.sleep', sleep)
     with pytest.raises(EndApplication):
-        runpy.run_path(str(Path(__file__).resolve().parents[1]/'main.py'))
+        runpy.run_path(str(Path(__file__).resolve().parents[1]/'main.py'), run_name='__main__')
     assert len(f.s.brain.responses) >= 4
     assert any(e['kind'] == 'normal_resumed' for e in f.a.calibration.events)
     assert not f.a.status()['armed']  # Normal application finally sends STOP.
@@ -314,3 +316,29 @@ def test_normal_observation_loss_revokes_without_retry(integrated, monkeypatch, 
     assert f.brain.blocked and stops and not f.b.pwms
     for _ in range(5): f.brain.update(f.frame())
     assert len(stops) == 1
+
+
+@pytest.mark.parametrize('failure', ['camera', 'detector'])
+def test_normal_application_startup_failure_releases_transport_and_camera(integrated, monkeypatch, failure):
+    import runpy
+    import hardware.rp2040_controller
+    import motion.controller
+    import vision.detector
+    f = integrated
+    calls = []
+    def unavailable(*args, **kwargs): raise RuntimeError('injected startup failure')
+    camera = SimpleNamespace(read=f.frame, close=lambda: calls.append('camera closed'))
+    monkeypatch.setitem(sys.modules, 'vision.camera', SimpleNamespace(
+        Camera=unavailable if failure == 'camera' else lambda: camera))
+    monkeypatch.setattr(hardware.rp2040_controller, 'RP2040Controller', lambda: f.host)
+    monkeypatch.setattr(motion.controller, 'RP2040Controller', lambda: f.host)
+    monkeypatch.setattr(f.host, 'close', lambda: calls.append('transport closed'))
+    monkeypatch.setattr(f.host, 'stop', lambda: calls.append('STOP'))
+    monkeypatch.setattr(CalibrationService, 'open', classmethod(lambda cls, *args: f.s))
+    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus: None))
+    monkeypatch.setenv('CHARLIE_VISION_TARGET', 'face')
+    monkeypatch.setattr(vision.detector, 'FaceDetector', unavailable)
+    with pytest.raises(RuntimeError, match='startup failure'):
+        runpy.run_path(str(Path(__file__).resolve().parents[1]/'main.py'), run_name='__main__')
+    assert calls[-2:] == ['STOP', 'transport closed']
+    assert ('camera closed' in calls) is (failure == 'detector')

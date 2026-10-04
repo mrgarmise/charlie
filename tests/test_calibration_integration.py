@@ -313,7 +313,7 @@ def test_normal_pi_main_keeps_idle_camera_and_request_lifecycle(service, monkeyp
         if len(ticks) == 3: raise Finished()
     monkeypatch.setattr('time.sleep', sleep)
     with pytest.raises(Finished):
-        runpy.run_path(str(Path(__file__).resolve().parents[1] / 'main.py'))
+        runpy.run_path(str(Path(__file__).resolve().parents[1] / 'main.py'), run_name='__main__')
     assert calls.count(('camera', 'read')) == 3
     assert ('display', 'IDLE') in calls
     assert ('camera', 'closed') in calls and ('body', 'closed') in calls

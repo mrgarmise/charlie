@@ -1,5 +1,7 @@
 # CAL-1 integrated normal-brain release
 
+Latest recovered software acceptance: [CAL-1-final-software-acceptance.md](CAL-1-final-software-acceptance.md). This document describes the recovered implementation; the latest report records follow-up fixes and final test results.
+
 Parent: `f5bc3955bfacddca3445eb218fbff2d51de0caba`, independently observed on
 `feature/active-vision` before cloning and again before publication. The release
 identifier is the commit containing this report. ALA-2's branch was not changed.

@@ -1,0 +1,215 @@
+{
+  "schema": "charlie-cal1-final-software-acceptance-v1",
+  "timestamp_utc": "2026-10-04T19:58:08.286980+00:00",
+  "parent": "ec0cd2ac82c961e4692e6c1dcf32b7b3b8baa774",
+  "first_recovery_checkpoint": "b1e72c888ecbc17c1a4748864ea6895c47dc1ddc",
+  "physical_authorization": false,
+  "test_environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "Python 3.12.14",
+    "simulated_io": [
+      "camera",
+      "PWM",
+      "clock",
+      "Pico filesystem",
+      "systemd"
+    ]
+  },
+  "source_sha256": {
+    "main.py": "9edb2366da51a2208c9ae818f2065b84e2ca482e1b76d00190e5ff62d42ad5d1",
+    "tests/test_brain_calibration.py": "e7cb32cc41a4678eff420f7dbada09b7328641f72bc5f717c66030fe5d7b073c",
+    "tests/test_cal1_release.py": "1f197f999336184c1241d581692c28504967cbc9175d29518d38415c85a3fea3",
+    "tests/test_calibration_integration.py": "a085ef7d66177e04264e84dfbbbb4cf1bcef0462a1f33843ed4a9e69a92a7827",
+    "tools/update_charlie.py": "268819a7589c1d207eaf9bf33d36267f9d255be00d7114afa6d1a25eb5533600"
+  },
+  "all_test_attempts": [
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/cal1-broad.xml.gz",
+      "original_sha256": "cfb2fbeee8c7a9da09f831e5cddfae2ffa498db4bf37ccf1a11f5b8f18242658",
+      "archived_sha256": "e63455f9c0f5c9a0460f500ff2a4a9f4f8a6008536984b757252d9161e560067",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "19",
+        "tests": "685",
+        "time": "68.085",
+        "timestamp": "2026-10-04T13:39:49.509595-03:00",
+        "hostname": "702e93b5fc54"
+      },
+      "historical_prior_session": true
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/cal1-final.xml.gz",
+      "original_sha256": "8c3466e72abaf64a1c1cf9dadef9e9f982beefef45b256d9521275393896e93b",
+      "archived_sha256": "838e64adfa4bbe228b10e80fe64e92334238b6d6ad8e66bd0558396af552346a",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "19",
+        "tests": "690",
+        "time": "72.215",
+        "timestamp": "2026-10-04T14:00:28.249731-03:00",
+        "hostname": "702e93b5fc54"
+      },
+      "historical_prior_session": true
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/final-broad.xml.gz",
+      "original_sha256": "a59e3c220368951f0e6fadff5f976ab7f312931d7176699d6ddc4fdbe98d5fe4",
+      "archived_sha256": "bcde4a9acdecb15b28b30caa975aa1d25eff200bf330757e467bc97d5555b289",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "19",
+        "tests": "706",
+        "time": "72.098",
+        "timestamp": "2026-10-04T15:55:38.972519-04:00",
+        "hostname": "3c1a37f27809"
+      },
+      "historical_prior_session": false
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/final-focused.xml.gz",
+      "original_sha256": "6e7f6784b874cdaaa0255784937c211146c57a48a63bee697a7ec5be3cc97bdf",
+      "archived_sha256": "32036acbb1e1356823b5638e14a12abb5a471c04fd10715d931d61a28332679b",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "238",
+        "time": "39.784",
+        "timestamp": "2026-10-04T15:55:26.340775-04:00",
+        "hostname": "3c1a37f27809"
+      },
+      "historical_prior_session": false
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/milestone2-focused.xml.gz",
+      "original_sha256": "d1e7e68bbd727dc091a9b10125b4ce6306990cb4ec0812c3bdfc077840751cc4",
+      "archived_sha256": "0ed0a4326549ff4e0381cb15c3dcf44a1baa7ee53874fc531c5213b8a3f6620c",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "127",
+        "time": "7.562",
+        "timestamp": "2026-10-04T15:50:17.938359-04:00",
+        "hostname": "3c1a37f27809"
+      },
+      "historical_prior_session": false
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/package-focused.xml.gz",
+      "original_sha256": "83f609f744185363f5c850749809c2c05a0f8157d62f1bea34764d14fa9fd872",
+      "archived_sha256": "432a4960a1456ca9cb5a5ed9960e06e22b742c5d16ea12504df33813c18b4d66",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "29",
+        "time": "2.846",
+        "timestamp": "2026-10-04T15:52:43.141889-04:00",
+        "hostname": "3c1a37f27809"
+      },
+      "historical_prior_session": false
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/package-lifecycle-corrected.xml.gz",
+      "original_sha256": "642c889763917d3abcdfd258f6057896c21d7a55b3b306177c6b47f501a3ec54",
+      "archived_sha256": "9314cebe941f48f85a71652c3fb3638f13b00098bcffcffd9a83f187ab824953",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "66",
+        "time": "3.238",
+        "timestamp": "2026-10-04T15:54:59.488310-04:00",
+        "hostname": "3c1a37f27809"
+      },
+      "historical_prior_session": false
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/package-lifecycle-final.xml.gz",
+      "original_sha256": "50de90a4dba8ba3c90526bb8e58a52f4cf32e0e9be57ec90ab3be0be6af59f39",
+      "archived_sha256": "f4fed121d25e31db453e10b692d2c28e719adc7703b9e3db58060333a6417e87",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "2",
+        "skipped": "0",
+        "tests": "66",
+        "time": "3.785",
+        "timestamp": "2026-10-04T15:54:09.316748-04:00",
+        "hostname": "3c1a37f27809"
+      },
+      "historical_prior_session": false
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/package-lifecycle.xml.gz",
+      "original_sha256": "fbc1e111c7c0c449172761c287c984f4ade7dcd067bb86af335e482d4732c97a",
+      "archived_sha256": "ae805a0fb97ff93b1480bbe18ff449896732ac1d9475f56fa2619f6df197e54c",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "3",
+        "skipped": "0",
+        "tests": "66",
+        "time": "3.544",
+        "timestamp": "2026-10-04T15:53:57.381865-04:00",
+        "hostname": "3c1a37f27809"
+      },
+      "historical_prior_session": false
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/recovered-broad.xml.gz",
+      "original_sha256": "68f66d8f85784342847e0aa34408ce3d833e0ee643fbb73a4b0b73cee3242dbb",
+      "archived_sha256": "cd9615b9e842d36d534f843d3994da15aeff75ecdea378634f59aec52d40451e",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "19",
+        "tests": "690",
+        "time": "66.639",
+        "timestamp": "2026-10-04T15:48:24.787480-04:00",
+        "hostname": "3c1a37f27809"
+      },
+      "historical_prior_session": false
+    },
+    {
+      "file": "docs/ppal/active-vision/recovery-20261004/recovered-focused.xml.gz",
+      "original_sha256": "c05fb3a61fce558d62092573217519b004662120dc3a813cb27d675a499f063f",
+      "archived_sha256": "0aa78c7c63dee79beaf1ad040536eb4a123b393aa12b1bf1a32a2de67559ee9c",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "222",
+        "time": "38.764",
+        "timestamp": "2026-10-04T15:45:58.927927-04:00",
+        "hostname": "3c1a37f27809"
+      },
+      "historical_prior_session": false
+    }
+  ],
+  "failed_attempt_explanation": "Initial lifecycle cases patched the hardware module but Deck had a cached imported transport constructor; corrected fixtures patch Deck constructor binding too. One intermediate run also used the old runpy entry invocation; changed to run_name=__main__. All failures preserved; final focused/broad suites passed.",
+  "other_checks": {
+    "compileall": "passed",
+    "tabnanny": "passed",
+    "git_diff_check": "passed",
+    "deployment_dry_run": "passed; no hardware/service/git mutation"
+  },
+  "remaining_acceptance": [
+    "Native Pi/MicroPython execution",
+    "Physical powered-start pulse and smoothness qualification",
+    "Independent physical envelope/combined-axis qualification and activated normal operation"
+  ]
+}

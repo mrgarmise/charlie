@@ -95,3 +95,22 @@ Guarded native lifecycle completion and independent score evidence remain pendin
 ALA-2 remains open until a Charlie-originated operational change independently
 improves complete-game Robotron SCORE. No physical gameplay, servo movement,
 firmware deployment or learned-policy activation is authorized by this handoff.
+
+## Continued mission after publishing the fix
+
+First fix checkpoint: `d1614152bc98de70e174073e90353d5512d5b3ec`.
+The existing original-history continuation acceptance was executed again after
+publication: **1 passed in 10.71s**. It restores original journal documents,
+retains the distinct consulted-test and train temporal investigations and their
+original unresolved attempts, starts the normal application, waits for missing
+evidence, receives a controlled independent acquisition-inbox delivery, and
+lets Charlie's existing Reflection/Executive/chooser implement and independently
+evaluate a supported offline temporal candidate. The earliest original project
+gets a second outcome; the other original history remains intact. Subsequent
+normal restart repeats no completed experiment. Startup supplies no deployment
+authority. This is explicitly controlled software evidence, not authentic
+Robotron improvement. Raw JUnit is retained alongside the earlier reports.
+
+The containing evidence checkpoint also restores the Pi acceptance script's
+original 100644 repository mode; instructions invoke it with bash as before.
+No functional code changed after the independently tested fix.

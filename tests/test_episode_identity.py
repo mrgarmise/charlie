@@ -334,3 +334,24 @@ def test_audit_retrieval_preserves_verified_copy_during_source_quarantine(tmp_pa
     assert actual['capture_horizon_supported'] is False # no compatible frames; evidence still available
     assert actual['distinct_source_episodes']==1
     j.close()
+
+
+def test_identity_alias_migration_cannot_reassign_historical_evaluation_partitions(tmp_path):
+    from PIL import Image
+    from learning.datasets import ExperienceDataset
+    from learning.episode_identity import canonical_experience
+    j=EvidenceJournal(tmp_path/'state'/'learning-evidence.sqlite3');ds=ExperienceDataset(j,tmp_path/'state'/'pixels')
+    roots=[];original_roles={}
+    for i,role in enumerate(('train','validation','test')):
+        root=package(tmp_path,str(i));(root/'report.json').write_text(json.dumps({'historical_episode':i}))
+        image=root/'frame.png';Image.new('RGB',(16,16),(i*80,20,30)).save(image)
+        episode='episode:'+sha(root/'report.json');original_roles[episode]=role
+        ds.add(image,episode=episode,source={'original':True});roots.append(root)
+    before=ds.snapshot(split=original_roles)
+    for root in roots:assert reconcile(root,j)['status']=='verified'
+    migrated_roles={canonical_experience(j,k):v for k,v in original_roles.items()}
+    assert ds.snapshot(split=migrated_roles).data['payload']['split']==migrated_roles
+    changed=dict(migrated_roles);keys=list(changed);changed[keys[0]],changed[keys[2]]=changed[keys[2]],changed[keys[0]]
+    with pytest.raises(ValueError,match='preserved evaluation groups'):ds.snapshot(split=changed)
+    assert j.get(before.id).document==before.document
+    j.close()

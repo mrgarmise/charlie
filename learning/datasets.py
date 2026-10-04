@@ -130,8 +130,10 @@ class ExperienceDataset:
             doc=previous.data['payload']
             if doc.get('category')!='experience_dataset_snapshot': continue
             for example in doc['examples']:
-                if example['source_episode'] in parent:
-                    group=find(example['source_episode'])
+                from .episode_identity import canonical_experience
+                original_group=canonical_experience(self.journal,example['source_episode'])
+                if original_group in parent:
+                    group=find(original_group)
                     prior_roles.setdefault(group,set()).add(example['partition'])
         if any(len(roles)>1 for roles in prior_roles.values()):
             raise ValueError('new duplicate joins previously isolated evaluation partitions')

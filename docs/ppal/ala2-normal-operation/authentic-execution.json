@@ -1,0 +1,785 @@
+{
+  "schema": "ala2-normal-operation-evidence-v1",
+  "base_revision": "f3f3cd9f4d5d2d5bfd4a8649833d40194981183a",
+  "milestone_revision": "29e7054ee0b09706f415ed8bf704ae9f3d6af887",
+  "dirty_worktree": true,
+  "code_sha256": {
+    "main.py": "cfa2d28c37caa9f537459c4118601b1a3e5f19d2d379f45f62a3fbc35856fd94",
+    "learning/lifecycle.py": "e6f04cf1925a8846be5e7e0eda92ccf6ccac830675661a9531d43f835b8280be",
+    "learning/cycle.py": "647979e44f577079bb89069e79eb9e18b22b3a9d24d3a435a22a443040ef825f",
+    "learning/meditation.py": "cfc371a38e1baf74c8e76edc930807e7c420a6f4fccd3d522ceac70222156b6b",
+    "memory/learning_projects.py": "17415450aca62b409a331c865c53fe7493cd6b6f5486a83ed67d2d63abc5686a",
+    "experiments/ppal/play_robotron.py": "c7395ef78c25044ec378b51aff6280ef24e98d08417f39fb7492a97389d9b213",
+    "tests/test_normal_learning_lifecycle.py": "d18ae3eee13cd8f63801dfb95e619e3ec40af2e35b13594938b242964877d40f"
+  },
+  "environment": {
+    "machine": "x86_64",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]"
+  },
+  "source_archive_sha256": "6c5ee17f6d9aa968c326fbbc51b51de20797517f3415b91fadf7696ca2a3d36e",
+  "recovered_transfer_sha256": "5764ca96d7c725c821997d3bf7dbb42841c7785364e40ddc2702282ba02d708a",
+  "original_archive_members_unchanged": true,
+  "retained_transfer_ids": 319,
+  "records": 364,
+  "meditation_results": [
+    {
+      "record_id": "6f3f29ca99e3581854e75ba9b60fb760a23e2579dffeeed88dcdd612866118cc",
+      "category": "normal_meditation_result",
+      "context_id": "c8afa7c99a4a160896496c62e64b26cb028ca5646b48dbd97abb4a97ff116265",
+      "result_path": "/workspace/scratch/c81a2d35e2bc/authentic-final/meditations/c8afa7c99a4a160896496c62e64b26cb028ca5646b48dbd97abb4a97ff116265/result.json",
+      "result_sha256": "ef5f183c48d0d2fb745ff1cf1aeafc599cd43baee7ebc9215e18482979ec38c6",
+      "source_episode": "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+      "status": "unavailable"
+    },
+    {
+      "record_id": "40fbf949c2d418d2c605704b371949b2f456ac411213a40d92cdce861e36ed4a",
+      "category": "normal_meditation_result",
+      "context_id": "3aa0a05ff31ca523e0e286c43612a35d9f48ddf1657e9a0a563583ffac7945a2",
+      "result_path": "/workspace/scratch/c81a2d35e2bc/authentic-final/meditations/3aa0a05ff31ca523e0e286c43612a35d9f48ddf1657e9a0a563583ffac7945a2/result.json",
+      "result_sha256": "68943a5d0ac0cd6579f58ecc6580a6dfc92ecd6e94de5615ca199e9add4f6016",
+      "source_episode": "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+      "status": "unavailable"
+    },
+    {
+      "record_id": "f438181953bb2066a5321612096347cfdca99bc64c5dc126e686b1ad70c6ac85",
+      "category": "normal_meditation_result",
+      "context_id": "6b500af5c08dfb141d737a53f8476190e04bbbc14372be0fbea26164504c2778",
+      "result_path": "/workspace/scratch/c81a2d35e2bc/authentic-final/meditations/6b500af5c08dfb141d737a53f8476190e04bbbc14372be0fbea26164504c2778/result.json",
+      "result_sha256": "5d85a0a430cea2a73e37e729ee61c9e924bf0ebd33117038bfb3f4b4b4178d85",
+      "source_episode": "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da",
+      "status": "unavailable"
+    },
+    {
+      "record_id": "a59bf3d0571c8ea063a2f25a4b6520b5982de2270dce8b11887bb538b8868c5b",
+      "category": "normal_meditation_result",
+      "context_id": "44c3646c7d8ff097c265c94b90232449fc1e4bfc88fd5cd3385d10af4093d912",
+      "result_path": "/workspace/scratch/c81a2d35e2bc/authentic-final/meditations/44c3646c7d8ff097c265c94b90232449fc1e4bfc88fd5cd3385d10af4093d912/result.json",
+      "result_sha256": "03480f444fe63c72d2b713582a1401329fca24d771f8cbf11334e934bc81e96f",
+      "source_episode": "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+      "status": "unavailable"
+    },
+    {
+      "record_id": "208d5c0497bc0347dc30aec6a3c32260457531b46b21616e548bf12a60e39b23",
+      "category": "normal_meditation_result",
+      "context_id": "3e2df517ee10da6d0b4ff4cf0f88c53c039ff059224916b6b780c33ff70b81e1",
+      "result_path": "/workspace/scratch/c81a2d35e2bc/authentic-final/meditations/3e2df517ee10da6d0b4ff4cf0f88c53c039ff059224916b6b780c33ff70b81e1/result.json",
+      "result_sha256": "926bf29cae4cc20179de799eda307eca6a10fd55ef1b2c793ff1797fe864aa1e",
+      "source_episode": "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+      "status": "completed"
+    }
+  ],
+  "completed_meditation_count": 1,
+  "projects": {
+    "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c": {
+      "goal": "Can temporal estimation improve without promoting uncertain track links?",
+      "method": "meditation-motion",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "corpus_id": null,
+            "meditation_id": "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5"
+          },
+          "dataset_id": "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da",
+          "memory_id": "2a5353aaead6549156e2b793717fdf2fb39050daf37711c8aede131b40f0b08c",
+          "prediction_id": "3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019",
+          "reason": "No independently verified player/target/threat trajectories supplied; Meditation associations and error summaries are not independent ground truth; No fresh sealed final motion evaluation or operational shadow qualification; Source episode already used as consulted-test; not fresh final evidence",
+          "resolution_id": "20e7a3dee0e02357dcc2912b994244892077343f6c6e6a24fbe7f277c91c73d5",
+          "result": "unresolved"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343": {
+      "goal": "Can temporal estimation improve without promoting uncertain track links?",
+      "method": "meditation-motion",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "corpus_id": null,
+            "meditation_id": "3fa39aefed01ea8fae9b9a0d97b95e52f3d6552284950f4e8c0976c471f8bde6"
+          },
+          "dataset_id": "3fa39aefed01ea8fae9b9a0d97b95e52f3d6552284950f4e8c0976c471f8bde6",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+          "memory_id": "4b78d2b6da9e0db49b4f69a7e3f86f17805c6b32ed7bea567cc6daa3c4bb607e",
+          "prediction_id": "ab443d5418272e3cb765532f2a2549e581f9c329aab789355da52075bf10aef3",
+          "reason": "No independently verified player/target/threat trajectories supplied; Meditation associations and error summaries are not independent ground truth; No fresh sealed final motion evaluation or operational shadow qualification; Source episode already used as train; not fresh final evidence",
+          "resolution_id": "ee787ba1c4a37696ab77d2358559f2fccd7d7b81a8f4f322adb0b2bfab582efd",
+          "result": "unresolved"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0": {
+      "goal": "The unresolved question may recur in independent experience: action_execution",
+      "method": "evidence-review",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "action_execution"
+          },
+          "dataset_id": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "memory_id": "6d215bcb55f411b9710a293694829fe03e42f7bfffd209d67601c58fcf4d25c2",
+          "prediction_id": "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+          "result": "supported"
+        },
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "action_execution"
+          },
+          "dataset_id": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "memory_id": "6cb58a6d25a3496df689ef56a575b592734676bd852bff715203a5252d6e1b2a",
+          "prediction_id": "b6aa05f89302696f71625c5d46cd4fd0ae779b6c95c2f0a84f4e8101130af2ca",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "1b58f4816111137371774738f6557cc526fde29ef0956579c82a00ab4985b1c2",
+          "result": "supported"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a": {
+      "goal": "The unresolved question may recur in independent experience: death_observability",
+      "method": "evidence-review",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "death_observability"
+          },
+          "dataset_id": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "memory_id": "4085f5701ce4cb8b754d25dd5aba1861769f94962834a9447d0b310e7994eaaa",
+          "prediction_id": "4e54b3ead4a0f0542310d6c6c43d198f68fe42e166b890ee5bf25a51dbcd6965",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "d482b84ae89a56659fe377492c3241214ee6c510275bc9ede39173adde6a1c40",
+          "result": "supported"
+        },
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "death_observability"
+          },
+          "dataset_id": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "memory_id": "462fd55a047ea623312350dfe70832217ec9f0274bb40eee22fd7cf846515113",
+          "prediction_id": "d274f48488c36cd87cfab8a39709155a54110ddb125ea5059bebd4a164fc3050",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "1b6444cec2d3043deca573cbe5b5e4125324bab4377467769879785cd8ea26b3",
+          "result": "supported"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345": {
+      "goal": "The unresolved question may recur in independent experience: ownership_continuity",
+      "method": "evidence-review",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "ownership_continuity"
+          },
+          "dataset_id": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "memory_id": "3a717c9848a786851ec2f609e18df6d1cb7573712360f4e4f7223e37e5c0410d",
+          "prediction_id": "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+          "result": "supported"
+        },
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "ownership_continuity"
+          },
+          "dataset_id": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "memory_id": "d2d4cd980ed34c484987275f6a6cf9e58ccf2d1dbacbe02dc2260a6206330187",
+          "prediction_id": "f6f335061416fcb176f3367ec50658d74f39218790ff0e8a7aa63994eb5686c6",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "8da919fdb7ffd570d7f81a5ff03e35707150f32d75ab7dc5ec17cb55586ab4c0",
+          "result": "supported"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf": {
+      "goal": "The unresolved question may recur in independent experience: score_attribution",
+      "method": "evidence-review",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "score_attribution"
+          },
+          "dataset_id": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "memory_id": "411bac0971be4a618d2dabbebf6bdeecd9cc7a9d3e23bb5281dec0157e9881ad",
+          "prediction_id": "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+          "result": "supported"
+        },
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "score_attribution"
+          },
+          "dataset_id": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "memory_id": "49c310e4f9d04ad49960b45852fd7a9e01c87b823a06023bb96899786fd85c53",
+          "prediction_id": "da3d87d578284a24aa4c93491266697181966311fc263ae83834261c7a25dceb",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "dd94a56938bdbd22f8c50066ce980f8b0b8f932801bcecbede782fcd0ddc352e",
+          "result": "supported"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2": {
+      "goal": "The unresolved question may recur in independent experience: self_uncertainty",
+      "method": "evidence-review",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "self_uncertainty"
+          },
+          "dataset_id": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "memory_id": "a2a5be43fb88f0ad5adc2a24378c6f6a470a0decfec2956c5f6d7cc69134945e",
+          "prediction_id": "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+          "result": "supported"
+        },
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "self_uncertainty"
+          },
+          "dataset_id": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "memory_id": "014470e3469ff8e0bb9e3958dc6e800493335b2b6d5849da3ffe356d022de319",
+          "prediction_id": "8b8f8ec6e474cf2fa3477b34c8837c5a95b6e805e488441d18326faaaa0352a8",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "f1ad513eabe5db47273be6c6239ecf04f94ece19228b89d79d0d9e39ca475a73",
+          "result": "supported"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f": {
+      "goal": "The unresolved question may recur in independent experience: semantic_coverage",
+      "method": "evidence-review",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "semantic_coverage"
+          },
+          "dataset_id": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "memory_id": "577b93735557a0ce93bb217c6f8d69fb97d15421735cc5c80fef7cca631e2c3b",
+          "prediction_id": "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+          "result": "supported"
+        },
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "semantic_coverage"
+          },
+          "dataset_id": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "62085bdcf4597c14779c783f723dca72e33b14583fbc89c314b87feefebb87b7",
+          "memory_id": "30a7c2d14048f2833e65c4ef062ab40fe95ebf5b750b8649817ecabbf637ec19",
+          "prediction_id": "e355951323063a8599ff67c629cddbe7d82eed933867935a3f0c389d916e4d5a",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "29b34b5a3c75284b4db763ae3453a40439564ac2031fa3b278602bc2a5acf213",
+          "result": "supported"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a": {
+      "goal": "The unresolved question may recur in independent experience: startup_latency",
+      "method": "evidence-review",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 1,
+        "resolved": 1,
+        "results": {
+          "supported": 1
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "predicate": "recurrent_context_gap",
+            "question_category": "startup_latency"
+          },
+          "dataset_id": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:685b1f6c5834803844dbbe2ec7f2fc456be3b987a33f49d3a8fb80bb5f94010b",
+            "episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927",
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+            "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "6b646288b58e9d66fa645d744fe792ae134c23d71250f4e9fcd0ff04c28b67ef",
+          "memory_id": "7f12af1a86a573f677181e327af61bd1a314cdce4afc9329367af8fac93939ca",
+          "prediction_id": "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+          "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+          "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+          "result": "supported"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df": {
+      "goal": "Can temporal estimation improve without promoting uncertain track links?",
+      "method": "meditation-motion",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "corpus_id": null,
+            "meditation_id": "9f48390757f38d41e39a844905fc8457bce6e4fd7b9d075d06bf9b38d4c7344c"
+          },
+          "dataset_id": "9f48390757f38d41e39a844905fc8457bce6e4fd7b9d075d06bf9b38d4c7344c",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "episode:b933be07446271a61522fa0ddde4bac71ec394a62ac699e0e6db3fa4e5e2d423",
+          "memory_id": "16495b2a69977084b7c789dd7ecdb767031830aea6d8655a0a960b943218e7fc",
+          "prediction_id": "81ac3dbee03e461066de5aa4396685f6cbd74b793dfb11dd5d1b9cfa33a58e91",
+          "reason": "No independently verified player/target/threat trajectories supplied; Meditation associations and error summaries are not independent ground truth; No fresh sealed final motion evaluation or operational shadow qualification; Source episode already used as validation; not fresh final evidence",
+          "resolution_id": "27a53fd2f0cf98f1db8429d9d5b16f66fe1216a9b78fecada158eb034d1f2cdf",
+          "result": "unresolved"
+        }
+      ],
+      "developmental_bookmark": null,
+      "operational_outcome": null
+    },
+    "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d": {
+      "goal": "Can preserved observations support the existing motion candidates?",
+      "method": "evidence-review",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 1,
+        "resolved": 1,
+        "results": {
+          "contradicted": 1
+        },
+        "support_fraction": 0.0
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "predicate": "capture_horizon_supported",
+            "question_category": "motion_evidence_availability"
+          },
+          "dataset_id": "2563c8f3caddf3df61bcc03b4c0e3dc351563dc8ece977366c3fbf3e7ebb084d",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "f0d68c5ba8c4d40c5d9bbeabbc5eb2f26dc0f3330375d782bf95dd1ac7607374",
+          "memory_id": "822884ae0fb76ce8abe5255f121087dbb37a76e144c3ad13f79f4d82a6f66ba6",
+          "prediction_id": "262ea3128ee8b4133eb610c295ebf30e1f4dba07730e6ef498328619fd792345",
+          "reason": "Reconstructed hash-bound capture timing; frozen-horizon availability only, identities and performance remain unqualified",
+          "resolution_id": "08410c3d8f56b833280e19d757959474bc7be012c60e44be852ae623a1e711c5",
+          "result": "contradicted"
+        }
+      ],
+      "developmental_bookmark": {
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Await separately authorized acquisition; resume this project only after new qualified evidence",
+        "op": "evidence_continuation",
+        "original_question": "Can preserved observations support the existing motion candidates?",
+        "physical_authorization": false,
+        "prediction_id": "262ea3128ee8b4133eb610c295ebf30e1f4dba07730e6ef498328619fd792345",
+        "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+        "qualification_keys": [
+          "5518b79b76bef23eee16a345c846a1e5ee25650049dc960dfcbf5b7dac6fe06d"
+        ],
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+          "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+          "Independent persistent player/object identities and board coordinates",
+          "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+        ],
+        "resolution_id": "08410c3d8f56b833280e19d757959474bc7be012c60e44be852ae623a1e711c5",
+        "rollback": "Keep baseline; no candidate activation or final-test reuse",
+        "servo_authorization": false,
+        "status": "READY_FOR_PLAY",
+        "evidence_id": "38ed02c703ebae3a31eef18c325b6e7ca45032f0ba675ca2dbefc134e3c3ebec"
+      },
+      "operational_outcome": null
+    },
+    "215156bbcff2ed248997a1abc3ab36d2bd3eb9d9eacbab8021996f8c51bbb0bf": {
+      "goal": "Can temporal estimation improve without promoting uncertain track links?",
+      "method": "meditation-motion",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection",
+      "experiment_history": [
+        {
+          "condition": {
+            "corpus_id": null,
+            "meditation_id": "4b136ac98c4b249c8829cb520ec55f981f658731d6abeedc520d186048110374"
+          },
+          "dataset_id": "4b136ac98c4b249c8829cb520ec55f981f658731d6abeedc520d186048110374",
+          "episode": "autonomous-learning-v1",
+          "evidence_groups": [
+            "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb"
+          ],
+          "experiment_kind": "offline",
+          "independence_unit": "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+          "memory_id": "7497ea4d4a34095e7d53c25ffa8320f4b8fbfa2bc36b8f2b913a9b92d4f336c5",
+          "prediction_id": "2f34786096c3323189757621892dc4460bc30e574580b763c52935058121d7ab",
+          "reason": "No independently verified player/target/threat trajectories supplied; Meditation associations and error summaries are not independent ground truth; No fresh sealed final motion evaluation or operational shadow qualification",
+          "resolution_id": "407b2224bb8dbaf7b26d6cb48993bf696713d5b26c421b309e1e64a6cd9435c4",
+          "result": "unresolved"
+        }
+      ],
+      "developmental_bookmark": {
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Await separately authorized acquisition; resume this project only after new qualified evidence",
+        "op": "evidence_continuation",
+        "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+        "physical_authorization": false,
+        "prediction_id": "2f34786096c3323189757621892dc4460bc30e574580b763c52935058121d7ab",
+        "project_id": "215156bbcff2ed248997a1abc3ab36d2bd3eb9d9eacbab8021996f8c51bbb0bf",
+        "qualification_keys": [
+          "5518b79b76bef23eee16a345c846a1e5ee25650049dc960dfcbf5b7dac6fe06d"
+        ],
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+          "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+          "Independent persistent player/object identities and board coordinates",
+          "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+        ],
+        "resolution_id": "407b2224bb8dbaf7b26d6cb48993bf696713d5b26c421b309e1e64a6cd9435c4",
+        "rollback": "Keep baseline; no candidate activation or final-test reuse",
+        "servo_authorization": false,
+        "status": "READY_FOR_PLAY",
+        "evidence_id": "ba09833c58fa07a284dc17f3c816f4f0b7161b92e6bfc686c375808a16db39f2"
+      },
+      "operational_outcome": null
+    }
+  },
+  "physical_authorization": false,
+  "physical_activations": 0,
+  "complete_game_score": "unqualified; reported historical subsystem score 100",
+  "new_robotron_experience": false,
+  "source_processing": "Normal main.py --offline, no manual intermediate commands",
+  "unsupported_validation": {
+    "native_pi": "hostname charlie does not resolve; not executed",
+    "broad_pytest_root": "legacy hardware scripts require machine/libcamera; supported suite is pytest tests"
+  },
+  "corrected_failures": [
+    "Recovered legacy context lacked retrospective_ingestion marker; now unavailable original tracks remain explicit",
+    "Recovered context aliases could commission duplicate meditation; episode identity now deduplicates commissions"
+  ],
+  "acceptance": "Host software lifecycle only; ALA-2 complete-game score improvement remains open",
+  "original_177_ids_retained": 177,
+  "restart_records": 364,
+  "export_package_sha256": "8b4c53f7ad8f0e3f656ab4aa25a7b40b208459e89f56a24f90b2950749278444",
+  "normal_startup_acceptance_tests": 11
+}

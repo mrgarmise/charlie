@@ -111,3 +111,148 @@ def test_gameplay_yields_without_acquiring_hardware(tmp_path,monkeypatch):
         assert lifecycle.phase=='experiencing'
         assert not lifecycle.journal.records()
     finally:lifecycle.close()
+
+
+def test_interruption_after_activation_reconciles_feedback_once(tmp_path,monkeypatch):
+    root=experience(tmp_path);state=tmp_path/'state';delivered_corpus(tmp_path,state)
+    authority=dict(source='explicit controlled offline authority',target='offline-shadow',execution='offline')
+    life=DevelopmentLifecycle(state,[root],offline_authority=authority)
+    from memory.learning_projects import LearningExecutive
+    original=LearningExecutive.receive_operational_outcome
+    def crash(*a,**kw):raise InterruptedError('after durable operational measurement')
+    monkeypatch.setattr(LearningExecutive,'receive_operational_outcome',crash)
+    try:
+        with pytest.raises(InterruptedError):life.turn()
+    finally:life.close()
+    monkeypatch.setattr(LearningExecutive,'receive_operational_outcome',original)
+    p=startup(state,[root]);assert p.returncode==0,p.stderr
+    records=rows(state)
+    for category in ('capability_activation','offline_operational_outcome','motion_final_consultation'):
+        assert sum(r.data['payload'].get('category')==category for r in records)==1
+    assert sum(r.data['payload'].get('op')=='operational_feedback' for r in records)==1
+
+
+def test_meditation_checkpoint_retry_and_source_integrity(tmp_path,monkeypatch):
+    root=experience(tmp_path);state=tmp_path/'state'
+    import experiments.ppal.meditate_robotron as m
+    original=m.quality
+    def crash(*a,**kw):raise InterruptedError('bounded reflection interrupted')
+    monkeypatch.setattr(m,'quality',crash)
+    life=DevelopmentLifecycle(state,[root])
+    try:
+        with pytest.raises(InterruptedError):life.turn()
+    finally:life.close()
+    monkeypatch.setattr(m,'quality',original)
+    p=startup(state,[root]);assert p.returncode==0,p.stderr
+    records=rows(state)
+    assert sum(r.data['payload'].get('category')=='reflection_commission' for r in records)==1
+    assert sum(r.data['payload'].get('category')=='normal_meditation_result' for r in records)==1
+    (root/'tracks.json').write_text('{}')
+    p=startup(state,[root],turns=1)
+    assert p.returncode!=0 and 'changed' in p.stderr
+    assert json.loads((state/'development-status.json').read_text())['error']
+
+
+def test_surviving_legacy_context_preserved_without_inventing_tracks(tmp_path):
+    state=tmp_path/'state';source=tmp_path/'legacy';source.mkdir()
+    from learning.datasets import SCOPE
+    j=EvidenceJournal(source/'learning-evidence.sqlite3')
+    old=j.append('observation',dict(category='learning_context_reference',source_episode='legacy-game',
+        context=dict(questions=[],identity_samples={})),episode=SCOPE,producer='existing-evidence-consolidation',version='ala-1')
+    j.close()
+    cmd=[sys.executable,'main.py','--offline','--learning-state',str(state),'--history-root',str(source),
+        '--episode-root',str(tmp_path/'empty'),'--learning-turns','2','--learning-interval','.05']
+    p=subprocess.run(cmd,capture_output=True,text=True,timeout=20)
+    assert p.returncode==0,p.stderr
+    records=rows(state);assert any(r.id==old.id for r in records)
+    result=next(r for r in records if r.data['payload'].get('category')=='normal_meditation_result')
+    assert result.data['payload']['status']=='unavailable'
+    assert not any(r.data['payload'].get('category')=='preserved_meditation' for r in records)
+
+
+def test_history_context_alias_is_not_another_meditation(tmp_path):
+    root=experience(tmp_path);state=tmp_path/'state'
+    p=startup(state,[root]);assert p.returncode==0,p.stderr
+    from learning.datasets import SCOPE
+    j=EvidenceJournal(state/'learning-evidence.sqlite3')
+    episode='episode:'+sha(root/'report.json')
+    j.append('observation',dict(category='learning_context_reference',source_episode=episode,
+        context=dict(questions=[],identity_samples={}),source_journal='relocated original notebook'),
+        episode=SCOPE,producer='existing-evidence-consolidation',version='ala-1')
+    j.close()
+    p=startup(state,[root]);assert p.returncode==0,p.stderr
+    assert sum(r.data['payload'].get('category')=='normal_meditation_result' for r in rows(state))==1
+
+
+def test_subsequent_diagnostic_failure_rolls_back_offline_only(tmp_path,monkeypatch):
+    root=experience(tmp_path);state=tmp_path/'state';delivered_corpus(tmp_path,state)
+    import learning.meditation as m
+    original=m.motion_error;calls=0
+    def degraded(spec,episodes):
+        nonlocal calls
+        calls+=1
+        metric=original(spec,episodes)
+        if calls==5:  # Three tuning comparisons, one sealed final, then subsequent use.
+            metric['candidate']=metric['baseline']+1
+        return metric
+    monkeypatch.setattr(m,'motion_error',degraded)
+    authority=dict(source='explicit controlled offline authority',target='offline-shadow',execution='offline')
+    life=DevelopmentLifecycle(state,[root],offline_authority=authority)
+    try:
+        life.turn()
+        from learning.deployment import CapabilityDeployment
+        active=CapabilityDeployment(life.journal).active('offline-shadow')
+        assert active['candidate'] is None and active['revoked_proposal']
+        assert any(r.data['payload'].get('op')=='operational_feedback' for r in life.journal.records())
+    finally:life.close()
+
+
+def test_exported_normal_notebook_restores_results_by_hash(tmp_path):
+    root=experience(tmp_path);state=tmp_path/'state'
+    p=startup(state,[root]);assert p.returncode==0,p.stderr
+    # Simulate relocation while retaining the original immutable record's path.
+    moved=tmp_path/'moved';state.rename(moved)
+    target=tmp_path/'target'
+    cmd=[sys.executable,'main.py','--offline','--learning-state',str(target),'--history-root',str(moved),
+        '--episode-root',str(root),'--learning-turns','2','--learning-interval','.05']
+    p=subprocess.run(cmd,capture_output=True,text=True,timeout=20)
+    assert p.returncode==0,p.stderr
+    assert sum(r.data['payload'].get('category')=='normal_meditation_result' for r in rows(target))==1
+
+
+def test_normal_attention_lifecycle_survives_worker_interruption(tmp_path,monkeypatch):
+    """Simulated camera/motion/process APIs; no hardware objects initialized."""
+    from types import ModuleType
+    import main
+    calls=[]
+    class Worker:
+        def __init__(self,**kwargs):calls.append('worker constructed');self.alive=False
+        def start(self):calls.append('worker started')
+        def is_alive(self):return self.alive
+        def join(self,**kwargs):calls.append('worker joined')
+    monkeypatch.setattr(main.multiprocessing,'get_context',lambda *a:SimpleNamespace(Process=Worker))
+    class Attention:
+        def __init__(self,*a):pass
+        def update(self,*a):calls.append('attention update')
+        def close(self):calls.append('attention closed')
+    class Camera:
+        def __init__(self):calls.append('simulated camera')
+        def close(self):calls.append('camera closed')
+    class Vision:
+        def __init__(self,*a):self.steps=0
+        def update(self):
+            self.steps+=1
+            if self.steps>2:raise KeyboardInterrupt()
+    replacements={
+        'motion.controller':dict(Deck=lambda:object()),
+        'attention.manager':dict(AttentionManager=Attention),
+        'stimulus.keyboard':dict(KeyboardStimulus=lambda bus:None),
+        'vision.camera':dict(Camera=Camera),
+        'vision.detector':dict(ColorDetector=lambda **kw:object()),
+        'vision.stimulus':dict(VisionStimulus=Vision)}
+    for name,contents in replacements.items():
+        module=ModuleType(name);module.__dict__.update(contents);monkeypatch.setitem(sys.modules,name,module)
+    with pytest.raises(KeyboardInterrupt):main.main(['--learning-state',str(tmp_path/'state')])
+    assert calls.count('worker started')==2
+    assert calls.count('attention update')==2
+    assert 'attention closed' in calls and 'camera closed' in calls

@@ -219,7 +219,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         project=executive.projects()[identifier]
         spec=dataset.journal.get(item['hypothesis_id']).data['payload']['proposal']
         from .datasets import scientific_content
-        if project.get('hold') and project['status']=='paused' and project.get('disposition')!='budget_exhausted' and not any(scientific_content(dataset.journal,h.get('dataset_id'))==scientific_content(dataset.journal,spec['dataset_id']) for h in project['experiment_history']):
+        if project.get('hold') and project['status'] in ('paused','blocked') and project['experiment_history'] and project.get('disposition')!='budget_exhausted' and not any(scientific_content(dataset.journal,h.get('dataset_id'))==scientific_content(dataset.journal,spec['dataset_id']) for h in project['experiment_history']):
             executive.transition(identifier,'candidate','New versioned evidence permits reassessment; no independent confirmation assumed',dataset.journal,[item['evidence_id']])
     started=time.monotonic(); results=[]; seen=set()
     for _ in range(max_jobs):
@@ -232,7 +232,11 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         if not selection['project']: break
         project=selection['project']; context=executive.chooser_context(project['id'])
         plan=select_offline_experiment(gateway,dataset.journal,context,budget_seconds=remaining)
-        if plan is None or plan['prediction_id'] in seen: break
+        if plan is None:
+            executive.transition(project['id'],'blocked','Evaluator/chooser has no justified executable investigation under current evidence',
+                dataset.journal,project['tactical_hypothesis_evidence'])
+            continue
+        if plan['prediction_id'] in seen: break
         seen.add(plan['prediction_id'])
         commission=executive.commission(plan,dataset.journal)
         result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups','model-evaluation','context-evidence','meditation-evidence'},

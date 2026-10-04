@@ -18,9 +18,10 @@ from .foundry import atomic_json
 
 
 class DevelopmentLifecycle:
-    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None):
+    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=()):
         self.output = Path(output).resolve()
         self.roots = [Path(r).resolve() for r in roots]
+        self.history_roots = [Path(r).resolve() for r in history_roots]
         if not 1 <= budget_seconds <= 60:
             raise ValueError('normal application learning budget must be 1..60 seconds')
         if any(self.output == r or r in self.output.parents for r in self.roots):
@@ -39,6 +40,12 @@ class DevelopmentLifecycle:
         self.executive = LearningExecutive(self.journal, self.gateway)
         self.budget = budget_seconds
         self.authority = offline_authority
+        import subprocess
+        repo=Path(__file__).resolve().parents[1]
+        revision=subprocess.run(['git','rev-parse','HEAD'],cwd=repo,capture_output=True,text=True)
+        dirty=subprocess.run(['git','status','--porcelain'],cwd=repo,capture_output=True,text=True)
+        self.provenance=dict(code_revision=revision.stdout.strip() if revision.returncode==0 else None,
+            dirty_worktree=bool(dirty.stdout),test_environment='offline process; no hardware capability initialized')
         self.error = None
         self.phase = 'idle'
         self._status()
@@ -55,13 +62,20 @@ class DevelopmentLifecycle:
         current = next((p for p in reversed(list(projects.values())) if p['status']=='active'), None)
         if not current:
             current = next((p for p in reversed(list(projects.values())) if p.get('experiment_history')), None)
+        summary=(self.phase,current['goal'] if current else None,self.error)
+        if summary!=getattr(self,'last_summary',None):
+            print('Development:',self.phase,'|',summary[1] or 'no project','|',self.error or '',flush=True)
+            self.last_summary=summary
         atomic_json(self.output/'development-status.json', dict(schema='charlie-development-status-v1',
-            phase=self.phase, current_project=current['id'] if current else None,
+            phase=self.phase, last_activity=getattr(self,'last_activity',self.phase), current_project=current['id'] if current else None,
             current_question=current['goal'] if current else None,
-            projects={k:dict(goal=v['goal'],status=v['status'],progress=v.get('progress',{})) for k,v in projects.items()},
+            projects={k:dict(goal=v['goal'],status=v['status'],progress=v.get('progress',{}),next_direction=v.get('next_direction')) for k,v in projects.items()},
             latest_findings=[dict(id=r.id,**r.data['payload']) for r in findings[-3:]],
+            latest_operational_outcome=next((dict(id=r.id,metrics=r.data['payload']['metrics'],changed_decisions=r.data['payload']['changed_decisions'])
+                for r in reversed(rows) if r.data['payload'].get('category')=='offline_operational_outcome'),None),
             evidence_requests=requests, activation=active,
             physical_authorization=False, physical_score_improvement='UNKNOWN', error=self.error,
+            provenance=self.provenance,
             authorization_requests=[r.data['payload'] for r in rows if r.data['payload'].get('category')=='offline_authorization_request'
                 and not any(a.data['payload'].get('proposal_id')==r.data['payload']['proposal_id'] for a in rows
                     if a.data['payload'].get('category')=='capability_activation')]))
@@ -71,14 +85,29 @@ class DevelopmentLifecycle:
         self._status()
 
     def acquire(self):
-        from .retrospective import discover_episodes
+        from .retrospective import discover_episodes, merge_history
         from .cycle import ingest_episode
         from .archive_audit import audit, ingest as qualification
         from .meditation import qualify_corpus
         changed = False
+        self.available_tracks = {}
+        for source in self.history_roots:
+            receipt=merge_history(source,self.output)
+            self.journal.append('event',dict(category='normal_history_restore',receipt=receipt),
+                episode=SCOPE,producer='existing-evidence-consolidation',version='normal-lifecycle-v1')
+        for record in self.journal.records('observation'):
+            p=record.data['payload']
+            if p.get('category')=='normal_meditation_result':
+                original=Path(p['result_path'])
+                candidates=[original,self.output/'meditations'/p['context_id']/'result.json']
+                candidates+=list((self.output/'recovered-history').glob('*/meditations/'+p['context_id']+'/**/result.json'))
+                if not any(path.is_file() and sha(path)==p['result_sha256'] for path in candidates):
+                    raise ValueError('durable meditation result changed or unavailable')
         for root in discover_episodes(self.roots):
             # Report files are the legacy finalization boundary. The player now
             # publishes report bytes atomically, so discovery cannot see a torn report.
+            if (root/'tracks.json').is_file():
+                self.available_tracks['episode:'+sha(root/'report.json')]=root/'tracks.json'
             before = len(self.journal.records())
             ingest_episode(root, self.dataset, self.gateway)
             qualification(self.journal, audit(root))
@@ -92,7 +121,12 @@ class DevelopmentLifecycle:
                 r.data['payload'].get('category')=='acquisition_delivery' and r.data['payload'].get('sha256')==key]
             if imported:
                 continue
-            record = qualify_corpus(self.dataset, path)
+            try:
+                record = qualify_corpus(self.dataset, path)
+            except (ValueError,OSError) as exc:
+                self.journal.append('event',dict(category='acquisition_delivery_rejected',sha256=key,
+                    reason=str(exc)),episode=SCOPE,producer='existing-acquisition-capability',version='normal-lifecycle-v1')
+                continue
             self.journal.append('event', dict(category='acquisition_delivery',sha256=key,record_id=record.id),
                 episode=SCOPE, sources=[record.id],producer='existing-acquisition-capability',version='normal-lifecycle-v1')
             changed = True
@@ -104,8 +138,8 @@ class DevelopmentLifecycle:
         from .meditation import consume
         context = self.journal.get(context_id).data['payload']
         episode = context['source_episode']
-        marker = next(r.data['payload'] for r in self.journal.records('event') if
-            r.data['payload'].get('category')=='retrospective_ingestion' and r.data['payload']['context_id']==context_id)
+        marker = next((r.data['payload'] for r in self.journal.records('event') if
+            r.data['payload'].get('category')=='retrospective_ingestion' and r.data['payload']['context_id']==context_id), None)
         source = None
         from .retrospective import discover_episodes
         for root in discover_episodes(self.roots):
@@ -113,6 +147,8 @@ class DevelopmentLifecycle:
                 source=root/'tracks.json'
                 break
         result_path=self.output/'meditations'/context_id/'result.json'
+        if result_path.exists() and json.loads(result_path.read_text()).get('status')=='unavailable' and source is not None and source.is_file():
+            result_path=result_path.parent/sha(source)/'result.json'
         checkpoint=result_path.parent/'checkpoint.json'
         result_path.parent.mkdir(parents=True,exist_ok=True)
         if result_path.exists():
@@ -134,6 +170,7 @@ class DevelopmentLifecycle:
             # Explicit bounded algorithm; no invented independent observations.
             deadline=time.monotonic()+self.budget
             def progress():
+                self.yield_for_primary()
                 if time.monotonic()>deadline:
                     raise TimeoutError('meditation yielded at bounded resource deadline')
             while len(history)<6:
@@ -154,12 +191,12 @@ class DevelopmentLifecycle:
             atomic_json(result_path,result)
         sources=[context_id,commission_id]
         if result['status']=='completed' and all(isinstance(result['quality'][k]['mean_error'],(int,float)) for k in ('adjacent','gaps')):
-            finding=consume(self.dataset,result_path,source_episode=episode,prior_use=marker['prior_use'])
+            finding=consume(self.dataset,result_path,source_episode=episode,prior_use=marker['prior_use'] if marker else context.get('prior_use','diagnostic'))
             sources.append(finding.id)
         return self.journal.append('observation',dict(category='normal_meditation_result',
             context_id=context_id,source_episode=episode,result_path=str(result_path),
             result_sha256=sha(result_path),status=result['status']),episode=SCOPE,sources=sources,
-            producer='Reflection',version='normal-lifecycle-v1')
+            producer='Reflection',version='normal-lifecycle-v1',provenance=self.provenance)
 
     def requests(self):
         qualifications = [r for r in self.journal.records('observation') if
@@ -220,6 +257,11 @@ class DevelopmentLifecycle:
             previous = [r for r in self.journal.records('observation') if r.data['payload'].get('category')=='offline_operational_outcome' and r.data['payload'].get('proposal_id')==row.id]
             if previous:
                 self.executive.receive_operational_outcome(previous[0].id)
+                metric=previous[0].data['payload']['metrics']
+                active=deployment.active('offline-shadow')
+                if active and active.get('proposal_id')==row.id and metric['candidate']>=metric['baseline'] and self.authority:
+                    deployment.rollback('offline-shadow',reason='Subsequent offline diagnostic failed frozen baseline; retain finding',
+                        authorization=self.authority,to_baseline=True)
                 continue
             active = deployment.active('offline-shadow')
             if not active or active.get('proposal_id')!=row.id:
@@ -245,30 +287,41 @@ class DevelopmentLifecycle:
                 decisions=decisions,changed_decisions=sum(d['action']!=d['baseline_action'] for d in decisions),
                 metrics=metric,evidence_use='reused validation diagnostic',controller_writes=0,
                 physical_score_improvement='UNKNOWN'),episode=row.data['episode'],sources=[row.id,resolution.id],
-                producer='existing-planner-offline-outcome',version='normal-lifecycle-v1')
+                producer='existing-planner-offline-outcome',version='normal-lifecycle-v1',provenance=self.provenance)
             self.executive.receive_operational_outcome(observation.id)
+            if metric['candidate']>=metric['baseline'] and self.authority:
+                deployment.rollback('offline-shadow',reason='Subsequent offline diagnostic failed frozen baseline; retain finding',
+                    authorization=self.authority,to_baseline=True)
+
+    def yield_for_primary(self):
+        from .cycle import gameplay_active
+        if gameplay_active():
+            raise InterruptedError('primary gameplay owns time-critical resources; checkpoint learning')
 
     def turn(self):
         return self.executive.develop(self)
 
     def close(self):
+        self.last_activity=self.phase
         self._phase('stopped')
         self.journal.close()
         self.lock.close()
 
 
-def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None):
+def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None, history_roots=()):
     """Application-owned worker; bounded polling delegates all decisions to Executive."""
     import signal
     if not .05 <= interval <= 300 or (turns is not None and turns<1):
         raise ValueError('bounded cadence and positive turns required')
+    import os
+    os.nice(10)  # Vision/control retain host CPU priority.
     stopped = False
     def stop(*unused):
         nonlocal stopped
         stopped = True
     signal.signal(signal.SIGTERM,stop)
     signal.signal(signal.SIGINT,stop)
-    lifecycle = DevelopmentLifecycle(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority)
+    lifecycle = DevelopmentLifecycle(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,history_roots=history_roots)
     try:
         count=0
         while not stopped and (turns is None or count<turns):

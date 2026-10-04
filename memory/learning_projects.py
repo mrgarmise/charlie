@@ -460,10 +460,13 @@ class LearningExecutive:
         # A completed result is a durable checkpoint, not another experience.
         contexts=[r for r in self.journal.records('observation') if
             r.data['payload'].get('category')=='learning_context_reference' and r.data['payload'].get('source_episode')]
-        completed={r.data['payload']['context_id'] for r in self.journal.records('observation') if
-            r.data['payload'].get('category')=='normal_meditation_result'}
+        results=[r.data['payload'] for r in self.journal.records('observation') if
+            r.data['payload'].get('category')=='normal_meditation_result']
+        completed_episodes={r['source_episode'] for r in results if r['status']=='completed'}
+        unavailable={r['context_id'] for r in results if r['status']=='unavailable'}
         for context in contexts:
-            if context.id in completed:
+            episode=context.data['payload']['source_episode']
+            if episode in completed_episodes or (context.id in unavailable and episode not in lifecycle.available_tracks):
                 continue
             commission=self.journal.append('event',dict(category='reflection_commission',context_id=context.id,
                 physical_authorization=False,reason='New preserved experience warrants bounded retrospective reflection'),
@@ -475,7 +478,7 @@ class LearningExecutive:
         lifecycle._phase('investigating')
         report = investigate(lifecycle.dataset,lifecycle.gateway,executive=self,
             budget_seconds=lifecycle.budget,max_jobs=1,review_questions=True,
-            diagnostics_only=False)
+            diagnostics_only=False,on_progress=lifecycle.yield_for_primary)
         lifecycle.requests()
         lifecycle.operational_feedback()
         projects=self.projects()

@@ -14,6 +14,7 @@ def parser():
     p.add_argument('--offline',action='store_true',help='no camera, motion, firmware or game transport')
     p.add_argument('--learning-state',type=Path,default=Path.home()/'.local/share/charlie/development')
     p.add_argument('--episode-root',type=Path,action='append',default=[])
+    p.add_argument('--history-root',type=Path,action='append',default=[],help='preserve and additively restore an existing notebook')
     p.add_argument('--learning-budget',type=float,default=10.)
     p.add_argument('--learning-interval',type=float,default=5.)
     p.add_argument('--learning-turns',type=int,help='bounded offline acceptance run')
@@ -31,13 +32,14 @@ def main(argv=None):
     authority=(dict(source='normal application startup: explicit offline-improvement authorization',
         target='offline-shadow',execution='offline') if args.allow_offline_improvements else None)
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
-                turns=args.learning_turns,offline_authority=authority)
+                turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root)
     if args.offline:
         run(args.learning_state,roots,**kwargs)
         return
     # Spawn a single application-owned child; no hardware objects are inherited.
     process=multiprocessing.get_context('spawn').Process(target=run,args=(args.learning_state,roots),kwargs=kwargs)
     process.start()
+    next_worker_restart=0.
     attention=camera=None
     try:
         from motion.controller import Deck
@@ -69,8 +71,12 @@ def main(argv=None):
                     previous=summary
             except (OSError,ValueError):
                 pass
-            if not process.is_alive():
-                raise RuntimeError('Executive worker stopped; preserve state and restart normal application')
+            if not process.is_alive() and time.monotonic()>=next_worker_restart:
+                process.join()
+                print('Development worker interrupted; resuming durable Executive state',flush=True)
+                process=multiprocessing.get_context('spawn').Process(target=run,args=(args.learning_state,roots),kwargs=kwargs)
+                process.start()
+                next_worker_restart=time.monotonic()+5.  # Supervision, not another learning scheduler.
             time.sleep(.02)
     finally:
         if attention: attention.close()

@@ -22,6 +22,25 @@ class Deck:
         if self.calibration is not None:
             return self.calibration.observe_primary(**observation)
 
+    def observe_frame(self, frame, target=None):
+        if self.calibration is not None:
+            return self.calibration.observe_frame(frame, target)
+
+    def brain_calibration(self, *, confirm=False):
+        if self.calibration is not None and self.calibration.brain is not None:
+            if confirm:
+                self.calibration.brain.confirm_start()
+            else:
+                self.calibration.brain.request()
+
+    def track_target(self, x, y):
+        # The shared-frame capability already has the raw target. Attention may
+        # express TRACK without sending unscoped legacy angle/PWM requests.
+        if self.calibration is not None and self.calibration.brain is not None:
+            return
+        from vision.mapping import pixel_to_angle
+        return self.track(*pixel_to_angle(x, y))
+
     # --------------------------------------------------
     # MOTION
     # --------------------------------------------------
@@ -37,6 +56,8 @@ class Deck:
         pan,
         tilt
     ):
+        if self.calibration is not None and self.calibration.brain is not None:
+            return  # Idle's old absolute angle list is not qualified evidence.
         self.body.look(
             pan,
             tilt
@@ -53,6 +74,8 @@ class Deck:
         )
 
     def scan(self):
+        if self.calibration is not None and self.calibration.brain is not None:
+            return self.calibration.brain.request_search()
         self.body.scan()
 
     def stop(self):
@@ -63,6 +86,8 @@ class Deck:
     # --------------------------------------------------
 
     def attitude(self, state):
+        if self.calibration is not None and self.calibration.brain is not None and state != 'IDLE':
+            return self.body.message(state)
 
         return self.body.display(
             state

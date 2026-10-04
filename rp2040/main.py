@@ -154,6 +154,22 @@ while True:
     except MotionError:
         servos.stop('SCHEDULER_SAFETY_FAILURE')
         behaviors.set_mode(behaviors.IDLE)
+    cal_status = servos.calibration.status()
+    cal_state = cal_status['state']
+    notice = None
+    if not link_lost and cal_status.get('automated'):
+        if cal_state == 'VERIFY_INITIAL':
+            review = (cal_status.get('constraints') or {}).get('powered_start_review') or {}
+            notice = 'START ' + str(review['pose']) + ' CONFIRM V' if review.get('pose') else 'START POSE UNVERIFIED'
+        elif cal_state == 'PREPARED':
+            notice = 'WAIT GP10 ' + str(cal_status.get('direction', ''))
+        elif cal_state == 'MOVING': notice = 'MOVING'
+        elif cal_state == 'AWAIT_CONFIRMATION': notice = 'OBSERVING'
+        elif cal_state == 'READY': notice = 'CAL READY'
+        elif cal_state == 'ABORTED': notice = 'CAL FAULT'
+        elif cal_state == 'CLOSED': notice = 'TRACKING' if servos.status()['armed'] else 'CAL SAVED'
+    if hasattr(display, 'capability_status'):
+        display.capability_status(notice)
     display.update()
     gc.collect()
     time.sleep_ms(20)

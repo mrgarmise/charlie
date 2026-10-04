@@ -39,6 +39,8 @@ class CommandHandler:
             elif name=='SESSION':
                 values=arguments(cmd,(1,));servos.establish_session(values[0])
                 self.behaviors.set_mode(self.behaviors.IDLE)
+                if self.display and hasattr(self.display, 'show_text'):
+                    self.display.show_text('BRAIN ONLINE', 3000)
                 print('OK SESSION')
             elif name=='AUTHORIZE':
                 owner,session,revision,transition=arguments(cmd,(4,))

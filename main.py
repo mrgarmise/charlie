@@ -21,9 +21,11 @@ neck = CalibrationService.open(deck.body, Path(os.environ.get(
     'CHARLIE_NECK_STATE', str(Path.home() / '.local/share/charlie/neck'))))
 deck.calibration = neck
 neck.refresh()
+neck.attach_brain(authorized=os.environ.get('CHARLIE_NECK_MOTION_AUTHORIZED') == '1',
+    supervised=os.environ.get('CHARLIE_NECK_SUPERVISED') == '1')
 
 bus = StimulusBus()
-attention = AttentionManager(bus)
+attention = AttentionManager(bus, mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED') == '1')
 
 KeyboardStimulus(bus)
 
@@ -33,16 +35,20 @@ detector = ColorDetector(
     lower=[105, 150, 70],
     upper=[125, 255, 160],
 )
+if os.environ.get('CHARLIE_VISION_TARGET') == 'face':
+    from vision.detector import FaceDetector
+    detector = FaceDetector(Path(__file__).resolve().parent / 'face_detection_yunet.onnx')
 
 vision = VisionStimulus(
     camera,
     detector,
     bus,
-    neck_observer=deck.observe_neck
+    frame_observer=deck.observe_frame
 )
 
 # Start idle explicitly.
 bus.emit("idle")
+attention.update(deck)
 
 try:
     while True:

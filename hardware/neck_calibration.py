@@ -126,10 +126,10 @@ def derive_candidate(evidence_path, commissioning, *, name, margin, supersedes=(
         raise ValueError('provenance mismatch')
     if any(e.get('kind')=='interruption' for e in events) or not any(e.get('kind')=='finished' for e in events):
         raise ValueError('completed uninterrupted calibration required')
-    starts=[e for e in events if e.get('kind')=='initial_verified']
+    starts=[e for e in events if e.get('kind') in ('initial_verified','qualified_start')]
     if len(starts)!=1: raise ValueError('exactly one verified start required')
     completed=[e for e in events if e.get('kind')=='movement_completed']
-    confirmed=[e for e in events if e.get('kind')=='confirmed']
+    confirmed=[e for e in events if e.get('kind') in ('confirmed','camera_confirmed')]
     if not completed or {e['step_id'] for e in completed}!={e['step_id'] for e in confirmed}:
         raise ValueError('every completed movement must be confirmed')
     points={tuple(starts[0]['verified_pose'])}
@@ -137,7 +137,20 @@ def derive_candidate(evidence_path, commissioning, *, name, margin, supersedes=(
     previous=starts[0]['verified_pose']
     for event in confirmed:
         proof=event.get('operator_confirmation',{})
-        if not all(proof.get(k) is True for k in ('clearance_verified','no_binding','settled','supervised')):
+        if event.get('kind') == 'camera_confirmed':
+            # These are candidate observations, never an assertion of interval
+            # clearance. Independent physical review is still mandatory.
+            vision = event.get('camera_evidence', {})
+            supervision = event.get('boundary_supervision', {})
+            frames = vision.get('frames', [])
+            if (vision.get('reliable') is not True or supervision.get('supervised') is not True
+                    or not supervision.get('operator') or len(frames) != 2):
+                raise ValueError('preserved camera and boundary-supervision evidence required')
+            for frame in frames:
+                captured = Path(frame['path']).read_bytes()
+                if hashlib.sha256(captured).hexdigest() != frame['artifact_sha256']:
+                    raise ValueError('camera evidence changed')
+        elif not all(proof.get(k) is True for k in ('clearance_verified','no_binding','settled','supervised')):
             raise ValueError('clearance evidence required')
         if any(not math.isfinite(float(v)) for v in event['visual_displacement']): raise ValueError('invalid vision evidence')
         if sum(float(v)**2 for v in event['visual_displacement'])<=0:
@@ -196,7 +209,13 @@ def independently_qualify(candidate, *, name, reviewer, evidence, physical_valid
     raw=Path(candidate['evidence']).read_bytes()
     if hashlib.sha256(raw).hexdigest()!=candidate['evidence_sha256']: raise ValueError('evidence changed')
     events=[json.loads(line)['event'] for line in raw.splitlines()]
-    operators={e['operator_confirmation']['operator'] for e in events if 'operator_confirmation' in e}
+    for event in events:
+        if event.get('kind') == 'camera_confirmed':
+            for frame in event.get('camera_evidence', {}).get('frames', []):
+                if hashlib.sha256(Path(frame['path']).read_bytes()).hexdigest() != frame['artifact_sha256']:
+                    raise ValueError('camera evidence changed after candidate derivation')
+    operators={e['operator_confirmation']['operator'] for e in events if e.get('operator_confirmation')}
+    operators.update(e['boundary_supervision']['operator'] for e in events if e.get('boundary_supervision'))
     if reviewer in operators or not operators: raise ValueError('independent reviewer required')
     review_raw=Path(evidence).read_bytes()
     review=json.loads(review_raw)

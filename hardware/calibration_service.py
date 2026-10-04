@@ -26,6 +26,7 @@ class CalibrationService:
         self.last_poll = -math.inf
         self.session = None
         self.unobserved = 0
+        self.brain = None
         # Recover a crash after committing a request but before Reflection.
         for request in self.requests().values():
             self._reflect_request(request['request_id'], self.journal.get(request['evidence_ids'][0]))
@@ -226,21 +227,42 @@ class CalibrationService:
         self.event('session_opened', request_id=request_id, evidence_path=str(evidence.path.resolve()))
         return self.session
 
-    def close_session(self):
+    def close_session(self, *, retain_qualified=False):
         if self.session is None:
             return
         session, self.session = self.session, None
         try:
             status = session.poll()
-            session.close()
+            motion = self.controller.motion_status() if retain_qualified else None
+            retain = bool(retain_qualified and status['state'] == 'CLOSED' and motion
+                          and motion.get('armed') and not motion.get('profile_invalid')
+                          and (motion.get('envelope') or {}).get('independently_qualified')
+                          and motion.get('owner') is None and not motion.get('moving'))
+            if not retain:
+                session.close()
             self.event('session_closed', run_id=status['run_id'], state=status['state'],
                        evidence_path=str(session.evidence.path.resolve()))
         finally:
             try:
-                self.controller.stop()
+                if not locals().get('retain', False):
+                    self.controller.stop()
                 self.controller.calibration_sink = session.previous_sink
             finally:
                 session.evidence.close()
+
+    def attach_brain(self, **options):
+        from .calibration_behavior import CalibrationBehavior
+        self.brain = CalibrationBehavior(self, **options)
+        return self.brain
+
+    def observe_frame(self, frame, target=None):
+        if self.brain is not None:
+            self.brain.update(frame, target)
+            if self.brain.authorized:
+                return self.brain.corrected_frame(frame)
+        return self.observe_primary(visual_tracking_available=bool(target),
+            observation_evidence=dict(frame_available=frame is not None,
+                target_visible=bool(target), fixed_scene_displacement='unavailable; target may move'))
 
     def resolve(self, request_id, *, evidence):
         """Independent qualification/activation must already exist externally."""

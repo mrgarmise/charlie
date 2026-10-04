@@ -67,6 +67,7 @@ class Envelope:
             raise MotionError(str(exc))
         self.qualified = profile.get('validation_status') == 'QUALIFIED'
         self.visual_response = profile.get('visual_response')
+        self.powered_start_review = profile.get('powered_start_review')
         self.observation_size = profile.get('observation_size')
         if self.qualified:
             from neck_profile_schema import validate
@@ -278,8 +279,17 @@ class ServoController:
             raise MotionError('START_VERIFICATION_REFUSED')
         if session != self._session or session is None or type(epoch) is not int or epoch != self._epoch:
             raise MotionError('STALE_SESSION_OR_EPOCH')
-        proof = self.calibration.attest(evidence, ('pose_verified','pulse_mapping_verified',
-                     'clearance_verified','cutoff_verified','external_power_off'))
+        if isinstance(evidence, dict) and evidence.get('powered') is True:
+            review = self.envelope.powered_start_review
+            if (not review or review.get('powered_initialization_verified') is not True
+                    or not review.get('reviewer') or not review.get('evidence')
+                    or review['reviewer'] == evidence.get('operator')
+                    or list(self.envelope.pose(pose)) != review.get('pose')):
+                raise MotionError('POWERED_START_REVIEW_REQUIRED')
+            proof = self.calibration.attest(evidence, ('pose_verified',))
+        else:
+            proof = self.calibration.attest(evidence, ('pose_verified','pulse_mapping_verified',
+                         'clearance_verified','cutoff_verified','external_power_off'))
         verified = self.envelope.pose(pose)
         self._start_confirmation = dict(pose=verified, evidence=proof, epoch=epoch,
                                          at=self._clock())

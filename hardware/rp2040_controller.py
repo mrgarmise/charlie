@@ -82,7 +82,7 @@ class RP2040Controller:
             self.motion_epoch = self.motion_owner = None
             self.link_session = uuid.uuid4().hex
             # Reconnection never preserves queued motion or control grants.
-            if not self.send("STOP") or not self.send("SESSION " + self.link_session):
+            if not self._accepted("STOP", "STOP") or not self._accepted("SESSION " + self.link_session, "SESSION"):
                 self._mark_disconnected()
                 return False
             self.last_tx = time.monotonic()
@@ -333,6 +333,22 @@ class RP2040Controller:
         accepted = self._accepted(f"PRIMARY {self.link_session} {status['epoch']}","PRIMARY")
         self.motion_epoch = self.motion_owner = None
         return accepted
+
+    def start_reviewed_powered_pose(self, pose, *, operator, evidence):
+        """Live confirmation plus installed independent powered-start review.
+
+        Does not bypass RP2040 qualification, electrical or startup safeguards.
+        GP10 is deliberately absent from normal activation.
+        """
+        status = self.motion_status()
+        if not status or status.get('session') != self.link_session:
+            return False
+        data = dict(pose=list(pose), operator=operator, evidence=evidence,
+                    powered=True, pose_verified=True)
+        command = 'START_VERIFY ' + self.link_session + ' ' + str(status['epoch']) + ' ' + json.dumps(data)
+        if not self._accepted(command, 'START_VERIFY'):
+            return False
+        return self._accepted('AUTOSTART ' + self.link_session + ' ' + str(status['epoch']), 'AUTOSTART')
 
     def neck_uncertain(self, reason='visual_discrepancy'):
         status=self.motion_status()

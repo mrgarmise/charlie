@@ -2,6 +2,16 @@ import cv2
 import numpy as np
 
 
+class FaceDetector:
+    """Reuse Charlie's established YuNet selection on the primary RGB camera."""
+    def __init__(self, model_path):
+        from .mobile_face import MobileFaceDetector
+        self.detector = MobileFaceDetector(model_path=str(model_path))
+
+    def detect(self, frame):
+        return self.detector.detect(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+
+
 class ColorDetector:
     def __init__(self, lower, upper):
         self.lower = np.array(lower, dtype=np.uint8)

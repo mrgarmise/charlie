@@ -1,0 +1,58 @@
+{
+  "schema": "charlie-cal1-recovery-validation-v1",
+  "timestamp_utc": "2026-10-04T19:47:11.096868+00:00",
+  "parent": "f5bc3955bfacddca3445eb218fbff2d51de0caba",
+  "recovered_workspace": "/workspace/scratch/0fac1d113cf9/charlie",
+  "unpublished_changes_recovered": true,
+  "physical_authorization": false,
+  "environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "test_python": "/workspace/scratch/0fac1d113cf9/cal1-validated-env/bin/python"
+  },
+  "focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "222",
+    "time": "38.764",
+    "timestamp": "2026-10-04T15:45:58.927927-04:00",
+    "hostname": "3c1a37f27809"
+  },
+  "source_sha256": {
+    "attention/manager.py": "bcc65956abe90114deee6108d3af01662a9f294bbca55211c039218f3b341929",
+    "behaviors/track.py": "982781013eb2d43d14f1532c160ee703bb607a7d4b297aba19b19564c12ab572",
+    "hardware/calibration_service.py": "871eca313ed1837105cc9173d824d6d56ed2500fad3091ca2896b23151c0c9e0",
+    "hardware/neck_calibration.py": "d90ecc09af60eb76608a76b417885abbf0229ad00d9c0c08f577159dbf10a9cd",
+    "hardware/rp2040_controller.py": "fa48f23c8c994036c95f534223631e3ae9382719e0189a928e2a63717fca8eeb",
+    "main.py": "163619e17236ae0aa05cb2eae01752176868efb5eef7b1a7504993b739db062f",
+    "motion/controller.py": "3ff62bc6258e790be085d2375986241bae1c024e0f750f5a51d5d0ab1bac2620",
+    "rp2040/calibration.py": "449f7bfc06a8657ff005a065e8a33f8174313687c39ea4726de9eb3d828ad8a1",
+    "rp2040/commands.py": "61bb82ece029a9a9620f2e7c4b1aa96243d2bcf249bdd775d9eb06ff89d1616e",
+    "rp2040/display.py": "7569bfbbfdcdffd483ebaf16bda3860d86775e8bac0799b5675f3c5c5dcfcd34",
+    "rp2040/main.py": "cb691024638017cbb27436bf877f2671f999d02ac789318d59980a446d0504f5",
+    "rp2040/servos.py": "dd60cb43ee57d61333d33004f065b344d93dbd20e7fa5a44982866109ad8170e",
+    "stimulus/keyboard.py": "0480e095ed06f39b1ae83b25b66f7ab40159e7ba500a3316faf846e79a19386a",
+    "tools/update_charlie.py": "c9c147c8830b4a639579de8e09d458c038b1cd2ac50173816658f9460d31598a",
+    "vision/detector.py": "d4aa8015759edef135b388c1f1dfeb2c858e4cca9a34a4afd568859ca09a4935",
+    "vision/stimulus.py": "125f3aeee4b2770ee8d0c9a0c0ec5aa4795df6c62e01049259504f420eaded1a",
+    "hardware/calibration_behavior.py": "9bc47dbd4159d59deb8613fbb0cf64478d6f3548519ee8330037dd6b578ce384",
+    "hardware/scene_response.py": "d40b51a1c8271537d0c73fd7586a26523de49f3a9bea704f900ec112bcbc7168",
+    "tests/test_brain_calibration.py": "445cf080e55a98f841cd080c613f351c7eb6fd5f95813a1c28826e116fc13a19",
+    "tests/test_cal1_release.py": "b825afbf0660060506651613b7002d493f41bb55f832ad92cb96340e5cd0e9f7"
+  },
+  "preserved_prior_test_logs": {
+    "cal1-final.xml": "8c3466e72abaf64a1c1cf9dadef9e9f982beefef45b256d9521275393896e93b",
+    "cal1-broad.xml": "cfb2fbeee8c7a9da09f831e5cddfae2ffa498db4bf37ccf1a11f5b8f18242658"
+  },
+  "fresh_test_log_sha256": "c05fb3a61fce558d62092573217519b004662120dc3a813cb27d675a499f063f",
+  "checks": {
+    "compileall": "passed",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "Hardware IO is simulated; native Pi/MicroPython not tested",
+    "Powered-start physical smoothness and independent envelope qualification remain pending"
+  ]
+}

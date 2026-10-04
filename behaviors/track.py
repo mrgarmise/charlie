@@ -9,7 +9,7 @@ class TrackBehavior(Behavior):
     def enter(self, deck):
         self.deck = deck
 
-        self.target = None
+        self.target = getattr(self, 'target', None)
         self.last_move = time.time()
 
         self.lost_time = None
@@ -44,6 +44,9 @@ class TrackBehavior(Behavior):
             return
 
         x, y = self.target
+        if hasattr(deck, 'track_target'):
+            deck.track_target(x, y)
+            return
 
         pan, tilt = pixel_to_angle(
             x,

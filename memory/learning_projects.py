@@ -574,6 +574,8 @@ class LearningExecutive:
                 physical_authorization=False,reason='New preserved experience warrants bounded retrospective reflection'),
                 episode=context.data['episode'],sources=[context.id],producer='LearningExecutive',version='normal-lifecycle-v1')
             lifecycle.reflect_experience(context.id,commission.id)
+            if lifecycle.phase=='experiencing':
+                return  # Primary owner preempts the rest of this turn too.
             break  # One bounded meditation per turn; existing portfolio gets time.
         # Held projects and identical imports cannot create new trials. Continue
         # any committed interruption before considering fresh opportunities.

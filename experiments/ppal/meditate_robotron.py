@@ -115,26 +115,38 @@ def _clone_raw(tracks):
 
 
 def reconstruct_once(tracks, window=3, max_gap=5,
-                     base_radius=2.0, radius_per_gap=1.8, on_progress=None):
+                     base_radius=2.0, radius_per_gap=1.8, on_progress=None, resume_state=None):
     """Conservative mutual-best predicted matching for one iteration."""
-    candidates = []
+    state = resume_state if resume_state is not None else {}
+    if 'rebuilt' in state:
+        return state['rebuilt'], state['merge_log']
+    candidates = state.setdefault('candidates', [])
     # Only future onsets inside max_gap can link. Preserve original j order,
     # including tie-breaking, while avoiding quadratic impossible pairs.
     onsets = sorted((int(t['first_tick']), j) for j,t in enumerate(tracks))
     times = [at for at,_ in onsets]
-    for i, left in enumerate(tracks):
+    for i in range(state.get("left", 0), len(tracks)):
+        left = tracks[i]
         if on_progress: on_progress()
         end = int(left['last_tick'])
         start, stop = bisect_right(times,end), bisect_right(times,end+max_gap)
-        for j in sorted(j for _,j in onsets[start:stop]):
+        neighbors = sorted(j for _,j in onsets[start:stop])
+        for position in range(state.get('neighbor', 0), len(neighbors)):
+            if on_progress: on_progress()
+            j = neighbors[position]
             right = tracks[j]
             if i == j:
+                state["neighbor"] = position + 1
                 continue
             info = predicted_link(left, right, window, max_gap,
                                   base_radius, radius_per_gap)
             if info is not None:
                 candidates.append((info["score"], i, j, info))
+            state['neighbor'] = position + 1
+        state['left'] = i + 1
+        state['neighbor'] = 0
 
+    if on_progress: on_progress()
     # Mutual-best prevents a busy region from greedily swallowing alternatives.
     best_out, best_in = {}, {}
     for score, i, j, info in sorted(candidates, key=lambda x: x[0]):
@@ -170,6 +182,7 @@ def reconstruct_once(tracks, window=3, max_gap=5,
 
     result.extend(t for idx, t in enumerate(tracks) if idx not in used)
     result.sort(key=lambda t: (int(t["first_tick"]), int(t["track_id"])))
+    state.update(rebuilt=result, merge_log=merge_log)
     return result, merge_log
 
 
@@ -196,7 +209,7 @@ def quality(tracks, window=3, max_gap=5):
 
 
 def meditate(raw_tracks, iterations=6, window=3, max_gap=5,
-             base_radius=2.0, radius_per_gap=1.8, on_progress=None):
+             base_radius=2.0, radius_per_gap=1.8, on_progress=None, resume_state=None):
     tracks = _clone_raw(raw_tracks)
     history = []
     all_merges = []
@@ -204,7 +217,8 @@ def meditate(raw_tracks, iterations=6, window=3, max_gap=5,
     for iteration in range(1, iterations + 1):
         before = len(tracks)
         rebuilt, merges = reconstruct_once(
-            tracks, window, max_gap, base_radius, radius_per_gap, on_progress=on_progress)
+            tracks, window, max_gap, base_radius, radius_per_gap, on_progress=on_progress, resume_state=resume_state)
+        if on_progress: on_progress()
         q = quality(rebuilt, window, max_gap)
         history.append({
             "iteration": iteration,
@@ -215,6 +229,7 @@ def meditate(raw_tracks, iterations=6, window=3, max_gap=5,
         })
         all_merges.extend({"iteration": iteration, **m} for m in merges)
         tracks = rebuilt
+        if resume_state is not None: resume_state.clear()
         if not merges:
             break
 

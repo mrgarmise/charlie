@@ -17,6 +17,10 @@ from .datasets import ExperienceDataset, SCOPE, sha
 from .foundry import atomic_json
 
 
+class MeditationYield(Exception):
+    """Expected cooperative resource interruption; never a completed finding."""
+
+
 class DevelopmentLifecycle:
     def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=()):
         self.output = Path(output).resolve()
@@ -160,27 +164,55 @@ class DevelopmentLifecycle:
             source_hash=sha(source)
             if checkpoint.exists():
                 saved=json.loads(checkpoint.read_text())
+                if 'state_digest' in saved and saved['state_digest'] != digest({k:v for k,v in saved.items() if k!='state_digest'}):
+                    raise ValueError('meditation checkpoint integrity mismatch')
+                if saved.get('context_id',context_id)!=context_id or saved.get('commission_id',commission_id)!=commission_id:
+                    raise ValueError('meditation checkpoint commission mismatch')
                 if saved['source_sha256']!=source_hash:
                     raise ValueError('meditation source changed')
                 tracks=saved['tracks'];history=saved['history'];merges=saved['merges']
+                reconstruction=saved.get('reconstruction',{})
             else:
                 tracks=json.loads(source.read_text()).get('tracks',[])
-                history=[];merges=[]
+                history=[];merges=[];reconstruction={}
             # Explicit bounded algorithm; no invented independent observations.
             deadline=time.monotonic()+self.budget
             def progress():
-                self.yield_for_primary()
+                try:
+                    self.yield_for_primary()
+                except InterruptedError as exc:
+                    self._phase('experiencing')
+                    raise MeditationYield(str(exc)) from exc
                 if time.monotonic()>deadline:
-                    raise TimeoutError('meditation yielded at bounded resource deadline')
-            while len(history)<6:
-                progress()
-                tracks, step, additions=meditate(tracks,iterations=1,on_progress=progress)
-                iteration=len(history)+1
-                history.extend(dict(h,iteration=iteration) for h in step)
-                merges.extend(dict(m,iteration=iteration) for m in additions)
-                atomic_json(checkpoint,dict(source_sha256=source_hash,tracks=tracks,history=history,merges=merges))
-                if not additions:
-                    break
+                    raise MeditationYield('meditation yielded at bounded resource deadline')
+            def save_checkpoint():
+                document=dict(source_sha256=source_hash,tracks=tracks,
+                    history=history,merges=merges,reconstruction=reconstruction,
+                    context_id=context_id,commission_id=commission_id)
+                document['state_digest']=digest(document)
+                atomic_json(checkpoint,document)
+            try:
+                # A stable saved iteration is already complete, even if the
+                # process stopped between its checkpoint and result publication.
+                while len(history)<6 and (not history or history[-1]['merges']):
+                    progress()
+                    tracks, step, additions=meditate(tracks,iterations=1,
+                        on_progress=progress,resume_state=reconstruction)
+                    iteration=len(history)+1
+                    history.extend(dict(h,iteration=iteration) for h in step)
+                    merges.extend(dict(m,iteration=iteration) for m in additions)
+                    save_checkpoint()
+            except MeditationYield as exc:
+                if sha(source)!=source_hash:
+                    raise ValueError('meditation source changed during computation')
+                save_checkpoint()
+                self.journal.append('event',dict(category='normal_meditation_yield',
+                    context_id=context_id,commission_id=commission_id,
+                    checkpoint_path=str(checkpoint),checkpoint_sha256=sha(checkpoint),
+                    completed_iterations=len(history),reason=str(exc),status='resumable'),
+                    episode=SCOPE,sources=[context_id,commission_id],
+                    producer='Reflection',version='normal-lifecycle-v1')
+                return None
             if sha(source)!=source_hash:
                 raise ValueError('meditation source changed during computation')
             result=dict(status='completed',quality=quality(tracks),history=history,merges=merges,

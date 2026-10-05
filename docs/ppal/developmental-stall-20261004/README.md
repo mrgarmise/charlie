@@ -137,6 +137,17 @@ implementation/fixture attempts; see counts in the saved reports.
 
 ## Guarded native acceptance on the original persistent notebook
 
+Final resumed validation: **538 passed, 19 Torch-dependent skips in 92.31s**.
+It includes both additional primary-preemption and unavailable-candidate
+regressions. Previous reports remain separate historical test evidence.
+The latest native status transcript establishes the unresolved dependency but
+contains no journal/cursor snapshots. Native acceptance of this fix is pending.
+Compact authentic snapshots retain every record ID, document SHA256 and original
+commitment time, plus checkpoint hashes/progress; their full-snapshot hashes bind
+the original generated snapshots preserved outside the checkout under
+`/workspace/scratch/c81a2d35e2bc/stall-raw-snapshots`. Original notebook/archive
+bytes remain preserved in their existing published recovery artifacts.
+
 Use the full containing published revision from the completion message:
 
 ```bash

@@ -297,7 +297,8 @@ def execute(plan, dataset, output=None, **unused):
                     sources=[plan['prediction_id']],producer='ModelFoundry',version=VERSION)
                 metrics=motion_error(selected['spec'],finals)
                 metrics.update(fresh_final_evidence=True,improved=all(a+.05<b for a,b in metrics['per_episode']),
-                    score_improvement='UNKNOWN',validation_scores=scores,selected_by='validation only')
+                    score_improvement='UNKNOWN',validation_scores=scores,selected_by='validation only',
+                    provenance_kind=corpus.get('provenance_kind','unclassified'))
                 if time.monotonic()>journal.get(plan['prediction_id']).data['payload']['deadline']:
                     metrics.update(improved=False,prediction_horizon='expired')
                 measured=journal.append('observation',dict(category='offline_model_evaluation',

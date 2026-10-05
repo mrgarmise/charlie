@@ -55,7 +55,7 @@ class EpisodeRunner:
                  shot_model: "ShotModel | None" = None,
                  adaptation_path: Path | None = None,
                  adaptation_replay: Path | None = None,
-                 memory_gateway=None) -> None:
+                 memory_gateway=None, policy=None) -> None:
         if adaptation_path and (shot_model is None or hud_reader is None):
             raise ValueError("adaptation needs an initial model and a visible HUD reader")
         from .shot_learning import ShotAdaptation
@@ -70,8 +70,8 @@ class EpisodeRunner:
         self.preview_dir = preview_dir
         self.hud_reader = hud_reader
         self.reward_tracker = RewardTracker()
-        self.forebrain = Forebrain()
-        self.hindbrain = Hindbrain(shot_model=shot_model)
+        self.forebrain = Forebrain(policy=policy)
+        self.hindbrain = Hindbrain(shot_model=shot_model,policy=policy)
         self.tracker = ObjectTracker()
         self.adaptation = ShotAdaptation(shot_model) if adaptation_path else None
         self.adaptation_path = adaptation_path
@@ -98,7 +98,7 @@ class EpisodeRunner:
                     action = Action(reason="no unambiguous player; neutral")
                 else:
                     goal = self.forebrain.update(before)
-                    intent, action = self.hindbrain.decide(before, goal)
+                    intent, action = self.hindbrain.decide(before, goal, timestamp=tick*self.duration_ms/1000.)
                 self.sink.execute(action, self.duration_ms)
                 result = self.arena.step(action) if self.arena else None
                 after_frame = self.source.read()
@@ -123,6 +123,8 @@ class EpisodeRunner:
                           "goal": asdict(goal) if goal else None,
                           "intent": asdict(intent) if intent else None,
                           "action": asdict(action),
+                          "decision_provenance": {'forebrain':self.forebrain.last_reason,
+                                                  'hindbrain':self.hindbrain.last_decision},
                           "before": asdict(before) if before else None,
                           "after": asdict(after) if after else None,
                           "hud_before": asdict(before_hud) if before_hud else None,

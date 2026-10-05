@@ -410,6 +410,7 @@ def main():
                         help='one precommitted developmental actuator experiment')
     parser.add_argument('--observer-context', type=Path, help='optional display-only project context; never policy input')
     parser.add_argument('--learned-semantics',type=Path,help='separately authorized, independently validated candidate-crop activation manifest')
+    parser.add_argument('--learned-policy',type=Path,help='qualified local PPAL decision policy; current acceptance is offline only')
     args = parser.parse_args()
 
     if args.seconds is not None and (not math.isfinite(args.seconds) or not 1 <= args.seconds <= 3600):
@@ -460,8 +461,21 @@ def main():
         except (OSError,ValueError,KeyError,ImportError,RuntimeError) as exc:
             semantic_error=f'{type(exc).__name__}: {exc}'
             print('LEARNED SEMANTICS UNAVAILABLE: '+semantic_error+'; baseline retained')
-    forebrain = Forebrain()
-    hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
+    policy=None;policy_error=None
+    policy_path=args.learned_policy
+    if policy_path is None:
+        import os
+        state=os.environ.get('CHARLIE_LEARNING_STATE')
+        if state and (Path(state)/'ppal-policy.json').is_file():policy_path=Path(state)/'ppal-policy.json'
+    if policy_path:
+        try:
+            from .qualified_policy import load_policy
+            policy=load_policy(policy_path,physical=args.arm)
+        except (OSError,ValueError,KeyError,TypeError,RuntimeError) as exc:
+            policy_error=f'{type(exc).__name__}: {exc}'
+            print('LEARNED POLICY UNAVAILABLE: '+policy_error+'; baseline retained')
+    forebrain = Forebrain(policy=policy)
+    hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire,policy=policy)
     shadow_forebrain = Forebrain()
     shadow_hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
     shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
@@ -957,7 +971,8 @@ def main():
                 if recovery != 'causal_control_challenge':
                     detections = [d for d, _ in recovery_frames[-1]]
                 shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
-                forebrain = Forebrain(); shadow_forebrain = Forebrain()
+                forebrain = Forebrain(policy=policy); shadow_forebrain = Forebrain()
+                if policy:policy.reset_predictions()
                 player = recovered
                 reseed = self_tracker.bind_track(
                     tick + 1, visual_agency.controlled_track_id, visual_agency.positions)
@@ -1014,12 +1029,15 @@ def main():
                                   "unresolved", visual_agency.assignments,
                                   visual_agency.controlled_track_id)
             world = WorldState(tick=tick, player=Position(*player),
-                               targets=targets, threats=threats, alive=True, unresolved=unresolved)
+                               targets=targets, threats=threats, alive=True, unresolved=unresolved,
+                               observation_safe=policy is None or agency_snapshot.get('identity_status')=='confirmed')
 
             # Physical IDs come directly from generic tracks. A semantic label
             # change does not rename the object or run a second association pass.
+            decision_started=time.perf_counter_ns()
             goal = forebrain.update(world)
-            intent, action = hindbrain.decide(world, goal)
+            intent, action = hindbrain.decide(world, goal, timestamp=source.timestamp)
+            decision_ns=time.perf_counter_ns()-decision_started
             experiment_context = None
             if experiment_plan and not experiment_status['attempted']:
                 from .experiment_return import experimental_action
@@ -1093,6 +1111,8 @@ def main():
                 "identity_status": agency_snapshot.get("identity_status"),
                 "experiment": experiment_context,
                 "learned_semantics": semantic_evidence,
+                "qualified_policy": {'forebrain':forebrain.last_reason,'hindbrain':hindbrain.last_decision,
+                                     'error':policy_error,'decision_ns':decision_ns},
                 "agency": agency_snapshot,
                 "targets": len(targets), "threats": len(threats),
                 "unresolved": len(unresolved),

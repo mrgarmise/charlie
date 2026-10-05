@@ -369,6 +369,18 @@ class DevelopmentLifecycle:
                 s = shadow(self.journal,row.id)
                 deployment.activate(row.id,target='offline-shadow',shadow_id=s.id,
                     authorization=dict(self.authority,proposal_id=row.id))
+            active_policy=deployment.active('offline-shadow')
+            policy_available=False
+            if active_policy and active_policy.get('proposal_id')==row.id:
+                try:
+                    deployment.export_policy('offline-shadow',self.output/'ppal-policy.json')
+                    from experiments.ppal.qualified_policy import load_policy
+                    load_policy(self.output/'ppal-policy.json')
+                    policy_available=True
+                except ValueError as exc:
+                    self.journal.append('event',dict(category='qualified_policy_export_blocked',proposal_id=row.id,
+                        reason=str(exc),resumption='Independent runtime qualification for retained candidate; baseline retained'),
+                        episode=row.data['episode'],sources=[row.id],producer='independent-deployment-boundary',version='ppal-policy-v1')
             previous = [r for r in self.journal.records('observation') if r.data['payload'].get('category')=='offline_operational_outcome' and r.data['payload'].get('proposal_id')==row.id]
             if previous:
                 self.executive.receive_operational_outcome(previous[0].id)
@@ -385,16 +397,22 @@ class DevelopmentLifecycle:
             episodes = [e for e in corpus['episodes'] if e['partition']=='validation']
             decisions = []
             for episode in episodes:
-                adapter = deployment.planning_adapter()
+                from experiments.ppal.qualified_policy import load_policy
+                policy=load_policy(self.output/'ppal-policy.json') if policy_available else None
+                pf,ph = Forebrain(policy=policy),Hindbrain(policy=policy)
+                adapter=deployment.planning_adapter()
                 f,h,bf,bh = Forebrain(),Hindbrain(),Forebrain(),Hindbrain()
                 for frame in episode['frames']:
                     if sha(frame['artifact']['path'])!=frame['artifact']['sha256']:
                         raise ValueError('operational input artifact changed')
                     world = world_from_frame(frame)
                     intent, action = adapter.decide(world,frame['timestamp'],f,h)
+                    pi,pa=ph.decide(world,pf.update(world),timestamp=frame['timestamp'])
                     bi, ba = bh.decide(world,bf.update(world))
                     decisions.append(dict(timestamp=frame['timestamp'],source_episode=episode['source_episode'],
                         artifact_sha256=frame['artifact']['sha256'],action=asdict(action),baseline_action=asdict(ba),
+                        qualified_policy_action=asdict(pa),qualified_policy_intent=asdict(pi),
+                        policy_provenance=dict(forebrain=pf.last_reason,hindbrain=ph.last_decision),
                         intent=asdict(intent),baseline_intent=asdict(bi)))
             metric = motion_error(candidate['spec'],episodes)
             observation = self.journal.append('observation',dict(category='offline_operational_outcome',

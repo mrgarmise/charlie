@@ -56,6 +56,7 @@ def main() -> None:
     parser.add_argument("--preview-dir", type=Path)
     parser.add_argument("--preflight-dir", type=Path, default=Path("ppal_live_preflight"))
     parser.add_argument("--shot-model", type=Path, help="optional PPAL-5 synthetic shot model")
+    parser.add_argument('--learned-policy',type=Path,help='qualified offline PPAL decision policy')
     parser.add_argument("--adapt-shot-model", type=Path,
                         help="write updated model only after enough clear pixel-labeled shots")
     parser.add_argument("--adapt-replay", type=Path, default=Path("ppal6_adaptation.jsonl"))
@@ -78,6 +79,10 @@ def main() -> None:
         parser.error("--synthetic-shot-scale must be positive and requires synthetic mode")
 
     arena = Simulator(shot_lane_scale=args.synthetic_shot_scale) if args.mode == "synthetic" else None
+    policy=None
+    if args.learned_policy:
+        from .qualified_policy import load_policy
+        policy=load_policy(args.learned_policy,physical=args.arm or args.mode!='synthetic')
     source = None
     try:
         profile = (args.profile or SYNTHETIC_PROFILE) if arena else args.profile
@@ -107,7 +112,7 @@ def main() -> None:
                                     args.duration_ms, args.preview_dir, hud_reader, shot_model,
                                     args.adapt_shot_model,
                                     args.adapt_replay if args.adapt_shot_model else None,
-                                    memory_gateway=gateway).run(args.max_steps)
+                                    memory_gateway=gateway,policy=policy).run(args.max_steps)
         print(f"OUTCOME {outcome} log={args.log} "
               f"controller={'ARCADE' if args.arm else 'DRY RUN'}")
     finally:

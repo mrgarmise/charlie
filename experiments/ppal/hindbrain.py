@@ -31,12 +31,15 @@ def distance_to_segment(point: Position, start: Position, end: Position) -> floa
 
 class Hindbrain:
     def __init__(self, panic_radius: float = 9, route_width: float = 9,
-                 shot_model: "ShotModel | None" = None, explore_fire: bool = False) -> None:
+                 shot_model: "ShotModel | None" = None, explore_fire: bool = False, policy=None) -> None:
         self.explore_fire = explore_fire
         self.fire_explorations = 0
         self.panic_radius = panic_radius
         self.route_width = route_width
         self.shot_model = shot_model
+        self.policy = policy
+        self.last_decision = {}
+        self._applied = []
         self.last_clear_id: str | None = None
         self.last_clear_tick: int | None = None
         self.last_panic_hold_id: str | None = None
@@ -57,7 +60,11 @@ class Hindbrain:
                          for o in occupants), default=100.)
             clearance = min((end.distance(o.position) for o in occupants), default=100.)
             margin = min(end.x, end.y, 100-end.x, 100-end.y)
-            candidates.append(((route, clearance, move == self.last_open_move, margin), move, end))
+            bias = self.policy.values('positioning_preference') if self.policy else {}
+            if bias and 'positioning_preference' not in self._applied:
+                self._applied.append('positioning_preference')
+            # Learned preference only arbitrates equally clear choices.
+            candidates.append(((route, clearance, bias.get(move, 0), move == self.last_open_move, margin), move, end))
         if not candidates:
             return Intent("hold"), Action(reason="no bounded open-space step")
         _, move, end = max(candidates, key=lambda row:row[0])
@@ -71,9 +78,26 @@ class Hindbrain:
                 Action(move, fire, "seek open space; explore FIRE effects" if threat is None and self.explore_fire
                        else "seek open space; no current rescue target"))
 
-    def decide(self, world: WorldState, goal: Goal) -> tuple[Intent, Action]:
+    def decide(self, world: WorldState, goal: Goal, *, timestamp=None) -> tuple[Intent, Action]:
+        self._applied = []
+        intent, action = self._decide(world, goal, timestamp=timestamp)
+        if self.policy and action.move in MOVE_VECTORS and world.unresolved:
+            dx,dy=MOVE_VECTORS[action.move];length=hypot(dx,dy)
+            end=Position(world.player.x+8*dx/length,world.player.y+8*dy/length)
+            if any(end.distance(item.position)<=4 for item in world.unresolved):
+                intent,action=Intent('hold'),Action('STAY',action.fire,'unresolved occupied next step; neutral movement')
+        self.last_decision = dict(reason=action.reason, intent=intent.kind,
+            policy=self.policy.trace(self._applied, disposition='immediate override' if intent.kind=='evade'
+                or action.reason.startswith('clear close threat') else
+                'unsafe observation' if not world.observation_safe else 'eligible') if self.policy else None)
+        return intent, action
+
+    def _decide(self, world: WorldState, goal: Goal, *, timestamp=None) -> tuple[Intent, Action]:
         if not world.alive:
             return Intent("hold"), Action(reason="world not alive")
+        if not world.observation_safe:
+            return Intent('hold'), Action(reason='unsafe observation; neutral')
+        projected = self.policy.predicted_targets(world, timestamp) if self.policy else None
         nearby = [threat for threat in world.threats if world.player.distance(threat.position) < self.panic_radius]
         if nearby:
             threat = min(nearby, key=lambda item: world.player.distance(item.position))
@@ -101,6 +125,10 @@ class Hindbrain:
         if target is None:
             return self._open_space(world)
 
+        if projected is not None:
+            target = next((item for item in projected if item.id == target.id), target)
+            self._applied.append('action_effect_prediction')
+
         blockers = [threat for threat in world.threats
                     if distance_to_segment(threat.position, world.player, target.position) < self.route_width
                     and threat.position.distance(world.player) < target.position.distance(world.player)]
@@ -112,7 +140,9 @@ class Hindbrain:
                         and world.tick > self.last_clear_tick)
             self.last_clear_id = blocker.id
             self.last_clear_tick = world.tick
-            fire = direction(world.player, blocker.position)
+            fire_values = self.policy.values('firing_behavior') if self.policy else {}
+            fire = direction(world.player, blocker.position, fire_values.get('deadband', 3))
+            if fire_values:self._applied.append('firing_behavior')
             predicted_miss = (self.shot_model is not None and not self.shot_model.likely_hit(
                 world.player, blocker.position, fire))
             movement = direction(world.player, target.position) if repeated or predicted_miss else "STAY"

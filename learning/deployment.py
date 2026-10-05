@@ -10,11 +10,11 @@ class CapabilityDeployment:
             p=row.data['payload']
             if p.get('category')=='capability_activation' and p['target']==target: active=p
         return active
-    def activate(self, proposal_id, *, target, authorization, adapters=('offline-shadow','ppal-semantics'),shadow_id=None,readiness_id=None):
+    def activate(self, proposal_id, *, target, authorization, adapters=('offline-shadow','ppal-semantics','ppal-policy'),shadow_id=None,readiness_id=None):
         proposal_record=self.journal.get(proposal_id);p=proposal_record.data['payload'];scope=proposal_record.data['episode']
         if p.get('category')!='model_deployment_proposal' or not p['eligible'] or p['target']!=target:
             raise ValueError('supported independent deployment proposal required')
-        if target not in adapters or target not in ('offline-shadow','ppal-semantics'): raise ValueError('production integration is not authorized or implemented')
+        if target not in adapters or target not in ('offline-shadow','ppal-semantics','ppal-policy'): raise ValueError('production integration is not authorized or implemented')
         if not authorization or authorization.get('target')!=target or authorization.get('proposal_id')!=proposal_id or not authorization.get('source'):
             raise ValueError('separate explicit execution authorization required')
         evaluation=self.journal.get(p['evaluation_id'])
@@ -24,8 +24,28 @@ class CapabilityDeployment:
         if measured['metrics'].get('fresh_final_evidence') is False:
             raise ValueError('fresh independent final evidence required; repeated test groups cannot deploy')
         candidate=measured['candidate']
+        if p['candidate_id']!=candidate['identifier']:raise ValueError('candidate identity differs from evaluation')
         if sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']: raise ValueError('candidate weights changed')
         contract=None;readiness=None;sources=[proposal_id]
+        policy_metadata={}
+        if candidate.get('spec',{}).get('adapter') in ('meditation-motion-v1','decision-parameters-v1'):
+            from .policy import revision,dirty,runtime_hash
+            policy_metadata=dict(policy_code_revision=revision(),
+                policy_code_dirty=dirty(),policy_runtime_sha256=runtime_hash(),
+                policy_provenance_kind=measured['metrics'].get('provenance_kind','unclassified'))
+        if target=='ppal-policy':
+            if candidate.get('spec',{}).get('adapter')!='decision-parameters-v1':
+                raise ValueError('evaluated decision parameters required')
+            # Reuse the same proposal/evaluation/activation gate. No physical
+            # adapter or self-granted authority is added.
+            provisional=dict(candidate=candidate,proposal_id=proposal_id,target=target,
+                authorization=authorization,shadow_id=shadow_id,activation_key='qualification-check',
+                previous_activation=None,**policy_metadata)
+            from .policy import policy_payload
+            policy_payload(self.journal,provisional)
+            if any(r.data['payload'].get('revoked_proposal')==proposal_id for r in self.journal.records('event')):
+                raise ValueError('rollback revoked decision proposal; new evaluation required')
+            contract=measured['metrics']['decision_contract'];sources.append(shadow_id)
         if candidate.get('spec',{}).get('adapter')=='meditation-motion-v1':
             if target!='offline-shadow': raise ValueError('motion candidate has no physical activation authority')
             resolution=self.journal.resolution_for(p.get('prediction_id'))
@@ -67,7 +87,7 @@ class CapabilityDeployment:
             candidate_id=p['candidate_id'],candidate=candidate,proposal_id=proposal_id,authorization=authorization,
             contract=contract,shadow_id=shadow_id,physical_readiness=readiness,evidence_scope=scope,
             previous_activation=previous['activation_key'] if previous else None,
-            activation_key=digest(dict(proposal=proposal_id,authorization=authorization))),episode=scope,
+            activation_key=digest(dict(proposal=proposal_id,authorization=authorization)),**policy_metadata),episode=scope,
             sources=sources,producer='authorized-capability-deployment',version='ala-2')
     def rollback(self, target, *, reason, authorization, to_baseline=False):
         current=self.active(target)
@@ -80,10 +100,19 @@ class CapabilityDeployment:
             candidate_id=prior['candidate_id'] if prior else None,candidate=prior['candidate'] if prior else None,
             contract=prior.get('contract') if prior else None,shadow_id=prior.get('shadow_id') if prior else None,
             physical_readiness=prior.get('physical_readiness') if prior else None,
+            policy_code_revision=prior.get('policy_code_revision') if prior else None,
+            policy_provenance_kind=prior.get('policy_provenance_kind') if prior else None,
+            policy_code_dirty=prior.get('policy_code_dirty') if prior else None,
+            policy_runtime_sha256=prior.get('policy_runtime_sha256') if prior else None,
+            proposal_id=prior.get('proposal_id') if prior else None,
             revoked_proposal=current.get('proposal_id'),
             authorization=authorization,reason=reason,previous_activation=None,
             activation_key=digest(dict(rollback=current['activation_key'],reason=reason,authorization=authorization))),
             episode=SCOPE,producer='authorized-capability-deployment',version='ala-1')
+
+    def export_policy(self,target,path):
+        from .policy import export_policy
+        return export_policy(self,target,path)
 
     def export(self,target,path):
         """Freeze a separately authorized version for an episode; rollback applies next load."""

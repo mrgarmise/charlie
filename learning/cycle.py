@@ -238,8 +238,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         old=executive.work_states().get(identifier)
         if not old or old['status']!='blocked':continue
         progress=executive.experiment_progress(dataset.artifacts.parent/'models',plan['prediction_id'])
-        dependency=digest(dict(dataset=plan['dataset_id'],budget=budget_seconds,
-            capabilities=registry.describe(),torch=torch_available))
+        dependency=executive.experiment_dependency(plan,budget_seconds,registry,torch_available)
         if old['dependency']!=dependency or old['after']!=progress:
             executive.transition(identifier,'candidate','Recorded experiment dependency/checkpoint changed; resume original work',
                 dataset.journal,[row.id])
@@ -279,7 +278,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
             if project['id'] in executive.work_states():
                 executive.account_work(project['id'],before=work_before,
                     after=digest(dict(resolution=result.get('resolution_id'))),
-                    dependency=digest(dict(dataset=plan['dataset_id'],budget=budget_seconds,capabilities=registry.describe(),torch=torch_available)),
+                    dependency=executive.experiment_dependency(plan,budget_seconds,registry,torch_available),
                     outcome='completed',sources=[plan['prediction_id']],
                     resumption_condition='Completed retained experiment; future independent evidence may justify a new version')
             if result['status']=='already_resolved':
@@ -303,8 +302,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         if result['status']=='deferred':
             result['developmental_progress']=executive.account_work(project['id'],before=work_before,
                 after=executive.experiment_progress(dataset.artifacts.parent/'models',plan['prediction_id']),
-                dependency=digest(dict(dataset=plan['dataset_id'],budget=budget_seconds,
-                    capabilities=registry.describe(),torch=torch_available)),outcome='yielded',sources=[plan['prediction_id']],
+                dependency=executive.experiment_dependency(plan,budget_seconds,registry,torch_available),outcome='yielded',sources=[plan['prediction_id']],
                 resumption_condition='Resume same prediction when its retained checkpoint, qualified dataset or capability/resource budget changes')
             break
         # Serial offline jobs can serve additional projects; no second physical

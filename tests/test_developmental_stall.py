@@ -1,5 +1,6 @@
 """Controlled software stalls and dependencies; no physical activation."""
 import json
+import pytest
 from pathlib import Path
 from learning.lifecycle import DevelopmentLifecycle, MeditationYield
 from memory.evidence import digest
@@ -140,6 +141,51 @@ def test_heartbeat_changes_are_not_computed_progress(tmp_path):
     j.close()
 
 
+@pytest.mark.parametrize('change',['checkpoint','capability','implementation'])
+def test_waiting_experiment_reconsiders_changed_checkpoint_without_new_evidence(tmp_path,monkeypatch,change):
+    from learning.capabilities import default_registry
+    import learning.cycle as cycle
+    registry=default_registry();original=registry.invoke;stuck=[];released=[False]
+    def invoke(method,**kwargs):
+        identifier=kwargs['plan']['project_id']
+        if not stuck:stuck.append(identifier)
+        if identifier==stuck[0] and not released[0]:return dict(status='deferred',returncode=75)
+        return original(method,**kwargs)
+    monkeypatch.setattr(cycle,'default_registry',lambda:registry)
+    monkeypatch.setattr(registry,'invoke',invoke)
+    root=experience(tmp_path);state=tmp_path/'state';life=DevelopmentLifecycle(state,[root])
+    life.turn()
+    plan=next(r.data['payload']['plan'] for r in life.journal.records('event')
+        if r.data['payload'].get('category')=='offline_experiment_plan'
+        and r.data['payload']['plan']['project_id']==stuck[0])
+    checkpoint=state/'models'/plan['prediction_id']/'candidate'/'progress.json'
+    checkpoint.parent.mkdir(parents=True,exist_ok=True)
+    checkpoint.write_text(json.dumps(dict(processing_units=1,pid=1,updated_at=1)))
+    for _ in range(10):life.turn()
+    assert life.executive.work_states()[stuck[0]]['status']=='blocked'
+    assert life.phase=='waiting for evidence'
+    before=[r.id for r in life.journal.records()]
+    checkpoint.write_text(json.dumps(dict(processing_units=1,pid=2,updated_at=2)))
+    life.turn()
+    assert [r.id for r in life.journal.records()]==before # heartbeat is not a wakeup
+    if change=='checkpoint':
+        checkpoint.write_text(json.dumps(dict(processing_units=2)))
+    elif change=='capability':
+        from dataclasses import replace
+        registry._items[plan['method']]=replace(registry.get(plan['method']),purpose='Reviewed execution capability')
+    else:
+        from memory.learning_projects import LearningExecutive
+        original_implementation=LearningExecutive.execution_implementation
+        monkeypatch.setattr(LearningExecutive,'execution_implementation',
+            lambda self:dict(original_implementation(self),controlled_review='new-adapter-revision'))
+    life.close();released[0]=True
+    life=DevelopmentLifecycle(state,[root]);life.turn()
+    assert life.executive.work_states()[stuck[0]]['status']=='completed'
+    assert sum(r.data['payload'].get('category')=='offline_experiment_plan' and
+        r.data['payload']['plan']['project_id']==stuck[0] for r in life.journal.records('event'))==1
+    life.close()
+
+
 def test_primary_preemption_is_not_meditation_stagnation(tmp_path,monkeypatch):
     root=experience(tmp_path);life=DevelopmentLifecycle(tmp_path/'state',[root])
     def primary():raise InterruptedError('primary owner preempted this slice')
@@ -169,4 +215,22 @@ def test_unavailable_candidate_cannot_claim_idle_productivity(tmp_path,monkeypat
     before=[r.id for r in life.journal.records()]
     for _ in range(4):life.turn()
     assert [r.id for r in life.journal.records()]==before
+    life.close()
+
+
+def test_quarantined_partial_meditation_does_not_keep_waiting_portfolio_busy(tmp_path,monkeypatch):
+    root=experience(tmp_path);state=tmp_path/'state';life=DevelopmentLifecycle(state,[root])
+    monkeypatch.setattr(meditation,'meditate',lambda *args,**kwargs:(_ for _ in ()).throw(MeditationYield('controlled interruption')))
+    life.turn()
+    assert life.executive.work_states()
+    (root/'tracks.json').write_text(json.dumps(dict(tracks=[]))) # genuine preserved-source modification
+    for _ in range(8):life.turn()
+    assert life.phase=='waiting for evidence'
+    assert not life.pending_work()
+    assert json.loads((state/'development-status.json').read_text())['identity_conflicts']
+    before=[r.id for r in life.journal.records()];life.close()
+    life=DevelopmentLifecycle(state,[root])
+    for _ in range(4):life.turn()
+    assert [r.id for r in life.journal.records()]==before
+    assert life.phase=='waiting for evidence'
     life.close()

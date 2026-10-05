@@ -545,6 +545,19 @@ class LearningExecutive:
             rollback='Retain baseline and every prior attempt; no physical activation'),
             [self._reference(self.journal,outcome['resolution_id']).id])
 
+    def execution_implementation(self):
+        """Actual existing execution adapters; documentation is not a dependency."""
+        from pathlib import Path
+        from learning.datasets import sha
+        base=Path(__file__).resolve().parents[1]/'learning'
+        return {name:sha(base/name) for name in
+            ('cycle.py','capabilities.py','worker.py','foundry.py','diagnostics.py','meditation.py')}
+
+    def experiment_dependency(self, plan, budget_seconds, registry, torch_available):
+        return digest(dict(dataset=plan['dataset_id'],budget=budget_seconds,
+            capabilities=registry.describe(),torch=torch_available,
+            implementation=self.execution_implementation()))
+
     def experiment_progress(self, output, prediction_id):
         from pathlib import Path
         import json

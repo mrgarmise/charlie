@@ -258,20 +258,30 @@ class DevelopmentLifecycle:
 
     def investigation_inputs(self):
         import importlib.util
+        from .cycle import default_registry
         observations=[r.id for r in self.journal.records() if
             r.data['kind'] in ('observation','resolution') and
             r.data['payload'].get('category')!='consolidated_evidence_reference']
         identity=[r.id for r in self.journal.records('event') if r.data['payload'].get('category') in
-            ('episode_identity_binding','episode_identity_alias','episode_identity_quarantine')]
+            ('episode_identity_binding','episode_identity_alias','episode_identity_quarantine','episode_identity_location')]
+        # Only retained unfinished work can wake on a computed checkpoint.
+        # Heartbeats, waiting receipts and completed experiments never do.
+        work=self.executive.work_states()
+        checkpoints={p['prediction_id']:self.executive.experiment_progress(self.output/'models',p['prediction_id'])
+            for row in self.journal.category_records('event','offline_experiment_plan')
+            for p in [row.data['payload']['plan']]
+            if work.get(p.get('project_id'),{}).get('status')=='blocked'}
         return digest(dict(observations=observations,identity=identity,torch=importlib.util.find_spec('torch') is not None,
-            budget=self.budget))
+            budget=self.budget,checkpoints=checkpoints,capabilities=default_registry().describe(),
+            implementation=self.executive.execution_implementation()))
 
     def pending_work(self):
         contexts={r.data['payload']['context_id'] for r in self.journal.records('event')
             if r.data['payload'].get('category')=='reflection_commission'}
         completed={r.data['payload']['context_id'] for r in self.journal.records('observation')
             if r.data['payload'].get('category')=='normal_meditation_result'}
-        if any(self.executive.work_ready(i,self.meditation_dependency(i)) for i in contexts-completed):
+        if any(self.evidence_eligible(self.journal.get(i).data['payload']) and
+                self.executive.work_ready(i,self.meditation_dependency(i)) for i in contexts-completed):
             return True
         import importlib.util
         available={'model-diagnostics','meditation-motion','evidence-review'}

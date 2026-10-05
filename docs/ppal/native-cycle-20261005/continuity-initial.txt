@@ -1,0 +1,57 @@
+.......F........F.                                                       [100%]
+=================================== FAILURES ===================================
+______________ test_duplicate_causal_work_is_rejected[resolution] ______________
+
+advancing = (PosixPath('/tmp/pytest-of-root/pytest-0/test_duplicate_causal_work_is_3/state'), PosixPath('/tmp/pytest-of-root/pytes...d82ed667b20cbdb720f7daf6c8e9d0639ea81fb30cfe9db6fae8f43663ac5c', 'next_direction': 'Resume retained work', ...}}, ...})
+category = 'resolution'
+
+    @pytest.mark.parametrize('category',['reflection_commission','learning_context_reference','normal_meditation_yield','resolution'])
+    def test_duplicate_causal_work_is_rejected(advancing,category):
+        _,_,before,after=advancing;after=deepcopy(after)
+>       document=next(json.loads(r['document']) for r in after['original_records']
+            if json.loads(r['document'])['payload'].get('category')==category or json.loads(r['document'])['kind']==category)
+E       StopIteration
+
+tests/test_developmental_continuity.py:69: StopIteration
+---------------------------- Captured stdout setup -----------------------------
+Development: idle | no project | 
+Development: reflecting | no project | 
+Development: investigating | no project | 
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: stopped | no project | Committed developmental checkpoint or conclusion advanced
+Development: idle | no project | 
+Development: reflecting | no project | 
+Development: investigating | no project | 
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: stopped | no project | Committed developmental checkpoint or conclusion advanced
+_ test_completed_findings_continue_to_candidate_evaluation_under_normal_owner __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_completed_findings_contin0')
+
+    def test_completed_findings_continue_to_candidate_evaluation_under_normal_owner(tmp_path):
+        root=experience(tmp_path);state=tmp_path/'state'
+        assert startup(state,[root],authorize=False).returncode==0
+        before=inspect(state);delivered_corpus(tmp_path,state)
+        assert startup(state,[root],authorize=True).returncode==0
+>       after=inspect(state);report=compare_restart(before,after)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_developmental_continuity.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/continuity.py:162: in compare_restart
+    require(allowed,'unclassified restart evidence requires review: '+producer+'/'+str(category or op or d['kind']))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+reason = 'unclassified restart evidence requires review: ModelFoundry/motion_final_consultation'
+
+    def require(condition, reason):
+>       if not condition:raise ContinuityError(reason)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       learning.continuity.ContinuityError: unclassified restart evidence requires review: ModelFoundry/motion_final_consultation
+
+learning/continuity.py:18: ContinuityError
+=========================== short test summary info ============================
+FAILED tests/test_developmental_continuity.py::test_duplicate_causal_work_is_rejected[resolution]
+FAILED tests/test_developmental_continuity.py::test_completed_findings_continue_to_candidate_evaluation_under_normal_owner
+2 failed, 16 passed in 4.89s

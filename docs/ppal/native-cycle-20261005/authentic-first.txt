@@ -1,0 +1,37 @@
+Development: idle | Can preserved observations support the existing motion candidates? | 
+Development: reflecting | Can preserved observations support the existing motion candidates? | 
+Development: investigating | Can preserved observations support the existing motion candidates? | 
+Development: blocked | Can preserved observations support the existing motion candidates? | FileNotFoundError: [Errno 2] No such file or directory: '/home/five/.local/share/charlie/development/pixels/2706f9c8cea76073f052268dc797565a290d772f3b76933db704ef4786ea0b02.png'
+Development: stopped | Can preserved observations support the existing motion candidates? | FileNotFoundError: [Errno 2] No such file or directory: '/home/five/.local/share/charlie/development/pixels/2706f9c8cea76073f052268dc797565a290d772f3b76933db704ef4786ea0b02.png'
+Traceback (most recent call last):
+  File "/workspace/scratch/c81a2d35e2bc/charlie-cycle/main.py", line 93, in <module>
+    main()
+  File "/workspace/scratch/c81a2d35e2bc/charlie-cycle/main.py", line 37, in main
+    run(args.learning_state,roots,**kwargs)
+  File "/workspace/scratch/c81a2d35e2bc/charlie-cycle/learning/lifecycle.py", line 462, in run
+    lifecycle.turn()
+  File "/workspace/scratch/c81a2d35e2bc/charlie-cycle/learning/lifecycle.py", line 435, in turn
+    return self.executive.develop(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c81a2d35e2bc/charlie-cycle/memory/learning_projects.py", line 669, in develop
+    report = investigate(lifecycle.dataset,lifecycle.gateway,executive=self,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c81a2d35e2bc/charlie-cycle/learning/cycle.py", line 215, in investigate
+    opportunities=([] if diagnostics_only or refinement_only else reflect_perceptual_opportunities(dataset,gateway,registry))+([] if refinement_only else reflect_model_investigations(dataset,gateway,registry))
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c81a2d35e2bc/charlie-cycle/experiments/ppal/reflect_robotron.py", line 436, in reflect_perceptual_opportunities
+    snap=dataset.snapshot(objective=objective); snapshots[method]=snap
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c81a2d35e2bc/charlie-cycle/learning/datasets.py", line 151, in snapshot
+    if sha(r['pixel_path'])!=r['pixel_sha256']: raise ValueError('pixel artifact modified')
+       ^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c81a2d35e2bc/charlie-cycle/learning/datasets.py", line 26, in sha
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/five/.local/share/charlie/development/pixels/2706f9c8cea76073f052268dc797565a290d772f3b76933db704ef4786ea0b02.png'

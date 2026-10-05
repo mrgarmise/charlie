@@ -1,0 +1,86 @@
+CHARLIE_LEARNING_STATE=/home/five/.local/share/charlie/development \
+  bash tools/accept_episode_identity_pi.sh "$RELEASE"
+........................................................................ [ 64%]
+.......................................                                  [100%]
+111 passed in 76.00s (0:01:15)
+Development: idle | Can preserved observations support the existing motion candidates? | 
+Development: reflecting | Can preserved observations support the existing motion candidates? | 
+Development: investigating | Can preserved observations support the existing motion candidates? | 
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: stopped | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | 
+Development: reflecting | Can preserved observations support the existing motion candidates? | 
+Development: investigating | Can preserved observations support the existing motion candidates? | 
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: stopped | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Traceback (most recent call last):
+  File "<stdin>", line 9, in <module>
+AssertionError: New evidence or unfinished eligible work changed state; inspect retained records before claiming restart dedup
+Connection to charlie.local closed.
+themintalex@MintHP:~$ 

@@ -1,0 +1,39 @@
+{
+  "source_raw_sha256": "be2754892cdf86af401eae8db37833985e79566906ed59c6e126b5ed292fcc0d",
+  "source_library_id": "libfile_ba180ff80c0c819180c1b41e6732d9bc",
+  "source_section": "AFTER RESTART + SECOND 12 TURNS",
+  "original_records": 823,
+  "original_ids_and_commitments_preserved": true,
+  "checkpoint_files": 7,
+  "byte_hash_verified_results": [
+    {
+      "context_id": "04f4a1c62c4646e56493454de0072e98e380b415554108a77e10cabd53eafcfd",
+      "sha256": "fac234e816a169a6dad70d6e67ced4197938fc5e05e039014c5a0d88fff88ba8"
+    },
+    {
+      "context_id": "3e017cbdcf6e81fc0a1cb17904074e320fd2d0dd7ffa4a8fdba4efd44d7d1ea3",
+      "sha256": "93ca031c7b6f93736c18c788b57b995822d4a54fc8b34c1009d27a3e55e14cd1"
+    },
+    {
+      "context_id": "4b12283ea4a1e5b0e2c59a31b9a59db69b384661b95aafc6040ab46ec9e6c212",
+      "sha256": "6381bf6c88c1e6bbf395ad9d8928b9206ce576abdbe02c94fe52f0ee2e47c2c4"
+    },
+    {
+      "context_id": "7ecc8949293ee480b1685ad6f78606cd18a464d22389bae4a4b6507355cafdc5",
+      "sha256": "3e67064b0f68ae00b5ff63650204c3a78e6aeb5ee9e12e12760698729a514829"
+    },
+    {
+      "context_id": "d7ba0af50f9fa1301efb05534236296c63884abdd3722f36be32731e5d00393c",
+      "sha256": "1264d65cc76931ebcac66abb770e1173a2164b22246db6a13c62342387ef7ea9"
+    },
+    {
+      "context_id": "e8e1028f0c6cda025f86f96ea3bed0527c3c087ddf1cce8e5a6aeef2fed1e722",
+      "sha256": "870dbb20a87b917f6817d19c69298fdb52dd07e5cd7360fb3a1a64f37277a75a"
+    }
+  ],
+  "original_native_directory": "/home/five/.local/share/charlie/development",
+  "host_copy": "/workspace/scratch/c81a2d35e2bc/native-cycle-authentic",
+  "selective_memory_and_evaluator": "not present in this inspection; not inferred or fabricated",
+  "history_177_gap": "No missing historical archive reconstructed; only exact surviving records in this new native inspection copied",
+  "new_independent_experience": false
+}

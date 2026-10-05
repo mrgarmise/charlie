@@ -79,10 +79,9 @@ def main() -> None:
         parser.error("--synthetic-shot-scale must be positive and requires synthetic mode")
 
     arena = Simulator(shot_lane_scale=args.synthetic_shot_scale) if args.mode == "synthetic" else None
-    policy=None
-    if args.learned_policy:
-        from .qualified_policy import load_policy
-        policy=load_policy(args.learned_policy,physical=args.arm or args.mode!='synthetic')
+    from .policy_loading import load_startup_policy
+    policy,policy_error=load_startup_policy(args.learned_policy,
+        physical=args.arm or args.mode!='synthetic')
     source = None
     try:
         profile = (args.profile or SYNTHETIC_PROFILE) if arena else args.profile
@@ -112,7 +111,8 @@ def main() -> None:
                                     args.duration_ms, args.preview_dir, hud_reader, shot_model,
                                     args.adapt_shot_model,
                                     args.adapt_replay if args.adapt_shot_model else None,
-                                    memory_gateway=gateway,policy=policy).run(args.max_steps)
+                                    memory_gateway=gateway,policy=policy,
+                                    policy_error=policy_error).run(args.max_steps)
         print(f"OUTCOME {outcome} log={args.log} "
               f"controller={'ARCADE' if args.arm else 'DRY RUN'}")
     finally:

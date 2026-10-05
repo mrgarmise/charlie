@@ -17,6 +17,9 @@ class CapabilityDeployment:
         if target not in adapters or target not in ('offline-shadow','ppal-semantics','ppal-policy'): raise ValueError('production integration is not authorized or implemented')
         if not authorization or authorization.get('target')!=target or authorization.get('proposal_id')!=proposal_id or not authorization.get('source'):
             raise ValueError('separate explicit execution authorization required')
+        activation_key=digest(dict(proposal=proposal_id,authorization=authorization))
+        if any(r.data['payload'].get('revoked_activation')==activation_key for r in self.journal.records('event')):
+            raise ValueError('rollback revoked this activation grant; new authorization required')
         evaluation=self.journal.get(p['evaluation_id'])
         measured=evaluation.data['payload']
         if evaluation.data['producer']!='ModelFoundry' or measured.get('category')!='offline_model_evaluation' or not measured.get('metrics',{}).get('improved') or not measured['metrics'].get('independence_groups'):
@@ -90,15 +93,28 @@ class CapabilityDeployment:
             contract=contract,shadow_id=shadow_id,physical_readiness=readiness,evidence_scope=scope,
             physical_readiness_id=readiness_id if target=='ppal-policy' else None,
             previous_activation=previous['activation_key'] if previous else None,
-            activation_key=digest(dict(proposal=proposal_id,authorization=authorization)),**policy_metadata),episode=scope,
+            activation_key=activation_key,**policy_metadata),episode=scope,
             sources=sources,producer='authorized-capability-deployment',version='ala-2')
     def rollback(self, target, *, reason, authorization, to_baseline=False):
         current=self.active(target)
         if not current or not reason or not authorization or authorization.get('target')!=target or not authorization.get('source'): raise ValueError('explicit rollback required')
+        request=digest(dict(target=target,reason=reason,authorization=authorization,to_baseline=to_baseline))
+        if current.get('rollback_request')==request:
+            return next(r for r in self.journal.records('event')
+                if r.data['payload'].get('activation_key')==current['activation_key'])
         prior=None
         if current['previous_activation'] and not to_baseline:
             prior=next(r.data['payload'] for r in self.journal.records('event') if r.data['payload'].get('activation_key')==current['previous_activation'])
             if sha(prior['candidate']['checkpoint'])!=prior['candidate']['checkpoint_sha256']: raise ValueError('rollback weights changed')
+            if prior.get('authorization',{}).get('execution')=='physical' and authorization.get('execution')!='physical':
+                raise ValueError('restoring physical policy requires separate physical rollback authority')
+            if target=='ppal-policy':
+                from .policy import policy_payload,runtime_hash
+                policy_payload(self.journal,prior)
+                if prior['policy_runtime_sha256']!=runtime_hash():
+                    raise ValueError('rollback runtime changed; new qualification required')
+                if any(r.data['payload'].get('revoked_proposal')==prior['proposal_id'] for r in self.journal.records('event')):
+                    raise ValueError('rollback cannot restore a revoked proposal')
         return self.journal.append('event',dict(category='capability_activation',target=target,
             candidate_id=prior['candidate_id'] if prior else None,candidate=prior['candidate'] if prior else None,
             contract=prior.get('contract') if prior else None,shadow_id=prior.get('shadow_id') if prior else None,
@@ -109,8 +125,13 @@ class CapabilityDeployment:
             policy_code_dirty=prior.get('policy_code_dirty') if prior else None,
             policy_runtime_sha256=prior.get('policy_runtime_sha256') if prior else None,
             proposal_id=prior.get('proposal_id') if prior else None,
-            revoked_proposal=current.get('proposal_id'),
-            authorization=authorization,reason=reason,previous_activation=None,
+            revoked_proposal=current.get('proposal_id') if not prior or prior.get('proposal_id')!=current.get('proposal_id') else None,
+            revoked_activation=current['activation_key'],
+            authorization=prior['authorization'] if prior else authorization,
+            rollback_authorization=authorization,
+            rollback_request=request,
+            rollback_source_activation=prior['activation_key'] if prior else None,
+            reason=reason,previous_activation=None,
             activation_key=digest(dict(rollback=current['activation_key'],reason=reason,authorization=authorization))),
             episode=SCOPE,producer='authorized-capability-deployment',version='ala-1')
 
@@ -140,13 +161,34 @@ class CapabilityDeployment:
                 return {'status':'blocked','reason':'decision authority cannot authorize another capability','manifest':None}
             if not authority.get('source') or authority.get('execution') not in ('offline','physical'):
                 raise ValueError('external bounded decision deployment authority required')
-            from .policy import shadow_policy
+            from .policy import shadow_policy,policy_payload,runtime_hash
             from pathlib import Path
             previous=self.active('ppal-policy')
-            if not previous or previous.get('proposal_id')!=proposal:
-                s=shadow_policy(self.journal,proposal)
-                self.activate(proposal,target='ppal-policy',authorization=dict(authority,proposal_id=proposal),
-                    shadow_id=s.id,readiness_id=authority.get('readiness_id'))
+            authorization=dict(authority,proposal_id=proposal)
+            try:
+                domains=p['contract']['domains']
+                if not isinstance(authority.get('allowed_domains'),list) or not set(domains)<=set(authority['allowed_domains']):
+                    raise ValueError('decision domain outside authorization')
+                reuse=previous and previous.get('proposal_id')==proposal and previous.get('authorization')==authorization
+                if reuse:
+                    policy_payload(self.journal,previous)
+                    if previous['policy_runtime_sha256']!=runtime_hash():
+                        raise ValueError('policy runtime changed; new qualification required')
+                else:
+                    # Check the requested grant even if this proposal was previously
+                    # activated under a different authority. Never inherit permission.
+                    if previous and previous.get('proposal_id')==proposal:
+                        policy_payload(self.journal,dict(previous,authorization=authorization,
+                            physical_readiness_id=authority.get('readiness_id')))
+                    s=shadow_policy(self.journal,proposal)
+                    self.activate(proposal,target='ppal-policy',authorization=authorization,
+                        shadow_id=s.id,readiness_id=authority.get('readiness_id'))
+            except (ValueError,KeyError,TypeError,OSError) as exc:
+                from .acquisition import retain_dependency_request
+                request=retain_dependency_request(self.journal,proposal,work_id=proposal,
+                    required_evidence=[dict(capability='ppal-policy',authority_digest=digest(authority),
+                        dependency='bounded authority and candidate/runtime-specific qualification')],reason=str(exc))
+                return dict(status='blocked',reason=str(exc),manifest=None,request_id=request.id)
             manifest=Path(path).with_name('ppal-policy.json')
             self.export_policy('ppal-policy',manifest)
             return dict(status='activated',manifest=str(manifest),proposal_id=proposal,

@@ -55,11 +55,12 @@ class EpisodeRunner:
                  shot_model: "ShotModel | None" = None,
                  adaptation_path: Path | None = None,
                  adaptation_replay: Path | None = None,
-                 memory_gateway=None, policy=None) -> None:
+                 memory_gateway=None, policy=None, policy_error=None) -> None:
         if adaptation_path and (shot_model is None or hud_reader is None):
             raise ValueError("adaptation needs an initial model and a visible HUD reader")
         from .shot_learning import ShotAdaptation
         self.memory_gateway = memory_gateway
+        self.policy_error = policy_error
         self.run_id = uuid.uuid4().hex
         self.source = source
         self.pipeline = pipeline
@@ -123,6 +124,7 @@ class EpisodeRunner:
                           "goal": asdict(goal) if goal else None,
                           "intent": asdict(intent) if intent else None,
                           "action": asdict(action),
+                          "policy_load_error": self.policy_error,
                           "decision_provenance": {'forebrain':self.forebrain.last_reason,
                                                   'hindbrain':self.hindbrain.last_decision},
                           "before": asdict(before) if before else None,

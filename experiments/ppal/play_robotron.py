@@ -461,19 +461,8 @@ def main():
         except (OSError,ValueError,KeyError,ImportError,RuntimeError) as exc:
             semantic_error=f'{type(exc).__name__}: {exc}'
             print('LEARNED SEMANTICS UNAVAILABLE: '+semantic_error+'; baseline retained')
-    policy=None;policy_error=None
-    policy_path=args.learned_policy
-    if policy_path is None:
-        import os
-        state=os.environ.get('CHARLIE_LEARNING_STATE')
-        if state and (Path(state)/'ppal-policy.json').is_file():policy_path=Path(state)/'ppal-policy.json'
-    if policy_path:
-        try:
-            from .qualified_policy import load_policy
-            policy=load_policy(policy_path,physical=args.arm)
-        except (OSError,ValueError,KeyError,TypeError,RuntimeError) as exc:
-            policy_error=f'{type(exc).__name__}: {exc}'
-            print('LEARNED POLICY UNAVAILABLE: '+policy_error+'; baseline retained')
+    from .policy_loading import load_startup_policy
+    policy,policy_error=load_startup_policy(args.learned_policy,physical=args.arm)
     forebrain = Forebrain(policy=policy)
     hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire,policy=policy)
     shadow_forebrain = Forebrain()

@@ -1,0 +1,72 @@
+....ss.ssFss................s..sssss.ss..ssss........................... [ 12%]
+........................................................................ [ 25%]
+........................................................................ [ 38%]
+........................................................................ [ 50%]
+........................................................................ [ 63%]
+........................................................................ [ 76%]
+........................................................................ [ 88%]
+................................................................         [100%]
+=================================== FAILURES ===================================
+_______ test_shadow_activation_requires_independent_support_and_rollback _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_shadow_activation_require0')
+
+    def test_shadow_activation_requires_independent_support_and_rollback(tmp_path):
+        ds,g=make(tmp_path)
+        from learning.datasets import sha
+        weights=tmp_path/'weights.bin';weights.write_bytes(b'controlled-test-candidate')
+        evaluation=ds.journal.append('observation',dict(category='offline_model_evaluation',metrics={'improved':True,'independence_groups':['controlled-held-out']},candidate={'checkpoint':str(weights),'checkpoint_sha256':sha(weights)}),episode=SCOPE,producer='ModelFoundry',version='1')
+        proposal=ds.journal.append('event',dict(category='model_deployment_proposal',candidate_id='controlled',evaluation_id=evaluation.id,eligible=True,target='offline-shadow'),episode=SCOPE,sources=[evaluation.id],producer='Reflection',version='1')
+        deploy=CapabilityDeployment(ds.journal)
+        with pytest.raises(ValueError): deploy.activate(proposal.id,target='live-PPAL',authorization={'source':'test'})
+        auth={'source':'explicit-controlled-authorization','target':'offline-shadow','proposal_id':proposal.id}
+>       deploy.activate(proposal.id,target='offline-shadow',authorization=auth)
+
+tests/test_ala_cycle.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <learning.deployment.CapabilityDeployment object at 0x7f2f6dd04ef0>
+proposal_id = '2feae217ff6173b9f32b81e05fbd2f1d6a868893fe482f9ed4860682061fa1c5'
+target = 'offline-shadow'
+authorization = {'source': 'explicit-controlled-authorization', 'target': 'offline-shadow', 'proposal_id': '2feae217ff6173b9f32b81e05fbd2f1d6a868893fe482f9ed4860682061fa1c5'}
+adapters = ('offline-shadow', 'ppal-semantics', 'ppal-policy'), shadow_id = None
+readiness_id = None
+
+    def activate(self, proposal_id, *, target, authorization, adapters=('offline-shadow','ppal-semantics','ppal-policy'),shadow_id=None,readiness_id=None):
+        proposal_record=self.journal.get(proposal_id);p=proposal_record.data['payload'];scope=proposal_record.data['episode']
+        if p.get('category')!='model_deployment_proposal' or not p['eligible'] or p['target']!=target:
+            raise ValueError('supported independent deployment proposal required')
+        if target not in adapters or target not in ('offline-shadow','ppal-semantics','ppal-policy'): raise ValueError('production integration is not authorized or implemented')
+        if not authorization or authorization.get('target')!=target or authorization.get('proposal_id')!=proposal_id or not authorization.get('source'):
+            raise ValueError('separate explicit execution authorization required')
+        evaluation=self.journal.get(p['evaluation_id'])
+        measured=evaluation.data['payload']
+        if evaluation.data['producer']!='ModelFoundry' or measured.get('category')!='offline_model_evaluation' or not measured.get('metrics',{}).get('improved') or not measured['metrics'].get('independence_groups'):
+            raise ValueError('independent model evaluation required')
+        if measured['metrics'].get('fresh_final_evidence') is False:
+            raise ValueError('fresh independent final evidence required; repeated test groups cannot deploy')
+        candidate=measured['candidate']
+>       if p['candidate_id']!=candidate['identifier']:raise ValueError('candidate identity differs from evaluation')
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'identifier'
+
+learning/deployment.py:27: KeyError
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_ala_foundry.py:6: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:33: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:59: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:74: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:83: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:113: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:127: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_operational.py:40: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_operational.py:95: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_operational.py:114: could not import 'torch': No module named 'torch'
+SKIPPED [3] tests/test_ala_portable.py:28: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_portable.py:57: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_portable.py:101: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_portable.py:145: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_refinement.py:13: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_refinement.py:44: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_refinement.py:56: could not import 'torch': No module named 'torch'
+1 failed, 549 passed, 19 skipped in 100.81s (0:01:40)

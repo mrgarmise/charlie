@@ -1,0 +1,15 @@
+{
+  "source": "Original Forebrain/Hindbrain blobs verified identical to 214d370816188a3a4e033f401352d138d9a960ba",
+  "samples": 10000,
+  "unit": "ns",
+  "median": 4915.0,
+  "p95": 35756,
+  "p99": 224199,
+  "minimum": 3185,
+  "maximum": 2297747,
+  "mean": 21275.5838,
+  "python": "3.12.14",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "controller_writes": 0,
+  "limitation": "Separate-process serial measurement, not paired per-sample or Pi timing"
+}

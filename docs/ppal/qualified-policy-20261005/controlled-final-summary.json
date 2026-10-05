@@ -1,0 +1,148 @@
+{
+  "source": "explicit controlled software fixture; not authentic Robotron or verified score improvement",
+  "normal_command": "main.py --offline --learning-state STATE --episode-root FIXTURE --learning-turns 8 --learning-budget 10 --allow-offline-improvements",
+  "original_state_path": "/workspace/scratch/c81a2d35e2bc/policy-controlled-final/state",
+  "initial_stdout": "Development: idle | no project | \nDevelopment: reflecting | no project | \nDevelopment: investigating | no project | \nDevelopment: evaluating | Can temporal estimation improve without promoting uncertain track links? | \nDevelopment: idle | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\nDevelopment: investigating | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\nDevelopment: idle | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\nDevelopment: investigating | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\nDevelopment: idle | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\nDevelopment: investigating | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\nDevelopment: waiting for evidence | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\nDevelopment: stopped | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\n",
+  "restart_stdout": "Development: idle | Can temporal estimation improve without promoting uncertain track links? | \nDevelopment: waiting for evidence | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\nDevelopment: stopped | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced\n",
+  "records_before_restart": 96,
+  "records_after_restart": 96,
+  "exact_restart": true,
+  "policy": {
+    "candidate_id": "80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a",
+    "investigation_id": "79428d73d8dcff612b092a8bc60e11d29c13bc0c6d376a37cf55d589f2b7207e",
+    "evaluation_id": "3cf426a546843252673df64fd727d1da1474c96ca5232c1f960fbf24bd1907b3",
+    "activation_key": "2d7adf6847deca540c958b9a74740161d6638887fe8675086e45341f7a0ec1de",
+    "rollback_identity": "2d7adf6847deca540c958b9a74740161d6638887fe8675086e45341f7a0ec1de",
+    "code_revision": "f6cf02bf673df392067ae6ade9c455d2bbe9707b",
+    "provenance_kind": "simulated-controlled-trajectories",
+    "policy_version": "ppal-policy-v1",
+    "domains": [
+      "action_effect_prediction"
+    ],
+    "applied_domains": [],
+    "disposition": "eligible"
+  },
+  "comparison_versions": {
+    "baseline_version": "2e13e81d94da82bdfb2dae44466fc21360da21d32c0060980953d2144f208480",
+    "baseline": {
+      "policy_version": "ppal-policy-v1",
+      "runtime_sha256": "25ff42d2303c226372c4750888b6cda062d370096be87eebe9ca3777bb3b8a26",
+      "policy": null,
+      "behavior": "existing Forebrain/Hindbrain defaults; no learned decision policy"
+    },
+    "candidate_version": "ac3fdb7cac266824a58d8e02622e193973746db7a7c4cfd40ff7c1045cfbbdec",
+    "candidate_id": "80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a",
+    "activation_key": "2d7adf6847deca540c958b9a74740161d6638887fe8675086e45341f7a0ec1de",
+    "investigation_id": "79428d73d8dcff612b092a8bc60e11d29c13bc0c6d376a37cf55d589f2b7207e",
+    "evaluation_id": "3cf426a546843252673df64fd727d1da1474c96ca5232c1f960fbf24bd1907b3",
+    "source_evidence": [
+      "dc5b75749643b7aa47ba4c7188835c17717168a4bac61e91397fa029ad64f22b"
+    ],
+    "permitted_domains": [
+      "action_effect_prediction"
+    ],
+    "readiness": "pending; offline version identities do not grant physical authorization",
+    "score_objective": "official_game_score",
+    "physical_authorization": false
+  },
+  "controller_writes": 0,
+  "physical_authorization": false,
+  "chain_ids": [
+    {
+      "id": "b3656c98f53b95939bccaa8fb377cef77cb76283809327c57d5cea9a18840844",
+      "category": "reflection_commission",
+      "operation": null
+    },
+    {
+      "id": "07b30b72c622a02f755e142ff4320fcb7f4a6fbda3d513cc70eb6dc7f638bce0",
+      "category": "normal_meditation_result",
+      "operation": null
+    },
+    {
+      "id": "0463cf649836267c9cc7dbc1fdc8144ea527759f70b40297d3be522ae35c4664",
+      "category": "perceptual_experiment_proposal",
+      "operation": null
+    },
+    {
+      "id": "ad59079894214f5da9c2eca5e862e62b80a6f22a1b1ca464e16ea507a287ff42",
+      "category": "perceptual_experiment_proposal",
+      "operation": null
+    },
+    {
+      "id": "8787dba13adb66cfbcd3ab0c8cc49d82e665868ef4ff50f42b4374ed336925ab",
+      "category": "perceptual_experiment_proposal",
+      "operation": null
+    },
+    {
+      "id": "608aede484dd90627155f02a89954bc0b17751f01c3499adcc080567728f9291",
+      "category": "perceptual_experiment_proposal",
+      "operation": null
+    },
+    {
+      "id": "79428d73d8dcff612b092a8bc60e11d29c13bc0c6d376a37cf55d589f2b7207e",
+      "category": "offline_experiment_plan",
+      "operation": null
+    },
+    {
+      "id": "3cf426a546843252673df64fd727d1da1474c96ca5232c1f960fbf24bd1907b3",
+      "category": "offline_model_evaluation",
+      "operation": null
+    },
+    {
+      "id": "9bf29c1903728ebb38c5963f3772297a811803d429ff073373f84e565179298f",
+      "category": "motion_operational_shadow",
+      "operation": null
+    },
+    {
+      "id": "51a01a3d6367475491b2ff462461687a5f6dfb288d7bbe9aa754b14bcb6fd13b",
+      "category": "capability_activation",
+      "operation": null
+    },
+    {
+      "id": "885b2df5343ab39de86d993a5036d469d8a4adaaf23a42c217f4731ccb832eed",
+      "category": "offline_operational_outcome",
+      "operation": null
+    },
+    {
+      "id": "189b9ec98a61179312b043b3dda4fcc9a4074adbfc76351737b05706973f2845",
+      "category": null,
+      "operation": "operational_feedback"
+    },
+    {
+      "id": "6eb3e3bd8daae5d62b544f5c489a7686cdccd70ca531ebb046c12896a769f5d4",
+      "category": "offline_experiment_plan",
+      "operation": null
+    },
+    {
+      "id": "edb27206b3d1363589936b3c095354f586181a92afebe54d356e82ab4772dcc6",
+      "category": "offline_experiment_plan",
+      "operation": null
+    },
+    {
+      "id": "afd24bbef22bd2ed484a6f00d983001f97515deb434142edf04cd8ace387d461",
+      "category": "offline_experiment_plan",
+      "operation": null
+    }
+  ],
+  "new_policy_changed_decisions": 1,
+  "measured_outcomes": [
+    {
+      "metrics": {
+        "baseline": 1.0,
+        "candidate": 0.0,
+        "independence_groups": [
+          "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484"
+        ],
+        "per_episode": [
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "qualified_observations": 6
+      },
+      "evidence_use": "reused validation diagnostic",
+      "physical_score_improvement": "UNKNOWN"
+    }
+  ]
+}

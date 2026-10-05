@@ -1,0 +1,43 @@
+{
+  "source": "/workspace/scratch/1e5a01e5b074/identity-authentic-final/learning-evidence.sqlite3",
+  "record_count": 455,
+  "journal_digest": "406174e67642b32eabb81767fba51f0fac4e4f2704c6c4351f0959015c9cf73b",
+  "read_only": true,
+  "candidate_evaluations": [
+    {
+      "id": "6aa5ee3cd0e1b1554dd23f0180faadd5288a8cca6e40bc0669cf1da10b9d5cf8",
+      "result": "unresolved",
+      "reason": "No independently verified player/target/threat trajectories supplied; Meditation associations and error summaries are not independent ground truth; No fresh sealed final motion evaluation or operational shadow qualification; Source episode already used as consulted-test; not fresh final evidence",
+      "eligible_proposal": null,
+      "candidate_ids": [
+        "ff934a962b96d937ebaa1dc5c9830b234dcf31cdb6f6d9215ced223be5228e7c",
+        "531d952746dde4f0fbbce325ea9061efc5d9ff13efa25fcfb6b490c665b06bad",
+        "b575a671d64812a6993329902d783eb3db88fdac64f9c5459f0b65d4054f4d5c"
+      ]
+    },
+    {
+      "id": "a76b46c8e821b9d61c61b0918fa3b2b1543d6d3e8a0f61c19e825d90402e0c62",
+      "result": "unresolved",
+      "reason": "No independently verified player/target/threat trajectories supplied; Meditation associations and error summaries are not independent ground truth; No fresh sealed final motion evaluation or operational shadow qualification; Source episode already used as train; not fresh final evidence",
+      "eligible_proposal": null,
+      "candidate_ids": [
+        "b144c1abc1de87c7cc313104b9229eabc8fd5f09579b22f7e8c4138fe2bef2ca",
+        "f4dee602152c5087c3acd90356634913f57e1ace04e800b2927672582543273c",
+        "69f37a265d80ac93c0c8d8b62f04de3211746f6a5be6be7c58c4752f2adfae12"
+      ]
+    },
+    {
+      "id": "ddd99db61c7b8d0e9ad1da10d1e301b430c9135493a3bac57d2e62cf93909336",
+      "result": "unresolved",
+      "reason": "No independently verified player/target/threat trajectories supplied; Meditation associations and error summaries are not independent ground truth; No fresh sealed final motion evaluation or operational shadow qualification; Source episode already used as validation; not fresh final evidence",
+      "eligible_proposal": null,
+      "candidate_ids": [
+        "329b4d449ecb420150110ffc6e4019c21598a723eb2c659c1c10935af8bc434b",
+        "1e5e89fe4adb03ce7de1c82eb40058ff1ab2e5a0bd198d1451fd5e52f563436c",
+        "597e6fc739326419dc987becdb2d9fe1f3853726102d18a12a4cbe5146dffb59"
+      ]
+    }
+  ],
+  "activations": [],
+  "limitation": "Preserved host notebook, distinct from current native notebook; no new observations or physical score claim"
+}

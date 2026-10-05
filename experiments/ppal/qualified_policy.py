@@ -103,8 +103,11 @@ def load_policy(path, *, physical=False):
         active = CapabilityDeployment(journal).active(payload['target'])
         if not active or not active.get('candidate') or policy_payload(journal, active) != payload:
             raise ValueError('policy is not current qualified activation; rollback/tampering detected')
-        # Offline permission can never be upgraded by an arm flag or the learner.
-        if physical:
+        # An arm flag cannot upgrade an offline grant. The same qualification
+        # boundary verifies exact independent readiness at load time.
+        if physical and (payload['target']!='ppal-policy' or
+                         payload['authorization'].get('execution')!='physical' or
+                         not payload.get('physical_readiness')):
             raise ValueError('PPAL decision policy physical readiness/activation is not qualified')
         return QualifiedPolicy.from_payload(payload)
     finally:

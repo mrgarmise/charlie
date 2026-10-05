@@ -53,14 +53,15 @@ def parameter_policy(tmp_path, parameters):
     proposal=ds.journal.append('event',dict(category='model_deployment_proposal',eligible=True,target='ppal-policy',
         candidate_id=candidate['identifier'],evaluation_id=measured.id,prediction_id=p['prediction_id'],contract=contract),
         episode='perceptual-learning',producer='Reflection',version='explicit-fixture')
-    s=ds.journal.append('observation',dict(category='decision_policy_shadow',passed=True,proposal_id=proposal.id,
-        candidate_id=candidate['identifier'],checkpoint_sha256=candidate['checkpoint_sha256'],controller_writes=0,
-        limitation='constructed acceptance contract; not scientific or score evidence'),episode='perceptual-learning',
-        producer='controlled-policy-adapter',version='explicit-fixture')
-    deployment.activate(proposal.id,target='ppal-policy',shadow_id=s.id,
-        authorization=dict(target='ppal-policy',proposal_id=proposal.id,source='explicit interface fixture',
-                           execution='offline',allowed_domains=sorted(parameters)))
-    deployment.export_policy('ppal-policy',path)
+    from learning.policy import shadow_policy
+    s=shadow_policy(ds.journal,proposal.id)
+    authority=dict(target='ppal-policy',source='explicit interface fixture',
+                   execution='offline',allowed_domains=sorted(parameters))
+    result=deployment.apply_authority({'operational_proposal':proposal.id},authority,path)
+    assert result['status']=='activated' and result['manifest']==str(path)
+    count=len(ds.journal.records())
+    assert deployment.apply_authority({'operational_proposal':proposal.id},authority,path)['status']=='activated'
+    assert len(ds.journal.records())==count
     return ds,g,deployment,path
 
 
@@ -158,8 +159,14 @@ def test_latency_and_normal_entry_point_persistence(tmp_path):
     import subprocess,sys,os
     ds,g,d,path=parameter_policy(tmp_path,{'goal_preference':{'rescue':-1,'survive':1}})
     from experiments.ppal.benchmark_decisions import measure
-    report=measure(load_policy(path),iterations=100)
-    assert report['baseline']['samples']==100 and report['policy_enabled']['samples']==100
+    report_path=os.environ.get('CHARLIE_POLICY_TIMING_OUTPUT')
+    count=10000 if report_path else 100
+    report=measure(load_policy(path),iterations=count)
+    assert report['baseline']['samples']==count and report['policy_enabled']['samples']==count
+    if report_path:
+        report['qualification']='constructed strategic interface fixture; not authentic game learning'
+        from pathlib import Path
+        Path(report_path).write_text(json.dumps(report,indent=2)+'\n')
     assert report['controller_writes']==0 and report['median_delta_ns'] is not None
     for restart in range(2):
         log=tmp_path/f'normal-{restart}.jsonl'
@@ -188,6 +195,11 @@ def test_motion_policy_preserves_observed_immediate_threat_and_unresolved_space(
 def test_rejected_evaluation_and_unauthorized_domain_cannot_activate(tmp_path):
     ds,g,d,path=parameter_policy(tmp_path,{'goal_preference':{'survive':1}})
     active=d.active('ppal-policy')
+    count=len(ds.journal.records())
+    with pytest.raises(ValueError,match='physical policy'):
+        d.activate(active['proposal_id'],target='ppal-policy',shadow_id=active['shadow_id'],
+            authorization=dict(active['authorization'],execution='physical',operating_domain='robotron-camera'))
+    assert len(ds.journal.records())==count
     with pytest.raises(ValueError,match='domain outside authorization'):
         d.activate(active['proposal_id'],target='ppal-policy',shadow_id=active['shadow_id'],
             authorization=dict(target='ppal-policy',proposal_id=active['proposal_id'],source='fixture',
@@ -201,3 +213,42 @@ def test_rejected_evaluation_and_unauthorized_domain_cannot_activate(tmp_path):
     with pytest.raises(ValueError,match='supported independent'):
         d.activate(rejected.id,target='ppal-policy',shadow_id=active['shadow_id'],
             authorization=dict(active['authorization'],proposal_id=rejected.id))
+
+
+def test_runtime_mismatch_and_legacy_activation_do_not_silently_requalify(tmp_path,monkeypatch):
+    ds,g,d,path=motion_policy(tmp_path)
+    from learning import policy as qualification
+    monkeypatch.setattr(qualification,'runtime_hash',lambda:'different-code-runtime')
+    with pytest.raises(ValueError,match='runtime version mismatch'):load_policy(path)
+    monkeypatch.undo()
+    active=d.active('offline-shadow')
+    legacy={k:v for k,v in active.items() if not k.startswith('policy_')}
+    ds.journal.append('event',legacy,episode='perceptual-learning',
+                      producer='authorized-capability-deployment',version='legacy-test-fixture')
+    count=len(ds.journal.records())
+    with pytest.raises(ValueError,match='legacy activation'):d.export_policy('offline-shadow',path)
+    assert len(ds.journal.records())==count
+
+
+def test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart(tmp_path):
+    from test_normal_learning_lifecycle import experience,delivered_corpus,startup,rows
+    root=experience(tmp_path);state=tmp_path/'state';delivered_corpus(tmp_path,state)
+    inbox=state/'acquisition-inbox'/'motion.json';c=json.loads(inbox.read_text())
+    c['provenance_kind']='simulated-controlled-trajectories'
+    for episode in c['episodes']:
+        for i,frame in enumerate(episode['frames']):
+            frame['targets'][0]['position']=[25-i,20]
+    inbox.write_text(json.dumps(c))
+    process=startup(state,[root]);assert process.returncode==0,process.stderr
+    policy=load_policy(state/'ppal-policy.json')
+    assert policy.identity['provenance_kind']=='simulated-controlled-trajectories'
+    original=rows(state)
+    outcomes=[r for r in original if r.data['payload'].get('category')=='offline_operational_outcome']
+    assert len(outcomes)==1
+    decisions=outcomes[0].data['payload']['decisions']
+    assert any(d['qualified_policy_action']['move']!=d['baseline_action']['move'] for d in decisions)
+    assert all(d['policy_provenance']['hindbrain']['policy']['activation_key']==policy.identity['activation_key'] for d in decisions)
+    assert outcomes[0].data['payload']['controller_writes']==0
+    assert any(r.data['payload'].get('op')=='operational_feedback' for r in original)
+    again=startup(state,[root]);assert again.returncode==0,again.stderr
+    assert [(r.id,r.document,r.committed_at) for r in rows(state)]==[(r.id,r.document,r.committed_at) for r in original]

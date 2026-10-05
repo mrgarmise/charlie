@@ -24,7 +24,8 @@ class CapabilityDeployment:
         if measured['metrics'].get('fresh_final_evidence') is False:
             raise ValueError('fresh independent final evidence required; repeated test groups cannot deploy')
         candidate=measured['candidate']
-        if p['candidate_id']!=candidate['identifier']:raise ValueError('candidate identity differs from evaluation')
+        if candidate.get('identifier') and p['candidate_id']!=candidate['identifier']:
+            raise ValueError('candidate identity differs from evaluation')
         if sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']: raise ValueError('candidate weights changed')
         contract=None;readiness=None;sources=[proposal_id]
         policy_metadata={}
@@ -40,9 +41,10 @@ class CapabilityDeployment:
             # adapter or self-granted authority is added.
             provisional=dict(candidate=candidate,proposal_id=proposal_id,target=target,
                 authorization=authorization,shadow_id=shadow_id,activation_key='qualification-check',
-                previous_activation=None,**policy_metadata)
+                previous_activation=None,physical_readiness_id=readiness_id,**policy_metadata)
             from .policy import policy_payload
-            policy_payload(self.journal,provisional)
+            qualified=policy_payload(self.journal,provisional)
+            readiness=qualified['physical_readiness']
             if any(r.data['payload'].get('revoked_proposal')==proposal_id for r in self.journal.records('event')):
                 raise ValueError('rollback revoked decision proposal; new evaluation required')
             contract=measured['metrics']['decision_contract'];sources.append(shadow_id)
@@ -86,6 +88,7 @@ class CapabilityDeployment:
         return self.journal.append('event',dict(category='capability_activation',target=target,
             candidate_id=p['candidate_id'],candidate=candidate,proposal_id=proposal_id,authorization=authorization,
             contract=contract,shadow_id=shadow_id,physical_readiness=readiness,evidence_scope=scope,
+            physical_readiness_id=readiness_id if target=='ppal-policy' else None,
             previous_activation=previous['activation_key'] if previous else None,
             activation_key=digest(dict(proposal=proposal_id,authorization=authorization)),**policy_metadata),episode=scope,
             sources=sources,producer='authorized-capability-deployment',version='ala-2')
@@ -100,6 +103,7 @@ class CapabilityDeployment:
             candidate_id=prior['candidate_id'] if prior else None,candidate=prior['candidate'] if prior else None,
             contract=prior.get('contract') if prior else None,shadow_id=prior.get('shadow_id') if prior else None,
             physical_readiness=prior.get('physical_readiness') if prior else None,
+            physical_readiness_id=prior.get('physical_readiness_id') if prior else None,
             policy_code_revision=prior.get('policy_code_revision') if prior else None,
             policy_provenance_kind=prior.get('policy_provenance_kind') if prior else None,
             policy_code_dirty=prior.get('policy_code_dirty') if prior else None,
@@ -130,6 +134,24 @@ class CapabilityDeployment:
         if not proposal or not authority:return {'status':'proposed_only','manifest':None}
         if any(r.data['payload'].get('revoked_proposal')==proposal for r in self.journal.records('event')):
             return {'status':'blocked','reason':'explicit rollback revoked this proposal; new evaluation/authorization required','manifest':None}
+        if authority.get('target')=='ppal-policy':
+            p=self.journal.get(proposal).data['payload']
+            if p.get('target')!='ppal-policy':
+                return {'status':'blocked','reason':'decision authority cannot authorize another capability','manifest':None}
+            if not authority.get('source') or authority.get('execution') not in ('offline','physical'):
+                raise ValueError('external bounded decision deployment authority required')
+            from .policy import shadow_policy
+            from pathlib import Path
+            previous=self.active('ppal-policy')
+            if not previous or previous.get('proposal_id')!=proposal:
+                s=shadow_policy(self.journal,proposal)
+                self.activate(proposal,target='ppal-policy',authorization=dict(authority,proposal_id=proposal),
+                    shadow_id=s.id,readiness_id=authority.get('readiness_id'))
+            manifest=Path(path).with_name('ppal-policy.json')
+            self.export_policy('ppal-policy',manifest)
+            return dict(status='activated',manifest=str(manifest),proposal_id=proposal,
+                activation_key=self.active('ppal-policy')['activation_key'],
+                objective_evidence='diagnostic only; score UNKNOWN')
         if not authority.get('source') or authority.get('target')!='ppal-semantics' or not isinstance(authority.get('allowed_domains'),list):
             raise ValueError('external bounded deployment authority required')
         p=self.journal.get(proposal).data['payload'];domains=set(p['contract']['domains'])

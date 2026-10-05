@@ -336,12 +336,22 @@ def shadow(journal, proposal_id):
         raise ValueError('candidate artifact changed')
     corpus=journal.get(candidate['dataset_digest']).data['payload']['corpus']
     steps=0
+    from .policy import runtime_hash
+    from experiments.ppal.qualified_policy import QualifiedPolicy
+    runtime=runtime_hash()
     for episode in corpus['episodes']:
         if episode['partition']!='validation': continue  # Do not reopen final frames.
         adapter=PlanningCandidate(candidate['spec']);forebrain=Forebrain();hindbrain=Hindbrain()
+        policy=QualifiedPolicy.from_payload(dict(spec=candidate['spec'],candidate_id=candidate['identifier'],
+            investigation_id=p['prediction_id'],evaluation_id=p['evaluation_id'],activation_key='unactivated-shadow',
+            rollback_identity='unactivated-shadow',code_revision='shadow',provenance_kind='unactivated-shadow'))
+        pf,ph=Forebrain(policy),Hindbrain(policy=policy)
         for frame in episode['frames']:
             world=world_from_frame(frame)
             intent,action=adapter.decide(world,frame['timestamp'],forebrain,hindbrain)
+            pi,pa=ph.decide(world,pf.update(world),timestamp=frame['timestamp'])
+            if not pa.move or not pa.fire or not pi.kind:
+                raise ValueError('qualified policy chooser produced an invalid action')
             if not action.move or not action.fire or not intent.kind:
                 raise ValueError('existing chooser produced an invalid action')
             steps+=1
@@ -349,6 +359,7 @@ def shadow(journal, proposal_id):
     return journal.append('observation',dict(category='motion_operational_shadow',passed=True,
         proposal_id=proposal_id,candidate_id=candidate['identifier'],
         checkpoint_sha256=candidate['checkpoint_sha256'],steps=steps,controller_writes=0,
+        policy_runtime_sha256=runtime,
         limitation='executable compatibility only; no physical readiness or score utility'),
         episode=proposal.data['episode'],sources=[proposal_id],
         producer='controlled-motion-adapter',version=VERSION)

@@ -84,8 +84,12 @@ and journal verification are outside timing. The existing player consumes
 `--learned-policy`, or discovers `CHARLIE_LEARNING_STATE/ppal-policy.json` before
 an episode. The existing synthetic `run_closed_loop` consumes `--learned-policy`.
 Baseline entry points require no policy. Invalid/unqualified/stale/revoked files
-fail closed. Physical decision-policy loading is deliberately rejected: an arm
-flag and offline activation cannot confer physical policy authority.
+fail closed. An arm flag and offline activation cannot confer physical policy
+authority. The forward physical admission gate additionally requires a distinct
+physical grant for the Robotron-camera domain, independent Robotron evaluation,
+and an independent candidate/checkpoint/runtime-specific readiness record with
+hash-bound proof. Generic fixtures and offline motion activations are rejected.
+No passing physical grant/activation was supplied or executed in this session.
 
 Goal reasoning and Hindbrain action reasoning retain compact durable policy,
 candidate, investigation, evaluation and activation IDs plus applied domains.
@@ -136,13 +140,128 @@ camera/game/system/measurement conditions, measurement qualification and stoppin
 rule. Preserve every failure, regression and inconclusive outcome. Diagnostic
 prediction/rescue/survival gains cannot qualify game-score improvement.
 
-Before physical policy support/use: independently qualify candidate-specific Pi
+Before physical policy use: independently qualify candidate-specific Pi
 cadence/contention, current-world arbitration, identity/uncertainty, recovery,
 controller release, camera ownership, terminal boundaries and rollback; then
-extend the current physical-readiness gate for this exact policy domain/runtime
+supply these exact candidate/runtime proofs to the existing deployment gate
 and obtain separate explicit physical learned-policy and gameplay authorization.
 This session neither supplies those observations nor grants that authority.
 Unarmed Pi tests/benchmark may run on retained qualified **offline** artifacts;
 no command here starts gameplay or enables a controller. Native Pi validation is
 pending. ALA-2 remains open until verified independently measured complete-game
 SCORE improvement from Charlie-originated learning.
+
+## Continued acceptance and operational handoff
+
+Runtime shadows now exercise this exact bounded Forebrain/Hindbrain policy and
+bind its runtime hash, rather than allowing the older full-projection shadow
+alone to qualify it. The existing `apply_authority` path accepts a qualifying
+decision proposal under an external bounded domain grant and exports the same
+policy artifact idempotently. Reflection/Evaluator remain the owners of proposal
+and evidence; no strategy search or winning values are invented here.
+
+The preserved authentic host notebook was opened read-only: **455 records**, three
+unresolved motion evaluations, **no activation**. Their exact candidate IDs,
+missing qualifications and journal digest are in `authentic-eligibility.json`.
+No authentic candidate could legitimately pass qualification. Both October 1
+investigations, original artifacts and prior evidence use are untouched.
+
+`controlled-final-summary.json` and `controlled-final-cycle.json.gz` bind a
+separate simulated normal-main execution. Before startup, the test supplies
+controlled experience/independent simulated measurements and an offline-only
+grant. One normal launch owns all intermediate commissioning, meditation,
+selection, independent temporal evaluation, runtime shadow, export, subsequent
+qualified-policy decision and Executive feedback. It retained **96 records**
+exactly across restart and measured **one changed runtime-policy decision**.
+The original generated notebook/artifacts remain under
+`/workspace/scratch/c81a2d35e2bc/policy-controlled-final/state`.
+This is simulated integration evidence, not authentic ALA-2 learning success.
+
+Temporal candidate `80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a`
+originated in the existing committed method, rather than a manually selected
+movement/firing rule. The summary retains investigation, evaluation, activation,
+source IDs, reuse limits and prospective comparison version identities. The
+diagnostic outcome returns to the Executive; complete-game score remains UNKNOWN.
+Separately constructed parameter fixtures validate goal/firing/position domains,
+authority, rejection, immediate overrides, rollback and normal synthetic restart.
+Their successful tests do not establish autonomous strategic discovery.
+
+Host timing: 10,000 samples per condition, alternating same-state baseline/policy
+order after 100 warmup steps. `latency.json` retains distributions, platform,
+fixture provenance and policy identifiers. No pass threshold was invented.
+
+| Loaded domain | Baseline median (µs) | Policy median (µs) | Policy p99 (µs) | Policy maximum (µs) |
+| --- | ---: | ---: | ---: | ---: |
+| Motion prediction | 7.717 | 19.962 | 253.887 | 2819.393 |
+| Goal preference fixture | 7.771 | 25.298 | 189.022 | 7686.204 |
+| Firing fixture | 7.103 | 9.924 | 99.764 | 1603.191 |
+
+Original pre-integration Forebrain/Hindbrain blobs were separately verified
+identical to parent 214d370 and measured: median **4.915 µs**, p99 **224.199 µs**,
+maximum **2297.747 µs** (`original-baseline-latency.json`). That serial-process
+measurement is not paired with new policy samples. New baseline timing includes
+the added reasoning/trace bookkeeping. Prior under-load and intermediate runs
+remain separately preserved. Scheduler tails vary materially; median costs
+cannot qualify Pi cadence, thermal/resource contention or controller deadlines.
+
+Guarded native acceptance uses the existing checkout and actual persistent
+notebook, with no new authority or replacement state:
+
+```bash
+cd /home/five/charlie-ala2-bae659f60b0e
+RELEASE='<exact final published 40-character SHA>'
+git fetch origin feature/agency-first-self
+git show "$RELEASE:tools/update_existing_ala2_pi.sh" | bash -s -- "$RELEASE"
+CHARLIE_LEARNING_STATE=/home/five/.local/share/charlie/development \
+  bash tools/accept_episode_identity_pi.sh "$RELEASE"
+```
+
+The existing updater refuses tracked modifications. Preserve any local native
+changes before updating; do not discard them. The guarded script now includes
+the policy tests and saves a 10,000-sample simulated policy latency report. It
+exports the original notebook, runs the same normal offline application, retains
+commissions/checkpoints/outcomes, and compares exact restart continuity. A
+legitimately advancing meditation can outlast finite acceptance turns and is
+reported pending. No controller, camera, movement or physical policy grant is
+added. Native acceptance for this checkpoint remains pending.
+
+One ordinary developmental startup remains `main.py` with the existing configured
+learning-state and episode roots; it resumes its own projects. With externally
+granted offline improvement authority it exports eligible temporal policy versions
+without a separate meditation/export application. The player discovers the
+configured state's version before an episode. Until independently qualified
+Robotron evidence and separate physical readiness/authority exist, ordinary
+physical decisions retain their baseline. Frozen complete-game score protocols
+remain prospective; no comparison games were executed.
+
+Final qualification regression: **552 passed, 19 Torch-dependent skips in
+107.83s** (`qualified-final-full.txt` and compressed JUnit). Focused qualification,
+normal lifecycle, motion and legacy deployment tests: **34 passed, 6 Torch skips
+in 19.80s**. `continued-focused.txt` separately records all ten policy tests,
+including autonomous normal-main/restart. The guarded timing-output branch was
+also exercised on this host. Syntax/diff checks passed. Earlier full passes and
+the initial legacy fixture failure are preserved as distinct reports; they are
+not substituted for final validation.
+
+Generated evidence records accurately retain their base revision plus dirty flag
+and exact runtime source hash; the final published source tree carries those
+tested changes. Gzip archives preserve original generated report bytes; raw
+copies remain under `/workspace/scratch/c81a2d35e2bc/policy-raw-reports`.
+
+Normal unarmed developmental startup on the existing Pi installation:
+
+```bash
+cd /home/five/charlie-ala2-bae659f60b0e
+/home/five/Projects/charlie/.venv/bin/python main.py --offline \
+  --learning-state /home/five/.local/share/charlie/development \
+  --episode-root /home/five/Projects/charlie/robotron-runs \
+  --learning-budget 10 --learning-interval 5
+```
+
+This is the normal application, not a meditation operator. It resumes/commissions
+its own development; without an external offline improvement grant it retains
+eligible proposals pending authority. `--allow-offline-improvements` is the
+existing optional **offline-only** grant, not physical permission. Current
+authentic evidence remains unqualified regardless of that flag. The existing
+status file distinguishes activation from pending proposals and keeps physical
+authorization false for this procedure.

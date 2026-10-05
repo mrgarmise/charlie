@@ -1,0 +1,41 @@
+{
+  "original_records": 455,
+  "runs": [
+    {
+      "run": "baseline",
+      "returncode": 0,
+      "records": 467,
+      "last_activity": "waiting for evidence",
+      "turn_outcome": null,
+      "work": {}
+    },
+    {
+      "run": "corrected",
+      "returncode": 0,
+      "records": 475,
+      "last_activity": "waiting for evidence",
+      "turn_outcome": {
+        "progress_occurred": false,
+        "reason": "No justified executable investigation under current evidence and capabilities",
+        "next_direction": "Await qualified evidence or capability/dependency change"
+      },
+      "work": {}
+    },
+    {
+      "run": "restart",
+      "returncode": 0,
+      "records": 475,
+      "last_activity": "waiting for evidence",
+      "turn_outcome": {
+        "progress_occurred": false,
+        "reason": "No justified executable investigation under current evidence and capabilities",
+        "next_direction": "Await qualified evidence or capability/dependency change"
+      },
+      "work": {}
+    }
+  ],
+  "all_original_documents_ids_times_preserved": true,
+  "restart_exact": true,
+  "physical_authorization": false,
+  "native": false
+}

@@ -66,9 +66,11 @@ class DevelopmentLifecycle:
         current = next((p for p in reversed(list(projects.values())) if p['status']=='active'), None)
         if not current:
             current = next((p for p in reversed(list(projects.values())) if p.get('experiment_history')), None)
-        summary=(self.phase,current['goal'] if current else None,self.error)
+        outcome=getattr(self,'last_turn',{})
+        work=self.executive.work_states()
+        summary=(self.phase,current['goal'] if current else None,self.error,outcome.get('reason'))
         if summary!=getattr(self,'last_summary',None):
-            print('Development:',self.phase,'|',summary[1] or 'no project','|',self.error or '',flush=True)
+            print('Development:',self.phase,'|',summary[1] or 'no project','|',self.error or outcome.get('reason',''),flush=True)
             self.last_summary=summary
         from .episode_identity import current_conflicts
         atomic_json(self.output/'development-status.json', dict(schema='charlie-development-status-v1',
@@ -78,7 +80,9 @@ class DevelopmentLifecycle:
             latest_findings=[dict(id=r.id,**r.data['payload']) for r in findings[-3:]],
             latest_operational_outcome=next((dict(id=r.id,metrics=r.data['payload']['metrics'],changed_decisions=r.data['payload']['changed_decisions'])
                 for r in reversed(rows) if r.data['payload'].get('category')=='offline_operational_outcome'),None),
-            evidence_requests=requests, identity_conflicts=current_conflicts(self.journal), activation=active,
+            developmental_work=self.executive.work_states(),turn_outcome=getattr(self,'last_turn',None),
+            evidence_requests=requests+[r.data['payload'] for r in rows if r.data['payload'].get('category')=='learning_evidence_request'
+                and work.get(r.data['payload'].get('work_id'),{}).get('status')!='completed'], identity_conflicts=current_conflicts(self.journal), activation=active,
             physical_authorization=False, physical_score_improvement='UNKNOWN', error=self.error,
             provenance=self.provenance,
             authorization_requests=[r.data['payload'] for r in rows if r.data['payload'].get('category')=='offline_authorization_request'
@@ -229,6 +233,54 @@ class DevelopmentLifecycle:
             result_sha256=sha(result_path),status=result['status']),episode=SCOPE,sources=sources,
             producer='Reflection',version='normal-lifecycle-v1',provenance=self.provenance)
 
+    def meditation_files(self, context_id):
+        base=self.output/'meditations'/context_id
+        return sorted(base.glob('**/checkpoint.json'))
+
+    def meditation_progress(self, context_id):
+        # Hash-bound computed content/cursors only; timestamps and heartbeat
+        # files cannot provide evidence of intellectual progress.
+        stages=[]
+        for path in self.meditation_files(context_id):
+            p=json.loads(path.read_text());r=p.get('reconstruction',{})
+            stages.append(dict(source=p['source_sha256'],iterations=len(p['history']),
+                tracks=digest(p['tracks']),left=r.get('left',0),neighbor=r.get('neighbor',0),
+                candidates=len(r.get('candidates',[])),rebuilt=digest(r.get('rebuilt'))))
+        return digest(stages)
+
+    def meditation_dependency(self, context_id):
+        context=self.journal.get(context_id).data['payload']
+        source=self.available_tracks.get(context['source_episode'])
+        from experiments.ppal import meditate_robotron
+        return digest(dict(source=sha(source) if source and source.is_file() else None,
+            checkpoint=self.meditation_progress(context_id),budget=self.budget,
+            implementation=sha(Path(meditate_robotron.__file__))))
+
+    def investigation_inputs(self):
+        import importlib.util
+        observations=[r.id for r in self.journal.records() if
+            r.data['kind'] in ('observation','resolution') and
+            r.data['payload'].get('category')!='consolidated_evidence_reference']
+        identity=[r.id for r in self.journal.records('event') if r.data['payload'].get('category') in
+            ('episode_identity_binding','episode_identity_alias','episode_identity_quarantine')]
+        return digest(dict(observations=observations,identity=identity,torch=importlib.util.find_spec('torch') is not None,
+            budget=self.budget))
+
+    def pending_work(self):
+        contexts={r.data['payload']['context_id'] for r in self.journal.records('event')
+            if r.data['payload'].get('category')=='reflection_commission'}
+        completed={r.data['payload']['context_id'] for r in self.journal.records('observation')
+            if r.data['payload'].get('category')=='normal_meditation_result'}
+        if any(self.executive.work_ready(i,self.meditation_dependency(i)) for i in contexts-completed):
+            return True
+        import importlib.util
+        available={'model-diagnostics','meditation-motion','evidence-review'}
+        if importlib.util.find_spec('torch') is not None:
+            available|={'cnn-reconstruction','cnn-classification','cnn-validation-extension'}
+        return self.executive.select(methods=available,
+            resources={'offline-slot','RGB-examples','torch','model-evaluation','context-evidence','meditation-evidence'},
+            authorized_methods=available,inspect=True)['project'] is not None
+
     def evidence_eligible(self, payload):
         from .episode_identity import eligible
         return eligible(self.journal,payload)
@@ -253,6 +305,22 @@ class DevelopmentLifecycle:
             matching = [r.id for r in qualifications if r.data['payload']['source_episode'] in origins]
             if matching and project['method']!='meditation-motion':
                 self.executive.retain_evidence_request(identifier,self.journal,matching)
+
+        # Expose precise infeasible portfolio gates through the same request
+        # owner; repeats reuse the request even across restart.
+        deferred=next((r for r in reversed(self.journal.records('event'))
+            if r.data['payload'].get('op')=='portfolio_deferred'),None)
+        if deferred:
+            from .acquisition import retain_dependency_request
+            for item in deferred.data['payload']['alternatives']:
+                project=self.executive.projects()[item['project_id']]
+                if project.get('developmental_bookmark'):continue
+                missing=list(item['missing_resources'])+[str(x) for x in item['unmet_dependencies']]
+                if not item['method_available']:missing.append('Available implementation/runtime for '+project['method'])
+                if not item['authorized']:missing.append('Existing method execution authorization for '+project['method'])
+                if project.get('hold'):missing.append(project.get('completion_rationale') or 'New independently qualified evidence for the retained investigation')
+                if missing:retain_dependency_request(self.journal,deferred.id,work_id=project['id'],
+                    required_evidence=missing,reason='Existing portfolio prerequisites are unavailable')
 
     def operational_feedback(self):
         """Reconcile guarded offline deployment and subsequent existing-brain use.

@@ -231,6 +231,18 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
                     dataset.journal,[item['evidence_id']])
         if project.get('hold') and project['status'] in ('paused','blocked') and project['experiment_history'] and project.get('disposition')!='budget_exhausted' and (project['method']!='meditation-motion' or spec.get('scope',{}).get('corpus_id')) and not any(scientific_content(dataset.journal,h.get('dataset_id'))==scientific_content(dataset.journal,spec['dataset_id']) for h in executive.agenda_history(identifier)):
             executive.transition(identifier,'candidate','New versioned evidence permits reassessment; no independent confirmation assumed',dataset.journal,[item['evidence_id']])
+    # A yielded committed experiment can resume after its precise input,
+    # checkpoint or capability changes. Preserve the original prediction.
+    for row in dataset.journal.category_records('event','offline_experiment_plan'):
+        plan=row.data['payload']['plan'];identifier=plan.get('project_id')
+        old=executive.work_states().get(identifier)
+        if not old or old['status']!='blocked':continue
+        progress=executive.experiment_progress(dataset.artifacts.parent/'models',plan['prediction_id'])
+        dependency=digest(dict(dataset=plan['dataset_id'],budget=budget_seconds,
+            capabilities=registry.describe(),torch=torch_available))
+        if old['dependency']!=dependency or old['after']!=progress:
+            executive.transition(identifier,'candidate','Recorded experiment dependency/checkpoint changed; resume original work',
+                dataset.journal,[row.id])
     started=time.monotonic(); results=[]; seen=set()
     for _ in range(max_jobs):
         remaining=budget_seconds-(time.monotonic()-started)
@@ -260,9 +272,16 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
                 'Source identity quarantined; preserve experiment and bookmark, await verified association',
                 dataset.journal,plan['source_evidence'])
             continue
+        work_before=executive.experiment_progress(dataset.artifacts.parent/'models',plan['prediction_id'])
         result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups','model-evaluation','context-evidence','meditation-evidence'},
             authorized={project['method']},plan=plan,dataset=dataset,output=dataset.artifacts.parent/'models',driver=driver,on_progress=on_progress)
         if result['status'] in ('resolved','already_resolved'):
+            if project['id'] in executive.work_states():
+                executive.account_work(project['id'],before=work_before,
+                    after=digest(dict(resolution=result.get('resolution_id'))),
+                    dependency=digest(dict(dataset=plan['dataset_id'],budget=budget_seconds,capabilities=registry.describe(),torch=torch_available)),
+                    outcome='completed',sources=[plan['prediction_id']],
+                    resumption_condition='Completed retained experiment; future independent evidence may justify a new version')
             if result['status']=='already_resolved':
                 payload=result['resolution']; result.update(result=payload['result'],reason=payload['reason'])
             executive.record_result(project['id'],plan,result,dataset.journal,episode=SCOPE)
@@ -281,7 +300,13 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
             from experiments.ppal.reflect_robotron import reflect_retrieval_outcome
             result['reflection']=reflect_retrieval_outcome(dataset.journal,plan,result,gateway)
         results.append(dict(project_id=project['id'],selection=selection,commission=commission,plan=plan,result=result))
-        if result['status']=='deferred': break
+        if result['status']=='deferred':
+            result['developmental_progress']=executive.account_work(project['id'],before=work_before,
+                after=executive.experiment_progress(dataset.artifacts.parent/'models',plan['prediction_id']),
+                dependency=digest(dict(dataset=plan['dataset_id'],budget=budget_seconds,
+                    capabilities=registry.describe(),torch=torch_available)),outcome='yielded',sources=[plan['prediction_id']],
+                resumption_condition='Resume same prediction when its retained checkpoint, qualified dataset or capability/resource budget changes')
+            break
         # Serial offline jobs can serve additional projects; no second physical
         # actuator experiment is smuggled into the ordinary action hook.
         executive.transition(project['id'],'paused','Offline result awaits independent new evidence; preserve questions',

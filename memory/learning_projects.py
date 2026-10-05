@@ -382,7 +382,7 @@ class LearningExecutive:
         if status in FINAL:
             self._remember_conclusion(event, project)
 
-    def select(self, *, methods, resources, authorized_methods, urgent_projects=()):
+    def select(self, *, methods, resources, authorized_methods, urgent_projects=(), inspect=False):
         """Sticky portfolio selection; explicit prerequisites can interrupt it.
 
         Urgency must refer to previously recorded, evidence-backed projects. It
@@ -410,12 +410,13 @@ class LearningExecutive:
                 missing_resources=missing, unmet_dependencies=unmet,
                 method_available=p['method'] in methods, authorized=p['method'] in authorized_methods,
                 urgent=p['id'] in urgent_projects, status=p['status']))
-            if blocked and p['status'] == 'active':
+            if blocked and p['status'] in ('active','candidate') and not p.get('hold') and not inspect:
                 self._event(dict(op='assessment', project_id=p['id'], changes=dict(status='blocked',
                     next_direction='await prerequisite; preserve hypotheses and history',
                     completion_rationale=f'Unavailable prerequisite: {alternatives[-1]}')))
         eligible = [a for a in alternatives if not a['blocked']]
         if not eligible:
+            if inspect:return dict(project=None,alternatives=alternatives)
             self._event(dict(op='portfolio_deferred', alternatives=alternatives,
                              reason='no feasible authorized project'))
             return dict(project=None, alternatives=alternatives, reason='no feasible authorized project; no justified experiment yet')
@@ -427,6 +428,7 @@ class LearningExecutive:
         chosen = max(urgent or active or resume or eligible, key=lambda a: (a['score'], a['project_id']))
         reason = ('evidenced interruption' if urgent else 'continue active project' if active
                   else 'resume interrupted project' if resume else 'generic value/uncertainty minus cost/risk policy')
+        if inspect:return dict(project=projects[chosen['project_id']],alternatives=alternatives)
         interrupted = [p['id'] for p in projects.values()
                        if p['status'] == 'active' and p['id'] != chosen['project_id']]
         resume_from=next((r.id for r in reversed(self.journal.records('event'))
@@ -543,6 +545,59 @@ class LearningExecutive:
             rollback='Retain baseline and every prior attempt; no physical activation'),
             [self._reference(self.journal,outcome['resolution_id']).id])
 
+    def experiment_progress(self, output, prediction_id):
+        from pathlib import Path
+        import json
+        stages=[]
+        for path in sorted((Path(output)/prediction_id).glob('**/*.json')):
+            if path.name not in ('progress.json','training.json'):continue
+            data=json.loads(path.read_text())
+            # Worker heartbeat/elapsed clocks alone never count as progress.
+            meaningful=({k:data[k] for k in ('processing_units','epoch','completed_batches','stage') if k in data}
+                if path.name=='progress.json' else data)
+            stages.append(dict(path=str(path.relative_to(Path(output))),content=meaningful))
+        return digest(stages)
+
+    def work_states(self):
+        """Durable cooperative progress, projected from the existing journal."""
+        states={}
+        for row in self.journal.records('event'):
+            p=row.data['payload']
+            if row.data['episode']==SCOPE and p.get('op')=='developmental_progress':
+                states[p['work_id']]=dict(p,evidence_id=row.id)
+        return states
+
+    def work_ready(self, work_id, dependency):
+        previous=self.work_states().get(work_id)
+        return not previous or previous['status']!='blocked' or previous['dependency']!=dependency
+
+    def account_work(self, work_id, *, before, after, dependency, outcome,
+                     sources, resumption_condition):
+        """Activity and elapsed time never count as developmental progress."""
+        old=self.work_states().get(work_id)
+        progressed=before!=after or outcome=='completed'
+        failures=0 if progressed or outcome=='preempted' or (old and old['dependency']!=dependency) else (old or {}).get('nonprogress_turns',0)+1
+        status='completed' if outcome=='completed' else 'blocked' if failures>=3 else 'advancing' if progressed else 'yielded'
+        if old and old['status']=='blocked' and old['dependency']==dependency and not progressed:
+            return old
+        sources=[self._reference(self.journal,i).id for i in sources]
+        event=self._event(dict(op='developmental_progress',work_id=work_id,
+            previous=(old or {}).get('evidence_id'),before=before,after=after,
+            dependency=dependency,progress_occurred=progressed,nonprogress_turns=failures,
+            status=status,outcome=outcome,resumption_condition=resumption_condition,
+            reason='Primary owner preempted the slice; not a developmental stall' if outcome=='preempted' else 'Three bounded attempts advanced no committed stage or checkpoint' if status=='blocked' else
+                'Committed stage/checkpoint advanced' if progressed else 'Bounded slice yielded without checkpoint advancement',
+            next_direction='Select another feasible objective; otherwise wait for the recorded dependency' if status=='blocked' else 'Resume retained work',
+            physical_authorization=False),sources)
+        if status=='blocked':
+            from learning.acquisition import retain_dependency_request
+            retain_dependency_request(self.journal,event.id,work_id=work_id,
+                required_evidence=[resumption_condition],reason=event.data['payload']['reason'])
+        if status=='blocked' and work_id in self.projects():
+            self.transition(work_id,'blocked','Non-progressing bounded investigation; '+resumption_condition,
+                self.journal,[event.id])
+        return dict(event.data['payload'],evidence_id=event.id)
+
     def develop(self, lifecycle):
         """One normal-operation turn, owned by this Executive, no second scheduler.
 
@@ -555,8 +610,7 @@ class LearningExecutive:
         if gameplay_active():
             lifecycle._phase('experiencing')
             return
-        lifecycle._phase('reflecting')
-        lifecycle.acquire()
+        changed=lifecycle.acquire()
         self.reconcile_agenda()
         # The Executive chooses eligible new experience for bounded reflection.
         # A completed result is a durable checkpoint, not another experience.
@@ -566,19 +620,38 @@ class LearningExecutive:
             r.data['payload'].get('category')=='normal_meditation_result']
         completed_episodes={r['source_episode'] for r in results if r['status']=='completed'}
         unavailable={r['context_id'] for r in results if r['status']=='unavailable'}
+        meditation_advanced=False
         for context in contexts:
             episode=context.data['payload']['source_episode']
             if episode in completed_episodes or (context.id in unavailable and episode not in lifecycle.available_tracks):
                 continue
+            dependency=lifecycle.meditation_dependency(context.id)
+            if not self.work_ready(context.id,dependency):
+                continue
+            lifecycle._phase('reflecting')
+            before=lifecycle.meditation_progress(context.id)
             commission=self.journal.append('event',dict(category='reflection_commission',context_id=context.id,
                 physical_authorization=False,reason='New preserved experience warrants bounded retrospective reflection'),
                 episode=context.data['episode'],sources=[context.id],producer='LearningExecutive',version='normal-lifecycle-v1')
-            lifecycle.reflect_experience(context.id,commission.id)
+            result=lifecycle.reflect_experience(context.id,commission.id)
+            work=self.account_work(context.id,before=before,after=lifecycle.meditation_progress(context.id),
+                dependency=lifecycle.meditation_dependency(context.id),outcome='completed' if result else 'preempted' if lifecycle.phase=='experiencing' else 'yielded',
+                sources=[context.id,commission.id],
+                resumption_condition='Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes')
+            meditation_advanced=work['progress_occurred']
             if lifecycle.phase=='experiencing':
                 return  # Primary owner preempts the rest of this turn too.
             break  # One bounded meditation per turn; existing portfolio gets time.
         # Held projects and identical imports cannot create new trials. Continue
         # any committed interruption before considering fresh opportunities.
+        signature=lifecycle.investigation_inputs()
+        previous=next((r.data['payload'] for r in reversed(self.journal.records('event'))
+            if r.data['payload'].get('op')=='developmental_wait'),None)
+        if previous and previous['inputs']==signature and not lifecycle.pending_work():
+            lifecycle.operational_feedback()
+            lifecycle.last_turn=dict(progress_occurred=False,reason=previous['reason'],next_direction=previous['next_direction'])
+            lifecycle._phase('waiting for evidence')
+            return
         lifecycle._phase('investigating')
         report = investigate(lifecycle.dataset,lifecycle.gateway,executive=self,
             budget_seconds=lifecycle.budget,max_jobs=1,review_questions=True,
@@ -586,8 +659,15 @@ class LearningExecutive:
         lifecycle.requests()
         lifecycle.operational_feedback()
         projects=self.projects()
-        eligible=any(p['status'] in ('active','candidate') and not p.get('hold') for p in projects.values())
-        lifecycle._phase('idle' if eligible or not projects else 'waiting for evidence')
+        pending=lifecycle.pending_work()
+        progressed=meditation_advanced or any(r['result']['status'] in ('resolved','already_resolved') or r['result'].get('developmental_progress',{}).get('progress_occurred',False) for r in report['results'])
+        lifecycle.last_turn=dict(progress_occurred=progressed,
+            reason='Committed developmental checkpoint or conclusion advanced' if progressed else 'No justified executable investigation under current evidence and capabilities',
+            next_direction='Resume checkpointed work' if pending else 'Await qualified evidence or capability/dependency change')
+        if not pending:
+            self._event(dict(op='developmental_wait',inputs=lifecycle.investigation_inputs(),
+                reason=lifecycle.last_turn['reason'],next_direction=lifecycle.last_turn['next_direction']))
+        lifecycle._phase('idle' if pending else 'waiting for evidence')
         return report
 
     def receive_operational_outcome(self, identifier):

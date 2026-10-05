@@ -5,6 +5,23 @@ from memory.evidence import digest
 from .datasets import sha,SCOPE
 
 
+def retain_dependency_request(journal, evidence_id, *, work_id, required_evidence, reason):
+    """Idempotent request at the existing acquisition boundary, never authority."""
+    evidence=journal.get(evidence_id)
+    key=digest(dict(work_id=work_id,required_evidence=required_evidence,reason=reason))
+    old=next((r for r in journal.category_records('event','learning_evidence_request')
+        if r.data['payload'].get('dependency_key')==key),None)
+    if old:return old
+    return journal.append('event',dict(category='learning_evidence_request',
+        dependency_key=key,work_id=work_id,method='developmental-dependency',
+        required_evidence=required_evidence,reason=reason,
+        status='AWAITING_DEPENDENCY',request_kind='evidence_acquisition_only',
+        fulfillment='Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility',
+        physical_authorization=False,servo_authorization=False,firmware_authorization=False),
+        episode=evidence.data['episode'],sources=[evidence_id],
+        producer='existing-acquisition-capability',version='normal-lifecycle-v1')
+
+
 def export_history(output):
     """Evidence-owned immutable transfer; exported copies are not new episodes."""
     import fcntl

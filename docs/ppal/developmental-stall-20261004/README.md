@@ -10,11 +10,11 @@ or authentic notebook state. Independent recovery validation: **39 passed in
 actual October 1 source archives. Earlier test reports below remain preserved
 as earlier-session evidence, not a claim that they were rerun in recovery.
 Large raw notebook snapshots remain unchanged under
-`/workspace/scratch/c81a2d35e2bc/charlie-stall/docs/ppal/developmental-stall-20261004/`
+`/workspace/scratch/c81a2d35e2bc/stall-raw-snapshots/`
 and the continuation notebook under
 `/workspace/scratch/c81a2d35e2bc/stall-authentic-continuation`.
 Published logs and summaries do not replace those originals. Dependency-change
-wakeup of blocked experiments is being checked after this recovery checkpoint.
+wakeup of blocked experiments passed the final resumed validation below.
 
 ## Diagnosis and provenance limits
 

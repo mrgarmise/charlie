@@ -45,6 +45,7 @@ def _unique(rows):
         elif category=='offline_experiment_plan':key=(category,p['plan']['prediction_id'])
         elif category=='learning_evidence_request' and p.get('dependency_key'):
             key=(category,p['dependency_key'])
+        elif category=='acquisition_dependency_satisfied':key=(category,p['request_id'])
         elif d['kind']=='resolution':key=('resolution',p['prediction_id'])
         if key:
             require(key not in keys,'duplicate commission, experience, finding, plan or dependency: '+str(key))
@@ -113,17 +114,17 @@ EXECUTIVE_OPS={'proposed','assessment','selected','outcome','lifecycle','agenda_
     'evidence_continuation','portfolio_deferred','developmental_progress','developmental_wait','operational_feedback'}
 CATEGORIES={
     'Reflection':{'reflection_commission','normal_meditation_yield','normal_meditation_result',
-        'perceptual_experiment_proposal','learning_project_proposal','model_deployment_proposal','retrieval_experiment_reflection'},
+        'perceptual_experiment_proposal','learning_project_proposal','model_deployment_proposal','retrieval_experiment_reflection','perceptual_learning_deferred'},
     'LearningExecutive':{'reflection_commission'},
     'existing-evidence-consolidation':{'consolidated_evidence_reference','learning_context_reference',
         'retrospective_ingestion','preserved_meditation','normal_history_restore','notebook_history_recovery'},
     'existing-evidence-acquisition':{'episode_identity_binding','episode_identity_location','episode_identity_alias','episode_identity_quarantine'},
     'ExperienceDataset':{'experience_example','experience_dataset_snapshot','artifact_location'},
     'archive-measurement-service':{'observation_qualification'},
-    'existing-acquisition-capability':{'learning_evidence_request','acquisition_delivery','acquisition_delivery_rejected'},
+    'existing-acquisition-capability':{'learning_evidence_request','acquisition_delivery','acquisition_delivery_rejected','acquisition_dependency_satisfied'},
     'external-motion-qualification':{'independent_motion_corpus'},
     'offline-orchestrator':{'offline_experiment_deferred'},
-    'verified-artifact-resolution':{'artifact_location'},
+    'verified-artifact-resolution':{'experience_artifact_location'},
     'Meditation:learned-representation':{'opaque_visual_groups'},
     'existing-chooser':{'offline_experiment_plan'},
     'ModelFoundry':{'meditation_candidate_evaluation','offline_model_evaluation','model_training','model_candidate_selected','motion_final_consultation'},
@@ -175,17 +176,50 @@ def compare_restart(before,after):
                 require(p['before']==fingerprint(oc,work),'first resumed turn lost its checkpoint')
             completed=p['outcome']=='completed'
             if completed:
-                require(any(r['payload'].get('category')=='normal_meditation_result' and r['payload']['context_id']==work
+                require(any(r['payload'].get('category')=='normal_meditation_result' and r['payload']['context_id']==work and r['payload']['status']=='completed'
                     or r['kind']=='resolution' and r['payload']['prediction_id'] in d['sources'] for r in rows.values()),'completion lacks durable result or evaluation')
             actual=p['before']!=p['after'] or completed
             require(p['progress_occurred']==actual,'activity incorrectly claimed as progress')
             require(p['status'] in ('advancing','yielded','blocked','completed'),'unknown retained work state')
             if actual:require(p['nonprogress_turns']==0,'progress counted as a stall')
             if p['status']=='blocked':
-                require(p.get('resumption_condition') and p['nonprogress_turns']>=3,'blocked work lacks durable resumption condition')
+                known_dependency=False
+                if p['outcome']=='blocked':
+                    for request in rows.values():
+                        rp=request['payload'];specs=rp.get('required_evidence',[])
+                        if rp.get('category')!='learning_evidence_request' or rp.get('work_id')!=work or len(specs)!=1:continue
+                        spec=specs[0]
+                        if not isinstance(spec,dict) or spec.get('type')!='preserved_tracks_artifact':continue
+                        origin=rows.get(work,{}).get('payload',{})
+                        commission=rows.get(spec.get('commission_id'),{}).get('payload',{})
+                        known_dependency=(spec.get('context_id')==work and
+                            spec.get('source_episode')==origin.get('source_episode') and
+                            commission.get('category')=='reflection_commission' and commission.get('context_id')==work and
+                            (not any(c['context_id']==work for c in nc.values()) or
+                             any(c['context_id']==work and c['document']['source_sha256']==spec.get('sha256') for c in nc.values())))
+                        if known_dependency:break
+                require(p.get('resumption_condition') and (p['nonprogress_turns']>=3 or known_dependency),
+                    'blocked work lacks durable resumption condition')
             latest[work]=(identifier,p)
             if actual:substantive.append(identifier)
-        elif d['kind']=='resolution' or category in ('normal_meditation_result','offline_model_evaluation','acquisition_delivery','offline_operational_outcome'):
+        elif category=='acquisition_dependency_satisfied':
+            request=rows.get(p.get('request_id'),{}).get('payload',{})
+            requirements=request.get('required_evidence',[])
+            require(len(requirements)==1 and isinstance(requirements[0],dict),'delivery lacks exact retained dependency')
+            spec=requirements[0]
+            example=rows.get(p.get('example_id'),{}).get('payload',{})
+            location_bound=(p.get('example_id') in d['sources'] and p.get('path')==example.get('pixel_path') or any(
+                rows[s]['payload'].get('category')=='experience_artifact_location' and
+                rows[s]['payload'].get('example')==p.get('example_id') and
+                rows[s]['payload'].get('path')==p.get('path') and rows[s]['payload'].get('sha256')==p.get('sha256')
+                for s in d['sources']))
+            require(spec.get('type')=='preserved_pixel_artifact' and
+                spec.get('example_id')==p.get('example_id') and spec.get('sha256')==p.get('sha256') and
+                example.get('category')=='experience_example' and example.get('pixel_sha256')==p.get('sha256') and location_bound and
+                request.get('work_id')==p.get('work_id') and p.get('request_id') in d['sources'] and
+                p.get('new_independent_experience') is False,'delivery does not qualify original requested bytes')
+            substantive.append(identifier)
+        elif d['kind']=='resolution' or category=='normal_meditation_result' and p['status']=='completed' or category in ('offline_model_evaluation','acquisition_delivery','offline_operational_outcome'):
             substantive.append(identifier)
     for context in set(advanced):
         require(context in latest and latest[context][1]['after']==fingerprint(nc,context),'checkpoint advancement lacks matching Executive accounting')
@@ -200,6 +234,8 @@ def compare_restart(before,after):
     blocked=[k for k,p in projected.items() if p['status']=='blocked']
     waiting=status.get('last_activity')=='waiting for evidence'
     require(not waiting or not runnable,'waiting state hides runnable retained work')
+    require(not waiting or not (status.get('turn_outcome') or {}).get('runnable_work_remaining'),
+        'waiting state hides eligible uncommissioned work')
     require(not (status.get('turn_outcome') or {}).get('progress_occurred') or bool(substantive),
         'status claims progress without a durable stage')
     return dict(schema='developmental-restart-acceptance-v1',continuity_passed=True,

@@ -1,0 +1,52 @@
+...................F.............................                        [100%]
+=================================== FAILURES ===================================
+___ test_missing_source_preserves_partial_commission_and_other_context_runs ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_missing_source_preserves_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6556d315e0>
+
+    def test_missing_source_preserves_partial_commission_and_other_context_runs(tmp_path,monkeypatch):
+        without_torch(monkeypatch)
+        root=experience(tmp_path);state=tmp_path/'state'
+        (root/'tracks.json').write_text(json.dumps({'tracks':fragments()}))
+        life=DevelopmentLifecycle(state,[root],budget_seconds=10)
+        original=__import__('experiments.ppal.meditate_robotron',fromlist=['predicted_link'])
+        clock=[0.];predict=original.predicted_link
+        from types import SimpleNamespace
+        import learning.lifecycle as lifecycle
+        monkeypatch.setattr(lifecycle,'time',SimpleNamespace(monotonic=lambda:clock[0]))
+        def compute(*args):
+            answer=predict(*args);clock[0]+=11;return answer
+        monkeypatch.setattr(original,'predicted_link',compute)
+        life.turn();before=inspect(state);checkpoint=next((state/'meditations').glob('*/checkpoint.json'))
+        raw=checkpoint.read_bytes();context=checkpoint.parent.name
+        episode=life.journal.get(context).data['payload']['source_episode']
+        monkeypatch.undo();without_torch(monkeypatch)
+        second=tmp_path/'second';second.mkdir()
+        (second/'report.json').write_text(json.dumps({'simulation':True,'distinct':2,'steps':[]}))
+        (second/'tracks.json').write_text((root/'tracks.json').read_text());life.roots.append(second)
+        acquire=life.acquire
+        def missing_source():
+            changed=acquire();life.available_tracks.pop(episode,None);return changed
+        monkeypatch.setattr(life,'acquire',missing_source)
+        for _ in range(6):life.turn()
+        assert checkpoint.read_bytes()==raw
+        assert life.executive.work_states()[context]['status']=='blocked'
+>       assert life.executive.work_states()[context]['nonprogress_turns']==1
+E       assert 0 == 1
+
+tests/test_developmental_dependencies.py:78: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: reflecting | no project | 
+Development: investigating | no project | 
+Development: idle | The unresolved question may recur in independent experience: score_attribution | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | The unresolved question may recur in independent experience: score_attribution | Committed developmental checkpoint or conclusion advanced
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+=========================== short test summary info ============================
+FAILED tests/test_developmental_dependencies.py::test_missing_source_preserves_partial_commission_and_other_context_runs
+1 failed, 48 passed in 27.68s

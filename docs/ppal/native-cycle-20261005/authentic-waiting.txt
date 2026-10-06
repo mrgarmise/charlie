@@ -1,0 +1,38 @@
+Development: idle | Can preserved observations support the existing motion candidates? | 
+Development: reflecting | Can preserved observations support the existing motion candidates? | 
+Development: investigating | Can preserved observations support the existing motion candidates? | 
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: reflecting | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: investigating | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: reflecting | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: investigating | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: reflecting | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: investigating | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: reflecting | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: investigating | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities
+Development: stopped | Can preserved observations support the existing motion candidates? | No justified executable investigation under current evidence and capabilities

@@ -590,7 +590,7 @@ class LearningExecutive:
         old=self.work_states().get(work_id)
         progressed=before!=after or outcome=='completed'
         failures=0 if progressed or outcome=='preempted' or (old and old['dependency']!=dependency) else (old or {}).get('nonprogress_turns',0)+1
-        status='completed' if outcome=='completed' else 'blocked' if failures>=3 else 'advancing' if progressed else 'yielded'
+        status='completed' if outcome=='completed' else 'blocked' if outcome=='blocked' or failures>=3 else 'advancing' if progressed else 'yielded'
         if old and old['status']=='blocked' and old['dependency']==dependency and not progressed:
             return old
         sources=[self._reference(self.journal,i).id for i in sources]
@@ -598,11 +598,11 @@ class LearningExecutive:
             previous=(old or {}).get('evidence_id'),before=before,after=after,
             dependency=dependency,progress_occurred=progressed,nonprogress_turns=failures,
             status=status,outcome=outcome,resumption_condition=resumption_condition,
-            reason='Primary owner preempted the slice; not a developmental stall' if outcome=='preempted' else 'Three bounded attempts advanced no committed stage or checkpoint' if status=='blocked' else
+            reason='Primary owner preempted the slice; not a developmental stall' if outcome=='preempted' else 'Original input unavailable; resume only after independent qualification' if outcome=='blocked' else 'Three bounded attempts advanced no committed stage or checkpoint' if status=='blocked' else
                 'Committed stage/checkpoint advanced' if progressed else 'Bounded slice yielded without checkpoint advancement',
             next_direction='Select another feasible objective; otherwise wait for the recorded dependency' if status=='blocked' else 'Resume retained work',
             physical_authorization=False),sources)
-        if status=='blocked':
+        if status=='blocked' and outcome!='blocked':
             from learning.acquisition import retain_dependency_request
             retain_dependency_request(self.journal,event.id,work_id=work_id,
                 required_evidence=[resumption_condition],reason=event.data['payload']['reason'])
@@ -634,6 +634,7 @@ class LearningExecutive:
         completed_episodes={r['source_episode'] for r in results if r['status']=='completed'}
         unavailable={r['context_id'] for r in results if r['status']=='unavailable'}
         meditation_advanced=False
+        meditation_outcome=None
         for context in contexts:
             episode=context.data['payload']['source_episode']
             if episode in completed_episodes or (context.id in unavailable and episode not in lifecycle.available_tracks):
@@ -641,17 +642,22 @@ class LearningExecutive:
             dependency=lifecycle.meditation_dependency(context.id)
             if not self.work_ready(context.id,dependency):
                 continue
-            lifecycle._phase('reflecting')
             before=lifecycle.meditation_progress(context.id)
             commission=self.journal.append('event',dict(category='reflection_commission',context_id=context.id,
                 physical_authorization=False,reason='New preserved experience warrants bounded retrospective reflection'),
                 episode=context.data['episode'],sources=[context.id],producer='LearningExecutive',version='normal-lifecycle-v1')
+            lifecycle.current_activity=dict(kind='meditation',context_id=context.id,commission_id=commission.id,source_episode=episode)
+            lifecycle._phase('reflecting')
             result=lifecycle.reflect_experience(context.id,commission.id)
             work=self.account_work(context.id,before=before,after=lifecycle.meditation_progress(context.id),
-                dependency=lifecycle.meditation_dependency(context.id),outcome='completed' if result else 'preempted' if lifecycle.phase=='experiencing' else 'yielded',
+                dependency=lifecycle.meditation_dependency(context.id),outcome='completed' if result else 'blocked' if lifecycle.reflection_dependency_blocked else 'preempted' if lifecycle.phase=='experiencing' else 'yielded',
                 sources=[context.id,commission.id],
-                resumption_condition='Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes')
+                resumption_condition=('Qualify original tracks '+(lifecycle.reflection_dependency['sha256'] or episode)+' for retained commission '+commission.id
+                    if lifecycle.reflection_dependency_blocked else 'Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes'))
             meditation_advanced=work['progress_occurred']
+            meditation_outcome=dict(context_id=context.id,commission_id=commission.id,status=work['status'],
+                outcome=work['outcome'],progress_occurred=work['progress_occurred'],
+                reason=work['reason'],resumption_condition=work['resumption_condition'])
             if lifecycle.phase=='experiencing':
                 return  # Primary owner preempts the rest of this turn too.
             break  # One bounded meditation per turn; existing portfolio gets time.
@@ -662,7 +668,8 @@ class LearningExecutive:
             if r.data['payload'].get('op')=='developmental_wait'),None)
         if previous and previous['inputs']==signature and not lifecycle.pending_work():
             lifecycle.operational_feedback()
-            lifecycle.last_turn=dict(progress_occurred=False,reason=previous['reason'],next_direction=previous['next_direction'])
+            lifecycle.last_turn=dict(progress_occurred=False,runnable_work_remaining=False,reason='No eligible work; retained dependencies unchanged',next_direction=previous['next_direction'],meditation=meditation_outcome)
+            lifecycle.current_activity=dict(kind='waiting',reason=lifecycle.last_turn['reason'])
             lifecycle._phase('waiting for evidence')
             return
         lifecycle._phase('investigating')
@@ -674,9 +681,13 @@ class LearningExecutive:
         projects=self.projects()
         pending=lifecycle.pending_work()
         progressed=meditation_advanced or any(r['result']['status'] in ('resolved','already_resolved') or r['result'].get('developmental_progress',{}).get('progress_occurred',False) for r in report['results'])
-        lifecycle.last_turn=dict(progress_occurred=progressed,
+        lifecycle.last_turn=dict(progress_occurred=progressed,runnable_work_remaining=pending,
             reason='Committed developmental checkpoint or conclusion advanced' if progressed else 'No justified executable investigation under current evidence and capabilities',
-            next_direction='Resume checkpointed work' if pending else 'Await qualified evidence or capability/dependency change')
+            next_direction='Resume checkpointed work' if pending else 'Await qualified evidence or capability/dependency change',
+            meditation=meditation_outcome,investigations=[dict(project_id=r['project_id'],prediction_id=r['plan']['prediction_id'],
+                status=r['result']['status'],result=r['result'].get('result')) for r in report['results']])
+        lifecycle.current_activity=dict(kind='runnable' if pending else 'waiting',next_direction=lifecycle.last_turn['next_direction'],
+            meditation=meditation_outcome,investigations=lifecycle.last_turn['investigations'])
         if not pending:
             self._event(dict(op='developmental_wait',inputs=lifecycle.investigation_inputs(),
                 reason=lifecycle.last_turn['reason'],next_direction=lifecycle.last_turn['next_direction']))

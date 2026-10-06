@@ -22,6 +22,29 @@ def retain_dependency_request(journal, evidence_id, *, work_id, required_evidenc
         producer='existing-acquisition-capability',version='normal-lifecycle-v1')
 
 
+def satisfy_artifact_requests(dataset):
+    """Qualify delivery of original bytes, never independent new experience."""
+    journal=dataset.journal
+    satisfied={r.data['payload']['request_id'] for r in journal.category_records('event','acquisition_dependency_satisfied')}
+    examples={r['id']:r for r in dataset.examples()};outputs=[]
+    for request in journal.category_records('event','learning_evidence_request'):
+        if request.id in satisfied:continue
+        p=request.data['payload'];required=p.get('required_evidence',[])
+        if len(required)!=1 or not isinstance(required[0],dict) or required[0].get('type')!='preserved_pixel_artifact':continue
+        spec=required[0];row=examples.get(spec['example_id'])
+        if not row or p['work_id']!='visual-artifact:'+row['id'] or row['pixel_sha256']!=spec['sha256']:continue
+        try:
+            if sha(row['pixel_path'])!=spec['sha256']:continue
+        except OSError:continue
+        receipt=journal.append('event',dict(category='acquisition_dependency_satisfied',request_id=request.id,
+            work_id=p['work_id'],example_id=row['id'],path=row['pixel_path'],sha256=spec['sha256'],
+            new_independent_experience=False,physical_authorization=False),episode=request.data['episode'],
+            sources=[request.id,row.get('artifact_location_id',row['id'])],
+            producer='existing-acquisition-capability',version='normal-lifecycle-v1')
+        outputs.append(receipt.id)
+    return outputs
+
+
 def export_history(output):
     """Evidence-owned immutable transfer; exported copies are not new episodes."""
     import fcntl

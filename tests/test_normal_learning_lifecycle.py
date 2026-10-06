@@ -171,6 +171,11 @@ def test_surviving_legacy_context_preserved_without_inventing_tracks(tmp_path):
     result=next(r for r in records if r.data['payload'].get('category')=='normal_meditation_result')
     assert result.data['payload']['status']=='unavailable'
     assert not any(r.data['payload'].get('category')=='preserved_meditation' for r in records)
+    status=json.loads((state/'development-status.json').read_text())
+    assert status['developmental_work'][old.id]['status']=='blocked'
+    assert status['developmental_work'][old.id]['progress_occurred'] is False
+    assert status['turn_outcome']['progress_occurred'] is False
+    assert status['turn_outcome']['next_direction']=='Await qualified evidence or capability/dependency change'
 
 
 def test_history_context_alias_is_not_another_meditation(tmp_path):

@@ -1,0 +1,78 @@
+RP2040 connection failed: [Errno 2] could not open port /dev/ttyACM0: [Errno 2] No such file or directory: '/dev/ttyACM0'
+
+==================================== ERRORS ====================================
+_________________ ERROR collecting OldPicoFiles/test_rp2040.py _________________
+ImportError while importing test module '/workspace/scratch/c81a2d35e2bc/charlie-cycle/OldPicoFiles/test_rp2040.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OldPicoFiles/__init__.py:1: in <module>
+    import machine
+E   ModuleNotFoundError: No module named 'machine'
+____________________ ERROR collecting test_mobile_track.py _____________________
+ImportError while importing test module '/workspace/scratch/c81a2d35e2bc/charlie-cycle/test_mobile_track.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_mobile_track.py:4: in <module>
+    from behaviors.mobile_track import MobileTrackBehavior
+E   ModuleNotFoundError: No module named 'behaviors.mobile_track'; 'behaviors' is not a package
+_________________ ERROR collecting tests/test_memory_recall.py _________________
+ImportError while importing test module '/workspace/scratch/c81a2d35e2bc/charlie-cycle/tests/test_memory_recall.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_memory_recall.py:5: in <module>
+    from behaviors.mobile_face_track import MobileFaceTrackBehavior
+E   ModuleNotFoundError: No module named 'behaviors.mobile_face_track'; 'behaviors' is not a package
+_____________________ ERROR collecting vision/hsv_test.py ______________________
+ImportError while importing test module '/workspace/scratch/c81a2d35e2bc/charlie-cycle/vision/hsv_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+vision/hsv_test.py:3: in <module>
+    from vision.camera import Camera
+vision/camera.py:7: in <module>
+    from libcamera import controls
+E   ModuleNotFoundError: No module named 'libcamera'
+____________________ ERROR collecting vision/test_orange.py ____________________
+ImportError while importing test module '/workspace/scratch/c81a2d35e2bc/charlie-cycle/vision/test_orange.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+vision/test_orange.py:3: in <module>
+    from vision.camera import Camera
+vision/camera.py:7: in <module>
+    from libcamera import controls
+E   ModuleNotFoundError: No module named 'libcamera'
+___________________ ERROR collecting vision/test_stimulus.py ___________________
+ImportError while importing test module '/workspace/scratch/c81a2d35e2bc/charlie-cycle/vision/test_stimulus.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+vision/test_stimulus.py:1: in <module>
+    from vision.camera import Camera
+vision/camera.py:7: in <module>
+    from libcamera import controls
+E   ModuleNotFoundError: No module named 'libcamera'
+=========================== short test summary info ============================
+ERROR OldPicoFiles/test_rp2040.py
+ERROR test_mobile_track.py
+ERROR tests/test_memory_recall.py
+ERROR vision/hsv_test.py
+ERROR vision/test_orange.py
+ERROR vision/test_stimulus.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 6 errors during collection !!!!!!!!!!!!!!!!!!!!
+1 skipped, 6 errors in 16.02s

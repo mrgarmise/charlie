@@ -431,6 +431,7 @@ def reflect_perceptual_opportunities(dataset, gateway, registry):
             gaps.append(r)
     if not gaps: return []
     snapshots={}; alternatives=[]
+    from learning.datasets import ArtifactUnavailable
     for objective,method in [('classification','cnn-classification'),('reconstruction','cnn-reconstruction')]:
         try:
             snap=dataset.snapshot(objective=objective); snapshots[method]=snap
@@ -438,6 +439,12 @@ def reflect_perceptual_opportunities(dataset, gateway, registry):
             rank=2 if objective=='classification' else 1
             alternatives.append(dict(method=method,eligible=True,rank=rank,
                 reason='verified target coverage' if rank==2 else 'unlabeled independent RGB coverage; investigate representation only'))
+        except ArtifactUnavailable as exc:
+            from learning.acquisition import retain_dependency_request
+            retain_dependency_request(dataset.journal,exc.example_id,
+                work_id='visual-artifact:'+exc.example_id,required_evidence=[exc.requirement],
+                reason=str(exc))
+            alternatives.append(dict(method=method,eligible=False,rank=0,reason=str(exc)))
         except ValueError as exc:
             alternatives.append(dict(method=method,eligible=False,rank=0,reason=str(exc)))
     for method in ('collect-examples','clarify-labels'):

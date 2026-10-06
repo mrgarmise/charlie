@@ -13,6 +13,16 @@ from memory.evidence import digest
 SCOPE = 'autonomous-learning-v1'
 VERSION = 'experience-dataset-v1'
 
+
+class ArtifactUnavailable(ValueError):
+    """A retained input dependency, never permission to substitute pixels."""
+    def __init__(self,row,reason):
+        self.example_id=row['id']
+        self.requirement=dict(type='preserved_pixel_artifact',example_id=row['id'],
+            path=row['pixel_path'],sha256=row['pixel_sha256'],
+            provenance='Original content-hashed pixels; relocation is not independent experience')
+        super().__init__(reason+': '+row['pixel_path']+'; expected SHA-256 '+row['pixel_sha256'])
+
 def scientific_content(journal,identifier):
     """Artifact relocation is not new scientific data or independent evidence."""
     try:p=journal.get(identifier).data['payload']
@@ -94,13 +104,16 @@ class ExperienceDataset:
         return [dict(r,source_episode=canonical_experience(self.journal,r['source_episode']))
                 for r in rows.values() if eligible(self.journal,r)]
 
-    def locate_artifacts(self,directory):
+    def locate_artifacts(self,directory, *, partial=False):
         """Append verified locations; never edit historical records after relocation."""
         directory=Path(directory).resolve();outputs=[]
         with self.journal.batch():
             for row in self.examples():
                 target=directory/(row['pixel_sha256']+'.png')
-                if not target.exists() or sha(target)!=row['pixel_sha256']:raise ValueError('relocated pixels unavailable or modified')
+                if partial and target==Path(row['pixel_path']).resolve():continue
+                if not target.exists() or sha(target)!=row['pixel_sha256']:
+                    if partial:continue
+                    raise ValueError('relocated pixels unavailable or modified')
                 record=self.journal.append('event',dict(category='experience_artifact_location',example=row['id'],
                     path=str(target),sha256=row['pixel_sha256'],historical_path=row.get('historical_pixel_path',row['pixel_path'])),
                     episode=SCOPE,sources=[row['id']],producer='verified-artifact-resolution',version=VERSION)
@@ -148,7 +161,9 @@ class ExperienceDataset:
             raise ValueError('all groups must be assigned exactly one independent partition')
         unique={}
         for r in rows:
-            if sha(r['pixel_path'])!=r['pixel_sha256']: raise ValueError('pixel artifact modified')
+            try:actual=sha(r['pixel_path'])
+            except OSError as exc:raise ArtifactUnavailable(r,'Original pixels unavailable') from exc
+            if actual!=r['pixel_sha256']:raise ArtifactUnavailable(r,'Original pixels modified; integrity conflict')
             item=dict(r,partition=split[find(r['source_episode'])],independence_group=find(r['source_episode']))
             key=r['pixel_sha256']
             if key in unique:

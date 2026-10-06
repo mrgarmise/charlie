@@ -51,6 +51,8 @@ class DevelopmentLifecycle:
         self.provenance=dict(code_revision=revision.stdout.strip() if revision.returncode==0 else None,
             dirty_worktree=bool(dirty.stdout),test_environment='offline process; no hardware capability initialized')
         self.error = None
+        self.reflection_dependency_blocked = False
+        self.reflection_dependency = None
         self.phase = 'idle'
         self._status()
 
@@ -68,6 +70,7 @@ class DevelopmentLifecycle:
             current = next((p for p in reversed(list(projects.values())) if p.get('experiment_history')), None)
         outcome=getattr(self,'last_turn',{})
         work=self.executive.work_states()
+        satisfied={r.data['payload']['request_id'] for r in rows if r.data['payload'].get('category')=='acquisition_dependency_satisfied'}
         summary=(self.phase,current['goal'] if current else None,self.error,outcome.get('reason'))
         if summary!=getattr(self,'last_summary',None):
             print('Development:',self.phase,'|',summary[1] or 'no project','|',self.error or outcome.get('reason',''),flush=True)
@@ -81,8 +84,9 @@ class DevelopmentLifecycle:
             latest_operational_outcome=next((dict(id=r.id,metrics=r.data['payload']['metrics'],changed_decisions=r.data['payload']['changed_decisions'])
                 for r in reversed(rows) if r.data['payload'].get('category')=='offline_operational_outcome'),None),
             developmental_work=self.executive.work_states(),turn_outcome=getattr(self,'last_turn',None),
+            current_activity=getattr(self,'current_activity',None),
             evidence_requests=requests+[r.data['payload'] for r in rows if r.data['payload'].get('category')=='learning_evidence_request'
-                and work.get(r.data['payload'].get('work_id'),{}).get('status')!='completed'], identity_conflicts=current_conflicts(self.journal), activation=active,
+                and r.id not in satisfied and work.get(r.data['payload'].get('work_id'),{}).get('status')!='completed'], identity_conflicts=current_conflicts(self.journal), activation=active,
             physical_authorization=False, physical_score_improvement='UNKNOWN', error=self.error,
             provenance=self.provenance,
             authorization_requests=[r.data['payload'] for r in rows if r.data['payload'].get('category')=='offline_authorization_request'
@@ -124,6 +128,12 @@ class DevelopmentLifecycle:
             qualification(self.journal, audit(root,identity=identity))
             changed |= len(self.journal.records()) != before
         self.available_tracks = verified_tracks(self.journal)
+        # Existing content-addressed acquisition inbox. Location receipts keep
+        # old evidence IDs; these bytes cannot become another experience.
+        locations=self.dataset.locate_artifacts(self.output/'pixels',partial=True)
+        from .acquisition import satisfy_artifact_requests
+        fulfilled=satisfy_artifact_requests(self.dataset)
+        changed |= bool(locations or fulfilled)
         # Independent acquisition owners deliver hash-bound qualifications here.
         # This adapter validates them; it never generates labels or authority.
         inbox = self.output/'acquisition-inbox'
@@ -157,10 +167,32 @@ class DevelopmentLifecycle:
         if result_path.exists() and json.loads(result_path.read_text()).get('status')=='unavailable' and source is not None and source.is_file():
             result_path=result_path.parent/sha(source)/'result.json'
         checkpoint=result_path.parent/'checkpoint.json'
+        original_checkpoint=self.output/'meditations'/context_id/'checkpoint.json'
+        if result_path.parent!=original_checkpoint.parent and original_checkpoint.is_file():
+            # A recovered source resumes retained work, even if an older
+            # unavailable-result receipt was published during interruption.
+            checkpoint=original_checkpoint
         result_path.parent.mkdir(parents=True,exist_ok=True)
         if result_path.exists():
             result=json.loads(result_path.read_text())
         elif source is None or not source.exists():
+            if checkpoint.is_file():
+                saved=json.loads(checkpoint.read_text())
+                if 'state_digest' in saved and saved['state_digest']!=digest({k:v for k,v in saved.items() if k!='state_digest'}):
+                    raise ValueError('meditation checkpoint integrity mismatch')
+                if saved.get('context_id',context_id)!=context_id or saved.get('commission_id',commission_id)!=commission_id:
+                    raise ValueError('meditation checkpoint commission mismatch')
+                expected=context.get('inventory',{}).get('tracks.json')
+                if expected and saved['source_sha256']!=expected:
+                    raise ValueError('meditation checkpoint source mismatch')
+                from .acquisition import retain_dependency_request
+                missing=dict(type='preserved_tracks_artifact',source_episode=episode,
+                    sha256=saved['source_sha256'],context_id=context_id,commission_id=commission_id)
+                retain_dependency_request(self.journal,commission_id,work_id=context_id,
+                    required_evidence=[missing],reason='Original tracks unavailable for retained checkpoint; qualify exact source before resumption')
+                self.reflection_dependency_blocked=True
+                self.reflection_dependency=missing
+                return None  # Preserve the partial checkpoint; no invented result.
             result=dict(status='unavailable',source_episode=episode,
                 reason='Original tracks unavailable; context questions retained, no tracks reconstructed from summaries')
             atomic_json(result_path,result)
@@ -228,10 +260,20 @@ class DevelopmentLifecycle:
         if result['status']=='completed' and all(isinstance(result['quality'][k]['mean_error'],(int,float)) for k in ('adjacent','gaps')):
             finding=consume(self.dataset,result_path,source_episode=episode,prior_use=marker['prior_use'] if marker else context.get('prior_use','diagnostic'))
             sources.append(finding.id)
-        return self.journal.append('observation',dict(category='normal_meditation_result',
+        receipt=self.journal.append('observation',dict(category='normal_meditation_result',
             context_id=context_id,source_episode=episode,result_path=str(result_path),
             result_sha256=sha(result_path),status=result['status']),episode=SCOPE,sources=sources,
             producer='Reflection',version='normal-lifecycle-v1',provenance=self.provenance)
+        if result['status']=='unavailable':
+            from .acquisition import retain_dependency_request
+            missing=dict(type='preserved_tracks_artifact',source_episode=episode,
+                sha256=context.get('inventory',{}).get('tracks.json'),context_id=context_id,commission_id=commission_id)
+            retain_dependency_request(self.journal,receipt.id,work_id=context_id,
+                required_evidence=[missing],reason='Original tracks unavailable; an availability receipt is not a completed investigation')
+            self.reflection_dependency_blocked=True
+            self.reflection_dependency=missing
+            return None
+        return receipt
 
     def meditation_files(self, context_id):
         base=self.output/'meditations'/context_id
@@ -263,7 +305,8 @@ class DevelopmentLifecycle:
             r.data['kind'] in ('observation','resolution') and
             r.data['payload'].get('category')!='consolidated_evidence_reference']
         identity=[r.id for r in self.journal.records('event') if r.data['payload'].get('category') in
-            ('episode_identity_binding','episode_identity_alias','episode_identity_quarantine','episode_identity_location')]
+            ('episode_identity_binding','episode_identity_alias','episode_identity_quarantine','episode_identity_location',
+             'experience_artifact_location','acquisition_dependency_satisfied')]
         # Only retained unfinished work can wake on a computed checkpoint.
         # Heartbeats, waiting receipts and completed experiments never do.
         work=self.executive.work_states()
@@ -276,12 +319,16 @@ class DevelopmentLifecycle:
             implementation=self.executive.execution_implementation()))
 
     def pending_work(self):
-        contexts={r.data['payload']['context_id'] for r in self.journal.records('event')
-            if r.data['payload'].get('category')=='reflection_commission'}
-        completed={r.data['payload']['context_id'] for r in self.journal.records('observation')
-            if r.data['payload'].get('category')=='normal_meditation_result'}
-        if any(self.evidence_eligible(self.journal.get(i).data['payload']) and
-                self.executive.work_ready(i,self.meditation_dependency(i)) for i in contexts-completed):
+        contexts={r.id:r.data['payload'] for r in self.journal.category_records('observation','learning_context_reference')
+            if r.data['payload'].get('source_episode')}
+        results=[r.data['payload'] for r in self.journal.category_records('observation','normal_meditation_result')]
+        completed_episodes={r['source_episode'] for r in results if r['status']=='completed'}
+        unavailable={r['context_id'] for r in results if r['status']=='unavailable'}
+        # Uncommissioned eligible contexts still need Executive attention. An
+        # unavailable receipt bookmarks missing input, not a completed finding.
+        if any(p['source_episode'] not in completed_episodes and self.evidence_eligible(p) and
+                (i not in unavailable or p['source_episode'] in self.available_tracks) and
+                self.executive.work_ready(i,self.meditation_dependency(i)) for i,p in contexts.items()):
             return True
         import importlib.util
         available={'model-diagnostics','meditation-motion','evidence-review'}
@@ -432,6 +479,8 @@ class DevelopmentLifecycle:
             raise InterruptedError('primary gameplay owns time-critical resources; checkpoint learning')
 
     def turn(self):
+        self.reflection_dependency_blocked=False
+        self.reflection_dependency=None
         return self.executive.develop(self)
 
     def close(self):

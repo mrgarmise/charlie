@@ -479,6 +479,36 @@ class LearningExecutive:
             method=plan['method'], execution='offline'), [bookmark.id])
         return dict(bookmark_id=bookmark.id, dispatch_id=dispatch.id)
 
+    def reassessment_ready(self, project_id, source_journal, spec):
+        """A changed collection is not resolution of a retained dependency.
+
+        Availability reviews may advance a *part* of their request when the
+        independently audited horizon conclusion changes. That still cannot
+        qualify identities, complete-game score or authorize physical work.
+        Motion experiments retain their existing qualified-corpus boundary.
+        """
+        project=self.projects()[project_id]
+        request=project.get('developmental_bookmark',{})
+        if (request.get('status')!='READY_FOR_PLAY' or project['method']!='evidence-review'
+                or spec.get('predicate')!='capture_horizon_supported'):
+            return True
+        from learning.diagnostics import retrieve_questions
+        try:
+            measurements=retrieve_questions(source_journal,spec)
+        except (ValueError,OSError):
+            return False
+        outcome=project['experiment_history'][-1]
+        previous=outcome['result']
+        prior_value={'supported':True,'contradicted':False,'unresolved':None}[previous]
+        resolution=source_journal.get(outcome['resolution_id'])
+        prior=next((source_journal.get(i).data['payload'].get('measurements',{})
+            for i in resolution.data['sources'] if source_journal.get(i).data['payload'].get('category')=='model_diagnostic_retrieval'),{})
+        available=measurements['capture_horizon_supported']
+        # The first usable horizon is a substantive partial dependency change;
+        # more unusable archives, or merely a larger pair count, are not.
+        return available is not None and (available!=prior_value or
+            (bool(measurements.get('compatible_pairs')) and not prior.get('compatible_pairs')))
+
     def retain_evidence_request(self, project_id, source_journal, qualification_ids):
         """Bookmark the existing unresolved investigation at the hardware boundary.
 
@@ -509,10 +539,17 @@ class LearningExecutive:
         if not origins.intersection(p['source_episode'] for p in qualification):
             raise ValueError('qualification must address this investigation evidence')
         needed = sorted({item for p in qualification for item in p['report']['required_new_evidence']})
+        keys=sorted(p['qualification_key'] for p in qualification)
+        old=next((r for r in self.journal.records('event') if r.data['episode']==SCOPE
+            and r.data['payload'].get('op')=='evidence_continuation'
+            and all(r.data['payload'].get(k)==v for k,v in dict(project_id=project_id,
+                prediction_id=outcome['prediction_id'],resolution_id=outcome['resolution_id'],
+                status='READY_FOR_PLAY',qualification_keys=keys,required_evidence=needed).items())),None)
+        if old:return old  # A relocated notebook is the same request.
         refs = [self._reference(source_journal,i) for i in [outcome['resolution_id'],*qualification_ids]]
         event = self._event(dict(op='evidence_continuation',project_id=project_id,
             prediction_id=outcome['prediction_id'],resolution_id=outcome['resolution_id'],
-            original_question=project['goal'],qualification_keys=sorted(p['qualification_key'] for p in qualification),
+            original_question=project['goal'],qualification_keys=keys,
             status='READY_FOR_PLAY',request_kind='evidence_acquisition_only',
             candidate_admitted=False,physical_authorization=False,firmware_authorization=False,
             servo_authorization=False,required_evidence=needed,
@@ -527,6 +564,12 @@ class LearningExecutive:
             return None
         outcome=p['experiment_history'][-1]
         if outcome['result']!='unresolved': return None
+        old=next((r for r in self.journal.records('event') if r.data['episode']==SCOPE
+            and r.data['payload'].get('op')=='evidence_continuation'
+            and all(r.data['payload'].get(k)==v for k,v in dict(project_id=project_id,
+                prediction_id=outcome['prediction_id'],resolution_id=outcome['resolution_id'],
+                status='AWAITING_QUALIFIED_EVIDENCE').items())),None)
+        if old:return old
         return self._event(dict(op='evidence_continuation',project_id=project_id,
             prediction_id=outcome['prediction_id'],resolution_id=outcome['resolution_id'],
             original_question=p['goal'],status='AWAITING_QUALIFIED_EVIDENCE',

@@ -1,0 +1,5 @@
+Development: idle | no project | 
+Development: investigating | no project | 
+Development: waiting for evidence | no project | No justified executable investigation under current evidence and capabilities
+Development: waiting for evidence | no project | No eligible work; retained dependencies unchanged
+Development: stopped | no project | No eligible work; retained dependencies unchanged

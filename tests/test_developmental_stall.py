@@ -57,6 +57,34 @@ def test_advancing_bounded_reconstruction_is_not_a_stall(tmp_path,monkeypatch):
     assert sum(r.data['payload'].get('category')=='reflection_commission' for r in rows(state))==1
 
 
+def test_reflecting_status_identifies_commission_not_unrelated_retained_project(tmp_path,monkeypatch):
+    from test_archive_qualification import archive
+    from learning.archive_audit import audit,ingest
+    from learning.cycle import investigate
+    root=experience(tmp_path);state=tmp_path/'state';life=DevelopmentLifecycle(state,[root])
+    q=ingest(life.journal,audit(archive(tmp_path)))
+    report=investigate(life.dataset,life.gateway,executive=life.executive,
+        diagnostics_only=True,review_questions=True,max_jobs=8)
+    old=next(r for r in report['results'] if r['plan']['predicate']=='capture_horizon_supported')
+    request=life.executive.retain_evidence_request(old['project_id'],life.journal,[q.id])
+    captured=[]
+    def yielded(*args,**kwargs):
+        captured.append(json.loads((state/'development-status.json').read_text()))
+        raise MeditationYield('controlled bounded slice')
+    monkeypatch.setattr(meditation,'meditate',yielded)
+    life.turn()
+    status=captured[0]
+    assert status['phase']=='reflecting'
+    assert status['current_project'] is None
+    assert status['current_question']!=life.executive.projects()[old['project_id']]['goal']
+    activity=status['current_activity']
+    assert activity['kind']=='meditation' and activity['commission_id']
+    assert activity['context_id'] in status['activity_description']
+    assert any(r['evidence_id']==request.id for r in status['evidence_requests'])
+    assert life.executive.projects()[old['project_id']]['hold']
+    life.close()
+
+
 def test_waiting_investigation_resumes_on_qualified_delivery(tmp_path):
     root=experience(tmp_path);state=tmp_path/'state'
     p=startup(state,[root],authorize=False,turns=12);assert p.returncode==0,p.stderr

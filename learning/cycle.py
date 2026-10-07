@@ -229,7 +229,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
             if all(eligible(dataset.journal,dataset.journal.get(i).data['payload']) for i in spec['source_evidence']):
                 executive.transition(identifier,'candidate','Acquisition restored verified association; resume preserved experiment',
                     dataset.journal,[item['evidence_id']])
-        if project.get('hold') and project['status'] in ('paused','blocked') and project['experiment_history'] and project.get('disposition')!='budget_exhausted' and (project['method']!='meditation-motion' or spec.get('scope',{}).get('corpus_id')) and not any(scientific_content(dataset.journal,h.get('dataset_id'))==scientific_content(dataset.journal,spec['dataset_id']) for h in executive.agenda_history(identifier)):
+        if project.get('hold') and project['status'] in ('paused','blocked') and project['experiment_history'] and project.get('disposition')!='budget_exhausted' and (project['method']!='meditation-motion' or spec.get('scope',{}).get('corpus_id')) and not any(scientific_content(dataset.journal,h.get('dataset_id'))==scientific_content(dataset.journal,spec['dataset_id']) for h in executive.agenda_history(identifier)) and executive.reassessment_ready(identifier,dataset.journal,spec):
             executive.transition(identifier,'candidate','New versioned evidence permits reassessment; no independent confirmation assumed',dataset.journal,[item['evidence_id']])
     # A yielded committed experiment can resume after its precise input,
     # checkpoint or capability changes. Preserve the original prediction.

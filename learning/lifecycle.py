@@ -66,19 +66,25 @@ class DevelopmentLifecycle:
             if p.get('developmental_bookmark')]
         active = CapabilityDeployment(self.journal).active('offline-shadow')
         current = next((p for p in reversed(list(projects.values())) if p['status']=='active'), None)
-        if not current:
-            current = next((p for p in reversed(list(projects.values())) if p.get('experiment_history')), None)
+        activity=getattr(self,'current_activity',{}) or {}
+        question=current['goal'] if current else None
+        if self.phase=='reflecting' and activity.get('kind')=='meditation':
+            current=None  # A retained agenda is not this context's commission.
+            context=self.journal.get(activity['context_id']).data['payload']['context']
+            question=next((q['question'] for q in context.get('questions',[]) if q.get('question')),None)
+        activity_description=('Meditation '+activity['context_id']+' for '+activity['source_episode']
+            if self.phase=='reflecting' and activity.get('kind')=='meditation' else None)
         outcome=getattr(self,'last_turn',{})
         work=self.executive.work_states()
         satisfied={r.data['payload']['request_id'] for r in rows if r.data['payload'].get('category')=='acquisition_dependency_satisfied'}
-        summary=(self.phase,current['goal'] if current else None,self.error,outcome.get('reason'))
+        summary=(self.phase,activity_description or question,self.error,outcome.get('reason'))
         if summary!=getattr(self,'last_summary',None):
             print('Development:',self.phase,'|',summary[1] or 'no project','|',self.error or outcome.get('reason',''),flush=True)
             self.last_summary=summary
         from .episode_identity import current_conflicts
         atomic_json(self.output/'development-status.json', dict(schema='charlie-development-status-v1',
             phase=self.phase, last_activity=getattr(self,'last_activity',self.phase), current_project=current['id'] if current else None,
-            current_question=current['goal'] if current else None,
+            current_question=question,activity_description=activity_description,
             projects={k:dict(goal=v['goal'],status=v['status'],progress=v.get('progress',{}),next_direction=v.get('next_direction')) for k,v in projects.items()},
             latest_findings=[dict(id=r.id,**r.data['payload']) for r in findings[-3:]],
             latest_operational_outcome=next((dict(id=r.id,metrics=r.data['payload']['metrics'],changed_decisions=r.data['payload']['changed_decisions'])

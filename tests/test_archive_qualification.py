@@ -71,6 +71,13 @@ def test_independent_eligibility_loop_and_restart_bookmark(tmp_path):
     assert event.data['payload']['physical_authorization'] is False
     assert event.data['payload']['candidate_admitted'] is False
     ds.journal.verify()
+    ds.journal.close()
+    copy=tmp_path/'copied-notebook.sqlite3';shutil.copy2(tmp_path/'e.sqlite3',copy)
+    moved=EvidenceJournal(copy)
+    count=len(moved.records())
+    assert LearningExecutive(moved,g).retain_evidence_request(row['project_id'],moved,[q.id]).id==event.id
+    assert len(moved.records())==count
+    moved.close()
 
 
 def test_time_availability_does_not_qualify_motion_or_score(tmp_path):
@@ -82,6 +89,52 @@ def test_time_availability_does_not_qualify_motion_or_score(tmp_path):
     assert row['result']['metrics']['qualified_identities']==0
     with pytest.raises(ValueError,match='missing-evidence'):
         LearningExecutive(ds.journal,g).retain_evidence_request(row['project_id'],ds.journal,[q.id])
+
+
+def test_ready_request_does_not_recommission_for_more_unqualified_captures(tmp_path):
+    """Software archives reproduce the native request, not physical evidence."""
+    ds,g=make(tmp_path);root=archive(tmp_path);q=ingest(ds.journal,audit(root))
+    report=investigate(ds,g,diagnostics_only=True,review_questions=True,max_jobs=8)
+    row=next(x for x in report['results'] if x['plan']['predicate']=='capture_horizon_supported')
+    executive=LearningExecutive(ds.journal,g)
+    request=executive.retain_evidence_request(row['project_id'],ds.journal,[q.id])
+    other=archive(tmp_path,name='another-sparse-archive')
+    report_path=other/'game-01/report.json'
+    document=json.loads(report_path.read_text());document['simulation_episode']=2
+    report_path.write_text(json.dumps(document))
+    ingest(ds.journal,audit(other))
+    result=investigate(ds,g,diagnostics_only=True,review_questions=True,max_jobs=8)
+    assert not any(r['project_id']==row['project_id'] for r in result['results'])
+    restored=LearningExecutive(ds.journal,g).projects()[row['project_id']]
+    assert restored['developmental_bookmark']['evidence_id']==request.id
+    assert len(restored['experiment_history'])==1
+    assert restored['hold']
+    count=len(ds.journal.records())
+    for _ in range(3):
+        assert investigate(ds,g,executive=LearningExecutive(ds.journal,g),
+            diagnostics_only=True,review_questions=True,max_jobs=8)['results']==[]
+    assert len(ds.journal.records())==count
+    assert len([r for r in ds.journal.records('event') if r.data['payload'].get('op')=='evidence_continuation'])==1
+
+
+def test_ready_request_reassesses_first_usable_horizon_without_qualifying_policy(tmp_path):
+    ds,g=make(tmp_path);q=ingest(ds.journal,audit(archive(tmp_path)))
+    row=next(x for x in investigate(ds,g,diagnostics_only=True,review_questions=True,max_jobs=8)['results']
+        if x['plan']['predicate']=='capture_horizon_supported')
+    request=LearningExecutive(ds.journal,g).retain_evidence_request(row['project_id'],ds.journal,[q.id])
+    ingest(ds.journal,audit(archive(tmp_path,name='usable-horizon',spacing=.15)))
+    report=investigate(ds,g,executive=LearningExecutive(ds.journal,g),diagnostics_only=True,review_questions=True,max_jobs=8)
+    resumed=next(x for x in report['results'] if x['project_id']==row['project_id'])
+    assert resumed['plan']['prediction_id']!=row['plan']['prediction_id']
+    assert resumed['result']['metrics']['compatible_pairs']>0
+    assert resumed['result']['metrics']['qualified_identities']==0
+    assert resumed['result']['metrics']['fresh_final_evidence'] is False
+    assert resumed['result']['reflection']['operational_change'] is None
+    project=LearningExecutive(ds.journal,g).projects()[row['project_id']]
+    assert project['developmental_bookmark']['evidence_id']==request.id
+    assert len(project['experiment_history'])==2
+    assert project['developmental_bookmark']['physical_authorization'] is False
+    assert investigate(ds,g,diagnostics_only=True,review_questions=True,max_jobs=8)['results']==[]
 
 
 def test_changed_pixels_refuse_independent_retrieval(tmp_path):

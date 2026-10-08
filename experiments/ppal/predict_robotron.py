@@ -49,7 +49,8 @@ def prediction_rows(track, window=3, max_gap=5):
     path = sorted(track.get("path", []), key=lambda p: int(p["tick"]))
     out = []
     for index in range(1, len(path)):
-        history = path[:index]
+        # predict_next consults only the last window, never the growing prefix.
+        history = path[max(0,index-window):index] if window>0 else path[:index]
         actual = path[index]
         gap = int(actual["tick"]) - int(history[-1]["tick"])
         if gap <= 0 or gap > max_gap:

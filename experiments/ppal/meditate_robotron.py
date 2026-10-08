@@ -26,8 +26,8 @@ def _xy(point):
     return float(point["center"][0]), float(point["center"][1])
 
 
-def _velocity(track, window=3):
-    path = _path(track)
+def _velocity(track, window=3, path=None):
+    path = _path(track) if path is None else path
     if len(path) < 2:
         return 0.0, 0.0
     usable = path[-window:]
@@ -52,20 +52,27 @@ def _kind_penalty(a, b):
     return 1.5
 
 
+def _prepare(track, window):
+    path=_path(track)
+    if not path:return None
+    return dict(start=_xy(path[0]),end=_xy(path[-1]),velocity=_velocity(track,window,path),
+        kinds={k for k,n in _kind_counts(track).items() if n and k!='unknown'})
+
+
 def predicted_link(left, right, window=3, max_gap=5,
-                   base_radius=2.0, radius_per_gap=1.8):
+                   base_radius=2.0, radius_per_gap=1.8, prepared=None):
     """Score A->B using A's predicted future location; None means implausible."""
     gap = int(right["first_tick"]) - int(left["last_tick"])
     if gap <= 0 or gap > max_gap:
         return None
 
-    lp, rp = _path(left), _path(right)
-    if not lp or not rp:
+    a,b=prepared if prepared is not None else (_prepare(left,window),_prepare(right,window))
+    if a is None or b is None:
         return None
 
-    ex, ey = _xy(lp[-1])
-    sx, sy = _xy(rp[0])
-    vx, vy = _velocity(left, window)
+    ex, ey = a['end']
+    sx, sy = b['start']
+    vx, vy = a['velocity']
     px, py = ex + vx * gap, ey + vy * gap
     error = math.hypot(sx - px, sy - py)
     radius = base_radius + radius_per_gap * gap
@@ -73,7 +80,7 @@ def predicted_link(left, right, window=3, max_gap=5,
         return None
 
     return {
-        "score": error + 0.55 * (gap - 1) + _kind_penalty(left, right),
+        "score": error + 0.55 * (gap - 1) + (0. if not a['kinds'] or not b['kinds'] or a['kinds'] & b['kinds'] else 1.5),
         "prediction_error": error,
         "gap": gap,
         "predicted": [px, py],
@@ -125,6 +132,7 @@ def reconstruct_once(tracks, window=3, max_gap=5,
     # including tie-breaking, while avoiding quadratic impossible pairs.
     onsets = sorted((int(t['first_tick']), j) for j,t in enumerate(tracks))
     times = [at for at,_ in onsets]
+    prepared={}
     for i in range(state.get("left", 0), len(tracks)):
         left = tracks[i]
         if on_progress: on_progress()
@@ -138,8 +146,10 @@ def reconstruct_once(tracks, window=3, max_gap=5,
             if i == j:
                 state["neighbor"] = position + 1
                 continue
+            if i not in prepared:prepared[i]=_prepare(left,window)
+            if j not in prepared:prepared[j]=_prepare(right,window)
             info = predicted_link(left, right, window, max_gap,
-                                  base_radius, radius_per_gap)
+                                  base_radius, radius_per_gap,(prepared[i],prepared[j]))
             if info is not None:
                 candidates.append((info["score"], i, j, info))
             state['neighbor'] = position + 1

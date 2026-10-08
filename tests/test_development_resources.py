@@ -71,3 +71,24 @@ def test_resource_preemption_inside_reconstruction_is_not_stall(tmp_path,monkeyp
 @pytest.mark.parametrize('kwargs',[dict(cpu_cores=0),dict(cpu_cores=5),dict(memory_mb=64),dict(temperature_c=90),dict(poll_seconds=1)])
 def test_unbounded_resources_rejected(kwargs):
     with pytest.raises(ValueError):DevelopmentResources(**kwargs)
+
+
+def test_memory_accounting_visits_only_owned_workers(tmp_path,monkeypatch):
+    import learning.resources as resources
+    root=tmp_path/'thread-self';root.mkdir();(root/'children').write_text('10 11')
+    for pid,children in ((10,'12'),(11,''),(12,'')):
+        path=tmp_path/str(pid)/'task'/str(pid);path.mkdir(parents=True)
+        (path/'children').write_text(children)
+    visited=[]
+    def rss(pid=None):visited.append(pid);return {None:100,10:200,11:300,12:400}[pid]
+    monkeypatch.setattr(resources,'resident_bytes',rss)
+    assert resources.owned_resident_bytes(tmp_path)==(1000,3)
+    assert set(visited)=={None,10,11,12}
+
+
+def test_worker_group_cannot_bypass_memory_budget(monkeypatch):
+    import learning.resources as resources
+    monkeypatch.setattr(resources,'owned_resident_bytes',lambda:(800*1024**2,2))
+    guard=ResourceGuard(owner=lambda:False)
+    with pytest.raises(ResourceUnavailable,match='memory'):guard.check(force=True)
+    assert guard.sample['owned_worker_count']==2

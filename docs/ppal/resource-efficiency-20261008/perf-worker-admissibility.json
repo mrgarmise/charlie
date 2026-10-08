@@ -1,0 +1,73 @@
+{
+  "source_sha256": "cbc3fbc63a477c08c65c6500a790cbce9ba1923329ac7e123cc951110f6eb255",
+  "results": [
+    {
+      "workers": 1,
+      "wall_seconds": 0.05127317200003745,
+      "cpu_seconds": 0.05088380399999998,
+      "self_peak_rss_bytes": 43794432,
+      "maximum_child_peak_rss_bytes": 0,
+      "completed_pairs": 53016,
+      "result_digest": "e60827777d60735490cce19535e2856a15fa55a3f9fd3b8ca98dbea932fb0ceb",
+      "source_mutated": false,
+      "qualification": "Unverified preserved-track arithmetic; no independent findings"
+    },
+    {
+      "workers": 2,
+      "wall_seconds": 0.48809104799988745,
+      "cpu_seconds": 0.6333012840000001,
+      "self_peak_rss_bytes": 51503104,
+      "maximum_child_peak_rss_bytes": 45453312,
+      "completed_pairs": 53016,
+      "result_digest": "e60827777d60735490cce19535e2856a15fa55a3f9fd3b8ca98dbea932fb0ceb",
+      "source_mutated": false,
+      "qualification": "Unverified preserved-track arithmetic; no independent findings"
+    },
+    {
+      "workers": 1,
+      "wall_seconds": 0.036528657999951974,
+      "cpu_seconds": 0.03599352800000003,
+      "self_peak_rss_bytes": 51503104,
+      "maximum_child_peak_rss_bytes": 45453312,
+      "completed_pairs": 53016,
+      "result_digest": "e60827777d60735490cce19535e2856a15fa55a3f9fd3b8ca98dbea932fb0ceb",
+      "source_mutated": false,
+      "qualification": "Unverified preserved-track arithmetic; no independent findings"
+    },
+    {
+      "workers": 2,
+      "wall_seconds": 0.4644160800000918,
+      "cpu_seconds": 0.6245190049999997,
+      "self_peak_rss_bytes": 52158464,
+      "maximum_child_peak_rss_bytes": 51503104,
+      "completed_pairs": 53016,
+      "result_digest": "e60827777d60735490cce19535e2856a15fa55a3f9fd3b8ca98dbea932fb0ceb",
+      "source_mutated": false,
+      "qualification": "Unverified preserved-track arithmetic; no independent findings"
+    },
+    {
+      "workers": 1,
+      "wall_seconds": 0.05476281999995081,
+      "cpu_seconds": 0.05599767500000019,
+      "self_peak_rss_bytes": 52158464,
+      "maximum_child_peak_rss_bytes": 51503104,
+      "completed_pairs": 53016,
+      "result_digest": "e60827777d60735490cce19535e2856a15fa55a3f9fd3b8ca98dbea932fb0ceb",
+      "source_mutated": false,
+      "qualification": "Unverified preserved-track arithmetic; no independent findings"
+    },
+    {
+      "workers": 2,
+      "wall_seconds": 0.453671869000118,
+      "cpu_seconds": 0.604900292,
+      "self_peak_rss_bytes": 52158464,
+      "maximum_child_peak_rss_bytes": 52158464,
+      "completed_pairs": 53016,
+      "result_digest": "e60827777d60735490cce19535e2856a15fa55a3f9fd3b8ca98dbea932fb0ceb",
+      "source_mutated": false,
+      "qualification": "Unverified preserved-track arithmetic; no independent findings"
+    }
+  ],
+  "physical_authorization": false,
+  "independently_qualified_findings": 0
+}

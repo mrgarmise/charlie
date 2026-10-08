@@ -40,6 +40,24 @@ def resident_bytes(pid=None):
     return 0
 
 
+def owned_resident_bytes(proc_root=None):
+    """Sample only this development process and its existing worker children."""
+    proc=Path('/proc') if proc_root is None else proc_root
+    total=resident_bytes();pending=[None];seen=set();count=0
+    while pending:
+        pid=pending.pop()
+        path=proc/'thread-self'/'children' if pid is None else proc/str(pid)/'task'/str(pid)/'children'
+        try:children=[int(i) for i in path.read_text().split()]
+        except FileNotFoundError:continue # completed worker
+        for child in children:
+            if child in seen:continue
+            seen.add(child)
+            try:total+=resident_bytes(child)
+            except FileNotFoundError:continue
+            count+=1;pending.append(child)
+    return total,count
+
+
 def temperature():
     values=[]
     for path in Path('/sys/class/thermal').glob('thermal_zone*/temp'):
@@ -56,6 +74,7 @@ class ResourceGuard:
         self.checked_at=None
         self.sample={}
         self.checks=0
+        self.peak_owned_resident_bytes=0
 
     def check(self, *, force=False):
         now=self.clock()
@@ -65,11 +84,15 @@ class ResourceGuard:
         from .cycle import gameplay_active
         if (self.owner or gameplay_active)():
             raise InterruptedError('primary gameplay owns time-critical resources; checkpoint learning')
-        rss=resident_bytes();temp=temperature()
+        try:rss,children=owned_resident_bytes()
+        except OSError as exc:raise ResourceUnavailable('Development worker memory telemetry unavailable') from exc
+        temp=temperature()
+        self.peak_owned_resident_bytes=max(self.peak_owned_resident_bytes,rss)
         usage=resource.getrusage(resource.RUSAGE_SELF)
         self.sample=dict(cpu_cores=self.policy.cpu_cores,memory_budget_mb=self.policy.memory_mb,
             temperature_limit_c=self.policy.temperature_c,ownership_poll_seconds=self.policy.poll_seconds,
-            resident_bytes=rss,peak_rss_bytes=usage.ru_maxrss*1024,
+            resident_bytes=rss,owned_worker_count=children,peak_rss_bytes=usage.ru_maxrss*1024,
+            peak_owned_resident_bytes=self.peak_owned_resident_bytes,
             cpu_seconds=usage.ru_utime+usage.ru_stime,temperature_c=temp,
             thermal_sensor_available=temp is not None,ownership_checks=self.checks)
         if rss>self.policy.memory_mb*1024**2:

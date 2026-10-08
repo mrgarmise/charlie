@@ -1,0 +1,45 @@
+{
+  "baseline": {
+    "samples": 10000,
+    "unit": "ns",
+    "median": 7572.0,
+    "p95": 31822,
+    "p99": 107152,
+    "minimum": 3504,
+    "maximum": 2196057,
+    "mean": 17655.5015
+  },
+  "policy_enabled": {
+    "samples": 10000,
+    "unit": "ns",
+    "median": 23377.5,
+    "p95": 45469,
+    "p99": 172928,
+    "minimum": 6251,
+    "maximum": 1730559,
+    "mean": 27305.4589
+  },
+  "median_delta_ns": 15805.5,
+  "policy": {
+    "candidate_id": "39a326bc3890c60037ae212e6d01999177a19bd99b652c2f2b11b9a9207881d9",
+    "investigation_id": "6069e35cebc0204eab53d00efccd8ee24ab6f4fa591e2e4c8c679850c7a8a337",
+    "evaluation_id": "e4223726e23138ffddced6f9d7235d453d208966264870c1088cfcac544a93a0",
+    "activation_key": "b8a8abc366cea3cf809e4a8962be44c7da65e33c276cf4ae106c220d554f53f0",
+    "rollback_identity": "b8a8abc366cea3cf809e4a8962be44c7da65e33c276cf4ae106c220d554f53f0",
+    "code_revision": "2e11d3b3068cd08bc1f0cc5d66ab9f5322c64ded",
+    "provenance_kind": "simulated-interface-fixture",
+    "policy_version": "ppal-policy-v1",
+    "domains": [
+      "goal_preference"
+    ],
+    "applied_domains": [],
+    "disposition": "eligible"
+  },
+  "python": "3.12.14",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "source": "controlled software WorldState fixtures; not Robotron performance evidence",
+  "boundary": "Forebrain.update + Hindbrain.decide including provenance; excludes capture, perception, transport and startup validation",
+  "implications": "Host distribution only; Pi contention, sustained cadence and end-to-end controller latency remain unqualified",
+  "controller_writes": 0,
+  "qualification": "constructed strategic interface fixture; not authentic game learning"
+}

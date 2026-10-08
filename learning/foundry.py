@@ -14,10 +14,11 @@ from memory.evidence import digest
 from .datasets import sha
 
 
-def atomic_json(path, data):
+def atomic_json(path, data, *, compact=False):
     path=Path(path); tmp=path.with_suffix('.tmp')
     with tmp.open('w') as stream:
-        stream.write(json.dumps(data,indent=2,allow_nan=False)+'\n'); stream.flush(); os.fsync(stream.fileno())
+        stream.write(json.dumps(data,indent=None if compact else 2,
+            separators=(',',':') if compact else None,allow_nan=False)+'\n'); stream.flush(); os.fsync(stream.fileno())
     tmp.replace(path)
     descriptor=os.open(str(path.parent),os.O_DIRECTORY)
     try: os.fsync(descriptor)

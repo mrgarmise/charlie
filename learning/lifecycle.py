@@ -26,6 +26,7 @@ class DevelopmentLifecycle:
     def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None):
         from .resources import ResourceGuard
         self.resources=ResourceGuard(resources)
+        self._stage_cache={}
         self.output = Path(output).resolve()
         self.roots = [Path(r).resolve() for r in roots]
         self.history_roots = [Path(r).resolve() for r in history_roots]
@@ -241,7 +242,7 @@ class DevelopmentLifecycle:
                     history=history,merges=merges,reconstruction=reconstruction,
                     context_id=context_id,commission_id=commission_id)
                 document['state_digest']=digest(document)
-                atomic_json(checkpoint,document)
+                atomic_json(checkpoint,document,compact=True)
             try:
                 # A stable saved iteration is already complete, even if the
                 # process stopped between its checkpoint and result publication.
@@ -297,16 +298,21 @@ class DevelopmentLifecycle:
     def meditation_stages(self, path):
         """Measured computation, explicitly separate from qualified learning."""
         try:
+            info=path.stat();key=(info.st_ino,info.st_size,info.st_mtime_ns)
+            cached=self._stage_cache.get(path)
+            if cached and cached[0]==key:return dict(cached[1])
             p=json.loads(path.read_text())
             if 'state_digest' in p and p['state_digest']!=digest({k:v for k,v in p.items() if k!='state_digest'}):
                 raise ValueError('checkpoint integrity mismatch')
             history=p['history'];r=p.get('reconstruction',{})
         except (OSError,ValueError,KeyError,TypeError) as exc:
             return dict(checkpoint_available=False,reason=str(exc))
-        return dict(checkpoint_available=True,completed_iterations=len(history),completed_left_tracks=r.get('left',0),
+        result=dict(checkpoint_available=True,completed_iterations=len(history),completed_left_tracks=r.get('left',0),
             neighbor_cursor=r.get('neighbor',0),retained_plausible_links=len(r.get('candidates',[])),
             reconstructed_links=sum(h.get('merges',0) for h in history),
             interpretation='Computational progress only; reconstructed identities remain unverified')
+        self._stage_cache[path]=(key,result)
+        return dict(result)
 
     def meditation_progress(self, context_id):
         # Hash-bound computed content/cursors only; timestamps and heartbeat
@@ -519,7 +525,13 @@ class DevelopmentLifecycle:
             return
         self.reflection_dependency_blocked=False
         self.reflection_dependency=None
-        return self.executive.develop(self)
+        try:return self.executive.develop(self)
+        except ResourceUnavailable as exc:
+            # Existing worker supervision checkpoints/stops its child. The
+            # committed plan remains owned by the Executive for resumption.
+            self.last_turn=dict(progress_occurred=False,reason=str(exc),next_direction='Yield resources; resume retained work')
+            self.current_activity=dict(kind='resource_wait',reason=str(exc))
+            self._phase('waiting for resources')
 
     def close(self):
         self.last_activity=self.phase

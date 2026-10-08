@@ -457,6 +457,7 @@ def main():
     parser.add_argument('--observer-context', type=Path, help='optional display-only project context; never policy input')
     parser.add_argument('--learned-semantics',type=Path,help='separately authorized, independently validated candidate-crop activation manifest')
     parser.add_argument('--learned-policy',type=Path,help='qualified local PPAL decision policy; current acceptance is offline only')
+    parser.add_argument('--visual-retention-hz',type=float,help='opt-in sampled-visual-v1; strict originals remain default')
     parser.add_argument('--evidence-frame-capacity',type=int,default=16)
     parser.add_argument('--evidence-record-capacity',type=int,default=512)
     parser.add_argument('--evidence-memory-mib',type=int,default=128)
@@ -470,6 +471,8 @@ def main():
 
     if args.seconds is not None and (not math.isfinite(args.seconds) or not 1 <= args.seconds <= 3600):
         parser.error("--seconds must be 1..3600")
+    if args.visual_retention_hz is not None and (not math.isfinite(args.visual_retention_hz) or not 0<args.visual_retention_hz<=30):
+        parser.error('visual retention Hz must be positive and <=30')
     if not (1<=args.evidence_frame_capacity<=64 and args.evidence_frame_capacity<=args.evidence_record_capacity<=4096
             and 16<=args.evidence_memory_mib<=512):
         parser.error('evidence budgets require frames 1..64, records frames..4096, memory 16..512 MiB')
@@ -574,7 +577,15 @@ def main():
     latest_agency_frame = None
     buffered_frames = []
     raw_frames = []
+    recorder=None
+    recent_observation_ids=[]
     def record_agency(snapshot):
+        if recorder is not None and recorder.latest_observation is not None:
+            recorder.event('perception_trace',dict(schema='first-person-trace-v1',
+                agency=snapshot,interpretation='Charlie-authored provisional beliefs; not independent visual truth'),
+                at=source.timestamp,sources=list(recent_observation_ids))
+            recent_observation_ids.append(source.observation_id)
+            if len(recent_observation_ids)>8:recent_observation_ids.pop(0)
         nonlocal agency_samples
         execution = getattr(controller, 'last_execution', None) or {}
         if session.state == SessionState.ACQUIRING and execution.get('move') not in (None,'STAY') and 'first_body_probe_at' not in timing:
@@ -656,7 +667,7 @@ def main():
     try:
         recorder=CaptureEvidence(args.output,diary.capture_origin['capture_id'],provenance,
             capacity=args.evidence_frame_capacity,record_capacity=args.evidence_record_capacity,
-            byte_capacity=args.evidence_memory_mib*1024*1024)
+            byte_capacity=args.evidence_memory_mib*1024*1024,visual_hz=args.visual_retention_hz)
     except BaseException:
         source.close()
         raise
@@ -697,6 +708,16 @@ def main():
         # and never inside the time-critical tracking/score observation loop.
         mark('calibration_started')
         calibration,sensory_report=sensory_preflight(source,args.output,seed_position=args.focus)
+        original_detect=recognizer.detect
+        def trace_detect(frame):
+            pairs=original_detect(frame)
+            recorder.event('detector_trace',dict(schema='first-person-trace-v1',
+                detections=[dict(kind=d.kind,center=list(d.center),box=list(d.box),pixels=d.pixels,
+                                 detector_output=e) for d,e in pairs],
+                geometry=dict(corners=getattr(calibration,'corners',None),output_size=getattr(calibration,'output_size',None)),
+                interpretation='Charlie detector outputs; no independent identity/semantic truth'),at=source.timestamp)
+            return pairs
+        recognizer.detect=trace_detect
         exposure_preflight=sensory_report.get('exposure')
         calibration_mode='fresh_session'
         mark('calibration_finished', mode=calibration_mode)
@@ -1175,7 +1196,7 @@ def main():
                     unresolved=[dict(id=o.id,position=[o.position.x,o.position.y]) for o in world.unresolved]),
                 self_track_id=visual_agency.controlled_track_id,identity_status=agency_snapshot.get('identity_status'),
                 policy=hindbrain.last_decision.get('policy'),goal=vars(goal),
-                intent=dict(kind=intent.kind,target_id=intent.target_id)),at=time.monotonic())
+                intent=dict(kind=intent.kind,target_id=intent.target_id)),at=time.monotonic(),sources=recent_observation_ids)
             prediction_persistence_ns=time.perf_counter_ns()-began
             controller.execute(action, pulse_ms)
             hindbrain.executed_tactic(world,action,timestamp=source.timestamp,

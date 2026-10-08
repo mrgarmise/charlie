@@ -15,6 +15,8 @@ class ObservedCamera:
         self.viewer_state = None
         self.read_failures = 0
         self.recorder = None
+        self.sequence = 0
+        self.observation_id = None
 
     def read(self):
         if self.progress: self.progress.enter('camera')
@@ -38,8 +40,12 @@ class ObservedCamera:
                           if self.capture else None)
         if self.timestamp is None:
             self.timestamp = time.monotonic()
+        self.sequence += 1
         if self.recorder is not None:
-            self.observation_id=self.recorder.capture(self.raw,dict(timestamp=self.timestamp,capture=self.capture))
+            self.observation_id=self.recorder.capture(self.raw,dict(timestamp=self.timestamp,capture=self.capture,
+                sequence=self.sequence,read_failures_total=self.read_failures,
+                timestamp_origin='first_pixel_exposure_at' if self.capture and self.capture.get('first_pixel_exposure_at') is not None else 'read_completion',
+                clock='source monotonic exposure' if self.capture else 'process monotonic read completion'))
         if self.progress: self.progress.fresh(self.timestamp)
         if self.publisher is not None:
             self.viewer_state = {'attached':self.publisher.attached,

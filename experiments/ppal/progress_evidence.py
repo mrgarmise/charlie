@@ -4,6 +4,7 @@ import os
 import time
 import threading
 import queue
+import math
 from collections import deque
 from concurrent.futures import Future
 from pathlib import Path
@@ -17,9 +18,14 @@ class CaptureEvidence:
     not durability. A finite emergency slot preserves the item causing a pause.
     """
     def __init__(self, output, episode, provenance, capacity=16, *, record_capacity=512,
-                 byte_capacity=128*1024*1024, flush_timeout=10.):
+                 byte_capacity=128*1024*1024, flush_timeout=10., visual_hz=None):
         if capacity<1 or record_capacity<capacity or byte_capacity<1 or not 0<flush_timeout<=120:
             raise ValueError('invalid bounded recording budget')
+        if visual_hz is not None and (not math.isfinite(visual_hz) or not 0<visual_hz<=30):
+            raise ValueError('visual retention Hz must be positive and <=30')
+        self.visual_hz=visual_hz;self._sample_origin=None;self._sample_slot=-1
+        self._contract_recorded=False;self._last_source_at=None
+        self._retention_counts=dict(selected=0,not_selected=0,unavailable=0)
         self.output=Path(output);self.episode=episode;self.provenance=provenance
         self.capacity=capacity;self.record_capacity=record_capacity;self.byte_capacity=byte_capacity
         self.flush_timeout=flush_timeout;self.preparing=True;self.count=0;self.overflow=None
@@ -96,7 +102,9 @@ class CaptureEvidence:
         seconds=max(1e-9,time.perf_counter()-self._started)
         return dict(stats,throughput_records_per_second=stats['written']/seconds,
             writer_error=str(self._fatal) if self._fatal else None,paused=bool(self.overflow),
-            recovery=self.recovery,writer_alive=self.thread.is_alive())
+            recovery=self.recovery,writer_alive=self.thread.is_alive(),
+            visual_contract='sampled-visual-v1' if self.visual_hz is not None else 'strict-full-frame-v1',
+            visual_hz=self.visual_hz,retention_counts=dict(self._retention_counts))
 
     def _save_state(self,status,**extra):
         from learning.foundry import atomic_json
@@ -130,7 +138,7 @@ class CaptureEvidence:
             self.overflow=item
             raise
         with self._lock:
-            identifier=args[1].id if fn in (self._capture,self._event) else f'log:{self._stats["accepted"]+1}'
+            identifier=args[1].id if fn in (self._capture,self._event,self._descriptor) else f'log:{self._stats["accepted"]+1}'
             self._uncommitted[item[0]]=identifier
             self._records+=1;self._frames+=int(is_frame);self._bytes+=size
             self._stats['accepted']+=1
@@ -141,21 +149,55 @@ class CaptureEvidence:
 
     def capture(self,image,metadata):
         from memory.evidence import EvidenceJournal
-        began=time.perf_counter_ns();self.count+=1
+        began=time.perf_counter_ns();at=metadata['timestamp']
+        if not math.isfinite(at) or (self._last_source_at is not None and at<self._last_source_at):
+            raise ValueError('source timestamps must be finite and monotonic')
+        self._last_source_at=at;self.count+=1
+        if self.visual_hz is not None and not self._contract_recorded:
+            contract=EvidenceJournal.prepare_observation(dict(category='camera_retention_contract',
+                schema='sampled-visual-v1',hz=self.visual_hz,schedule='first source + fixed exposure-clock slots; no catch-up duplication',
+                pixel_claim='only hashed camera_capture artifacts independently inspectable',
+                critical_trace='every source descriptor and retention disposition required'),
+                episode=self.episode,at=at,producer='CaptureEvidence',version='3',provenance=self.provenance)
+            self._submit(self._event,('camera_retention_contract',contract),size=len(contract.document.encode()))
+            self._contract_recorded=True
+        selected=True
+        if self.visual_hz is not None:
+            if self._sample_origin is None:self._sample_origin=at
+            slot=math.floor((at-self._sample_origin)*self.visual_hz+1e-7)
+            selected=slot>self._sample_slot
+            if selected:self._sample_slot=slot
         size=image.width*image.height*len(image.getbands())*(4 if image.mode in ('I','F') else 2 if image.mode.startswith('I;16') else 1)
-        if size>self.byte_capacity:
+        status='selected' if selected else 'not_selected'
+        reason='scheduled original' if selected else 'not selected by predictable visual policy'
+        if selected and self.visual_hz is not None and not self.preparing:
+            with self._lock:
+                optional_full=(self._frames>=max(1,self.capacity-1) or self._bytes+size+4096>self.byte_capacity*0.8
+                               or self._records>=max(1,self.record_capacity-8))
+            if optional_full:
+                selected=False;status='unavailable';reason='optional payload budget; critical trace reserved'
+        if selected and size>self.byte_capacity:
             self._recovery_gap=True;self._gap_reason='source frame exceeded configured memory budget'
             raise ValueError('source frame exceeds configured memory budget; recording incomplete')
-        self._largest_frame=max(self._largest_frame,size)
-        prepared=EvidenceJournal.prepare_observation(dict(category='camera_observation',sample=self.count,
-            metadata=metadata,source_path=f'observations/camera-{self.count:06d}.png',
-            size=list(image.size),mode=image.mode,interpretation='observed pixels queued; artifact integrity verified by writer'),
-            episode=self.episode,at=metadata['timestamp'],producer='ObservedCamera',version='2',provenance=self.provenance)
-        self._submit(self._capture,(image.copy(),prepared,self.count),
-            size=size+len(prepared.document.encode()),is_frame=True)
-        self.latest_observation=prepared
+        self._largest_frame=max(self._largest_frame,size if selected else 0)
+        payload=dict(category='camera_observation',sample=self.count,metadata=metadata,
+            source_path=f'observations/camera-{self.count:06d}.png' if selected else None,
+            size=list(image.size),mode=image.mode,interpretation='camera source descriptor; semantics unverified')
+        if self.visual_hz is not None:
+            payload.update(visual_contract='sampled-visual-v1',retention=dict(status=status,reason=reason),
+                clock=metadata.get('clock','monotonic; exposure or disclosed read completion'))
+        prepared=EvidenceJournal.prepare_observation(payload,episode=self.episode,at=at,
+            producer='ObservedCamera',version='3' if self.visual_hz is not None else '2',provenance=self.provenance)
+        if selected:
+            self._submit(self._capture,(image.copy(),prepared,self.count),size=size+len(prepared.document.encode()),is_frame=True)
+        else:
+            self._submit(self._descriptor,(None,prepared),size=len(prepared.document.encode()))
+        self._retention_counts[status]+=1;self.latest_observation=prepared
         with self._lock:self._stats['enqueue_ns']+=time.perf_counter_ns()-began
         return prepared.id
+
+    def _descriptor(self,unused,prepared):
+        self.journal.commit_prepared(prepared)
 
     def _capture(self,image,prepared,number):
         import hashlib
@@ -182,17 +224,18 @@ class CaptureEvidence:
             self._stats['captures_written']+=1;self._stats['encode_ns']+=encode_ns
             self._stats['write_ns']+=time.perf_counter_ns()-began
 
-    def event(self,kind,payload,*,at):
+    def event(self,kind,payload,*,at,sources=None):
         from memory.evidence import EvidenceJournal
         if self.latest_observation is None:raise ValueError('event needs a source observation')
         began=time.perf_counter_ns();source=self.latest_observation.id
+        dependencies=list(dict.fromkeys([source]+list(sources or [])))
         if kind.endswith('_prediction'):
             now=time.monotonic()
             prepared=EvidenceJournal.prepare_buffered_prediction(dict(category=kind,observation_id=source,**payload),
-                episode=self.episode,at=now,deadline=now+5.,sources=[source],producer='PPAL',version='2')
+                episode=self.episode,at=now,deadline=now+5.,sources=dependencies,producer='PPAL',version='2')
         else:
             prepared=EvidenceJournal.prepare_observation(dict(category=kind,observation_id=source,**payload),
-                episode=self.episode,at=at,sources=[source],producer='PPAL',version='2',provenance=self.provenance)
+                episode=self.episode,at=at,sources=dependencies,producer='PPAL',version='2',provenance=self.provenance)
         self._submit(self._event,(kind,prepared),size=len(prepared.document.encode()))
         with self._lock:self._stats['enqueue_ns']+=time.perf_counter_ns()-began
         return prepared.id

@@ -14,7 +14,7 @@ from experiments.ppal.robotron_agency import VECTORS
                           (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
                           (False,False,False,False,False,False,False,True)])
 
-def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False,finalization_disk_error=False):
+def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False,finalization_disk_error=False,sampled=False):
     from experiments.ppal import play_robotron as play
     import time as real_time
     real_sleep=real_time.sleep
@@ -24,7 +24,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     pending = [None]; response_reads = [0]
     class Source:
         def read(self):
-            real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+            real_sleep(.05)  # bounded 20 Hz host fixture; no native latency claim
             clock[0]+=.01; reads[0]+=1
             if pending[0] is not None:
                 response_reads[0] += 1
@@ -124,7 +124,8 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
                         + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
                         + (['--bootstrap-body-fire'] if bootstrap else [])
                         + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
-                        + (['--recalibrate'] if recalibrate else []))
+                        + (['--recalibrate'] if recalibrate else [])
+                        + (['--visual-retention-hz','5'] if sampled else []))
     if finalization_disk_error:
         from experiments.ppal.progress_supervision import ObservationFailure
         with pytest.raises(ObservationFailure,match='disk full'):play.main()
@@ -138,6 +139,12 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     from memory.evidence import EvidenceJournal
     recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
     captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+    if sampled:
+        observations=recording.category_records('observation','camera_observation')
+        assert len(observations)>len(captures)
+        assert recording.category_records('observation','detector_trace')
+        assert recording.category_records('observation','perception_trace')
+        assert report['recording_pipeline']['visual_contract']=='sampled-visual-v1'
     assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
     recording.verify()
     predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
@@ -230,3 +237,8 @@ def test_real_player_confirmed_terminal_completion(monkeypatch,tmp_path):
 def test_finalization_storage_error_releases_before_any_disk_logging(monkeypatch,tmp_path):
     test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
         False,False,False,False,False,False,False,False,finalization_disk_error=True)
+
+
+def test_normal_player_opt_in_sampled_trace_uses_existing_chooser(monkeypatch,tmp_path):
+    test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+        False,False,False,False,False,False,False,False,sampled=True)

@@ -96,8 +96,20 @@ def recording_completion(root):
         rows=journal.records();captures=journal.category_records('observation','camera_capture')
         observations=journal.category_records('observation','camera_observation')
         bindings={r.data['payload'].get('observation_id') for r in captures}
-        if any(r.id not in bindings for r in observations):
-            raise IdentityIntegrityError('observation has no completed original frame')
+        contracts=journal.category_records('observation','camera_retention_contract')
+        sampled=bool(contracts and len(contracts)==1 and contracts[0].data['payload'].get('schema')=='sampled-visual-v1')
+        for r in observations:
+            payload=r.data['payload']
+            if payload.get('visual_contract')=='sampled-visual-v1':
+                status=payload.get('retention',{}).get('status')
+                if not sampled or status not in ('selected','not_selected','unavailable'):
+                    raise IdentityIntegrityError('invalid sampled visual contract/disposition')
+                if status=='selected' and r.id not in bindings:
+                    raise IdentityIntegrityError('selected observation has no completed original frame')
+                if status!='selected' and (r.id in bindings or payload.get('source_path') is not None):
+                    raise IdentityIntegrityError('unretained observation falsely claims original pixels')
+            elif r.id not in bindings:
+                raise IdentityIntegrityError('observation has no completed original frame')
         for row in captures:
             ref=row.data['payload']['artifact'];path=root/ref['path']
             if path.is_symlink() or path.resolve().parent!=(root/'observations').resolve() or hashlib.sha256(path.read_bytes()).hexdigest()!=ref['sha256']:

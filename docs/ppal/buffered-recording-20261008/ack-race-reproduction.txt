@@ -1,0 +1,5 @@
+Pre-publication candidate recorder: completion Future was acknowledged before capacity counters decreased.
+Forced acknowledgement interleaving reproduced: deque index out of range.
+Corrected recorder releases counters before acknowledgement.
+Final forced-interleaving regression and full suite pass; see test_acknowledged_completion_releases_capacity_before_next_preflight_capture.
+No source experience or native record was modified.

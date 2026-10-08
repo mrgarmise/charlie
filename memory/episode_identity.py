@@ -88,9 +88,60 @@ def content_identity(root, artifacts):
     return 'content:'+digest(core)
 
 
+def recording_completion(root):
+    """Compute an exact writer-owned receipt only after writer termination."""
+    from .evidence import EvidenceJournal
+    root=Path(root);journal=EvidenceJournal(root/'session-evidence.sqlite3',read_only=True)
+    try:
+        rows=journal.records();captures=journal.category_records('observation','camera_capture')
+        observations=journal.category_records('observation','camera_observation')
+        bindings={r.data['payload'].get('observation_id') for r in captures}
+        if any(r.id not in bindings for r in observations):
+            raise IdentityIntegrityError('observation has no completed original frame')
+        for row in captures:
+            ref=row.data['payload']['artifact'];path=root/ref['path']
+            if path.is_symlink() or path.resolve().parent!=(root/'observations').resolve() or hashlib.sha256(path.read_bytes()).hexdigest()!=ref['sha256']:
+                raise IdentityIntegrityError('recorded pixels corrupt or missing')
+        if list((root/'observations').glob('*.pending')):
+            raise IdentityIntegrityError('interrupted image publication remains')
+        names=['session-evidence.sqlite3']+[r.data['payload']['artifact']['path'] for r in captures]
+        names += [name for name in ('steps.jsonl','agency.jsonl') if (root/name).exists()]
+        body=dict(schema='charlie-writer-completion-v1',records=len(rows),captures=len(captures),
+            last_record_id=rows[-1].id if rows else None,
+            artifacts={name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in sorted(names)})
+        return dict(body,sha256=digest(body))
+    finally:journal.close()
+
+
+def verify_recording_completion(root):
+    """New buffered captures fail closed; historical captures are untouched."""
+    root=Path(root);path=root/'recording-state.json'
+    if not path.exists():
+        report_path=root/'report.json'
+        report=json.loads(report_path.read_text()) if report_path.exists() else {}
+        if report.get('recording_pipeline',{}).get('schema')=='charlie-buffered-recording-v1':
+            raise IdentityIntegrityError('buffered writer completion marker missing')
+        journal_path=root/'session-evidence.sqlite3'
+        if journal_path.exists():
+            from .evidence import EvidenceJournal
+            original=EvidenceJournal(journal_path,read_only=True)
+            try:
+                if original.category_records('observation','camera_observation'):
+                    raise IdentityIntegrityError('buffered writer marker missing for new observation records')
+            finally:original.close()
+        return None # Older source packages have no new writer claim.
+    state=json.loads(path.read_text())
+    if state.get('schema')!='charlie-buffered-recording-v1' or state.get('status')!='complete':
+        raise IdentityIntegrityError('buffered writer incomplete; exclude from sealing/evaluation')
+    if state.get('completion')!=recording_completion(root):
+        raise IdentityIntegrityError('buffered writer completion receipt inconsistent')
+    return state
+
+
 def finalize_capture(root):
     root = Path(root)
     origin = begin_capture(root)
+    verify_recording_completion(root)
     artifacts = artifact_manifest(root)
     if 'report.json' not in artifacts:
         raise IdentityIntegrityError('capture finalization requires a completed report')
@@ -106,6 +157,7 @@ def finalize_capture(root):
 def inspect_capture(root):
     """Read only. Missing legacy identifiers are derived in the journal, not source."""
     root = Path(root).resolve()
+    verify_recording_completion(root)
     artifacts = artifact_manifest(root)
     origin = None
     if (root/(ORIGIN+'.pending')).exists() and not (root/ORIGIN).exists():

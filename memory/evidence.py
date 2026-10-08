@@ -41,6 +41,17 @@ class EvidenceRecord:
         return json.loads(self.document)
 
 
+@dataclass(frozen=True)
+class PreparedEvidence:
+    """Immutable enqueue-time document; not a durable commitment receipt."""
+    id: str
+    document: str
+
+    @property
+    def data(self):
+        return json.loads(self.document)
+
+
 class EvidenceJournal:
     """One bounded episode's lab notebook, separate from selective MARM stores."""
 
@@ -165,6 +176,48 @@ class EvidenceJournal:
             "json_extract(document,'$.kind')='resolution' AND "
             "json_extract(document,'$.payload.prediction_id')=?", (prediction_id,)).fetchone()
         return EvidenceRecord(*row) if row else None
+
+    @staticmethod
+    def prepare_observation(payload, *, episode, at, sources=(), producer, version, provenance=None):
+        return EvidenceJournal._prepare('observation',payload,episode=episode,at=at,
+            sources=sources,producer=producer,version=version,provenance=provenance)
+
+    @staticmethod
+    def prepare_buffered_prediction(expected, *, episode, at, deadline, sources, producer, version):
+        if abs(time.monotonic()-at)>.1 or not sources or not math.isfinite(deadline) or deadline<=at:
+            raise ValueError('buffered forecast must be prepared now with evidence and future horizon')
+        return EvidenceJournal._prepare('prediction',dict(expected=expected,deadline=deadline,
+            mode='buffered_live_prospective',durability='RAM at enqueue; durable only after verified writer completion'),
+            episode=episode,at=at,sources=sources,producer=producer,version=version)
+
+    @staticmethod
+    def _prepare(kind,payload,*,episode,at,sources,producer,version,provenance=None):
+        if not episode or not producer or not version or (at is not None and (not math.isfinite(at) or at<0)):
+            raise ValueError('invalid buffered evidence metadata')
+        document=canonical(dict(schema=SCHEMA,kind=kind,episode=episode,at=at,sources=list(sources),
+            producer=producer,version=version,provenance=provenance or {},payload=payload))
+        return PreparedEvidence(hashlib.sha256(document.encode()).hexdigest(),document)
+
+    def commit_prepared(self, prepared):
+        """Writer commits a frozen FIFO document; delayed receipt is explicit."""
+        if not isinstance(prepared,PreparedEvidence) or digest(prepared.data)!=prepared.id:
+            raise ValueError('invalid prepared document')
+        d=prepared.data
+        if d.get('schema')!=SCHEMA or set(d)!={'schema','kind','episode','at','sources','producer','version','provenance','payload'}:
+            raise ValueError('invalid prepared schema')
+        if d['kind']=='prediction':
+            p=d['payload']
+            if (p.get('mode')!='buffered_live_prospective' or not d['sources']
+                    or not math.isfinite(p['deadline']) or p['deadline']<=d['at']):
+                raise ValueError('valid buffered horizon and sources required')
+            latest=self.conn.execute("SELECT MAX(json_extract(document,'$.at')) FROM records WHERE json_extract(document,'$.kind')='observation' AND json_extract(document,'$.episode')=?",(d['episode'],)).fetchone()[0]
+            if latest is not None and latest>d['at']:raise ValueError('buffered prediction behind later observation')
+            for ref in d['sources']:
+                at=self.get(ref).data['at']
+                if at is not None and at>d['at']:raise ValueError('buffered forecast depends on future evidence')
+        elif d['kind']!='observation':raise ValueError('unsupported prepared kind')
+        return self._append(d['kind'],d['payload'],episode=d['episode'],at=d['at'],sources=d['sources'],
+            producer=d['producer'],version=d['version'],provenance=d['provenance'])
 
     def append(self, kind, payload, *, episode, at=None, sources=(), producer,
                version, provenance=None):

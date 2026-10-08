@@ -37,7 +37,7 @@ def test_orphaned_capture_survives_without_fake_observation(tmp_path):
     r.capture(Image.new('RGB',(32,32),'white'),dict(timestamp=1));r.close()
     assert (tmp_path/'observations/camera-000007.png').read_bytes()==before
     j=EvidenceJournal(tmp_path/'session-evidence.sqlite3',read_only=True)
-    assert len(j.records())==1 and j.records()[0].data['payload']['sample']==8;j.close()
+    assert len(j.category_records('observation','camera_capture'))==1 and j.category_records('observation','camera_capture')[0].data['payload']['sample']==8;j.close()
 
 
 def test_actual_sensory_preflight_bounded_optics_and_quality(monkeypatch,tmp_path):
@@ -89,7 +89,7 @@ def test_live_prediction_history_enters_existing_acquisition_once(tmp_path):
     before=[row.id for row in j.records()]
     assert import_episode(root,j)==episode and [row.id for row in j.records()]==before
     assert len(j.records('episode'))==1
-    assert j.get(prediction).data['payload']['mode']=='live_prospective'
+    assert j.get(prediction).data['payload']['mode']=='buffered_live_prospective'
     assert j.records('resolution')[0].data['payload']['result']=='contradicted'
     j.verify();j.close()
 

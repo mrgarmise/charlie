@@ -23,7 +23,7 @@ CHARLIE_POLICY_TIMING_OUTPUT="$report/policy-latency.json" CHARLIE_IDENTITY_ACCE
   tests/test_archive_qualification.py tests/test_meditation_candidate.py \
   tests/test_robotron_score_comparison.py tests/test_development_resources.py \
   tests/test_development_efficiency.py tests/test_development_profile.py \
-  tests/test_controller_sandbox.py tests/test_robotron_exploration.py tests/test_sensory_recording.py \
+  tests/test_controller_sandbox.py tests/test_robotron_exploration.py tests/test_sensory_recording.py tests/test_buffered_recording.py \
   tests/test_real_time_tactical_learning.py tests/test_robotron_agency_integration.py -q --junitxml="$report/native-regression.xml" \
   | tee "$report/native-regression.txt"
 args=(--offline --learning-state "$state" --episode-root "$roots"

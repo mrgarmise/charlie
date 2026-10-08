@@ -457,6 +457,9 @@ def main():
     parser.add_argument('--observer-context', type=Path, help='optional display-only project context; never policy input')
     parser.add_argument('--learned-semantics',type=Path,help='separately authorized, independently validated candidate-crop activation manifest')
     parser.add_argument('--learned-policy',type=Path,help='qualified local PPAL decision policy; current acceptance is offline only')
+    parser.add_argument('--evidence-frame-capacity',type=int,default=16)
+    parser.add_argument('--evidence-record-capacity',type=int,default=512)
+    parser.add_argument('--evidence-memory-mib',type=int,default=128)
     args = parser.parse_args()
     screen_classifier=classify_screen_state
     if args.title_reference:
@@ -467,6 +470,9 @@ def main():
 
     if args.seconds is not None and (not math.isfinite(args.seconds) or not 1 <= args.seconds <= 3600):
         parser.error("--seconds must be 1..3600")
+    if not (1<=args.evidence_frame_capacity<=64 and args.evidence_frame_capacity<=args.evidence_record_capacity<=4096
+            and 16<=args.evidence_memory_mib<=512):
+        parser.error('evidence budgets require frames 1..64, records frames..4096, memory 16..512 MiB')
     if not math.isfinite(args.uncertainty_seconds) or not 10 <= args.uncertainty_seconds <= 300:
         parser.error("--uncertainty-seconds must be 10..300")
     if not 30 <= args.pulse_ms <= 200:
@@ -610,8 +616,7 @@ def main():
                                   "candidates": _pair_evidence(visual_agency.pairs)})
         if progress: progress.perception()
         agency_samples += 1
-        with (args.output / "agency.jsonl").open("a") as stream:
-            stream.write(json.dumps(row) + "\n")
+        recorder.append_line(args.output/'agency.jsonl',row)
         if snapshot["event"]:
             print(f"AGENCY {snapshot['event'].upper()}: self={snapshot['self_track_id']} "
                   f"candidate={snapshot['candidate_track_id']} confidence={snapshot['confidence']:.2f} "
@@ -649,11 +654,14 @@ def main():
                   'knowledge_sha256':hashlib.sha256(args.knowledge.read_bytes()).hexdigest()}
     from .progress_evidence import CaptureEvidence
     try:
-        recorder=CaptureEvidence(args.output,diary.capture_origin['capture_id'],provenance)
+        recorder=CaptureEvidence(args.output,diary.capture_origin['capture_id'],provenance,
+            capacity=args.evidence_frame_capacity,record_capacity=args.evidence_record_capacity,
+            byte_capacity=args.evidence_memory_mib*1024*1024)
     except BaseException:
         source.close()
         raise
     source.recorder=recorder
+    rows.recorder=recorder
     mark('evidence_recording_started',journal='session-evidence.sqlite3',scope='recording session, not verified game')
     def new_controller():
         if progress: progress.enter('controller')
@@ -1199,6 +1207,7 @@ def main():
                 "self_track_id": self_tracker.player_track_id,
                 "identity_status": agency_snapshot.get("identity_status"),
                 "experiment": experiment_context,
+                "recording_pipeline":recorder.telemetry(),
                 "tactical_learning":dict(plan=hindbrain.tactical_plan,outcome=tactical_outcome,
                     prediction_id=tactical_prediction_id,decision_ns=decision_ns,
                     feedback_persistence_ns=feedback_persistence_ns,prediction_persistence_ns=prediction_persistence_ns),
@@ -1251,27 +1260,33 @@ def main():
             failure_kind = 'player_failure'
         raise
     finally:
-        if progress: progress.enter('finalizing')
+        # Release controls/camera before disk-backed diaries or writer drains.
+        recording_error=None
+        if controller is not None:
+            try:controller.close()
+            except (OSError,ConnectionError):pass
+        try:source.close()
+        except Exception as exc:recording_error=f'camera close: {type(exc).__name__}: {exc}'
+        if progress:
+            try:progress.enter('finalizing')
+            except OSError as exc:recording_error=f'progress finalization: {exc}'
         timing['stopped_at'] = time.monotonic()
         start_transport = timing.get('start_transport') or {}
         ordinary = timing.get('first_ordinary_execution') or {}
         if ordinary.get('started_at') is not None and start_transport.get('write_completed_at') is not None:
             timing['start_to_first_ordinary_action_seconds'] = ordinary['started_at']-start_transport['write_completed_at']
             timing['start_to_first_ordinary_action_basis'] = 'controller action start minus START local write completion; not remote execution/display onset'
-        diary.transition(session.stop(result))
-        diary.close()
-        if controller is not None:
-            try:
-                controller.close()
-            except (OSError, ConnectionError):
-                pass
-        source.close()
-        recording_error=None
+        try:
+            diary.transition(session.stop(result));diary.close()
+        except OSError as exc:recording_error=f'diary finalization: {exc}'
         try:recorder.close()
         except Exception as exc:
             recording_error=f'{type(exc).__name__}: {exc}'
             result='ERROR: evidence finalization failed; original partial records retained'
-        if progress: progress.enter('finalizing')
+        if recording_error:result='ERROR: evidence finalization failed; original partial records retained'
+        if progress:
+            try:progress.enter('finalizing')
+            except OSError:pass
         if publisher is not None:
             publisher.close()
         if semantic_observer is not None:
@@ -1303,6 +1318,8 @@ def main():
                   "sensory_preflight":locals().get('sensory_report'),
                   "session_evidence":"session-evidence.sqlite3",
                   "recording_error":recording_error,
+                  "recording_pipeline":recorder.telemetry(),
+                  "prediction_commitment_mode":"buffered_live_prospective",
                   "calibration_mode": locals().get("calibration_mode"),
                   "exposure_preflight": locals().get("exposure_preflight"),
                   "calibration": {"corners":getattr(locals().get("calibration"), "corners", None),
@@ -1330,7 +1347,7 @@ def main():
         from learning.foundry import atomic_json
         atomic_json(args.output / "report.json", report)
         from memory.episode_identity import finalize_capture
-        finalize_capture(args.output)
+        if recording_error is None:finalize_capture(args.output)
         print(f"Evidence: {args.output}/report.json")
         if recording_error:
             import sys

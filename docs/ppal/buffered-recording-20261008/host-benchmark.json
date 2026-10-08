@@ -1,0 +1,379 @@
+{
+  "schema": "charlie-buffered-benchmark-v1",
+  "revision": "54002c41eabe5da3e1db7f56df84816649e005a6",
+  "dirty_worktree": true,
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "hardware_model": null,
+    "logical_cpus": 9,
+    "meminfo": "MemTotal:       10206508 kB\nMemFree:         7167628 kB\nMemAvailable:    9511736 kB\nBuffers:           37092 kB\nCached:          2484080 kB\nSwapCached:            0 kB\nActive:           490564 kB\nInactive:        2101216 kB\nActive(anon):         80 kB\nInactive(anon):   100412 kB\nActive(file):     490484 kB\nInactive(file):  2000804 kB\nUnevictable:       29920 kB\nMlocked:               0 kB\nSwapTotal:             0 kB\nSwapFree:              0 kB\nDirty:             74148 kB\nWriteback:             0 kB\nAnonPages:        100472 kB\nMapped:            71264 kB\nShmem:                12 kB\nKReclaimable:     163836 kB\nSlab:             220396 kB\nSReclaimable:     163836 kB\nSUnreclaim:        56560 kB\nKernelStack:        3356 kB\nPageTables:         3580 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     5103252 kB\nCommitted_AS:     450312 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:        4616 kB\nVmallocChunk:          0 kB\nPercpu:             2736 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:     30720 kB\nFilePmdMapped:         0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:      262144 kB\nDirectMap2M:     5175296 kB\nDirectMap1G:    15728640 kB\n"
+  },
+  "baseline_revision": "70e5b714f0d2ddad72fc2f4792032fd22f99963e",
+  "baseline_module_sha256": "1a9d25f56f7ffa8c6ff375c88b8dc7b72e3279f05e91e28ad6e324dce1d30a89",
+  "source_sha256": "60a53ec71812431a4edb5e8a5524da104a66f7e8a16ccca62362572ff173c2bb",
+  "code_sha256": {
+    "experiments/ppal/progress_evidence.py": "0983640c53ee2961cfd65a0207240611cbd0ae03b283558b6faf7be6a12c3f09",
+    "memory/evidence.py": "a1869634407f5e355925bf1f10077ff585130b409d702f0ccfd910695053748b",
+    "memory/episode_identity.py": "e99573c9a30cf305c47274145c98c12fd99d6aed13321d4049e1900728e5a13e",
+    "/workspace/scratch/c81a2d35e2bc/charlie-freedom/tools/benchmark_buffered_recording.py": "06821e7301e02035df6ca54375edfc829b455221fba07b78785b2114d83ed031"
+  },
+  "cases": [
+    {
+      "case": "baseline-normal",
+      "camera": "repeated authentic failed-start pixels; simulated acquisition",
+      "wall_seconds": 1.986942581999756,
+      "cpu_seconds": 1.6973061269999998,
+      "peak_process_rss_kib": 31560,
+      "system_core_busy_percent": {
+        "cpu": 9.664804469273744,
+        "cpu0": 83.41708542713567,
+        "cpu1": 1.492537313432836,
+        "cpu2": 0.5025125628140703,
+        "cpu3": 0.0,
+        "cpu4": 0.0,
+        "cpu5": 0.0,
+        "cpu6": 0.0,
+        "cpu7": 0.0,
+        "cpu8": 3.0
+      },
+      "acquisition_including_snapshot": {
+        "samples": 20,
+        "median_ns": 1846169.0,
+        "p95_ns": 4561137,
+        "p99_ns": 4561137,
+        "max_ns": 5943016
+      },
+      "tactical": {
+        "samples": 20,
+        "median_ns": 72601.0,
+        "p95_ns": 207869,
+        "p99_ns": 207869,
+        "max_ns": 249047
+      },
+      "decision_path_including_record_enqueue": {
+        "samples": 20,
+        "median_ns": 84328635.0,
+        "p95_ns": 87589342,
+        "p99_ns": 87589342,
+        "max_ns": 92006441
+      },
+      "writer_frame_service": {
+        "samples": 20,
+        "median_ns": 81034140.5,
+        "p95_ns": 84639076,
+        "p99_ns": 84639076,
+        "max_ns": 84705507
+      },
+      "encoding": {
+        "samples": 20,
+        "median_ns": 79186534.5,
+        "p95_ns": 82973918,
+        "p99_ns": 82973918,
+        "max_ns": 83180860
+      },
+      "completed_frames": 20,
+      "sustained_completed_frames_per_second": 10.0657161315004,
+      "acquisition_pauses": 0,
+      "pipeline": {
+        "frame_capacity": 4,
+        "legacy_prediction_wait": true
+      },
+      "exposure": {
+        "first_timestamp": 6835.313572396,
+        "last_timestamp": 6837.210821974,
+        "latest_capture_metadata": null
+      },
+      "failure": null,
+      "controller_commands": 0,
+      "independently_qualified_findings": 0
+    },
+    {
+      "case": "buffered-normal",
+      "camera": "repeated authentic failed-start pixels; simulated acquisition",
+      "wall_seconds": 2.027894364000531,
+      "cpu_seconds": 2.336831977,
+      "peak_process_rss_kib": 53636,
+      "system_core_busy_percent": {
+        "cpu": 12.903225806451612,
+        "cpu0": 85.14851485148515,
+        "cpu1": 3.9215686274509802,
+        "cpu2": 3.4482758620689653,
+        "cpu3": 3.4482758620689653,
+        "cpu4": 3.4482758620689653,
+        "cpu5": 2.9702970297029703,
+        "cpu6": 3.4482758620689653,
+        "cpu7": 3.4482758620689653,
+        "cpu8": 7.729468599033816
+      },
+      "acquisition_including_snapshot": {
+        "samples": 20,
+        "median_ns": 1067304.0,
+        "p95_ns": 2486396,
+        "p99_ns": 2486396,
+        "max_ns": 4526708
+      },
+      "tactical": {
+        "samples": 20,
+        "median_ns": 74665.0,
+        "p95_ns": 88757,
+        "p99_ns": 88757,
+        "max_ns": 93896
+      },
+      "decision_path_including_record_enqueue": {
+        "samples": 20,
+        "median_ns": 1360733.0,
+        "p95_ns": 2769928,
+        "p99_ns": 2769928,
+        "max_ns": 4825788
+      },
+      "writer_frame_service": {
+        "samples": 20,
+        "median_ns": 81435170.5,
+        "p95_ns": 96464392,
+        "p99_ns": 96464392,
+        "max_ns": 108605033
+      },
+      "encoding": {
+        "samples": 20,
+        "median_ns": 79223408.0,
+        "p95_ns": 94379538,
+        "p99_ns": 94379538,
+        "max_ns": 105699021
+      },
+      "completed_frames": 20,
+      "sustained_completed_frames_per_second": 9.862446661444917,
+      "acquisition_pauses": 0,
+      "pipeline": {
+        "accepted": 99,
+        "written": 99,
+        "captures_written": 20,
+        "max_occupancy": 10,
+        "max_bytes": 5534221,
+        "backpressure": 0,
+        "enqueue_ns": 15103243,
+        "encode_ns": 1643099610,
+        "write_ns": 35358854,
+        "occupancy": 0,
+        "frame_occupancy": 0,
+        "buffered_bytes": 0,
+        "record_capacity": 512,
+        "frame_capacity": 16,
+        "byte_capacity": 134217728,
+        "emergency_slots": 1,
+        "schema": "charlie-buffered-recording-v1",
+        "worker_encoding_allowance_bytes": 5529600,
+        "emergency_byte_allowance": 2764800,
+        "throughput_records_per_second": 47.47235366207409,
+        "writer_error": null,
+        "paused": false,
+        "recovery": {
+          "previous_status": null,
+          "interrupted_flush": false,
+          "uncommitted_tail": null
+        },
+        "writer_alive": false
+      },
+      "exposure": {
+        "first_timestamp": 6837.385608882,
+        "last_timestamp": 6839.284132115,
+        "latest_capture_metadata": null
+      },
+      "failure": null,
+      "controller_commands": 0,
+      "independently_qualified_findings": 0
+    },
+    {
+      "case": "buffered-burst",
+      "camera": "repeated authentic failed-start pixels; simulated acquisition",
+      "wall_seconds": 1.7713786829999663,
+      "cpu_seconds": 1.8192490880000003,
+      "peak_process_rss_kib": 111236,
+      "system_core_busy_percent": {
+        "cpu": 11.565053425518542,
+        "cpu0": 96.61016949152543,
+        "cpu1": 0.0,
+        "cpu2": 0.0,
+        "cpu3": 0.0,
+        "cpu4": 0.0,
+        "cpu5": 0.5617977528089888,
+        "cpu6": 0.0,
+        "cpu7": 0.0,
+        "cpu8": 6.818181818181818
+      },
+      "acquisition_including_snapshot": {
+        "samples": 20,
+        "median_ns": 2136070.0,
+        "p95_ns": 4144050,
+        "p99_ns": 4144050,
+        "max_ns": 5795283
+      },
+      "tactical": {
+        "samples": 19,
+        "median_ns": 50123,
+        "p95_ns": 100048,
+        "p99_ns": 100048,
+        "max_ns": 1462288
+      },
+      "decision_path_including_record_enqueue": {
+        "samples": 19,
+        "median_ns": 2323200,
+        "p95_ns": 5090633,
+        "p99_ns": 5090633,
+        "max_ns": 6045131
+      },
+      "writer_frame_service": {
+        "samples": 20,
+        "median_ns": 81971022.0,
+        "p95_ns": 89928456,
+        "p99_ns": 89928456,
+        "max_ns": 106075483
+      },
+      "encoding": {
+        "samples": 20,
+        "median_ns": 79816652.0,
+        "p95_ns": 87330290,
+        "p99_ns": 87330290,
+        "max_ns": 103733747
+      },
+      "completed_frames": 20,
+      "sustained_completed_frames_per_second": 11.290640556952203,
+      "acquisition_pauses": 1,
+      "pipeline": {
+        "accepted": 94,
+        "written": 94,
+        "captures_written": 20,
+        "max_occupancy": 79,
+        "max_bytes": 44273166,
+        "backpressure": 1,
+        "enqueue_ns": 9930078,
+        "encode_ns": 1634838743,
+        "write_ns": 36616672,
+        "occupancy": 0,
+        "frame_occupancy": 0,
+        "buffered_bytes": 0,
+        "record_capacity": 512,
+        "frame_capacity": 16,
+        "byte_capacity": 134217728,
+        "emergency_slots": 1,
+        "schema": "charlie-buffered-recording-v1",
+        "worker_encoding_allowance_bytes": 5529600,
+        "emergency_byte_allowance": 2764800,
+        "throughput_records_per_second": 52.78627159896237,
+        "writer_error": null,
+        "paused": false,
+        "recovery": {
+          "previous_status": null,
+          "interrupted_flush": false,
+          "uncommitted_tail": null
+        },
+        "writer_alive": false
+      },
+      "exposure": {
+        "first_timestamp": 6839.449793667,
+        "last_timestamp": 6840.931334174,
+        "latest_capture_metadata": null
+      },
+      "failure": null,
+      "controller_commands": 0,
+      "independently_qualified_findings": 0
+    },
+    {
+      "case": "buffered-slow-storage",
+      "camera": "repeated authentic failed-start pixels; simulated acquisition",
+      "wall_seconds": 3.7609011120002833,
+      "cpu_seconds": 1.795923881000001,
+      "peak_process_rss_kib": 111236,
+      "system_core_busy_percent": {
+        "cpu": 5.43253616770003,
+        "cpu0": 45.333333333333336,
+        "cpu1": 0.26595744680851063,
+        "cpu2": 0.0,
+        "cpu3": 0.0,
+        "cpu4": 0.0,
+        "cpu5": 0.0,
+        "cpu6": 0.0,
+        "cpu7": 0.0,
+        "cpu8": 3.674540682414698
+      },
+      "acquisition_including_snapshot": {
+        "samples": 20,
+        "median_ns": 1925070.0,
+        "p95_ns": 2278316,
+        "p99_ns": 2278316,
+        "max_ns": 4292759
+      },
+      "tactical": {
+        "samples": 20,
+        "median_ns": 73698.0,
+        "p95_ns": 99256,
+        "p99_ns": 99256,
+        "max_ns": 223538
+      },
+      "decision_path_including_record_enqueue": {
+        "samples": 20,
+        "median_ns": 2210209.0,
+        "p95_ns": 2693403,
+        "p99_ns": 2693403,
+        "max_ns": 4531175
+      },
+      "writer_frame_service": {
+        "samples": 20,
+        "median_ns": 183443930.0,
+        "p95_ns": 187541283,
+        "p99_ns": 187541283,
+        "max_ns": 192902368
+      },
+      "encoding": {
+        "samples": 20,
+        "median_ns": 80733288.0,
+        "p95_ns": 85017577,
+        "p99_ns": 85017577,
+        "max_ns": 90273685
+      },
+      "completed_frames": 20,
+      "sustained_completed_frames_per_second": 5.317874467952374,
+      "acquisition_pauses": 0,
+      "pipeline": {
+        "accepted": 99,
+        "written": 99,
+        "captures_written": 20,
+        "max_occupancy": 50,
+        "max_bytes": 27671099,
+        "backpressure": 0,
+        "enqueue_ns": 16677524,
+        "encode_ns": 1621059576,
+        "write_ns": 38617459,
+        "occupancy": 0,
+        "frame_occupancy": 0,
+        "buffered_bytes": 0,
+        "record_capacity": 512,
+        "frame_capacity": 16,
+        "byte_capacity": 134217728,
+        "emergency_slots": 1,
+        "schema": "charlie-buffered-recording-v1",
+        "worker_encoding_allowance_bytes": 5529600,
+        "emergency_byte_allowance": 2764800,
+        "throughput_records_per_second": 26.254168539420515,
+        "writer_error": null,
+        "paused": false,
+        "recovery": {
+          "previous_status": null,
+          "interrupted_flush": false,
+          "uncommitted_tail": null
+        },
+        "writer_alive": false
+      },
+      "exposure": {
+        "first_timestamp": 6841.261315469,
+        "last_timestamp": 6843.160394486,
+        "latest_capture_metadata": null
+      },
+      "failure": null,
+      "controller_commands": 0,
+      "independently_qualified_findings": 0
+    }
+  ],
+  "limitations": "No physical gameplay; tactical states controlled fixtures even with native camera. CPU counters include OS load; RSS cumulative high water. No inference/transport or complete-game score qualification."
+}

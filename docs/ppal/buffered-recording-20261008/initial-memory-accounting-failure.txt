@@ -1,0 +1,48 @@
+...F.....................................                                [100%]
+=================================== FAILURES ===================================
+________________ test_memory_and_record_budgets_are_independent ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_memory_and_record_budgets0')
+
+    def test_memory_and_record_budgets_are_independent(tmp_path):
+        r=CaptureEvidence(tmp_path,'simulation',{},capacity=10,record_capacity=10,byte_capacity=10000);r.ready()
+        entered,release=hold_writer(r)
+        try:
+            r.capture(Image.new('RGB',(40,40)),dict(timestamp=time.monotonic()));assert entered.wait(1)
+>           r.capture(Image.new('RGB',(40,40)),dict(timestamp=time.monotonic()))
+
+tests/test_buffered_recording.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/progress_evidence.py:150: in capture
+    self._submit(self._capture,(image.copy(),prepared,self.count),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.progress_evidence.CaptureEvidence object at 0x7f63cc56c770>
+fn = <function hold_writer.<locals>.slow at 0x7f63cc56a8e0>
+args = (<PIL.Image.Image image mode=RGB size=40x40 at 0x7F63CC56D430>, PreparedEvidence(id='21ddcdcb057b4333678749e9742b5fec0...0002.png"},"producer":"ObservedCamera","provenance":{},"schema":"charlie-evidence-v1","sources":[],"version":"2"}'), 2)
+size = 5218, is_frame = True
+
+    def _submit(self,fn,args,*,size=0,is_frame=False):
+        item=(Future(),fn,args,size,is_frame)
+        if size>self.byte_capacity:
+            self._recovery_gap=True
+            raise ValueError('required record exceeds memory budget; recording incomplete')
+        if self._closed or self._inspection:raise RuntimeError('completed recorder is immutable')
+        if self.overflow:raise RuntimeError('recording paused; drain before new observations')
+        with self._lock:
+            full=(self._records>=self.record_capacity or self._bytes+size>self.byte_capacity or
+                  (is_frame and self._frames>=self.capacity))
+        if full and self.preparing:
+            self.pending[0].result(timeout=self.flush_timeout);self._collect()
+            return self._submit(fn,args,size=size,is_frame=is_frame)
+        if full or self._fatal:
+            self.overflow=item
+            with self._lock:self._stats['backpressure']+=1
+            from .progress_supervision import ObservationFailure
+>           raise ObservationFailure('evidence writer saturated or failed; controls must pause; emergency item retained')
+E           experiments.ppal.progress_supervision.ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained
+
+experiments/ppal/progress_evidence.py:123: ObservationFailure
+=========================== short test summary info ============================
+FAILED tests/test_buffered_recording.py::test_memory_and_record_budgets_are_independent
+1 failed, 40 passed in 17.47s

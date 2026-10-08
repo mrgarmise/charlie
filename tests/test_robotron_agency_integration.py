@@ -14,7 +14,7 @@ from experiments.ppal.robotron_agency import VECTORS
                           (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
                           (False,False,False,False,False,False,False,True)])
 
-def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False,finalization_disk_error=False):
     from experiments.ppal import play_robotron as play
     import time as real_time
     real_sleep=real_time.sleep
@@ -112,12 +112,23 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
         plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
         (tmp_path/'plan.json').write_text(json.dumps(plan))
+    if finalization_disk_error:
+        transition=play.GameDiary.transition
+        def faulty_diary(self,change):
+            if change and change.new=='stopped':
+                assert closed==['controller','camera']
+                raise OSError('simulated finalization disk full')
+            return transition(self,change)
+        monkeypatch.setattr(play.GameDiary,'transition',faulty_diary)
     monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
                         + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
                         + (['--bootstrap-body-fire'] if bootstrap else [])
                         + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
                         + (['--recalibrate'] if recalibrate else []))
-    if fail_during_play:
+    if finalization_disk_error:
+        from experiments.ppal.progress_supervision import ObservationFailure
+        with pytest.raises(ObservationFailure,match='disk full'):play.main()
+    elif fail_during_play:
         with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
     else:
         play.main()
@@ -199,6 +210,9 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     elif terminal:
         from experiments.ppal.marathon_robotron import safe_to_restart
         assert safe_to_restart(report)
+    elif finalization_disk_error:
+        assert 'disk full' in report['recording_error']
+        assert not (tmp_path/'run/capture-manifest.json').exists()
     else:
         assert report['result'].startswith('ERROR:') if fail_during_play else report['result']=='DIAGNOSTIC LIMIT'
 
@@ -211,3 +225,8 @@ def test_real_player_loop_has_no_default_duration_limit(monkeypatch,tmp_path):
 def test_real_player_confirmed_terminal_completion(monkeypatch,tmp_path):
     test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
         False,False,False,False,False,False,True,False,terminal=True)
+
+
+def test_finalization_storage_error_releases_before_any_disk_logging(monkeypatch,tmp_path):
+    test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+        False,False,False,False,False,False,False,False,finalization_disk_error=True)

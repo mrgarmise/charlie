@@ -23,6 +23,52 @@ from .eyes.calibration import Calibration
 from .eyes.settle import locate
 
 
+def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
+    """Reuse current camera owner/geometry/focus/exposure; no motion authority.
+
+    White balance settles and locks measured gains only. Without an independent
+    color chart we explicitly cannot qualify absolute color fidelity.
+    """
+    from dataclasses import asdict
+    from learning.foundry import atomic_json
+    from .eyes.exposure import optimize_screen_exposure, screen_evidence
+    started=time.monotonic();deadline=started+timeout
+    class BoundedSource:
+        def read(self):
+            if time.monotonic()>=deadline:raise ValueError('sensory preflight deadline; assistance required')
+            return source.read()
+        def __getattr__(self,name):return getattr(source,name)
+    bounded=BoundedSource()
+    report=dict(status='preparing',started_at=started,physical_motion=False,
+                color_fidelity='unqualified without an independent color reference')
+    try:
+        exposure=optimize_screen_exposure(bounded,output)
+        report['exposure']=exposure
+        seed=seed_position if seed_position is not None else bounded.lens_position()
+        if seed is None:raise ValueError('focus metadata unavailable; assistance required')
+        optics=run_preflight(bounded,seed_position=seed)
+        report.update(geometry=asdict(optics.geometry),focus=asdict(optics.focus))
+        # Require actual detail, not a successful method return or zero-valued
+        # focus optimum. Limits reuse established exposure qualification.
+        frame=bounded.read()
+        import numpy as np
+        quality=screen_evidence(frame,np.array(optics.geometry.corners))
+        report['quality']=quality
+        if quality['detail_pixels']<50 or optics.focus.score<=0:
+            raise ValueError('insufficient visual detail for meaningful observation; assistance required')
+        lock=getattr(bounded,'lock_white_balance',None)
+        report['white_balance_locked']=bool(lock(source.capture)) if callable(lock) else False
+        report['status']='usable'
+        report['finished_at']=time.monotonic()
+        optics.calibration.save(output/'calibration.json')
+        return optics.calibration,report
+    except Exception as exc:
+        report.update(status='failed',reason=str(exc),finished_at=time.monotonic(),request='restore a complete readable display view')
+        raise
+    finally:
+        atomic_json(output/'sensory-preflight.json',report)
+
+
 @dataclass(frozen=True)
 class PreflightConfig:
     # Geometry must agree repeatedly before START is authorized.

@@ -141,4 +141,6 @@ class ShadowPredictor:
 
 def action_dict(action) -> dict:
     fire = "NONE" if action.fire == "STAY" else action.fire
-    return {"move": action.move, "fire": fire, "reason": action.reason}
+    result={"move": action.move, "fire": fire, "reason": action.reason}
+    if action.controls:result['controls']=list(action.controls)
+    return result

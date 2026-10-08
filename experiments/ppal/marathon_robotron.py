@@ -339,14 +339,20 @@ def safe_to_restart(report, returncode=0):
     evidence = end.get('evidence') or {}
     terminal=(report.get('result')=='GAME OVER' and end.get('state')=='game_over' and end.get('confirmed') is True
         and evidence.get('not_gameplay_streak',0)>=8 and (evidence.get('screen') or {}).get('state')=='not_gameplay'
-        and (evidence.get('screen') or {}).get('phase') in ('startable','terminal'))
+        and (evidence.get('screen') or {}).get('phase') in ('startable','terminal','title'))
     causal=evidence.get('rule')=='persistent_not_gameplay_plus_no_controlled_self' and evidence.get('agency_failures',0)>=1
     visual=(evidence.get('rule')=='gameplay_terminal_attract_sequence' and evidence.get('established_gameplay') is True
         and evidence.get('terminal_corroborated') is True and evidence.get('attract_streak',0)>=3
         and len(set(evidence.get('terminal_capture_timestamps',[])))>=3
         and len(set(evidence.get('attract_capture_timestamps',[])))>=3
         and (evidence.get('screen') or {}).get('phase')=='startable')
-    return terminal and (causal or visual)
+    title=(evidence.get('rule')=='established_gameplay_then_verified_title'
+        and evidence.get('established_gameplay') is True and evidence.get('attract_streak',0)>=3
+        and len(set(evidence.get('attract_capture_timestamps',[])))>=3
+        and (evidence.get('title_reference') or {}).get('matched') is True
+        and bool((evidence.get('title_reference') or {}).get('sha256'))
+        and (evidence.get('screen') or {}).get('phase')=='title')
+    return terminal and (causal or visual or title)
 
 
 

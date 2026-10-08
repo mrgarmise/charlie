@@ -36,6 +36,7 @@ from .episode_end import EpisodeEndObserver
 from .robotron_agency import VisualAgency
 from .score_observer import ScoreObserver
 from .observation_camera import ObservedCamera
+from .preflight import sensory_preflight
 from PIL import ImageDraw
 
 HUMANS = {"dad", "mom", "kid"}
@@ -300,13 +301,13 @@ def _pair_evidence(pairs):
     return rows
 
 
-def _initial_start_decision(source, calibration, *, timeout=4., required=3):
+def _initial_start_decision(source, calibration, *, timeout=4., required=3,classifier=classify_screen_state):
     """Positive stable pregame authorizes one START; gameplay attaches, else stop."""
     deadline=time.monotonic()+timeout
     history=[]; frames=[]; previous=None; streak=0
     while time.monotonic()<deadline:
         raw=source.read()
-        screen=classify_screen_state(calibration.apply(raw))
+        screen=classifier(calibration.apply(raw))
         phase=screen.get('phase','unknown')
         streak=streak+1 if phase==previous else 1
         previous=phase
@@ -320,7 +321,49 @@ def _initial_start_decision(source, calibration, *, timeout=4., required=3):
     return dict(action='stop',reason='no stable positive pregame or gameplay evidence',observations=history),frames
 
 
-def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.0, on_observation=None, generic_ready=False):
+def _explore_startup(source,calibration,controller,forebrain,recorder,*,timeout=30.,max_actions=32,classifier=classify_screen_state,on_control=None):
+    """Bounded permitted interactions; visual commencement is a separate gate."""
+    deadline=time.monotonic()+timeout;history=[];streak=0;last_at=None
+    for attempt in range(max_actions+3):
+        if time.monotonic()>=deadline:break
+        raw=source.read();frame=calibration.apply(raw);screen=classifier(frame)
+        fresh=last_at is None or source.timestamp>last_at;last_at=source.timestamp
+        streak=streak+1 if fresh and screen.get('phase')=='gameplay' else 0
+        if streak>=3:
+            return dict(action='attach',reason='three fresh gameplay observations after exploration',observations=history,
+                        gameplay_verified=True,exploratory_actions=len(history))
+        if screen.get('phase')=='gameplay':continue # observe commencement quietly
+        if len(history)>=max_actions:break
+        # Coarse measured scene signature is context, not a semantic label.
+        context=hashlib.sha256(frame.convert('RGB').resize((16,12)).tobytes()).hexdigest()
+        action=forebrain.exploratory_action(dict(screen,context=context))
+        prediction=dict(question=forebrain.last_reason['question'],action=action_dict(action),
+                        controls=list(action.controls),origin_at=source.timestamp,screen=screen,
+                        expectation='an observable response may occur; identity and game meaning unestablished')
+        prediction_id=recorder.event('exploratory_prediction',prediction,at=time.monotonic())
+        if action.controls:
+            for button in action.controls:
+                if on_control:on_control(button,'requested')
+                controller._command(button)
+                if on_control:on_control(button,'acknowledged')
+        else:controller.execute(action,80)
+        execution=getattr(controller,'last_execution',None)
+        recorder.event('exploratory_execution',dict(prediction_id=prediction_id,action=action_dict(action),
+            controls=list(action.controls),transport=getattr(controller,'last_command',None),execution=execution),at=time.monotonic())
+        after=calibration.apply(source.read());following=classifier(after)
+        after_context=hashlib.sha256(after.convert('RGB').resize((16,12)).tobytes()).hexdigest()
+        outcome=dict(prediction_id=prediction_id,origin_at=prediction['origin_at'],observed_at=source.timestamp,
+            controls=list(action.controls),scene_changed=after_context!=context,screen=following,
+            interpretation='visual change is association, not independently established control causation',
+            result='provisional_response' if after_context!=context else 'inconclusive',
+            proposed_sequence=[r['controls'] for r in history[-3:]]+[list(action.controls)])
+        recorder.event('exploratory_outcome',outcome,at=time.monotonic())
+        forebrain.exploratory_outcome(outcome);history.append(outcome)
+    return dict(action='wait',reason='bounded exploration ended without independently verified gameplay',
+                observations=history,gameplay_verified=False,request='additional readable observations or operator assistance')
+
+
+def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.0, on_observation=None, generic_ready=False,classifier=classify_screen_state):
     """Observe quietly after START and preserve why acquisition passed or failed."""
     deadline = time.monotonic() + timeout
     collected = []
@@ -342,7 +385,7 @@ def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.
             "candidate_count": len(pairs),
             "capture_timestamp": getattr(source, 'timestamp', None),
             "observed_at_monotonic": time.monotonic(),
-            "screen_state": classify_screen_state(playfield),
+            "screen_state": classifier(playfield),
             "stable_center": list(center) if center else None,
             "stable_appearance": list(appearance) if appearance else None,
             "candidates": _pair_evidence(pairs),
@@ -399,6 +442,9 @@ def main():
                         help="lock camera to this manual lens position after warm-up and before START")
     parser.add_argument("--start-wait", type=float, default=4.0,
                         help="seconds to wait after START for visual gameplay/self evidence")
+    parser.add_argument('--exploration-seconds',type=float,default=30.)
+    parser.add_argument('--exploration-actions',type=int,default=32)
+    parser.add_argument('--title-reference',type=Path,help='operator-verified hashed title marker declaration; no text recognition')
     parser.add_argument("--threshold", type=float, default=0.82)
     parser.add_argument("--margin", type=float, default=0.04)
     parser.add_argument("--output", type=Path)
@@ -412,6 +458,12 @@ def main():
     parser.add_argument('--learned-semantics',type=Path,help='separately authorized, independently validated candidate-crop activation manifest')
     parser.add_argument('--learned-policy',type=Path,help='qualified local PPAL decision policy; current acceptance is offline only')
     args = parser.parse_args()
+    screen_classifier=classify_screen_state
+    if args.title_reference:
+        from .robotron_screen_state import TaughtTitleReference
+        screen_classifier=TaughtTitleReference(args.title_reference).classify
+    if not 1<=args.exploration_actions<=128 or not 1<=args.exploration_seconds<=120:
+        parser.error('bounded exploration requires 1..128 actions and 1..120 seconds')
 
     if args.seconds is not None and (not math.isfinite(args.seconds) or not 1 <= args.seconds <= 3600):
         parser.error("--seconds must be 1..3600")
@@ -595,6 +647,10 @@ def main():
         revision,dirty = None,None
     provenance = {'git_commit':revision,'dirty_worktree':dirty,
                   'knowledge_sha256':hashlib.sha256(args.knowledge.read_bytes()).hexdigest()}
+    from .progress_evidence import CaptureEvidence
+    recorder=CaptureEvidence(args.output,diary.capture_origin['capture_id'],provenance)
+    source.recorder=recorder
+    mark('evidence_recording_started',journal='session-evidence.sqlite3',scope='recording session, not verified game')
     def new_controller():
         if progress: progress.enter('controller')
         instance = ArcadeController(args.host, args.port, protocol="positions")
@@ -627,35 +683,25 @@ def main():
 
         # Task-aware optics preflight runs before START, with neutral controls,
         # and never inside the time-critical tracking/score observation loop.
-        if args.recalibrate:
-            mark('exposure_started')
-            exposure_preflight = optimize_screen_exposure(source, args.output)
-            mark('exposure_finished', status=exposure_preflight.get('status'))
-
-        # Attract's striped border supplies geometry, not gameplay identity.
-        # Complete all slow optical/geometric preparation before spending a life.
         mark('calibration_started')
-        if args.recalibrate:
-            calibration = prepare(source, args.output, require_uniform_border=False)
-            calibration_mode = 'fresh_before_start'
-        else:
-            if not args.calibration.exists():
-                raise RuntimeError(f'saved calibration missing: {args.calibration}; run once with --recalibrate')
-            calibration = Calibration.load(args.calibration)
-            calibration_mode = 'saved'
-            print(f'Loaded calibration: {args.calibration}')
+        calibration,sensory_report=sensory_preflight(source,args.output,seed_position=args.focus)
+        exposure_preflight=sensory_report.get('exposure')
+        calibration_mode='fresh_session'
         mark('calibration_finished', mode=calibration_mode)
+        recorder.ready()
+        mark('evidence_ready',raw_frames=recorder.count)
         phase(SessionState.CAMERA_READY, 'optics and geometric calibration complete')
         mark('camera_ready')
 
         auto_start = args.arm and not args.no_start_game
         if auto_start:
-            decision, decision_frames = _initial_start_decision(source, calibration, timeout=args.start_wait)
+            decision, decision_frames = _initial_start_decision(source, calibration, timeout=args.start_wait,classifier=screen_classifier)
             buffered_frames.extend(decision_frames)
             mark('start_decision', decision=decision)
-            if decision['action']=='stop':
-                raise RuntimeError('initial START not authorized: '+decision['reason'])
-            auto_start = decision['action']=='start'
+            auto_start = decision['action']!='attach'
+            if auto_start:
+                decision=dict(decision,classifier_recommendation=decision['action'],action='explore',
+                    reason='usable recorded view and explicit session authority; explore permitted inputs')
             if not auto_start:
                 print('GAMEPLAY ALREADY VISIBLE: attaching without START')
         else:
@@ -663,14 +709,19 @@ def main():
             mark('start_decision', decision=decision)
         if auto_start:
             controller = new_controller()
-            phase(SessionState.STARTING, 'stable recognized pregame plus explicit --arm')
-            print('CAMERA READY; tapping Robotron START')
-            mark('start_requested')
-            controller._command('START')
-            timing['start_transport'] = getattr(controller, 'last_command', None)
-            mark('start_acknowledged')
-            phase(SessionState.WAITING_FOR_GAMEPLAY, 'START acknowledged; candidate watch is not semantic certification')
-            print('START sent; waiting for visual gameplay evidence')
+            phase(SessionState.STARTING, 'explicit session authority and usable recorded view; screen semantics may be unknown')
+            mark('exploration_started')
+            def exploratory_control(button,state):
+                if button=='START':
+                    mark('start_'+state)
+                    if state=='acknowledged':timing['start_transport']=getattr(controller,'last_command',None)
+            exploration=_explore_startup(source,calibration,controller,forebrain,recorder,
+                timeout=args.exploration_seconds,max_actions=args.exploration_actions,on_control=exploratory_control,classifier=screen_classifier)
+            recorder.event('startup_summary',exploration,at=time.monotonic())
+            mark('exploration_finished',verified=exploration['gameplay_verified'])
+            if not exploration['gameplay_verified']:
+                raise RuntimeError('exploratory startup waiting: '+exploration['reason'])
+            phase(SessionState.WAITING_FOR_GAMEPLAY, 'fresh visual commencement; controls alone never establish an episode')
 
         # Fresh temporal state belongs to this run/new START, never unreadable frames.
         try:
@@ -681,7 +732,7 @@ def main():
         if args.arm:
             player, acquisition, frames, startup_watch, gameplay_visual_frame = _wait_for_gameplay(
                 source, calibration, recognizer, args.output, timeout=args.start_wait,
-                on_observation=observe_unmeasured, generic_ready=True)
+                on_observation=observe_unmeasured, generic_ready=True,classifier=screen_classifier)
             if acquisition is None:
                 raise RuntimeError('gameplay entry unconfirmed; controls neutral')
         else:
@@ -798,7 +849,7 @@ def main():
             pending_move = None
             pending_at = None
             # Observe terminal transitions independently of a lingering SELF belief.
-            screen=classify_screen_state(playfield)
+            screen=screen_classifier(playfield)
             screen['capture_timestamp']=source.timestamp
             episode_observer.observe_phase(screen)
             if episode_observer.visual_boundary:
@@ -1163,6 +1214,11 @@ def main():
             except (OSError, ConnectionError):
                 pass
         source.close()
+        recording_error=None
+        try:recorder.close()
+        except Exception as exc:
+            recording_error=f'{type(exc).__name__}: {exc}'
+            result='ERROR: evidence finalization failed; original partial records retained'
         if progress: progress.enter('finalizing')
         if publisher is not None:
             publisher.close()
@@ -1191,6 +1247,10 @@ def main():
                   "learning_mode": "fixed_policy_with_shadow_diagnostics",
                   "auto_start": locals().get('auto_start', False),
                   "start_decision": locals().get('decision'),
+                  "exploratory_startup":locals().get('exploration'),
+                  "sensory_preflight":locals().get('sensory_report'),
+                  "session_evidence":"session-evidence.sqlite3",
+                  "recording_error":recording_error,
                   "calibration_mode": locals().get("calibration_mode"),
                   "exposure_preflight": locals().get("exposure_preflight"),
                   "calibration": {"corners":getattr(locals().get("calibration"), "corners", None),
@@ -1220,6 +1280,9 @@ def main():
         from memory.episode_identity import finalize_capture
         finalize_capture(args.output)
         print(f"Evidence: {args.output}/report.json")
+        if recording_error:
+            import sys
+            if sys.exc_info()[0] is None:raise ObservationFailure(recording_error)
 
 
 if __name__ == "__main__":

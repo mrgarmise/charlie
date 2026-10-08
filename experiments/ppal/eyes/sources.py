@@ -82,6 +82,14 @@ class PiCameraSource:
                             "AnalogueGain": float(gain)})
         return True
 
+    def lock_white_balance(self, capture: dict) -> bool:
+        picam=self.camera.picam2
+        gains=capture.get('colour_gains') if isinstance(capture,dict) else None
+        if not gains or len(gains)!=2 or not all(k in picam.camera_controls for k in ('AwbEnable','ColourGains')):
+            return False
+        picam.set_controls({'AwbEnable':False,'ColourGains':tuple(float(g) for g in gains)})
+        return True
+
     def autofocus(self) -> None:
         self.camera.autofocus()
 

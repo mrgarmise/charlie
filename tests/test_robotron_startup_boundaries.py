@@ -19,6 +19,7 @@ def test_failed_prestart_calibration_never_constructs_controller(monkeypatch,tmp
         assert kw['require_uniform_border'] is False
         raise ValueError('no stable geometry')
     monkeypatch.setattr(play,'prepare',prepare)
+    monkeypatch.setattr(play,'sensory_preflight',lambda source,output,**kw:prepare(source,output,require_uniform_border=False))
     def controller(*a,**kw):pytest.fail('No controller or START before successful geometry')
     monkeypatch.setattr(play,'ArcadeController',controller)
     monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--recalibrate','--output',str(tmp_path/'run')])

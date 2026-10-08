@@ -139,3 +139,39 @@ def classify_screen_state(playfield: Image.Image) -> dict:
     if min(border)>=.65:
         return dict(evidence,state='unknown',phase='transition',reason='border_without_active_field_evidence')
     return dict(evidence,state='unknown',reason='insufficient_screen_phase_evidence')
+
+
+class TaughtTitleReference:
+    """One operator-verified visual anchor, not inferred title/GAME OVER text."""
+    def __init__(self, declaration):
+        import json,hashlib
+        from pathlib import Path
+        from PIL import Image
+        import numpy as np
+        path=Path(declaration);d=json.loads(path.read_text())
+        if d.get('schema')!='charlie-title-reference-v1' or d.get('verified_by')!='operator':
+            raise ValueError('independently verified title reference required')
+        image=(path.parent/d['image']).resolve()
+        if not image.is_relative_to(path.parent.resolve()) or hashlib.sha256(image.read_bytes()).hexdigest()!=d['sha256']:
+            raise ValueError('title reference integrity mismatch')
+        roi=d['roi']
+        if len(roi)!=4 or not 0<=roi[0]<roi[2]<=1 or not 0<=roi[1]<roi[3]<=1:
+            raise ValueError('normalized title marker ROI required')
+        self.roi=roi;self.sha256=d['sha256'];self.threshold=d.get('maximum_normalized_error',.04)
+        if not 0<self.threshold<=.1:raise ValueError('conservative title matching bound required')
+        with Image.open(image) as im:self.template=self._sample(im)
+        if float(np.std(self.template))<.05:raise ValueError('title reference lacks discriminating detail')
+
+    def _sample(self,frame):
+        import numpy as np
+        w,h=frame.size;x0,y0,x1,y1=self.roi
+        return np.asarray(frame.convert('RGB').crop((int(w*x0),int(h*y0),int(w*x1),int(h*y1))).resize((64,32)),dtype=float)/255.
+
+    def classify(self,frame):
+        import numpy as np
+        result=classify_screen_state(frame)
+        error=float(np.mean(np.abs(self._sample(frame)-self.template)))
+        result['title_reference']=dict(sha256=self.sha256,error=error,matched=error<=self.threshold)
+        if error<=self.threshold:
+            result.update(state='not_gameplay',phase='title',reason='operator-verified title reference matched')
+        return result

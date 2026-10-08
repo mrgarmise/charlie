@@ -16,11 +16,15 @@ from experiments.ppal.robotron_agency import VECTORS
 
 def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
     from experiments.ppal import play_robotron as play
+    import time as real_time
+    real_sleep=real_time.sleep
+    start_read=[0]
     clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
     image=Image.new('RGB',(100,100))
     pending = [None]; response_reads = [0]
     class Source:
         def read(self):
+            real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
             clock[0]+=.01; reads[0]+=1
             if pending[0] is not None:
                 response_reads[0] += 1
@@ -28,8 +32,8 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
                     u = pending[0]; p = points[0]
                     points[0] = (p[0]+u[0],p[1]+u[1])
                     pending[0] = None
-            if respawn and reads[0] == 25: points[0]=(80.,80.)
-            if fail_during_play and reads[0]>28: raise RuntimeError('camera disconnected')
+            if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+            if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
             if extended and reads[0]>600: raise KeyboardInterrupt
             return image
         def close(self): closed.append('camera')
@@ -42,6 +46,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         def __init__(self,*a,**k): self.last_execution=None
         def _command(self,command):
             commands.append(command)
+            if command=='START':start_read[0]=reads[0]
             self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
         def execute(self,action,ms):
             commands.append(action)
@@ -65,7 +70,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     if rejected_challenge:
         original_player=play.VisualAgency.player.fget
         monkeypatch.setattr(play.VisualAgency,'player',property(
-            lambda self:None if reads[0]>28 else original_player(self)))
+            lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
         def reject(*a,**kw):
             challenges.append(True)
             return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
@@ -73,8 +78,8 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         monkeypatch.setattr(play,'_control_challenge',reject)
         monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
     if terminal:
-        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>28 else 'gameplay' if 'START' in commands else 'not_gameplay',
-            'phase':'terminal' if reads[0]>28 else 'gameplay' if 'START' in commands else 'startable'})
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+            'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
     if recalibrate:
         def prepare(source,output,**kwargs):
             assert 'START' not in commands
@@ -83,6 +88,11 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
             return type('Calibration',(),{'apply':lambda self,f:f})()
         monkeypatch.setattr(play,'prepare',prepare)
         monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+    def sensory(source,output,**kwargs):
+        assert 'START' not in commands
+        calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+        return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+    monkeypatch.setattr(play,'sensory_preflight',sensory)
     if experiment:
         from pathlib import Path
         from memory.evidence import EvidenceJournal
@@ -113,6 +123,12 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         play.main()
     report=json.loads((tmp_path/'run/report.json').read_text())
     t=report['session_timing']
+    assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+    from memory.evidence import EvidenceJournal
+    recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+    captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+    assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+    recording.close()
     if already_gameplay:
         assert 'START' not in commands and 'start_requested' not in t
         assert report['start_decision']['action']=='attach'
@@ -131,7 +147,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     assert any(e['kind']=='state_transition' and e['new']=='playing' for e in telemetry_events)
     assert t['first_life_lost_at'] is None
     if recalibrate:
-        assert t['start_requested']>=20. and report['calibration_mode']=='fresh_before_start'
+        assert t['start_requested']>=20. and report['calibration_mode']=='fresh_session'
     assert report['acquisition']==('provisional_body_agency' if bootstrap else 'generic_visual_agency')
     actions=[r for r in report['steps'] if 'action' in r]
     assert actions

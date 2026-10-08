@@ -1,0 +1,36 @@
+....ss.ss.ss................s..sssss.ss..ssss........................... [ 10%]
+........................................................................ [ 21%]
+.........F..............s............................................... [ 32%]
+........................................................................ [ 43%]
+........................................................................ [ 54%]
+........................................................................ [ 65%]
+........................................................................ [ 76%]
+........................................................................ [ 87%]
+........................................................................ [ 98%]
+.............                                                            [100%]
+=================================== FAILURES ===================================
+______ test_offline_failure_preserves_sources_and_live_has_no_dependency _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-5/test_offline_failure_preserves0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f5fe49dc500>
+
+    def test_offline_failure_preserves_sources_and_live_has_no_dependency(tmp_path,monkeypatch):
+        root=make_episode(tmp_path/'run')
+        original={p.name:p.read_bytes() for p in root.iterdir()}
+        j=EvidenceJournal(tmp_path/'e.sqlite3')
+        monkeypatch.setattr(j,'append',lambda *a,**kw: (_ for _ in ()).throw(OSError('disk full')))
+        with pytest.raises(OSError,match='disk full'):
+            import_episode(root,j)
+        assert {p.name:p.read_bytes() for p in root.iterdir()}==original
+        import ast
+        runner=Path(__file__).parents[1]/'experiments/ppal/play_robotron.py'
+        tree=ast.parse(runner.read_text())
+        modules=[n.module or '' for n in ast.walk(tree) if isinstance(n,ast.ImportFrom)]
+>       assert not any('episode_evidence' in m or 'memory.evidence' in m for m in modules)
+E       assert not True
+E        +  where True = any(<generator object test_offline_failure_preserves_sources_and_live_has_no_dependency.<locals>.<genexpr> at 0x7f5fe2441560>)
+
+tests/test_episode_evidence.py:124: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_episode_evidence.py::test_offline_failure_preserves_sources_and_live_has_no_dependency
+1 failed, 641 passed, 20 skipped in 121.26s (0:02:01)

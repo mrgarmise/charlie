@@ -31,10 +31,13 @@ class EpisodeEndObserver:
         if at is None or (self.last_capture is not None and at<=self.last_capture):return
         self.last_capture=at
         phase=screen.get('phase','unknown')
+        if phase=='title' and not ((screen.get('title_reference') or {}).get('matched') is True
+                and (screen.get('title_reference') or {}).get('sha256')):
+            phase='unknown'
         if self.phase_history is None:self.phase_history=[]
         if not self.phase_history or self.phase_history[-1]['phase']!=phase:
             self.phase_history.append(dict(phase=phase,capture_timestamp=at,reason=screen.get('reason'),label_scores=screen.get('label_scores')))
-        self.observe_screen(screen.get('state','unknown') if phase in ('gameplay','terminal','startable') else 'unknown')
+        self.observe_screen(screen.get('state','unknown') if phase in ('gameplay','terminal','startable','title') else 'unknown')
         if phase=='gameplay':
             self.established_gameplay=True;self.terminal_streak=0;self.terminal_corroborated=False;self.attract_streak=0
             self.terminal_captures=[];self.attract_captures=[]
@@ -42,7 +45,7 @@ class EpisodeEndObserver:
             self.terminal_streak+=1;self.attract_streak=0;self.attract_captures=[]
             self.terminal_captures=((self.terminal_captures or [])+[at])[-3:]
             if self.terminal_streak>=3:self.terminal_corroborated=True
-        elif phase=='startable':
+        elif phase in ('startable','title'):
             self.terminal_streak=0;self.attract_streak+=1
             self.attract_captures=((self.attract_captures or [])+[at])[-self.required_not_gameplay:]
         else:
@@ -51,7 +54,8 @@ class EpisodeEndObserver:
 
     @property
     def visual_boundary(self):
-        return (self.established_gameplay and self.terminal_corroborated
+        taught=bool(self.phase_history and self.phase_history[-1]['phase']=='title')
+        return (self.established_gameplay and (self.terminal_corroborated or taught)
                 and self.attract_streak>=3 and self.not_gameplay_streak>=self.required_not_gameplay)
 
 
@@ -87,7 +91,9 @@ class EpisodeEndObserver:
 
     def evidence(self, *, screen: dict, self_lost_frames: int) -> dict:
         return {
-            "rule": "gameplay_terminal_attract_sequence" if self.visual_boundary else "persistent_not_gameplay_plus_no_controlled_self",
+            "rule": "established_gameplay_then_verified_title" if self.visual_boundary and screen.get('phase')=='title' else
+                "gameplay_terminal_attract_sequence" if self.visual_boundary else "persistent_not_gameplay_plus_no_controlled_self",
+            "title_reference":screen.get('title_reference'),
             "established_gameplay":self.established_gameplay,"terminal_corroborated":self.terminal_corroborated,
             "attract_streak":self.attract_streak,"phase_history":self.phase_history or [],
             "terminal_capture_timestamps":self.terminal_captures or [],"attract_capture_timestamps":self.attract_captures or [],

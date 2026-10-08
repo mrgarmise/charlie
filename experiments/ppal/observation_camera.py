@@ -14,6 +14,7 @@ class ObservedCamera:
         self.publisher = publisher
         self.viewer_state = None
         self.read_failures = 0
+        self.recorder = None
 
     def read(self):
         if self.progress: self.progress.enter('camera')
@@ -37,6 +38,8 @@ class ObservedCamera:
                           if self.capture else None)
         if self.timestamp is None:
             self.timestamp = time.monotonic()
+        if self.recorder is not None:
+            self.recorder.capture(self.raw,dict(timestamp=self.timestamp,capture=self.capture))
         if self.progress: self.progress.fresh(self.timestamp)
         if self.publisher is not None:
             self.viewer_state = {'attached':self.publisher.attached,

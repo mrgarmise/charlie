@@ -7,10 +7,12 @@ This module runs on Charlie/Mint, never on the arcade Pi Zero.
 
 import socket
 import time
+import threading
 from typing import Callable
 
 from .hands import encode
 from .models import Action
+from .controller_sandbox import ControllerSandbox, validate_controls
 
 
 POSITIONS = {"STAY": "CENTER", "NONE": "CENTER", "N": "UP", "NE": "UP_RIGHT",
@@ -53,6 +55,9 @@ class ArcadeController:
         self.closed = False
         self.last_execution = None
         self.last_command = None
+        self.sandbox = ControllerSandbox()
+        self._wire_lock = threading.RLock()
+        self._hold_timer = None
         try:
             self._command("NEUTRAL")
         except BaseException:
@@ -61,6 +66,25 @@ class ArcadeController:
             raise
 
     def _command(self, command: str) -> None:
+        with self._wire_lock:
+            # Validation failures emit nothing and retain only the previously
+            # permitted state. Transport failures cannot leave a live stream.
+            try:self._authorized_command(command)
+            except (OSError, ConnectionError):
+                self.closed = True
+                if self._hold_timer is not None:self._hold_timer.cancel()
+                self.sandbox.commit(set())
+                try:
+                    self.stream.write(b'NEUTRAL\n')
+                    self.stream.readline(64)
+                except OSError:pass
+                self.stream.close();self.connection.close()
+                raise
+
+    def _authorized_command(self, command):
+        if self.closed and command != 'NEUTRAL':
+            raise RuntimeError('controller closed')
+        command, held = self.sandbox.prepare(command)
         self.last_command = {'command':command, 'write_started_at':time.monotonic()}
         self.stream.write((command + "\n").encode("ascii"))
         self.last_command['write_completed_at'] = time.monotonic()
@@ -69,12 +93,26 @@ class ArcadeController:
         self.last_command['accepted'] = response == b'OK\n'
         if response != b"OK\n":
             raise ConnectionError(f"arcade rejected {command}: {response[:32]!r}")
+        self.sandbox.commit(held)
+        if self._hold_timer is not None:
+            self._hold_timer.cancel()
+        # Bounded safety lease, not an anti-spam limit. Each permitted new
+        # pulse/hold renews it; stopped callers cannot hold buttons forever.
+        if command != 'NEUTRAL' and (held or command.startswith(('LS_', 'RS_', 'DPAD_'))):
+            self._hold_timer = threading.Timer(.5, self._expire_hold)
+            self._hold_timer.daemon = True
+            self._hold_timer.start()
+
+    def _expire_hold(self):
+        try:self._command('NEUTRAL')
+        except (OSError, ValueError):self.connection.close()
 
     def execute(self, action: Action, duration_ms: int = 100) -> None:
         if self.closed:
             raise RuntimeError("controller closed")
         # Validate the entire action before modifying any held controls.
         desired_positions = positions_for(action)
+        buttons = validate_controls(action.controls, self.sandbox.held)
         desired = controls_for(action) if self.protocol == "legacy" else frozenset()
         if not 30 <= duration_ms <= 500:
             raise ValueError("duration_ms must be 30..500")
@@ -87,6 +125,8 @@ class ArcadeController:
             timing["commands"].append({"command":command, "sent_at":began,
                                        "ack_at":time.monotonic()})
         try:
+            for button in buttons:
+                send(button+'_DOWN')
             if self.protocol == "positions":
                 for current, new in zip(self.positions, desired_positions):
                     if current != new:
@@ -102,6 +142,8 @@ class ArcadeController:
             self.sleep(duration_ms / 1000)
             timing["pulse_finished_at"] = time.monotonic()
             if self.pulse:
+                for button in buttons:
+                    send(button+'_UP')
                 if self.protocol == "positions":
                     for command in ("LS_CENTER", "RS_CENTER"):
                         send(command)
@@ -123,6 +165,7 @@ class ArcadeController:
         if self.closed:
             return
         self.closed = True
+        if self._hold_timer is not None:self._hold_timer.cancel()
         try:
             self._command("NEUTRAL")
         finally:

@@ -9,6 +9,7 @@ import json
 import socket
 
 from .models import Action
+from .controller_sandbox import validate_bridge_message
 
 
 AXES = {
@@ -31,6 +32,8 @@ class ButtonCommand:
 
 
 def encode(action: Action, sequence: int, duration_ms: int = 100) -> ButtonCommand:
+    if action.controls:
+        raise ValueError('button combinations require the existing text arcade protocol')
     if sequence < 1 or not 30 <= duration_ms <= 500:
         raise ValueError("sequence must be positive; duration_ms must be 30..500")
     if action.move not in AXES or action.move == "NONE":
@@ -77,6 +80,7 @@ class TCPCommandSink:
         self.closed = False
 
     def _send(self, message: dict) -> dict:
+        validate_bridge_message(message)
         wire = (json.dumps(message, separators=(",", ":")) + "\n").encode("utf-8")
         self.stream.write(wire)
         response = self.stream.readline(4097)

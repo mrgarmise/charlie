@@ -6,8 +6,10 @@ camera pixels; this module never reads emulator memory or screenshots.
 import math
 import socket
 import time
+import threading
 
 from experiments.ppal.models import Action
+from experiments.ppal.controller_sandbox import ControllerSandbox
 
 DIRECTIONS = {'STAY': 'CENTER', 'NONE': 'CENTER', 'N': 'UP', 'NE': 'UP_RIGHT',
               'E': 'RIGHT', 'SE': 'DOWN_RIGHT', 'S': 'DOWN', 'SW': 'DOWN_LEFT',
@@ -19,6 +21,9 @@ class ArcadeController:
         self.host, self.port, self.timeout = host, port, timeout
         self.socket = None
         self.reader = None
+        self.sandbox = ControllerSandbox()
+        self._wire_lock = threading.RLock()
+        self._hold_timer = None
 
     def open(self):
         if self.socket is not None:
@@ -32,10 +37,10 @@ class ArcadeController:
             raise
 
     def command(self, command):
-        if command not in {'NEUTRAL', 'START', 'BACK'} and command not in {
-            prefix + value for prefix in ('LS_', 'RS_') for value in DIRECTIONS.values()
-        }:
-            raise ValueError('Unsupported controller command')
+        with self._wire_lock:return self._authorized_command(command)
+
+    def _authorized_command(self, command):
+        command, held = self.sandbox.prepare(command)
         if self.socket is None:
             raise RuntimeError('Controller is not connected')
         try:
@@ -43,10 +48,19 @@ class ArcadeController:
             response = self.reader.readline(64)
             if response != b'OK\n':
                 raise OSError('Controller rejected command or disconnected')
+            self.sandbox.commit(held)
+            if self._hold_timer is not None:self._hold_timer.cancel()
+            if command != 'NEUTRAL' and (held or command.startswith(('LS_', 'RS_', 'DPAD_'))):
+                self._hold_timer=threading.Timer(.5,self._expire_hold)
+                self._hold_timer.daemon=True;self._hold_timer.start()
         except BaseException:
             # A broken stream cannot be reused: a late OK could match the next command.
             self._disconnect()
             raise
+
+    def _expire_hold(self):
+        try:self.command('NEUTRAL')
+        except (OSError,RuntimeError):self._disconnect()
 
     def execute(self, action: Action):
         if action.move not in DIRECTIONS or action.fire not in DIRECTIONS:
@@ -55,6 +69,8 @@ class ArcadeController:
         self.command('RS_' + DIRECTIONS[action.fire])
 
     def _disconnect(self):
+        if self._hold_timer is not None:self._hold_timer.cancel()
+        self.sandbox.commit(set())
         if self.socket is not None:
             try:
                 self.socket.shutdown(socket.SHUT_RDWR)

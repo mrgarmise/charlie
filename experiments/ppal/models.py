@@ -51,3 +51,4 @@ class Action:
     move: str = "STAY"
     fire: str = "NONE"
     reason: str = ""
+    controls: tuple[str, ...] = ()

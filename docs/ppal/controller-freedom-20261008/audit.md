@@ -1,0 +1,29 @@
+# Existing-path audit and controller milestone
+
+Parent feature/agency-first-self was verified remotely and fetched at 71deae2855d002f101ae1e9b4e0939f75e62241c (tree 60dd529f6ca454d42d3eb5154c3e10202ab2fcd4). Implementation uses an isolated worktree; prior worktrees and production configurations were not modified. No AGENTS.md applies.
+
+## Actual operational paths
+
+Normal Robotron entry: experiments/ppal/play_robotron.py, also invoked by the established main.py task / marathon supervisor. Camera ownership is vision.camera.Camera and its existing CameraLease; PiCameraSource captures RGB plus fresh exposure metadata, ObservedCamera publishes to the passive browser preview. Calibration normalizes the current field, TaughtRecognizer supplies detections, VisualAgency/ObjectTracker retain provisional identity and actuator evidence. WorldState passes current targets, threats and unresolved objects to Forebrain.update and Hindbrain.decide. The existing ArcadeController executes a bounded twin-stick pulse, releases it, then fresh exposures and VisualAgency's two-endpoint response window feed the next decision. GameDiary, agency.jsonl, steps.jsonl, report and source captures support later acquisition.
+
+Forebrain owns persistent game goals. Hindbrain owns immediate collision/evasion, clear-route shots and subsequent-angle changes. The existing short-horizon ShadowPredictor measures constant-velocity expectations but does not drive the controller. ShotModel is supported by Hindbrain; the physical runner does not currently load a shot model automatically. Qualified PPAL policies and semantic operational shadows load only through existing guarded interfaces. No Learning Executive or Meditation turn is called by the per-frame chooser; development is a separate normal-app process that yields while gameplay owns resources. These completed interfaces are preserved.
+
+Before this mission startup required three stable startable/gameplay classifications and otherwise stopped before a controller was constructed. Exposure optimization ran only under --recalibrate; normal startup could reuse stale geometry without current validation. The original failed-start capture exposes exactly the classifier gate, not a transport failure. Further milestones must prepare every session and separate exploratory authority from confirmed gameplay and independent score qualification.
+
+## Actual Xbox wire vocabulary
+
+Read-only inspection of mrgarmise/charlie-arcade main at 3e6f708afd61a5767be105c2fc151dc9c3a81f1e established src/controller.py blob f20fe0f702283c8f76d405be309aa5377635ddc0 and config/Charlie Virtual Controller.cfg blob 6159eb6e99d7dc07288d8e640e9b261faa8b1a2e. This is published mapping evidence, not a fresh native hardware test. A/B/X/Y, LB/RB, BACK/START/GUIDE, LS_CLICK/RS_CLICK, LT/RT, LS/RS/DPAD positions and legacy DOWN/UP holds are implemented. RT is ABS_RZ (+5), BACK is BTN_SELECT/button 6, GUIDE BTN_MODE/button 8. COIN/SELECT aliases emit BACK; that mapping does not establish their game effect. Position commands must be parsed before legacy suffixes because LS_UP and LS_DOWN are absolute positions. Bare buttons tap and release before ACK. Disconnect neutralizes the existing server. The physical operator's GUIDE+BACK stop path remains untouched.
+
+Three sending paths exist in this repository: experiments/ppal/arcade_transport.py, experiments/robotron/live.py, and experiments/ppal/hands.py JSON bridge. All now validate at their lowest shared send boundary. The JSON receiver has only the original move_/fire_ vocabulary; unknown button fields are rejected rather than inventing an incompatible receiver protocol. Full Xbox experimentation uses the established text transport, not a new controller.
+
+RT and its aliases are rejected including legacy suffixes. Machine-level QUIT/player-selection, compound strings, whitespace and injected command lines are excluded. A stateful sandbox rejects GUIDE+BACK in either hold order and through aliases. Batch Action.controls combinations are validated before any command is sent. Ordinary safe taps, repeats, simultaneous permitted buttons and independent stick actions have no effectiveness/spam gate. A 500-ms renewable hold lease neutralizes stopped callers; socket timeout, supervised process watchdog, release and disconnect remain bounded. The lease is input safety, not a prohibition on repeated actions.
+
+## Authentic failed-start provenance
+
+Original uploaded archive marathon-20261008-031501.tar.gz: SHA256 c6894512e8a79898bbd158f957d22113f1580138bc9d373f67a92209e2208635, Library libfile_215da3053d108191a9fd7286de8dc279. Extracted without modification using safe data-only extraction. game-01/report.json records 99d561382a0a55d0dc2bb4dea4b511350c8cdae5 with dirty_worktree true, six saved initial PNGs, unknown phase and 'initial START not authorized: no stable positive pregame or gameplay evidence'. Original source bytes remain unchanged. This is an authentic previous native failure, not gameplay or acceptance performed in this mission.
+
+## Validation boundary
+
+Initial relevant baseline: 45 host tests passed in 8.74 seconds. First controller-focused run found a lost best-effort NEUTRAL on transport rejection; that failure is retained and corrected by neutralizing before closing the unusable stream. Loopback and software fixtures are simulations; they do not operate an arcade controller or camera. New native mapping/firmware deployment, physical gameplay and persistent learned-policy activation are not authorized. Publication of this controller milestone does not complete startup/tactical acceptance or ALA-2 score improvement.
+
+Full host offline suite after correction: 633 passed, 20 skipped in 111.04 seconds. Environment x86_64 Linux, Python 3.12; unavailable Torch and original historical collision capture account for skips. This is independently executed host qualification, not native Pi or physical acceptance.

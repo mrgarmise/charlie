@@ -457,6 +457,9 @@ def main():
     parser.add_argument('--observer-context', type=Path, help='optional display-only project context; never policy input')
     parser.add_argument('--learned-semantics',type=Path,help='separately authorized, independently validated candidate-crop activation manifest')
     parser.add_argument('--learned-policy',type=Path,help='qualified local PPAL decision policy; current acceptance is offline only')
+    parser.add_argument('--rolling-seconds',type=float,default=0.,help='opt-in bounded original incident memory; native RAM tradeoff unmeasured')
+    parser.add_argument('--rolling-frames',type=int,default=60)
+    parser.add_argument('--rolling-memory-mib',type=int,default=32)
     parser.add_argument('--visual-retention-hz',type=float,help='opt-in sampled-visual-v1; strict originals remain default')
     parser.add_argument('--evidence-frame-capacity',type=int,default=16)
     parser.add_argument('--evidence-record-capacity',type=int,default=512)
@@ -471,6 +474,8 @@ def main():
 
     if args.seconds is not None and (not math.isfinite(args.seconds) or not 1 <= args.seconds <= 3600):
         parser.error("--seconds must be 1..3600")
+    if not math.isfinite(args.rolling_seconds) or not 0<=args.rolling_seconds<=10 or not 1<=args.rolling_frames<=300 or not 1<=args.rolling_memory_mib<=128:
+        parser.error('rolling budgets require 0..10 seconds, 1..300 frames, 1..128 MiB')
     if args.visual_retention_hz is not None and (not math.isfinite(args.visual_retention_hz) or not 0<args.visual_retention_hz<=30):
         parser.error('visual retention Hz must be positive and <=30')
     if not (1<=args.evidence_frame_capacity<=64 and args.evidence_frame_capacity<=args.evidence_record_capacity<=4096
@@ -606,12 +611,12 @@ def main():
                           'preceding_action':preceding_action, 'experiment':experiment_plan})
         # Encoding PNGs between pulses lengthened unseen intervals substantially.
         # Buffer a bounded set of originals; write images only after controls close.
-        if latest_agency_frame is not None and len(raw_frames) < 96:
+        if args.visual_retention_hz is None and latest_agency_frame is not None and len(raw_frames) < 96:
             raw_name = f"raw-{visual_agency.tick:04d}.png"
             buffered_frames.append((raw_name, latest_agency_frame.copy()))
             row["raw_frame"] = raw_name
             raw_frames.append({"sample":visual_agency.tick, "path":raw_name})
-        if latest_agency_frame is not None and len(agency_frames) < 24:
+        if args.visual_retention_hz is None and latest_agency_frame is not None and len(agency_frames) < 24:
             frame = latest_agency_frame.copy()
             draw = ImageDraw.Draw(frame)
             for track_id in visual_agency.positions:
@@ -667,7 +672,8 @@ def main():
     try:
         recorder=CaptureEvidence(args.output,diary.capture_origin['capture_id'],provenance,
             capacity=args.evidence_frame_capacity,record_capacity=args.evidence_record_capacity,
-            byte_capacity=args.evidence_memory_mib*1024*1024,visual_hz=args.visual_retention_hz)
+            byte_capacity=args.evidence_memory_mib*1024*1024,visual_hz=args.visual_retention_hz,rolling_seconds=args.rolling_seconds,
+            rolling_frames=args.rolling_frames,rolling_bytes=args.rolling_memory_mib*1024*1024)
     except BaseException:
         source.close()
         raise
@@ -1138,7 +1144,9 @@ def main():
             feedback_persistence_ns=0
             if tactical_outcome is not None:
                 began=time.perf_counter_ns()
-                recorder.event('tactical_outcome',tactical_outcome,at=time.monotonic())
+                outcome_id=recorder.event('tactical_outcome',tactical_outcome,at=time.monotonic())
+                if args.rolling_seconds and tactical_outcome.get('resolved_result')=='contradicted':
+                    recorder.request_incident('Charlie tactical prediction contradicted',prediction_id=tactical_outcome.get('prediction_id'))
                 feedback_persistence_ns=time.perf_counter_ns()-began
             experiment_context = None
             if experiment_plan and not experiment_status['attempted']:
@@ -1348,6 +1356,7 @@ def main():
                   "acquisition": locals().get("acquisition"),
                   "gameplay_visual_frame": locals().get("gameplay_visual_frame"),
                   "startup_watch": locals().get("startup_watch", []),
+                  "diagnostic_buffer_bytes":sum(f.width*f.height*len(f.getbands()) for _,f in buffered_frames),
                   "agency_frames": agency_frames,
                   "raw_frames": raw_frames,
                   "tracking_log": "agency.jsonl",

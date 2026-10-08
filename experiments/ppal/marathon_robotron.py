@@ -104,6 +104,8 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
         assessment = None
         if executive is not None and plan and plan.get('project_id') and resolution:
             assessment=executive.record_result(plan['project_id'],plan,resolution,commitments,episode=episode)
+        stage('reconcile_perception')
+        reconciliation=gateway.evaluator.reconcile_perception(journal,game)
         stage('derive')
         derive_episode(game,journal,episode)
         stage('reflection')

@@ -189,7 +189,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     assert all(row['tracking']['clock']=='seconds' for row in telemetry)
     assert all(row['tracking']['detections'] for row in telemetry)
     assert (tmp_path/'run/tracks.json').exists()
-    original=Image.open(tmp_path/'run'/report['raw_frames'][0]['path'])
+    original=Image.open(tmp_path/'run'/(captures[0].data['payload']['artifact']['path'] if sampled else report['raw_frames'][0]['path']))
     assert original.getextrema()==((0,0),(0,0),(0,0))
     assert all(r['self_track_id']==r['agency']['controlled_track_id'] for r in actions)
     if bootstrap:

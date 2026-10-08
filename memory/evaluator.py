@@ -249,6 +249,75 @@ class MemoryEvaluator:
                  **{k:json.loads(payload).get(k) for k in ('text','source','tags','confidence','evidence')}}
                 for identifier, status, priority, payload in rows]
 
+    @staticmethod
+    def reconcile_perception(journal, capture_root):
+        """Offline exact-source reconciliation; no camera, frame substitution or learning agenda.
+
+        Independently supplied visual measurements must bind exact original
+        pixels/clock/geometry and declare uncertainty. Detector output is one
+        witness, never the independent measurement of itself.
+        """
+        import math
+        from .evidence import digest
+        root=Path(capture_root).resolve()
+        cameras={r.id:r for r in journal.category_records('observation','camera_observation')}
+        captures={r.data['payload']['observation_id']:r for r in journal.category_records('observation','camera_capture')}
+        independent={}
+        for r in journal.category_records('observation','independent_visual_measurement'):
+            independent.setdefault(r.data['payload'].get('observation_id'),[]).append(r)
+        outputs=[]
+        for trace in journal.category_records('observation','detector_trace'):
+            p=trace.data['payload'];identifier=p.get('observation_id');source=cameras.get(identifier)
+            if source is None:continue
+            capture=captures.get(identifier);judgments=[];references=[trace.id,source.id]
+            original=None
+            if capture:
+                artifact=capture.data['payload']['artifact'];path=root/artifact['path']
+                if path.is_symlink() or root not in path.resolve().parents or hashlib.sha256(path.read_bytes()).hexdigest()!=artifact['sha256']:
+                    raise ValueError('independent source pixels missing or changed')
+                original=artifact;references.append(capture.id)
+            measurements=independent.get(identifier,[])
+            valid=[]
+            for witness in measurements:
+                q=witness.data['payload']
+                try:
+                    method=journal.get(q.get('method_reference'));m=method.data['payload'];proof=m.get('qualification_artifact',{})
+                    qualified=(method.data['producer']=='independent-visual-measurement' and m.get('category')=='visual_measurement_method_qualification'
+                        and m.get('status')=='verified' and proof.get('path') and
+                        hashlib.sha256(Path(proof['path']).read_bytes()).hexdigest()==proof.get('sha256'))
+                except (KeyError,TypeError,OSError):qualified=False
+                if (qualified and witness.data['producer']=='independent-visual-measurement' and original
+                    and q.get('artifact_sha256')==original['sha256'] and q.get('timestamp')==source.data['at']
+                    and q.get('geometry_sha256')==digest(p.get('geometry'))
+                    and q.get('method_reference') and q.get('identity_association')=='independently_qualified'):
+                    valid.append(witness);references.extend([method.id,witness.id])
+            for index,detection in enumerate(p.get('detections',[])):
+                point=detection.get('center',[])
+                sane=len(point)==2 and all(isinstance(v,(float,int)) and math.isfinite(v) and 0<=v<=100 for v in point)
+                matching=[w for w in valid if w.data['payload'].get('detection_index')==index]
+                verdict='plausible_but_not_independently_observed' if sane and not original else 'unresolved'
+                reason='internal normalized measurement only; originals not retained' if verdict.startswith('plausible') else 'original pixels do not independently certify detection; qualified visual measurement missing'
+                errors=[]
+                for witness in matching:
+                    q=witness.data['payload'];other=q.get('center',[]);bound=q.get('position_uncertainty');internal=q.get('internal_position_uncertainty')
+                    if (not sane or len(other)!=2 or not all(isinstance(v,(int,float)) and math.isfinite(v) for v in other)
+                        or not all(isinstance(v,(int,float)) and math.isfinite(v) and v>=0 for v in (bound,internal))):continue
+                    error=math.hypot(point[0]-other[0],point[1]-other[1]);errors.append(dict(distance=error,bound=bound+internal,measurement_id=witness.id))
+                if errors:
+                    outcomes={e['distance']<=e['bound'] for e in errors}
+                    verdict='corroborated' if outcomes=={True} else 'disputed' if outcomes=={False} else 'unresolved'
+                    reason='exact original source and declared independent uncertainty; disagreement retained'
+                judgments.append(dict(detection_index=index,status=verdict,reason=reason,calculations=errors,
+                    alternatives=['identity association uncertainty','timing/occlusion/motion uncertainty','detector error'],
+                    causation='unqualified; no nearest-frame or interpolated truth'))
+            finding=journal.append('observation',dict(category='perception_reconciliation',schema='visual-reconciliation-v1',
+                observation_id=identifier,trace_id=trace.id,source_timestamp=source.data['at'],original=original,
+                judgments=judgments,independent_measurements=[r.id for r in valid],
+                source_capture=str(root),new_independent_experience=False),episode=trace.data['episode'],
+                sources=list(dict.fromkeys(references)),producer='independent-evidence-reconciler',version='1')
+            outputs.append(finding)
+        return outputs
+
     def stats(self, source: str, kind: str, tags=()):
         feature = json.dumps([source, kind, sorted(tags)], separators=(",", ":"))
         with self._connect() as conn:

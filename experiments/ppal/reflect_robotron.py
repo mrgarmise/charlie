@@ -401,6 +401,12 @@ def reflect_episode_context(root,journal,episode,gateway,*,plan=None,resolution=
         elif category=='external_observation':external.append(row)
         else:identities[row.get('identity_status','unknown')]+=1
     questions=[]
+    reconciled=journal.category_records('observation','perception_reconciliation')
+    reconciliation_counts=Counter(j['status'] for r in reconciled for j in r.data['payload']['judgments'])
+    if any(reconciliation_counts.get(k) for k in ('disputed','unresolved','plausible_but_not_independently_observed')):
+        questions.append(dict(category='perception_reconciliation',
+            question='Which independently observed same-source measurements explain these conflicting or unverified perceptions?',
+            measured=dict(reconciliation_counts)))
     if identities.get('unknown'):questions.append(dict(category='self_uncertainty',question='Which observations distinguish loss of identity from loss of the physical object?',measured=dict(unknown_samples=identities['unknown'],samples=sum(identities.values()))))
     if (report.get('episode_end') or {}).get('confirmed') is not True:questions.append(dict(category='episode_boundary',question='Which missing independent observations could settle the episode boundary?',measured=dict(result=report.get('result'),boundary='unverified')))
     if meditation and meditation.get('merges'):questions.append(dict(category='retrospective_identity',question='Which additional observations could verify or contradict the reconstructed identity links?',measured=dict(hypothesized_links=len(meditation['merges']),independently_verified_links=None)))

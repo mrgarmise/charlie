@@ -170,6 +170,15 @@ def ingest(root, dataset):
     try:
         imported = import_episode(root, source, identity=identity)
         context = discover(root)
+        reconciled=MemoryEvaluator.reconcile_perception(source,root)
+        if reconciled:
+            counts=Counter(j['status'] for r in reconciled for j in r.data['payload']['judgments'])
+            context['perception_reconciliation']=dict(counts=dict(counts),finding_ids=[r.id for r in reconciled],
+                independent_truth='only exact qualified original measurements; estimates remain estimates')
+            if counts.get('disputed') or counts.get('unresolved') or counts.get('plausible_but_not_independently_observed'):
+                context['questions'].append(dict(category='perception_reconciliation',
+                    question='Which independently observed same-source measurements explain these unresolved or conflicting perceptions?',
+                    measured=dict(counts)))
         # Durable consolidated context is an interpretation, not independent truth.
         ref = journal.append('observation', dict(category='learning_context_reference',
             source_episode=episode, source_journal=str(source.path.resolve()),

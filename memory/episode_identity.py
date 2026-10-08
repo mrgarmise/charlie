@@ -95,7 +95,8 @@ def recording_completion(root):
     try:
         rows=journal.records();captures=journal.category_records('observation','camera_capture')
         observations=journal.category_records('observation','camera_observation')
-        bindings={r.data['payload'].get('observation_id') for r in captures}
+        bindings={r.data['payload'].get('observation_id'):r for r in captures}
+        if len(bindings)!=len(captures):raise IdentityIntegrityError('duplicate original capture identity')
         contracts=journal.category_records('observation','camera_retention_contract')
         sampled=bool(contracts and len(contracts)==1 and contracts[0].data['payload'].get('schema')=='sampled-visual-v1')
         for r in observations:
@@ -106,11 +107,20 @@ def recording_completion(root):
                     raise IdentityIntegrityError('invalid sampled visual contract/disposition')
                 if status=='selected' and r.id not in bindings:
                     raise IdentityIntegrityError('selected observation has no completed original frame')
-                if status!='selected' and (r.id in bindings or payload.get('source_path') is not None):
+                if status!='selected' and (payload.get('source_path') is not None or (r.id in bindings and
+                    (bindings[r.id].data['payload'].get('retention_reason')!='incident' or not bindings[r.id].data['payload'].get('incident_request_id')))):
                     raise IdentityIntegrityError('unretained observation falsely claims original pixels')
             elif r.id not in bindings:
                 raise IdentityIntegrityError('observation has no completed original frame')
+        requests=journal.category_records('observation','incident_request')
+        resolved={r.data['payload'].get('request_id') for r in journal.category_records('observation','incident_resolution')}
+        if any(r.id not in resolved for r in requests):raise IdentityIntegrityError('incident request unresolved')
         for row in captures:
+            req=row.data['payload'].get('incident_request_id')
+            if req:
+                request=journal.get(req);start,end=request.data['payload']['requested_interval']
+                if request.id not in resolved or not start<=row.data['at']<=end:
+                    raise IdentityIntegrityError('incident artifact outside its resolved request')
             ref=row.data['payload']['artifact'];path=root/ref['path']
             if path.is_symlink() or path.resolve().parent!=(root/'observations').resolve() or hashlib.sha256(path.read_bytes()).hexdigest()!=ref['sha256']:
                 raise IdentityIntegrityError('recorded pixels corrupt or missing')

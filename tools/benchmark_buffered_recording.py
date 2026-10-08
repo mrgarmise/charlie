@@ -22,6 +22,7 @@ from experiments.ppal.observation_camera import ObservedCamera
 from experiments.ppal.models import WorldState,Position,Object
 from experiments.ppal.forebrain import Forebrain
 from experiments.ppal.hindbrain import Hindbrain
+from memory.episode_identity import verify_recording_completion
 from memory.evidence import EvidenceJournal
 from PIL import Image
 
@@ -46,16 +47,16 @@ def run_case(args,name,recorder_type,rows_type,*,burst=False,slow_ms=0):
         class SoftwareCamera:
             def read(self):return image.copy()
             def close(self):pass
-        raw=SoftwareCamera();camera_kind='repeated authentic failed-start pixels; simulated acquisition'
+        raw=SoftwareCamera();camera_kind='software acquisition of supplied frozen pixels; source hash in benchmark report'
     camera=ObservedCamera(raw,require_fresh=args.native_camera)
     options=dict(visual_hz=args.visual_hz,rolling_seconds=args.rolling_seconds) if recorder_type is CaptureEvidence else {}
     recorder=recorder_type(directory,'benchmark-not-independent-game',dict(simulated_tactics=True),**options)
     recorder.ready();camera.recorder=recorder
-    costs=[];encode=[];original=recorder._capture
-    def instrument(*item):
+    costs=[];encode=[];peak_snapshots=0;original=recorder._capture
+    def instrument(*item,**kwargs):
         began=time.perf_counter_ns()
         if slow_ms:time.sleep(slow_ms/1000)
-        try:return original(*item)
+        try:return original(*item,**kwargs)
         finally:costs.append(time.perf_counter_ns()-began)
     recorder._capture=instrument
     # PIL encoder timing is measured on the writer, never on the decision caller.
@@ -97,6 +98,8 @@ def run_case(args,name,recorder_type,rows_type,*,burst=False,slow_ms=0):
             recorder.event('tactical_execution',dict(prediction_id=previous,controller_emitted=False),at=time.monotonic())
             if recorder_type is CaptureEvidence and args.incident_every and (tick+1)%args.incident_every==0:
                 recorder.request_incident('synthetic recorder burst fixture',preceding=.3,following=.2)
+            if hasattr(recorder,'telemetry'):
+                peak_snapshots=max(peak_snapshots,recorder.telemetry()['total_accounted_snapshot_bytes'])
             rows.append(dict(tick=tick,prediction_id=previous,observed_at=camera.timestamp))
             fast.append(time.perf_counter_ns()-start)
     except Exception as exc:failure=f'{type(exc).__name__}: {exc}'
@@ -105,6 +108,13 @@ def run_case(args,name,recorder_type,rows_type,*,burst=False,slow_ms=0):
         try:recorder.close()
         except Exception as exc:failure=f'{failure or ""}; {type(exc).__name__}: {exc}'
         Image.Image.save=save
+    completion=None
+    if recorder_type is CaptureEvidence:
+        try:
+            verify_recording_completion(directory)
+            completion='verified'
+        except Exception as exc:
+            completion=f'rejected: {type(exc).__name__}: {exc}'
     elapsed=time.perf_counter()-began;cpu_used=time.process_time()-cpu;after=counters()
     utilization={}
     for core,a in before.items():
@@ -112,10 +122,17 @@ def run_case(args,name,recorder_type,rows_type,*,burst=False,slow_ms=0):
         utilization[core]=(100*(total-delta[3]-delta[4])/total) if total else None
     journal=EvidenceJournal(directory/'session-evidence.sqlite3',read_only=True);journal.verify()
     captures=len(journal.category_records('observation','camera_capture'));source_records=journal.category_records('observation','camera_observation')
-    observations=len(source_records) if source_records else captures;journal.close()
+    observations=len(source_records) if source_records else captures
+    resolutions=[r for r in journal.records() if r.data['payload'].get('category')=='incident_resolution']
+    incident_shortfalls=sum(len(r.data['payload'].get('shortfalls',[])) for r in resolutions)
+    journal.close()
     artifact_bytes=[p.stat().st_size for p in (directory/'observations').glob('*.png')]
     pixel_bytes=sum(artifact_bytes)
     trace_bytes=sum(p.stat().st_size for p in directory.glob('*') if p.is_file() and p.suffix in ('.sqlite3','.jsonl'))
+    source_span=(last_timestamp-first_timestamp) if first_timestamp is not None and last_timestamp is not None else 0
+    acquisition_rate=(observations-1)/source_span if source_span>0 else None
+    retained_arrival=captures/source_span if source_span>0 else None
+    frame_service=1e9/(sum(costs)/len(costs)) if costs and sum(costs)>0 else None
     dist=lambda r:distribution(r) if r else None
     return dict(case=name,camera=camera_kind,wall_seconds=elapsed,cpu_seconds=cpu_used,
         peak_process_rss_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
@@ -124,7 +141,13 @@ def run_case(args,name,recorder_type,rows_type,*,burst=False,slow_ms=0):
         writer_frame_service=dist(costs),encoding=dist(encode),completed_frames=captures,
         source_observations=observations,source_rate_hz=observations/elapsed,pixel_bytes=pixel_bytes,trace_bytes=trace_bytes,
         mean_encoded_bytes_per_frame=pixel_bytes/captures if captures else None,
-        theoretical_positive_queue_growth_frames_per_second=max(0.,(args.visual_hz or args.hz)-(captures/elapsed)),
+        acquisition_span_seconds=source_span,acquisition_rate_hz=acquisition_rate,
+        retained_arrival_rate_including_incidents=retained_arrival,
+        approximate_writer_frame_service_hz=frame_service,
+        approximate_positive_queue_growth_frames_per_second=max(0.,retained_arrival-frame_service) if retained_arrival is not None and frame_service is not None else None,
+        queue_growth_limitation='Observed finite-run arrivals include incidents; frame service excludes journal work. Not a storage-capacity or sustained-rate qualification.',
+        peak_sampled_snapshot_bytes=peak_snapshots,completion_receipt=completion,
+        resolved_incident_requests=len(resolutions),explicit_incident_shortfalls=incident_shortfalls,
         sustained_completed_frames_per_second=captures/elapsed,acquisition_pauses=pause,
         pipeline=recorder.telemetry() if hasattr(recorder,'telemetry') else {'frame_capacity':4,'legacy_prediction_wait':True},
         exposure=dict(first_timestamp=first_timestamp,last_timestamp=last_timestamp,latest_capture_metadata=capture_metadata),

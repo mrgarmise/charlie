@@ -150,6 +150,8 @@ def test_three_unattended_attempts_have_behavioral_return_path(tmp_path,monkeypa
                  response_window={'endpoint':2,'origin_at':now,'move':action.move},
                  evidence=[{'track_id':9,'reason':'signed_command_response'}],tracking={'events':[],'detections':[]})
         (game/'agency.jsonl').write_text(json.dumps(row)+'\n')
+        from test_recording_handoff import seal_software_recording
+        seal_software_recording(game)
         return 0
     result=marathon.developmental_marathon(args,driver=driver,gateway=g)
     assert result['status']=='bounded_attempts_complete' and len(result['games'])==3

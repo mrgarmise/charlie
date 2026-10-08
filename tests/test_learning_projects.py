@@ -245,7 +245,9 @@ def test_opt_in_runner_manages_campaign_and_unchanged_terminal_guard(tmp_path):
         game_seconds=1.,focus=1.3,retry_wait=0,learning_projects=True,project_evidence=tmp_path/'projects.sqlite3')
     def driver(cmd,timeout):
         plan=json.loads(Path(cmd[cmd.index('--experiment-plan')+1]).read_text())
-        synthetic_game(Path(cmd[cmd.index('--output')+1]),plan)
+        game=Path(cmd[cmd.index('--output')+1]);synthetic_game(game,plan)
+        from test_recording_handoff import seal_software_recording
+        seal_software_recording(game)
         return 0
     doc=developmental_marathon(args,driver=driver,gateway=g)
     assert doc['status']=='bounded_attempts_complete' and len(doc['games'])==3
@@ -343,6 +345,8 @@ def test_four_game_runner_discovers_competing_project_and_switches_after_complet
                     response_window=dict(endpoint=2),evidence=[dict(track_id=17,reason='different_measured_response')],
                     tracking=dict(events=[],detections=[])))
             (game/'agency.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in rows))
+        from test_recording_handoff import seal_software_recording
+        seal_software_recording(game)
         return 0
     doc=developmental_marathon(args,driver=driver,gateway=g)
     assert len(plans)==4 and doc['status']=='bounded_attempts_complete'

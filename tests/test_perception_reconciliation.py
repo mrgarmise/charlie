@@ -68,7 +68,14 @@ def test_normal_acquisition_context_carries_reconciliation_without_rewriting_sou
     context=contexts[0].data['payload']['context']
     assert context['perception_reconciliation']['counts']['unresolved']==1
     assert any(q['category']=='perception_reconciliation' for q in context['questions'])
+    requests=notebook.category_records('event','learning_evidence_request')
+    assert len(requests)==1
+    request=requests[0].data['payload']
+    assert request['physical_authorization'] is False
+    assert request['required_evidence'][0]['observation_id']==obs
+    assert request['required_evidence'][0]['original']['sha256']
     assert inventory(root)==before
     assert ingest(root,dataset)['record_id']==first['record_id']
     assert len(notebook.category_records('observation','learning_context_reference'))==1
+    assert len(notebook.category_records('event','learning_evidence_request'))==1
     notebook.verify();notebook.close()

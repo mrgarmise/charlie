@@ -15,6 +15,18 @@ def capture(root):
     return report
 
 
+
+def seal_software_recording(root):
+    """Finish a controllerless recorder after all simulated episode files exist."""
+    report=json.loads((root/'report.json').read_text())
+    recorder=CaptureEvidence(root,'software-handoff-'+root.name,{'simulation':True})
+    recorder.capture(Image.new('RGB',(20,20)),{'timestamp':time.monotonic()})
+    recorder.close()
+    report.update(recording_pipeline=recorder.telemetry(),recording_error=None)
+    (root/'report.json').write_text(json.dumps(report))
+    finalize_capture(root)
+    assert recording_readiness(root,report)['status']=='ready'
+
 def test_consecutive_distinct_completed_recorders_ready_without_controller(tmp_path):
     a=capture(tmp_path/'first');b=capture(tmp_path/'second')
     assert recording_readiness(tmp_path/'first',a)['status']=='ready'

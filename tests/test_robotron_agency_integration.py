@@ -216,7 +216,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         assert len(actions)>100
     elif terminal:
         from experiments.ppal.marathon_robotron import safe_to_restart
-        assert safe_to_restart(report)
+        assert safe_to_restart(report,capture_root=tmp_path/'run')
     elif finalization_disk_error:
         assert 'disk full' in report['recording_error']
         assert not (tmp_path/'run/capture-manifest.json').exists()

@@ -186,6 +186,22 @@ def ingest(root, dataset):
             content_id=identity['content_id'], experience_id=identity['experience_id'],
             context=context, inventory=before, prior_use='diagnostic'), episode=SCOPE,
             producer='existing-evidence-consolidation', version=VERSION)
+        # Preserve exact unresolved dependencies at the existing acquisition boundary.
+        # A request is not authority or independent truth; Executive owns eligibility.
+        missing=[]
+        for finding in reconciled:
+            payload=finding.data['payload']
+            if any(j['status']!='corroborated' for j in payload['judgments']):
+                missing.append(dict(type='independent_visual_measurement',
+                    observation_id=payload['observation_id'],trace_id=payload['trace_id'],
+                    source_timestamp=payload['source_timestamp'],original=payload['original'],
+                    requires='Exact source pixels, clock, geometry, qualified identity and method, bounded uncertainty; no interpolation substitute'))
+        if missing:
+            from .acquisition import retain_dependency_request
+            retain_dependency_request(journal,ref.id,
+                work_id='perception-reconciliation:'+identity['experience_id'],
+                required_evidence=missing,
+                reason='Unresolved or disputed perceptions require independent exact-source measurements')
         saved = root.parent/(root.name+'-evidence')/'meditation.json'
         history = json.loads((Path(__file__).resolve().parents[1]/'docs/ppal/ala-1-demonstration.json').read_text())['snapshot_split']
         prior = history.get(episode, 'diagnostic')

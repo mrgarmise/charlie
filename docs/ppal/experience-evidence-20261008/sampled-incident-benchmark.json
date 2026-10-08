@@ -1,0 +1,508 @@
+{
+  "schema": "charlie-buffered-benchmark-v1",
+  "revision": "8a0198df357efba76bc3ba431011d05d72f29579",
+  "dirty_worktree": true,
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "hardware_model": null,
+    "logical_cpus": 9,
+    "meminfo": "MemTotal:       10206508 kB\nMemFree:         7316936 kB\nMemAvailable:    9533128 kB\nBuffers:           30816 kB\nCached:          2376344 kB\nSwapCached:            0 kB\nActive:           373136 kB\nInactive:        2098560 kB\nActive(anon):         72 kB\nInactive(anon):    94376 kB\nActive(file):     373064 kB\nInactive(file):  2004184 kB\nUnevictable:       29920 kB\nMlocked:               0 kB\nSwapTotal:             0 kB\nSwapFree:              0 kB\nDirty:             67736 kB\nWriteback:             0 kB\nAnonPages:         94896 kB\nMapped:            72656 kB\nShmem:                12 kB\nKReclaimable:     136084 kB\nSlab:             191448 kB\nSReclaimable:     136084 kB\nSUnreclaim:        55364 kB\nKernelStack:        3324 kB\nPageTables:         3388 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     5103252 kB\nCommitted_AS:     460540 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:        4584 kB\nVmallocChunk:          0 kB\nPercpu:             2592 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:     28672 kB\nFilePmdMapped:         0 kB\nBalloon:               0 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:       71680 kB\nDirectMap2M:     4317184 kB\nDirectMap1G:    16777216 kB\n"
+  },
+  "visual_hz": 5.0,
+  "rolling_seconds": 1.0,
+  "incident_every": 15,
+  "baseline_revision": "70e5b714f0d2ddad72fc2f4792032fd22f99963e",
+  "baseline_module_sha256": "1a9d25f56f7ffa8c6ff375c88b8dc7b72e3279f05e91e28ad6e324dce1d30a89",
+  "source_sha256": "60a53ec71812431a4edb5e8a5524da104a66f7e8a16ccca62362572ff173c2bb",
+  "code_sha256": {
+    "experiments/ppal/progress_evidence.py": "eb9968b5b0db7c2bd6cc72be7f23bb138d23a19c98b24f6371a70022c5f11993",
+    "memory/evidence.py": "a1869634407f5e355925bf1f10077ff585130b409d702f0ccfd910695053748b",
+    "memory/episode_identity.py": "d64926e49a168c33e79b6564beb318a222e6f5c01d00431efb504848175bea52",
+    "/workspace/scratch/c81a2d35e2bc/charlie-experience/tools/benchmark_buffered_recording.py": "2d1f7bdee659f38e35976196a59d1850021f81049ff245370ffa03580da54bde"
+  },
+  "cases": [
+    {
+      "case": "baseline-normal",
+      "camera": "software acquisition of supplied frozen pixels; source hash in benchmark report",
+      "wall_seconds": 4.465754622000077,
+      "cpu_seconds": 4.455308345000001,
+      "peak_process_rss_kib": 33092,
+      "system_core_busy_percent": {
+        "cpu": 11.539418055210147,
+        "cpu0": 2.0089285714285716,
+        "cpu1": 0.0,
+        "cpu2": 1.1185682326621924,
+        "cpu3": 0.8968609865470852,
+        "cpu4": 1.342281879194631,
+        "cpu5": 0.0,
+        "cpu6": 98.21428571428571,
+        "cpu7": 0.0,
+        "cpu8": 0.0
+      },
+      "acquisition_including_snapshot": {
+        "samples": 60,
+        "median_ns": 746256.5,
+        "p95_ns": 1082344,
+        "p99_ns": 2831666,
+        "max_ns": 3638182
+      },
+      "tactical": {
+        "samples": 60,
+        "median_ns": 66459.0,
+        "p95_ns": 105256,
+        "p99_ns": 138926,
+        "max_ns": 148540
+      },
+      "decision_path_including_record_enqueue": {
+        "samples": 60,
+        "median_ns": 73131761.5,
+        "p95_ns": 80777578,
+        "p99_ns": 84494221,
+        "max_ns": 88331747
+      },
+      "writer_frame_service": {
+        "samples": 60,
+        "median_ns": 70742616.0,
+        "p95_ns": 78460298,
+        "p99_ns": 79212203,
+        "max_ns": 83489251
+      },
+      "encoding": {
+        "samples": 60,
+        "median_ns": 68916755.0,
+        "p95_ns": 76680260,
+        "p99_ns": 76844613,
+        "max_ns": 81699299
+      },
+      "completed_frames": 60,
+      "source_observations": 60,
+      "source_rate_hz": 13.435579219784318,
+      "pixel_bytes": 69154080,
+      "trace_bytes": 310769,
+      "mean_encoded_bytes_per_frame": 1152568.0,
+      "acquisition_span_seconds": 4.390031239999985,
+      "acquisition_rate_hz": 13.439539897214992,
+      "retained_arrival_rate_including_incidents": 13.667328709032196,
+      "approximate_writer_frame_service_hz": 13.931894447615342,
+      "approximate_positive_queue_growth_frames_per_second": 0.0,
+      "queue_growth_limitation": "Observed finite-run arrivals include incidents; frame service excludes journal work. Not a storage-capacity or sustained-rate qualification.",
+      "peak_sampled_snapshot_bytes": 0,
+      "completion_receipt": null,
+      "resolved_incident_requests": 0,
+      "explicit_incident_shortfalls": 0,
+      "sustained_completed_frames_per_second": 13.435579219784318,
+      "acquisition_pauses": 0,
+      "pipeline": {
+        "frame_capacity": 4,
+        "legacy_prediction_wait": true
+      },
+      "exposure": {
+        "first_timestamp": 850.932738482,
+        "last_timestamp": 855.322769722,
+        "latest_capture_metadata": null
+      },
+      "failure": null,
+      "controller_commands": 0,
+      "independently_qualified_findings": 0
+    },
+    {
+      "case": "buffered-normal",
+      "camera": "software acquisition of supplied frozen pixels; source hash in benchmark report",
+      "wall_seconds": 3.1352998280000293,
+      "cpu_seconds": 3.5072054149999996,
+      "peak_process_rss_kib": 140280,
+      "system_core_busy_percent": {
+        "cpu": 12.46900460503011,
+        "cpu0": 11.35646687697161,
+        "cpu1": 2.5396825396825395,
+        "cpu2": 2.2222222222222223,
+        "cpu3": 86.85897435897436,
+        "cpu4": 1.9169329073482428,
+        "cpu5": 1.9169329073482428,
+        "cpu6": 1.9169329073482428,
+        "cpu7": 2.2222222222222223,
+        "cpu8": 1.910828025477707
+      },
+      "acquisition_including_snapshot": {
+        "samples": 60,
+        "median_ns": 817472.0,
+        "p95_ns": 2992975,
+        "p99_ns": 3178290,
+        "max_ns": 4991837
+      },
+      "tactical": {
+        "samples": 60,
+        "median_ns": 59833.5,
+        "p95_ns": 84355,
+        "p99_ns": 96123,
+        "max_ns": 146047
+      },
+      "decision_path_including_record_enqueue": {
+        "samples": 60,
+        "median_ns": 1114602.5,
+        "p95_ns": 3231739,
+        "p99_ns": 3406138,
+        "max_ns": 5261227
+      },
+      "writer_frame_service": {
+        "samples": 38,
+        "median_ns": 68626733.5,
+        "p95_ns": 74848014,
+        "p99_ns": 82854038,
+        "max_ns": 88637932
+      },
+      "encoding": {
+        "samples": 38,
+        "median_ns": 66501684.0,
+        "p95_ns": 72294365,
+        "p99_ns": 80814406,
+        "max_ns": 86084788
+      },
+      "completed_frames": 38,
+      "source_observations": 60,
+      "source_rate_hz": 19.136925746037274,
+      "pixel_bytes": 43797584,
+      "trace_bytes": 412865,
+      "mean_encoded_bytes_per_frame": 1152568.0,
+      "acquisition_span_seconds": 1.965841673,
+      "acquisition_rate_hz": 30.01258993048114,
+      "retained_arrival_rate_including_incidents": 19.33014266708955,
+      "approximate_writer_frame_service_hz": 14.262534241346765,
+      "approximate_positive_queue_growth_frames_per_second": 5.067608425742785,
+      "queue_growth_limitation": "Observed finite-run arrivals include incidents; frame service excludes journal work. Not a storage-capacity or sustained-rate qualification.",
+      "peak_sampled_snapshot_bytes": 74705882,
+      "completion_receipt": "verified",
+      "resolved_incident_requests": 4,
+      "explicit_incident_shortfalls": 19,
+      "sustained_completed_frames_per_second": 12.120052972490274,
+      "acquisition_pauses": 0,
+      "pipeline": {
+        "accepted": 336,
+        "written": 336,
+        "captures_written": 38,
+        "max_occupancy": 159,
+        "max_bytes": 41528405,
+        "backpressure": 0,
+        "enqueue_ns": 44277509,
+        "encode_ns": 2583593932,
+        "write_ns": 71068143,
+        "occupancy": 0,
+        "frame_occupancy": 0,
+        "buffered_bytes": 0,
+        "record_capacity": 512,
+        "frame_capacity": 16,
+        "byte_capacity": 134217728,
+        "emergency_slots": 1,
+        "schema": "charlie-buffered-recording-v1",
+        "worker_encoding_allowance_bytes": 5529600,
+        "emergency_byte_allowance": 2764800,
+        "throughput_records_per_second": 105.18334189488763,
+        "writer_error": null,
+        "paused": false,
+        "recovery": {
+          "previous_status": null,
+          "interrupted_flush": false,
+          "uncommitted_tail": null
+        },
+        "writer_alive": false,
+        "visual_contract": "sampled-visual-v1",
+        "visual_hz": 5.0,
+        "retention_counts": {
+          "selected": 10,
+          "not_selected": 50,
+          "unavailable": 0
+        },
+        "rolling": {
+          "seconds": 1.0,
+          "capacity_frames": 60,
+          "capacity_bytes": 33554432,
+          "frames": 0,
+          "bytes": 0,
+          "peak_bytes": 33177600,
+          "evictions": 48
+        },
+        "incidents": {
+          "requests": 4,
+          "active": 0,
+          "extra_frames": 28
+        },
+        "total_accounted_snapshot_bytes": 0
+      },
+      "exposure": {
+        "first_timestamp": 855.494338618,
+        "last_timestamp": 857.460180291,
+        "latest_capture_metadata": null
+      },
+      "failure": null,
+      "controller_commands": 0,
+      "independently_qualified_findings": 0
+    },
+    {
+      "case": "buffered-burst",
+      "camera": "software acquisition of supplied frozen pixels; source hash in benchmark report",
+      "wall_seconds": 1.1628330009999672,
+      "cpu_seconds": 1.2338677989999987,
+      "peak_process_rss_kib": 151220,
+      "system_core_busy_percent": {
+        "cpu": 11.927480916030534,
+        "cpu0": 15.254237288135593,
+        "cpu1": 93.04347826086956,
+        "cpu2": 0.0,
+        "cpu3": 0.0,
+        "cpu4": 0.0,
+        "cpu5": 0.0,
+        "cpu6": 0.0,
+        "cpu7": 0.0,
+        "cpu8": 0.0
+      },
+      "acquisition_including_snapshot": {
+        "samples": 60,
+        "median_ns": 617495.0,
+        "p95_ns": 1739498,
+        "p99_ns": 1838224,
+        "max_ns": 2620383
+      },
+      "tactical": {
+        "samples": 60,
+        "median_ns": 35212.5,
+        "p95_ns": 68791,
+        "p99_ns": 83323,
+        "max_ns": 121540
+      },
+      "decision_path_including_record_enqueue": {
+        "samples": 60,
+        "median_ns": 863645.0,
+        "p95_ns": 1933745,
+        "p99_ns": 2027675,
+        "max_ns": 2857685
+      },
+      "writer_frame_service": {
+        "samples": 14,
+        "median_ns": 68196188.0,
+        "p95_ns": 71282527,
+        "p99_ns": 71282527,
+        "max_ns": 81725834
+      },
+      "encoding": {
+        "samples": 14,
+        "median_ns": 65901883.5,
+        "p95_ns": 69195604,
+        "p99_ns": 69195604,
+        "max_ns": 79104654
+      },
+      "completed_frames": 14,
+      "source_observations": 60,
+      "source_rate_hz": 51.59812281591903,
+      "pixel_bytes": 16135952,
+      "trace_bytes": 416961,
+      "mean_encoded_bytes_per_frame": 1152568.0,
+      "acquisition_span_seconds": 0.06776195899999493,
+      "acquisition_rate_hz": 870.6950163587273,
+      "retained_arrival_rate_including_incidents": 206.6055971020709,
+      "approximate_writer_frame_service_hz": 14.450472214646993,
+      "approximate_positive_queue_growth_frames_per_second": 192.1551248874239,
+      "queue_growth_limitation": "Observed finite-run arrivals include incidents; frame service excludes journal work. Not a storage-capacity or sustained-rate qualification.",
+      "peak_sampled_snapshot_bytes": 72053005,
+      "completion_receipt": "verified",
+      "resolved_incident_requests": 4,
+      "explicit_incident_shortfalls": 133,
+      "sustained_completed_frames_per_second": 12.039561990381106,
+      "acquisition_pauses": 0,
+      "pipeline": {
+        "accepted": 321,
+        "written": 321,
+        "captures_written": 14,
+        "max_occupancy": 320,
+        "max_bytes": 38906900,
+        "backpressure": 0,
+        "enqueue_ns": 20762200,
+        "encode_ns": 938240881,
+        "write_ns": 26815665,
+        "occupancy": 0,
+        "frame_occupancy": 0,
+        "buffered_bytes": 0,
+        "record_capacity": 512,
+        "frame_capacity": 16,
+        "byte_capacity": 134217728,
+        "emergency_slots": 1,
+        "schema": "charlie-buffered-recording-v1",
+        "worker_encoding_allowance_bytes": 5529600,
+        "emergency_byte_allowance": 2764800,
+        "throughput_records_per_second": 271.33878788709205,
+        "writer_error": null,
+        "paused": false,
+        "recovery": {
+          "previous_status": null,
+          "interrupted_flush": false,
+          "uncommitted_tail": null
+        },
+        "writer_alive": false,
+        "visual_contract": "sampled-visual-v1",
+        "visual_hz": 5.0,
+        "retention_counts": {
+          "selected": 1,
+          "not_selected": 59,
+          "unavailable": 0
+        },
+        "rolling": {
+          "seconds": 1.0,
+          "capacity_frames": 60,
+          "capacity_bytes": 33554432,
+          "frames": 0,
+          "bytes": 0,
+          "peak_bytes": 33177600,
+          "evictions": 48
+        },
+        "incidents": {
+          "requests": 4,
+          "active": 0,
+          "extra_frames": 13
+        },
+        "total_accounted_snapshot_bytes": 0
+      },
+      "exposure": {
+        "first_timestamp": 858.675144003,
+        "last_timestamp": 858.742905962,
+        "latest_capture_metadata": null
+      },
+      "failure": null,
+      "controller_commands": 0,
+      "independently_qualified_findings": 0
+    },
+    {
+      "case": "buffered-slow-storage",
+      "camera": "software acquisition of supplied frozen pixels; source hash in benchmark report",
+      "wall_seconds": 4.401711219999925,
+      "cpu_seconds": 2.052820442,
+      "peak_process_rss_kib": 154944,
+      "system_core_busy_percent": {
+        "cpu": 5.32156368221942,
+        "cpu0": 5.643340857787811,
+        "cpu1": 41.950113378684804,
+        "cpu2": 0.0,
+        "cpu3": 0.22675736961451248,
+        "cpu4": 0.22675736961451248,
+        "cpu5": 0.0,
+        "cpu6": 0.45351473922902497,
+        "cpu7": 0.0,
+        "cpu8": 0.0
+      },
+      "acquisition_including_snapshot": {
+        "samples": 60,
+        "median_ns": 915001.5,
+        "p95_ns": 2859828,
+        "p99_ns": 3426648,
+        "max_ns": 4067538
+      },
+      "tactical": {
+        "samples": 60,
+        "median_ns": 64676.0,
+        "p95_ns": 166657,
+        "p99_ns": 308066,
+        "max_ns": 313314
+      },
+      "decision_path_including_record_enqueue": {
+        "samples": 60,
+        "median_ns": 1277333.0,
+        "p95_ns": 3305198,
+        "p99_ns": 3787193,
+        "max_ns": 4361604
+      },
+      "writer_frame_service": {
+        "samples": 24,
+        "median_ns": 171852116.5,
+        "p95_ns": 175311976,
+        "p99_ns": 177536760,
+        "max_ns": 180945928
+      },
+      "encoding": {
+        "samples": 24,
+        "median_ns": 69057574.0,
+        "p95_ns": 72688811,
+        "p99_ns": 75067657,
+        "max_ns": 78761746
+      },
+      "completed_frames": 24,
+      "source_observations": 60,
+      "source_rate_hz": 13.631062330345475,
+      "pixel_bytes": 27661632,
+      "trace_bytes": 396486,
+      "mean_encoded_bytes_per_frame": 1152568.0,
+      "acquisition_span_seconds": 1.9663927120000153,
+      "acquisition_rate_hz": 30.00417955169859,
+      "retained_arrival_rate_including_incidents": 12.20508998713163,
+      "approximate_writer_frame_service_hz": 5.80885047514572,
+      "approximate_positive_queue_growth_frames_per_second": 6.396239511985911,
+      "queue_growth_limitation": "Observed finite-run arrivals include incidents; frame service excludes journal work. Not a storage-capacity or sustained-rate qualification.",
+      "peak_sampled_snapshot_bytes": 74738791,
+      "completion_receipt": "verified",
+      "resolved_incident_requests": 4,
+      "explicit_incident_shortfalls": 33,
+      "sustained_completed_frames_per_second": 5.45242493213819,
+      "acquisition_pauses": 0,
+      "pipeline": {
+        "accepted": 322,
+        "written": 322,
+        "captures_written": 24,
+        "max_occupancy": 240,
+        "max_bytes": 41561314,
+        "backpressure": 0,
+        "enqueue_ns": 45655308,
+        "encode_ns": 1669217121,
+        "write_ns": 45750647,
+        "occupancy": 0,
+        "frame_occupancy": 0,
+        "buffered_bytes": 0,
+        "record_capacity": 512,
+        "frame_capacity": 16,
+        "byte_capacity": 134217728,
+        "emergency_slots": 1,
+        "schema": "charlie-buffered-recording-v1",
+        "worker_encoding_allowance_bytes": 5529600,
+        "emergency_byte_allowance": 2764800,
+        "throughput_records_per_second": 72.8116730749869,
+        "writer_error": null,
+        "paused": false,
+        "recovery": {
+          "previous_status": null,
+          "interrupted_flush": false,
+          "uncommitted_tail": null
+        },
+        "writer_alive": false,
+        "visual_contract": "sampled-visual-v1",
+        "visual_hz": 5.0,
+        "retention_counts": {
+          "selected": 10,
+          "not_selected": 50,
+          "unavailable": 0
+        },
+        "rolling": {
+          "seconds": 1.0,
+          "capacity_frames": 60,
+          "capacity_bytes": 33554432,
+          "frames": 0,
+          "bytes": 0,
+          "peak_bytes": 33177600,
+          "evictions": 48
+        },
+        "incidents": {
+          "requests": 4,
+          "active": 0,
+          "extra_frames": 14
+        },
+        "total_accounted_snapshot_bytes": 0
+      },
+      "exposure": {
+        "first_timestamp": 859.885264391,
+        "last_timestamp": 861.851657103,
+        "latest_capture_metadata": null
+      },
+      "failure": null,
+      "controller_commands": 0,
+      "independently_qualified_findings": 0
+    }
+  ],
+  "limitations": "No physical gameplay; tactical states controlled fixtures even with native camera. CPU counters include OS load; RSS cumulative high water. No inference/transport or complete-game score qualification."
+}

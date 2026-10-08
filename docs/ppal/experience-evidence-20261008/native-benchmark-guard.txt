@@ -1,0 +1,8 @@
+usage: benchmark_buffered_recording.py [-h] --output OUTPUT [--source SOURCE]
+                                       [--samples SAMPLES] [--hz HZ]
+                                       [--slow-write-ms SLOW_WRITE_MS]
+                                       [--native-camera]
+                                       [--visual-hz VISUAL_HZ]
+                                       [--rolling-seconds ROLLING_SECONDS]
+                                       [--incident-every INCIDENT_EVERY]
+benchmark_buffered_recording.py: error: native camera benchmark requires verified aarch64 Raspberry Pi 5 hardware

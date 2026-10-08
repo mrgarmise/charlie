@@ -65,3 +65,27 @@ def test_boundary_failure_is_inconclusive(tmp_path,change):
         row['boundary_certificate']=j.append('observation',boundary,episode=p.data['episode'],
             producer='independent-physical-measurement',version='controlled').id
     with pytest.raises((ValueError,KeyError)):validate_certificates(j,row)
+
+
+def test_human_confirmation_requires_original_final_score_and_no_disagreement(tmp_path):
+    """Entire boundary/qualification is a software fixture, not a physical game."""
+    from PIL import Image
+    from experiments.ppal.score_observer import ScoreObserver
+    j,plan,p=setup(tmp_path);row,frames,proof=certified(j,p,tmp_path)
+    Image.new('RGB',(20,20),'red').save(frames[1]['path']);frames[1]['sha256']=sha(frames[1]['path'])
+    boundary=j.get(row['boundary_certificate']).data['payload'];boundary['terminal_frames']=frames
+    b=j.append('observation',boundary,episode=p.data['episode'],producer='independent-physical-measurement',version='controlled-human-interface')
+    row['boundary_certificate']=b.id
+    proposal=ScoreObserver.review_proposal(j,frames[1]['path'],source_episode=row['source_episode'],timestamp=1.,clock='controlled fixture',
+        proposed=1100,confidence=.99,partition='final')
+    annotation=ScoreObserver.annotate_review(j,proposal.id,annotator='independent fixture reviewer',verdict='correct',value=1200,
+        reason='controlled qualification interface only',independent=True)
+    old=j.get(row['score_observations'][0]['validation_evidence']).data['payload']
+    old.update(boundary_certificate=b.id,artifact_sha256=frames[1]['sha256'],human_annotation_id=annotation.id)
+    measurement=j.append('observation',old,episode=p.data['episode'],producer='independent-physical-measurement',version='controlled-human-interface')
+    row['score_observations'][0].update(validation_evidence=measurement.id,artifact_sha256=frames[1]['sha256'])
+    validate_certificates(j,row)
+    ScoreObserver.annotate_review(j,proposal.id,annotator='disagreeing fixture reviewer',verdict='correct',value=1300,
+        reason='independent disagreement must survive',independent=True)
+    with pytest.raises(ValueError,match='disagreement'):validate_certificates(j,row)
+    j.close()

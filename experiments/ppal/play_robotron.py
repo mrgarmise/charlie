@@ -638,7 +638,7 @@ def main():
                   f"candidate={snapshot['candidate_track_id']} confidence={snapshot['confidence']:.2f} "
                   f"runner={snapshot['runner_up_confidence']:.2f}")
         if score_observer is not None and source.raw is not None:
-            score_observer.submit(source.raw, timestamp=source.timestamp,
+            score_observer.submit(source.raw, timestamp=source.timestamp,observation_id=source.observation_id,
                                   sample=visual_agency.tick, preceding_action={
                                       "action":preceding_action, "agency_command":snapshot.get("command"),
                                       "self_track_id":snapshot.get("self_track_id"),
@@ -1324,6 +1324,9 @@ def main():
             score_observer.close()
         if score_observer is not None and not score_observer.thread.is_alive():
             buffered_frames.extend(score_observer.frames)
+        if score_observer is not None and score_observer.thread.is_alive():
+            recording_error='score instrumentation writer unfinished; next-game handoff blocked'
+            result='ERROR: incomplete score recording'
         score_summary = score_observer.report() if score_observer is not None else {"status":"unmeasured", "self_score":None}
         if 'raw' in locals():
             save_review(raw,locals().get('tick',0),'final-view')

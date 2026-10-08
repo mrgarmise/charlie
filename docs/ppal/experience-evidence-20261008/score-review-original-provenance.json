@@ -1,0 +1,15 @@
+{
+  "source_run": "play-20261004-205356",
+  "source_revision": {
+    "git_commit": "bb40d02d3a128706e204cfd8e636fb1a9c5fd21b",
+    "dirty_worktree": true,
+    "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+  },
+  "raw_frame": "score-raw-0015.png",
+  "timestamp": 1000.717239,
+  "clock": "original native process monotonic",
+  "frame_sha256": "6a57456f50ee6b22d5b8dd9323dd07a888895872a2b7a6d68059197544156c4c",
+  "original_report_sha256": "98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+  "original_score_log_sha256": "b9ba52812ef9eb095ba3b66b97233f12d0972f0d4d27c8de621aa4c7153f9e3f",
+  "scope": "historical original image review; no new game; no independent score or boundary qualification; no human confirmation fabricated"
+}

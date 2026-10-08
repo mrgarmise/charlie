@@ -284,7 +284,9 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 doc['status']='child_timeout';break
             if index>=args.max_games:
                 doc['status']='bounded_attempts_complete';break
-            if not safe_to_restart(report,rc):
+            entry['recording_readiness']=recording_readiness(game,report)
+            write_session(session/'session.json',doc)
+            if not safe_to_restart(report,rc,capture_root=game):
                 doc['status']='unverified_episode_boundary'
                 print('DEVELOPMENT STOP: no confirmed game-over evidence; no further START',flush=True)
                 break
@@ -333,10 +335,31 @@ def established_gameplay(report):
     return bool(report.get("armed") and report.get("acquisition") and
                 any("action" in s for s in steps))
 
-def safe_to_restart(report, returncode=0):
+def recording_readiness(root,report):
+    """Between-game barrier; no controller or permission authority."""
+    from memory.episode_identity import verify_recording_completion,inspect_capture
+    try:
+        if not report or report.get('recording_error') or report.get('recording_pipeline',{}).get('writer_alive'):
+            raise ValueError('recording failure or live previous writer')
+        if report.get('score_summary',{}).get('worker_finished') is False:
+            raise ValueError('previous score instrumentation writer unfinished')
+        state=verify_recording_completion(root)
+        if state is None:raise ValueError('no verified new recording receipt')
+        identity=inspect_capture(root)
+        if identity.get('status')=='quarantined':raise ValueError('capture identity quarantined')
+        return dict(status='ready',completion_sha256=state['completion']['sha256'],
+            incident_requests='durably resolved',previous_writer='terminated and source sealed',
+            complete_game_score='separate qualification required')
+    except (ValueError,OSError,KeyError) as exc:
+        return dict(status='blocked',reason=str(exc),physical_authorization=False)
+
+
+def safe_to_restart(report, returncode=0,*,capture_root=None):
     """Only an explicit, evidenced terminal screen may authorize another START."""
     if returncode != 0 or not report:
         return False
+    if capture_root is not None and recording_readiness(capture_root,report)['status']!='ready':return False
+    if capture_root is None and report.get('recording_pipeline'):return False
     end = report.get('episode_end', {})
     evidence = end.get('evidence') or {}
     terminal=(report.get('result')=='GAME OVER' and end.get('state')=='game_over' and end.get('confirmed') is True

@@ -48,7 +48,8 @@ def run_case(args,name,recorder_type,rows_type,*,burst=False,slow_ms=0):
             def close(self):pass
         raw=SoftwareCamera();camera_kind='repeated authentic failed-start pixels; simulated acquisition'
     camera=ObservedCamera(raw,require_fresh=args.native_camera)
-    recorder=recorder_type(directory,'benchmark-not-independent-game',dict(simulated_tactics=True))
+    options=dict(visual_hz=args.visual_hz,rolling_seconds=args.rolling_seconds) if recorder_type is CaptureEvidence else {}
+    recorder=recorder_type(directory,'benchmark-not-independent-game',dict(simulated_tactics=True),**options)
     recorder.ready();camera.recorder=recorder
     costs=[];encode=[];original=recorder._capture
     def instrument(*item):
@@ -94,6 +95,8 @@ def run_case(args,name,recorder_type,rows_type,*,burst=False,slow_ms=0):
             previous=recorder.event('tactical_prediction',dict(question='software option timing',
                 action={'move':action.move,'fire':action.fire},simulated_world=True),at=time.monotonic())
             recorder.event('tactical_execution',dict(prediction_id=previous,controller_emitted=False),at=time.monotonic())
+            if recorder_type is CaptureEvidence and args.incident_every and (tick+1)%args.incident_every==0:
+                recorder.request_incident('synthetic recorder burst fixture',preceding=.3,following=.2)
             rows.append(dict(tick=tick,prediction_id=previous,observed_at=camera.timestamp))
             fast.append(time.perf_counter_ns()-start)
     except Exception as exc:failure=f'{type(exc).__name__}: {exc}'
@@ -108,13 +111,20 @@ def run_case(args,name,recorder_type,rows_type,*,burst=False,slow_ms=0):
         delta=[x-y for x,y in zip(after[core],a)];total=sum(delta[:8])
         utilization[core]=(100*(total-delta[3]-delta[4])/total) if total else None
     journal=EvidenceJournal(directory/'session-evidence.sqlite3',read_only=True);journal.verify()
-    captures=len(journal.category_records('observation','camera_capture'));journal.close()
+    captures=len(journal.category_records('observation','camera_capture'));source_records=journal.category_records('observation','camera_observation')
+    observations=len(source_records) if source_records else captures;journal.close()
+    artifact_bytes=[p.stat().st_size for p in (directory/'observations').glob('*.png')]
+    pixel_bytes=sum(artifact_bytes)
+    trace_bytes=sum(p.stat().st_size for p in directory.glob('*') if p.is_file() and p.suffix in ('.sqlite3','.jsonl'))
     dist=lambda r:distribution(r) if r else None
     return dict(case=name,camera=camera_kind,wall_seconds=elapsed,cpu_seconds=cpu_used,
         peak_process_rss_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
         system_core_busy_percent=utilization,acquisition_including_snapshot=dist(acquisitions),
         tactical=dist(decisions),decision_path_including_record_enqueue=dist(fast),
         writer_frame_service=dist(costs),encoding=dist(encode),completed_frames=captures,
+        source_observations=observations,source_rate_hz=observations/elapsed,pixel_bytes=pixel_bytes,trace_bytes=trace_bytes,
+        mean_encoded_bytes_per_frame=pixel_bytes/captures if captures else None,
+        theoretical_positive_queue_growth_frames_per_second=max(0.,(args.visual_hz or args.hz)-(captures/elapsed)),
         sustained_completed_frames_per_second=captures/elapsed,acquisition_pauses=pause,
         pipeline=recorder.telemetry() if hasattr(recorder,'telemetry') else {'frame_capacity':4,'legacy_prediction_wait':True},
         exposure=dict(first_timestamp=first_timestamp,last_timestamp=last_timestamp,latest_capture_metadata=capture_metadata),
@@ -127,7 +137,12 @@ def main():
     p.add_argument('--source',type=Path,default=Path('tests/fixtures/robotron-failed-start-031501/start-decision-000.png'))
     p.add_argument('--samples',type=int,default=20);p.add_argument('--hz',type=float,default=10)
     p.add_argument('--slow-write-ms',type=float,default=100);p.add_argument('--native-camera',action='store_true')
+    p.add_argument('--visual-hz',type=float,help='opt-in sampling of new recorder only; original baseline unchanged')
+    p.add_argument('--rolling-seconds',type=float,default=0.)
+    p.add_argument('--incident-every',type=int,default=0)
     a=p.parse_args()
+    if a.visual_hz is not None and not 0<a.visual_hz<=30:p.error('visual Hz must be positive and <=30')
+    if not 0<=a.rolling_seconds<=10 or not 0<=a.incident_every<=120:p.error('bounded rolling and incident fixture budgets required')
     if not 2<=a.samples<=120 or not 1<=a.hz<=60 or not 0<=a.slow_write_ms<=500:p.error('bounded samples/rate/storage delay required')
     model=Path('/proc/device-tree/model').read_text().strip('\x00') if Path('/proc/device-tree/model').exists() else None
     if a.native_camera and (platform.machine()!='aarch64' or not model or 'Raspberry Pi 5' not in model):
@@ -139,6 +154,7 @@ def main():
         environment=dict(python=sys.version,machine=platform.machine(),platform=platform.platform(),
             hardware_model=model,logical_cpus=os.cpu_count(),
             meminfo=Path('/proc/meminfo').read_text() if Path('/proc/meminfo').exists() else None),
+        visual_hz=a.visual_hz,rolling_seconds=a.rolling_seconds,incident_every=a.incident_every,
         baseline_revision=BASELINE,baseline_module_sha256=old_sha,
         source_sha256=hashlib.sha256(a.source.read_bytes()).hexdigest() if not a.native_camera else None,
         code_sha256={str(f):hashlib.sha256(f.read_bytes()).hexdigest() for f in

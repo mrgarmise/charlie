@@ -170,6 +170,9 @@ def finalize_capture(root):
     body = dict(schema=SCHEMA, capture_id=origin['capture_id'], artifacts=artifacts,
                 content_id=content_identity(root, artifacts))
     manifest = dict(body, manifest_id='manifest:'+digest(body))
+    # Finalization is after all writers terminate; sync source bytes before durable seal.
+    for name in artifacts:
+        with (root/name).open('rb') as stream:os.fsync(stream.fileno())
     _publish_once(root/MANIFEST, manifest)
     if artifact_manifest(root) != artifacts:
         raise IdentityIntegrityError('source artifacts changed during finalization')
@@ -200,6 +203,9 @@ def inspect_capture(root):
     else:
         body = dict(schema=SCHEMA, artifacts=artifacts, content_id=content_identity(root, artifacts))
         manifest = dict(body, manifest_id='manifest:'+digest(body))
+    # Finalization is after all writers terminate; sync source bytes before durable seal.
+    for name in artifacts:
+        with (root/name).open('rb') as stream:os.fsync(stream.fileno())
         status = 'legacy; occurrence unknown'
     content = manifest['content_id']
     legacy = ('episode:'+artifacts['report.json'] if 'report.json' in artifacts

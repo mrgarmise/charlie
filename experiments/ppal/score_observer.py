@@ -30,7 +30,7 @@ class ScoreObserver:
         # game score history; a viewpoint change is not a new game/reset.
         self.queue.put(('geometry',calibration),timeout=1.)
 
-    def submit(self, frame, *, timestamp, sample, preceding_action):
+    def submit(self, frame, *, timestamp, sample, preceding_action,observation_id=None):
         begin = time.monotonic()
         if self.queue.full():
             self.dropped += 1
@@ -39,7 +39,7 @@ class ScoreObserver:
         try:
             copied = frame.copy()
             self.queue.put_nowait((copied, timestamp, sample, preceding_action,
-                                  time.monotonic()-begin))
+                                  time.monotonic()-begin,observation_id))
         except Exception:
             self.errors += 1
 
@@ -52,7 +52,7 @@ class ScoreObserver:
                 if len(item)==2 and item[0]=='geometry':
                     self.system.reader.calibration=item[1]
                     continue
-                frame, timestamp, sample, action, copy_seconds = item
+                frame, timestamp, sample, action, copy_seconds, observation_id = item
                 begin = time.monotonic()
                 error = None
                 try:
@@ -82,14 +82,14 @@ class ScoreObserver:
                     row['raw_frame'] = name
                 elif changed:
                     self.omitted_change_frames += 1
-                row.update(sample=sample, timestamp=timestamp, preceding_action=action,
+                row.update(sample=sample, timestamp=timestamp, preceding_action=action,observation_id=observation_id,
                            processing_seconds=elapsed, enqueue_copy_seconds=copy_seconds,
                            error=error, reward_evidence=channels.self_delta,
                            attribution='temporal_association_only')
                 # The final image is retained at close even when this row did
                 # not trigger retention. Bind it explicitly without rewriting
                 # the append-only historical score row.
-                self.final_observation = dict(sample=sample, timestamp=timestamp,
+                self.final_observation = dict(sample=sample, timestamp=timestamp,observation_id=observation_id,
                     raw_frame=name, observed_score=channels.player1.observed_score,
                     retained_score=channels.player1.score,
                     status=channels.player1.status, error=error)
@@ -122,6 +122,104 @@ class ScoreObserver:
             if all(name != self.latest_frame[0] for name, _ in self.frames):
                 self.frames.append(self.latest_frame)
 
+    @staticmethod
+    def review_proposal(journal,frame,*,source_episode,timestamp,clock,proposed,confidence,
+                        source_id=None,context=None,partition='diagnostic',synthetic=False):
+        """Immutable score proposal for existing offline inspection; never a certificate."""
+        import hashlib,math
+        from pathlib import Path
+        frame=Path(frame).resolve()
+        if not source_episode or not clock or not math.isfinite(timestamp) or timestamp<0:
+            raise ValueError('original source identity, timestamp and clock required')
+        if proposed is not None and (type(proposed) is not int or proposed<0):raise ValueError('invalid proposed score')
+        if not math.isfinite(confidence) or not 0<=confidence<=1:raise ValueError('invalid confidence')
+        if partition not in ('training','validation','final','diagnostic'):raise ValueError('invalid image partition')
+        from PIL import Image
+        with Image.open(frame) as original:original.verify()
+        artifact_hash=hashlib.sha256(frame.read_bytes()).hexdigest()
+        rows=journal.category_records('observation','score_review_proposal')
+        if any((r.data['payload']['source_episode']==source_episode or r.data['payload']['artifact']['sha256']==artifact_hash
+                or ((context or {}).get('source_session') and r.data['payload'].get('context',{}).get('source_session')==(context or {}).get('source_session')))
+                and r.data['payload']['partition']!=partition for r in rows):
+            raise ValueError('one source game/session cannot cross score training/validation/final partitions')
+        if source_id:
+            source=journal.get(source_id)
+            if source.data['episode']!=source_episode or source.data['at']!=timestamp:
+                raise ValueError('score proposal must bind exact original source time/episode')
+        return journal.append('observation',dict(category='score_review_proposal',schema='score-human-review-v1',
+            artifact=dict(path=str(frame),sha256=artifact_hash),
+            source_episode=source_episode,timestamp=timestamp,clock=clock,proposed_score=proposed,
+            confidence=confidence,context=context or {},partition=partition,synthetic=synthetic,
+            timestamp_provenance='exact original journal source' if source_id else 'operator-supplied source metadata; not independently qualified',
+            qualification='unqualified proposal; no complete-game or reader-accuracy certificate'),
+            episode=source_episode,at=timestamp,sources=[source_id] if source_id else [],producer='ScoreObserver',version='human-review-v1')
+
+    @staticmethod
+    def annotate_review(journal,proposal_id,*,annotator,verdict,value=None,reason,independent=False):
+        import hashlib
+        from datetime import datetime,timezone
+        from pathlib import Path
+        row=journal.get(proposal_id);p=row.data['payload']
+        if p.get('category')!='score_review_proposal' or not annotator.strip() or not reason.strip():
+            raise ValueError('original score proposal, annotator and rationale required')
+        if hashlib.sha256(Path(p['artifact']['path']).read_bytes()).hexdigest()!=p['artifact']['sha256']:
+            raise ValueError('original score image changed')
+        if verdict=='confirm':value=p['proposed_score']
+        elif verdict=='unreadable':value=None
+        elif verdict!='correct':raise ValueError('confirm, correct or unreadable required')
+        if verdict!='unreadable' and (type(value) is not int or value<0):raise ValueError('readable annotation requires exact nonnegative digits')
+        return journal.append('observation',dict(category='score_human_annotation',proposal_id=proposal_id,
+            annotator=annotator,verdict=verdict,value=value,reason=reason,independence_attested=bool(independent),
+            reviewed_at=datetime.now(timezone.utc).isoformat(),artifact_sha256=p['artifact']['sha256'],
+            source_episode=p['source_episode'],timestamp=p['timestamp'],partition=p['partition'],synthetic=p['synthetic'],
+            qualification='human annotation; complete-game boundary and independent qualification still required'),
+            episode=row.data['episode'],sources=[proposal_id],producer='human-score-review',version='1')
+
+    @staticmethod
+    def review_metrics(journal,*,partition='final'):
+        import math
+        proposals={r.id:r.data['payload'] for r in journal.category_records('observation','score_review_proposal')
+                   if r.data['payload']['partition']==partition and not r.data['payload']['synthetic']}
+        annotations={}
+        for r in journal.category_records('observation','score_human_annotation'):
+            p=r.data['payload']
+            if p['proposal_id'] in proposals and p['independence_attested']:
+                annotations.setdefault(p['proposal_id'],[]).append(p)
+        eligible=correct=accepted=false_confident=abstained=disagreement=unreadable=0
+        seen_pixels=set();bins={}
+        for key,rows in annotations.items():
+            image=proposals[key]['artifact']['sha256']
+            if image in seen_pixels:continue
+            seen_pixels.add(image)
+            duplicates=[k for k in annotations if proposals[k]['artifact']['sha256']==image]
+            if len({(proposals[k]['proposed_score'],proposals[k]['confidence'],proposals[k].get('context',{}).get('reader_revision')) for k in duplicates})!=1:
+                disagreement+=1;continue
+            values={r['value'] for k in duplicates for r in annotations[k]}
+            if len(values)!=1:disagreement+=1;continue
+            value=next(iter(values))
+            if value is None:unreadable+=1;continue
+            eligible+=1;p=proposals[key];prediction=p['proposed_score']
+            if prediction is None:abstained+=1;continue
+            accepted+=1;correct+=int(prediction==value)
+            false_confident+=int(prediction!=value and p['confidence']>=.99)
+            b=bins.setdefault(min(9,int(p['confidence']*10)),dict(samples=0,confidence_sum=0.,correct=0))
+            b['samples']+=1;b['confidence_sum']+=p['confidence'];b['correct']+=int(prediction==value)
+        # Wilson interval describes this labeled batch, not independence of adjacent frames.
+        if accepted:
+            z=1.959963984540054;rate=correct/accepted;d=1+z*z/accepted
+            center=(rate+z*z/(2*accepted))/d
+            half=z*math.sqrt(rate*(1-rate)/accepted+z*z/(4*accepted*accepted))/d
+            interval=[max(0,center-half),min(1,center+half)]
+        else:rate=None;interval=None
+        return dict(partition=partition,eligible=eligible,accepted=accepted,correct=correct,exact_score_accuracy=rate,
+            wilson_95_interval=interval,false_confident_acceptances=false_confident,abstained=abstained,
+            abstention_rate=abstained/eligible if eligible else None,coverage=accepted/eligible if eligible else None,
+            disputed_proposals=disagreement,unreadable=unreadable,
+            qualification='descriptive labeled batch only; source-group independence and reader calibration unverified',
+            calibration_bins={str(k):dict(samples=b['samples'],mean_confidence=b['confidence_sum']/b['samples'],
+                empirical_accuracy=b['correct']/b['samples']) for k,b in bins.items()},
+            distinct_original_images=len(seen_pixels),target_99_supported=False)
+
     def report(self):
         return {**self.system.report(), 'log':'score.jsonl', 'samples':len(self.costs),
                 'dropped_samples':self.dropped, 'errors':self.errors,
@@ -130,6 +228,8 @@ class ScoreObserver:
                 'processing_seconds_total':sum(self.costs),
                 'processing_seconds_max':max(self.costs, default=0.),
                 'raw_frames':[name for name, _ in self.frames],
+                'retained_instrumentation_bytes':sum(f.width*f.height*len(f.getbands()) for _,f in self.frames),
+                'queue_capacity':2,'queue_occupancy':self.queue.qsize(),
                 'raw_frame_retention':'first 16 samples, up to 16 later accepted changes, final sample',
                 'omitted_change_frames':self.omitted_change_frames,
                 'accepted_confidence':dict(self.accepted_confidence),

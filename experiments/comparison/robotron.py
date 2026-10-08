@@ -139,6 +139,18 @@ def validate_certificates(journal,row,*,protocol=None):
     if not measurements: raise ValueError('final score missing')
     for m in measurements:
         c=certificate(m['validation_evidence'],'official_score_measurement')
+        if c.get('human_annotation_id'):
+            annotation=journal.get(c['human_annotation_id']);a=annotation.data['payload']
+            proposal=journal.get(a['proposal_id']);review=proposal.data['payload']
+            if (a.get('category')!='score_human_annotation' or a.get('independence_attested') is not True
+                or a.get('synthetic') or a.get('verdict')=='unreadable' or a.get('value')!=m.get('value')
+                or a.get('artifact_sha256')!=m.get('artifact_sha256') or a.get('timestamp')!=m.get('timestamp')
+                or a.get('source_episode')!=row['source_episode'] or review.get('synthetic')
+                or sha(review['artifact']['path'])!=m.get('artifact_sha256')):
+                raise ValueError('auditable independent human annotation must match original final score')
+            peers=[r.data['payload']['value'] for r in journal.category_records('observation','score_human_annotation')
+                   if r.data['payload'].get('proposal_id')==proposal.id and r.data['payload'].get('independence_attested')]
+            if len(set(peers))!=1:raise ValueError('human score annotation disagreement remains unresolved')
         if (c.get('value')!=m.get('value') or c.get('timestamp')!=m.get('timestamp')
                 or c.get('phase')!='final' or c.get('artifact_sha256')!=m.get('artifact_sha256')
                 or c.get('boundary_certificate')!=row['boundary_certificate']

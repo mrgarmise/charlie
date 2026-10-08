@@ -1,0 +1,606 @@
+...........FF...F.F.........FFF.FFFF.F.                                  [100%]
+=================================== FAILURES ===================================
+_____ test_normal_yield_restart_retains_commission_and_progress[deadline] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_normal_yield_restart_reta0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f19cff8a3c0>
+reason = 'deadline'
+
+    @pytest.mark.parametrize('reason',['deadline','primary'])
+    def test_normal_yield_restart_retains_commission_and_progress(tmp_path,monkeypatch,reason):
+        root=experience(tmp_path);state=tmp_path/'state'
+        (root/'tracks.json').write_text(json.dumps(dict(tracks=fragments())))
+        life=DevelopmentLifecycle(state,[root],budget_seconds=1)
+        clock=[0.];seen=[];original=meditation.predicted_link
+        import learning.lifecycle as lifecycle
+        from types import SimpleNamespace
+        monkeypatch.setattr(lifecycle,'time',SimpleNamespace(monotonic=lambda:clock[0]))
+        def prediction(left,right,*args):
+            seen.append((left['track_id'],right['track_id']))
+            answer=original(left,right,*args)
+            if len(seen)==1:clock[0]=2.
+            return answer
+        monkeypatch.setattr(meditation,'predicted_link',prediction)
+        if reason=='primary':
+            def primary():
+                if clock[0]>1:raise InterruptedError('primary gameplay owns resources')
+            monkeypatch.setattr(life,'yield_for_primary',primary)
+        try:
+            life.turn()
+            if reason=='primary':assert life.phase=='experiencing'
+        finally:life.close()
+        before=rows(state)
+        events=lambda c:[r for r in before if r.data['payload'].get('category')==c]
+        assert len(events('reflection_commission'))==1
+        assert len(events('normal_meditation_yield'))==1
+        assert not events('normal_meditation_result')
+        saved=json.loads(next((state/'meditations').glob('*/checkpoint.json')).read_text())
+        assert saved['reconstruction']['neighbor']==1
+        assert not saved['history']
+        monkeypatch.setattr(meditation,'predicted_link',original)
+        monkeypatch.undo()
+        process=startup(state,[root],authorize=False)
+>       assert process.returncode==0,process.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/24/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/24/status\'\n').returncode
+
+tests/test_meditation_yield.py:72: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: reflecting | Meditation e18445a068b5ccb492a4deb2334e58914e80bdd56e065de0acf4fdf93a860c85 for episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3 | 
+Development: investigating | no project | 
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: stopped | no project | Committed developmental checkpoint or conclusion advanced
+______ test_normal_yield_restart_retains_commission_and_progress[primary] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_normal_yield_restart_reta1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f19cff8a240>
+reason = 'primary'
+
+    @pytest.mark.parametrize('reason',['deadline','primary'])
+    def test_normal_yield_restart_retains_commission_and_progress(tmp_path,monkeypatch,reason):
+        root=experience(tmp_path);state=tmp_path/'state'
+        (root/'tracks.json').write_text(json.dumps(dict(tracks=fragments())))
+        life=DevelopmentLifecycle(state,[root],budget_seconds=1)
+        clock=[0.];seen=[];original=meditation.predicted_link
+        import learning.lifecycle as lifecycle
+        from types import SimpleNamespace
+        monkeypatch.setattr(lifecycle,'time',SimpleNamespace(monotonic=lambda:clock[0]))
+        def prediction(left,right,*args):
+            seen.append((left['track_id'],right['track_id']))
+            answer=original(left,right,*args)
+            if len(seen)==1:clock[0]=2.
+            return answer
+        monkeypatch.setattr(meditation,'predicted_link',prediction)
+        if reason=='primary':
+            def primary():
+                if clock[0]>1:raise InterruptedError('primary gameplay owns resources')
+            monkeypatch.setattr(life,'yield_for_primary',primary)
+        try:
+            life.turn()
+            if reason=='primary':assert life.phase=='experiencing'
+        finally:life.close()
+        before=rows(state)
+        events=lambda c:[r for r in before if r.data['payload'].get('category')==c]
+        assert len(events('reflection_commission'))==1
+        assert len(events('normal_meditation_yield'))==1
+        assert not events('normal_meditation_result')
+        saved=json.loads(next((state/'meditations').glob('*/checkpoint.json')).read_text())
+        assert saved['reconstruction']['neighbor']==1
+        assert not saved['history']
+        monkeypatch.setattr(meditation,'predicted_link',original)
+        monkeypatch.undo()
+        process=startup(state,[root],authorize=False)
+>       assert process.returncode==0,process.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/37/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/37/status\'\n').returncode
+
+tests/test_meditation_yield.py:72: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: reflecting | Meditation cdc49bd6344bc6fc8ebb30055a5f5d77600b2b4621b0db0e997a1525e2be8fd0 for episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3 | 
+Development: experiencing | no project | 
+Development: stopped | no project | 
+_____________ test_advancing_bounded_reconstruction_is_not_a_stall _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_advancing_bounded_reconst0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f19cff66e70>
+
+    def test_advancing_bounded_reconstruction_is_not_a_stall(tmp_path,monkeypatch):
+        root=experience(tmp_path);state=tmp_path/'state'
+        from test_meditation_yield import fragments
+        (root/'tracks.json').write_text(json.dumps(dict(tracks=fragments())))
+        original=meditation.predicted_link
+        clock=[0.]
+        import learning.lifecycle as lifecycle
+        from types import SimpleNamespace
+        monkeypatch.setattr(lifecycle,'time',SimpleNamespace(monotonic=lambda:clock[0]))
+        def advance(*args):
+            value=original(*args);clock[0]+=11;return value
+        monkeypatch.setattr(meditation,'predicted_link',advance)
+        life=DevelopmentLifecycle(state,[root])
+        cursors=[]
+        for _ in range(4):
+            life.turn();work=next(iter(life.executive.work_states().values()))
+            assert work['status']=='advancing' and work['nonprogress_turns']==0
+            cursors.append(work['after'])
+        assert len(set(cursors))==4
+        life.close();monkeypatch.undo()
+>       p=startup(state,[root],authorize=False);assert p.returncode==0,p.stderr
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/60/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/60/status\'\n').returncode
+
+tests/test_developmental_stall.py:56: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: reflecting | Meditation 4089c2561609c76ace50fce2fa07814c9c313f3142ded16370efef3c01e95899 for episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3 | 
+Development: investigating | no project | 
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Meditation 4089c2561609c76ace50fce2fa07814c9c313f3142ded16370efef3c01e95899 for episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3 | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Meditation 4089c2561609c76ace50fce2fa07814c9c313f3142ded16370efef3c01e95899 for episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3 | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Meditation 4089c2561609c76ace50fce2fa07814c9c313f3142ded16370efef3c01e95899 for episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3 | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: stopped | no project | Committed developmental checkpoint or conclusion advanced
+___________ test_waiting_investigation_resumes_on_qualified_delivery ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_waiting_investigation_res0')
+
+    def test_waiting_investigation_resumes_on_qualified_delivery(tmp_path):
+        root=experience(tmp_path);state=tmp_path/'state'
+>       p=startup(state,[root],authorize=False,turns=12);assert p.returncode==0,p.stderr
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/73/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/73/status\'\n').returncode
+
+tests/test_developmental_stall.py:90: AssertionError
+_______________ test_normal_startup_owns_full_cycle_and_restart ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_normal_startup_owns_full_0')
+
+    def test_normal_startup_owns_full_cycle_and_restart(tmp_path):
+        root=experience(tmp_path);state=tmp_path/'state';delivered_corpus(tmp_path,state)
+        before=sha(root/'tracks.json')
+        process=startup(state,[root])
+>       assert process.returncode==0,process.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/112/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/112/status\'\n').returncode
+
+tests/test_normal_learning_lifecycle.py:59: AssertionError
+__________________ test_no_authority_keeps_candidate_pending ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_no_authority_keeps_candid0')
+
+    def test_no_authority_keeps_candidate_pending(tmp_path):
+        root=experience(tmp_path);state=tmp_path/'state';delivered_corpus(tmp_path,state)
+        p=startup(state,[root],authorize=False)
+>       assert p.returncode==0,p.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/123/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/123/status\'\n').returncode
+
+tests/test_normal_learning_lifecycle.py:86: AssertionError
+_____________ test_evidence_arrival_resumes_blocked_work_and_lock ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_evidence_arrival_resumes_0')
+
+    def test_evidence_arrival_resumes_blocked_work_and_lock(tmp_path):
+        root=experience(tmp_path);state=tmp_path/'state'
+>       p=startup(state,[root],turns=1);assert p.returncode==0,p.stderr
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/134/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/134/status\'\n').returncode
+
+tests/test_normal_learning_lifecycle.py:94: AssertionError
+_________ test_interruption_after_activation_reconciles_feedback_once __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_interruption_after_activa0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f19d016c5c0>
+
+    def test_interruption_after_activation_reconciles_feedback_once(tmp_path,monkeypatch):
+        root=experience(tmp_path);state=tmp_path/'state';delivered_corpus(tmp_path,state)
+        authority=dict(source='explicit controlled offline authority',target='offline-shadow',execution='offline')
+        life=DevelopmentLifecycle(state,[root],offline_authority=authority)
+        from memory.learning_projects import LearningExecutive
+        original=LearningExecutive.receive_operational_outcome
+        def crash(*a,**kw):raise InterruptedError('after durable operational measurement')
+        monkeypatch.setattr(LearningExecutive,'receive_operational_outcome',crash)
+        try:
+            with pytest.raises(InterruptedError):life.turn()
+        finally:life.close()
+        monkeypatch.setattr(LearningExecutive,'receive_operational_outcome',original)
+>       p=startup(state,[root]);assert p.returncode==0,p.stderr
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/151/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/151/status\'\n').returncode
+
+tests/test_normal_learning_lifecycle.py:128: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: reflecting | Meditation 34cf37ed6b61fe208820b79fa824b5fef4ee5d1888d00971e476b9a622a55219 for episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3 | 
+Development: investigating | no project | 
+Development: evaluating | no project | 
+Development: stopped | no project | 
+____________ test_meditation_checkpoint_retry_and_source_integrity _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_meditation_checkpoint_ret0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f19d01060c0>
+
+    def test_meditation_checkpoint_retry_and_source_integrity(tmp_path,monkeypatch):
+        root=experience(tmp_path);state=tmp_path/'state'
+        import experiments.ppal.meditate_robotron as m
+        original=m.quality
+        def crash(*a,**kw):raise InterruptedError('bounded reflection interrupted')
+        monkeypatch.setattr(m,'quality',crash)
+        life=DevelopmentLifecycle(state,[root])
+        try:
+            with pytest.raises(InterruptedError):life.turn()
+        finally:life.close()
+        monkeypatch.setattr(m,'quality',original)
+>       p=startup(state,[root]);assert p.returncode==0,p.stderr
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/164/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/164/status\'\n').returncode
+
+tests/test_normal_learning_lifecycle.py:146: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: reflecting | Meditation b5ff92b8d6d4802cb447b64fd2fe64f60407e01feb2f87cb1b67ec23cb1a9b89 for episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3 | 
+Development: stopped | no project | 
+_______ test_surviving_legacy_context_preserved_without_inventing_tracks _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_surviving_legacy_context_0')
+
+    def test_surviving_legacy_context_preserved_without_inventing_tracks(tmp_path):
+        state=tmp_path/'state';source=tmp_path/'legacy';source.mkdir()
+        from learning.datasets import SCOPE
+        j=EvidenceJournal(source/'learning-evidence.sqlite3')
+        old=j.append('observation',dict(category='learning_context_reference',source_episode='legacy-game',
+            context=dict(questions=[],identity_samples={})),episode=SCOPE,producer='existing-evidence-consolidation',version='ala-1')
+        j.close()
+        cmd=[sys.executable,'main.py','--offline','--learning-state',str(state),'--history-root',str(source),
+            '--episode-root',str(tmp_path/'empty'),'--learning-turns','2','--learning-interval','.05']
+        p=subprocess.run(cmd,capture_output=True,text=True,timeout=20)
+>       assert p.returncode==0,p.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/175/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/175/status\'\n').returncode
+
+tests/test_normal_learning_lifecycle.py:169: AssertionError
+_____________ test_history_context_alias_is_not_another_meditation _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_history_context_alias_is_0')
+
+    def test_history_context_alias_is_not_another_meditation(tmp_path):
+        root=experience(tmp_path);state=tmp_path/'state'
+        p=startup(state,[root]);assert p.returncode==0,p.stderr
+        from learning.datasets import SCOPE
+        j=EvidenceJournal(state/'learning-evidence.sqlite3')
+        episode='episode:'+sha(root/'report.json')
+        j.append('observation',dict(category='learning_context_reference',source_episode=episode,
+            context=dict(questions=[],identity_samples={}),source_journal='relocated original notebook'),
+            episode=SCOPE,producer='existing-evidence-consolidation',version='ala-1')
+        j.close()
+>       p=startup(state,[root]);assert p.returncode==0,p.stderr
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/197/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/197/status\'\n').returncode
+
+tests/test_normal_learning_lifecycle.py:191: AssertionError
+____________ test_exported_normal_notebook_restores_results_by_hash ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_exported_normal_notebook_0')
+
+    def test_exported_normal_notebook_restores_results_by_hash(tmp_path):
+        root=experience(tmp_path);state=tmp_path/'state'
+>       p=startup(state,[root]);assert p.returncode==0,p.stderr
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 532, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/lifecycle.py", line 494, in turn
+E             try:self.resources.check(force=True)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 68, in check
+E             rss=resident_bytes();temp=temperature()
+E                 ^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/c81a2d35e2bc/charlie-perf/learning/resources.py", line 38, in resident_bytes
+E             for line in status.read_text().splitlines():
+E                         ^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/proc/212/status'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', 'main.py', '--offl...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'/proc/212/status\'\n').returncode
+
+tests/test_normal_learning_lifecycle.py:220: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_meditation_yield.py::test_normal_yield_restart_retains_commission_and_progress[deadline]
+FAILED tests/test_meditation_yield.py::test_normal_yield_restart_retains_commission_and_progress[primary]
+FAILED tests/test_developmental_stall.py::test_advancing_bounded_reconstruction_is_not_a_stall
+FAILED tests/test_developmental_stall.py::test_waiting_investigation_resumes_on_qualified_delivery
+FAILED tests/test_normal_learning_lifecycle.py::test_normal_startup_owns_full_cycle_and_restart
+FAILED tests/test_normal_learning_lifecycle.py::test_no_authority_keeps_candidate_pending
+FAILED tests/test_normal_learning_lifecycle.py::test_evidence_arrival_resumes_blocked_work_and_lock
+FAILED tests/test_normal_learning_lifecycle.py::test_interruption_after_activation_reconciles_feedback_once
+FAILED tests/test_normal_learning_lifecycle.py::test_meditation_checkpoint_retry_and_source_integrity
+FAILED tests/test_normal_learning_lifecycle.py::test_surviving_legacy_context_preserved_without_inventing_tracks
+FAILED tests/test_normal_learning_lifecycle.py::test_history_context_alias_is_not_another_meditation
+FAILED tests/test_normal_learning_lifecycle.py::test_exported_normal_notebook_restores_results_by_hash
+12 failed, 27 passed in 10.94s

@@ -1,0 +1,61 @@
+....ss.ss.ss................s..sssss.ss..ssss........................... [ 11%]
+........................................................s............... [ 23%]
+.....................................................F.................. [ 35%]
+........................................................................ [ 47%]
+........................................................................ [ 58%]
+........................................................................ [ 70%]
+........................................................................ [ 82%]
+........................................................................ [ 94%]
+....................................                                     [100%]
+=================================== FAILURES ===================================
+___________ test_checkpoint_integrity_failure_cannot_publish_finding ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_checkpoint_integrity_fail0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f39eb3fd280>
+
+    def test_checkpoint_integrity_failure_cannot_publish_finding(tmp_path,monkeypatch):
+        root=experience(tmp_path);state=tmp_path/'state';life=DevelopmentLifecycle(state,[root])
+        life.acquire()
+        context=next(r for r in life.journal.records() if r.data['payload'].get('category')=='learning_context_reference')
+        commission=life.journal.append('event',dict(category='reflection_commission',context_id=context.id),
+            episode=context.data['episode'],sources=[context.id],producer='LearningExecutive',version='test')
+        path=state/'meditations'/context.id/'checkpoint.json';path.parent.mkdir(parents=True)
+        path.write_text(json.dumps(dict(state_digest='corrupt',tracks=[])))
+        try:
+            with pytest.raises(ValueError,match='integrity'):
+                life.reflect_experience(context.id,commission.id)
+            assert not any(r.data['payload'].get('category')=='normal_meditation_result' for r in life.journal.records())
+>       finally:life.close()
+                ^^^^^^^^^^^^
+
+tests/test_meditation_yield.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/lifecycle.py:516: in close
+    self._phase('stopped')
+learning/lifecycle.py:110: in _phase
+    self._status()
+learning/lifecycle.py:102: in _status
+    analytical_progress=[dict(context_id=p.parent.name,**self.meditation_stages(p))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <learning.lifecycle.DevelopmentLifecycle object at 0x7f39eb3fd730>
+path = PosixPath('/tmp/pytest-of-root/pytest-2/test_checkpoint_integrity_fail0/state/meditations/3c4609262210b3b8fa69cfa1f0ea74e742132e19e33e774181a2c4118de5fde2/checkpoint.json')
+
+    def meditation_stages(self, path):
+        """Measured computation, explicitly separate from qualified learning."""
+        p=json.loads(path.read_text());r=p.get('reconstruction',{})
+>       return dict(completed_iterations=len(p['history']),completed_left_tracks=r.get('left',0),
+                                             ^^^^^^^^^^^^
+            neighbor_cursor=r.get('neighbor',0),retained_plausible_links=len(r.get('candidates',[])),
+            reconstructed_links=sum(h['merges'] for h in p['history']),
+            interpretation='Computational progress only; reconstructed identities remain unverified')
+E       KeyError: 'history'
+
+learning/lifecycle.py:300: KeyError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: stopped | no project | 
+=========================== short test summary info ============================
+FAILED tests/test_meditation_yield.py::test_checkpoint_integrity_failure_cannot_publish_finding
+1 failed, 592 passed, 20 skipped in 110.45s (0:01:50)

@@ -15,6 +15,7 @@ from memory.evaluator import MemoryEvaluator
 from memory.store import JsonlStore
 from .datasets import ExperienceDataset, SCOPE, sha
 from .foundry import atomic_json
+from .resources import ResourceUnavailable
 
 
 class MeditationYield(Exception):
@@ -22,7 +23,9 @@ class MeditationYield(Exception):
 
 
 class DevelopmentLifecycle:
-    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=()):
+    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None):
+        from .resources import ResourceGuard
+        self.resources=ResourceGuard(resources)
         self.output = Path(output).resolve()
         self.roots = [Path(r).resolve() for r in roots]
         self.history_roots = [Path(r).resolve() for r in history_roots]
@@ -95,6 +98,9 @@ class DevelopmentLifecycle:
                 and r.id not in satisfied and work.get(r.data['payload'].get('work_id'),{}).get('status')!='completed'], identity_conflicts=current_conflicts(self.journal), activation=active,
             physical_authorization=False, physical_score_improvement='UNKNOWN', error=self.error,
             provenance=self.provenance,
+            resources=self.resources.sample,
+            analytical_progress=[dict(context_id=p.parent.name,**self.meditation_stages(p))
+                for p in sorted((self.output/'meditations').glob('**/checkpoint.json'))],
             authorization_requests=[r.data['payload'] for r in rows if r.data['payload'].get('category')=='offline_authorization_request'
                 and not any(a.data['payload'].get('proposal_id')==r.data['payload']['proposal_id'] for a in rows
                     if a.data['payload'].get('category')=='capability_activation')]))
@@ -222,6 +228,9 @@ class DevelopmentLifecycle:
             def progress():
                 try:
                     self.yield_for_primary()
+                except ResourceUnavailable as exc:
+                    self._phase('waiting for resources')
+                    raise MeditationYield(str(exc)) from exc
                 except InterruptedError as exc:
                     self._phase('experiencing')
                     raise MeditationYield(str(exc)) from exc
@@ -285,6 +294,20 @@ class DevelopmentLifecycle:
         base=self.output/'meditations'/context_id
         return sorted(base.glob('**/checkpoint.json'))
 
+    def meditation_stages(self, path):
+        """Measured computation, explicitly separate from qualified learning."""
+        try:
+            p=json.loads(path.read_text())
+            if 'state_digest' in p and p['state_digest']!=digest({k:v for k,v in p.items() if k!='state_digest'}):
+                raise ValueError('checkpoint integrity mismatch')
+            history=p['history'];r=p.get('reconstruction',{})
+        except (OSError,ValueError,KeyError,TypeError) as exc:
+            return dict(checkpoint_available=False,reason=str(exc))
+        return dict(checkpoint_available=True,completed_iterations=len(history),completed_left_tracks=r.get('left',0),
+            neighbor_cursor=r.get('neighbor',0),retained_plausible_links=len(r.get('candidates',[])),
+            reconstructed_links=sum(h.get('merges',0) for h in history),
+            interpretation='Computational progress only; reconstructed identities remain unverified')
+
     def meditation_progress(self, context_id):
         # Hash-bound computed content/cursors only; timestamps and heartbeat
         # files cannot provide evidence of intellectual progress.
@@ -300,9 +323,13 @@ class DevelopmentLifecycle:
         context=self.journal.get(context_id).data['payload']
         source=self.available_tracks.get(context['source_episode'])
         from experiments.ppal import meditate_robotron
+        from . import cycle,resources
+        from dataclasses import asdict
         return digest(dict(source=sha(source) if source and source.is_file() else None,
             checkpoint=self.meditation_progress(context_id),budget=self.budget,
-            implementation=sha(Path(meditate_robotron.__file__))))
+            implementation=sha(Path(meditate_robotron.__file__)),
+            resource_implementation=sha(Path(resources.__file__)),ownership_implementation=sha(Path(cycle.__file__)),
+            resource_budget=asdict(self.resources.policy)))
 
     def investigation_inputs(self):
         import importlib.util
@@ -480,11 +507,16 @@ class DevelopmentLifecycle:
                     authorization=self.authority,to_baseline=True)
 
     def yield_for_primary(self):
-        from .cycle import gameplay_active
-        if gameplay_active():
-            raise InterruptedError('primary gameplay owns time-critical resources; checkpoint learning')
+        self.resources.check()
 
     def turn(self):
+        from .resources import ResourceUnavailable
+        try:self.resources.check(force=True)
+        except (ResourceUnavailable,InterruptedError) as exc:
+            self.last_turn=dict(progress_occurred=False,reason=str(exc),next_direction='Yield resources; retain existing work')
+            self.current_activity=dict(kind='resource_wait',reason=str(exc))
+            self._phase('waiting for resources' if isinstance(exc,ResourceUnavailable) else 'experiencing')
+            return
         self.reflection_dependency_blocked=False
         self.reflection_dependency=None
         return self.executive.develop(self)
@@ -496,12 +528,15 @@ class DevelopmentLifecycle:
         self.lock.close()
 
 
-def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None, history_roots=()):
+def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None, history_roots=(), resources=None):
     """Application-owned worker; bounded polling delegates all decisions to Executive."""
     import signal
     if not .05 <= interval <= 300 or (turns is not None and turns<1):
         raise ValueError('bounded cadence and positive turns required')
     import os
+    from .resources import DevelopmentResources
+    resources=resources or DevelopmentResources()
+    resources.apply()
     os.nice(10)  # Vision/control retain host CPU priority.
     stopped = False
     def stop(*unused):
@@ -509,7 +544,7 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
         stopped = True
     signal.signal(signal.SIGTERM,stop)
     signal.signal(signal.SIGINT,stop)
-    lifecycle = DevelopmentLifecycle(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,history_roots=history_roots)
+    lifecycle = DevelopmentLifecycle(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,history_roots=history_roots,resources=resources)
     try:
         count=0
         while not stopped and (turns is None or count<turns):

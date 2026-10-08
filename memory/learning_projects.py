@@ -693,7 +693,7 @@ class LearningExecutive:
             lifecycle._phase('reflecting')
             result=lifecycle.reflect_experience(context.id,commission.id)
             work=self.account_work(context.id,before=before,after=lifecycle.meditation_progress(context.id),
-                dependency=lifecycle.meditation_dependency(context.id),outcome='completed' if result else 'blocked' if lifecycle.reflection_dependency_blocked else 'preempted' if lifecycle.phase=='experiencing' else 'yielded',
+                dependency=lifecycle.meditation_dependency(context.id),outcome='completed' if result else 'blocked' if lifecycle.reflection_dependency_blocked else 'preempted' if lifecycle.phase in ('experiencing','waiting for resources') else 'yielded',
                 sources=[context.id,commission.id],
                 resumption_condition=('Qualify original tracks '+(lifecycle.reflection_dependency['sha256'] or episode)+' for retained commission '+commission.id
                     if lifecycle.reflection_dependency_blocked else 'Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes'))
@@ -701,7 +701,12 @@ class LearningExecutive:
             meditation_outcome=dict(context_id=context.id,commission_id=commission.id,status=work['status'],
                 outcome=work['outcome'],progress_occurred=work['progress_occurred'],
                 reason=work['reason'],resumption_condition=work['resumption_condition'])
-            if lifecycle.phase=='experiencing':
+            if lifecycle.phase in ('experiencing','waiting for resources'):
+                lifecycle.last_turn=dict(progress_occurred=meditation_advanced,
+                    reason=meditation_outcome['reason'],meditation=meditation_outcome,
+                    next_direction='Yield resources; resume the retained commission later')
+                lifecycle.current_activity=dict(kind='resource_wait',meditation=meditation_outcome)
+                lifecycle._status()
                 return  # Primary owner preempts the rest of this turn too.
             break  # One bounded meditation per turn; existing portfolio gets time.
         # Held projects and identical imports cannot create new trials. Continue

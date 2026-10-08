@@ -23,11 +23,19 @@ def gameplay_active():
     # time-critical work. Non-Linux callers must supply equivalent orchestration.
     proc=Path('/proc')
     if not proc.is_dir(): return True
-    for path in proc.glob('[0-9]*/cmdline'):
-        try:
-            args=path.read_bytes().split(b'\0')
-            if b'experiments.ppal.play_robotron' in args: return True
-        except (OSError,PermissionError): pass
+    # scandir reads only the process directory. Path.glob recursively visits
+    # each PID directory and matches its entries on every analytical pulse.
+    try:
+        with os.scandir(proc) as entries:
+            for entry in entries:
+                if not entry.name.isdigit():continue
+                try:
+                    with open(os.path.join(entry.path,'cmdline'),'rb') as stream:
+                        args=stream.read().split(b'\0')
+                    if b'experiments.ppal.play_robotron' in args:return True
+                except (OSError,PermissionError):pass # exited process
+    except OSError:
+        return True  # Unavailable ownership information cannot admit learning.
     return False
 
 

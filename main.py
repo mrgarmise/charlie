@@ -18,6 +18,9 @@ def parser():
     p.add_argument('--learning-budget',type=float,default=10.)
     p.add_argument('--learning-interval',type=float,default=5.)
     p.add_argument('--learning-turns',type=int,help='bounded offline acceptance run')
+    p.add_argument('--learning-cpu-cores',type=int,default=2)
+    p.add_argument('--learning-memory-mb',type=int,default=768)
+    p.add_argument('--learning-temperature-c',type=float,default=75.)
     p.add_argument('--allow-offline-improvements',action='store_true',
         help='external authority for independently qualified offline-shadow candidates only')
     return p
@@ -29,10 +32,12 @@ def main(argv=None):
         raise ValueError('bounded acceptance runs must be offline')
     roots=args.episode_root or [Path(__file__).resolve().parent/'robotron-runs']
     from learning.lifecycle import run
+    from learning.resources import DevelopmentResources
+    resources=DevelopmentResources(args.learning_cpu_cores,args.learning_memory_mb,args.learning_temperature_c)
     authority=(dict(source='normal application startup: explicit offline-improvement authorization',
         target='offline-shadow',execution='offline') if args.allow_offline_improvements else None)
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
-                turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root)
+                turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources)
     if args.offline:
         run(args.learning_state,roots,**kwargs)
         return

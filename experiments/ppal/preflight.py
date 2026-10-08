@@ -118,6 +118,32 @@ class PreflightResult:
     focus: FocusResult
 
 
+class ImagingMonitor:
+    """Cheap evidence of major view/lighting drift; never assumes game phase."""
+    def __init__(self,playfield,*,required=3,limit=2):
+        self.reference=self.measure(playfield);self.required=required;self.limit=limit
+        self.streak=0;self.reacquisitions=0
+
+    @staticmethod
+    def measure(frame):
+        rgb=np.asarray(frame.convert('RGB').resize((80,60)),dtype=float)
+        edges=np.concatenate((rgb[:3].reshape(-1,3),rgb[-3:].reshape(-1,3),
+            rgb[:,:3].reshape(-1,3),rgb[:,-3:].reshape(-1,3)))
+        return dict(border=float(np.mean(np.max(edges,axis=1))),clipped=float(np.mean(np.max(rgb,axis=2)>=250)))
+
+    def observe(self,frame):
+        current=self.measure(frame)
+        drift=(self.reference['border']>=40 and current['border']<self.reference['border']*.25
+            or current['clipped']>max(.6,self.reference['clipped']*3))
+        self.streak=self.streak+1 if drift else 0
+        if self.streak<self.required:return None
+        return dict(reason='persistent major measured view/illumination change',reference=self.reference,current=current,
+                    allowed=self.reacquisitions<self.limit)
+
+    def reacquired(self,frame):
+        self.reference=self.measure(frame);self.streak=0;self.reacquisitions+=1
+
+
 def _as_rgb_array(frame: Image.Image) -> np.ndarray:
     return np.asarray(frame.convert("RGB"))
 

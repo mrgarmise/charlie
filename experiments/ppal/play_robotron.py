@@ -36,7 +36,7 @@ from .episode_end import EpisodeEndObserver
 from .robotron_agency import VisualAgency
 from .score_observer import ScoreObserver
 from .observation_camera import ObservedCamera
-from .preflight import sensory_preflight
+from .preflight import sensory_preflight, ImagingMonitor
 from PIL import ImageDraw
 
 HUMANS = {"dad", "mom", "kid"}
@@ -516,7 +516,7 @@ def main():
     from .policy_loading import load_startup_policy
     policy,policy_error=load_startup_policy(args.learned_policy,physical=args.arm)
     forebrain = Forebrain(policy=policy)
-    hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire,policy=policy)
+    hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire,policy=policy,tactical_learning=True)
     shadow_forebrain = Forebrain()
     shadow_hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
     shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
@@ -648,7 +648,11 @@ def main():
     provenance = {'git_commit':revision,'dirty_worktree':dirty,
                   'knowledge_sha256':hashlib.sha256(args.knowledge.read_bytes()).hexdigest()}
     from .progress_evidence import CaptureEvidence
-    recorder=CaptureEvidence(args.output,diary.capture_origin['capture_id'],provenance)
+    try:
+        recorder=CaptureEvidence(args.output,diary.capture_origin['capture_id'],provenance)
+    except BaseException:
+        source.close()
+        raise
     source.recorder=recorder
     mark('evidence_recording_started',journal='session-evidence.sqlite3',scope='recording session, not verified game')
     def new_controller():
@@ -803,6 +807,7 @@ def main():
         pending_origin = None
         pending_origin_at = None
         episode_observer = EpisodeEndObserver(required_not_gameplay=8)
+        imaging_monitor=ImagingMonitor(calibration.apply(source.raw))
         for watched in startup_watch:
             episode_observer.observe_phase(dict(watched['screen_state'],capture_timestamp=watched.get('capture_timestamp')))
         print(f"CHARLIE LOOSE: diagnostic limit {args.seconds:.1f}s" if args.seconds else "CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state")
@@ -859,6 +864,26 @@ def main():
                 diary.event('episode_boundary_confirmed',evidence=episode_end['evidence'])
                 print('GAME OVER CONFIRMED: gameplay → rankings → attract evidence')
                 break
+            drift=imaging_monitor.observe(playfield)
+            if drift and screen.get('phase') not in ('title','terminal','startable'):
+                controller._command('NEUTRAL')
+                diary.event('sensory_reacquisition_requested',evidence=drift)
+                if not drift['allowed']:
+                    raise ObservationFailure('bounded sensory reacquisition exhausted; assistance required')
+                recorder.preparing=True
+                calibration,reacquired_optics=sensory_preflight(source,args.output,seed_position=args.focus)
+                recorder.ready();imaging_monitor.reacquired(calibration.apply(source.raw))
+                recorder.event('sensory_reacquired',reacquired_optics,at=time.monotonic())
+                interrupted=hindbrain.interrupt_tactic('new imaging coordinates; previous response window interrupted')
+                if interrupted:recorder.event('tactical_outcome',interrupted,at=time.monotonic())
+                retired=visual_agency.reframe()
+                diary.event('coordinate_epoch_changed',retired_track_ids=retired,reason='fresh independently observed geometry')
+                if score_observer is not None:score_observer.reframe(calibration)
+                if policy:policy.reset_predictions()
+                pending_move=None;pending_origin_at=None
+                self_tracker.player_track_id=None
+                shadow_predictor=ShadowPredictor(horizon_seconds=.15,max_speed=100.)
+                continue # fresh geometry requires ordinary agency recovery
             self_obs = self_tracker.observe_tracks(tick + 1, visual_agency.positions)
             agency_player = visual_agency.player
             new_player = None
@@ -1075,9 +1100,17 @@ def main():
             # Physical IDs come directly from generic tracks. A semantic label
             # change does not rename the object or run a second association pass.
             decision_started=time.perf_counter_ns()
+            tactical_outcome=hindbrain.tactical_feedback(world,timestamp=source.timestamp,
+                track_id=visual_agency.controlled_track_id,identity_status=agency_snapshot.get('identity_status'),
+                response_window=agency_snapshot.get('response_window'))
             goal = forebrain.update(world)
             intent, action = hindbrain.decide(world, goal, timestamp=source.timestamp)
             decision_ns=time.perf_counter_ns()-decision_started
+            feedback_persistence_ns=0
+            if tactical_outcome is not None:
+                began=time.perf_counter_ns()
+                recorder.event('tactical_outcome',tactical_outcome,at=time.monotonic())
+                feedback_persistence_ns=time.perf_counter_ns()-began
             experiment_context = None
             if experiment_plan and not experiment_status['attempted']:
                 from .experiment_return import experimental_action
@@ -1124,7 +1157,23 @@ def main():
             if 'first_ordinary_action_requested' not in timing:
                 mark('first_ordinary_action_requested', action=action_dict(action), identity_status=agency_snapshot.get('identity_status'))
             preceding_action = {"tick":tick, "timestamp":pending_at, **action_dict(action)}
+            began=time.perf_counter_ns()
+            hindbrain.align_tactical_action(action)
+            tactical_prediction_id=recorder.event('tactical_prediction',dict(
+                **hindbrain.tactical_plan,actual_action=action_dict(action),
+                observed_world=dict(tick=world.tick,player=[world.player.x,world.player.y],
+                    targets=[dict(id=o.id,position=[o.position.x,o.position.y]) for o in world.targets],
+                    threats=[dict(id=o.id,position=[o.position.x,o.position.y]) for o in world.threats],
+                    unresolved=[dict(id=o.id,position=[o.position.x,o.position.y]) for o in world.unresolved]),
+                self_track_id=visual_agency.controlled_track_id,identity_status=agency_snapshot.get('identity_status'),
+                policy=hindbrain.last_decision.get('policy'),goal=vars(goal),
+                intent=dict(kind=intent.kind,target_id=intent.target_id)),at=time.monotonic())
+            prediction_persistence_ns=time.perf_counter_ns()-began
             controller.execute(action, pulse_ms)
+            hindbrain.executed_tactic(world,action,timestamp=source.timestamp,
+                track_id=visual_agency.controlled_track_id,prediction_id=tactical_prediction_id)
+            recorder.event('tactical_execution',dict(prediction_id=tactical_prediction_id,
+                action=action_dict(action),control_execution=getattr(controller,'last_execution',None)),at=time.monotonic())
             if 'first_ordinary_execution' not in timing:
                 execution = getattr(controller, 'last_execution', None)
                 timing['first_ordinary_execution'] = dict(execution) if execution else None
@@ -1150,6 +1199,9 @@ def main():
                 "self_track_id": self_tracker.player_track_id,
                 "identity_status": agency_snapshot.get("identity_status"),
                 "experiment": experiment_context,
+                "tactical_learning":dict(plan=hindbrain.tactical_plan,outcome=tactical_outcome,
+                    prediction_id=tactical_prediction_id,decision_ns=decision_ns,
+                    feedback_persistence_ns=feedback_persistence_ns,prediction_persistence_ns=prediction_persistence_ns),
                 "learned_semantics": semantic_evidence,
                 "qualified_policy": {'forebrain':forebrain.last_reason,'hindbrain':hindbrain.last_decision,
                                      'error':policy_error,'decision_ns':decision_ns},
@@ -1244,7 +1296,7 @@ def main():
                   "episode_end": episode_end,
                   "score": score_summary["self_score"], "score_status": score_summary["status"],
                   "score_summary": score_summary,
-                  "learning_mode": "fixed_policy_with_shadow_diagnostics",
+                  "learning_mode": "session_tactical_feedback_with_guarded_persistent_policy",
                   "auto_start": locals().get('auto_start', False),
                   "start_decision": locals().get('decision'),
                   "exploratory_startup":locals().get('exploration'),

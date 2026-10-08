@@ -128,6 +128,13 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
     captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
     assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+    recording.verify()
+    predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+    executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+    assert predictions and executions
+    assert {r.data['payload']['prediction_id'] for r in executions} <= {r.id for r in predictions}
+    assert all(r.data['payload']['expected']['selected']=={k:r.data['payload']['expected']['actual_action'][k] for k in ('move','fire')} for r in predictions)
+    assert all(r.data['sources'] for r in predictions)
     recording.close()
     if already_gameplay:
         assert 'START' not in commands and 'start_requested' not in t

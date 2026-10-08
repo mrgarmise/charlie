@@ -70,3 +70,42 @@ def test_unreadable_preflight_preserves_failure_and_never_calls_controller(tmp_p
     import json
     d=json.loads((tmp_path/'sensory-preflight.json').read_text())
     assert d['status']=='failed' and d['request'] and not d['physical_motion']
+
+
+def test_live_prediction_history_enters_existing_acquisition_once(tmp_path):
+    import json,time
+    from experiments.ppal.episode_evidence import import_episode
+    root=tmp_path/'run';root.mkdir()
+    r=CaptureEvidence(root,'recording-not-qualified-game',{'source':'simulation'})
+    r.capture(Image.new('RGB',(32,32)),dict(timestamp=time.monotonic()));r.ready()
+    prediction=r.event('tactical_prediction',dict(question='test response',hypothesis={'move':'E'}),at=time.monotonic())
+    r.capture(Image.new('RGB',(32,32),'white'),dict(timestamp=time.monotonic()))
+    r.event('tactical_outcome',dict(prediction_id=prediction,eligible=True,resolved_result='contradicted'),at=time.monotonic());r.close()
+    (root/'report.json').write_text(json.dumps({'result':'simulated recording','steps':[]}))
+    original=EvidenceJournal(root/'session-evidence.sqlite3',read_only=True)
+    original_rows={row.id:row.document for row in original.records()};original.close()
+    j=EvidenceJournal(tmp_path/'learning.sqlite3');episode=import_episode(root,j)
+    assert all(j.get(k).document==v for k,v in original_rows.items())
+    before=[row.id for row in j.records()]
+    assert import_episode(root,j)==episode and [row.id for row in j.records()]==before
+    assert len(j.records('episode'))==1
+    assert j.get(prediction).data['payload']['mode']=='live_prospective'
+    assert j.records('resolution')[0].data['payload']['result']=='contradicted'
+    j.verify();j.close()
+
+
+def test_recording_congestion_retains_last_frame_and_fails_closed(tmp_path):
+    import threading,time
+    from experiments.ppal.progress_supervision import ObservationFailure
+    r=CaptureEvidence(tmp_path,'simulation',{},capacity=1);r.ready()
+    release=threading.Event();started=threading.Event();original=r._capture
+    def slow(*args):
+        started.set();assert release.wait(2);return original(*args)
+    r._capture=slow
+    r.capture(Image.new('RGB',(32,32),'red'),dict(timestamp=time.monotonic()))
+    assert started.wait(1)
+    try:
+        with pytest.raises(ObservationFailure,match='saturated'):
+            r.capture(Image.new('RGB',(32,32),'blue'),dict(timestamp=time.monotonic()))
+    finally:release.set();r.close()
+    assert Image.open(tmp_path/'observations/camera-000002.png').getpixel((0,0))==(0,0,255)

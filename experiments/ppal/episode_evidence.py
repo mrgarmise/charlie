@@ -32,6 +32,21 @@ def _external_observations(root,journal,episode,start_id,provenance):
             episode=episode,at=row.get('timestamp'),sources=[start_id],producer=ADAPTER,version='1',provenance=provenance)
 
 
+def _session_history(root,journal,episode,start_id,refs):
+    """Retain live prospective records exactly once, never replay as experience."""
+    name='session-evidence.sqlite3'
+    if name not in refs:return
+    source=EvidenceJournal(root/name,read_only=True)
+    try:
+        rows=source.records()
+        journal.merge_from(source)
+        journal.append('event',dict(category='recording_history_retained',artifact=refs[name],
+            original_record_ids=[r.id for r in rows],
+            interpretation='original recording history; not additional independent gameplay'),
+            episode=episode,sources=[start_id],producer=ADAPTER,version='1')
+    finally:source.close()
+
+
 def import_episode(root, journal, *, identity=None):
     root = Path(root)
     report_path = root / 'report.json'
@@ -51,6 +66,7 @@ def import_episode(root, journal, *, identity=None):
     if complete:
         start=next(r for r in journal.records('episode') if r.data['episode']==episode)
         _external_observations(root,journal,episode,start.id,provenance)
+        _session_history(root,journal,episode,start.id,refs)
         return episode
     start = journal.append('episode', dict(artifacts=refs, capture_id=identity['capture_id'], manifest_id=identity['manifest_id'],
                            content_id=identity['content_id'], experience_id=identity['experience_id'],
@@ -105,8 +121,10 @@ def import_episode(root, journal, *, identity=None):
         if 'shadow' in step:
             add('reported_forecast', {**ref,'pointer':ref['pointer']+['shadow']}, step.get('observed_at'))
     _external_observations(root,journal,episode,start.id,provenance)
+    _session_history(root,journal,episode,start.id,refs)
     # Index preflight/failure context without inventing transition timestamps.
-    for field in ('startup_watch','exposure_preflight','episode_end','calibration','acquisition'):
+    for field in ('startup_watch','exposure_preflight','episode_end','calibration','acquisition',
+                  'sensory_preflight','exploratory_startup','session_evidence'):
         if field in report:
             add('session_'+field,{**refs['report.json'],'pointer':[field]})
     journal.append('event',dict(category='episode_import_complete',content_id=identity['content_id']),

@@ -25,6 +25,11 @@ class ScoreObserver:
         self.thread = threading.Thread(target=self._run, daemon=True)
         self.thread.start()
 
+    def reframe(self,calibration):
+        # FIFO changes reader geometry between old/new observations. Preserve
+        # game score history; a viewpoint change is not a new game/reset.
+        self.queue.put(('geometry',calibration),timeout=1.)
+
     def submit(self, frame, *, timestamp, sample, preceding_action):
         begin = time.monotonic()
         if self.queue.full():
@@ -44,6 +49,9 @@ class ScoreObserver:
             try:
                 if item is None:
                     return
+                if len(item)==2 and item[0]=='geometry':
+                    self.system.reader.calibration=item[1]
+                    continue
                 frame, timestamp, sample, action, copy_seconds = item
                 begin = time.monotonic()
                 error = None

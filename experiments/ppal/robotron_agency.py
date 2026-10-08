@@ -54,6 +54,15 @@ class VisualAgency:
                                        "provisional" if self.controlled_track_id is not None else "unknown")
         return snapshot
 
+    def reframe(self):
+        """New camera coordinates invalidate association, never recycle IDs."""
+        retired=list(self.tracker.active)
+        self.tracker.finished.extend(self.tracker.active.values())
+        self.tracker.active.clear()
+        self.agency=AgencyTracker()
+        self.positions={};self.assignments={};self.pairs=[]
+        return retired
+
     @property
     def controlled_track_id(self):
         if self.agency.self_id is not None:

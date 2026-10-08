@@ -14,7 +14,10 @@ class CaptureEvidence:
         self.output=output;self.episode=episode;self.provenance=provenance
         self.pool=ThreadPoolExecutor(max_workers=1,thread_name_prefix='camera-evidence')
         self.pending=[];self.capacity=capacity;self.preparing=True;self.count=0;self.overflow=None
-        self.pool.submit(self._open).result(timeout=10)
+        try:self.pool.submit(self._open).result(timeout=10)
+        except BaseException:
+            self.pool.shutdown(wait=False,cancel_futures=True)
+            raise
 
     def _open(self):
         from memory.evidence import EvidenceJournal
@@ -72,7 +75,8 @@ class CaptureEvidence:
                 current=self.latest
                 timely=current is not None and prediction.data['at']<current.data['at']<=prediction.data['payload']['deadline']
                 self.journal.resolve(prediction.id,sources=(current.id,) if timely else (),
-                    result='supported' if timely and payload.get('scene_changed') else 'unresolved',
+                    result=(payload.get('resolved_result','supported' if payload.get('scene_changed') else 'unresolved')
+                        if timely and payload.get('eligible',True) else 'unresolved'),
                     reason='observed visual association only; independent causation unqualified' if timely else 'late, missing or ambiguous observation')
             return self.journal.append('observation',dict(category=kind,**payload),
                 episode=self.episode,at=at,sources=(self.latest.id,) if self.latest else (),

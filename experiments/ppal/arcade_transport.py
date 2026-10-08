@@ -31,7 +31,7 @@ def positions_for(action: Action) -> tuple[str, str]:
 
 def controls_for(action: Action) -> frozenset[str]:
     """Map PPAL's independent move/fire directions to left/right sticks."""
-    buttons = encode(action, sequence=1).buttons
+    buttons = encode(Action(action.move,action.fire), sequence=1).buttons
     return frozenset(
         ("LS_" if button.startswith("move_") else "RS_") + button.split("_", 1)[1].upper()
         for button in buttons

@@ -17,9 +17,11 @@ report=$(mktemp -d "$state/native-identity-acceptance-XXXXXX")
 # Preserve a post-run history export even when a regression/assertion fails.
 trap '"$python" -m learning.acquisition --output "$state" --export-history > "$report/post-run-export.json" || echo "Post-run export unavailable; retain report directory: $report" >&2' EXIT
 "$python" -m learning.acquisition --output "$state" --export-history > "$report/pre-run-export.json"
+# Capture prior failure/status and project lineage before tests or the app run.
+"$python" tools/inspect_developmental_progress.py "$state" > "$report/pre-development.json"
 CHARLIE_POLICY_TIMING_OUTPUT="$report/policy-latency.json" CHARLIE_IDENTITY_ACCEPTANCE_ROOT="$roots" "$python" -m pytest \
   tests/test_episode_identity.py tests/test_normal_learning_lifecycle.py tests/test_meditation_yield.py tests/test_developmental_stall.py tests/test_developmental_continuity.py tests/test_developmental_dependencies.py tests/test_qualified_ppal_policy.py tests/test_ppal_policy_continuity.py \
-  tests/test_retrospective.py tests/test_preserved_meditation_recovery.py tests/test_learning_projects.py \
+  tests/test_retrospective.py tests/test_preserved_meditation_recovery.py tests/test_learning_projects.py tests/test_developmental_inspection.py \
   tests/test_archive_qualification.py tests/test_meditation_candidate.py \
   tests/test_robotron_score_comparison.py tests/test_development_resources.py \
   tests/test_development_efficiency.py tests/test_development_profile.py \
@@ -30,7 +32,6 @@ args=(--offline --learning-state "$state" --episode-root "$roots"
   --history-root /home/five/charlie-meditation-20261003-01
   --history-root /home/five/charlie-offline-learning
   --learning-turns 12 --learning-interval .05 --learning-budget 10)
-"$python" tools/inspect_developmental_progress.py "$state" > "$report/pre-development.json"
 # No offline deployment grant is added; physical authority remains false.
 "$python" main.py "${args[@]}" | tee "$report/first-twelve-turns.txt"
 "$python" tools/inspect_developmental_progress.py "$state" > "$report/first-progress.json"

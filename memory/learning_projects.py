@@ -137,8 +137,13 @@ class LearningExecutive:
 
     def projects(self):
         """Rebuild operational state; no mutable snapshot is authoritative."""
+        return self.project_state(self.journal)
+
+    @staticmethod
+    def project_state(journal):
+        """Read-only projection shared with acceptance; never constructs an Executive."""
         projects = {}
-        for record in self.journal.records('event'):
+        for record in journal.records('event'):
             if record.data['episode'] != SCOPE:
                 continue
             p = record.data['payload']; op = p.get('op')

@@ -36,6 +36,7 @@ def test_evidence_originated_cycle_resolution_memory_and_restart(tmp_path):
     assert len(report['results'])==1
     result=report['results'][0]; assert result['plan']['experiment_kind']=='offline'
     assert result['result']['status']=='resolved'
+    assert result['plan']['method']==report['projects'][result['project_id']]['method']=='cnn-reconstruction'
     prediction=ds.journal.get(result['plan']['prediction_id']); outcome=ds.journal.get(result['result']['evaluation_id'])
     assert prediction.sequence<outcome.sequence
     assert report['projects'][result['project_id']]['progress']['independent_physical_episodes']==0

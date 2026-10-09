@@ -1,0 +1,42 @@
+F
+=================================== FAILURES ===================================
+_________ test_evidence_originated_cycle_resolution_memory_and_restart _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-5/test_evidence_originated_cycle0')
+
+    def test_evidence_originated_cycle_resolution_memory_and_restart(tmp_path):
+        pytest.importorskip('torch')
+        ds,g=make(tmp_path)
+>       report=investigate(ds,g,budget_seconds=8,max_jobs=2,driver=driver)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ala_cycle.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/cycle.py:295: in investigate
+    commission=executive.commission(plan,dataset.journal)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <memory.learning_projects.LearningExecutive object at 0x7f8560ea2630>
+plan = {'project_id': '414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252', 'prediction_id': '3a13b38ab4f7ac1d3...b74ce7c1a81e17167a759362bc1c0b', 'dataset_id': 'f38bd5d302e1da47144068e6c6b9c7ddf2a364e5cd1ad6876c5269d25affc564', ...}
+source_journal = <memory.evidence.EvidenceJournal object at 0x7f8593b14920>
+
+    def commission(self, plan, source_journal):
+        """Executive-owned durable bookmark and offline meditation dispatch.
+    
+        Discovery reports evidence; only a selected project can commission it.
+        This records authority over investigation, never physical authority.
+        """
+        project = self.projects()[plan['project_id']]
+        committed = [r.data['payload']['plan'] for r in source_journal.records('event')
+                     if r.data['payload'].get('category') == 'offline_experiment_plan'
+                     and r.data['payload']['plan']['prediction_id'] == plan['prediction_id']]
+>       if committed != [plan] or project['status'] != 'active' or plan['method'] != project['method']:
+                                                                   ^^^^^^^^^^^^^^
+E       KeyError: 'method'
+
+memory/learning_projects.py:475: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_ala_cycle.py::test_evidence_originated_cycle_resolution_memory_and_restart
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 1.63s

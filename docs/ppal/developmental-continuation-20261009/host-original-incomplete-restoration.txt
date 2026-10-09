@@ -1,0 +1,19 @@
+Development: idle | no project | 
+Development: blocked | no project | ValueError: durable meditation result changed or unavailable
+Development: stopped | no project | ValueError: durable meditation result changed or unavailable
+Traceback (most recent call last):
+  File "/workspace/scratch/c81a2d35e2bc/charlie/main.py", line 98, in <module>
+    main()
+  File "/workspace/scratch/c81a2d35e2bc/charlie/main.py", line 42, in main
+    run(args.learning_state,roots,**kwargs)
+  File "/workspace/scratch/c81a2d35e2bc/charlie/learning/lifecycle.py", line 592, in run
+    lifecycle.turn()
+  File "/workspace/scratch/c81a2d35e2bc/charlie/learning/lifecycle.py", line 556, in turn
+    try:return self.executive.develop(self)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c81a2d35e2bc/charlie/memory/learning_projects.py", line 674, in develop
+    changed=lifecycle.acquire()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c81a2d35e2bc/charlie/learning/lifecycle.py", line 158, in acquire
+    raise ValueError('durable meditation result changed or unavailable')
+ValueError: durable meditation result changed or unavailable

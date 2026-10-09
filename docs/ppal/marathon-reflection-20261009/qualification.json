@@ -1,0 +1,36 @@
+{
+  "implementation_commit": "95b27870d0637240b511cc7362ea73886f86190d",
+  "source_git_blobs": {
+    "experiments/ppal/marathon_robotron.py": "600966ed68ad5d27c0b0e8f5024db09a0d60dbf9",
+    "experiments/ppal/episode_evidence.py": "cb03b9a45637269693ade1b7f394b2410fe3d9b5",
+    "experiments/ppal/process_robotron_episode.py": "88a72f7002cbcda99723b6227f1a1380c2cf6a26",
+    "learning/cycle.py": "a42a47d7fb25e341e9f9aca07acc06b2b7f3bd46",
+    "learning/lifecycle.py": "da777847d2be7d54f0dd630425ebbe59e5fd2c2d",
+    "tests/test_marathon_deferred.py": "5cef92335eaa58ea574a17431cd2dced5adb930b"
+  },
+  "full_suite": {
+    "returncode": 0,
+    "summary": "721 passed, 21 skipped in 187.84s",
+    "junit": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "21",
+      "tests": "742",
+      "time": "187.825",
+      "timestamp": "2026-10-08T20:08:28.567146-06:00",
+      "hostname": "1a2040fccfbc"
+    }
+  },
+  "focused_suite": {
+    "returncode": 0,
+    "summary": "93 passed, 6 skipped in 15.91s"
+  },
+  "host": "x86_64 Python 3.12; pytest 9.1.1, NumPy 2.5.3, Pillow 12.3.0, OpenCV headless 5.0.0.93, pyserial 3.5",
+  "evidence": "authentic retained October 1 BODY/FIRE proposal seed; simulated game children and outcomes; real offline subprocesses and normal Executive",
+  "native_pi_accepted": false,
+  "physical_actions": false,
+  "physical_policy_activation": false,
+  "interrupted_native_run_available_to_host": false,
+  "verified_score_improvement": false
+}

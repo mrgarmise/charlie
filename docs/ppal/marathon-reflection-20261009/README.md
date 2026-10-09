@@ -40,8 +40,18 @@ For a new marathon substitute its exact printed session directory. A productive 
 
 ## Host validation / limitations
 
-Focused qualification of the final source: **93 passed, 6 skipped in 15.91s** (marathon, import, live commitment feedback, projects, supervision, normal lifecycle, resource guards and offline cycle). Full frozen-source qualification follows in a separate published validation receipt.
+Focused qualification of the final source: **93 passed, 6 skipped in 15.91s** (marathon, import, live commitment feedback, projects, supervision, normal lifecycle, resource guards and offline cycle). Final full qualification of the unchanged implementation source: **721 passed, 21 skipped in 187.84s**, exit 0. `qualification.json` binds tested source blobs to implementation commit `95b27870d0637240b511cc7362ea73886f86190d`; complete console/JUnit records are retained losslessly. Compilation and git diff checks passed.
 
 Tests run **controllerless simulated games**, real supervised offline subprocesses, normal Executive turns, occupied-notebook handoff, three independent episode identities and commitment/result dedup, uncertain/missing-report/time-out stops, interrupt bookmarking, rollback within an import chunk, multi-restart 550-observation import, original-history retention, completion receipt rejection, and primary resource release. Authentic October 1 BODY/FIRE extracts supply existing Reflection-generated diagnostic proposals; subsequent games/outcomes are simulated, not physical confirmation or learned SCORE success. No strategy/score improvement is claimed.
 
 Host: x86_64 Python 3.12, isolated pytest/NumPy/Pillow/OpenCV/pyserial dependencies. Native Pi acceptance of this change and resume against the actual 024021 databases remain outstanding. Focused/full-suite transcripts and JUnit evidence accompany qualification. ALA-2 remains open until Charlie-originated learning improves independently verified mean complete-game Robotron SCORE.
+
+## Guarded native software qualification
+
+After the normal evidence-preserving checkout/update of the exact final published checkpoint, use the existing Pi Python environment from the repository directory (no --arm):
+
+```bash
+python -m pytest tests/test_marathon_deferred.py tests/test_marathon_robotron.py tests/test_episode_evidence.py tests/test_experiment_return.py tests/test_learning_projects.py tests/test_progress_supervision.py tests/test_normal_learning_lifecycle.py tests/test_development_resources.py tests/test_ala_cycle.py -q
+```
+
+Then the offline `--reflect-session` command above may resume the retained native episode. Keep original integrity reports and capture directories intact; preserve a consistent backup of databases before update/resume. Check `reflection-progress.json` source bindings and completion receipts, raw recording seal, unchanged original capture hashes, journal integrity and record-ID continuity. Growing processed journals or advancing retained checkpoints are legitimate; exact record-count equality is not a success condition. No extra independent experience may be inferred from replay counts. Missing qualification/authorization should remain an explicit dependency. If another normal app owns the notebook, observe its acquisition handoff/status instead of relaunching a second Executive.

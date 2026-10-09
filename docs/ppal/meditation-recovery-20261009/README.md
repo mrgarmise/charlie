@@ -147,3 +147,14 @@ recoverable. Regression logs record host/Python/dependency scope and failures.
 No daemon, boot-time gameplay, external research, generalized recovery platform
 or second learning owner was implemented. Those are separate Charlie UP backlog
 items, not ALA-2 acceptance substitutes.
+
+## Final host qualification
+
+Tested implementation: `830c54b090af8d00fa2f8050c71df80d67b57755`.
+Final `pytest -q tests`: **742 passed, 21 skipped in 191.68s (0:03:11)**.
+Final continuity/dependency/normal-owner focused set: **54 passed in 22.61s**.
+Host: x86_64, Python 3.12.14, NumPy 2.5.3, no Torch.
+Compilation, shell syntax and diff checks passed. Logs (including failed
+intermediate runs) are retained losslessly as gzip with original byte hashes
+in `log-index.json`. Skips and exact commands are in `qualification.json`.
+These results do not establish native Pi acceptance or physical improvement.

@@ -1,7 +1,7 @@
 {
   "base_revision": "6fcd5b21432dc0da8dd6afab52c446b6d1c55b0a",
   "branch": "feature/agency-first-self",
-  "phase": "focused-qualified recovery milestone; final full suite running",
+  "phase": "host offline qualified; native acceptance pending",
   "environment": {
     "machine": "x86_64",
     "python": "3.12.14",
@@ -23,5 +23,18 @@
   "physical_authorization": false,
   "complete_game_score_improvement": "not demonstrated",
   "exact_october9_failure_artifact_available": false,
-  "source_artifact_audit": "authentic-artifact-audit.json"
+  "source_artifact_audit": "authentic-artifact-audit.json",
+  "tested_implementation_revision": "830c54b090af8d00fa2f8050c71df80d67b57755",
+  "final_suite_command": "PYTHONPATH=../deps python -m pytest -q tests",
+  "final_suite_result": "742 passed, 21 skipped in 191.68s (0:03:11)",
+  "final_skips": {
+    "collection skipped": 1,
+    "could not import 'torch': No module named 'torch'": 18,
+    "original October 1 artifacts required; use documented acceptance environment": 1,
+    "Optional full 119-original archive replay; retained nine originals always run": 1
+  },
+  "compilation": "passed",
+  "shell_syntax": "passed",
+  "diff_check": "passed",
+  "continuity_validation": "Explicit category lineage, duplicate and exact dependency checks; 54 final focused passes"
 }

@@ -1,0 +1,102 @@
+[
+  {
+    "original_name": "authentic-reference-scope-failure.txt",
+    "original_sha256": "12dc5119240bb7b08d84fb5d127f89d7f2c9a2203fd2c7f9ec12a95cf89b7b57",
+    "compressed_name": "authentic-reference-scope-failure.txt.gz"
+  },
+  {
+    "original_name": "authentic-reference-scope-failure.xml",
+    "original_sha256": "72a8a70f6f2fa3e22c173e147f64e841445f4a7ea0b327dbcf7b907f9bef23dc",
+    "compressed_name": "authentic-reference-scope-failure.xml.gz"
+  },
+  {
+    "original_name": "continuity-complete.txt",
+    "original_sha256": "291802ddde616adddafa07d0c57e9c474a90dadfde5f1baea725666b2497cd96",
+    "compressed_name": "continuity-complete.txt.gz"
+  },
+  {
+    "original_name": "continuity-complete.xml",
+    "original_sha256": "556f9edd94543721d544cc3bd4d6916235bc968b5ede5bba1409c6724fe78a1e",
+    "compressed_name": "continuity-complete.xml.gz"
+  },
+  {
+    "original_name": "continuity-final.txt",
+    "original_sha256": "f015b72a61ecd9d826e5c340877359c11e9d534a286143b5f54fee91b198fd99",
+    "compressed_name": "continuity-final.txt.gz"
+  },
+  {
+    "original_name": "continuity-final.xml",
+    "original_sha256": "59c559478a198ed0899f151456175f773c997bcd47e57f75155a0d7e0a6a83dc",
+    "compressed_name": "continuity-final.xml.gz"
+  },
+  {
+    "original_name": "focused-complete.txt",
+    "original_sha256": "da6ac27d6f72d1bf7d93d7cf1a6bfa342a90510dadc4ce76849ce26cc9566dc5",
+    "compressed_name": "focused-complete.txt.gz"
+  },
+  {
+    "original_name": "focused-complete.xml",
+    "original_sha256": "5110ac870919c0e988547f03def90d691999fec8913ac450bb7a13b284a788b3",
+    "compressed_name": "focused-complete.xml.gz"
+  },
+  {
+    "original_name": "focused-final.txt",
+    "original_sha256": "4a24a491b092b20fef6fb975eef0fb1d0e6beae3ff51f738a41da0ec32399219",
+    "compressed_name": "focused-final.txt.gz"
+  },
+  {
+    "original_name": "focused-final.xml",
+    "original_sha256": "0b88143ac8868b9f304724d01ec08b720d35e23615e1bb5b832cf3e682289447",
+    "compressed_name": "focused-final.xml.gz"
+  },
+  {
+    "original_name": "focused.txt",
+    "original_sha256": "d81a81ef1c265c1df30cb86bb5b7f825836f7ad82d18eb2c944670a91b3e566a",
+    "compressed_name": "focused.txt.gz"
+  },
+  {
+    "original_name": "focused.xml",
+    "original_sha256": "b2fd1b482638a36b799122197588a48913d2178fbe88c52601e6d857930b5ca5",
+    "compressed_name": "focused.xml.gz"
+  },
+  {
+    "original_name": "full-continuity-vocabulary-failure.txt",
+    "original_sha256": "320ca55f12f5e5f7dd648ad67365c16bbd2e9799dff985d45ef4631f965ba0f4",
+    "compressed_name": "full-continuity-vocabulary-failure.txt.gz"
+  },
+  {
+    "original_name": "full-continuity-vocabulary-failure.xml",
+    "original_sha256": "4524ddd9675130eb26a12dcdcb820521bdace4951c386fb6d158bfc09906ac41",
+    "compressed_name": "full-continuity-vocabulary-failure.xml.gz"
+  },
+  {
+    "original_name": "full-import-boundary.txt",
+    "original_sha256": "7322491726983797692d1872fe0981d65aaf33201c01acee5c9aea4a217d4197",
+    "compressed_name": "full-import-boundary.txt.gz"
+  },
+  {
+    "original_name": "full-import-boundary.xml",
+    "original_sha256": "f5a4a7b7537688023370a9a2d71fb41b53a8ee6fcb8773feed3c84ccfece5b69",
+    "compressed_name": "full-import-boundary.xml.gz"
+  },
+  {
+    "original_name": "unscoped-collection-failure.txt",
+    "original_sha256": "fe8ab13fb57116a8a9b943d893dc931d35a54ad48f2b398f1719586c3cf5ddcb",
+    "compressed_name": "unscoped-collection-failure.txt.gz"
+  },
+  {
+    "original_name": "unscoped-collection-failure.xml",
+    "original_sha256": "8b7382d0c6db68ff8ec9f14df9979df3e415035a72ac786f14c93759425503bf",
+    "compressed_name": "unscoped-collection-failure.xml.gz"
+  },
+  {
+    "original_name": "full.txt",
+    "original_sha256": "e30c2ef882ccebc488062f36cf5b891195fd92b7f9deda7014507e6094f79b24",
+    "compressed_name": "full.txt.gz"
+  },
+  {
+    "original_name": "full.xml",
+    "original_sha256": "fb57ce5fa92e3b510549b81c3985300cbf12f4cc0f9aa455088af38043682967",
+    "compressed_name": "full.xml.gz"
+  }
+]

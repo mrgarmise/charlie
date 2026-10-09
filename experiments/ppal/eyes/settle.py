@@ -8,7 +8,7 @@ from PIL import ImageDraw
 from .calibration import Calibration
 
 
-def locate(frame, require_uniform_border=True):
+def _border_candidates(frame, require_uniform_border=True):
     rgb = np.asarray(frame.convert('RGB'))
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
     height, width = rgb.shape[:2]
@@ -62,6 +62,7 @@ def locate(frame, require_uniform_border=True):
             if not .15*width*height<area<.90*width*height:
                 continue
             support=[]
+            endpoint_support=[]
             colors=[]
             for start,end in zip(points,np.roll(points,-1,axis=0)):
                 samples = np.linspace(start, end, 100).astype(int)
@@ -91,8 +92,13 @@ def locate(frame, require_uniform_border=True):
                 contrast = (pixels[:, None, :]-side_pixels).max(axis=2).min(axis=1)
                 hits = (pixels.max(axis=1) > 100) & (contrast > 35)
                 support.append(float(hits.sum())/100)
+                # A long line may be extrapolated well beyond its physical end.
+                # Total support cannot establish the four claimed corners.
+                full_hits=np.zeros(100,dtype=bool)
+                full_hits[valid]=hits
+                endpoint_support.append(min(float(full_hits[:10].mean()),float(full_hits[-10:].mean())))
                 colors.append(np.median(pixels/np.maximum(pixels.sum(axis=1, keepdims=True), 1), axis=0))
-            if min(support)<.65:
+            if len(endpoint_support)!=4 or min(endpoint_support)<.65 or min(support)<.65:
                 continue
             color_spread = float(np.max(
                 np.linalg.norm(
@@ -102,10 +108,23 @@ def locate(frame, require_uniform_border=True):
             ))
             if require_uniform_border and color_spread > .10:
                 continue
-            candidates.append((min(support), points))
+            candidates.append(((float(np.mean(support)),min(support)), points))
     if not candidates:
         raise ValueError('No complete game border found; include all corners and aim more squarely at TV')
     candidates.sort(key=lambda item:item[0],reverse=True)
+    return candidates
+
+
+def locate(frame, require_uniform_border=True, *, previous=None, max_jitter_pixels=8.):
+    """Discover in the full frame; prior geometry only ranks fresh supported candidates."""
+    candidates=_border_candidates(frame,require_uniform_border)
+    if previous is not None:
+        previous=np.asarray(previous,dtype=float)
+        if previous.shape!=(4,2) or not np.all(np.isfinite(previous)):
+            raise ValueError('Invalid previous border geometry')
+        nearby=[item for item in candidates if np.max(np.linalg.norm(item[1]-previous,axis=1))<=max_jitter_pixels]
+        if nearby:
+            candidates=nearby
     return candidates[0][1]
 
 
@@ -143,7 +162,8 @@ def prepare(source, output: Path, *, require_uniform_border=True):
             attempts.append(row)
             locate_started = time.monotonic()
             try:
-                points = locate(frame, require_uniform_border=require_uniform_border)
+                points = locate(frame, require_uniform_border=require_uniform_border,
+                    previous=np.median(observations,axis=0) if observations else None)
             except ValueError as exc:
                 row['locate_seconds'] = time.monotonic()-locate_started
                 observations.clear()

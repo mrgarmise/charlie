@@ -1,0 +1,70 @@
+{
+  "source_library_file": "libfile_9427196945988191884a3ea59ba61dbb",
+  "archive_sha256": "277769a3e4d2d106fdab98a80be7c6a8532be75415875314949ed6130cc71a04",
+  "source": "robotron-runs/marathon-20261009-004249/game-01",
+  "original_images": true,
+  "report_sha256": "4488f4f5533a70627455a0b1d642e520c6035ee60c8fc7423607e9d9402cc984",
+  "uploaded_detector_sha256": "13d1554f8957e530b0e8161bde86e3ae15b4ecf427536f74e71a6dc054e209c9",
+  "rows": [
+    {
+      "frame": "camera-000001.png",
+      "source_path": "marathon-20261009-004249/game-01/observations/camera-000001.png",
+      "sha256": "bb7f160f42b66ea4e4d2b9d01c2809e76dfa9df1a8b2185cba81f6f1f9150d42",
+      "rgb_sha256": "a328272b4818d2635c13dbf2f8c385708612ebb352e2e8a721df3a99c6da22a3"
+    },
+    {
+      "frame": "camera-000002.png",
+      "source_path": "marathon-20261009-004249/game-01/observations/camera-000002.png",
+      "sha256": "2e83bbf6f94a2bb729505be17ecc280bd08e09a339404366c43cc15e78b43d0b",
+      "rgb_sha256": "77a50c6ddeb42f6466cef57f884fb7a634e2b7c182e7dd1db56cc48f7c73a0e3"
+    },
+    {
+      "frame": "camera-000003.png",
+      "source_path": "marathon-20261009-004249/game-01/observations/camera-000003.png",
+      "sha256": "6db5e01cd91ab45c67bad313daa2963394388d2538217c26fb04c5ee28a7fb70",
+      "rgb_sha256": "f6849c7673dad356eaee88b3c8107466f0f7d201c9631e4f1e8ea46bb845334e"
+    },
+    {
+      "frame": "camera-000004.png",
+      "source_path": "marathon-20261009-004249/game-01/observations/camera-000004.png",
+      "sha256": "9c9a7e43444133df45c905c91b5bb389cb2a6e3e64ea99e6ab661377dc17cb06",
+      "rgb_sha256": "85aab4f532e72e6dc84cd734173aa6a12bd933c18d02cb2bdf121cacb33ca0ba"
+    },
+    {
+      "frame": "camera-000005.png",
+      "source_path": "marathon-20261009-004249/game-01/observations/camera-000005.png",
+      "sha256": "52297d480cfa80ebce8e0b61f34d2ac5b18fed6cf94a2fac749dd107d9cbc706",
+      "rgb_sha256": "eb9ad654d8f1d9a66e82b21e40b9bf7dc6ace61c5bc17bbebb0e777bf245f389"
+    },
+    {
+      "frame": "camera-000006.png",
+      "source_path": "marathon-20261009-004249/game-01/observations/camera-000006.png",
+      "sha256": "23dc3d34e056a082e5f80c69ebfe36464d9f363fc731059a8b7a80e72f60d546",
+      "rgb_sha256": "897981ff059920e500e5562bf6f4bfe937e84de213975fbb9c6d0bb2c0ba2580"
+    },
+    {
+      "frame": "camera-000018.png",
+      "source_path": "marathon-20261009-004249/game-01/observations/camera-000018.png",
+      "sha256": "62078cb558bf26d414769850561f251723b8cdc29a7079727fff2d9dcf28cba0",
+      "rgb_sha256": "5cf03d7cbeaafa6d9356631ca18d0907fe4873b0aa332593b4cb4aa626fae567"
+    },
+    {
+      "frame": "camera-000112.png",
+      "source_path": "marathon-20261009-004249/game-01/observations/camera-000112.png",
+      "sha256": "5b89e35f4e2fecd3ba2529a2115561acf3233b6d39e5d60d28cdc44a1b443c17",
+      "rgb_sha256": "e0eafc0c448c0f3f9c2d84cc8a8aa6ad1f9758e429f7bd08d6c2abd3d6f39a34"
+    },
+    {
+      "frame": "camera-000113.png",
+      "source_path": "marathon-20261009-004249/game-01/observations/camera-000113.png",
+      "sha256": "6491f113ff5687bcf6e2f7e6fe55da0b603aff065fde3a31efef9819f39f379f",
+      "rgb_sha256": "b0977d80ccd8f4071b70ea6b19eb4cf7ef6e9a4e65206d68c553df0b1025d9c3"
+    }
+  ],
+  "note": "Exact original PNG bytes. Manually inspected broad border region is diagnostic geometry regression, not independently qualified gameplay/score or trajectory truth.",
+  "source_report_provenance": {
+    "git_commit": "7991731b95a54997b161c64c153c9f68b4f420af",
+    "dirty_worktree": true,
+    "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+  }
+}

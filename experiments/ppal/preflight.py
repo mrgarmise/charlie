@@ -192,7 +192,9 @@ def locate_stable_geometry(source, config: PreflightConfig | None = None) -> Geo
         frame = source.read()
 
         try:
-            points = locate(frame, require_uniform_border=False)
+            points = locate(frame, require_uniform_border=False,
+                previous=np.median(observations,axis=0) if observations else None,
+                max_jitter_pixels=cfg.max_jitter_pixels)
         except ValueError as exc:
             observations.clear()
             last_reason = str(exc)

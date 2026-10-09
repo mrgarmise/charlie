@@ -42,6 +42,8 @@ def _unique(rows):
         elif category=='normal_meditation_yield':
             key=(category,p['context_id'],p['commission_id'],p['checkpoint_sha256'])
         elif category=='preserved_meditation':key=(category,p['source_episode'],p['artifact_sha256'])
+        elif category=='preserved_meditation_rejection':key=(category,p['source_episode'],p['artifact_sha256'],p['validator'])
+        elif category=='retrospective_meditation_continuation':key=(category,p['ingestion_id'],p.get('meditation_id'),p.get('meditation_rejection_id'))
         elif category=='offline_experiment_plan':key=(category,p['plan']['prediction_id'])
         elif category=='learning_evidence_request' and p.get('dependency_key'):
             key=(category,p['dependency_key'])
@@ -117,7 +119,7 @@ CATEGORIES={
         'perceptual_experiment_proposal','learning_project_proposal','model_deployment_proposal','retrieval_experiment_reflection','perceptual_learning_deferred'},
     'LearningExecutive':{'reflection_commission'},
     'existing-evidence-consolidation':{'consolidated_evidence_reference','learning_context_reference',
-        'retrospective_ingestion','preserved_meditation','normal_history_restore','notebook_history_recovery'},
+        'retrospective_ingestion','preserved_meditation','preserved_meditation_rejection','retrospective_meditation_continuation','normal_history_restore','notebook_history_recovery'},
     'existing-evidence-acquisition':{'episode_identity_binding','episode_identity_location','episode_identity_alias','episode_identity_quarantine'},
     'ExperienceDataset':{'experience_example','experience_dataset_snapshot','artifact_location'},
     'archive-measurement-service':{'observation_qualification'},
@@ -165,7 +167,25 @@ def compare_restart(before,after):
         if category=='capability_activation':
             require(p.get('authorization',{}).get('execution')!='physical','physical activation during offline acceptance')
         label=category or op or d['kind'];counts[label]=counts.get(label,0)+1
-        if op=='developmental_progress':
+        if category=='preserved_meditation_rejection':
+            context=rows.get(p.get('context_id'),{}).get('payload',{})
+            h=p.get('artifact_sha256','')
+            require(context.get('category')=='learning_context_reference' and
+                context.get('source_episode')==p.get('source_episode') and p.get('context_id') in d['sources'] and
+                len(h)==64 and all(c in '0123456789abcdef' for c in h) and p.get('artifact_path') and
+                p.get('status')=='rejected' and p.get('reason') and p.get('validator') and p.get('resumption_condition'),
+                'rejected finding lacks exact source context, hash or resumption dependency')
+        elif category=='retrospective_meditation_continuation':
+            origin=rows.get(p.get('ingestion_id'),{}).get('payload',{})
+            finding=p.get('meditation_id') or p.get('meditation_rejection_id')
+            result=rows.get(finding,{}).get('payload',{})
+            require(origin.get('category')=='retrospective_ingestion' and
+                origin.get('meditation_rejection_id') and origin.get('source_episode')==p.get('source_episode') and
+                result.get('source_episode')==p.get('source_episode') and
+                result.get('category') in ('preserved_meditation','preserved_meditation_rejection') and
+                p.get('ingestion_id') in d['sources'] and finding in d['sources'],
+                'finding continuation lacks retained ingestion and validated result lineage')
+        elif op=='developmental_progress':
             work=p['work_id'];prior=latest.get(work)
             require(p.get('previous')==(prior[0] if prior else None),'developmental progress lineage reset')
             # Experiment completion binds an independent resolution, whereas
@@ -213,6 +233,18 @@ def compare_restart(before,after):
                 rows[s]['payload'].get('example')==p.get('example_id') and
                 rows[s]['payload'].get('path')==p.get('path') and rows[s]['payload'].get('sha256')==p.get('sha256')
                 for s in d['sources']))
+            if spec.get('type')=='valid_preserved_prediction_finding':
+                finding=rows.get(p.get('finding_id'),{}).get('payload',{})
+                require(finding.get('category')=='preserved_meditation' and
+                    finding.get('source_episode')==spec.get('source_episode') and
+                    finding.get('prior_use')==spec.get('prior_use') and
+                    finding.get('artifact_sha256')!=spec.get('rejected_sha256') and
+                    p.get('finding_id') in d['sources'] and p.get('request_id') in d['sources'] and
+                    p.get('work_id')==request.get('work_id')=='preserved-meditation:'+spec['source_episode'] and
+                    p.get('new_independent_experience') is False,
+                    'replacement finding does not satisfy exact rejected dependency')
+                substantive.append(identifier)
+                continue
             require(spec.get('type')=='preserved_pixel_artifact' and
                 spec.get('example_id')==p.get('example_id') and spec.get('sha256')==p.get('sha256') and
                 example.get('category')=='experience_example' and example.get('pixel_sha256')==p.get('sha256') and location_bound and

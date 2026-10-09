@@ -121,21 +121,98 @@ def motion_error(spec, episodes):
         independence_groups=groups,per_episode=list(zip(errors,baseline)),qualified_observations=qualified)
 
 
+class InvalidPreservedFinding(ValueError):
+    """Only source-format/measurement rejection, never storage or journal failure."""
+
+
+def preserved_finding(raw):
+    try:
+        finding = json.loads(raw)
+        quality = finding['quality']
+        for kind in ('adjacent', 'gaps'):
+            value = quality[kind]['mean_error']
+            if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
+                raise InvalidPreservedFinding('finite preserved prediction errors required: '+kind)
+        # Reject nonfinite values anywhere; journal canonicalization must not
+        # become an uncaught source-validation failure after import.
+        canonical(finding)
+    except (ValueError, KeyError, TypeError, UnicodeError, OverflowError) as exc:
+        raise InvalidPreservedFinding(str(exc)) from exc
+    return finding
+
+
 def consume(dataset, path, *, source_episode, prior_use):
     """Import an exact preserved finding, with explicit historical evidence use."""
     if prior_use not in ('train', 'validation', 'consulted-test', 'diagnostic'):
         raise ValueError('explicit historical use required')
     p = Path(path)
-    finding = json.loads(p.read_text())
-    quality = finding['quality']
-    for kind in ('adjacent', 'gaps'):
-        value = quality[kind]['mean_error']
-        if not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
-            raise ValueError('finite preserved prediction errors required')
+    raw = p.read_bytes()
+    finding = preserved_finding(raw)
+    from hashlib import sha256
     return dataset.journal.append('observation', dict(category='preserved_meditation',
-        artifact_sha256=sha(p), source_episode=source_episode, prior_use=prior_use,
+        artifact_sha256=sha256(raw).hexdigest(), source_episode=source_episode, prior_use=prior_use,
         finding=finding, qualification='retrospective unverified track reconstruction'),
         episode=SCOPE, producer='existing-evidence-consolidation', version=VERSION)
+
+
+def acquire_preserved(dataset, path, *, source_episode, prior_use, context_id):
+    """Retain invalid bytes/dependency once; retry only a changed artifact hash.
+
+    Accepted findings remain diagnostic interpretations. A replacement does not
+    certify the source or create a new physical experience.
+    """
+    import os
+    from hashlib import sha256
+    from .acquisition import retain_dependency_request
+    if prior_use not in ('train', 'validation', 'consulted-test', 'diagnostic'):
+        raise ValueError('explicit historical use required')
+    p=Path(path); raw=p.read_bytes(); h=sha256(raw).hexdigest()
+    journal=dataset.journal
+    old=next((r for r in journal.category_records('event','preserved_meditation_rejection')
+        if r.data['payload']['source_episode']==source_episode
+        and r.data['payload']['artifact_sha256']==h
+        and r.data['payload']['validator']==VERSION),None)
+    target=dataset.artifacts.parent/'preserved-findings'/(h+'.json')
+    target.parent.mkdir(parents=True,exist_ok=True)
+    if not target.exists():
+        tmp=target.with_suffix('.tmp')
+        with tmp.open('wb') as stream:
+            stream.write(raw); stream.flush(); os.fsync(stream.fileno())
+        tmp.replace(target)
+        fd=os.open(str(target.parent),os.O_DIRECTORY)
+        try: os.fsync(fd)
+        finally: os.close(fd)
+    if sha(target)!=h:
+        raise ValueError('preserved finding snapshot integrity mismatch')
+    if sha(p)!=h:
+        raise ValueError('preserved source finding changed during acquisition')
+    rejection=old
+    if old is None:
+        try:
+            med=consume(dataset,target,source_episode=source_episode,prior_use=prior_use)
+        except InvalidPreservedFinding as exc:
+            rejection=journal.append('event',dict(category='preserved_meditation_rejection',
+                source_episode=source_episode,artifact_sha256=h,artifact_path=str(target.resolve()),
+                original_path=str(p.resolve()),context_id=context_id,prior_use=prior_use,
+                status='rejected',reason=str(exc),validator=VERSION,
+                source_producer='unknown unless present in preserved bytes',
+                qualification='No valid prediction-error finding; not independent evidence',
+                resumption_condition='A distinct provenance-preserved artifact with finite nonnegative adjacent and gap errors; never interpolate missing measurements'),
+                episode=SCOPE,sources=[context_id],producer='existing-evidence-consolidation',version=VERSION)
+        else:
+            for request in journal.category_records('event','learning_evidence_request'):
+                rp=request.data['payload']
+                if rp['work_id']=='preserved-meditation:'+source_episode:
+                    journal.append('event',dict(category='acquisition_dependency_satisfied',
+                        request_id=request.id,work_id=rp['work_id'],finding_id=med.id,new_independent_experience=False,
+                        qualification='Replacement passed source validation only; not independent measurement'),
+                        episode=SCOPE,sources=[request.id,med.id],producer='existing-acquisition-capability',version=VERSION)
+            return med, None
+    retain_dependency_request(journal,rejection.id,work_id='preserved-meditation:'+source_episode,
+        required_evidence=[dict(type='valid_preserved_prediction_finding',source_episode=source_episode,
+            rejected_sha256=h,prior_use=prior_use,context_id=context_id)],
+        reason=rejection.data['payload']['resumption_condition'])
+    return None, rejection
 
 
 def reflect(dataset, gateway, registry):

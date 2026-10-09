@@ -1,0 +1,27 @@
+{
+  "base_revision": "6fcd5b21432dc0da8dd6afab52c446b6d1c55b0a",
+  "branch": "feature/agency-first-self",
+  "phase": "focused-qualified recovery milestone; final full suite running",
+  "environment": {
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "torch_available": false
+  },
+  "tests": {
+    "final_continuity": "54 passed in 22.61s",
+    "earlier_import_focused": "88 passed in 16.55s",
+    "earlier_import_full": "739 passed, 21 skipped in 190.64s",
+    "failures_preserved": [
+      "unscoped hardware collectors unavailable",
+      "authentic inspection fixture used wrong journal scope; corrected",
+      "new rejection records absent from restart closed vocabulary; fixed with explicit lineage checks and regressions"
+    ]
+  },
+  "native_pi_validated": false,
+  "physical_actions": 0,
+  "physical_authorization": false,
+  "complete_game_score_improvement": "not demonstrated",
+  "exact_october9_failure_artifact_available": false,
+  "source_artifact_audit": "authentic-artifact-audit.json"
+}

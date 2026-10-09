@@ -91,6 +91,8 @@ class DevelopmentLifecycle:
             current_question=question,activity_description=activity_description,
             projects={k:dict(goal=v['goal'],status=v['status'],progress=v.get('progress',{}),next_direction=v.get('next_direction')) for k,v in projects.items()},
             latest_findings=[dict(id=r.id,**r.data['payload']) for r in findings[-3:]],
+            rejected_preserved_findings=[dict(id=r.id,**r.data['payload']) for r in rows
+                if r.data['payload'].get('category')=='preserved_meditation_rejection'],
             latest_operational_outcome=next((dict(id=r.id,metrics=r.data['payload']['metrics'],changed_decisions=r.data['payload']['changed_decisions'])
                 for r in reversed(rows) if r.data['payload'].get('category')=='offline_operational_outcome'),None),
             developmental_work=self.executive.work_states(),turn_outcome=getattr(self,'last_turn',None),
@@ -193,7 +195,7 @@ class DevelopmentLifecycle:
     def reflect_experience(self, context_id, commission_id):
         """Executive-commissioned existing track meditation, checkpointed by iteration."""
         from experiments.ppal.meditate_robotron import meditate, quality
-        from .meditation import consume
+        from .meditation import acquire_preserved
         context = self.journal.get(context_id).data['payload']
         episode = context['source_episode']
         marker = next((r.data['payload'] for r in self.journal.records('event') if
@@ -296,12 +298,15 @@ class DevelopmentLifecycle:
                 origin='Executive-commissioned existing predictive meditation')
             atomic_json(result_path,result)
         sources=[context_id,commission_id]
-        if result['status']=='completed' and all(isinstance(result['quality'][k]['mean_error'],(int,float)) for k in ('adjacent','gaps')):
-            finding=consume(self.dataset,result_path,source_episode=episode,prior_use=marker['prior_use'] if marker else context.get('prior_use','diagnostic'))
-            sources.append(finding.id)
+        finding_validation=None
+        if result['status']=='completed':
+            finding,rejected=acquire_preserved(self.dataset,result_path,source_episode=episode,
+                prior_use=marker['prior_use'] if marker else context.get('prior_use','diagnostic'),context_id=context_id)
+            sources.append(finding.id if finding else rejected.id)
+            finding_validation='accepted diagnostic' if finding else 'rejected; dependency retained'
         receipt=self.journal.append('observation',dict(category='normal_meditation_result',
             context_id=context_id,source_episode=episode,result_path=str(result_path),
-            result_sha256=sha(result_path),status=result['status']),episode=SCOPE,sources=sources,
+            result_sha256=sha(result_path),status=result['status'],finding_validation=finding_validation),episode=SCOPE,sources=sources,
             producer='Reflection',version='normal-lifecycle-v1',provenance=self.provenance)
         if result['status']=='unavailable':
             from .acquisition import retain_dependency_request

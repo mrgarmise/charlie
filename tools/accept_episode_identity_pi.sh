@@ -19,7 +19,7 @@ trap '"$python" -m learning.acquisition --output "$state" --export-history > "$r
 "$python" -m learning.acquisition --output "$state" --export-history > "$report/pre-run-export.json"
 CHARLIE_POLICY_TIMING_OUTPUT="$report/policy-latency.json" CHARLIE_IDENTITY_ACCEPTANCE_ROOT="$roots" "$python" -m pytest \
   tests/test_episode_identity.py tests/test_normal_learning_lifecycle.py tests/test_meditation_yield.py tests/test_developmental_stall.py tests/test_developmental_continuity.py tests/test_developmental_dependencies.py tests/test_qualified_ppal_policy.py tests/test_ppal_policy_continuity.py \
-  tests/test_retrospective.py tests/test_learning_projects.py \
+  tests/test_retrospective.py tests/test_preserved_meditation_recovery.py tests/test_learning_projects.py \
   tests/test_archive_qualification.py tests/test_meditation_candidate.py \
   tests/test_robotron_score_comparison.py tests/test_development_resources.py \
   tests/test_development_efficiency.py tests/test_development_profile.py \

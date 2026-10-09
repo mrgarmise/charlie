@@ -137,7 +137,7 @@ def discover(root):
 def ingest(root, dataset):
     """Preserve saved findings and exact source manifests, with retry dedup."""
     from experiments.ppal.episode_evidence import import_episode
-    from .meditation import consume
+    from .meditation import acquire_preserved
     from .acquisition import maintain_episode_identity
     from memory.episode_identity import IdentityIntegrityError
     root = Path(root).resolve()
@@ -155,13 +155,31 @@ def ingest(root, dataset):
     if existing:
         marker = existing[-1].data['payload']
         context = journal.get(marker['context_id']).data['payload']
-        if marker.get('meditation_id'):
+        supplements=[r for r in journal.category_records('event','retrospective_meditation_continuation')
+            if r.data['payload']['ingestion_id']==existing[-1].id]
+        accepted=marker.get('meditation_id') or next((r.data['payload']['meditation_id'] for r in reversed(supplements) if r.data['payload'].get('meditation_id')),None)
+        if accepted:
             saved = root.parent/(root.name+'-evidence')/'meditation.json'
-            expected = journal.get(marker['meditation_id']).data['payload']['artifact_sha256']
+            expected = journal.get(accepted).data['payload']['artifact_sha256']
             # An exported source copy may omit sibling derivations. A supplied
             # artifact must match; absence never destroys a journaled finding.
             if saved.is_file() and sha(saved) != expected:
                 raise ValueError('preserved meditation artifact changed')
+        elif marker.get('meditation_rejection_id'):
+            saved = root.parent/(root.name+'-evidence')/'meditation.json'
+            if saved.is_file():
+                med, rejected = acquire_preserved(dataset,saved,source_episode=episode,
+                    prior_use=marker['prior_use'],context_id=marker['context_id'])
+                latest=supplements[-1].data['payload'] if supplements else marker
+                if (med.id if med else None)==latest.get('meditation_id') and (rejected.id if rejected else None)==latest.get('meditation_rejection_id'):
+                    return dict(status='preserved',source_episode=episode,record_id=existing[-1].id,
+                        relocated_inventory_digest=digest(before))
+                journal.append('event',dict(category='retrospective_meditation_continuation',
+                    ingestion_id=existing[-1].id,source_episode=episode,
+                    meditation_id=med.id if med else None,
+                    meditation_rejection_id=rejected.id if rejected else None),
+                    episode=SCOPE,sources=[existing[-1].id,med.id if med else rejected.id],
+                    producer='existing-evidence-consolidation',version=VERSION)
         # Package verification and conservative legacy alias reconciliation are
         # acquisition-owned, not report-hash equality or path equality.
         return dict(status='preserved', source_episode=episode, record_id=existing[-1].id,
@@ -206,14 +224,16 @@ def ingest(root, dataset):
         history = json.loads((Path(__file__).resolve().parents[1]/'docs/ppal/ala-1-demonstration.json').read_text())['snapshot_split']
         prior = history.get(episode, 'diagnostic')
         prior = 'consulted-test' if prior == 'test' else prior
-        med = consume(dataset, saved, source_episode=episode, prior_use=prior) if saved.exists() else None
+        med, rejected = acquire_preserved(dataset, saved, source_episode=episode, prior_use=prior,
+            context_id=ref.id) if saved.exists() else (None, None)
         if inventory(root) != before:
             raise ValueError('archive changed during ingestion')
         completed = journal.append('event', dict(category='retrospective_ingestion',
             source_episode=episode, physical_episode=imported, context_id=ref.id,
-            meditation_id=med.id if med else None, inventory_digest=digest(before),
+            meditation_id=med.id if med else None, meditation_rejection_id=rejected.id if rejected else None,
+            inventory_digest=digest(before),
             preserved_bytes_unchanged=True, prior_use=prior), episode=SCOPE,
-            sources=[ref.id]+([med.id] if med else []), producer='existing-evidence-consolidation', version=VERSION)
+            sources=[ref.id]+([med.id] if med else [])+([rejected.id] if rejected else []), producer='existing-evidence-consolidation', version=VERSION)
         return dict(status='imported', source_episode=episode, record_id=completed.id)
     finally:
         source.close()

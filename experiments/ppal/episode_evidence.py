@@ -84,42 +84,63 @@ def import_episode(root, journal, *, identity=None):
     # Partial runs without agency/score remain first-class episodes.
     if 'report.json' in refs:
         add('session_report', refs['report.json'])
-    executions = set()
+    checkpoints={}
+    for record in journal.category_records('event','episode_import_checkpoint'):
+        if record.data['episode']==episode:
+            payload=record.data['payload']
+            checkpoints[payload['stage']]=payload
+    executions=set(checkpoints.get('agency.jsonl',{}).get('action_digests',[]))
+    def units(stage, values):
+        """Commit source units and cursor together; yield only after durable chunks.
+
+        A retry skips committed units rather than spending its budget appending
+        the same prefix. Cursors are bookkeeping, never additional experience.
+        """
+        from itertools import islice
+        saved=checkpoints.get(stage,{})
+        binding=refs['report.json' if stage=='report_steps' else stage]['sha256']
+        if saved and saved['source_sha256']!=binding:
+            raise ValueError('import checkpoint source changed')
+        iterator=enumerate(values)
+        while True:
+            chunk=list(islice(iterator,100))
+            if not chunk:break
+            pending=[(index,value) for index,value in chunk if index+1>saved.get('completed_units',0)]
+            if not pending:continue
+            with journal.batch():
+                for index,value in pending:yield index,value
+                journal.append('event',dict(category='episode_import_checkpoint',stage=stage,
+                    source_sha256=binding,completed_units=chunk[-1][0]+1,
+                    action_digests=sorted(executions) if stage=='agency.jsonl' else []),
+                    episode=episode,sources=[start.id],producer=ADAPTER,version='import-cursor-v1')
     for name, category in (('agency.jsonl','agency_tracking_observation'), ('score.jsonl','score_observation'),
                            ('events.jsonl','session_event_observation'), ('steps.jsonl','partial_planning_observation')):
-        if name not in refs:
-            continue
-        if name == 'steps.jsonl' and report_path.exists():
-            continue  # completed report already references those same steps
-        for line, text in enumerate((root/name).read_text().splitlines(), 1):
-            if not text.strip():
-                continue
-            try:
-                row = json.loads(text)
-            except ValueError:
-                # A killed writer may leave a torn final line. It remains in the
-                # hashed artifact; do not reinterpret it as an observation.
-                add('unreadable_artifact_line', {**refs[name], 'line':line})
-                continue
-            at = row.get('capture_timestamp', row.get('timestamp'))
-            if name == 'events.jsonl':
-                at = row.get('at', at)  # Existing diary's explicit monotonic phase timestamps.
-            # Legacy relative t is NOT interchangeable with sensor monotonic time.
-            ref = {**refs[name], 'line':line}
-            with journal.batch():
-                add(category, ref, at=at, subsystem=name.removesuffix('.jsonl'))
-                execution = row.get('control_execution') if name=='agency.jsonl' else None
+        if name not in refs:continue
+        if name == 'steps.jsonl' and report_path.exists():continue
+        with (root/name).open() as stream:
+            for index,text in units(name,stream):
+                line=index+1
+                if not text.strip():continue
+                try:row=json.loads(text)
+                except ValueError:
+                    add('unreadable_artifact_line',{**refs[name],'line':line})
+                    continue
+                at=row.get('capture_timestamp',row.get('timestamp'))
+                if name=='events.jsonl':at=row.get('at',at)
+                ref={**refs[name],'line':line}
+                add(category,ref,at=at,subsystem=name.removesuffix('.jsonl'))
+                execution=row.get('control_execution') if name=='agency.jsonl' else None
                 if execution and digest(execution) not in executions:
                     executions.add(digest(execution))
                     add('action_transport_report',{**ref,'pointer':['control_execution']},
                         at=execution.get('started_at'),subsystem='controller')
-    for index, step in enumerate(report.get('steps', [])):
-        ref = {**refs['report.json'], 'pointer':['steps', index]}
-        add('planning_observation', ref, step.get('observed_at',step.get('capture_timestamp')))
-        if 'action' in step:
-            add('action_issued', ref, step.get('action_timestamp'))
-        if 'shadow' in step:
-            add('reported_forecast', {**ref,'pointer':ref['pointer']+['shadow']}, step.get('observed_at'))
+    if 'report.json' in refs:
+        for index,step in units('report_steps',report.get('steps',[])):
+            ref={**refs['report.json'],'pointer':['steps',index]}
+            add('planning_observation',ref,step.get('observed_at',step.get('capture_timestamp')))
+            if 'action' in step:add('action_issued',ref,step.get('action_timestamp'))
+            if 'shadow' in step:
+                add('reported_forecast',{**ref,'pointer':ref['pointer']+['shadow']},step.get('observed_at'))
     _external_observations(root,journal,episode,start.id,provenance)
     _session_history(root,journal,episode,start.id,refs)
     # Index preflight/failure context without inventing transition timestamps.

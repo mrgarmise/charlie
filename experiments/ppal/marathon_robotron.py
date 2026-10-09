@@ -40,15 +40,34 @@ class ProcessingDeferred(RuntimeError):
     """Bounded productive processing needs another offline invocation."""
 
 
-def process_supervised(game, output, gateway, commitments, plan=None, executive=None, budget=300., chunks=3, ala_root=None, ala_budget=60.,ala_authority=None):
+def preserve_processing_artifacts(output):
+    """Retain prior diagnostic/config bytes before resuming native processing.
+
+    SQLite history remains append-only; source captures are never rewritten.
+    Snapshots are correlated processing history, not independent experience.
+    """
+    import hashlib
+    output=Path(output)
+    for path in [*output.glob('*.json'),*output.glob('*.md')]:
+        data=path.read_bytes()
+        target=output/'processing-history'/(path.name+'-'+hashlib.sha256(data).hexdigest())
+        target.parent.mkdir(exist_ok=True)
+        if target.exists():
+            if target.read_bytes()!=data:raise ValueError('processing history integrity mismatch')
+        else:target.write_bytes(data)
+
+
+def process_supervised(game, output, gateway, commitments, plan=None, executive=None, budget=300., chunks=3, ala_root=None, ala_budget=60.,ala_authority=None, defer_meditation=False):
     from .progress_supervision import supervise
     output.mkdir(parents=True, exist_ok=True)
+    if defer_meditation:preserve_processing_artifacts(output)
     config = dict(game=str(game), output=str(output), evaluator=str(gateway.evaluator.path),
                   outbox=str(gateway.store.path), project=gateway.project, session=gateway.session,
                   commitments=str(commitments.path), plan=plan,
                   project_evidence=str(executive.journal.path) if executive else None,
                   progress=str(output/'processing-progress.json'), work_budget=budget,
-                  ala_root=str(ala_root) if ala_root else None, ala_budget=ala_budget,ala_authority=ala_authority)
+                  ala_root=str(ala_root) if ala_root else None, ala_budget=ala_budget,ala_authority=ala_authority,
+                  defer_meditation=defer_meditation)
     # Paths and already committed plan only; no credentials or new hypotheses.
     path = output/'processing-config.json'
     write_session(path, config)
@@ -66,7 +85,7 @@ def process_supervised(game, output, gateway, commitments, plan=None, executive=
     return load_report(output/'between-game.json')
 
 
-def process_completed_episode(game, output, gateway, commitments, plan=None, executive=None, progress=None, work_budget=None, ala_root=None, ala_budget=60.,ala_authority=None):
+def process_completed_episode(game, output, gateway, commitments, plan=None, executive=None, progress=None, work_budget=None, ala_root=None, ala_budget=60.,ala_authority=None, defer_meditation=False):
     """Existing E/E + Reflection + Meditation + Evaluator, between games only."""
     from memory.evidence import EvidenceJournal
     from .episode_evidence import import_episode, derive_episode, summarize
@@ -75,6 +94,7 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
     from .meditate_robotron import meditate, quality
     from .evaluate_robotron_shadow import evaluate
     output.mkdir(parents=True,exist_ok=True)
+    if defer_meditation:preserve_processing_artifacts(output)
     import resource
     began=time.monotonic()
     stage_resources={}
@@ -92,7 +112,7 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
         usage=resource.getrusage(resource.RUSAGE_SELF)
         stage_resources[name]=dict(elapsed=now-began,cpu=usage.ru_utime+usage.ru_stime,max_rss_kib=usage.ru_maxrss)
         if progress: progress.update(stage=name)
-        print(f'BETWEEN GAME: {name}', flush=True)
+        print(f"{'OFFLINE EPISODE' if defer_meditation else 'BETWEEN GAME'}: {name}", flush=True)
     journal=EvidenceJournal(output/'evidence.sqlite3', on_progress=pulse)
     try:
         stage('import')
@@ -100,7 +120,17 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
         # Resolve live commitment first. Replay diagnostics must not masquerade
         # as outcomes of the pre-game experiment.
         stage('resolve_experiment')
-        resolution=resolve_experiment(game,journal,episode,commitments,plan,gateway) if plan else None
+        resolution=None
+        if plan:
+            if (game/'report.json').is_file():
+                resolution=resolve_experiment(game,journal,episode,commitments,plan,gateway)
+            else:
+                retained=commitments.resolution_for(plan['prediction_id'])
+                retained=retained or commitments.resolve(plan['prediction_id'],sources=(),result='unresolved',
+                    reason='child ended without report; preserved partial evidence cannot resolve experiment')
+                resolution=dict(prediction_id=plan['prediction_id'],resolution_id=retained.id,
+                    result=retained.data['payload']['result'],reason=retained.data['payload']['reason'],
+                    attempted=None,score_attribution=None)
         assessment = None
         if executive is not None and plan and plan.get('project_id') and resolution:
             assessment=executive.record_result(plan['project_id'],plan,resolution,commitments,episode=episode)
@@ -124,7 +154,13 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
         (output/'shadow-evaluation.json').write_text(json.dumps(shadow,indent=2)+'\n')
         stage('meditation')
         meditation=None
-        if (game/'tracks.json').exists():
+        if defer_meditation and (output/'meditation.json').is_file():
+            import hashlib
+            meditation=load_report(output/'meditation.json')
+            if (not meditation or not (game/'tracks.json').is_file()
+                    or meditation.get('source_sha256')!=hashlib.sha256((game/'tracks.json').read_bytes()).hexdigest()):
+                raise ValueError('retained meditation source mismatch; preserve original finding')
+        if not defer_meditation and (game/'tracks.json').exists():
             tracks=json.loads((game/'tracks.json').read_text()).get('tracks',[])
             import hashlib
             source_hash=hashlib.sha256((game/'tracks.json').read_bytes()).hexdigest()
@@ -192,6 +228,12 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
     doc={'schema':'charlie-developmental-marathon-v1','status':'running','games':[],
          'objective':'official_game_score','policy':'existing policy plus at most one explicit actuator experiment',
          'seed':str(args.seed_episode) if args.seed_episode else None}
+    play_first=getattr(args,'play_first',False)
+    doc['development_timing']='after_marathon' if play_first else 'between_games'
+    doc['phase']='gameplay'
+    doc['learning_project_evidence']=str(project_journal.path) if project_journal else None
+    doc['learning_root']=str(getattr(args,'learning_root',None) or
+        (Path.home()/'.local/share/charlie/development' if play_first else gateway.evaluator.path.with_name('autonomous-learning')))
     plan=None
     # Tests may inject an in-process driver and gateway. Physical default always
     # supervises offline work in a separate process with existing durable stores.
@@ -202,9 +244,17 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 ala_budget=getattr(args,'ala_budget',60.),ala_authority=authority)
     else:
         processor = process_completed_episode
+    primary_claim=None
+    if play_first:
+        from learning.cycle import gameplay_session
+        primary_claim=gameplay_session()
+        primary_claim.__enter__()
     try:
         if args.seed_episode:
-            doc['seed_processing']=processor(args.seed_episode,session/'seed-evidence',gateway,commitments,executive=executive)
+            if play_first:
+                doc['seed_processing']={'status':'deferred','path':str(args.seed_episode.resolve())}
+            else:
+                doc['seed_processing']=processor(args.seed_episode,session/'seed-evidence',gateway,commitments,executive=executive)
         for index in range(1,args.max_games+1):
             game=session/f'game-{index:02d}'
             selection = None
@@ -236,6 +286,11 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 viewer_context = session/f'game-{index:02d}-observer-context.json'
                 write_session(viewer_context, {'episode':str(game.resolve()), 'project':selection['project']})
                 cmd.extend(['--observer-context', str(viewer_context)])
+            if play_first:
+                # Bookmark before the child: interrupted captures remain discoverable.
+                doc['games'].append(dict(path=str(game),experiment=plan,status='recording',
+                    reason_for_experiment=reason))
+                write_session(session/'session.json',doc)
             rc=driver(cmd,30.)
             report=load_report(game/'report.json')
             entry={'path':str(game),'returncode':rc,'result':report.get('result') if report else 'missing report',
@@ -243,23 +298,25 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                    'supervision':load_report(game.parent/(game.name+'-progress-supervisor.json'))}
             if executive:
                 entry['project_selection'] = selection
-            doc['games'].append(entry)
+            if play_first:doc['games'][-1]=entry
+            else:doc['games'].append(entry)
             write_session(session/'session.json',doc)
             if report:
                 entry['score_evidence']=report.get('score_summary',{'self_score':report.get('score'),'status':report.get('score_status','unknown')})
                 entry['score_attribution']='unknown; accepted reading is not independently verified score'
                 entry['self_status']=dict(Counter(s.get('identity_status','unknown') for s in report.get('steps',[])))
-                entry['between_game']=processor(game,session/f'game-{index:02d}-evidence',gateway,commitments,plan,executive)
+                entry['between_game']=({'status':'deferred','reason':'play first; original evidence and commitment retained'} if play_first else
+                    processor(game,session/f'game-{index:02d}-evidence',gateway,commitments,plan,executive))
             else:
                 entry['between_game']={'status':'unknown; no complete report'}
-                if plan:
+                if plan and not play_first:
                     resolution=commitments.resolve(plan['prediction_id'],sources=(),result='unresolved',reason='child ended without report')
                     entry['resolution_id']=resolution.id
                     if executive and plan.get('project_id'):
                         executive.record_result(plan['project_id'], plan,
                             dict(resolution_id=resolution.id, result='unresolved', reason='child ended without report'),
                             commitments, episode='missing-report:'+str(game))
-                if game.exists():
+                if game.exists() and not play_first:
                     partial = processor(game, session/f'game-{index:02d}-partial-evidence', gateway,
                                         commitments, None, executive)
                     entry['between_game']['partial_evidence'] = partial
@@ -283,7 +340,8 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             if rc==124:
                 doc['status']='child_timeout';break
             if index>=args.max_games:
-                doc['status']='bounded_attempts_complete';break
+                doc['status']='bounded_attempts_complete' if safe_to_restart(report,rc,capture_root=game) else 'unverified_episode_boundary'
+                break
             entry['recording_readiness']=recording_readiness(game,report)
             write_session(session/'session.json',doc)
             if not safe_to_restart(report,rc,capture_root=game):
@@ -302,7 +360,8 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
         doc['error']=f'{type(exc).__name__}: {exc}'
         print(f"DEVELOPMENT STOP: {doc['error']}",flush=True)
     finally:
-        if plan and not any(r.data['payload']['prediction_id']==plan['prediction_id'] for r in commitments.records('resolution')):
+        if primary_claim:primary_claim.__exit__(None,None,None)
+        if plan and not play_first and not any(r.data['payload']['prediction_id']==plan['prediction_id'] for r in commitments.records('resolution')):
             try:
                 unresolved=commitments.resolve(plan['prediction_id'],sources=(),result='unresolved',
                     reason='orchestration stopped without sufficient resolving evidence')
@@ -322,7 +381,131 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             write_session(session/'session.json',doc)
             project_journal.close()
         print(f"DEVELOPMENT COMPLETE: {doc['status']}; attempts={len(doc['games'])}; {session}",flush=True)
+    if play_first and doc['status']!='interrupted':
+        doc['reflection']=reflect_marathon(session,args,gateway=gateway)
     return doc
+
+def reflect_marathon(session, args, *, gateway=None, processor=None, development=None):
+    """Resume the existing offline adapters, then the normal Executive lifecycle.
+
+    This is a phase handoff, never an agenda selector or controller owner.
+    Original session.json and captures are read-only during offline recovery.
+    """
+    import fcntl
+    from memory.evidence import EvidenceJournal
+    from memory.gateway import MemoryGateway
+    from memory.learning_projects import LearningExecutive
+    from memory.episode_identity import inspect_capture
+    from learning.cycle import gameplay_active
+    from learning.datasets import sha
+    from learning.lifecycle import run as develop
+    session=Path(session).resolve()
+    doc=load_report(session/'session.json')
+    if not doc:raise ValueError('existing marathon session.json required')
+    if gameplay_active():raise RuntimeError('reflection unavailable during active gameplay')
+    gateway=gateway or MemoryGateway()
+    processor=processor or process_supervised
+    development=development or develop
+    path=session/'reflection-progress.json'
+    with (session/'reflection.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        state=load_report(path) or dict(schema='charlie-marathon-reflection-v1',episodes={},
+            learning_root=str(getattr(args,'learning_root',None) or doc.get('learning_root') or
+                gateway.evaluator.path.with_name('autonomous-learning')),
+            project_evidence=str(getattr(args,'project_evidence',None) or doc.get('learning_project_evidence') or
+                gateway.evaluator.path.with_name('learning-project-evidence.sqlite3')),
+            physical_authorization=False)
+        # A resume cannot silently relocate durable Executive state.
+        for key in ('learning_root','project_evidence'):
+            requested=getattr(args,key,None)
+            if requested and Path(requested).resolve()!=Path(state[key]).resolve():
+                raise ValueError('resume must retain '+key)
+        commitments=EvidenceJournal(session/'experiment-evidence.sqlite3')
+        projects=EvidenceJournal(state['project_evidence'])
+        executive=LearningExecutive(projects,gateway)
+        state['phase']='importing';write_session(path,state)
+        roots=[]
+        entries=list(doc.get('games',[]))
+        if doc.get('seed'):
+            entries.insert(0,dict(path=doc['seed'],experiment=None,seed=True))
+        try:
+            for entry in entries:
+                game=Path(entry['path']).resolve()
+                if not game.exists():
+                    state['episodes'][str(game)]=dict(status='blocked',reason='original capture unavailable')
+                    write_session(path,state);continue
+                try:
+                    identity=inspect_capture(game)
+                    binding={k:identity[k] for k in ('capture_id','manifest_id','content_id','artifacts')}
+                except (ValueError,OSError) as exc:
+                    state['episodes'][str(game)]=dict(status='blocked',reason=str(exc))
+                    write_session(path,state);continue
+                roots.append(game)
+                output=session/('seed-evidence' if entry.get('seed') else game.name+'-evidence')
+                prior=state['episodes'].get(str(game),{})
+                if prior.get('source_binding') and prior['source_binding']!=binding:
+                    raise ValueError('reflection source changed after checkpoint')
+                if prior.get('status')=='completed':
+                    if sha(output/'between-game.json')!=prior['result_sha256']:
+                        raise ValueError('completed reflection receipt changed')
+                    with_journal=EvidenceJournal(output/'evidence.sqlite3',read_only=True)
+                    with_journal.close()
+                    continue
+                state['episodes'][str(game)]=dict(status='processing',source_binding=binding,
+                    boundary='confirmed' if safe_to_restart(load_report(game/'report.json'),entry.get('returncode',0),capture_root=game)
+                        else 'uncertain; not independently confirmed complete',
+                    complete_game_score='requires independent qualification')
+                write_session(path,state)
+                try:
+                    # Expensive meditation belongs to the Executive below, not this importer.
+                    processor(game,output,gateway,commitments,entry.get('experiment'),executive,
+                        **(dict(budget=getattr(args,'processing_budget',300.)) if processor is process_supervised else {}),
+                        defer_meditation=True)
+                except (ProcessingDeferred,ProcessingYield) as exc:
+                    state['episodes'][str(game)]['status']='yielded'
+                    state['phase']='yielded';state['reason']=str(exc)
+                    write_session(path,state);return state
+                state['episodes'][str(game)].update(status='completed',result_sha256=sha(output/'between-game.json'))
+                write_session(path,state)
+            # Exact project history, including unresolved experiments, enters the
+            # existing normal notebook. No new independent experience is inferred.
+            notebook=Path(state['learning_root'])
+            if any(notebook.resolve()==r or r in notebook.resolve().parents or notebook.resolve() in r.parents for r in roots):
+                raise ValueError('normal notebook must be separate from original captures')
+            notebook.mkdir(parents=True,exist_ok=True)
+            from memory.evidence import digest
+            handoff=dict(schema='charlie-marathon-handoff-v1',session=str(session),
+                episodes=[str(r) for r in roots],project_evidence=str(projects.path.resolve()),
+                retained_project_ids=[r.id for r in projects.records()],physical_authorization=False)
+            handoff_path=notebook/'marathon-handoffs'/(digest(handoff)+'.json')
+            handoff_path.parent.mkdir(exist_ok=True)
+            write_session(handoff_path,handoff)
+            state['handoff']=str(handoff_path)
+            with (notebook/'offline.lock').open('a') as notebook_lock:
+                try:fcntl.flock(notebook_lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+                except BlockingIOError:
+                    state.update(phase='executive_owned',
+                        development_status=str(notebook/'development-status.json'),
+                        reason='Existing normal Executive owns notebook; durable acquisition handoff awaits its next turn')
+                    write_session(path,state);return state
+                target=EvidenceJournal(notebook/'learning-evidence.sqlite3')
+                try:target.merge_from(projects)
+                finally:target.close()
+            state['phase']='executive';write_session(path,state)
+            development(notebook,roots,budget_seconds=min(getattr(args,'ala_budget',10.),60.),
+                interval=.05,turns=getattr(args,'reflection_turns',12),offline_authority=None)
+            state['phase']='checkpointed'
+            state['development_status']=str(notebook/'development-status.json')
+            state['reason']='Executive retains unfinished work; reflection may resume without gameplay'
+            write_session(path,state)
+            return state
+        except BaseException as exc:
+            state['phase']='interrupted' if isinstance(exc,KeyboardInterrupt) else 'blocked'
+            state['reason']=type(exc).__name__+': '+str(exc);write_session(path,state)
+            raise
+        finally:
+            commitments.close();projects.close()
+
 
 def load_report(path):
     try: return json.loads(path.read_text())
@@ -419,6 +602,9 @@ def meditate_session(session_dir, games):
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('--play-first',action='store_true',help='defer all expensive development until gameplay ends; requires developmental learning projects')
+    ap.add_argument('--reflect-session',type=Path,help='resume offline reflection of an existing marathon; never arms camera/controller')
+    ap.add_argument('--reflection-turns',type=int,default=12,help='bounded normal Executive turns after imports; durable work resumes later')
     ap.add_argument("--max-games",type=int)
     ap.add_argument("--game-seconds",type=float,default=None,
                     help="opt-in diagnostic duration, never normal game completion")
@@ -449,12 +635,21 @@ def main():
         ap.error('--retry-wait must be 0..60')
     if not math.isfinite(a.processing_budget) or not 10 <= a.processing_budget <= 3600:
         ap.error('--processing-budget must be 10..3600')
+    if not 1<=a.reflection_turns<=1000:ap.error('--reflection-turns must be 1..1000')
+    if not math.isfinite(a.ala_budget) or not 1<=a.ala_budget<=3600: ap.error('--ala-budget must be 1..3600')
+    if a.reflect_session:
+        if a.arm:ap.error('--reflect-session is offline; --arm is prohibited')
+        result=reflect_marathon(a.reflect_session,a)
+        print(json.dumps(result,indent=2))
+        if result['phase']=='yielded':raise SystemExit(75)
+        return
+    if a.play_first and not (a.developmental and a.learning_projects):
+        ap.error('--play-first requires --developmental --learning-projects')
     if not a.arm: ap.error("--arm is required for an autonomous marathon")
     if (a.learning_projects or a.project_evidence) and not a.developmental:
         ap.error('learning project options require --developmental')
     if (a.ala_learning or a.learning_root) and not a.learning_projects:
         ap.error('ALA options require --developmental --learning-projects')
-    if not math.isfinite(a.ala_budget) or not 1<=a.ala_budget<=3600: ap.error('--ala-budget must be 1..3600')
     if a.project_evidence and not a.learning_projects:
         ap.error('--project-evidence requires --learning-projects')
     if a.developmental:

@@ -119,6 +119,29 @@ class DevelopmentLifecycle:
         from .episode_identity import verified_tracks
         changed = False
         self.available_tracks = {}
+        roots=list(self.roots)
+        # A marathon relinquishes primary resources and hands evidence to this
+        # same owner. It never starts a competing Executive in an owned notebook.
+        for handoff_path in sorted((self.output/'marathon-handoffs').glob('*.json')):
+            handoff=json.loads(handoff_path.read_text())
+            if (handoff.get('schema')!='charlie-marathon-handoff-v1'
+                    or handoff.get('physical_authorization') is not False
+                    or handoff_path.stem!=digest(handoff)):
+                raise ValueError('invalid marathon acquisition handoff')
+            roots.extend(Path(p).resolve() for p in handoff['episodes'])
+            prior=self.journal.category_records('event','marathon_history_acquired')
+            if any(r.data['payload']['handoff_id']==handoff_path.stem for r in prior):continue
+            source=EvidenceJournal(handoff['project_evidence'],read_only=True)
+            try:
+                for identifier in handoff['retained_project_ids']:source.get(identifier)
+                self.journal.merge_from(source)
+            finally:source.close()
+            self.journal.append('event',dict(category='marathon_history_acquired',
+                handoff_id=handoff_path.stem,session=handoff['session'],
+                retained_project_ids=handoff['retained_project_ids'],
+                interpretation='original project history; no additional gameplay or authority'),
+                episode=SCOPE,producer='existing-evidence-consolidation',version='normal-lifecycle-v1')
+            changed=True
         for source in self.history_roots:
             receipt=merge_history(source,self.output)
             self.journal.append('event',dict(category='normal_history_restore',receipt=receipt),
@@ -131,7 +154,7 @@ class DevelopmentLifecycle:
                 candidates+=list((self.output/'recovered-history').glob('*/meditations/'+p['context_id']+'/**/result.json'))
                 if not any(path.is_file() and sha(path)==p['result_sha256'] for path in candidates):
                     raise ValueError('durable meditation result changed or unavailable')
-        for root in discover_episodes(self.roots):
+        for root in discover_episodes(roots):
             before = len(self.journal.records())
             identity=maintain_episode_identity(root,self.journal)
             if identity['status']!='verified':

@@ -15,10 +15,35 @@ from memory.learning_projects import LearningExecutive
 from .datasets import ExperienceDataset, SCOPE, sha
 from .capabilities import default_registry
 import importlib.util
+from contextlib import contextmanager
+
+
+def _gameplay_lock():
+    import tempfile
+    return Path(tempfile.gettempdir())/f'charlie-gameplay-{os.getuid()}.lock'
+
+
+@contextmanager
+def gameplay_session():
+    """Existing primary-resource boundary spans gaps between marathon children.
+
+    Kernel ownership expires on process exit; no stale PID file grants authority.
+    This reserves resources only and never selects an agenda or sends controls.
+    """
+    with _gameplay_lock().open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        try:yield
+        finally:fcntl.flock(lock,fcntl.LOCK_UN)
 from .foundry import atomic_json
 
 
 def gameplay_active():
+    try:
+        with _gameplay_lock().open('a') as lock:
+            try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+            except BlockingIOError:return True
+            finally:fcntl.flock(lock,fcntl.LOCK_UN)
+    except OSError:return True  # Ownership unavailable: fail closed.
     # No camera ownership probe. Refuse host training while a live player owns
     # time-critical work. Non-Linux callers must supply equivalent orchestration.
     proc=Path('/proc')
@@ -211,7 +236,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
     # ordinary pause handoff. Never commission that completed prediction again.
     for identifier, project in executive.projects().items():
         history=project['experiment_history']
-        if project['status']=='active' and history:
+        if project['status']=='active' and history and history[-1].get('experiment_kind')=='offline':
             pending=[r for r in dataset.journal.records('event') if
                 r.data['payload'].get('category')=='offline_experiment_plan' and
                 r.data['payload']['plan'].get('project_id')==identifier and

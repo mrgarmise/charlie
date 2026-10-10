@@ -37,6 +37,7 @@ def delivered_corpus(tmp_path,state):
     state.mkdir(exist_ok=True)
     path=corpus(None,tmp_path)
     document=json.loads(path.read_text())
+    document['provenance_kind']='simulated-controlled-trajectories'
     # Distinct target/player velocities cross an existing chooser deadband.
     # Future action changes are measured, not hand-chosen by runtime.
     for e in document['episodes']:
@@ -44,6 +45,13 @@ def delivered_corpus(tmp_path,state):
             f['targets'][0]['position']=[24-i,20]
     inbox=state/'acquisition-inbox';inbox.mkdir(exist_ok=True)
     (inbox/'motion.json').write_text(json.dumps(document))
+    # Explicit test-harness admission; normal acquisition must reject these
+    # generated reports/bin files as physical independent measurements.
+    from learning.datasets import ExperienceDataset
+    from learning.meditation import qualify_corpus
+    journal=EvidenceJournal(state/'learning-evidence.sqlite3')
+    try:qualify_corpus(ExperienceDataset(journal,state/'pixels'),inbox/'motion.json',allow_fixture=True)
+    finally:journal.close()
 
 
 def rows(state):

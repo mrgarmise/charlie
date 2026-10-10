@@ -20,7 +20,7 @@ def motion_policy(tmp_path):
     ds,g=make(tmp_path);finding(ds,tmp_path)
     source=corpus(ds,tmp_path);document=json.loads(source.read_text())
     document['provenance_kind']='simulated-controlled-trajectories'
-    source.write_text(json.dumps(document));qualify_corpus(ds,source)
+    source.write_text(json.dumps(document));qualify_corpus(ds,source,allow_fixture=True)
     row=investigate(ds,g,diagnostics_only=True,max_jobs=1)['results'][0]
     proposal=row['result']['deployment_proposal'];s=shadow(ds.journal,proposal)
     deployment=CapabilityDeployment(ds.journal)
@@ -239,6 +239,12 @@ def test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart(tmp
         for i,frame in enumerate(episode['frames']):
             frame['targets'][0]['position']=[25-i,20]
     inbox.write_text(json.dumps(c))
+    # Explicit updated fixture admission outside normal acquisition.
+    from memory.evidence import EvidenceJournal
+    from learning.datasets import ExperienceDataset
+    journal=EvidenceJournal(state/'learning-evidence.sqlite3')
+    try:qualify_corpus(ExperienceDataset(journal,state/'pixels'),inbox,allow_fixture=True)
+    finally:journal.close()
     process=startup(state,[root]);assert process.returncode==0,process.stderr
     policy=load_policy(state/'ppal-policy.json')
     assert policy.identity['provenance_kind']=='simulated-controlled-trajectories'

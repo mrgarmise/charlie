@@ -16,7 +16,7 @@ from .datasets import SCOPE, sha
 VERSION = 'meditation-motion-v1'
 
 
-def qualify_corpus(dataset, path):
+def qualify_corpus(dataset, path, *, allow_fixture=False):
     """Bind external trajectory measurements to exact saved capture bytes.
 
     This validates provenance and separation, not the truth of the external
@@ -42,6 +42,8 @@ def qualify_corpus(dataset, path):
         partition=episode.get('partition')
         report=episode.get('source_report',{})
         receipt=qualified_reference(dataset.journal,identity,report,capture_root=episode.get('source_capture_root'))
+        if not allow_fixture and not receipt.get('independent_gameplay'):
+            raise ValueError('independently qualified original occurrence with start/terminal provenance required; report hashes alone are not independent motion evidence')
         identities.append(receipt)
         group=receipt['experience_id']
         if not identity or group in ids or partition not in ('validation','test'):
@@ -54,32 +56,62 @@ def qualify_corpus(dataset, path):
         else: validation+=1
         frames=episode.get('frames',[])
         if not 3<=len(frames)<=4096: raise ValueError('bounded qualified trajectory required')
-        previous=None
+        previous=None;episode_captures=set()
         for frame in frames:
             at=frame.get('timestamp')
-            if not isinstance(at,(int,float)) or not math.isfinite(at) or (previous is not None and at<=previous):
+            if type(at) not in (int,float) or not math.isfinite(at) or at<0 or (previous is not None and at<=previous):
                 raise ValueError('increasing finite capture timestamps required')
             previous=at
             artifact=frame.get('artifact',{})
             if not artifact.get('path') or sha(artifact['path'])!=artifact.get('sha256'):
                 raise ValueError('exact capture artifact required')
             h=artifact['sha256']
+            if h in episode_captures:
+                raise ValueError('reused image cannot establish another independently measured trajectory frame')
+            episode_captures.add(h)
             if h in captures and captures[h]!=identity:
                 raise ValueError('duplicate captures connect purported independent episodes')
             captures[h]=identity
             if frame.get('identity_status')!='independently_verified':
                 raise ValueError('independently verified identities required')
+            if not allow_fixture:
+                _verify_original_motion_frame(episode,frame)
             world_from_frame(frame)  # Validate coordinates and role identities before committing.
     if final<3 or validation<1: raise ValueError('validation and three final episodes required')
+    assessment=None
+    if not allow_fixture:
+        from memory.evaluator import MemoryEvaluator
+        assessment=MemoryEvaluator.assess_motion_measurement_provenance(corpus)
     return dataset.journal.append('observation',dict(category='independent_motion_corpus',
-        corpus=corpus,identity_references=identities,artifact_sha256=sha(p)),episode=SCOPE,
+        corpus=corpus,identity_references=identities,artifact_sha256=sha(p),fixture_only=bool(allow_fixture),
+        independence_assessment=assessment),episode=SCOPE,
         producer='external-motion-qualification',version=VERSION)
+
+
+def _verify_original_motion_frame(episode,frame):
+    """A coordinate claim cannot import an unrelated image into an occurrence."""
+    from memory.evidence import EvidenceJournal
+    from PIL import Image
+    root=Path(episode['source_capture_root']).resolve();path=Path(frame['artifact']['path']).resolve()
+    if not path.is_relative_to(root):raise ValueError('motion frame outside qualified original capture')
+    source=EvidenceJournal(root/'session-evidence.sqlite3',read_only=True)
+    try:
+        source.verify()
+        observation=source.get(frame['observation_id'])
+        capture=next((r for r in source.category_records('observation','camera_capture')
+            if r.data['payload'].get('observation_id')==observation.id),None)
+        if observation.data['payload'].get('category')!='camera_observation' or capture is None:raise ValueError('original camera observation and completed capture required')
+        artifact=capture.data['payload']['artifact']
+        if ((root/artifact['path']).resolve()!=path or artifact['sha256']!=frame['artifact']['sha256'] or
+            observation.data['at']!=frame['timestamp']):raise ValueError('motion frame hash, identity or timestamp disagrees with original camera')
+        with Image.open(path) as image:image.verify()
+    finally:source.close()
 
 
 def world_from_frame(frame):
     from experiments.ppal.models import Position,Object,WorldState
     def position(values):
-        if len(values)!=2 or any(not isinstance(v,(int,float)) or not math.isfinite(v) or not 0<=v<=100 for v in values):
+        if len(values)!=2 or any(type(v) not in (int,float) or not math.isfinite(v) or not 0<=v<=100 for v in values):
             raise ValueError('finite board coordinates required')
         return Position(*values)
     seen={'player'}

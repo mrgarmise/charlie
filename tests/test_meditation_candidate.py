@@ -51,7 +51,7 @@ def test_archived_findings_generate_executable_candidates_but_keep_baseline(tmp_
 
 
 def test_independent_controlled_loop_guarded_execution_and_rollback(tmp_path):
-    ds,g=make(tmp_path);finding(ds,tmp_path);qualify_corpus(ds,corpus(ds,tmp_path))
+    ds,g=make(tmp_path);finding(ds,tmp_path);qualify_corpus(ds,corpus(ds,tmp_path),allow_fixture=True)
     row=investigate(ds,g,diagnostics_only=True,max_jobs=1)['results'][0]
     result=row['result'];assert result['result']=='supported'
     assert result['metrics']['fresh_final_evidence']
@@ -92,11 +92,11 @@ def test_motion_evidence_gates(tmp_path,mutation):
     if mutation=='prior-use':data['episodes'][1]['prior_use']='train'
     if mutation=='unverified':data['episodes'][1]['frames'][0]['identity_status']='provisional'
     path.write_text(json.dumps(data))
-    with pytest.raises(ValueError):qualify_corpus(ds,path)
+    with pytest.raises(ValueError):qualify_corpus(ds,path,allow_fixture=True)
 
 
 def test_motion_crash_consumes_final_once_and_abstains(tmp_path,monkeypatch):
-    ds,g=make(tmp_path);finding(ds,tmp_path);qualify_corpus(ds,corpus(ds,tmp_path))
+    ds,g=make(tmp_path);finding(ds,tmp_path);qualify_corpus(ds,corpus(ds,tmp_path),allow_fixture=True)
     import learning.meditation as m
     original=m.motion_error
     def fail_final(spec,episodes):
@@ -114,7 +114,7 @@ def test_published_final_episode_cannot_be_renamed_into_new_root(tmp_path):
     ds,g=make(tmp_path);path=corpus(ds,tmp_path);data=json.loads(path.read_text())
     data['episodes'][1]['source_episode']='episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da'
     path.write_text(json.dumps(data))
-    with pytest.raises(ValueError,match='report bytes'):qualify_corpus(ds,path)
+    with pytest.raises(ValueError,match='report bytes'):qualify_corpus(ds,path,allow_fixture=True)
 
 
 def test_boot_change_abstains_before_any_candidate_evaluation(tmp_path,monkeypatch):
@@ -134,3 +134,15 @@ def test_boot_change_abstains_before_any_candidate_evaluation(tmp_path,monkeypat
     assert result['result']=='unresolved' and result['metrics']['clock_continuity']=='UNKNOWN'
     assert execute(plan,ds)['result']=='unresolved'
     assert not list((tmp_path/'models').glob('**/*.json'))
+
+
+@pytest.mark.parametrize('mutation',['boolean-time','negative-time','boolean-position','reused-frame'])
+def test_motion_measurement_types_and_within_episode_duplicate_rejected(tmp_path,mutation):
+    ds,g=make(tmp_path);path=corpus(ds,tmp_path);data=json.loads(path.read_text())
+    frames=data['episodes'][0]['frames']
+    if mutation=='boolean-time':frames[0]['timestamp']=False
+    if mutation=='negative-time':frames[0]['timestamp']=-1
+    if mutation=='boolean-position':frames[0]['player'][0]=True
+    if mutation=='reused-frame':frames[1]['artifact']=frames[0]['artifact']
+    path.write_text(json.dumps(data))
+    with pytest.raises(ValueError):qualify_corpus(ds,path,allow_fixture=True)

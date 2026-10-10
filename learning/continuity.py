@@ -117,7 +117,8 @@ EXECUTIVE_OPS={'proposed','assessment','selected','outcome','lifecycle','agenda_
 CATEGORIES={
     'ScoreObserver':{'score_review_source','score_review_proposal','score_game_record'},
     'human-score-review':{'score_human_annotation','score_review_status'},
-    'MemoryEvaluator':{'evaluated_memory_recalled','score_reader_review_reconciliation','score_reader_candidate_evaluation','score_reader_frozen_baseline'},
+    'human-evidence-review':{'evidence_human_annotation'},
+    'MemoryEvaluator':{'evaluated_memory_recalled','score_reader_review_reconciliation','score_reader_candidate_evaluation','score_reader_frozen_baseline','evidence_annotation_evaluation'},
     'Reflection':{'reflection_commission','normal_meditation_yield','normal_meditation_result',
         'perceptual_experiment_proposal','learning_project_proposal','model_deployment_proposal','retrieval_experiment_reflection','perceptual_learning_deferred'},
     'LearningExecutive':{'reflection_commission'},
@@ -126,7 +127,7 @@ CATEGORIES={
     'existing-evidence-acquisition':{'episode_identity_binding','episode_identity_location','episode_identity_alias','episode_identity_quarantine'},
     'ExperienceDataset':{'experience_example','experience_dataset_snapshot','artifact_location'},
     'archive-measurement-service':{'observation_qualification'},
-    'existing-acquisition-capability':{'learning_evidence_request','acquisition_delivery','acquisition_delivery_rejected','acquisition_dependency_satisfied','acquisition_search_result','score_acquisition_deficiency'},
+    'existing-acquisition-capability':{'learning_evidence_request','acquisition_delivery','acquisition_delivery_rejected','acquisition_dependency_satisfied','acquisition_search_result','score_acquisition_deficiency','acquisition_source_discovery','evidence_review_request','acquisition_measurement_deficiency'},
     'external-motion-qualification':{'independent_motion_corpus'},
     'offline-orchestrator':{'offline_experiment_deferred'},
     'verified-artifact-resolution':{'experience_artifact_location'},

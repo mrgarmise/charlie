@@ -250,15 +250,22 @@ def serve_review(journal_path, root=None, port=8769):
             if url.path=='/':
                 page=Path(__file__).with_name('score-review.html').read_text().replace('__REVIEW_TOKEN__',token)
                 return self.reply(200,page,'text/html; charset=utf-8')
+            if url.path=='/evidence':
+                page=Path(__file__).with_name('evidence-review.html').read_text().replace('__REVIEW_TOKEN__',token)
+                return self.reply(200,page,'text/html; charset=utf-8')
             j=EvidenceJournal(journal_path)
             try:
                 if url.path=='/queue':
                     if root:import_queue(j,root)
-                    return self.reply(200,json.dumps(dict(games=queue_rows(j),history=performance_history(j),baselines=baseline_history(j))))
+                    return self.reply(200,json.dumps(dict(games=queue_rows(j),history=performance_history(j),baselines=baseline_history(j),evidence=evidence_queue(j))))
                 if url.path=='/image':
                     query=parse_qs(url.query)
                     from .score_observer import ScoreObserver
-                    if query.get('game'):
+                    if query.get('review'):
+                        review=j.get(query['review'][0]).data['payload'];index=int(query.get('frame',['-1'])[0])
+                        if review.get('category')!='evidence_review_request' or not 0<=index<len(review['frames']):raise ValueError('recorded review frame required')
+                        artifact=review['frames'][index]['artifact'];path=evidence_review_artifact(j,artifact);expected=artifact['sha256']
+                    elif query.get('game'):
                         game=j.get(query['game'][0]).data['payload'];index=int(query.get('frame',['-1'])[0])
                         originals=game.get('additional_originals',[])
                         if game.get('category')!='score_game_record' or not 0<=index<len(originals):raise ValueError('recorded supporting frame required')
@@ -274,12 +281,13 @@ def serve_review(journal_path, root=None, port=8769):
             except (ValueError,KeyError,OSError) as exc:self.reply(400,json.dumps(dict(error=str(exc))))
             finally:j.close()
         def do_POST(self):
-            if self.path!='/review' or self.headers.get('X-Review-Token')!=token:return self.reply(403,b'Forbidden','text/plain')
+            if self.path not in ('/review','/evidence-review') or self.headers.get('X-Review-Token')!=token:return self.reply(403,b'Forbidden','text/plain')
             try:
                 length=int(self.headers.get('Content-Length','0'))
                 if not 1<=length<=16384:raise ValueError('bounded review required')
                 data=json.loads(self.rfile.read(length));j=EvidenceJournal(journal_path)
-                try:r=review_game(j,data.pop('id'),**data)
+                try:
+                    r=(review_evidence if self.path=='/evidence-review' else review_game)(j,data.pop('id'),**data)
                 finally:j.close()
                 self.reply(200,json.dumps(dict(id=r.id)))
             except (ValueError,KeyError,OSError,TypeError) as exc:self.reply(400,json.dumps(dict(error=str(exc))))
@@ -288,6 +296,75 @@ def serve_review(journal_path, root=None, port=8769):
     print(f'Deferred score review: http://127.0.0.1:{server.server_port}',flush=True)
     try:server.serve_forever()
     finally:server.server_close()
+
+
+def evidence_review_artifact(journal,artifact):
+    """Resolve only recorded byte aliases, preserving original request identity."""
+    paths=[Path(artifact['path'])]
+    for r in journal.category_records('observation','acquisition_source_discovery'):
+        paths.extend(Path(f['artifact']['path']) for f in r.data['payload'].get('original_observations',[])
+            if f['artifact']['sha256']==artifact['sha256'] and f.get('source_kind')=='original_camera_pixels')
+    for path in paths:
+        if path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest()==artifact['sha256']:return path
+    raise ValueError('original review frame missing or changed')
+
+
+def evidence_queue(journal):
+    annotations=journal.category_records('observation','evidence_human_annotation')
+    outputs=[]
+    for r in journal.category_records('event','evidence_review_request'):
+        history=[dict(id=a.id,**a.data['payload']) for a in annotations if a.data['payload']['review_id']==r.id]
+        superseded={a.get('supersedes') for a in history}
+        active=[a for a in history if a['id'] not in superseded]
+        outputs.append(dict(id=r.id,**r.data['payload'],review_status=active[-1]['verdict'] if active else 'pending',
+            annotation_history=history,active_annotations=active))
+    return outputs
+
+
+def review_evidence(journal,identifier,*,annotator,verdict,objects=None,reason='',independent=False):
+    """Immutable pixel/identity claims. No corpus, board truth or authorization."""
+    from datetime import datetime,timezone
+    from memory.evaluator import MemoryEvaluator
+    if (journal.path.parent/'capture-manifest.json').is_file():raise ValueError('sealed original diary cannot be used for review')
+    request=journal.get(identifier);p=request.data['payload']
+    if p.get('category')!='evidence_review_request':raise ValueError('existing acquisition review request required')
+    if not isinstance(annotator,str) or not annotator.strip() or len(annotator)>128:raise ValueError('bounded reviewer identity required')
+    if verdict not in ('confirm','correct','cannot_determine','reject','defer'):raise ValueError('supported evidence response required')
+    if type(independent) is not bool:raise ValueError('explicit independence attestation required')
+    if not isinstance(reason,str) or len(reason)>4096:raise ValueError('bounded explanation required')
+    objects=[] if objects is None else objects
+    if not isinstance(objects,list) or len(objects)>32:raise ValueError('bounded object measurements required')
+    if verdict in ('confirm','correct') and not objects:raise ValueError('positions required; otherwise cannot determine')
+    # Abstention can be saved even after the source is lost. Claims cannot.
+    dimensions=[]
+    if objects:
+        for frame in p['frames']:
+            with Image.open(evidence_review_artifact(journal,frame['artifact'])) as image:dimensions.append(image.size)
+    import math
+    seen=set()
+    for obj in objects:
+        if not isinstance(obj,dict) or set(obj)!={'id','role','positions'}:raise ValueError('object ID, role and positions required')
+        if not isinstance(obj['id'],str) or not obj['id'].strip() or len(obj['id'])>128 or obj['id'] in seen:raise ValueError('distinct bounded persistent IDs required')
+        seen.add(obj['id'])
+        if obj['role'] not in ('player','target','threat','unknown'):raise ValueError('explicit observed role required')
+        if not isinstance(obj['positions'],list) or len(obj['positions'])!=len(dimensions):raise ValueError('position in each original required')
+        for point,(width,height) in zip(obj['positions'],dimensions):
+            if not isinstance(point,list) or len(point)!=2 or any(type(v) not in (int,float) or not math.isfinite(v) for v in point):raise ValueError('finite measured pixel coordinates required')
+            if not 0<=point[0]<width or not 0<=point[1]<height:raise ValueError('position outside original image')
+    previous=next((a for a in reversed(journal.category_records('observation','evidence_human_annotation'))
+        if a.data['payload']['review_id']==identifier and a.data['payload']['annotator']==annotator.strip()),None)
+    comparison=dict(annotator=annotator.strip(),verdict=verdict,objects=objects,reason=reason,independent=independent)
+    if previous and all(previous.data['payload'].get(k)==v for k,v in comparison.items()):return previous
+    with journal.batch():
+        annotation=journal.append('observation',dict(category='evidence_human_annotation',review_id=identifier,
+            request_id=p['request_id'],work_id=p['work_id'],**comparison,
+            reviewed_at=datetime.now(timezone.utc).isoformat(),original_frames=p['frames'],
+            original_prediction=p['provisional_determination'],units='original_image_pixels',
+            identity_status='reviewer_claim; independent qualification pending',partition=p['partition'],
+            supersedes=previous.id if previous else None),episode=request.data['episode'],
+            sources=[request.id,*([previous.id] if previous else [])],producer='human-evidence-review',version='deferred-measurement-v1')
+        MemoryEvaluator.evaluate_evidence_annotation(journal,annotation.id)
+    return annotation
 
 
 def performance_history(journal):

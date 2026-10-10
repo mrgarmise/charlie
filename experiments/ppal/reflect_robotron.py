@@ -640,12 +640,42 @@ def expose_score_review_contexts(dataset):
     return output
 
 
+def expose_measurement_review_contexts(dataset):
+    """Diagnostic corrections enter existing Reflection without a chosen remedy."""
+    from learning.datasets import SCOPE
+    journal=dataset.journal;latest={}
+    for r in journal.category_records('observation','evidence_annotation_evaluation'):
+        latest[r.data['payload']['annotation_id']]=r
+    annotations=journal.category_records('observation','evidence_human_annotation')
+    superseded={r.data['payload'].get('supersedes') for r in annotations};outputs=[]
+    for annotation in annotations:
+        if annotation.id in superseded or annotation.id not in latest:continue
+        request=journal.get(annotation.data['payload']['review_id']).data['payload']
+        if request.get('synthetic') or request['partition'] not in ('diagnostic','training'):continue
+        result=latest[annotation.id];p=result.data['payload']
+        episode=request['frames'][0].get('source_episode')
+        if not episode:continue
+        context=dict(measurement_review=dict(annotation_id=annotation.id,evaluation_id=result.id,
+            work_id=request['work_id'],original_question=request['original_question'],
+            measurements=p['measurements'],deficiencies=p['deficiencies']),
+            questions=[dict(category='measurement_review_uncertainty',
+                question='Which original observations explain the uncertainty or corrections in these identity and position reviews?',
+                measured=dict(qualified_motion=False,reviewer_claims=len(p['measurements'])))],
+            causal_performance_change='UNKNOWN',independent_motion_corpus=False)
+        outputs.append(journal.append('observation',dict(category='learning_context_reference',
+            source_episode=episode,context=context,prior_use='diagnostic',
+            interpretation='Reflection diagnostic feedback; no selected method or qualified trajectory'),
+            episode=SCOPE,producer='existing-evidence-consolidation',version='measurement-feedback-v1'))
+    return outputs
+
+
 def reflect_question_investigations(dataset,gateway,registry):
     """Use any existing question category, without assigning a gameplay remedy."""
     from learning.datasets import SCOPE
     from memory.evidence import digest,canonical
     from learning.episode_identity import eligible, canonical_experience
     expose_score_review_contexts(dataset)
+    expose_measurement_review_contexts(dataset)
     grouped={}
     for record in dataset.journal.records('observation'):
         p=record.data['payload']

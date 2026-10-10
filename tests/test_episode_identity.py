@@ -311,14 +311,14 @@ def test_motion_qualification_uses_capture_occurrence_not_report_alone(tmp_path)
         witness(root,identity,str(n));verified=reconcile(root,j)
         e['source_episode']=verified['source_episode'];e['source_capture_root']=str(root)
         e['source_report']=dict(path=str(root/'report.json'),sha256=sha(root/'report.json'))
-    source.write_text(json.dumps(document));record=qualify_corpus(ds,source)
+    source.write_text(json.dumps(document));record=qualify_corpus(ds,source,allow_fixture=True)
     refs=record.data['payload']['identity_references']
     assert len({r['experience_id'] for r in refs})==4 and all(r['observation_id'] for r in refs)
     document['episodes'][1]['source_episode']=document['episodes'][0]['source_episode']
     document['episodes'][1]['source_capture_root']=document['episodes'][0]['source_capture_root']
     document['episodes'][1]['source_report']=document['episodes'][0]['source_report']
     source.write_text(json.dumps(document))
-    with pytest.raises(ValueError,match='unique'):qualify_corpus(ds,source)
+    with pytest.raises(ValueError,match='unique'):qualify_corpus(ds,source,allow_fixture=True)
     j.close()
 
 

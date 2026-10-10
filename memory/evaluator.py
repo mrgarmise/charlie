@@ -33,6 +33,112 @@ class MemoryEvaluator:
     THRESHOLD = 0.4
 
     @staticmethod
+    def assess_motion_measurement_provenance(corpus):
+        """Check the external verification protocol, never a candidate's claims.
+
+        This checks independence/provenance, not a guarantee of visual truth.
+        The original-frame and occurrence validators still check captured bytes.
+        """
+        from .evidence import digest
+        import math
+        proof=corpus['qualification_artifact'];path=Path(proof['path'])
+        if hashlib.sha256(path.read_bytes()).hexdigest()!=proof['sha256']:raise ValueError('independent qualification artifact changed')
+        try:protocol=json.loads(path.read_text())
+        except (ValueError,UnicodeError):raise ValueError('structured independent measurement protocol required; opaque proof text is insufficient')
+        if not isinstance(protocol,dict) or protocol.get('schema')!='charlie-motion-measurement-protocol-v1':raise ValueError('independent motion measurement protocol required')
+        method=protocol.get('method',{});assessment=protocol.get('independence',{})
+        if not isinstance(method,dict) or not isinstance(assessment,dict):raise ValueError('measurement method and independence assessment required')
+        for name in ('id','revision','observer','observed_at'):
+            if not isinstance(method.get(name),str) or not method[name].strip():raise ValueError('measurement method revision and observer provenance required')
+        if (assessment.get('candidate_predictions_used') is not False or assessment.get('tracker_identities_used_as_truth') is not False or
+            assessment.get('training_overlap') is not False or assessment.get('unresolved_correlations')!=[]):
+            raise ValueError('correlated predictions, tracker identity or unresolved independence cannot qualify motion')
+        for name in ('shared_inputs','shared_assumptions','failure_modes','identity_verification','geometry_verification'):
+            if not isinstance(assessment.get(name),str) or not assessment[name].strip():raise ValueError('explicit shared-input, identity and geometry verification assessment required')
+        measurements=protocol.get('measurements',[])
+        expected=[]
+        for episode in corpus['episodes']:
+            for frame in episode['frames']:
+                expected.append(dict(source_episode=episode['source_episode'],artifact_sha256=frame['artifact']['sha256'],
+                    timestamp=frame['timestamp'],player=frame['player'],targets=frame.get('targets',[]),threats=frame.get('threats',[])))
+        if not expected:raise ValueError('independently measured original frames required')
+        if not isinstance(measurements,list) or len(measurements)!=len(expected):raise ValueError('exact independently measured frame inventory required')
+        observed=[]
+        for measurement in measurements:
+            if not isinstance(measurement,dict):raise ValueError('independent measurement record required')
+            uncertainty=measurement.get('uncertainty_board_units')
+            if type(uncertainty) not in (int,float) or not math.isfinite(uncertainty) or uncertainty<0:raise ValueError('finite measurement uncertainty required')
+            if measurement.get('identity_status')!='independently_verified':raise ValueError('independent identity verification required')
+            observed.append({name:measurement.get(name) for name in expected[0]})
+        if sorted(map(digest,observed))!=sorted(map(digest,expected)):raise ValueError('trajectory claims disagree with hash-bound independent measurements')
+        return dict(method=method,independence=assessment,protocol_sha256=proof['sha256'],
+            qualification='external independently collected measurement provenance checked; residual visual error and stated uncertainty remain')
+
+    @staticmethod
+    def reconcile_evidence_annotations(journal):
+        annotations=journal.category_records('observation','evidence_human_annotation')
+        superseded={a.data['payload'].get('supersedes') for a in annotations}
+        return [MemoryEvaluator.evaluate_evidence_annotation(journal,a.id).id
+            for a in annotations if a.id not in superseded]
+
+    @staticmethod
+    def evaluate_evidence_annotation(journal,annotation_id):
+        """Measure reviewed pixels without certifying board identity or a corpus."""
+        import math
+        from experiments.ppal.inspect_robotron_score import evidence_review_artifact
+        from PIL import Image
+        annotation=journal.get(annotation_id);a=annotation.data['payload']
+        if a.get('category')!='evidence_human_annotation' or annotation.data['producer']!='human-evidence-review':raise ValueError('human evidence annotation required')
+        request=journal.get(a['review_id']);p=request.data['payload'];deficiencies=[];measurements=[]
+        try:
+            if p.get('category')!='evidence_review_request' or a['original_frames']!=p['frames']:raise ValueError('original request binding changed')
+            if a.get('units')!='original_image_pixels':raise ValueError('observed pixel units required')
+            dimensions=[];times=[]
+            for frame in p['frames']:
+                with Image.open(evidence_review_artifact(journal,frame['artifact'])) as image:dimensions.append(image.size)
+                at=frame['timestamp']
+                if type(at) not in (int,float) or not math.isfinite(at):raise ValueError('finite original timestamps required')
+                times.append(at)
+            if any(b<=t for t,b in zip(times,times[1:])):raise ValueError('increasing original timestamps required')
+            ids=set()
+            for obj in a['objects']:
+                if not isinstance(obj.get('id'),str) or not obj['id'] or obj['id'] in ids:raise ValueError('distinct claimed identity required')
+                ids.add(obj['id'])
+                points=obj['positions']
+                if len(points)!=len(dimensions):raise ValueError('complete original position sequence required')
+                for point,(width,height) in zip(points,dimensions):
+                    if len(point)!=2 or any(type(v) not in (int,float) or not math.isfinite(v) for v in point):raise ValueError('finite observed position required')
+                    if not 0<=point[0]<width or not 0<=point[1]<height:raise ValueError('position outside original image')
+                for i in range(len(points)-1):
+                    measurements.append(dict(claimed_identity=obj['id'],role=obj['role'],
+                        method='human original-pixel annotation plus Evaluator displacement',
+                        method_revision=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                        confidence=None,
+                        displacement=[points[i+1][axis]-points[i][axis] for axis in (0,1)],
+                        units='original_image_pixels',elapsed=times[i+1]-times[i],elapsed_units='recorded_seconds',
+                        source_hashes=[p['frames'][i]['artifact']['sha256'],p['frames'][i+1]['artifact']['sha256']],
+                        identity_status='reviewer_claim_unqualified',uncertainty='Unquantified annotation, timing and camera geometry error'))
+        except (ValueError,KeyError,OSError,TypeError,IndexError) as exc:
+            deficiencies.append(str(exc));measurements=[]
+        all_annotations=journal.category_records('observation','evidence_human_annotation')
+        superseded={r.data['payload'].get('supersedes') for r in all_annotations}
+        other=[r for r in all_annotations if r.id not in superseded and r.id!=annotation.id and r.data['payload'].get('review_id')==request.id]
+        disagreement=any(r.data['payload'].get('objects')!=a.get('objects') or r.data['payload'].get('verdict')!=a.get('verdict') for r in other)
+        if disagreement:deficiencies.append('Active independent reviewers disagree; no consensus truth inferred')
+        if not a.get('independent'):deficiencies.append('Reviewer did not attest independent observation')
+        if a.get('verdict') not in ('confirm','correct'):deficiencies.append('Reviewer abstained, rejected or deferred; no trajectory qualification')
+        deficiencies.extend(['Persistent identity is reviewer-attested, not separately qualified',
+            'Pixel displacement is not calibrated board trajectory; independent camera geometry and uncertainty required',
+            'Diagnostic review is consulted evidence, never fresh final evaluation',
+            'One validation and three nonoverlapping unconsulted final groups remain required'])
+        return journal.append('observation',dict(category='evidence_annotation_evaluation',annotation_id=annotation.id,
+            request_id=p['request_id'],work_id=p['work_id'],status='unresolved',measurements=measurements,
+            deficiencies=deficiencies,independence_assessment='Human observation supports provisional pixel measurement; shared inputs, prior exposure and identity assumptions remain unresolved',
+            qualified_for='diagnostic pixel measurements only' if measurements else 'none',
+            independent_motion_corpus=False,physical_authorization=False),episode=request.data['episode'],
+            sources=[request.id,annotation.id],producer='MemoryEvaluator',version='deferred-measurement-v1')
+
+    @staticmethod
     def reconcile_score_reviews(journal):
         """Expose immutable reviewer outcomes as diagnostic evidence, not an agenda."""
         from experiments.ppal.score_observer import ScoreObserver

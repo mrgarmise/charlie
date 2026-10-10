@@ -54,14 +54,17 @@ def investigate_requests(dataset, roots, *, provenance, check=lambda: None):
     """
     journal = dataset.journal
     discoveries = discover_request_sources(dataset, roots, provenance=provenance, check=check)
+    reviews = commission_measurement_reviews(journal, discoveries)
+    satisfy_motion_requests(dataset)
     categories = ('episode_identity_binding', 'episode_identity_location',
                   'episode_identity_alias', 'episode_identity_quarantine',
                   'observation_qualification', 'independent_motion_corpus',
                   'experience_artifact_location', 'acquisition_delivery',
-                  'acquisition_delivery_rejected', 'acquisition_dependency_satisfied')
+                  'acquisition_delivery_rejected', 'acquisition_dependency_satisfied',
+                  'evidence_annotation_evaluation')
     evidence = [r for r in journal.records() if r.data['payload'].get('category') in categories]
     availability = dict(roots=[dict(path=str(Path(r).resolve()), available=Path(r).is_dir()) for r in roots],
-                        evidence=[r.id for r in evidence], discoveries=discoveries)
+                        evidence=[r.id for r in evidence], discoveries=discoveries, review_requests=reviews)
     signature = digest(availability)
     previous = {(r.data['payload']['request_id'], r.data['payload']['availability'])
                 for r in journal.category_records('event', 'acquisition_search_result')}
@@ -80,11 +83,12 @@ def investigate_requests(dataset, roots, *, provenance, check=lambda: None):
             request_id=request.id, work_id=p['work_id'], availability=signature,
             searched_sources=availability['roots'], inspected_evidence=availability['evidence'],
             discovery_ids=discoveries,
+            review_request_ids=reviews,
             required_evidence=p['required_evidence'],
             status='delivered' if delivery else 'unsatisfied',
             delivery_id=delivery.id if delivery else None,
-            reason='Existing validator delivered the requested original artifact' if delivery else
-                'Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency',
+            reason='Existing validator delivered evidence for the retained exact dependency' if delivery else
+                'Configured source inspection returned; no validator has delivered evidence satisfying this exact dependency. Discovery receipts retain failures and inspection bounds',
             next_requirement=p['required_evidence'] if not delivery else [],
             qualification_authority='existing artifact/corpus validators and independent Evaluator',
             new_independent_experience=False, physical_authorization=False,
@@ -150,7 +154,7 @@ def discover_request_sources(dataset, roots, *, provenance, check=lambda: None):
                         with Image.open(frame['path']) as image:image.verify()
                         frames.append(dict(artifact=frame,timestamp=observation.data['at'],
                             timestamp_status='recorded_unqualified',observation_id=observation.id,
-                            capture_record_id=capture.id,source_kind='original_camera_pixels',
+                            capture_record_id=capture.id,source_episode=capture.data['episode'],source_kind='original_camera_pixels',
                             capture_provenance=capture.data['provenance'],identity_status='unverified',
                             measurement_status='original_pixels_only'))
                     if len(source.category_records('observation','camera_capture'))>256:
@@ -204,6 +208,96 @@ def discover_request_sources(dataset, roots, *, provenance, check=lambda: None):
                 independent_measurements=False,physical_authorization=False),episode=SCOPE,
                 producer='existing-acquisition-capability',version='request-source-v1',provenance=provenance)
             outputs.append(record.id)
+    return sorted(set(outputs))
+
+
+def satisfy_motion_requests(dataset):
+    """Deliver only existing independently qualified corpora to exact bookmarks."""
+    journal=dataset.journal;outputs=[]
+    satisfied={r.data['payload']['request_id'] for r in journal.category_records('event','acquisition_dependency_satisfied')}
+    consulted={episode for r in journal.category_records('observation','motion_final_consultation') for episode in r.data['payload']['episodes']}
+    from .episode_identity import eligible
+    for request in journal.category_records('event','learning_evidence_request'):
+        if request.id in satisfied:continue
+        bookmarks=[journal.get(i).data['payload'] for i in request.data['sources']]
+        bookmark=next((b for b in bookmarks if b.get('op')=='evidence_continuation' and
+            b.get('required_evidence')==request.data['payload']['required_evidence'] and
+            b.get('acceptance_criteria',{}).get('interface')=='existing independent_motion_corpus acquisition inbox'),None)
+        if bookmark is None:continue
+        for record in reversed(journal.category_records('observation','independent_motion_corpus')):
+            p=record.data['payload']
+            if record.data['producer']!='external-motion-qualification' or p.get('fixture_only') or not p.get('independence_assessment') or not eligible(journal,p):continue
+            corpus=p['corpus'];episodes=corpus['episodes']
+            if any(e['source_episode'] in consulted for e in episodes if e['partition']=='test'):continue
+            refs=[corpus['qualification_artifact']]+[e['source_report'] for e in episodes]+[f['artifact'] for e in episodes for f in e['frames']]
+            try:
+                if any(sha(ref['path'])!=ref['sha256'] for ref in refs):continue
+            except OSError:continue
+            if any(not any(abs(b['timestamp']-a['timestamp']-.15)<=.025 for a,b in zip(e['frames'][1:],e['frames'][2:])) for e in episodes):continue
+            reference=journal.append('observation',dict(category='consolidated_evidence_reference',
+                journal=str(journal.path.resolve()),record_id=record.id,source_episode=record.data['episode'],source_kind=record.data['kind']),
+                episode=request.data['episode'],producer='existing-evidence-consolidation',version='motion-delivery-v1')
+            receipt=journal.append('event',dict(category='acquisition_dependency_satisfied',request_id=request.id,
+                work_id=request.data['payload']['work_id'],corpus_id=record.id,
+                required_evidence=request.data['payload']['required_evidence'],
+                qualification='Existing corpus and independent measurement validators; original question and final-use gates retained',
+                new_independent_experience=False,physical_authorization=False),episode=request.data['episode'],
+                sources=[request.id,reference.id],producer='existing-acquisition-capability',version='motion-delivery-v1')
+            outputs.append(receipt.id);break
+    return outputs
+
+
+def commission_measurement_reviews(journal, discovery_ids):
+    """Execute an existing motion-evidence request, never originate a project."""
+    outputs=[]
+    for request in journal.category_records('event','learning_evidence_request'):
+        p=request.data['payload']
+        bookmarks=[journal.get(i).data['payload'] for i in request.data['sources']]
+        bookmark=next((b for b in bookmarks if b.get('op')=='evidence_continuation' and
+            b.get('acceptance_criteria',{}).get('interface')=='existing independent_motion_corpus acquisition inbox'),None)
+        if bookmark is None:continue
+        seen=set()
+        for identifier in discovery_ids:
+            discovery=journal.get(identifier);d=discovery.data['payload']
+            frames=[f for f in d.get('original_observations',[]) if
+                f.get('source_kind')=='original_camera_pixels' and type(f.get('timestamp')) in (int,float)]
+            frames.sort(key=lambda f:f['timestamp'])
+            sequence=next((frames[i:i+3] for i in range(len(frames)-2)
+                if all(abs(b['timestamp']-a['timestamp']-.15)<=.025
+                    for a,b in zip(frames[i:i+3],frames[i+1:i+3]))),None)
+            if not sequence:continue
+            key=digest([(f['artifact']['sha256'],f['timestamp']) for f in sequence])
+            if key in seen:continue
+            seen.add(key)
+            # A moved archive must not create another pending human task.
+            old=next((r for r in journal.category_records('event','evidence_review_request')
+                if r.data['payload'].get('request_id')==request.id and r.data['payload'].get('sequence_key')==key),None)
+            if old:outputs.append(old.id);continue
+            reference=journal.append('observation',dict(category='consolidated_evidence_reference',
+                journal=str(journal.path.resolve()),record_id=discovery.id,
+                source_episode=discovery.data['episode'],source_kind=discovery.data['kind']),
+                episode=request.data['episode'],producer='existing-evidence-consolidation',version='deferred-measurement-v1')
+            review=journal.append('event',dict(category='evidence_review_request',request_id=request.id,
+                work_id=p['work_id'],original_question=bookmark.get('original_question'),
+                required_evidence=p['required_evidence'],sequence_key=key,frames=sequence,
+                question='Identify the same visible object across these originals and mark its pixel position in each. Abstain if identity or position cannot be determined.',
+                provisional_determination='No independently verified identity or board trajectory; original pixels only',
+                uncertainty='Visual ambiguity, camera geometry, persistent identity and source independence remain unresolved',
+                partition='diagnostic',prior_use='human diagnostic review; never unconsulted final evidence',
+                synthetic=any(f.get('capture_provenance',{}).get('synthetic') is True for f in sequence),
+                qualification='Evaluator must assess annotation; calibrated board trajectories and independent episode partitions still required',
+                physical_authorization=False),episode=request.data['episode'],sources=[request.id,reference.id],
+                producer='existing-acquisition-capability',version='deferred-measurement-v1')
+            outputs.append(review.id)
+        if not seen:
+            journal.append('event',dict(category='acquisition_measurement_deficiency',request_id=request.id,
+                work_id=p['work_id'],discovery_ids=discovery_ids,
+                missing=['Three hash-bound original camera frames at 150ms +/-25ms adjacent spacing',
+                    'Independently verified persistent identity and calibrated board positions',
+                    'One validation and three distinct unconsulted final episode groups'],
+                assistance='Provide preserved original camera observations or separately authorize missing experience; no physical execution requested by this adapter',
+                status='unsatisfied',physical_authorization=False),episode=request.data['episode'],sources=[request.id],
+                producer='existing-acquisition-capability',version='deferred-measurement-v1')
     return sorted(set(outputs))
 
 

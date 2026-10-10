@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="1" tests="62" time="21.898" timestamp="2026-10-10T17:29:33.876134+02:00" hostname="5c65b9d02f11"><testcase classname="tests.test_deferred_measurement_review" name="test_request_driven_camera_review_and_restart_immutable_correction" time="0.056" /><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[nan]" time="0.020" /><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[inf]" time="0.019" /><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[True]" time="0.019" /><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[-1]" time="0.018" /><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[100]" time="0.020" /><testcase classname="tests.test_deferred_measurement_review" name="test_changed_original_abstention_and_aliases" time="0.024" /><testcase classname="tests.test_deferred_measurement_review" name="test_disagreement_and_synthetic_feedback_do_not_qualify" time="0.031" /><testcase classname="tests.test_deferred_measurement_review" name="test_real_http_shared_operator_server" time="0.281" /><testcase classname="tests.test_request_source_discovery" name="test_new_files_in_same_existing_root_trigger_request_response" time="0.034" /><testcase classname="tests.test_request_source_discovery" name="test_failure_and_escape_do_not_prevent_other_source_search" time="0.025" /><testcase classname="tests.test_request_source_discovery" name="test_no_request_no_inspection" time="0.011" /><testcase classname="tests.test_request_source_discovery" name="test_resource_interruption_retains_completed_source_and_resumes" time="0.015" /><testcase classname="tests.test_acquisition_investigation" name="test_unavailable_search_is_durable_and_changed_source_reconsidered" time="0.035" /><testcase classname="tests.test_acquisition_investigation" name="test_two_dependencies_deliver_original_bytes_without_independent_experience" time="0.023" /><testcase classname="tests.test_acquisition_investigation" name="test_existing_bookmark_commission_is_idempotent" time="0.012" /><testcase classname="tests.test_acquisition_investigation" name="test_corrupt_inbox_deduplicated_and_changed_bytes_retried" time="0.026" /><testcase classname="tests.test_acquisition_investigation" name="test_rejected_delivery_retries_when_external_artifact_changes" time="0.015" /><testcase classname="tests.test_acquisition_investigation" name="test_restart_between_acquisition_and_executive_delivery" time="0.026" /><testcase classname="tests.test_score_review_frontend" name="test_batch_navigation_correction_filters_and_keyboard" time="0.161" /><testcase classname="tests.test_score_review_frontend" name="test_measurement_review_marking_and_abstention" time="0.159" /><testcase classname="tests.test_meditation_candidate" name="test_archived_findings_generate_executable_candidates_but_keep_baseline" time="0.036" /><testcase classname="tests.test_meditation_candidate" name="test_independent_controlled_loop_guarded_execution_and_rollback" time="0.057" /><testcase classname="tests.test_meditation_candidate" name="test_motion_evidence_gates[model-label]" time="0.011" /><testcase classname="tests.test_meditation_candidate" name="test_motion_evidence_gates[duplicate]" time="0.010" /><testcase classname="tests.test_meditation_candidate" name="test_motion_evidence_gates[changed-frame]" time="0.010" /><testcase classname="tests.test_meditation_candidate" name="test_motion_evidence_gates[prior-use]" time="0.011" /><testcase classname="tests.test_meditation_candidate" name="test_motion_evidence_gates[unverified]" time="0.011" /><testcase classname="tests.test_meditation_candidate" name="test_motion_crash_consumes_final_once_and_abstains" time="0.026" /><testcase classname="tests.test_meditation_candidate" name="test_published_final_episode_cannot_be_renamed_into_new_root" time="0.013" /><testcase classname="tests.test_meditation_candidate" name="test_boot_change_abstains_before_any_candidate_evaluation" time="0.015" /><testcase classname="tests.test_meditation_candidate" name="test_motion_measurement_types_and_within_episode_duplicate_rejected[boolean-time]" time="0.010" /><testcase classname="tests.test_meditation_candidate" name="test_motion_measurement_types_and_within_episode_duplicate_rejected[negative-time]" time="0.010" /><testcase classname="tests.test_meditation_candidate" name="test_motion_measurement_types_and_within_episode_duplicate_rejected[boolean-position]" time="0.010" /><testcase classname="tests.test_meditation_candidate" name="test_motion_measurement_types_and_within_episode_duplicate_rejected[reused-frame]" time="0.010" /><testcase classname="tests.test_episode_identity" name="test_complete_manifest_distinguishes_packages_not_gameplay" time="0.005" /><testcase classname="tests.test_episode_identity" name="test_copies_relocation_and_multiple_restoration_restarts" time="0.015" /><testcase classname="tests.test_episode_identity" name="test_distinct_capture_attempts_identical_report_do_not_prove_games" time="0.006" /><testcase classname="tests.test_episode_identity" name="test_independent_games_identical_reports_require_external_boundaries" time="0.008" /><testcase classname="tests.test_episode_identity" name="test_missing_identifier_safe_mapping_malformed_origin_quarantined" time="0.005" /><testcase classname="tests.test_episode_identity" name="test_modified_verified_artifact_excluded_valid_copy_remains" time="0.008" /><testcase classname="tests.test_episode_identity" name="test_interrupted_finalization_resumes_same_origin" time="0.009" /><testcase classname="tests.test_episode_identity" name="test_ambiguous_legacy_report_reconsidered_when_witness_arrives" time="0.008" /><testcase classname="tests.test_episode_identity" name="test_normal_application_conflict_does_not_block_development_or_restart" time="5.946"><failure message="assert (1 == 2)&#10; +  where 1 = len([EvidenceRecord(sequence=40, id='aac87bed903aca8a57af80930fff24996401e835c382418efba3d3cfe722ad96', document='{&quot;at&quot;:18...c66de267fe7ed7db0ba15abe5942b0b&quot;],&quot;version&quot;:&quot;meditation-motion-v1&quot;}', committed_at='2026-10-10T15:29:36.031769+00:00')])">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_normal_application_confli0')
+
+    def test_normal_application_conflict_does_not_block_development_or_restart(tmp_path):
+        root=experience(tmp_path);bad=package(tmp_path,'bad');begin_capture(bad)
+        origin=json.loads((bad/ORIGIN).read_text());origin['capture_id']='malformed'
+        (bad/ORIGIN).write_text(json.dumps(origin))
+        state=tmp_path/'state'
+        first=startup(state,[root,bad],authorize=False,turns=12)
+        assert first.returncode==0,first.stderr
+        original=rows(state)
+        assert any(r.data['payload'].get('category')=='episode_identity_quarantine' for r in original)
+        assert any(r.data['payload'].get('category')=='normal_meditation_result' and r.data['payload']['status']=='completed' for r in original)
+        assert any(r.data['kind']=='resolution' for r in original)
+        requests=[r for r in original if r.data['payload'].get('op')=='evidence_continuation']
+        assert requests and requests[0].data['payload']['required_evidence']
+        for _ in range(2):
+            restarted=startup(state,[root,bad],authorize=False,turns=12)
+            assert restarted.returncode==0,restarted.stderr
+            assert [r.id for r in rows(state)]==[r.id for r in original]
+        delivered_corpus(tmp_path,state)
+        second=startup(state,[root,bad],authorize=False,turns=12)
+        assert second.returncode==0,second.stderr
+        after=rows(state)
+        evaluations=[r for r in after if r.data['payload'].get('category')=='meditation_candidate_evaluation']
+&gt;       assert len(evaluations)==2 and evaluations[-1].data['payload']['result']['result']=='supported'
+E       assert (1 == 2)
+E        +  where 1 = len([EvidenceRecord(sequence=40, id='aac87bed903aca8a57af80930fff24996401e835c382418efba3d3cfe722ad96', document='{"at":18...c66de267fe7ed7db0ba15abe5942b0b"],"version":"meditation-motion-v1"}', committed_at='2026-10-10T15:29:36.031769+00:00')])
+
+tests/test_episode_identity.py:166: AssertionError</failure></testcase><testcase classname="tests.test_episode_identity" name="test_actual_october1_collision_normal_discovery" time="0.001"><skipped type="pytest.skip" message="original October 1 artifacts required; use documented acceptance environment">/workspace/scratch/a5d7375d8e4e/charlie-motion/tests/test_episode_identity.py:176: original October 1 artifacts required; use documented acceptance environment</skipped></testcase><testcase classname="tests.test_episode_identity" name="test_original_distinct_temporal_projects_restore_defer_and_resume" time="7.016"><failure message="AssertionError: assert 1 == 2&#10; +  where 1 = len([{'condition': {'corpus_id': None, 'meditation_id': 'e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5'...us-learning-v1', 'evidence_groups': ['episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da'], ...}])">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_original_distinct_tempora0')
+
+    def test_original_distinct_temporal_projects_restore_defer_and_resume(tmp_path):
+        from learning.lifecycle import DevelopmentLifecycle
+        from learning.retrospective import merge_history
+        from memory.learning_projects import LearningExecutive
+        source,original=original_notebook(tmp_path)
+        state=tmp_path/'state';merge_history(source,state)
+        root=experience(tmp_path)
+        ids=['aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c',
+             '63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343']
+        j=EvidenceJournal(state/'learning-evidence.sqlite3');before=LearningExecutive(j,None).projects()
+        assert before[ids[0]]['scope']['meditation_id']!=before[ids[1]]['scope']['meditation_id']
+        assert [j.get(before[i]['scope']['meditation_id']).data['payload']['prior_use'] for i in ids]==['consulted-test','train']
+        assert all(p['status']=='paused' and len(p['experiment_history'])==1 for p in (before[i] for i in ids))
+        j.close()
+        process=startup(state,[root],authorize=False,turns=12);assert process.returncode==0,process.stderr
+        j=EvidenceJournal(state/'learning-evidence.sqlite3');executive=LearningExecutive(j,None)
+        after=executive.projects()
+        assert all(after[i]['experiment_history']==before[i]['experiment_history'] for i in ids)
+        assert all(after[i]['scope']==before[i]['scope'] and after[i]['origins'][:len(before[i]['origins'])]==before[i]['origins'] for i in ids)
+        assert all(after[i]['developmental_bookmark']['required_evidence'] for i in ids)
+        assert all(after[i]['agenda_representative']==ids[0] for i in ids)
+        assert [(r.id,r.document,r.committed_at) for r in j.records()][:len(original)]==[
+            (r['id'],r['document'],r['committed_at']) for r in original]
+        count=len(j.records());j.close()
+        assert startup(state,[root],authorize=False,turns=12).returncode==0
+        assert len(rows(state))==count
+        delivered_corpus(tmp_path,state)
+        process=startup(state,[root],authorize=False,turns=12);assert process.returncode==0,process.stderr
+        j=EvidenceJournal(state/'learning-evidence.sqlite3');projects=LearningExecutive(j,None).projects()
+&gt;       assert len(projects[ids[0]]['experiment_history'])==2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = len([{'condition': {'corpus_id': None, 'meditation_id': 'e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5'...us-learning-v1', 'evidence_groups': ['episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da'], ...}])
+
+tests/test_episode_identity.py:246: AssertionError</failure></testcase><testcase classname="tests.test_episode_identity" name="test_standalone_content_adapter_imports_shared_experience_once" time="0.006" /><testcase classname="tests.test_episode_identity" name="test_safe_malformed_derived_alias_repair_preserves_original_journal" time="0.006" /><testcase classname="tests.test_episode_identity" name="test_normal_finalized_capture_restart_and_mutation_quarantine" time="4.277" /><testcase classname="tests.test_episode_identity" name="test_motion_qualification_uses_capture_occurrence_not_report_alone" time="0.029" /><testcase classname="tests.test_episode_identity" name="test_audit_retrieval_preserves_verified_copy_during_source_quarantine" time="0.011" /><testcase classname="tests.test_episode_identity" name="test_identity_alias_migration_cannot_reassign_historical_evaluation_partitions" time="0.014" /><testcase classname="tests.test_qualified_ppal_policy" name="test_qualified_motion_restart_rollback_and_charlie_fixture_origin" time="0.063" /><testcase classname="tests.test_qualified_ppal_policy" name="test_strategic_influence_and_immediate_override" time="0.071" /><testcase classname="tests.test_qualified_ppal_policy" name="test_tactical_fire_shot_model_and_deterministic_reason" time="0.076" /><testcase classname="tests.test_qualified_ppal_policy" name="test_missing_corrupt_version_unqualified_and_domain_rejected" time="0.045" /><testcase classname="tests.test_qualified_ppal_policy" name="test_runtime_has_no_learning_journal_or_controller_calls" time="0.078" /><testcase classname="tests.test_qualified_ppal_policy" name="test_latency_and_normal_entry_point_persistence" time="0.655" /><testcase classname="tests.test_qualified_ppal_policy" name="test_motion_policy_preserves_observed_immediate_threat_and_unresolved_space" time="0.074" /><testcase classname="tests.test_qualified_ppal_policy" name="test_rejected_evaluation_and_unauthorized_domain_cannot_activate" time="0.091" /><testcase classname="tests.test_qualified_ppal_policy" name="test_runtime_mismatch_and_legacy_activation_do_not_silently_requalify" time="0.053" /><testcase classname="tests.test_qualified_ppal_policy" name="test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart" time="1.446"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-root/pytest-11/test_normal_main_autonomously_0/state/ppal-policy.json'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_normal_main_autonomously_0')
+
+    def test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart(tmp_path):
+        from test_normal_learning_lifecycle import experience,delivered_corpus,startup,rows
+        root=experience(tmp_path);state=tmp_path/'state';delivered_corpus(tmp_path,state)
+        inbox=state/'acquisition-inbox'/'motion.json';c=json.loads(inbox.read_text())
+        c['provenance_kind']='simulated-controlled-trajectories'
+        for episode in c['episodes']:
+            for i,frame in enumerate(episode['frames']):
+                frame['targets'][0]['position']=[25-i,20]
+        inbox.write_text(json.dumps(c))
+        process=startup(state,[root]);assert process.returncode==0,process.stderr
+&gt;       policy=load_policy(state/'ppal-policy.json')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_qualified_ppal_policy.py:243: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/qualified_policy.py:94: in load_policy
+    if location.stat().st_size &gt; 65536:
+       ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-11/test_normal_main_autonomously_0/state/ppal-policy.json')
+follow_symlinks = True
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+&gt;       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-root/pytest-11/test_normal_main_autonomously_0/state/ppal-policy.json'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:840: FileNotFoundError</failure></testcase></testsuite></testsuites>

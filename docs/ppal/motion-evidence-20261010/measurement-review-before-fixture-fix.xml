@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="33" time="2.080" timestamp="2026-10-10T17:21:31.099176+02:00" hostname="5c65b9d02f11"><testcase classname="tests.test_deferred_measurement_review" name="test_request_driven_camera_review_and_restart_immutable_correction" time="0.057"><failure message="KeyError: 'existing-fixture-project'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_request_driven_camera_rev0')
+
+    def test_request_driven_camera_review_and_restart_immutable_correction(tmp_path):
+        life,root,r,q=setup(tmp_path)
+        assert q['request_id']==r.id and q['synthetic'] and len(q['frames'])==3
+        assert q['original_question']=='Retained fixture temporal question'
+        before=life.journal.get(q['id']).document
+        a=review_evidence(life.journal,q['id'],annotator='fixture reviewer',verdict='confirm',objects=positions(),independent=True)
+        assert review_evidence(life.journal,q['id'],annotator='fixture reviewer',verdict='confirm',objects=positions(),independent=True).id==a.id
+        correction=positions();correction[0]['positions'][1]=[7,5]
+        b=review_evidence(life.journal,q['id'],annotator='fixture reviewer',verdict='correct',objects=correction,independent=True)
+        assert b.data['payload']['supersedes']==a.id and life.journal.get(q['id']).document==before
+        evaluation=life.journal.category_records('observation','evidence_annotation_evaluation')[-1].data['payload']
+        assert evaluation['measurements'][0]['displacement']==[3,0]
+        assert evaluation['status']=='unresolved' and not evaluation['independent_motion_corpus']
+        assert 'calibrated' in ' '.join(evaluation['deficiencies'])
+&gt;       count=len(life.journal.records());life.close()
+                                          ^^^^^^^^^^^^
+
+tests/test_deferred_measurement_review.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/lifecycle.py:591: in close
+    self._phase('stopped')
+learning/lifecycle.py:113: in _phase
+    self._status()
+learning/lifecycle.py:66: in _status
+    projects = self.executive.projects()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+memory/learning_projects.py:140: in projects
+    return self.project_state(self.journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+journal = &lt;memory.evidence.EvidenceJournal object at 0x7ff32c178380&gt;
+
+    @staticmethod
+    def project_state(journal):
+        """Read-only projection shared with acceptance; never constructs an Executive."""
+        projects = {}
+        for record in journal.records('event'):
+            if record.data['episode'] != SCOPE:
+                continue
+            p = record.data['payload']; op = p.get('op')
+            if op == 'proposed':
+                projects[p['project']['id']] = p['project']
+            elif op == 'evidence_added':
+                project = projects[p['project_id']]
+                project['origins'].extend(p['origins'])
+                project['hypothesis_evidence'].extend(p['hypothesis_evidence'])
+                project['tactical_hypothesis_evidence'] = list(dict.fromkeys(
+                    project.get('tactical_hypothesis_evidence', []) + p['tactical_hypothesis_evidence']))
+            elif op == 'selected':
+                for identifier, project in projects.items():
+                    if project['status'] == 'active' and identifier != p['project_id']:
+                        project['status'] = 'paused'
+                        project['next_direction'] = 'resume after interruption'
+                        project['interrupted_by'] = p['project_id']
+                    if identifier in p.get('interrupted_projects', []):
+                        project['interrupted_by'] = p['project_id']
+                project = projects[p['project_id']]
+                project.update(status='active', selection=p)
+                project.pop('interrupted_by', None)
+            elif op == 'outcome':
+                projects[p['project_id']]['experiment_history'].append(p['outcome'])
+            elif op == 'assessment':
+                projects[p['project_id']].update(p['changes'])
+            elif op == 'lifecycle':
+                projects[p['project_id']].update(status=p['status'],
+                    completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
+                    hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'operational_feedback':
+                projects[p['project_id']].update(next_direction=p['next_direction'],
+                    operational_outcome=p['outcome_id'])
+            elif op == 'agenda_relationship':
+                for identifier in p['members']:
+                    projects[identifier]['agenda_representative']=p['representative']
+                    projects[identifier]['agenda_members']=p['members']
+                    projects[identifier]['agenda_equivalence_evidence']=record.id
+            elif op == 'agenda_scope_added':
+                project=projects[p['project_id']]
+                project.setdefault('agenda_scopes',[project['scope']])
+                if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
+            elif op == 'evidence_continuation':
+&gt;               projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'existing-fixture-project'
+
+memory/learning_projects.py:190: KeyError</failure></testcase><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[nan]" time="0.023"><failure message="KeyError: 'existing-fixture-project'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_invalid_measurement_rejec0')
+value = nan
+
+    @pytest.mark.parametrize('value',[float('nan'),float('inf'),True,-1,100])
+    def test_invalid_measurement_rejected(tmp_path,value):
+        life,root,r,q=setup(tmp_path);objects=positions();objects[0]['positions'][0][0]=value
+        with pytest.raises(ValueError):review_evidence(life.journal,q['id'],annotator='fixture',verdict='correct',objects=objects)
+&gt;       assert not life.journal.category_records('observation','evidence_human_annotation');life.close()
+                                                                                            ^^^^^^^^^^^^
+
+tests/test_deferred_measurement_review.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/lifecycle.py:591: in close
+    self._phase('stopped')
+learning/lifecycle.py:113: in _phase
+    self._status()
+learning/lifecycle.py:66: in _status
+    projects = self.executive.projects()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+memory/learning_projects.py:140: in projects
+    return self.project_state(self.journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+journal = &lt;memory.evidence.EvidenceJournal object at 0x7ff32340b170&gt;
+
+    @staticmethod
+    def project_state(journal):
+        """Read-only projection shared with acceptance; never constructs an Executive."""
+        projects = {}
+        for record in journal.records('event'):
+            if record.data['episode'] != SCOPE:
+                continue
+            p = record.data['payload']; op = p.get('op')
+            if op == 'proposed':
+                projects[p['project']['id']] = p['project']
+            elif op == 'evidence_added':
+                project = projects[p['project_id']]
+                project['origins'].extend(p['origins'])
+                project['hypothesis_evidence'].extend(p['hypothesis_evidence'])
+                project['tactical_hypothesis_evidence'] = list(dict.fromkeys(
+                    project.get('tactical_hypothesis_evidence', []) + p['tactical_hypothesis_evidence']))
+            elif op == 'selected':
+                for identifier, project in projects.items():
+                    if project['status'] == 'active' and identifier != p['project_id']:
+                        project['status'] = 'paused'
+                        project['next_direction'] = 'resume after interruption'
+                        project['interrupted_by'] = p['project_id']
+                    if identifier in p.get('interrupted_projects', []):
+                        project['interrupted_by'] = p['project_id']
+                project = projects[p['project_id']]
+                project.update(status='active', selection=p)
+                project.pop('interrupted_by', None)
+            elif op == 'outcome':
+                projects[p['project_id']]['experiment_history'].append(p['outcome'])
+            elif op == 'assessment':
+                projects[p['project_id']].update(p['changes'])
+            elif op == 'lifecycle':
+                projects[p['project_id']].update(status=p['status'],
+                    completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
+                    hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'operational_feedback':
+                projects[p['project_id']].update(next_direction=p['next_direction'],
+                    operational_outcome=p['outcome_id'])
+            elif op == 'agenda_relationship':
+                for identifier in p['members']:
+                    projects[identifier]['agenda_representative']=p['representative']
+                    projects[identifier]['agenda_members']=p['members']
+                    projects[identifier]['agenda_equivalence_evidence']=record.id
+            elif op == 'agenda_scope_added':
+                project=projects[p['project_id']]
+                project.setdefault('agenda_scopes',[project['scope']])
+                if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
+            elif op == 'evidence_continuation':
+&gt;               projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'existing-fixture-project'
+
+memory/learning_projects.py:190: KeyError</failure></testcase><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[inf]" time="0.020"><failure message="KeyError: 'existing-fixture-project'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_invalid_measurement_rejec1')
+value = inf
+
+    @pytest.mark.parametrize('value',[float('nan'),float('inf'),True,-1,100])
+    def test_invalid_measurement_rejected(tmp_path,value):
+        life,root,r,q=setup(tmp_path);objects=positions();objects[0]['positions'][0][0]=value
+        with pytest.raises(ValueError):review_evidence(life.journal,q['id'],annotator='fixture',verdict='correct',objects=objects)
+&gt;       assert not life.journal.category_records('observation','evidence_human_annotation');life.close()
+                                                                                            ^^^^^^^^^^^^
+
+tests/test_deferred_measurement_review.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/lifecycle.py:591: in close
+    self._phase('stopped')
+learning/lifecycle.py:113: in _phase
+    self._status()
+learning/lifecycle.py:66: in _status
+    projects = self.executive.projects()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+memory/learning_projects.py:140: in projects
+    return self.project_state(self.journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+journal = &lt;memory.evidence.EvidenceJournal object at 0x7ff32344aa80&gt;
+
+    @staticmethod
+    def project_state(journal):
+        """Read-only projection shared with acceptance; never constructs an Executive."""
+        projects = {}
+        for record in journal.records('event'):
+            if record.data['episode'] != SCOPE:
+                continue
+            p = record.data['payload']; op = p.get('op')
+            if op == 'proposed':
+                projects[p['project']['id']] = p['project']
+            elif op == 'evidence_added':
+                project = projects[p['project_id']]
+                project['origins'].extend(p['origins'])
+                project['hypothesis_evidence'].extend(p['hypothesis_evidence'])
+                project['tactical_hypothesis_evidence'] = list(dict.fromkeys(
+                    project.get('tactical_hypothesis_evidence', []) + p['tactical_hypothesis_evidence']))
+            elif op == 'selected':
+                for identifier, project in projects.items():
+                    if project['status'] == 'active' and identifier != p['project_id']:
+                        project['status'] = 'paused'
+                        project['next_direction'] = 'resume after interruption'
+                        project['interrupted_by'] = p['project_id']
+                    if identifier in p.get('interrupted_projects', []):
+                        project['interrupted_by'] = p['project_id']
+                project = projects[p['project_id']]
+                project.update(status='active', selection=p)
+                project.pop('interrupted_by', None)
+            elif op == 'outcome':
+                projects[p['project_id']]['experiment_history'].append(p['outcome'])
+            elif op == 'assessment':
+                projects[p['project_id']].update(p['changes'])
+            elif op == 'lifecycle':
+                projects[p['project_id']].update(status=p['status'],
+                    completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
+                    hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'operational_feedback':
+                projects[p['project_id']].update(next_direction=p['next_direction'],
+                    operational_outcome=p['outcome_id'])
+            elif op == 'agenda_relationship':
+                for identifier in p['members']:
+                    projects[identifier]['agenda_representative']=p['representative']
+                    projects[identifier]['agenda_members']=p['members']
+                    projects[identifier]['agenda_equivalence_evidence']=record.id
+            elif op == 'agenda_scope_added':
+                project=projects[p['project_id']]
+                project.setdefault('agenda_scopes',[project['scope']])
+                if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
+            elif op == 'evidence_continuation':
+&gt;               projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'existing-fixture-project'
+
+memory/learning_projects.py:190: KeyError</failure></testcase><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[True]" time="0.025"><failure message="KeyError: 'existing-fixture-project'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_invalid_measurement_rejec2')
+value = True
+
+    @pytest.mark.parametrize('value',[float('nan'),float('inf'),True,-1,100])
+    def test_invalid_measurement_rejected(tmp_path,value):
+        life,root,r,q=setup(tmp_path);objects=positions();objects[0]['positions'][0][0]=value
+        with pytest.raises(ValueError):review_evidence(life.journal,q['id'],annotator='fixture',verdict='correct',objects=objects)
+&gt;       assert not life.journal.category_records('observation','evidence_human_annotation');life.close()
+                                                                                            ^^^^^^^^^^^^
+
+tests/test_deferred_measurement_review.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/lifecycle.py:591: in close
+    self._phase('stopped')
+learning/lifecycle.py:113: in _phase
+    self._status()
+learning/lifecycle.py:66: in _status
+    projects = self.executive.projects()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+memory/learning_projects.py:140: in projects
+    return self.project_state(self.journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+journal = &lt;memory.evidence.EvidenceJournal object at 0x7ff32344ab10&gt;
+
+    @staticmethod
+    def project_state(journal):
+        """Read-only projection shared with acceptance; never constructs an Executive."""
+        projects = {}
+        for record in journal.records('event'):
+            if record.data['episode'] != SCOPE:
+                continue
+            p = record.data['payload']; op = p.get('op')
+            if op == 'proposed':
+                projects[p['project']['id']] = p['project']
+            elif op == 'evidence_added':
+                project = projects[p['project_id']]
+                project['origins'].extend(p['origins'])
+                project['hypothesis_evidence'].extend(p['hypothesis_evidence'])
+                project['tactical_hypothesis_evidence'] = list(dict.fromkeys(
+                    project.get('tactical_hypothesis_evidence', []) + p['tactical_hypothesis_evidence']))
+            elif op == 'selected':
+                for identifier, project in projects.items():
+                    if project['status'] == 'active' and identifier != p['project_id']:
+                        project['status'] = 'paused'
+                        project['next_direction'] = 'resume after interruption'
+                        project['interrupted_by'] = p['project_id']
+                    if identifier in p.get('interrupted_projects', []):
+                        project['interrupted_by'] = p['project_id']
+                project = projects[p['project_id']]
+                project.update(status='active', selection=p)
+                project.pop('interrupted_by', None)
+            elif op == 'outcome':
+                projects[p['project_id']]['experiment_history'].append(p['outcome'])
+            elif op == 'assessment':
+                projects[p['project_id']].update(p['changes'])
+            elif op == 'lifecycle':
+                projects[p['project_id']].update(status=p['status'],
+                    completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
+                    hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'operational_feedback':
+                projects[p['project_id']].update(next_direction=p['next_direction'],
+                    operational_outcome=p['outcome_id'])
+            elif op == 'agenda_relationship':
+                for identifier in p['members']:
+                    projects[identifier]['agenda_representative']=p['representative']
+                    projects[identifier]['agenda_members']=p['members']
+                    projects[identifier]['agenda_equivalence_evidence']=record.id
+            elif op == 'agenda_scope_added':
+                project=projects[p['project_id']]
+                project.setdefault('agenda_scopes',[project['scope']])
+                if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
+            elif op == 'evidence_continuation':
+&gt;               projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'existing-fixture-project'
+
+memory/learning_projects.py:190: KeyError</failure></testcase><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[-1]" time="0.026"><failure message="KeyError: 'existing-fixture-project'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_invalid_measurement_rejec3')
+value = -1
+
+    @pytest.mark.parametrize('value',[float('nan'),float('inf'),True,-1,100])
+    def test_invalid_measurement_rejected(tmp_path,value):
+        life,root,r,q=setup(tmp_path);objects=positions();objects[0]['positions'][0][0]=value
+        with pytest.raises(ValueError):review_evidence(life.journal,q['id'],annotator='fixture',verdict='correct',objects=objects)
+&gt;       assert not life.journal.category_records('observation','evidence_human_annotation');life.close()
+                                                                                            ^^^^^^^^^^^^
+
+tests/test_deferred_measurement_review.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/lifecycle.py:591: in close
+    self._phase('stopped')
+learning/lifecycle.py:113: in _phase
+    self._status()
+learning/lifecycle.py:66: in _status
+    projects = self.executive.projects()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+memory/learning_projects.py:140: in projects
+    return self.project_state(self.journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+journal = &lt;memory.evidence.EvidenceJournal object at 0x7ff32340a1e0&gt;
+
+    @staticmethod
+    def project_state(journal):
+        """Read-only projection shared with acceptance; never constructs an Executive."""
+        projects = {}
+        for record in journal.records('event'):
+            if record.data['episode'] != SCOPE:
+                continue
+            p = record.data['payload']; op = p.get('op')
+            if op == 'proposed':
+                projects[p['project']['id']] = p['project']
+            elif op == 'evidence_added':
+                project = projects[p['project_id']]
+                project['origins'].extend(p['origins'])
+                project['hypothesis_evidence'].extend(p['hypothesis_evidence'])
+                project['tactical_hypothesis_evidence'] = list(dict.fromkeys(
+                    project.get('tactical_hypothesis_evidence', []) + p['tactical_hypothesis_evidence']))
+            elif op == 'selected':
+                for identifier, project in projects.items():
+                    if project['status'] == 'active' and identifier != p['project_id']:
+                        project['status'] = 'paused'
+                        project['next_direction'] = 'resume after interruption'
+                        project['interrupted_by'] = p['project_id']
+                    if identifier in p.get('interrupted_projects', []):
+                        project['interrupted_by'] = p['project_id']
+                project = projects[p['project_id']]
+                project.update(status='active', selection=p)
+                project.pop('interrupted_by', None)
+            elif op == 'outcome':
+                projects[p['project_id']]['experiment_history'].append(p['outcome'])
+            elif op == 'assessment':
+                projects[p['project_id']].update(p['changes'])
+            elif op == 'lifecycle':
+                projects[p['project_id']].update(status=p['status'],
+                    completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
+                    hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'operational_feedback':
+                projects[p['project_id']].update(next_direction=p['next_direction'],
+                    operational_outcome=p['outcome_id'])
+            elif op == 'agenda_relationship':
+                for identifier in p['members']:
+                    projects[identifier]['agenda_representative']=p['representative']
+                    projects[identifier]['agenda_members']=p['members']
+                    projects[identifier]['agenda_equivalence_evidence']=record.id
+            elif op == 'agenda_scope_added':
+                project=projects[p['project_id']]
+                project.setdefault('agenda_scopes',[project['scope']])
+                if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
+            elif op == 'evidence_continuation':
+&gt;               projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'existing-fixture-project'
+
+memory/learning_projects.py:190: KeyError</failure></testcase><testcase classname="tests.test_deferred_measurement_review" name="test_invalid_measurement_rejected[100]" time="0.023"><failure message="KeyError: 'existing-fixture-project'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_invalid_measurement_rejec4')
+value = 100
+
+    @pytest.mark.parametrize('value',[float('nan'),float('inf'),True,-1,100])
+    def test_invalid_measurement_rejected(tmp_path,value):
+        life,root,r,q=setup(tmp_path);objects=positions();objects[0]['positions'][0][0]=value
+        with pytest.raises(ValueError):review_evidence(life.journal,q['id'],annotator='fixture',verdict='correct',objects=objects)
+&gt;       assert not life.journal.category_records('observation','evidence_human_annotation');life.close()
+                                                                                            ^^^^^^^^^^^^
+
+tests/test_deferred_measurement_review.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/lifecycle.py:591: in close
+    self._phase('stopped')
+learning/lifecycle.py:113: in _phase
+    self._status()
+learning/lifecycle.py:66: in _status
+    projects = self.executive.projects()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+memory/learning_projects.py:140: in projects
+    return self.project_state(self.journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+journal = &lt;memory.evidence.EvidenceJournal object at 0x7ff3233f78f0&gt;
+
+    @staticmethod
+    def project_state(journal):
+        """Read-only projection shared with acceptance; never constructs an Executive."""
+        projects = {}
+        for record in journal.records('event'):
+            if record.data['episode'] != SCOPE:
+                continue
+            p = record.data['payload']; op = p.get('op')
+            if op == 'proposed':
+                projects[p['project']['id']] = p['project']
+            elif op == 'evidence_added':
+                project = projects[p['project_id']]
+                project['origins'].extend(p['origins'])
+                project['hypothesis_evidence'].extend(p['hypothesis_evidence'])
+                project['tactical_hypothesis_evidence'] = list(dict.fromkeys(
+                    project.get('tactical_hypothesis_evidence', []) + p['tactical_hypothesis_evidence']))
+            elif op == 'selected':
+                for identifier, project in projects.items():
+                    if project['status'] == 'active' and identifier != p['project_id']:
+                        project['status'] = 'paused'
+                        project['next_direction'] = 'resume after interruption'
+                        project['interrupted_by'] = p['project_id']
+                    if identifier in p.get('interrupted_projects', []):
+                        project['interrupted_by'] = p['project_id']
+                project = projects[p['project_id']]
+                project.update(status='active', selection=p)
+                project.pop('interrupted_by', None)
+            elif op == 'outcome':
+                projects[p['project_id']]['experiment_history'].append(p['outcome'])
+            elif op == 'assessment':
+                projects[p['project_id']].update(p['changes'])
+            elif op == 'lifecycle':
+                projects[p['project_id']].update(status=p['status'],
+                    completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
+                    hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'operational_feedback':
+                projects[p['project_id']].update(next_direction=p['next_direction'],
+                    operational_outcome=p['outcome_id'])
+            elif op == 'agenda_relationship':
+                for identifier in p['members']:
+                    projects[identifier]['agenda_representative']=p['representative']
+                    projects[identifier]['agenda_members']=p['members']
+                    projects[identifier]['agenda_equivalence_evidence']=record.id
+            elif op == 'agenda_scope_added':
+                project=projects[p['project_id']]
+                project.setdefault('agenda_scopes',[project['scope']])
+                if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
+            elif op == 'evidence_continuation':
+&gt;               projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'existing-fixture-project'
+
+memory/learning_projects.py:190: KeyError</failure></testcase><testcase classname="tests.test_deferred_measurement_review" name="test_changed_original_abstention_and_aliases" time="0.034"><failure message="KeyError: 'existing-fixture-project'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_changed_original_abstenti0')
+
+    def test_changed_original_abstention_and_aliases(tmp_path):
+        life,root,r,q=setup(tmp_path);copy=root.parent/'alias';shutil.copytree(root,copy)
+        investigate_requests(life.dataset,[root.parent],provenance=life.provenance)
+        assert len(evidence_queue(life.journal))==1
+        (root/'original-0.png').unlink()
+        assert evidence_review_artifact(life.journal,q['frames'][0]['artifact'])==copy/'original-0.png'
+        (copy/'original-0.png').unlink()
+        with pytest.raises(ValueError):review_evidence(life.journal,q['id'],annotator='fixture',verdict='confirm',objects=positions())
+        a=review_evidence(life.journal,q['id'],annotator='fixture',verdict='cannot_determine',reason='Original unavailable')
+        assert a.data['payload']['verdict']=='cannot_determine'
+        MemoryEvaluator.reconcile_evidence_annotations(life.journal)
+&gt;       assert not life.journal.category_records('observation','independent_motion_corpus');life.close()
+                                                                                            ^^^^^^^^^^^^
+
+tests/test_deferred_measurement_review.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/lifecycle.py:591: in close
+    self._phase('stopped')
+learning/lifecycle.py:113: in _phase
+    self._status()
+learning/lifecycle.py:66: in _status
+    projects = self.executive.projects()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+memory/learning_projects.py:140: in projects
+    return self.project_state(self.journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+journal = &lt;memory.evidence.EvidenceJournal object at 0x7ff345b390d0&gt;
+
+    @staticmethod
+    def project_state(journal):
+        """Read-only projection shared with acceptance; never constructs an Executive."""
+        projects = {}
+        for record in journal.records('event'):
+            if record.data['episode'] != SCOPE:
+                continue
+            p = record.data['payload']; op = p.get('op')
+            if op == 'proposed':
+                projects[p['project']['id']] = p['project']
+            elif op == 'evidence_added':
+                project = projects[p['project_id']]
+                project['origins'].extend(p['origins'])
+                project['hypothesis_evidence'].extend(p['hypothesis_evidence'])
+                project['tactical_hypothesis_evidence'] = list(dict.fromkeys(
+                    project.get('tactical_hypothesis_evidence', []) + p['tactical_hypothesis_evidence']))
+            elif op == 'selected':
+                for identifier, project in projects.items():
+                    if project['status'] == 'active' and identifier != p['project_id']:
+                        project['status'] = 'paused'
+                        project['next_direction'] = 'resume after interruption'
+                        project['interrupted_by'] = p['project_id']
+                    if identifier in p.get('interrupted_projects', []):
+                        project['interrupted_by'] = p['project_id']
+                project = projects[p['project_id']]
+                project.update(status='active', selection=p)
+                project.pop('interrupted_by', None)
+            elif op == 'outcome':
+                projects[p['project_id']]['experiment_history'].append(p['outcome'])
+            elif op == 'assessment':
+                projects[p['project_id']].update(p['changes'])
+            elif op == 'lifecycle':
+                projects[p['project_id']].update(status=p['status'],
+                    completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
+                    hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'operational_feedback':
+                projects[p['project_id']].update(next_direction=p['next_direction'],
+                    operational_outcome=p['outcome_id'])
+            elif op == 'agenda_relationship':
+                for identifier in p['members']:
+                    projects[identifier]['agenda_representative']=p['representative']
+                    projects[identifier]['agenda_members']=p['members']
+                    projects[identifier]['agenda_equivalence_evidence']=record.id
+            elif op == 'agenda_scope_added':
+                project=projects[p['project_id']]
+                project.setdefault('agenda_scopes',[project['scope']])
+                if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
+            elif op == 'evidence_continuation':
+&gt;               projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'existing-fixture-project'
+
+memory/learning_projects.py:190: KeyError</failure></testcase><testcase classname="tests.test_deferred_measurement_review" name="test_disagreement_and_synthetic_feedback_do_not_qualify" time="0.037"><failure message="KeyError: 'existing-fixture-project'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_disagreement_and_syntheti0')
+
+    def test_disagreement_and_synthetic_feedback_do_not_qualify(tmp_path):
+        from experiments.ppal.reflect_robotron import expose_measurement_review_contexts
+        life,root,r,q=setup(tmp_path)
+        review_evidence(life.journal,q['id'],annotator='one',verdict='confirm',objects=positions(),independent=True)
+        other=positions();other[0]['id']='a-different-claimed-identity'
+        review_evidence(life.journal,q['id'],annotator='two',verdict='correct',objects=other,independent=True)
+        reports=MemoryEvaluator.reconcile_evidence_annotations(life.journal)
+        assert all('disagree' in ' '.join(life.journal.get(i).data['payload']['deficiencies']) for i in reports)
+        assert expose_measurement_review_contexts(life.dataset)==[]
+&gt;       assert not life.journal.category_records('observation','independent_motion_corpus');life.close()
+                                                                                            ^^^^^^^^^^^^
+
+tests/test_deferred_measurement_review.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/lifecycle.py:591: in close
+    self._phase('stopped')
+learning/lifecycle.py:113: in _phase
+    self._status()
+learning/lifecycle.py:66: in _status
+    projects = self.executive.projects()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+memory/learning_projects.py:140: in projects
+    return self.project_state(self.journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+journal = &lt;memory.evidence.EvidenceJournal object at 0x7ff345ac9910&gt;
+
+    @staticmethod
+    def project_state(journal):
+        """Read-only projection shared with acceptance; never constructs an Executive."""
+        projects = {}
+        for record in journal.records('event'):
+            if record.data['episode'] != SCOPE:
+                continue
+            p = record.data['payload']; op = p.get('op')
+            if op == 'proposed':
+                projects[p['project']['id']] = p['project']
+            elif op == 'evidence_added':
+                project = projects[p['project_id']]
+                project['origins'].extend(p['origins'])
+                project['hypothesis_evidence'].extend(p['hypothesis_evidence'])
+                project['tactical_hypothesis_evidence'] = list(dict.fromkeys(
+                    project.get('tactical_hypothesis_evidence', []) + p['tactical_hypothesis_evidence']))
+            elif op == 'selected':
+                for identifier, project in projects.items():
+                    if project['status'] == 'active' and identifier != p['project_id']:
+                        project['status'] = 'paused'
+                        project['next_direction'] = 'resume after interruption'
+                        project['interrupted_by'] = p['project_id']
+                    if identifier in p.get('interrupted_projects', []):
+                        project['interrupted_by'] = p['project_id']
+                project = projects[p['project_id']]
+                project.update(status='active', selection=p)
+                project.pop('interrupted_by', None)
+            elif op == 'outcome':
+                projects[p['project_id']]['experiment_history'].append(p['outcome'])
+            elif op == 'assessment':
+                projects[p['project_id']].update(p['changes'])
+            elif op == 'lifecycle':
+                projects[p['project_id']].update(status=p['status'],
+                    completion_rationale=p['reason'], lifecycle_evidence=p['evidence'],
+                    hold=p['status'] in ('blocked', 'paused'))
+            elif op == 'operational_feedback':
+                projects[p['project_id']].update(next_direction=p['next_direction'],
+                    operational_outcome=p['outcome_id'])
+            elif op == 'agenda_relationship':
+                for identifier in p['members']:
+                    projects[identifier]['agenda_representative']=p['representative']
+                    projects[identifier]['agenda_members']=p['members']
+                    projects[identifier]['agenda_equivalence_evidence']=record.id
+            elif op == 'agenda_scope_added':
+                project=projects[p['project_id']]
+                project.setdefault('agenda_scopes',[project['scope']])
+                if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
+            elif op == 'evidence_continuation':
+&gt;               projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'existing-fixture-project'
+
+memory/learning_projects.py:190: KeyError</failure></testcase><testcase classname="tests.test_request_source_discovery" name="test_new_files_in_same_existing_root_trigger_request_response" time="0.036" /><testcase classname="tests.test_request_source_discovery" name="test_failure_and_escape_do_not_prevent_other_source_search" time="0.016" /><testcase classname="tests.test_request_source_discovery" name="test_no_request_no_inspection" time="0.015" /><testcase classname="tests.test_request_source_discovery" name="test_resource_interruption_retains_completed_source_and_resumes" time="0.023" /><testcase classname="tests.test_acquisition_investigation" name="test_unavailable_search_is_durable_and_changed_source_reconsidered" time="0.028" /><testcase classname="tests.test_acquisition_investigation" name="test_two_dependencies_deliver_original_bytes_without_independent_experience" time="0.022" /><testcase classname="tests.test_acquisition_investigation" name="test_existing_bookmark_commission_is_idempotent" time="0.093" /><testcase classname="tests.test_acquisition_investigation" name="test_corrupt_inbox_deduplicated_and_changed_bytes_retried" time="0.029" /><testcase classname="tests.test_acquisition_investigation" name="test_rejected_delivery_retries_when_external_artifact_changes" time="0.016" /><testcase classname="tests.test_acquisition_investigation" name="test_restart_between_acquisition_and_executive_delivery" time="0.029" /><testcase classname="tests.test_score_review_queue" name="test_thirty_attempts_are_queued_without_review_and_missing_image_survives" time="0.139" /><testcase classname="tests.test_score_review_queue" name="test_interrupted_attempt_remains_and_original_score_not_rewritten" time="0.005" /><testcase classname="tests.test_score_review_queue" name="test_batch_review_restart_filters_and_missing_original" time="0.011" /><testcase classname="tests.test_score_review_queue" name="test_aliases_do_not_inflate_queue_or_qualified_averages" time="0.014" /><testcase classname="tests.test_score_review_queue" name="test_http_batch_review_preserves_originals_and_restart" time="0.358" /><testcase classname="tests.test_score_review_queue" name="test_review_cannot_mutate_sealed_source_and_annotation_is_atomic" time="0.006" /><testcase classname="tests.test_score_review_queue" name="test_legacy_alias_and_relocated_original_review" time="0.006" /><testcase classname="tests.test_score_review_queue" name="test_preserved_historical_photograph_bytes_and_provenance" time="0.006" /><testcase classname="tests.test_score_review_queue" name="test_supporting_originals_remain_hash_bound_and_missing_input_pending" time="0.006" /><testcase classname="tests.test_score_feedback_learning" name="test_existing_evaluator_compares_frozen_original_predictions" time="0.007" /><testcase classname="tests.test_score_feedback_learning" name="test_training_consultation_and_original_integrity_gate" time="0.010" /><testcase classname="tests.test_score_feedback_learning" name="test_normal_acquisition_preserves_review_ids_and_idempotent_restart" time="0.036" /><testcase classname="tests.test_score_feedback_learning" name="test_reflection_exposes_diagnostic_feedback_without_opening_final_labels" time="0.006" /><testcase classname="tests.test_score_feedback_learning" name="test_corrupt_source_diary_retained_without_blocking_available_review" time="0.011" /><testcase classname="tests.test_score_feedback_learning" name="test_existing_registry_exposes_reader_evaluation_without_fixture_authority" time="0.007" /></testsuite></testsuites>

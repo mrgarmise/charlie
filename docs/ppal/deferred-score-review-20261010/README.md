@@ -18,3 +18,16 @@ The 30-game fixture collects 30 attempts and 29 proposals without human review;
 the missing photograph remains a record. Fixtures are not physical games. Test
 transcripts and JUnit are retained alongside this report. Native Pi validation
 and real unattended-marathon acceptance remain outstanding.
+
+Milestone B extends the same inspector with loopback batch review:
+`python -m experiments.ppal.inspect_robotron_score --review-journal /path/to/existing/learning-evidence.sqlite3 --queue-root /authorized/robotron-runs --serve-review`
+Open `http://127.0.0.1:8769` locally (remote Pi access requires an operator SSH tunnel).
+It supplies originals, zoom, prefilled corrections, six verdicts, queue filters,
+keyboard navigation and durable immutable reviews. Reviewer independence is an
+explicit attestation, not a complete-game certificate. Corrections supersede only
+that reviewer's earlier annotation; other reviewers' disagreements remain visible.
+Direct HTTP and journal tests: 28 passed in 1.96s, including a 30-attempt queue,
+original image bytes, authenticated correction, denied tokenless write, and durable
+review after server termination. Exact test names are in milestone-b.xml. Browser
+visual validation is unavailable: Chromium installation failed with an invalid ZIP
+from the download endpoint. No browser-rendered usability result is claimed.

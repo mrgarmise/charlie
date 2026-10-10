@@ -91,6 +91,7 @@ class ScoreObserver:
                 # the append-only historical score row.
                 self.final_observation = dict(sample=sample, timestamp=timestamp,observation_id=observation_id,
                     raw_frame=name, observed_score=channels.player1.observed_score,
+                    confidence=channels.player1.confidence,
                     retained_score=channels.player1.score,
                     status=channels.player1.status, error=error)
                 with self.log.path.open('a', encoding='utf-8') as stream:
@@ -192,17 +193,19 @@ class ScoreObserver:
                 proposal=ScoreObserver.review_proposal(journal,artifact['path'],source_episode=source_episode,
                     timestamp=at,clock='original camera capture monotonic',source_id=source.id,
                     proposed=value,confidence=confidence,synthetic=synthetic or report.get('simulation',False),
-                    context=dict(source_session=str(session),reader_revision=(report.get('provenance') or {}).get('code_revision'),
+                    context=dict(source_session=str(session),reader_revision=(report.get('provenance') or {}).get('git_commit'),
                         capture_key=capture_key,terminal_support=at in terminal_times and boundary.get('confirmed') is True))
             else:deficiencies.append('Original capture timestamp unavailable')
         else:deficiencies.append('Original readable image unavailable')
         timing=report.get('session_timing') or {}
         payload=dict(category='score_game_record',attempt_id=attempt,capture_key=capture_key,
             session=str(session),number=number,source_root=str(root),source_episode=source_episode,
+            capture_created_at=origin.get('created_at'),
             report_sha256=report_hash,proposal_id=proposal.id if proposal else None,artifact=artifact,
             reported_score=summary.get('self_score',report.get('score')),reader_status=summary.get('status','unmeasured'),
             start_timestamp=timing.get('started_at'),end_timestamp=timing.get('stopped_at'),
-            provenance=report.get('provenance',{}),policy=report.get('planning_mode','unknown'),
+            provenance=report.get('provenance',{}),policy=report.get('policy_identity','unknown'),
+            experimental_status=report.get('experiment_status'),
             configuration={k:report.get(k) for k in ('seconds','pulse_ms','armed','learned_semantics')},
             result=report.get('result','interrupted' if interrupted else 'awaiting report'),
             boundary=boundary,complete_game_claim=boundary.get('confirmed') is True,
@@ -278,9 +281,12 @@ class ScoreObserver:
         annotations={}
         all_annotations=journal.category_records('observation','score_human_annotation')
         superseded={r.data['payload'].get('supersedes') for r in all_annotations}
+        latest_status={r.data['payload'].get('proposal_id'):r.data['payload'] for r in
+            journal.category_records('observation','score_review_status')}
         for r in all_annotations:
             if r.id in superseded:continue
             p=r.data['payload']
+            if latest_status.get(p['proposal_id'],{}).get('status') in ('pending','insufficient','disputed'):continue
             if p['proposal_id'] in proposals and p['independence_attested']:
                 annotations.setdefault(p['proposal_id'],[]).append(p)
         eligible=correct=accepted=false_confident=abstained=disagreement=unreadable=0

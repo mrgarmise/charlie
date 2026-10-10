@@ -1378,7 +1378,15 @@ def main():
                   "agency_log": "agency.jsonl",
                   "steps": rows}
         from learning.foundry import atomic_json
+        report['policy_identity']=dict(policy.identity) if policy else dict(kind='baseline',code_revision=revision,
+            knowledge_sha256=provenance['knowledge_sha256'],bootstrap_body_fire=args.bootstrap_body_fire)
         atomic_json(args.output / "report.json", report)
+        # Existing diary gains deferred score evidence before immutable sealing.
+        # Operator reviews go to a consolidated notebook, never into this sealed source.
+        from memory.evidence import EvidenceJournal
+        score_diary=EvidenceJournal(args.output/'session-evidence.sqlite3')
+        try:ScoreObserver.queue_game(score_diary,args.output,session=args.output.parent,number=args.output.name)
+        finally:score_diary.close()
         from memory.episode_identity import finalize_capture
         if recording_error is None:finalize_capture(args.output)
         print(f"Evidence: {args.output}/report.json")

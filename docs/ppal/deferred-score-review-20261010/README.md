@@ -104,3 +104,45 @@ The repaired broad suite passed 763 tests with 21 skips in 202.19s
 (full-after-finalization-fix.xml). Final incremental source/capability tests are in
 queue-final.xml and negative-source.xml. The final full-suite rerun and exact
 source SHA-256 manifest are published separately when complete.
+
+Final regression: **767 passed, 21 skipped, zero failures/errors in 196.94s**.
+Command (Node runtime explicitly enabled for the JavaScript DOM-double test):
+`CODEX_PRIMARY_RUNTIME_NODE=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node /workspace/scratch/a5d7375d8e4e/test-env/bin/python -m pytest -q tests --junitxml=docs/ppal/deferred-score-review-20261010/full-suite.xml`.
+Implementation bytes match published `49ad061d34a58506580b0baadceb08917a17282a`;
+all eleven equality checks and source/test SHA-256 values are in environment.json.
+The final commit adds reports and updates the old fixed-eight registry assertion
+to require the new reader adapter and unique capability identifiers. The earlier
+one-failure broad run is retained in full-before-registry-expectation-fix.xml.
+Root-wide collection also encountered platform-specific hardware modules;
+root-collection-failure.xml preserves that failed command. The bounded supported
+`tests` suite, rather than hardware utility scripts outside it, is the passing run.
+
+Authentic normal-Executive persistence (host only): copied the previously preserved
+October 4 notebook continuation into a separate working notebook. Its 507 original
+records are intact, and the source inventory is byte-for-byte unchanged. Normal
+application operation produced seven existing-artifact location receipts, eleven
+unsatisfied acquisition search results, eleven consolidated references, eleven
+Executive result receipts and one durable waiting decision: 548 total records.
+A further restart from a clean checkout of published 49ad061 adds zero records.
+No script selects a question, hypothesis, candidate or learning conclusion.
+First command was executed in the verified source worktree (local parent 177b0b2,
+dirty, implementation bytes equal published 49ad061); subsequent restart commands
+executed in a clean checkout of 49ad061:
+`python main.py --offline --learning-state /workspace/scratch/a5d7375d8e4e/score-authentic-continuation --episode-root /workspace/scratch/a5d7375d8e4e/authentic-original --learning-turns 3 --learning-budget 2 --learning-interval 0.05`.
+Exact retained requests, work IDs, next requirements and restart assertions are in
+authentic-continuity.json; immutable added records and pre-restart IDs are in
+authentic-before-final-restart.json. There is no fresh independent experience.
+This older notebook is not the 1,406-record native Pi notebook, which remains
+inaccessible here. Its missing original capture/trajectory measurements were not
+replaced by fixture images, simulated trajectories or reviewer labels.
+
+Remaining authentic gates: independently measured persistent object identities
+and board trajectories, at least one validation and three unconsulted final
+experience groups with compatible 150ms +/-25ms horizons, native candidate-specific
+cadence/ownership/recovery/rollback qualification, synchronized independently
+qualified start/terminal/HUD evidence, and a separate sealed final reader protocol.
+There is no generated and independently qualified authentic score-reader candidate
+or complete-game score improvement. Physical comparison, gameplay and policy
+activation remain unauthorized. Tracker implementation/offline validation is
+published; native unattended marathon, rendered-browser usability and ALA-2
+learning acceptance remain open.

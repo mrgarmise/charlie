@@ -1,0 +1,135 @@
+{
+  "published_code_revision": "49ad061d34a58506580b0baadceb08917a17282a",
+  "original_records": 507,
+  "continued_records": 548,
+  "restart_added_records": 0,
+  "original_source_unchanged": true,
+  "original_record_ids_retained": true,
+  "new_record_categories": {
+    "experience_artifact_location": 7,
+    "acquisition_search_result": 11,
+    "consolidated_evidence_reference": 11,
+    "evidence_search_received": 11,
+    "developmental_wait": 1
+  },
+  "acquisition_results": [
+    {
+      "request_id": "b303a1456626b6c97e645c48c3ff0705139a3cda9c97e9d1f55294761b18f7f0",
+      "work_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+        "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+        "Independent persistent player/object identities and board coordinates",
+        "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+      ]
+    },
+    {
+      "request_id": "823acd556d8b3ed9313d12250755ae28ef77e4ca8d74b985d1c1b59f60c747ef",
+      "work_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ]
+    },
+    {
+      "request_id": "cedc9944378b591481a5b6a21cc43ea8ec48e374cdf292b182ac20ee8a720a25",
+      "work_id": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ]
+    },
+    {
+      "request_id": "5a368f57a8795ef8c0cb29a4979d15b77efd76dae5a635c4597d918ae773ca8e",
+      "work_id": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ]
+    },
+    {
+      "request_id": "9f2568da6a1daec1cc2579c573b288006f3c9d5573bc66f743d524ac970fbba5",
+      "work_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ]
+    },
+    {
+      "request_id": "a1832aa02d75d7c27945d17abab8e62343a656046b2e30f825e464b9bf9acbda",
+      "work_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ]
+    },
+    {
+      "request_id": "2287ce0dfbb0d017c73530330456213e79d721d50b1b90cb475195970775b2ee",
+      "work_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ]
+    },
+    {
+      "request_id": "edb1c136c7ab447ea93399c77e9415c0f393a810b23358971c6ea162f7ea6b4f",
+      "work_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ]
+    },
+    {
+      "request_id": "bdd6732b268e758b2b7c7980eff99bc2d2c696c97591a05c28a1c0b8bc20ff83",
+      "work_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ]
+    },
+    {
+      "request_id": "eedc626452b030808917bb50e3e616ac661981bb9ba2edde771f489e75ffa03a",
+      "work_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ]
+    },
+    {
+      "request_id": "14bbf92ef431c7cb22beb119f9eb71ae10f0f3bfd6fd177acbf9c0de25f68f4f",
+      "work_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+      "status": "unsatisfied",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ]
+    }
+  ],
+  "executive_next_direction": null,
+  "state_error": null,
+  "qualification": "Authentic older October 4 notebook continuation on host; not latest native Pi acceptance",
+  "independent_games_added": 0,
+  "qualified_reader_examples_added": 0,
+  "physical_authorization": false,
+  "score_improvement": "UNKNOWN"
+}

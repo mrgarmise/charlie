@@ -113,7 +113,7 @@ def _checkpoint_transition(old,new):
 # acceptance merely because they have a timestamp or a valid content hash.
 EXECUTIVE_OPS={'proposed','assessment','selected','outcome','lifecycle','agenda_relationship',
     'agenda_scope_added','evidence_added','investigation_bookmark','meditation_dispatch',
-    'evidence_continuation','portfolio_deferred','developmental_progress','developmental_wait','operational_feedback'}
+    'evidence_continuation','evidence_search_received','portfolio_deferred','developmental_progress','developmental_wait','operational_feedback'}
 CATEGORIES={
     'Reflection':{'reflection_commission','normal_meditation_yield','normal_meditation_result',
         'perceptual_experiment_proposal','learning_project_proposal','model_deployment_proposal','retrieval_experiment_reflection','perceptual_learning_deferred'},
@@ -123,7 +123,7 @@ CATEGORIES={
     'existing-evidence-acquisition':{'episode_identity_binding','episode_identity_location','episode_identity_alias','episode_identity_quarantine'},
     'ExperienceDataset':{'experience_example','experience_dataset_snapshot','artifact_location'},
     'archive-measurement-service':{'observation_qualification'},
-    'existing-acquisition-capability':{'learning_evidence_request','acquisition_delivery','acquisition_delivery_rejected','acquisition_dependency_satisfied'},
+    'existing-acquisition-capability':{'learning_evidence_request','acquisition_delivery','acquisition_delivery_rejected','acquisition_dependency_satisfied','acquisition_search_result'},
     'external-motion-qualification':{'independent_motion_corpus'},
     'offline-orchestrator':{'offline_experiment_deferred'},
     'verified-artifact-resolution':{'experience_artifact_location'},
@@ -222,6 +222,26 @@ def compare_restart(before,after):
                     'blocked work lacks durable resumption condition')
             latest[work]=(identifier,p)
             if actual:substantive.append(identifier)
+        elif category=='acquisition_search_result':
+            request=rows.get(p.get('request_id'),{}).get('payload',{})
+            require(request.get('category')=='learning_evidence_request' and
+                p.get('work_id')==request.get('work_id') and
+                p.get('required_evidence')==request.get('required_evidence') and
+                p.get('request_id') in d['sources'] and
+                p.get('new_independent_experience') is False and
+                p.get('status') in ('delivered','unsatisfied'), 'search changed original dependency or experience identity')
+            if p['status']=='delivered':
+                delivery=rows.get(p.get('delivery_id'),{}).get('payload',{})
+                require(delivery.get('category')=='acquisition_dependency_satisfied' and
+                    delivery.get('request_id')==p['request_id'],'search delivery not bound to original request')
+        elif op=='evidence_search_received':
+            search=rows.get(p.get('search_id'),{}).get('payload',{})
+            require(search.get('category')=='acquisition_search_result' and
+                p.get('work_id')==search.get('work_id') and p.get('status')==search.get('status') and
+                p.get('request_id')==search.get('request_id') and
+                p.get('unresolved_dependency')==search.get('next_requirement') and
+                p.get('hypothesis_result')=='unchanged' and p.get('evidence_qualified') is False,
+                'Executive receipt promoted or changed acquisition evidence')
         elif category=='acquisition_dependency_satisfied':
             request=rows.get(p.get('request_id'),{}).get('payload',{})
             requirements=request.get('required_evidence',[])

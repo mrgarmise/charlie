@@ -177,19 +177,26 @@ class DevelopmentLifecycle:
         inbox = self.output/'acquisition-inbox'
         for path in sorted(inbox.glob('*.json')):
             key = sha(path)
+            from .acquisition import qualification_inputs
+            inputs=qualification_inputs(path,self.journal)
             imported = [r for r in self.journal.records('event') if
-                r.data['payload'].get('category')=='acquisition_delivery' and r.data['payload'].get('sha256')==key]
+                r.data['payload'].get('sha256')==key and
+                (r.data['payload'].get('category')=='acquisition_delivery' or
+                 r.data['payload'].get('category')=='acquisition_delivery_rejected' and
+                 r.data['payload'].get('qualification_inputs')==inputs)]
             if imported:
                 continue
             try:
                 record = qualify_corpus(self.dataset, path)
-            except (ValueError,OSError) as exc:
+            except (ValueError,OSError,TypeError,AttributeError,KeyError) as exc:
                 self.journal.append('event',dict(category='acquisition_delivery_rejected',sha256=key,
-                    reason=str(exc)),episode=SCOPE,producer='existing-acquisition-capability',version='normal-lifecycle-v1')
+                    reason=str(exc),qualification_inputs=inputs),episode=SCOPE,producer='existing-acquisition-capability',version='normal-lifecycle-v1')
                 continue
             self.journal.append('event', dict(category='acquisition_delivery',sha256=key,record_id=record.id),
                 episode=SCOPE, sources=[record.id],producer='existing-acquisition-capability',version='normal-lifecycle-v1')
             changed = True
+        from .acquisition import investigate_requests
+        changed |= bool(investigate_requests(self.dataset, roots, provenance=self.provenance))
         return changed
 
     def reflect_experience(self, context_id, commission_id):

@@ -659,6 +659,50 @@ class LearningExecutive:
                 self.journal,[event.id])
         return dict(event.data['payload'],evidence_id=event.id)
 
+    def commission_evidence_searches(self):
+        """Send existing bookmarks to acquisition without choosing a new goal."""
+        from learning.acquisition import retain_dependency_request
+        outputs=[]
+        for row in self.journal.records('event'):
+            p=row.data['payload']
+            if p.get('op')!='evidence_continuation' or not p.get('required_evidence'):
+                continue
+            outputs.append(retain_dependency_request(self.journal,row.id,
+                work_id=p['project_id'],required_evidence=p['required_evidence'],
+                reason='Investigate the retained Executive evidence dependency').id)
+        return outputs
+
+    def receive_evidence_searches(self):
+        """Retain acquisition's result; existing selection still owns next work.
+
+        Unsatisfied search is not a contradicted hypothesis. This receipt carries
+        no evidence qualification, project completion or deployment authority.
+        """
+        consumed={r.data['payload'].get('search_id') for r in self.journal.records('event')
+                  if r.data['payload'].get('op')=='evidence_search_received'}
+        outputs=[]
+        for row in self.journal.category_records('event','acquisition_search_result'):
+            if row.id in consumed:continue
+            p=row.data['payload']
+            request=self.journal.get(p['request_id']).data['payload']
+            if (row.data['producer']!='existing-acquisition-capability' or
+                    p.get('physical_authorization') is not False or p.get('new_independent_experience') is not False or
+                    p['status'] not in ('delivered','unsatisfied') or
+                    p['work_id']!=request['work_id'] or p['required_evidence']!=request['required_evidence']):
+                raise ValueError('acquisition result changed original dependency')
+            if p['status']=='delivered':
+                delivery=self.journal.get(p['delivery_id']).data['payload']
+                if delivery.get('category')!='acquisition_dependency_satisfied' or delivery.get('request_id')!=p['request_id']:
+                    raise ValueError('acquisition result lacks exact validated delivery')
+            outputs.append(self._event(dict(op='evidence_search_received',search_id=row.id,
+                request_id=p['request_id'],work_id=p['work_id'],status=p['status'],
+                unresolved_dependency=p['next_requirement'],
+                next_direction='Reconsider delivered evidence through existing investigation gates' if p['status']=='delivered' else
+                    'Preserve original question; select other eligible work or await changed evidence/capability',
+                hypothesis_result='unchanged',evidence_qualified=False,
+                physical_authorization=False),[self._reference(self.journal,row.id).id]).id)
+        return outputs
+
     def develop(self, lifecycle):
         """One normal-operation turn, owned by this Executive, no second scheduler.
 
@@ -671,7 +715,9 @@ class LearningExecutive:
         if gameplay_active():
             lifecycle._phase('experiencing')
             return
+        self.commission_evidence_searches()
         changed=lifecycle.acquire()
+        self.receive_evidence_searches()
         self.reconcile_agenda()
         # The Executive chooses eligible new experience for bounded reflection.
         # A completed result is a durable checkpoint, not another experience.

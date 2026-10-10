@@ -1,0 +1,296 @@
+
+==================================== ERRORS ====================================
+________________ ERROR collecting tests/test_ala_operational.py ________________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_ala_operational.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_ala_operational.py:17: in <module>
+    from experiments.ppal.play_robotron import _objects
+experiments/ppal/play_robotron.py:31: in <module>
+    from .eyes.settle import prepare
+experiments/ppal/eyes/settle.py:5: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+____________ ERROR collecting tests/test_motion_sprite_tracking.py _____________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_motion_sprite_tracking.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_motion_sprite_tracking.py:13: in <module>
+    from experiments.ppal.eyes.sprites import regions
+experiments/ppal/eyes/sprites.py:9: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+__________________ ERROR collecting tests/test_ppal_focus.py ___________________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_ppal_focus.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_ppal_focus.py:3: in <module>
+    from experiments.ppal.camera import (
+experiments/ppal/camera.py:13: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+__________________ ERROR collecting tests/test_ppal_settle.py __________________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_ppal_settle.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_ppal_settle.py:4: in <module>
+    from experiments.ppal.eyes.settle import locate
+experiments/ppal/eyes/settle.py:5: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+_________________ ERROR collecting tests/test_ppal_sprites.py __________________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_ppal_sprites.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_ppal_sprites.py:6: in <module>
+    from experiments.ppal.eyes.sprites import SpriteDetector
+experiments/ppal/eyes/sprites.py:9: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+__________________ ERROR collecting tests/test_ppal_teach.py ___________________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_ppal_teach.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_ppal_teach.py:3: in <module>
+    from experiments.ppal.eyes.teach import choose_samples
+experiments/ppal/eyes/teach.py:15: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+___________ ERROR collecting tests/test_ppal_visual_control_probe.py ___________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_ppal_visual_control_probe.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_ppal_visual_control_probe.py:1: in <module>
+    from experiments.ppal.visual_control_probe import (
+experiments/ppal/visual_control_probe.py:20: in <module>
+    from .eyes.settle import prepare
+experiments/ppal/eyes/settle.py:5: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+________________ ERROR collecting tests/test_replay_robotron.py ________________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_replay_robotron.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_replay_robotron.py:3: in <module>
+    from experiments.ppal.replay_robotron import _action_dict, _appearance_player
+experiments/ppal/replay_robotron.py:23: in <module>
+    from .eyes.taught_recognizer import TaughtRecognizer
+experiments/ppal/eyes/taught_recognizer.py:15: in <module>
+    from .sprites import feature, regions
+experiments/ppal/eyes/sprites.py:9: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+________ ERROR collecting tests/test_robotron_developmental_evidence.py ________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_developmental_evidence.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_developmental_evidence.py:7: in <module>
+    from experiments.ppal.robotron_screen_state import classify_screen_state
+experiments/ppal/robotron_screen_state.py:9: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+_____________ ERROR collecting tests/test_robotron_exploration.py ______________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_exploration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_exploration.py:6: in <module>
+    from experiments.ppal import play_robotron as play
+experiments/ppal/play_robotron.py:31: in <module>
+    from .eyes.settle import prepare
+experiments/ppal/eyes/settle.py:5: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+_______________ ERROR collecting tests/test_robotron_exposure.py _______________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_exposure.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_exposure.py:5: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+___________ ERROR collecting tests/test_robotron_geometry_replay.py ____________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_geometry_replay.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_geometry_replay.py:9: in <module>
+    from experiments.ppal.eyes.settle import locate
+experiments/ppal/eyes/settle.py:5: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+_________________ ERROR collecting tests/test_robotron_hud.py __________________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_hud.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_hud.py:5: in <module>
+    from experiments.ppal.robotron_hud import RobotronHUDReader
+experiments/ppal/robotron_hud.py:16: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+_________ ERROR collecting tests/test_robotron_new_run_regressions.py __________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_new_run_regressions.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_new_run_regressions.py:9: in <module>
+    from experiments.ppal.robotron_hud import RobotronHUDReader
+experiments/ppal/robotron_hud.py:16: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+______________ ERROR collecting tests/test_robotron_open_space.py ______________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_open_space.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_open_space.py:10: in <module>
+    from experiments.ppal.score_observer import ScoreObserver
+experiments/ppal/score_observer.py:7: in <module>
+    from .robotron_score_system import RobotronScoreSystem
+experiments/ppal/robotron_score_system.py:6: in <module>
+    from .robotron_hud import RobotronHUDReader
+experiments/ppal/robotron_hud.py:16: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+______________ ERROR collecting tests/test_robotron_preflight.py _______________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_preflight.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_preflight.py:1: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+________ ERROR collecting tests/test_robotron_recorded_screen_states.py ________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_recorded_screen_states.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_recorded_screen_states.py:8: in <module>
+    from experiments.ppal.robotron_screen_state import classify_screen_state
+experiments/ppal/robotron_screen_state.py:9: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+___________ ERROR collecting tests/test_robotron_response_window.py ____________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_response_window.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_response_window.py:12: in <module>
+    from experiments.ppal.robotron_hud import RobotronHUDReader
+experiments/ppal/robotron_hud.py:16: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+_____________ ERROR collecting tests/test_robotron_screen_state.py _____________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_robotron_screen_state.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_robotron_screen_state.py:4: in <module>
+    from experiments.ppal.robotron_screen_state import classify_screen_state
+experiments/ppal/robotron_screen_state.py:9: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+______________ ERROR collecting tests/test_score_human_review.py _______________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_score_human_review.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_score_human_review.py:6: in <module>
+    from experiments.ppal.score_observer import ScoreObserver
+experiments/ppal/score_observer.py:7: in <module>
+    from .robotron_score_system import RobotronScoreSystem
+experiments/ppal/robotron_score_system.py:6: in <module>
+    from .robotron_hud import RobotronHUDReader
+experiments/ppal/robotron_hud.py:16: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+________________ ERROR collecting tests/test_score_observer.py _________________
+ImportError while importing test module '/workspace/scratch/a5d7375d8e4e/charlie/tests/test_score_observer.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_score_observer.py:4: in <module>
+    from experiments.ppal.score_observer import ScoreObserver
+experiments/ppal/score_observer.py:7: in <module>
+    from .robotron_score_system import RobotronScoreSystem
+experiments/ppal/robotron_score_system.py:6: in <module>
+    from .robotron_hud import RobotronHUDReader
+experiments/ppal/robotron_hud.py:16: in <module>
+    import cv2
+E   ModuleNotFoundError: No module named 'cv2'
+=========================== short test summary info ============================
+ERROR tests/test_ala_operational.py
+ERROR tests/test_motion_sprite_tracking.py
+ERROR tests/test_ppal_focus.py
+ERROR tests/test_ppal_settle.py
+ERROR tests/test_ppal_sprites.py
+ERROR tests/test_ppal_teach.py
+ERROR tests/test_ppal_visual_control_probe.py
+ERROR tests/test_replay_robotron.py
+ERROR tests/test_robotron_developmental_evidence.py
+ERROR tests/test_robotron_exploration.py
+ERROR tests/test_robotron_exposure.py
+ERROR tests/test_robotron_geometry_replay.py
+ERROR tests/test_robotron_hud.py
+ERROR tests/test_robotron_new_run_regressions.py
+ERROR tests/test_robotron_open_space.py
+ERROR tests/test_robotron_preflight.py
+ERROR tests/test_robotron_recorded_screen_states.py
+ERROR tests/test_robotron_response_window.py
+ERROR tests/test_robotron_screen_state.py
+ERROR tests/test_score_human_review.py
+ERROR tests/test_score_observer.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 21 errors during collection !!!!!!!!!!!!!!!!!!!
+1 skipped, 21 errors in 1.92s

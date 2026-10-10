@@ -45,6 +45,77 @@ def satisfy_artifact_requests(dataset):
     return outputs
 
 
+def investigate_requests(dataset, roots, *, provenance):
+    """Respond to retained requests using existing acquisition qualifications.
+
+    A search result is not a qualification or an experiment. Only the existing
+    artifact and independent corpus validators can deliver those. Changed source
+    receipts permit reconsideration; identical failed searches survive restart.
+    """
+    journal = dataset.journal
+    categories = ('episode_identity_binding', 'episode_identity_location',
+                  'episode_identity_alias', 'episode_identity_quarantine',
+                  'observation_qualification', 'independent_motion_corpus',
+                  'experience_artifact_location', 'acquisition_delivery',
+                  'acquisition_delivery_rejected', 'acquisition_dependency_satisfied')
+    evidence = [r for r in journal.records() if r.data['payload'].get('category') in categories]
+    availability = dict(roots=[dict(path=str(Path(r).resolve()), available=Path(r).is_dir()) for r in roots],
+                        evidence=[r.id for r in evidence])
+    signature = digest(availability)
+    previous = {(r.data['payload']['request_id'], r.data['payload']['availability'])
+                for r in journal.category_records('event', 'acquisition_search_result')}
+    satisfied = {r.data['payload']['request_id']: r for r in evidence
+                 if r.data['payload'].get('category') == 'acquisition_dependency_satisfied'}
+    outputs = []
+    for request in journal.category_records('event', 'learning_evidence_request'):
+        p = request.data['payload']
+        if p.get('method') != 'developmental-dependency' or (request.id, signature) in previous:
+            continue
+        # Delivery means exactly what its original validator certified. A raw
+        # recording or retrospective tracker output never satisfies a trajectory
+        # request merely because its filename or episode is recognizable.
+        delivery = satisfied.get(request.id)
+        result = journal.append('event', dict(category='acquisition_search_result',
+            request_id=request.id, work_id=p['work_id'], availability=signature,
+            searched_sources=availability['roots'], inspected_evidence=availability['evidence'],
+            required_evidence=p['required_evidence'],
+            status='delivered' if delivery else 'unsatisfied',
+            delivery_id=delivery.id if delivery else None,
+            reason='Existing validator delivered the requested original artifact' if delivery else
+                'Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency',
+            next_requirement=p['required_evidence'] if not delivery else [],
+            qualification_authority='existing artifact/corpus validators and independent Evaluator',
+            new_independent_experience=False, physical_authorization=False,
+            servo_authorization=False, firmware_authorization=False),
+            episode=request.data['episode'], sources=[request.id, *[r.id for r in evidence
+                if r.data['episode']==request.data['episode']]],
+            producer='existing-acquisition-capability', version='request-investigation-v1', provenance=provenance)
+        outputs.append(result.id)
+    return outputs
+
+
+def qualification_inputs(path, journal):
+    """Retry rejected delivery when referenced bytes or identity receipts change."""
+    files=[]
+    try:
+        corpus=json.loads(Path(path).read_text())
+        references=[corpus.get('qualification_artifact',{})]
+        for episode in corpus.get('episodes',[]):
+            references.append(episode.get('source_report',{}))
+            references.extend(frame.get('artifact',{}) for frame in episode.get('frames',[]))
+        for reference in references:
+            name=reference.get('path')
+            if not name:continue
+            try:value=sha(name)
+            except OSError:value=None
+            files.append(dict(path=name,sha256=value))
+    except (ValueError,TypeError,AttributeError):
+        files=[] # Malformed unchanged inbox bytes are not repeatedly imported.
+    identities=[r.id for r in journal.records('event') if r.data['payload'].get('category') in
+        ('episode_identity_binding','episode_identity_location','episode_identity_alias','episode_identity_quarantine')]
+    return digest(dict(inbox=sha(path),files=files,identities=identities))
+
+
 def export_history(output):
     """Evidence-owned immutable transfer; exported copies are not new episodes."""
     import fcntl

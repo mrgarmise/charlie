@@ -78,3 +78,34 @@ def test_corrupt_inbox_deduplicated_and_changed_bytes_retried(tmp_path):
     assert len(life.journal.category_records('event','acquisition_delivery_rejected'))==2
     assert not life.journal.category_records('observation','independent_motion_corpus')
     life.close()
+
+
+def test_rejected_delivery_retries_when_external_artifact_changes(tmp_path):
+    import json
+    life=DevelopmentLifecycle(tmp_path/'state',[])
+    inbox=life.output/'acquisition-inbox';inbox.mkdir()
+    proof=tmp_path/'missing-proof.json'
+    (inbox/'fixture.json').write_text(json.dumps(dict(source_kind='independent_measurement',
+        qualification_artifact=dict(path=str(proof),sha256='not-a-valid-hash'),episodes=[])))
+    life.acquire();life.acquire()
+    assert len(life.journal.category_records('event','acquisition_delivery_rejected'))==1
+    proof.write_text('Explicit software fixture; not qualification')
+    life.acquire();life.acquire()
+    assert len(life.journal.category_records('event','acquisition_delivery_rejected'))==2
+    assert not life.journal.category_records('observation','independent_motion_corpus')
+    life.close()
+
+
+def test_restart_between_acquisition_and_executive_delivery(tmp_path):
+    state=tmp_path/'state';life=DevelopmentLifecycle(state,[])
+    original=request(life,'retained-question',['Original input'])
+    searches=investigate_requests(life.dataset,[],provenance=life.provenance)
+    life.close()
+    life=DevelopmentLifecycle(state,[])
+    assert not investigate_requests(life.dataset,[],provenance=life.provenance)
+    assert len(life.executive.receive_evidence_searches())==1
+    event=next(r for r in life.journal.records('event') if r.data['payload'].get('op')=='evidence_search_received')
+    assert event.data['payload']['request_id']==original.id
+    assert event.data['payload']['search_id']==searches[0]
+    assert not life.executive.receive_evidence_searches()
+    life.close()

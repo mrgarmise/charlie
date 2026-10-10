@@ -195,9 +195,15 @@ class DevelopmentLifecycle:
             self.journal.append('event', dict(category='acquisition_delivery',sha256=key,record_id=record.id),
                 episode=SCOPE, sources=[record.id],producer='existing-acquisition-capability',version='normal-lifecycle-v1')
             changed = True
-        from .acquisition import investigate_requests
-        changed |= bool(investigate_requests(self.dataset, roots, provenance=self.provenance))
+        self.acquisition_roots=roots
+        changed |= bool(self.respond_to_requests())
         return changed
+
+    def respond_to_requests(self):
+        """Report this turn's source discovery for newly retained dependencies."""
+        from .acquisition import investigate_requests
+        return investigate_requests(self.dataset,getattr(self,'acquisition_roots',self.roots),
+            provenance=self.provenance)
 
     def reflect_experience(self, context_id, commission_id):
         """Executive-commissioned existing track meditation, checkpointed by iteration."""

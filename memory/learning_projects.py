@@ -776,6 +776,9 @@ class LearningExecutive:
             budget_seconds=lifecycle.budget,max_jobs=1,review_questions=True,
             diagnostics_only=False,on_progress=lifecycle.yield_for_primary)
         lifecycle.requests()
+        self.commission_evidence_searches()
+        lifecycle.respond_to_requests()
+        self.receive_evidence_searches()
         lifecycle.operational_feedback()
         projects=self.projects()
         pending=lifecycle.pending_work()

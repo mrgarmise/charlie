@@ -83,6 +83,34 @@ routing and persistence, not the complete native developmental acceptance cycle.
 
 ## Remaining mission and recovery
 
+### Incremental publication and wait-order correction
+
+The routing milestone was published as
+`f1e8d1c786aabbd4e66b5f4a9a458137a4254af4`. The first broad regression then
+finished with 747 passed, 21 skipped and one failure:
+`test_unavailable_candidate_cannot_claim_idle_productivity`. A new request created
+late in a turn received its search result on the following turn, after the first
+turn had already reported durable waiting. The correction answers newly created
+requests using that same turn's completed discovery before committing waiting.
+Initial full-suite failure evidence is retained in `full-before-wait-fix.*`.
+
+Additional recovery tests verify interruption between acquisition and Executive
+receipt and retry when referenced external artifact bytes change. The final
+authentic host restart still preserves all 507 records exactly, with no new records;
+the original extraction's inventory digest is unchanged. See
+`authentic-final-restart.json`. Final focused and broader regression results are
+published with the qualification increment.
+
+The corrected ordering passed all 34 focused tests (31.601 seconds), with zero
+failures/errors in `final-focused.xml`. Command:
+
+```bash
+python -m pytest -q tests/test_acquisition_investigation.py tests/test_developmental_stall.py tests/test_developmental_dependencies.py tests/test_normal_learning_lifecycle.py --junitxml=docs/ppal/evidence-investigation-20261010/final-focused.xml
+```
+
+The broad rerun uses `python -m pytest -q tests --junitxml=docs/ppal/evidence-investigation-20261010/full.xml`.
+Its result is pending at the wait-order repair checkpoint.
+
 Milestone A has host-tested routing and provenance-preserved responses. Milestone B
 has host-tested persistence and authentic durable waiting, but native resumption
 on new qualifying evidence remains unobserved. Milestone C on the latest original

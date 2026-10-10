@@ -1,0 +1,45 @@
+........ss.ss.ss................s..sssss.ss..ssss....................... [  9%]
+........................................................................ [ 18%]
+..................F.......................s............................. [ 28%]
+........................................................................ [ 37%]
+........................................................................ [ 46%]
+........................................................................ [ 56%]
+........................................................................ [ 65%]
+........................................................................ [ 75%]
+................................................................s....... [ 84%]
+........................................................................ [ 93%]
+................................................                         [100%]
+=================================== FAILURES ===================================
+__________ test_unavailable_candidate_cannot_claim_idle_productivity ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_unavailable_candidate_can0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f510bdc40e0>
+
+    def test_unavailable_candidate_cannot_claim_idle_productivity(tmp_path,monkeypatch):
+        from test_learning_projects import hypothesis
+        import importlib.util
+        original=importlib.util.find_spec
+        monkeypatch.setattr(importlib.util,'find_spec',lambda name:None if name=='torch' else original(name))
+        life=DevelopmentLifecycle(tmp_path/'state',[])
+        p=hypothesis(life.journal,method='cnn-reconstruction')
+        identifier=life.executive.propose(p['proposal'],life.journal,[p['evidence_id']])
+        life.turn()
+        assert life.phase=='waiting for evidence'
+        assert life.executive.projects()[identifier]['status']=='blocked'
+        before=[r.id for r in life.journal.records()]
+        for _ in range(4):life.turn()
+>       assert [r.id for r in life.journal.records()]==before
+E       AssertionError: assert ['843fcf3ac28...cc07cdf', ...] == ['843fcf3ac28...cc07cdf', ...]
+E         
+E         Left contains 3 more items, first extra item: '5077874c069426c56fb262e92f0150bcbab70e1988c70d119a16f471135cd81b'
+E         Use -v to get more diff
+
+tests/test_developmental_stall.py:245: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: investigating | no project | 
+Development: waiting for evidence | no project | No justified executable investigation under current evidence and capabilities
+Development: waiting for evidence | no project | No eligible work; retained dependencies unchanged
+=========================== short test summary info ============================
+FAILED tests/test_developmental_stall.py::test_unavailable_candidate_cannot_claim_idle_productivity
+1 failed, 747 passed, 21 skipped in 227.17s (0:03:47)

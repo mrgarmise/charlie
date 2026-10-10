@@ -1,0 +1,19 @@
+{
+  "schema": "developmental-restart-acceptance-v1",
+  "continuity_passed": true,
+  "original_records_preserved": 507,
+  "appended_records": 0,
+  "new_record_categories": {},
+  "substantive_progress": false,
+  "progress_records": [],
+  "advanced_meditations": [],
+  "runnable_work": [],
+  "blocked_work": [],
+  "completed_work": [],
+  "classification": "waiting",
+  "steady_state_reached": true,
+  "restart_exact": true,
+  "physical_authorization": false,
+  "physical_score_improvement": "UNKNOWN",
+  "original_extraction_unchanged": true
+}

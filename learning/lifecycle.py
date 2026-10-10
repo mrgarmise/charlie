@@ -213,7 +213,7 @@ class DevelopmentLifecycle:
         """Report this turn's source discovery for newly retained dependencies."""
         from .acquisition import investigate_requests
         return investigate_requests(self.dataset,getattr(self,'acquisition_roots',self.roots),
-            provenance=self.provenance)
+            provenance=self.provenance,check=self.resources.check)
 
     def reflect_experience(self, context_id, commission_id):
         """Executive-commissioned existing track meditation, checkpointed by iteration."""

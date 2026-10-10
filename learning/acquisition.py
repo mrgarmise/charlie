@@ -45,7 +45,7 @@ def satisfy_artifact_requests(dataset):
     return outputs
 
 
-def investigate_requests(dataset, roots, *, provenance):
+def investigate_requests(dataset, roots, *, provenance, check=lambda: None):
     """Respond to retained requests using existing acquisition qualifications.
 
     A search result is not a qualification or an experiment. Only the existing
@@ -53,6 +53,7 @@ def investigate_requests(dataset, roots, *, provenance):
     receipts permit reconsideration; identical failed searches survive restart.
     """
     journal = dataset.journal
+    discoveries = discover_request_sources(dataset, roots, provenance=provenance, check=check)
     categories = ('episode_identity_binding', 'episode_identity_location',
                   'episode_identity_alias', 'episode_identity_quarantine',
                   'observation_qualification', 'independent_motion_corpus',
@@ -60,7 +61,7 @@ def investigate_requests(dataset, roots, *, provenance):
                   'acquisition_delivery_rejected', 'acquisition_dependency_satisfied')
     evidence = [r for r in journal.records() if r.data['payload'].get('category') in categories]
     availability = dict(roots=[dict(path=str(Path(r).resolve()), available=Path(r).is_dir()) for r in roots],
-                        evidence=[r.id for r in evidence])
+                        evidence=[r.id for r in evidence], discoveries=discoveries)
     signature = digest(availability)
     previous = {(r.data['payload']['request_id'], r.data['payload']['availability'])
                 for r in journal.category_records('event', 'acquisition_search_result')}
@@ -78,6 +79,7 @@ def investigate_requests(dataset, roots, *, provenance):
         result = journal.append('event', dict(category='acquisition_search_result',
             request_id=request.id, work_id=p['work_id'], availability=signature,
             searched_sources=availability['roots'], inspected_evidence=availability['evidence'],
+            discovery_ids=discoveries,
             required_evidence=p['required_evidence'],
             status='delivered' if delivery else 'unsatisfied',
             delivery_id=delivery.id if delivery else None,
@@ -92,6 +94,117 @@ def investigate_requests(dataset, roots, *, provenance):
             producer='existing-acquisition-capability', version='request-investigation-v1', provenance=provenance)
         outputs.append(result.id)
     return outputs
+
+
+def discover_request_sources(dataset, roots, *, provenance, check=lambda: None):
+    """Request-driven inspection of original references, never trajectory truth.
+
+    Content changes inside an existing root are acquisition availability changes.
+    Each completed episode is retained before checking the next resource slice.
+    Bounds are reported as deficiencies, not as an exhaustive successful search.
+    """
+    if not dataset.journal.category_records('event', 'learning_evidence_request'):
+        return []
+    from itertools import islice
+    journal=dataset.journal; outputs=[]
+    for root in dict.fromkeys(Path(r).resolve() for r in roots):
+        check()
+        reports=list(islice(root.rglob('report.json'), 129)) if root.is_dir() else []
+        if len(reports)>128:
+            result=journal.append('observation',dict(category='acquisition_source_discovery',
+                root=str(root),status='incomplete',deficiencies=['128 episode search bound reached; remaining sources not inspected'],
+                original_observations=[],independent_measurements=False),episode=SCOPE,
+                producer='existing-acquisition-capability',version='request-source-v1',provenance=provenance)
+            outputs.append(result.id)
+        for report in sorted(reports[:128]):
+            check()
+            directory=report.parent; artifacts=[]; frames=[]; deficiencies=[]
+            def original(path):
+                path=Path(path).resolve()
+                if not path.is_relative_to(root):raise ValueError('source reference escapes authorized root')
+                if not path.is_file():raise ValueError('original source unavailable: '+str(path))
+                if path.stat().st_size>8*1024*1024:raise ValueError('8MiB artifact inspection bound reached: '+str(path))
+                return dict(path=str(path),sha256=sha(path))
+            try:
+                reference=original(report);artifacts.append(reference)
+                header=json.loads(report.read_text())
+                if not isinstance(header,dict):raise ValueError('report object required')
+            except (OSError,ValueError) as exc:
+                header={};deficiencies.append(str(exc))
+            diary=directory/'session-evidence.sqlite3'
+            if diary.exists():
+                import sqlite3
+                from memory.evidence import EvidenceJournal
+                source=None
+                try:
+                    artifacts.append(original(diary))
+                    source=EvidenceJournal(diary,read_only=True)
+                    source.verify()
+                    for capture in source.category_records('observation','camera_capture')[:256]:
+                        check()
+                        p=capture.data['payload'];frame=original(directory/p['artifact']['path'])
+                        if frame['sha256']!=p['artifact']['sha256']:raise ValueError('camera capture bytes changed')
+                        observation=source.get(p['observation_id'])
+                        if observation.data['payload'].get('category')!='camera_observation':raise ValueError('camera descriptor required')
+                        from PIL import Image
+                        with Image.open(frame['path']) as image:image.verify()
+                        frames.append(dict(artifact=frame,timestamp=observation.data['at'],
+                            timestamp_status='recorded_unqualified',observation_id=observation.id,
+                            capture_record_id=capture.id,source_kind='original_camera_pixels',
+                            capture_provenance=capture.data['provenance'],identity_status='unverified',
+                            measurement_status='original_pixels_only'))
+                    if len(source.category_records('observation','camera_capture'))>256:
+                        deficiencies.append('256 camera capture inspection bound reached')
+                except (OSError,ValueError,KeyError,TypeError,sqlite3.Error) as exc:
+                    deficiencies.append('Original camera diary: '+str(exc))
+                finally:
+                    if source:source.close()
+            for name in ('agency.jsonl','observations.jsonl','score.jsonl'):
+                path=directory/name
+                if not path.exists():continue
+                try:
+                    reference=original(path);artifacts.append(reference)
+                    with path.open() as stream:
+                        for line,text in enumerate(stream,1):
+                            if line>4096:
+                                deficiencies.append(name+': 4096 row inspection bound reached');break
+                            if not text.strip():continue
+                            try:
+                                row=json.loads(text)
+                                if not isinstance(row,dict):raise ValueError('observation object required')
+                                filename=row.get('raw_frame') or row.get('frame')
+                                if not isinstance(filename,str):continue
+                                if len(frames)>=256:
+                                    deficiencies.append('256 original frame inspection bound reached');break
+                                frame=original(directory/filename)
+                                from PIL import Image
+                                with Image.open(frame['path']) as image:
+                                    image.verify()
+                                timestamp=row.get('capture_timestamp',row.get('timestamp'))
+                                import math
+                                valid_time=type(timestamp) in (int,float) and math.isfinite(timestamp)
+                                frames.append(dict(artifact=frame,timestamp=timestamp if valid_time else None,
+                                    timestamp_status='recorded_unqualified' if valid_time else 'missing_or_invalid',
+                                    source_stream=reference,line=line,row_sha256=digest(row),
+                                    proposed_tracking=row.get('tracking'),
+                                    commanded_action=row.get('control_execution'),
+                                    source_kind='derived_rectified_playfield' if name=='agency.jsonl' else 'preserved_frame_unverified_origin',
+                                    identity_status='unverified',measurement_status='original_pixels_only'))
+                            except (OSError,ValueError,TypeError) as exc:
+                                deficiencies.append(name+':'+str(line)+': '+str(exc))
+                except (OSError,ValueError) as exc:deficiencies.append(str(exc))
+            if not frames:deficiencies.append('No usable hash-bound original frame references in inspected streams')
+            deficiencies.append('Persistent identity, calibrated board positions, independence and frozen partition remain unqualified')
+            record=journal.append('observation',dict(category='acquisition_source_discovery',
+                root=str(root),episode_path=str(directory),status='originals_found' if frames else 'unavailable',
+                source_artifacts=artifacts,original_observations=frames,deficiencies=deficiencies,
+                capture_identity=header.get('capture_identity') if isinstance(header.get('capture_identity'),str) else None,
+                capture_code_revision=header.get('code_revision') if isinstance(header.get('code_revision'),str) else None,
+                independence='originals may be consulted or overlapping; no new independent count',
+                independent_measurements=False,physical_authorization=False),episode=SCOPE,
+                producer='existing-acquisition-capability',version='request-source-v1',provenance=provenance)
+            outputs.append(record.id)
+    return sorted(set(outputs))
 
 
 def qualification_inputs(path, journal):

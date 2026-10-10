@@ -162,3 +162,22 @@ def test_preserved_historical_photograph_bytes_and_provenance(tmp_path):
     assert p.data['payload']['artifact']['sha256']==origin['sha256']
     assert ScoreObserver.review_metrics(j,partition='diagnostic')['eligible']==0
     j.verify();j.close()
+
+
+def test_supporting_originals_remain_hash_bound_and_missing_input_pending(tmp_path):
+    from experiments.ppal.inspect_robotron_score import queue_rows,review_game
+    root=game(tmp_path/'one');Image.new('RGB',(20,20),'purple').save(root/'other.png')
+    with (root/'score.jsonl').open('a') as stream:
+        stream.write(json.dumps(dict(timestamp=2.,raw_frame='other.png',p1={'observed_score':100,'confidence':.8}))+'\n')
+    j=EvidenceJournal(tmp_path/'j.sqlite3');r=ScoreObserver.queue_game(j,root,session='fixture',number=1,synthetic=True)
+    assert r.data['payload']['artifact']['path'].endswith('original.png') # terminal preferred
+    assert len(r.data['payload']['additional_originals'])==1
+    import hashlib
+    extra=r.data['payload']['additional_originals'][0]
+    assert hashlib.sha256(Path(extra['path']).read_bytes()).hexdigest()==extra['sha256']
+    review_game(j,r.id,annotator='fixture',verdict='confirm')
+    (root/'original.png').unlink()
+    later=ScoreObserver.queue_game(j,root,session='fixture',number=1,synthetic=True)
+    assert later.data['payload']['proposal_id']!=r.data['payload']['proposal_id']
+    assert queue_rows(j)[0]['review_status']=='pending'
+    j.close()

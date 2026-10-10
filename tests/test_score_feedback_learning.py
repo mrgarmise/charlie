@@ -77,3 +77,30 @@ def test_reflection_exposes_diagnostic_feedback_without_opening_final_labels(tmp
     assert len(expose_score_review_contexts(dataset))==1
     assert not j.category_records('event','learning_project_proposal') # Reflection/Executive later own commissioning
     j.close()
+
+
+def test_corrupt_source_diary_retained_without_blocking_available_review(tmp_path):
+    from experiments.ppal.inspect_robotron_score import import_queue
+    root=tmp_path/'sources';root.mkdir();bad=root/'bad';bad.mkdir()
+    (bad/'session-evidence.sqlite3').write_bytes(b'corrupt fixture SQLite')
+    good=root/'good';good.mkdir();source=EvidenceJournal(good/'session-evidence.sqlite3')
+    p=reviewed(source,good/'image',partition='diagnostic');source.close()
+    j=EvidenceJournal(tmp_path/'normal.sqlite3');import_queue(j,root)
+    assert j.get(p.id).id==p.id
+    failures=j.category_records('observation','score_acquisition_deficiency');assert len(failures)==1
+    before=[r.id for r in j.records()];import_queue(j,root);assert [r.id for r in j.records()]==before
+    j.verify();j.close()
+
+
+def test_existing_registry_exposes_reader_evaluation_without_fixture_authority(tmp_path):
+    from learning.capabilities import default_registry
+    from learning.datasets import ExperienceDataset
+    j=EvidenceJournal(tmp_path/'j.sqlite3');dataset=ExperienceDataset(j,tmp_path/'pixels')
+    c=candidate(j,[]);registry=default_registry();name='score-reader-evaluation'
+    resources={'score-reader-candidate','reviewed-score-evidence'}
+    assert registry.get(name).execution=='offline'
+    with pytest.raises(ValueError,match='authorization'):registry.invoke(name,resources=resources,authorized=set(),dataset=dataset,candidate_id=c.id,reader=lambda image:(1,.9))
+    with pytest.raises(ValueError,match='fixture'):registry.invoke(name,resources=resources,authorized={name},dataset=dataset,candidate_id=c.id,reader=lambda image:(1,.9),allow_fixture=True)
+    result=registry.invoke(name,resources=resources,authorized={name},dataset=dataset,candidate_id=c.id,reader=lambda image:(1,.9))
+    assert result.data['payload']['report']['status']=='unresolved'
+    j.close()

@@ -87,3 +87,20 @@ path relocation. The historical-pixel test preserves
 `bf52abb6f741e8d3e042cf1944adadc6ed7450eb7104e8b2fc068d04741c6c32`.
 Its synthetic review metadata explicitly has no authentic source clock or score
 label; it contributes zero qualified reader examples and zero complete games.
+
+Further bounded acceptance: supporting originals are available through the same
+inspector, with preserved hashes and timestamps. Reviewing another image does not
+silently relabel the primary photograph; numeric controls are disabled until the
+primary is selected. A newly selected primary image invalidates the prior queue
+status while retaining its old annotation. A corrupt diary produces a durable
+source deficiency and does not block available diaries; identical retry is
+idempotent. The existing capability registry exposes offline reader evaluation
+under explicit method/resource authorization and excludes fixture admission.
+Rejected evaluations are journaled before raising the validation error. An empty
+eligible batch returns an explicit unsatisfied evidence requirement.
+The real UI JavaScript passes batch/navigation/correction/filter/zoom checks with
+a DOM double (frontend.xml); this is not browser-rendered visual validation.
+The repaired broad suite passed 763 tests with 21 skips in 202.19s
+(full-after-finalization-fix.xml). Final incremental source/capability tests are in
+queue-final.xml and negative-source.xml. The final full-suite rerun and exact
+source SHA-256 manifest are published separately when complete.

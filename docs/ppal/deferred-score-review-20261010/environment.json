@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-10-10T03:51:50.073920+00:00",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "executable": "/workspace/scratch/a5d7375d8e4e/test-env/bin/python",
+  "physical_activity": false,
+  "native_pi_validation": false,
+  "source_sha256": {
+    "experiments/ppal/score_observer.py": "e47158b50911316a7ef3c2d50a7d79b6bd082cb2805cea740ff844fde44c9af3",
+    "experiments/ppal/inspect_robotron_score.py": "15346841d73d1786d88b1754353badab6a063220b550e6054fb1b5ded281be37",
+    "experiments/ppal/score-review.html": "f28b01a1dacae219f8a6603dc7c85582e5136f5f921c328d5f502b61e0ae4511",
+    "experiments/ppal/play_robotron.py": "3d599868adc3a16cbbd18f2818ddcf098852e1d09631c45cba91b2963337fceb",
+    "experiments/ppal/marathon_robotron.py": "a6ab879cefa06cdae6bae348e1ae0e35e6b18c58db1ec82441c055c798dbed28",
+    "experiments/ppal/reflect_robotron.py": "495b08cded81bee8175c85dcdd7d75f30101e0805013407dd15106d25f1fdbc0",
+    "experiments/comparison/robotron.py": "df1b7957957b5a04fa8ad5c129fb0d347d4744a0e2ca676ff5b42c4cb3836dfc",
+    "memory/evaluator.py": "bf6b0fe7847418c3c7f88c35a7bff4557b35a2ddb56384e59c5e53d6c8252444",
+    "learning/lifecycle.py": "ad2e6fc8a366c9ae46524ea59c392939c2c6b4d4be0ed0d756fce074d3f6493d",
+    "learning/continuity.py": "ae4a19bae1aedd7beb6541da4659324ab45bdcbcdbf5bd529351be8505667d69",
+    "learning/capabilities.py": "cd3bad95124ffe27d7faa3e0a3c506755f9df4b0a0c1ce7cb800cb958aa4313d"
+  },
+  "limitations": [
+    "No Pi hostname resolution/access",
+    "No native 1406-record state accessible",
+    "Chromium download was an invalid archive; UI logic and HTTP tests only",
+    "No authentic independent reviewed-score batch",
+    "No sealed final reader protocol or generated score-reader candidate"
+  ],
+  "commands": {
+    "final": "CODEX_PRIMARY_RUNTIME_NODE=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node /workspace/scratch/a5d7375d8e4e/test-env/bin/python -m pytest -q tests --junitxml=docs/ppal/deferred-score-review-20261010/full-suite.xml",
+    "queue_final": "python -m pytest -q tests/test_score_review_queue.py tests/test_score_feedback_learning.py tests/test_score_performance_history.py tests/test_score_review_frontend.py",
+    "negative_source": "python -m pytest -q tests/test_score_feedback_learning.py tests/test_score_review_queue.py tests/test_score_performance_history.py tests/test_acquisition_investigation.py tests/test_developmental_dependencies.py tests/test_developmental_stall.py tests/test_normal_learning_lifecycle.py",
+    "final_integration": "python -m pytest -q tests/test_robotron_agency_integration.py tests/test_perception_reconciliation.py tests/test_robotron_startup_boundaries.py tests/test_episode_evidence.py tests/test_score_review_queue.py tests/test_score_feedback_learning.py tests/test_score_performance_history.py"
+  }
+}

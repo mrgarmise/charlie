@@ -33,6 +33,13 @@ class CapabilityRegistry:
         if identifier in ('model-diagnostics','evidence-review'):
             from .diagnostics import execute
             return execute(**inputs)
+        if identifier=='score-reader-evaluation':
+            from .cycle import gameplay_active
+            from memory.evaluator import MemoryEvaluator
+            if gameplay_active():raise RuntimeError('offline reader evaluation unavailable during gameplay')
+            if inputs.get('allow_fixture'):raise ValueError('normal capability cannot admit fixture evidence')
+            return MemoryEvaluator.evaluate_score_reader(inputs['dataset'].journal,inputs['candidate_id'],
+                inputs['reader'],partition=inputs.get('partition','validation'))
         if identifier=='meditation-motion':
             from .meditation import execute
             return execute(**inputs)
@@ -48,6 +55,7 @@ class CapabilityRegistry:
 def default_registry():
     registry=CapabilityRegistry()
     for item in (
+        Capability('score-reader-evaluation','Independently compare an existing Charlie-originated score-reader candidate with immutable pre-review predictions',('score-reader-candidate','reviewed-score-evidence'),('reader-evaluation','evidence-deficiency'),.1,('no candidate generation or deployment authority','sealed final reader protocol unavailable','source groups may not overlap training'),'hash-bound independent labels; diagnostic or validation only'),
         Capability('meditation-motion','Generate executable temporal planning candidates from preserved meditation',('meditation-evidence',),('candidate','evidence-gate-result'),.1,('unverified retrospective tracks cannot qualify evaluation','no physical activation adapter'),'fresh independently verified trajectories required'),
         Capability('evidence-review','Search frozen experience references for recurring unresolved questions',('context-evidence',),('retrieval-resolution',),.05,('reported questions are not established causal facts',),'distinct source episodes; unknown provenance abstains'),
         Capability('model-diagnostics','Retrieve discriminating training-history evidence for competing failure explanations',('model-evaluation',),('diagnostic-resolution',),.05,('compatibility is not causal identification','no test pixels are opened'),'frozen training-history predicates'),

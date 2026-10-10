@@ -142,19 +142,30 @@ def import_queue(journal, root):
     from .score_observer import ScoreObserver
     root=Path(root).resolve()
     if not root.is_dir():raise ValueError('authorized saved evidence root unavailable')
+    def deficiency(path,exc):
+        from memory.evidence import digest
+        try:content=hashlib.sha256(Path(path).read_bytes()).hexdigest()
+        except OSError:content=None
+        journal.append('observation',dict(category='score_acquisition_deficiency',source_path=str(path),
+            source_sha256=content,reason=str(exc),physical_authorization=False),
+            episode='score-review-acquisition',producer='existing-acquisition-capability',version='score-feedback-v1')
     # Existing session diary includes attempts without report.json.
     for path in sorted(set(root.rglob('experiment-evidence.sqlite3')) | set(root.rglob('session-evidence.sqlite3'))):
         if path.resolve()==journal.path.resolve():continue
-        source=EvidenceJournal(path,read_only=True)
-        try:journal.merge_from(source)
-        finally:source.close()
+        import sqlite3
+        try:
+            source=EvidenceJournal(path,read_only=True)
+            try:journal.merge_from(source)
+            finally:source.close()
+        except (OSError,ValueError,KeyError,sqlite3.DatabaseError) as exc:deficiency(path,exc)
     for path in sorted(root.rglob('report.json')):
         folder=path.parent
         try:
             parent=json.loads((folder.parent/'session.json').read_text())
             number=next((i+1 for i,g in enumerate(parent.get('games',[])) if Path(g['path']).name==folder.name),None)
-        except (OSError,ValueError,KeyError):number=None
-        ScoreObserver.queue_game(journal,folder,session=folder.parent,number=number or folder.name)
+        except (OSError,ValueError,KeyError,TypeError,AttributeError):number=None
+        try:ScoreObserver.queue_game(journal,folder,session=folder.parent,number=number or folder.name)
+        except (OSError,ValueError,KeyError,TypeError,AttributeError) as exc:deficiency(path,exc)
 
 
 def queue_rows(journal):
@@ -173,7 +184,8 @@ def queue_rows(journal):
     for p in unique.values():
         proposal=journal.get(p['proposal_id']).data['payload'] if p['proposal_id'] else None
         peers=[r for r in annotations if r.id not in superseded and r.data['payload']['proposal_id']==p['proposal_id']]
-        status=statuses.get(p['attempt_id'],{}).get('status','pending')
+        previous=statuses.get(p['attempt_id'],{})
+        status=previous.get('status','pending') if previous.get('proposal_id')==p['proposal_id'] else 'pending'
         if len({r.data['payload']['value'] for r in peers})>1:status='disputed'
         if proposal:
             p.update(proposed_score=proposal['proposed_score'],confidence=proposal['confidence'],
@@ -197,6 +209,7 @@ def review_game(journal, identifier, *, annotator, verdict, value=None, reason='
 def _review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False):
     from .score_observer import ScoreObserver
     from datetime import datetime,timezone
+    if type(independent) is not bool:raise ValueError('independence attestation must be explicit boolean')
     row=journal.get(identifier);p=row.data['payload']
     if p.get('category')!='score_game_record' or not isinstance(annotator,str) or not annotator.strip():raise ValueError('game and reviewer identity required')
     statuses={'confirm':'confirmed','correct':'corrected','unreadable':'unreadable',
@@ -243,11 +256,19 @@ def serve_review(journal_path, root=None, port=8769):
                     if root:import_queue(j,root)
                     return self.reply(200,json.dumps(dict(games=queue_rows(j),history=performance_history(j),baselines=baseline_history(j))))
                 if url.path=='/image':
-                    key=parse_qs(url.query).get('id',[''])[0];p=j.get(key).data['payload']
-                    if p.get('category')!='score_review_proposal':raise ValueError('original proposal required')
+                    query=parse_qs(url.query)
                     from .score_observer import ScoreObserver
-                    path=ScoreObserver.review_artifact(j,p);raw=path.read_bytes()
-                    if hashlib.sha256(raw).hexdigest()!=p['artifact']['sha256']:raise ValueError('original image changed')
+                    if query.get('game'):
+                        game=j.get(query['game'][0]).data['payload'];index=int(query.get('frame',['-1'])[0])
+                        originals=game.get('additional_originals',[])
+                        if game.get('category')!='score_game_record' or not 0<=index<len(originals):raise ValueError('recorded supporting frame required')
+                        artifact=originals[index];path=Path(artifact['path']);expected=artifact['sha256']
+                    else:
+                        key=query.get('id',[''])[0];p=j.get(key).data['payload']
+                        if p.get('category')!='score_review_proposal':raise ValueError('original proposal required')
+                        path=ScoreObserver.review_artifact(j,p);expected=p['artifact']['sha256']
+                    raw=path.read_bytes()
+                    if hashlib.sha256(raw).hexdigest()!=expected:raise ValueError('original image changed')
                     return self.reply(200,raw,'image/png' if path.suffix.lower()=='.png' else 'image/jpeg')
                 self.reply(404,b'Not found','text/plain')
             except (ValueError,KeyError,OSError) as exc:self.reply(400,json.dumps(dict(error=str(exc))))

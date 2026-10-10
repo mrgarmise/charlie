@@ -230,11 +230,26 @@ class ScoreObserver:
                         capture_key=capture_key,terminal_support=at in terminal_times and boundary.get('confirmed') is True))
             else:deficiencies.append('Original capture timestamp unavailable')
         else:deficiencies.append('Original readable image unavailable')
+        additional=[];seen={artifact['sha256']} if artifact else set()
+        for row in reversed(observations):
+            if len(additional)>=8:break
+            name=row.get('raw_frame');at=row.get('timestamp',row.get('t'))
+            if not isinstance(name,str) or type(at) not in (int,float) or not math.isfinite(at):continue
+            path=(root/name).resolve()
+            if not path.is_relative_to(root):continue
+            try:
+                from PIL import Image
+                with Image.open(path) as image:image.verify()
+                key=hashlib.sha256(path.read_bytes()).hexdigest()
+            except (OSError,ValueError):continue
+            if key in seen:continue
+            seen.add(key);additional.append(dict(path=str(path),sha256=key,timestamp=at,
+                camera_observation_id=row.get('observation_id'),terminal_support=at in terminal_times))
         timing=report.get('session_timing') or {}
         payload=dict(category='score_game_record',attempt_id=attempt,capture_key=capture_key,
             session=str(session),number=number,source_root=str(root),source_episode=source_episode,
             capture_created_at=origin.get('created_at'),
-            report_sha256=report_hash,proposal_id=proposal.id if proposal else None,artifact=artifact,
+            report_sha256=report_hash,proposal_id=proposal.id if proposal else None,artifact=artifact,additional_originals=additional,
             reported_score=summary.get('self_score',report.get('score')),reader_status=summary.get('status','unmeasured'),
             start_timestamp=timing.get('started_at',timing.get('gameplay_timer_started_at',timing.get('application_started'))),end_timestamp=timing.get('stopped_at'),
             provenance=report.get('provenance',{}),policy=report.get('policy_identity','unknown'),

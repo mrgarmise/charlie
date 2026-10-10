@@ -48,6 +48,19 @@ class MemoryEvaluator:
 
     @staticmethod
     def evaluate_score_reader(journal,candidate_id,reader,*,partition='validation',allow_fixture=False):
+        try:
+            return MemoryEvaluator._evaluate_score_reader(journal,candidate_id,reader,
+                partition=partition,allow_fixture=allow_fixture)
+        except (ValueError,KeyError,OSError,TypeError,RuntimeError) as exc:
+            journal.append('observation',dict(category='score_reader_candidate_evaluation',
+                candidate_id=candidate_id,report=dict(status='rejected',partition=partition,reason=str(exc),
+                    fixture_only=bool(allow_fixture),physical_authorization=False,
+                    qualification='failed offline evaluation preserved; no improvement or deployment inferred')),
+                episode='score-reader-rejected-evaluation',producer='MemoryEvaluator',version='score-feedback-v1')
+            raise
+
+    @staticmethod
+    def _evaluate_score_reader(journal,candidate_id,reader,*,partition='validation',allow_fixture=False):
         """Bounded independent offline comparison against immutable pre-review predictions.
 
         Caller supplies an existing Charlie-originated candidate. No candidate is
@@ -121,6 +134,7 @@ class MemoryEvaluator:
             baseline=metrics('baseline'),candidate=metrics('candidate'),
             false_high_confidence=sum(r['candidate'] is not None and r['candidate']!=r['label'] and r['confidence']>=.99 for r in outcomes),
             total_seconds=sum(r['seconds'] for r in outcomes),outcomes=outcomes,deficiencies=deficiencies,
+            missing_requirements=['Independent readable original reviews in the requested partition, a frozen reader revision, and training-disjoint source groups'] if not n else [],
             fixture_only=bool(allow_fixture),qualification='descriptive reviewed batch; no sealed final, physical capability or deployment authority',
             uncertainty='finite labeled sample; correlated frames do not establish population improvement',physical_authorization=False)
         return journal.append('observation',dict(category='score_reader_candidate_evaluation',candidate_id=candidate_id,

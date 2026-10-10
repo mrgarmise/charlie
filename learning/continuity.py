@@ -126,7 +126,7 @@ CATEGORIES={
     'existing-evidence-acquisition':{'episode_identity_binding','episode_identity_location','episode_identity_alias','episode_identity_quarantine'},
     'ExperienceDataset':{'experience_example','experience_dataset_snapshot','artifact_location'},
     'archive-measurement-service':{'observation_qualification'},
-    'existing-acquisition-capability':{'learning_evidence_request','acquisition_delivery','acquisition_delivery_rejected','acquisition_dependency_satisfied','acquisition_search_result'},
+    'existing-acquisition-capability':{'learning_evidence_request','acquisition_delivery','acquisition_delivery_rejected','acquisition_dependency_satisfied','acquisition_search_result','score_acquisition_deficiency'},
     'external-motion-qualification':{'independent_motion_corpus'},
     'offline-orchestrator':{'offline_experiment_deferred'},
     'verified-artifact-resolution':{'experience_artifact_location'},

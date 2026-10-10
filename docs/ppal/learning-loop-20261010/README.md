@@ -39,7 +39,7 @@ Focused command:
 ```
 
 Result: **87 passed**, 10.06 seconds. [Raw output](guide-focused.txt).
-The broader supported regression command is `python -m pytest -q tests`.
+The maintained regression command `/workspace/scratch/a5d7375d8e4e/ala-loop-env/bin/python -m pytest -q tests` passed **845 tests, 21 skipped in 198.62 seconds**. [Raw output](guide-regression.txt).
 Unqualified repository-root collection was also attempted and failed during
 collection of legacy manual/Pi scripts (`machine`, libcamera, desktop dependency
 and module collision); it is not a passing check. Its exact output is preserved
@@ -66,3 +66,11 @@ Physical gameplay, servo movement, flashing and persistent physical policy
 activation are unauthorized. ALA-2 remains open until independently measured
 complete-game Robotron SCORE improves against the frozen baseline through
 Charlie-originated learning. This safety repair does not establish improvement.
+
+## Incremental historical discovery
+
+Existing acquisition now retains hash-bound score, controller, event, planning and annotation row references even without images. Request text selects relevant evidence kinds; it does not create or rank projects. Rows remain unqualified reports, including tracker beliefs. Original image qualification and final evidence requirements are unchanged.
+
+Durable discovery receipts contain filesystem change stamps, permitting unchanged diagnostic inspections to be reused after restart without rehashing or decoding images. These stamps are cache invalidation, never measurement proof; independent qualification still verifies original hashes. Missing or changed referenced artifacts invalidate the receipt. Each turn inspects at most 128 changed episodes; cached episodes no longer prevent later episodes from being reached. Lightweight report-path enumeration and metadata checks still occur.
+
+Host command: `python -m pytest -q tests/test_request_source_discovery.py tests/test_acquisition_investigation.py tests/test_ala_acquisition.py`. [Focused results](history-focused.txt). Fixtures cover missing/corrupt inputs, changes, original request identity, nonfinite timestamps, provenance, restart, request-driven filtering and advancement beyond the processing bound. No authentic independent measurements or native acceptance are established by these fixtures.

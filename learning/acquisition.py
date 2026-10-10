@@ -45,6 +45,20 @@ def satisfy_artifact_requests(dataset):
     return outputs
 
 
+def _request_focus(required):
+    """Interpret evidence requirements, never choose developmental priorities."""
+    text=json.dumps(required).lower()
+    focus=set()
+    for terms,kinds in (
+        (('motion','movement','command','actuator'),('controller_command_report','tracking_belief','frames')),
+        (('identity','ownership','player'),('tracking_belief','frames')),
+        (('death','terminal','boundary'),('session_event_unqualified','controller_command_report','frames')),
+        (('score','scoring'),('score_observation_unqualified','annotation_unqualified','session_event_unqualified')),
+        (('temporal','trajectory','trajectories','150ms'),('frames','tracking_belief'))):
+        if any(term in text for term in terms):focus.update(kinds)
+    return sorted(focus)
+
+
 def investigate_requests(dataset, roots, *, provenance, check=lambda: None):
     """Respond to retained requests using existing acquisition qualifications.
 
@@ -79,10 +93,21 @@ def investigate_requests(dataset, roots, *, provenance, check=lambda: None):
         # recording or retrospective tracker output never satisfies a trajectory
         # request merely because its filename or episode is recognizable.
         delivery = satisfied.get(request.id)
+        focus=_request_focus(p['required_evidence'])
+        relevant=[];incomplete=False
+        for identifier in discoveries:
+            item=journal.get(identifier).data['payload']
+            incomplete |= item.get('status')=='incomplete'
+            rows=[r for r in item.get('historical_observations',[]) if not focus or set(r['kinds']).intersection(focus)]
+            frames=item.get('original_observations',[]) if not focus or 'frames' in focus else []
+            if rows or frames:relevant.append(dict(discovery_id=identifier,historical_rows=rows,frame_count=len(frames)))
+        state=('available' if delivery else 'search_incomplete' if incomplete else
+               'potentially_reconstructable' if reviews and any(r['frame_count'] for r in relevant) else
+               'available_unqualified' if relevant else 'unavailable')
         result = journal.append('event', dict(category='acquisition_search_result',
             request_id=request.id, work_id=p['work_id'], availability=signature,
             searched_sources=availability['roots'], inspected_evidence=availability['evidence'],
-            discovery_ids=discoveries,
+            discovery_ids=discoveries,search_focus=focus,relevant_sources=relevant,evidence_state=state,
             review_request_ids=reviews,
             required_evidence=p['required_evidence'],
             status='delivered' if delivery else 'unsatisfied',
@@ -100,6 +125,15 @@ def investigate_requests(dataset, roots, *, provenance, check=lambda: None):
     return outputs
 
 
+def _source_stamp(path):
+    """Cheap invalidation only; measurement qualification must still verify hashes."""
+    try:
+        st=Path(path).stat()
+        return [st.st_dev,st.st_ino,st.st_size,st.st_mtime_ns,st.st_ctime_ns]
+    except OSError:
+        return None
+
+
 def discover_request_sources(dataset, roots, *, provenance, check=lambda: None):
     """Request-driven inspection of original references, never trajectory truth.
 
@@ -109,22 +143,34 @@ def discover_request_sources(dataset, roots, *, provenance, check=lambda: None):
     """
     if not dataset.journal.category_records('event', 'learning_evidence_request'):
         return []
-    from itertools import islice
     journal=dataset.journal; outputs=[]
+    previous={r.data['payload'].get('episode_path'):r for r in journal.category_records('observation','acquisition_source_discovery') if r.data['payload'].get('source_stamps')}
     for root in dict.fromkeys(Path(r).resolve() for r in roots):
         check()
-        reports=list(islice(root.rglob('report.json'), 129)) if root.is_dir() else []
-        if len(reports)>128:
-            result=journal.append('observation',dict(category='acquisition_source_discovery',
-                root=str(root),status='incomplete',deficiencies=['128 episode search bound reached; remaining sources not inspected'],
-                original_observations=[],independent_measurements=False),episode=SCOPE,
-                producer='existing-acquisition-capability',version='request-source-v1',provenance=provenance)
-            outputs.append(result.id)
-        for report in sorted(reports[:128]):
+        reports=sorted(root.rglob('report.json')) if root.is_dir() else []
+        processed=0
+        for report in reports:
             check()
-            directory=report.parent; artifacts=[]; frames=[]; deficiencies=[]
+            directory=report.parent; artifacts=[]; frames=[]; deficiencies=[]; historical=[]
+            tracked={str(directory/name):_source_stamp(directory/name) for name in
+                ('report.json','session-evidence.sqlite3','agency.jsonl','observations.jsonl','score.jsonl','events.jsonl','steps.jsonl','controller.jsonl','annotations.jsonl')}
+            old=previous.get(str(directory))
+            if old and old.data['payload'].get('root')==str(root):
+                tracked.update({path:_source_stamp(path) for path in old.data['payload']['source_stamps']})
+                if tracked==old.data['payload']['source_stamps']:
+                    outputs.append(old.id)
+                    continue
+            if processed>=128:
+                result=journal.append('observation',dict(category='acquisition_source_discovery',
+                    root=str(root),status='incomplete',deficiencies=['128 changed episode inspection bound reached; retry advances remaining sources'],
+                    original_observations=[],independent_measurements=False),episode=SCOPE,
+                    producer='existing-acquisition-capability',version='request-source-v2',provenance=provenance)
+                outputs.append(result.id)
+                break
+            processed+=1
             def original(path):
                 path=Path(path).resolve()
+                tracked[str(path)]=_source_stamp(path)
                 if not path.is_relative_to(root):raise ValueError('source reference escapes authorized root')
                 if not path.is_file():raise ValueError('original source unavailable: '+str(path))
                 if path.stat().st_size>8*1024*1024:raise ValueError('8MiB artifact inspection bound reached: '+str(path))
@@ -163,7 +209,7 @@ def discover_request_sources(dataset, roots, *, provenance, check=lambda: None):
                     deficiencies.append('Original camera diary: '+str(exc))
                 finally:
                     if source:source.close()
-            for name in ('agency.jsonl','observations.jsonl','score.jsonl'):
+            for name in ('agency.jsonl','observations.jsonl','score.jsonl','events.jsonl','steps.jsonl','controller.jsonl','annotations.jsonl'):
                 path=directory/name
                 if not path.exists():continue
                 try:
@@ -176,6 +222,22 @@ def discover_request_sources(dataset, roots, *, provenance, check=lambda: None):
                             try:
                                 row=json.loads(text)
                                 if not isinstance(row,dict):raise ValueError('observation object required')
+                                import math, hashlib
+                                timestamp=row.get('capture_timestamp',row.get('timestamp',row.get('at')))
+                                valid_time=type(timestamp) in (int,float) and math.isfinite(timestamp)
+                                kinds=[]
+                                if name=='score.jsonl':kinds.append('score_observation_unqualified')
+                                if name=='annotations.jsonl':kinds.append('annotation_unqualified')
+                                if name=='events.jsonl':kinds.append('session_event_unqualified')
+                                if name=='steps.jsonl':kinds.append('planning_belief')
+                                if name=='controller.jsonl' or row.get('control_execution'):kinds.append('controller_command_report')
+                                if row.get('tracking'):kinds.append('tracking_belief')
+                                if kinds:
+                                    historical.append(dict(source_stream=reference,line=line,
+                                        row_sha256=hashlib.sha256(text.encode()).hexdigest(),kinds=kinds,
+                                        timestamp=timestamp if valid_time else None,
+                                        timestamp_status='recorded_unqualified' if valid_time else 'missing_or_invalid',
+                                        epistemic_status='historical report; not independently verified measurement'))
                                 filename=row.get('raw_frame') or row.get('frame')
                                 if not isinstance(filename,str):continue
                                 if len(frames)>=256:
@@ -201,7 +263,7 @@ def discover_request_sources(dataset, roots, *, provenance, check=lambda: None):
             deficiencies.append('Persistent identity, calibrated board positions, independence and frozen partition remain unqualified')
             record=journal.append('observation',dict(category='acquisition_source_discovery',
                 root=str(root),episode_path=str(directory),status='originals_found' if frames else 'unavailable',
-                source_artifacts=artifacts,original_observations=frames,deficiencies=deficiencies,
+                source_artifacts=artifacts,original_observations=frames,historical_observations=historical,source_stamps=tracked,deficiencies=deficiencies,
                 capture_identity=header.get('capture_identity') if isinstance(header.get('capture_identity'),str) else None,
                 capture_code_revision=header.get('code_revision') if isinstance(header.get('code_revision'),str) else None,
                 independence='originals may be consulted or overlapping; no new independent count',

@@ -80,3 +80,70 @@ def test_resource_interruption_retains_completed_source_and_resumes(tmp_path):
     ids=discover_request_sources(life.dataset,[root],provenance=life.provenance)
     assert len(ids)==2 and original[0].id in ids
     life.close()
+
+
+def test_unchanged_discovery_uses_durable_index_without_rehash(tmp_path,monkeypatch):
+    import learning.acquisition as acquisition
+    root=tmp_path/'source';path=episode(root)
+    state=tmp_path/'state';life=DevelopmentLifecycle(state,[root]);request(life,'retained',['Originals'])
+    first=discover_request_sources(life.dataset,[root],provenance=life.provenance)
+    life.close();life=DevelopmentLifecycle(state,[root])
+    real=acquisition.sha
+    def fail(path):raise AssertionError('unchanged archive rehashed')
+    monkeypatch.setattr(acquisition,'sha',fail)
+    assert discover_request_sources(life.dataset,[root],provenance=life.provenance)==first
+    monkeypatch.setattr(acquisition,'sha',real)
+    (path/'frame.png').unlink()
+    changed=discover_request_sources(life.dataset,[root],provenance=life.provenance)
+    assert changed!=first and life.journal.get(changed[0]).data['payload']['status']=='unavailable'
+    life.close()
+
+
+def test_nonframe_history_preserves_provenance_without_qualification(tmp_path):
+    root=tmp_path/'source';path=episode(root)
+    for name,row in [('score.jsonl',{'timestamp':1,'score':1300}),
+                     ('controller.jsonl',{'timestamp':2,'command':'BACK'}),
+                     ('events.jsonl',{'at':3,'event':'game_over'}),
+                     ('annotations.jsonl',{'timestamp':float('nan'),'reviewed_score':1200})]:
+        (path/name).write_text(json.dumps(row)+'\n')
+    life=DevelopmentLifecycle(tmp_path/'state',[root]);request(life,'retained',['Score and boundaries'])
+    ids=discover_request_sources(life.dataset,[root],provenance=life.provenance)
+    p=life.journal.get(ids[0]).data['payload'];rows=p['historical_observations']
+    kinds={k for r in rows for k in r['kinds']}
+    assert {'score_observation_unqualified','controller_command_report','session_event_unqualified','annotation_unqualified'}<=kinds
+    assert all(r['source_stream']['sha256'] and r['row_sha256'] and r['line']==1 for r in rows)
+    assert next(r for r in rows if 'annotation_unqualified' in r['kinds'])['timestamp'] is None
+    assert not p['independent_measurements']
+    assert not life.journal.category_records('observation','independent_motion_corpus')
+    life.close()
+
+
+def test_changed_episode_bound_advances_past_cached_sources(tmp_path):
+    root=tmp_path/'source'
+    for n in range(130):
+        path=root/f'{n:03}';path.mkdir(parents=True);(path/'report.json').write_text('{}')
+    life=DevelopmentLifecycle(tmp_path/'state',[root]);request(life,'retained',['Originals'])
+    first=discover_request_sources(life.dataset,[root],provenance=life.provenance)
+    assert sum('episode_path' in life.journal.get(i).data['payload'] for i in first)==128
+    second=discover_request_sources(life.dataset,[root],provenance=life.provenance)
+    assert len(second)==130
+    assert len(life.journal.category_records('observation','acquisition_source_discovery'))==131
+    assert discover_request_sources(life.dataset,[root],provenance=life.provenance)==second
+    life.close()
+
+
+def test_request_driven_search_does_not_assign_agenda_or_qualify_scores(tmp_path):
+    root=tmp_path/'source';path=episode(root)
+    (path/'score.jsonl').write_text(json.dumps({'timestamp':1,'score':3500})+'\n')
+    life=DevelopmentLifecycle(tmp_path/'state',[root])
+    scoring=request(life,'own-scoring-question',['Score observations and game boundaries'])
+    identity=request(life,'own-identity-question',['Independent player identity'])
+    ids=investigate_requests(life.dataset,[root],provenance=life.provenance)
+    results={life.journal.get(i).data['payload']['request_id']:life.journal.get(i).data['payload'] for i in ids}
+    a,b=results[scoring.id],results[identity.id]
+    assert a['search_focus']!=b['search_focus']
+    assert a['relevant_sources'][0]['frame_count']==0
+    assert b['relevant_sources'][0]['frame_count']==1
+    assert all(p['status']=='unsatisfied' and not p['physical_authorization'] for p in results.values())
+    assert not life.executive.projects()
+    life.close()

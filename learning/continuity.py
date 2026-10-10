@@ -115,6 +115,9 @@ EXECUTIVE_OPS={'proposed','assessment','selected','outcome','lifecycle','agenda_
     'agenda_scope_added','evidence_added','investigation_bookmark','meditation_dispatch',
     'evidence_continuation','evidence_search_received','portfolio_deferred','developmental_progress','developmental_wait','operational_feedback'}
 CATEGORIES={
+    'ScoreObserver':{'score_review_source','score_review_proposal','score_game_record'},
+    'human-score-review':{'score_human_annotation','score_review_status'},
+    'MemoryEvaluator':{'evaluated_memory_recalled','score_reader_review_reconciliation','score_reader_candidate_evaluation','score_reader_frozen_baseline'},
     'Reflection':{'reflection_commission','normal_meditation_yield','normal_meditation_result',
         'perceptual_experiment_proposal','learning_project_proposal','model_deployment_proposal','retrieval_experiment_reflection','perceptual_learning_deferred'},
     'LearningExecutive':{'reflection_commission'},
@@ -135,7 +138,6 @@ CATEGORIES={
     'existing-planner-offline-outcome':{'offline_operational_outcome'},
     'controlled-motion-adapter':{'motion_operational_shadow'},
     'controlled-policy-adapter':{'decision_policy_shadow'},
-    'MemoryEvaluator':{'evaluated_memory_recalled'},
 }
 
 

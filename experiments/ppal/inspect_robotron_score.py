@@ -129,7 +129,7 @@ def import_queue(journal, root):
     root=Path(root).resolve()
     if not root.is_dir():raise ValueError('authorized saved evidence root unavailable')
     # Existing session diary includes attempts without report.json.
-    for path in sorted(root.rglob('experiment-evidence.sqlite3')):
+    for path in sorted(set(root.rglob('experiment-evidence.sqlite3')) | set(root.rglob('session-evidence.sqlite3'))):
         if path.resolve()==journal.path.resolve():continue
         source=EvidenceJournal(path,read_only=True)
         try:journal.merge_from(source)

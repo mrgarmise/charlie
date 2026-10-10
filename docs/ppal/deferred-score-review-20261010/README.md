@@ -31,3 +31,21 @@ original image bytes, authenticated correction, denied tokenless write, and dura
 review after server termination. Exact test names are in milestone-b.xml. Browser
 visual validation is unavailable: Chromium installation failed with an invalid ZIP
 from the download endpoint. No browser-rendered usability result is claimed.
+
+Milestone C: normal DevelopmentLifecycle.acquire imports existing session and
+marathon diaries into its existing notebook and reconciles immutable human reviews
+through MemoryEvaluator. Restart imports are idempotent. Observations supply no
+selected project, priority, physical authorization or replacement reader.
+MemoryEvaluator.evaluate_score_reader accepts an existing Reflection/ModelFoundry
+candidate with explicit training consultation, compares immutable original baseline
+predictions with reviewer labels, rejects source/session/image overlap, mixed
+baselines, changed images, invalid digits and nonfinite confidence, and records
+coverage, accuracy, high-confidence errors and timing. Evaluation is bounded to
+256 originals. Synthetic reviews require an explicit fixture mode and remain
+labeled. Diagnostic/validation results cannot grant deployment; sealed final
+reader evaluation needs an independent protocol and is rejected by this adapter.
+Complete-game certificate validation rejects superseded annotations and unresolved
+review statuses. Legacy content aliases do not create extra queue games.
+32 tests passed in 3.79s (milestone-c.xml), including normal acquisition/restart and
+candidate interface fixtures. There are no new authentic independent reviews,
+Charlie-originated score-reader candidates or native Pi results in this environment.

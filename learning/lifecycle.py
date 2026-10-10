@@ -195,6 +195,14 @@ class DevelopmentLifecycle:
             self.journal.append('event', dict(category='acquisition_delivery',sha256=key,record_id=record.id),
                 episode=SCOPE, sources=[record.id],producer='existing-acquisition-capability',version='normal-lifecycle-v1')
             changed = True
+        # Deferred operator feedback joins this same notebook, preserving IDs.
+        # It cannot authorize gameplay, select a project or qualify a game.
+        from experiments.ppal.inspect_robotron_score import import_queue
+        before=len(self.journal.records())
+        for root in roots:
+            if root.is_dir():import_queue(self.journal,root)
+        MemoryEvaluator.reconcile_score_reviews(self.journal)
+        changed |= len(self.journal.records())!=before
         self.acquisition_roots=roots
         changed |= bool(self.respond_to_requests())
         return changed

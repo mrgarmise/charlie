@@ -148,8 +148,15 @@ def validate_certificates(journal,row,*,protocol=None):
                 or a.get('source_episode')!=row['source_episode'] or review.get('synthetic')
                 or sha(review['artifact']['path'])!=m.get('artifact_sha256')):
                 raise ValueError('auditable independent human annotation must match original final score')
-            peers=[r.data['payload']['value'] for r in journal.category_records('observation','score_human_annotation')
-                   if r.data['payload'].get('proposal_id')==proposal.id and r.data['payload'].get('independence_attested')]
+            annotations=journal.category_records('observation','score_human_annotation')
+            superseded={r.data['payload'].get('supersedes') for r in annotations}
+            if annotation.id in superseded:raise ValueError('score certificate references superseded annotation')
+            statuses=[r.data['payload'] for r in journal.category_records('observation','score_review_status')
+                if r.data['payload'].get('proposal_id')==proposal.id]
+            if statuses and statuses[-1]['status'] not in ('confirmed','corrected'):
+                raise ValueError('score review remains unresolved')
+            peers=[r.data['payload']['value'] for r in annotations if r.id not in superseded
+                   and r.data['payload'].get('proposal_id')==proposal.id and r.data['payload'].get('independence_attested')]
             if len(set(peers))!=1:raise ValueError('human score annotation disagreement remains unresolved')
         if (c.get('value')!=m.get('value') or c.get('timestamp')!=m.get('timestamp')
                 or c.get('phase')!='final' or c.get('artifact_sha256')!=m.get('artifact_sha256')

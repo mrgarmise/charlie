@@ -32,6 +32,102 @@ class MemoryEvaluator:
 
     THRESHOLD = 0.4
 
+    @staticmethod
+    def reconcile_score_reviews(journal):
+        """Expose immutable reviewer outcomes as diagnostic evidence, not an agenda."""
+        from experiments.ppal.score_observer import ScoreObserver
+        annotations=journal.category_records('observation','score_human_annotation')
+        statuses=journal.category_records('observation','score_review_status')
+        if not annotations and not statuses:return None
+        return journal.append('observation',dict(category='score_reader_review_reconciliation',
+            annotation_ids=[r.id for r in annotations],status_ids=[r.id for r in statuses],
+            metrics={p:ScoreObserver.review_metrics(journal,partition=p) for p in ('diagnostic','training','validation','final')},
+            interpretation='reviewer observations; no physical score qualification or selected learning priority',
+            physical_authorization=False),episode='score-review-diagnostics',
+            producer='MemoryEvaluator',version='score-feedback-v1')
+
+    @staticmethod
+    def evaluate_score_reader(journal,candidate_id,reader,*,partition='validation',allow_fixture=False):
+        """Bounded independent offline comparison against immutable pre-review predictions.
+
+        Caller supplies an existing Charlie-originated candidate. No candidate is
+        generated, selected, activated or promoted here. Final evidence requires
+        an independent sealed protocol and is deliberately unavailable here.
+        """
+        import math,time
+        from PIL import Image
+        candidate=journal.get(candidate_id);payload=candidate.data['payload']
+        if candidate.data['producer'] not in ('Reflection','ModelFoundry'):
+            raise ValueError('existing Charlie-originated candidate required')
+        if partition not in ('validation','diagnostic'):raise ValueError('sealed final evaluation requires independent protocol')
+        training=payload.get('training_proposal_ids')
+        if not isinstance(training,list):raise ValueError('explicit candidate training consultation required')
+        proposals={r.id:r.data['payload'] for r in journal.category_records('observation','score_review_proposal')}
+        used=[proposals[i] for i in training]
+        def identity(p):
+            return {('image',p['artifact']['sha256']),('episode',p['source_episode']),
+                ('session',p.get('context',{}).get('source_session') or p['source_episode'])}
+        consulted=set().union(*(identity(p) for p in used)) if used else set()
+        annotations=journal.category_records('observation','score_human_annotation')
+        superseded={r.data['payload'].get('supersedes') for r in annotations}
+        status={r.data['payload'].get('proposal_id'):r.data['payload']['status'] for r in journal.category_records('observation','score_review_status')}
+        samples=[];seen=set();deficiencies=[]
+        if len(proposals)>4096:raise ValueError('bounded review evaluation requires a smaller journal snapshot')
+        for key,p in proposals.items():
+            if p['partition']!=partition or p['synthetic'] and not allow_fixture:continue
+            if identity(p)&consulted:raise ValueError('candidate training overlaps evaluation game, session or image')
+            if p['artifact']['sha256'] in seen:continue
+            if status.get(key) in ('pending','insufficient','disputed'):continue
+            aliases={k for k,q in proposals.items() if q['artifact']['sha256']==p['artifact']['sha256']}
+            if len({(proposals[k]['proposed_score'],proposals[k]['confidence']) for k in aliases})!=1:continue
+            peers=[r for r in annotations if r.id not in superseded and r.data['payload']['proposal_id'] in aliases
+                and r.data['payload']['independence_attested']]
+            values={r.data['payload']['value'] for r in peers}
+            if len(values)!=1 or None in values:continue
+            revision=p.get('context',{}).get('reader_revision')
+            if not revision:deficiencies.append('frozen original reader revision missing');continue
+            raw=Path(p['artifact']['path']).read_bytes()
+            if hashlib.sha256(raw).hexdigest()!=p['artifact']['sha256']:raise ValueError('original score image changed')
+            # All merged diaries must obey the same partition boundary.
+            if any(q['partition']!=partition and identity(q)&identity(p) for q in proposals.values()):
+                raise ValueError('source crosses evaluation partitions')
+            seen.add(p['artifact']['sha256'])
+            samples.append((key,p,values.pop(),[r.id for r in peers]))
+        if len(samples)>256:raise ValueError('bounded candidate evaluation permits at most 256 originals')
+        revisions={p['context']['reader_revision'] for _,p,_,_ in samples}
+        if len(revisions)>1:raise ValueError('mixed reader baselines forbidden')
+        frozen=journal.append('observation',dict(category='score_reader_frozen_baseline',
+            reader_revision=next(iter(revisions),None),partition=partition,
+            predictions=[dict(proposal_id=k,value=p['proposed_score'],confidence=p['confidence']) for k,p,_,_ in samples]),
+            episode=candidate.data['episode'],producer='MemoryEvaluator',version='score-feedback-v1')
+        outcomes=[]
+        for key,p,label,labels in samples:
+            begin=time.monotonic()
+            with Image.open(p['artifact']['path']) as original:answer=reader(original.copy())
+            seconds=time.monotonic()-begin
+            if not isinstance(answer,(tuple,list)) or len(answer)!=2:raise ValueError('candidate must return score and confidence')
+            value,confidence=answer
+            if value is not None and (type(value) is not int or value<0):raise ValueError('invalid candidate score')
+            if type(confidence) not in (float,int) or not math.isfinite(confidence) or not 0<=confidence<=1:
+                raise ValueError('invalid candidate confidence')
+            outcomes.append(dict(proposal_id=key,label=label,annotation_ids=labels,baseline=p['proposed_score'],
+                candidate=value,confidence=confidence,seconds=seconds))
+        n=len(outcomes)
+        def metrics(field):
+            accepted=[r for r in outcomes if r[field] is not None]
+            return dict(samples=n,accepted=len(accepted),abstained=n-len(accepted),
+                exact_accuracy=sum(r[field]==r['label'] for r in accepted)/len(accepted) if accepted else None)
+        report=dict(status='measured_offline_batch' if n else 'unresolved',partition=partition,
+            baseline=metrics('baseline'),candidate=metrics('candidate'),
+            false_high_confidence=sum(r['candidate'] is not None and r['candidate']!=r['label'] and r['confidence']>=.99 for r in outcomes),
+            total_seconds=sum(r['seconds'] for r in outcomes),outcomes=outcomes,deficiencies=deficiencies,
+            fixture_only=bool(allow_fixture),qualification='descriptive reviewed batch; no sealed final, physical capability or deployment authority',
+            uncertainty='finite labeled sample; correlated frames do not establish population improvement',physical_authorization=False)
+        return journal.append('observation',dict(category='score_reader_candidate_evaluation',candidate_id=candidate_id,
+            baseline_id=frozen.id,training_consultation=training,report=report),episode=candidate.data['episode'],
+            sources=[candidate_id,frozen.id],producer='MemoryEvaluator',version='score-feedback-v1')
+
+
     def __init__(self, path=DEFAULT_EVALUATIONS, exploration_rate=0.05):
         if not 0 <= exploration_rate <= 1:
             raise ValueError("exploration_rate must be within [0, 1]")
@@ -258,7 +354,6 @@ class MemoryEvaluator:
         witness, never the independent measurement of itself.
         """
         import math
-        from .evidence import digest
         root=Path(capture_root).resolve()
         cameras={r.id:r for r in journal.category_records('observation','camera_observation')}
         captures={r.data['payload']['observation_id']:r for r in journal.category_records('observation','camera_capture')}

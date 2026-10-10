@@ -146,11 +146,17 @@ class ScoreObserver:
             report={};deficiencies.append('Report unavailable: '+str(exc))
         try:origin=json.loads((root/'capture-origin.json').read_text())
         except (OSError,ValueError):pass
+        if not isinstance(origin,dict):
+            origin={};deficiencies.append('Invalid capture origin')
         source_episode=origin.get('capture_id') or attempt
         if report_hash:source_episode='episode:'+report_hash
         capture_key=origin.get('capture_id') or attempt
         summary=report.get('score_summary') or {};boundary=report.get('episode_end') or {}
-        terminal_times=(boundary.get('evidence') or {}).get('terminal_capture_timestamps',[])
+        if not isinstance(summary,dict):summary={};deficiencies.append('Invalid score summary')
+        if not isinstance(boundary,dict):boundary={};deficiencies.append('Invalid game boundary')
+        evidence=boundary.get('evidence') or {}
+        terminal_times=evidence.get('terminal_capture_timestamps',[]) if isinstance(evidence,dict) else []
+        if not isinstance(terminal_times,list):terminal_times=[]
         observations=[]
         try:
             with (root/'score.jsonl').open() as stream:
@@ -179,9 +185,14 @@ class ScoreObserver:
                 artifact=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest())
             except (OSError,ValueError):continue
             selected=row;break
+        if not origin.get('capture_id') and report_hash:
+            # Content aliases without a capture nonce are one saved episode.
+            capture_key='legacy-score-capture:'+digest(dict(report=report_hash,
+                image=artifact['sha256'] if artifact else None))
         proposal=None
         if selected:
             at=selected.get('timestamp',selected.get('t'));channel=selected.get('p1') or {}
+            if not isinstance(channel,dict):channel={}
             value=channel.get('observed_score',channel.get('observed'));confidence=channel.get('confidence',0)
             if type(value) is not int or value<0:value=None
             if type(confidence) not in (int,float) or not math.isfinite(confidence) or not 0<=confidence<=1:confidence=0
@@ -302,7 +313,13 @@ class ScoreObserver:
             if len(values)!=1:disagreement+=1;continue
             value=next(iter(values))
             if value is None:unreadable+=1;continue
-            eligible+=1;p=proposals[key];prediction=p['proposed_score']
+            from pathlib import Path
+            import hashlib
+            p=proposals[key]
+            try:
+                if hashlib.sha256(Path(p['artifact']['path']).read_bytes()).hexdigest()!=image:continue
+            except OSError:continue
+            eligible+=1;prediction=p['proposed_score']
             if prediction is None:abstained+=1;continue
             accepted+=1;correct+=int(prediction==value)
             false_confident+=int(prediction!=value and p['confidence']>=.99)

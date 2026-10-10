@@ -103,3 +103,19 @@ Restart retained **638 records**, one proposal and zero capability activations. 
 Evidence: [before](learning-loop-authentic-before.json), [after](learning-loop-authentic-after.json), [restart](learning-loop-authentic-restart.json), [normal-run log](learning-loop-authentic-first.txt), [restart log](learning-loop-authentic-restart.txt). Run provenance records a dirty host worktree; published clean-checkout replay remains a follow-up validation.
 
 Native access again failed with `ssh -o BatchMode=yes -o ConnectTimeout=5 five@charlie 'uname -m'`: hostname resolution failure. Native validation, actual source-layout discovery, environment preflight and specific physical authorization remain essential blockers. No physical execution, movement, flashing or policy activation occurred. ALA-2 remains open.
+
+## Clean published-checkout validation and alias repair
+
+At exact published `c5e222bcd12a12a9b3d13a067140d0b3ec4d0f7c`, an independently fetched clean worktree passed [49 focused tests](clean-loop-focused.txt) and [38 lifecycle, provenance, policy and rollback tests](loop-continuity-tests.txt). The normal offline application reproduced one staged proposal from the older transferred notebook, retained 638 records on restart, left zero activations and preserved all 67 source hashes. [Clean report](clean-loop-authentic-report.json) records clean Git state and exact revision; [first log](clean-loop-authentic-first.txt) and [restart log](clean-loop-authentic-restart.txt) preserve execution.
+
+A subsequent narrowly scoped cache repair tracks both the original reference path and its resolved artifact, so retargeting an alias invalidates the diagnostic receipt. [19 acquisition tests](alias-focused.txt) include this retargeting test and preserve the no-independent-experience invariant.
+
+An earlier in-progress broader run ended with exit 1 and no pytest summary; its [partial output](proposal-regression.txt) is retained and is not counted as passing validation. The fresh published-checkout regression XML records **875 tests, 21 skipped, one failure**: independent restart acceptance did not recognize `LearningExecutive/gameplay_experiment_proposal`. This is a real integration defect, not a passing suite. [Failed XML](clean-loop-full.xml) preserves it. The earlier Guide milestone's 845 passed/21 skipped regression remains attributable to that milestone only.
+
+[Native gate and exact offline commands](NATIVE.md) document the remaining Pi/archive/preflight boundary. Current host functionality does not establish native validation, authentic original-recording search, independently measured motion improvement, complete-game score improvement or physical experiment execution.
+
+## Independent restart acceptance repair
+
+The existing closed-protocol continuity validator now recognizes staged experiment requests only after validating false permissions, retained unsatisfied acquisition and ModelFoundry evaluation links, unchanged original question, exact alternatives, one-game scope, stable proposal identity and consolidated provenance. Duplicate proposal identities fail acceptance. Adding a category to the vocabulary alone would have been insufficient.
+
+[26 focused tests](proposal-continuity-focused.txt) pass, including the previously failing preserved-meditation restart case and deliberately rehashed forged authority, scope, question and alternatives. [45 acquisition/lifecycle/recovery tests](continuity-repair-tests.txt) also pass. [12 isolated rendering/controller tests](loop-render-isolation.txt) pass; those were investigated before the XML identified the actual failure. The broad suite must be rerun against this repaired checkpoint before claiming full regression acceptance.

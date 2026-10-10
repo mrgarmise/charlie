@@ -147,3 +147,20 @@ def test_request_driven_search_does_not_assign_agenda_or_qualify_scores(tmp_path
     assert all(p['status']=='unsatisfied' and not p['physical_authorization'] for p in results.values())
     assert not life.executive.projects()
     life.close()
+
+
+def test_frame_alias_retarget_invalidates_discovery_without_independence(tmp_path):
+    root=tmp_path/'source';path=episode(root)
+    first=path/'original-a.png';second=path/'original-b.png'
+    Image.new('RGB',(12,12),'red').save(first);Image.new('RGB',(12,12),'blue').save(second)
+    alias=path/'frame.png';alias.unlink();alias.symlink_to(first.name)
+    life=DevelopmentLifecycle(tmp_path/'state',[root]);request(life,'retained',['Temporal frames'])
+    a=discover_request_sources(life.dataset,[root],provenance=life.provenance)
+    alias.unlink();alias.symlink_to(second.name)
+    b=discover_request_sources(life.dataset,[root],provenance=life.provenance)
+    assert a!=b
+    payload=life.journal.get(b[0]).data['payload']
+    assert payload['original_observations'][0]['artifact']['path']==str(second)
+    assert not payload['independent_measurements']
+    assert not life.journal.category_records('observation','independent_motion_corpus')
+    life.close()

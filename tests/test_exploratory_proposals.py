@@ -74,3 +74,23 @@ def test_staged_request_cannot_be_used_as_deployment_authority(tmp_path):
                 authorization={'proposal_id':proposal.id,'target':target,'source':'fixture approval'})
     assert not life.journal.category_records('event','capability_activation')
     life.close()
+
+
+def test_independent_restart_validator_checks_staged_scope_and_permissions(tmp_path):
+    from tools.inspect_developmental_progress import inspect
+    from learning.continuity import compare_restart, ContinuityError
+    from memory.evidence import canonical,digest
+    import json,copy
+    life,identifier=prepare(tmp_path);life._status();before=inspect(life.output)
+    proposal=life.executive.stage_evidence_experiment();life._status();after=inspect(life.output)
+    assert compare_restart(before,after)['continuity_passed']
+    for change in ('authority','scope','question','alternatives'):
+        bad=copy.deepcopy(after);row=bad['original_records'][-1];data=json.loads(row['document'])
+        assert data['payload']['category']=='gameplay_experiment_proposal'
+        if change=='authority':data['payload']['authorization']['gameplay']=True
+        if change=='scope':data['payload']['trial_scope']['maximum_games']=2
+        if change=='question':data['payload']['original_question']='human-substituted question'
+        if change=='alternatives':data['payload']['alternatives']=[]
+        row.update(id=digest(data),document=canonical(data))
+        with pytest.raises(ContinuityError):compare_restart(before,bad)
+    life.close()

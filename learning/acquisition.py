@@ -169,7 +169,9 @@ def discover_request_sources(dataset, roots, *, provenance, check=lambda: None):
                 break
             processed+=1
             def original(path):
-                path=Path(path).resolve()
+                path=Path(path).absolute()
+                tracked[str(path)]=_source_stamp(path)
+                path=path.resolve()
                 tracked[str(path)]=_source_stamp(path)
                 if not path.is_relative_to(root):raise ValueError('source reference escapes authorized root')
                 if not path.is_file():raise ValueError('original source unavailable: '+str(path))

@@ -48,6 +48,7 @@ def _unique(rows):
         elif category=='learning_evidence_request' and p.get('dependency_key'):
             key=(category,p['dependency_key'])
         elif category=='acquisition_dependency_satisfied':key=(category,p['request_id'])
+        elif category=='gameplay_experiment_proposal':key=(category,p['proposal_id'])
         elif d['kind']=='resolution':key=('resolution',p['prediction_id'])
         if key:
             require(key not in keys,'duplicate commission, experience, finding, plan or dependency: '+str(key))
@@ -121,7 +122,7 @@ CATEGORIES={
     'MemoryEvaluator':{'evaluated_memory_recalled','score_reader_review_reconciliation','score_reader_candidate_evaluation','score_reader_frozen_baseline','evidence_annotation_evaluation'},
     'Reflection':{'reflection_commission','normal_meditation_yield','normal_meditation_result',
         'perceptual_experiment_proposal','learning_project_proposal','model_deployment_proposal','retrieval_experiment_reflection','perceptual_learning_deferred'},
-    'LearningExecutive':{'reflection_commission'},
+    'LearningExecutive':{'reflection_commission','gameplay_experiment_proposal'},
     'existing-evidence-consolidation':{'consolidated_evidence_reference','learning_context_reference',
         'retrospective_ingestion','preserved_meditation','preserved_meditation_rejection','retrospective_meditation_continuation','normal_history_restore','notebook_history_recovery'},
     'existing-evidence-acquisition':{'episode_identity_binding','episode_identity_location','episode_identity_alias','episode_identity_quarantine'},
@@ -167,6 +168,35 @@ def compare_restart(before,after):
             producer.startswith('CapabilityRegistry:') and category=='model_diagnostic_retrieval')
         require(allowed,'unclassified restart evidence requires review: '+producer+'/'+str(category or op or d['kind']))
         require(p.get('physical_authorization') is not True,'restart record grants physical authority')
+        if category=='gameplay_experiment_proposal':
+            permissions={'offline_investigation','offline_shadow','gameplay','persistent_policy','servo','firmware'}
+            require(producer=='LearningExecutive' and op=='experiment_staged' and
+                set(p.get('authorization',{}))==permissions and all(v is False for v in p['authorization'].values()) and
+                p.get('candidate_qualified') is False and p.get('physical_authorization') is False,
+                'staged experiment cannot qualify evidence or grant authority')
+            search=rows.get(p.get('search_id'),{}).get('payload',{})
+            evaluation=rows.get(p.get('evaluation_id'),{}).get('payload',{})
+            finding=rows.get(p.get('meditation_id'),{}).get('payload',{})
+            bookmark=rows.get(p.get('bookmark_id'),{}).get('payload',{})
+            require(search.get('category')=='acquisition_search_result' and search.get('status')=='unsatisfied' and
+                search.get('work_id')==p.get('project_id') and search.get('required_evidence')==p.get('original_requirements') and
+                rows[p['search_id']]['producer']=='existing-acquisition-capability' and rows.get(p.get('evaluation_id'),{}).get('producer')=='ModelFoundry' and
+                p.get('original_question')==bookmark.get('original_question') and
+                evaluation.get('category')=='meditation_candidate_evaluation' and evaluation.get('result',{}).get('result')=='unresolved' and
+                evaluation.get('prediction_id')==bookmark.get('prediction_id') and finding.get('category')=='preserved_meditation' and
+                bookmark.get('op')=='evidence_continuation' and bookmark.get('project_id')==p.get('project_id'),
+                'staged experiment lost retained investigation or acquisition provenance')
+            alternatives=p.get('alternatives',[])
+            require(alternatives==evaluation['result'].get('candidates') and 1<=len(alternatives)<=8 and
+                p.get('trial_scope')==dict(game='robotron',maximum_games=1,maximum_candidate_shadows=len(alternatives),candidate_activation=False),
+                'staged experiment changed candidate alternatives or execution scope')
+            require(p.get('proposal_id')==digest(dict(project_id=p['project_id'],meditation_id=p['meditation_id'],evaluation_id=p['evaluation_id'],
+                scope='one baseline Robotron game; offline temporal shadows only')),
+                'staged experiment identity changed')
+            references={rows[i]['payload'].get('record_id') for i in d['sources']
+                if rows[i]['payload'].get('category')=='consolidated_evidence_reference'}
+            require({p['search_id'],p['evaluation_id'],p['meditation_id'],p['bookmark_id']}<=references,
+                'staged experiment lacks consolidated source references')
         if category=='capability_activation':
             require(p.get('authorization',{}).get('execution')!='physical','physical activation during offline acceptance')
         label=category or op or d['kind'];counts[label]=counts.get(label,0)+1

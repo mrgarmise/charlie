@@ -1,0 +1,23 @@
+{
+  "archives": [
+    {
+      "name": "tracking-hud-fix-20261001-002127.tar.gz",
+      "library_id": "libfile_de0b78f3f00881918a34f5c4288fcd1e",
+      "sha256": "480b329dfeaeab498107ba37a5ec1267fb020962ac3904052d4f341a88ad6c36",
+      "bytes": 1035434
+    },
+    {
+      "name": "tracking-hud-fix-goodview-20261001-002659.tar.gz",
+      "library_id": "libfile_09b9a9e7a0e48191963557562d3fbdfc",
+      "sha256": "93eba0850a8f78b18369c40c842745f63404a06a452832b4f432a697aabc875d",
+      "bytes": 931701
+    },
+    {
+      "name": "marathon-20261009-004249.tar.gz",
+      "library_id": "libfile_9427196945988191884a3ea59ba61dbb",
+      "sha256": "277769a3e4d2d106fdab98a80be7c6a8532be75415875314949ed6130cc71a04",
+      "bytes": 128599059
+    }
+  ],
+  "qualification": "host replay of original captures; not new physical gameplay"
+}

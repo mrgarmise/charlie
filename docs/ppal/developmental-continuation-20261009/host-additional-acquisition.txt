@@ -1,0 +1,8 @@
+Development: idle | no project | 
+Development: reflecting | Meditation e13c49cfaaede2820f25543060437d4d077d34f51be4b4d1010283ab399a002e for episode:9810a3016b1cdcd579ceb78a76ffcc3138ba0dbc8f9780ec303b97f5ba568927 | 
+Development: investigating | no project | 
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | Meditation 2f241ff038e25c6b00fe28a7159651b8a9d88510faa1ca66559389d936f2e1fa for episode:88c01685d0f73160ae583287b68949d38e3f9ff2c42e6b27e69e0b0f272a47bf | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: waiting for evidence | no project | Committed developmental checkpoint or conclusion advanced
+Development: stopped | no project | Committed developmental checkpoint or conclusion advanced

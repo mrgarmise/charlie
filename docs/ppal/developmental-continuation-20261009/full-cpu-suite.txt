@@ -1,0 +1,77 @@
+........................................................................ [  9%]
+........................................................................ [ 18%]
+.........................................s.............................. [ 28%]
+........................................................................ [ 37%]
+........................................................................ [ 46%]
+........................................................................ [ 56%]
+........................................................................ [ 65%]
+...............................................................Timeout (0:00:30)!
+Thread 0x00007f32cc9fd6c0 (most recent call first):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 355 in wait
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/queue.py", line 171 in get
+  File "/workspace/scratch/c81a2d35e2bc/charlie/experiments/ppal/score_observer.py", line 48 in _run
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 1012 in run
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 1075 in _bootstrap_inner
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 1032 in _bootstrap
+
+Thread 0x00007f32bffff6c0 (most recent call first):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 355 in wait
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/queue.py", line 171 in get
+  File "/workspace/scratch/c81a2d35e2bc/charlie/experiments/ppal/progress_evidence.py", line 75 in _run
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 1012 in run
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 1075 in _bootstrap_inner
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 1032 in _bootstrap
+
+Thread 0x00007f32cd5fe6c0 (most recent call first):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 359 in wait
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 655 in wait
+  File "/workspace/scratch/c81a2d35e2bc/charlie/experiments/ppal/eyes/passive.py", line 81 in _run
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 1012 in run
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 1075 in _bootstrap_inner
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/threading.py", line 1032 in _bootstrap
+
+Thread 0x00007f335b3c5740 (most recent call first):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1376 in replace
+  File "/workspace/scratch/c81a2d35e2bc/charlie/experiments/ppal/progress_supervision.py", line 26 in update
+  File "/workspace/scratch/c81a2d35e2bc/charlie/experiments/ppal/progress_supervision.py", line 35 in fresh
+  File "/workspace/scratch/c81a2d35e2bc/charlie/experiments/ppal/observation_camera.py", line 49 in read
+  File "/workspace/scratch/c81a2d35e2bc/charlie/experiments/ppal/play_robotron.py", line 851 in main
+  File "/workspace/scratch/c81a2d35e2bc/charlie/tests/test_robotron_agency_integration.py", line 135 in test_armed_runner_uses_generic_agency_and_always_releases
+  File "/workspace/scratch/c81a2d35e2bc/charlie/tests/test_robotron_agency_integration.py", line 228 in test_real_player_loop_has_no_default_duration_limit
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/python.py", line 167 in pytest_pyfunc_call
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_callers.py", line 121 in _multicall
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_manager.py", line 120 in _hookexec
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_hooks.py", line 512 in __call__
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/python.py", line 1707 in runtest
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/runner.py", line 184 in pytest_runtest_call
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_callers.py", line 121 in _multicall
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_manager.py", line 120 in _hookexec
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_hooks.py", line 512 in __call__
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/runner.py", line 250 in <lambda>
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/runner.py", line 361 in from_call
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/runner.py", line 249 in call_and_report
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/runner.py", line 139 in runtestprotocol
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/runner.py", line 118 in pytest_runtest_protocol
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_callers.py", line 121 in _multicall
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_manager.py", line 120 in _hookexec
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_hooks.py", line 512 in __call__
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/main.py", line 408 in pytest_runtestloop
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_callers.py", line 121 in _multicall
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_manager.py", line 120 in _hookexec
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_hooks.py", line 512 in __call__
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/main.py", line 384 in _main
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/main.py", line 330 in wrap_session
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/main.py", line 377 in pytest_cmdline_main
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_callers.py", line 121 in _multicall
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_manager.py", line 120 in _hookexec
+  File "/workspace/scratch/c81a2d35e2bc/deps/pluggy/_hooks.py", line 512 in __call__
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/config/__init__.py", line 229 in _main
+  File "/workspace/scratch/c81a2d35e2bc/deps/_pytest/config/__init__.py", line 253 in _console_main
+  File "/workspace/scratch/c81a2d35e2bc/deps/pytest/__main__.py", line 9 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 198 in _run_module_as_main
+......... [ 75%]
+...............................................................s........ [ 84%]
+........................................................................ [ 93%]
+...............................................                          [100%]
+765 passed, 2 skipped in 265.91s (0:04:25)

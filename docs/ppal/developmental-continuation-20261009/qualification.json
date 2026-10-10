@@ -1,0 +1,36 @@
+{
+  "tested_revision": "3fe59795aba5bb47308e37fed02ddb55f8b169a3",
+  "tested_tree": "a9821b57be7e0e826d51d511a9152e52fc6385c9",
+  "environment": {
+    "python": "3.12.14",
+    "machine": "x86_64",
+    "torch": "2.14.1+cpu",
+    "numpy": "2.5.3",
+    "pillow": "12.3.0"
+  },
+  "full_suite": {
+    "command": "PYTHONPATH=.:../deps:../torch-deps python -m pytest -q tests -o faulthandler_timeout=30",
+    "passed": 765,
+    "skipped": 2,
+    "seconds": 265.91,
+    "report": "full-cpu-suite.txt",
+    "skip_reasons": [
+      "original October 1 collision acceptance root not yet supplied",
+      "optional full 119-original geometry archive not yet supplied"
+    ],
+    "diagnostic_trace": "30-second faulthandler stack during deliberately extended simulated player-loop test; test subsequently passed"
+  },
+  "native_pi": "not observed; pending",
+  "physical_authorization": false,
+  "authentic_findings": "unverified retrospective diagnostics; not independent corroboration",
+  "score_improvement": "UNKNOWN",
+  "initial_attempts": "Incomplete broad test logs retained; do not count as full passes. Pre-fix focused CPU diagnostic reproduced missing method KeyError, now corrected.",
+  "separate_original_source_acceptance": {
+    "passed": 16,
+    "skipped": 0,
+    "seconds": 80.34,
+    "report": "original-source-tests.txt",
+    "tests": "actual October 1 identity collision and full October 9 119-frame geometry replay plus retained geometry regressions",
+    "qualification": "authentic captures tested on host; not native or physical session acceptance"
+  }
+}

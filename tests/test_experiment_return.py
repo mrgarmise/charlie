@@ -173,3 +173,17 @@ def test_unverified_boundary_stops_without_second_start(tmp_path):
     result=marathon.developmental_marathon(args,driver=driver,gateway=g)
     assert len(calls)==1 and result['status']=='unverified_episode_boundary'
     assert result['games'][0]['experiment'] is None
+
+
+def test_single_observation_admits_exploration_without_improvement_claim(tmp_path):
+    g=gateway(tmp_path);root=seed(tmp_path/'single')
+    path=root/'agency.jsonl';path.write_text(path.read_text().splitlines()[0]+'\n')
+    j=EvidenceJournal(tmp_path/'source.sqlite3');episode=import_episode(root,j)
+    proposals=reflect_actuator_evidence(root,j,episode,g)
+    assert proposals and all(p['proposal']['evidence_windows']==1 for p in proposals)
+    c=EvidenceJournal(tmp_path/'commitments.sqlite3')
+    plan=select_experiment(g,c,tmp_path/'next',horizon_seconds=60)
+    assert plan and plan['max_actions']==1 and plan['body']=='NE'
+    assert all(p['proposal']['score_claim'] is None for p in proposals)
+    assert not c.category_records('event','capability_activation')
+    j.close();c.close()

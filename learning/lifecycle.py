@@ -104,7 +104,7 @@ class DevelopmentLifecycle:
             resources=self.resources.sample,
             analytical_progress=[dict(context_id=p.parent.name,**self.meditation_stages(p))
                 for p in sorted((self.output/'meditations').glob('**/checkpoint.json'))],
-            authorization_requests=[r.data['payload'] for r in rows if r.data['payload'].get('category')=='offline_authorization_request'
+            authorization_requests=[r.data['payload'] for r in rows if r.data['payload'].get('category') in ('offline_authorization_request','gameplay_experiment_proposal')
                 and not any(a.data['payload'].get('proposal_id')==r.data['payload']['proposal_id'] for a in rows
                     if a.data['payload'].get('category')=='capability_activation')]))
 

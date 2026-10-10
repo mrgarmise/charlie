@@ -186,6 +186,9 @@ class LearningExecutive:
                 project=projects[p['project_id']]
                 project.setdefault('agenda_scopes',[project['scope']])
                 if p['scope'] not in project['agenda_scopes']: project['agenda_scopes'].append(p['scope'])
+            elif op == 'experiment_staged':
+                projects[p['project_id']].update(experiment_proposal_id=p['proposal_id'],
+                    next_direction='Request specific authorization and environment preflight; continue other eligible offline work')
             elif op == 'evidence_continuation':
                 projects[p['project_id']]['developmental_bookmark'] = dict(p, evidence_id=record.id)
         return projects
@@ -387,22 +390,26 @@ class LearningExecutive:
         if status in FINAL:
             self._remember_conclusion(event, project)
 
-    def select(self, *, methods, resources, authorized_methods, urgent_projects=(), inspect=False):
+    def select(self, *, methods, resources, authorized_methods, urgent_projects=(), inspect=False, exploratory_projects=None):
         """Sticky portfolio selection; explicit prerequisites can interrupt it.
 
         Urgency must refer to previously recorded, evidence-backed projects. It
         does not authorize their method. Paused budgets need explicit renewal.
         """
+        if exploratory_projects is not None and not inspect:
+            raise ValueError('exploratory proposal selection is read-only; it cannot commission execution')
         projects = self.projects(); alternatives = []
         for p in projects.values():
             if (p['status'] in FINAL or p.get('disposition') == 'budget_exhausted'
                     or p.get('agenda_representative',p['id'])!=p['id']):
                 continue
+            if exploratory_projects is not None and p['id'] not in exploratory_projects:
+                continue
             missing = sorted(set(p.get('requires', [])) - set(resources))
             unmet = [d for d in p.get('dependencies', [])
                      if projects.get(d, {}).get('disposition') != 'achieved']
             blocked = (missing or unmet or p['method'] not in methods
-                       or p['method'] not in authorized_methods or p.get('hold', False))
+                       or p['method'] not in authorized_methods or (p.get('hold', False) and exploratory_projects is None))
             resolved = p.get('progress', {}).get('resolved', 0)
             terms = dict(objective_contribution=p.get('objective_contribution', .5),
                 learning_value=p.get('learning_value', .5),
@@ -696,12 +703,90 @@ class LearningExecutive:
                     raise ValueError('acquisition result lacks exact validated delivery')
             outputs.append(self._event(dict(op='evidence_search_received',search_id=row.id,
                 request_id=p['request_id'],work_id=p['work_id'],status=p['status'],
-                unresolved_dependency=p['next_requirement'],
+                unresolved_dependency=p['next_requirement'],evidence_state=p.get('evidence_state','unavailable'),
                 next_direction='Reconsider delivered evidence through existing investigation gates' if p['status']=='delivered' else
                     'Preserve original question; select other eligible work or await changed evidence/capability',
                 hypothesis_result='unchanged',evidence_qualified=False,
                 physical_authorization=False),[self._reference(self.journal,row.id).id]).id)
         return outputs
+
+    def stage_evidence_experiment(self):
+        """Portfolio-owned request for experience; no controller or activation.
+
+        Existing temporal candidate artifacts determine the alternatives. An
+        unresolved qualification does not prohibit asking for an exploratory
+        baseline observation with unactivated shadow comparisons.
+        """
+        import hashlib
+        from pathlib import Path
+        from learning.datasets import sha
+        from .evidence import canonical
+        from learning.meditation import PlanningCandidate
+        projects=self.projects();choices={}
+        searches={r.data['payload']['work_id']:r for r in self.journal.category_records('event','acquisition_search_result')}
+        evaluations={r.data['payload']['prediction_id']:r for r in self.journal.category_records('observation','meditation_candidate_evaluation')
+            if r.data['producer']=='ModelFoundry'}
+        for identifier,project in projects.items():
+            search=searches.get(identifier);bookmark=project.get('developmental_bookmark')
+            if (project.get('method')!='meditation-motion' or not bookmark or not search
+                    or search.data['payload']['status']!='unsatisfied'
+                    or search.data['payload'].get('evidence_state')=='search_incomplete'):
+                continue
+            evaluation=evaluations.get(bookmark.get('prediction_id'))
+            if not evaluation or evaluation.data['payload']['result']['result']!='unresolved':continue
+            candidates=evaluation.data['payload']['result'].get('candidates',[])
+            if not candidates or len(candidates)>8:continue
+            try:
+                finding=self.journal.get(project['scope']['meditation_id'])
+                if finding.data['payload'].get('category')!='preserved_meditation':continue
+                for candidate in candidates:
+                    if candidate.get('originator')!='Reflection' or finding.id not in candidate.get('source_evidence',[]):
+                        raise ValueError('candidate lacks original meditation')
+                    PlanningCandidate(candidate['spec'])
+                    if hashlib.sha256((canonical(candidate['spec'])+'\n').encode()).hexdigest()!=candidate['checkpoint_sha256']:
+                        raise ValueError('preserved candidate specification changed')
+                    checkpoint=Path(candidate['checkpoint'])
+                    if checkpoint.is_file() and sha(checkpoint)!=candidate['checkpoint_sha256']:
+                        raise ValueError('available candidate artifact changed')
+            except (OSError,ValueError,KeyError,TypeError):continue
+            choices[identifier]=(search,evaluation,finding,candidates)
+        selection=self.select(methods={'meditation-motion'},resources={'offline-slot','meditation-evidence'},
+            authorized_methods={'meditation-motion'},inspect=True,exploratory_projects=set(choices))
+        project=selection['project']
+        if project is None:return None
+        identifier=project['id'];search,evaluation,finding,candidates=choices[identifier]
+        key=digest(dict(project_id=identifier,meditation_id=finding.id,evaluation_id=evaluation.id,
+            scope='one baseline Robotron game; offline temporal shadows only'))
+        old=next((r for r in self.journal.category_records('event','gameplay_experiment_proposal')
+            if r.data['payload'].get('proposal_id')==key),None)
+        if old:return old
+        return self._event(dict(op='experiment_staged',category='gameplay_experiment_proposal',proposal_id=key,
+            project_id=identifier,original_question=project['goal'],meditation_id=finding.id,
+            bookmark_id=project['developmental_bookmark']['evidence_id'],search_id=search.id,evaluation_id=evaluation.id,
+            original_requirements=search.data['payload']['required_evidence'],
+            hypothesis=project['expected'],alternatives=candidates,portfolio_selection=selection['alternatives'],
+            artifact_status='Preserved specifications verified against recorded checkpoint hashes; missing original checkpoint paths require exact derived reconstruction during preflight, not invented observations',
+            variation='Collect one game using the frozen existing baseline; compare all retained Reflection temporal alternatives offline without controller output',
+            expected_observation='New camera sequences and recorded actions may separate temporal-estimation error from incorrect historical associations',
+            measurements=['Original hash-bound camera frames with capture clock and acknowledged command timing',
+                'Verified game start and terminal boundaries, independent complete-game SCORE annotation',
+                'Independently reviewed identities, calibration and measured trajectories; ambiguous outcomes remain unresolved'],
+            trial_scope=dict(game='robotron',maximum_games=1,maximum_candidate_shadows=len(candidates),candidate_activation=False),
+            environment=dict(host='charlie',hardware='Raspberry Pi 5',preflight_required=['Bind current code revision, frozen baseline hash, camera/calibration and controller configuration before specific approval']),
+            constraints=['Existing resource, thermal and independent physical authorization gates',
+                'No Guide/Home; no game switching; no servo movement or firmware changes',
+                'A live game is not stopped merely because an offline analysis budget expires'],
+            stopping=['Verified terminal state after one game','Operator cancellation','Existing safety/resource/controller interruption'],
+            interpretation=dict(support='Independently measured held-out motion error below the frozen baseline',
+                contradiction='Independently measured error fails to improve against baseline',
+                inconclusive='Missing/ambiguous identities, calibration, timings, boundaries or independent measurements; preserve alternatives'),
+            rollback='Candidates remain unactivated; restore neutral controller through existing shutdown and preserve the frozen baseline and all attempts',
+            status='AWAITING_SPECIFIC_AUTHORIZATION_AND_ENVIRONMENT_PREFLIGHT',
+            requested_permissions=['robotron-gameplay:one-baseline-game','offline-shadow:listed-temporal-candidates'],
+            authorization=dict(offline_investigation=False,offline_shadow=False,gameplay=False,persistent_policy=False,servo=False,firmware=False),
+            physical_authorization=False,candidate_qualified=False,score_improvement='UNKNOWN',
+            execution='staged only; existing physical gates must receive separate experiment-specific authorization'),
+            [self._reference(self.journal,i).id for i in (search.id,evaluation.id,finding.id,project['developmental_bookmark']['evidence_id'])])
 
     def develop(self, lifecycle):
         """One normal-operation turn, owned by this Executive, no second scheduler.
@@ -718,6 +803,7 @@ class LearningExecutive:
         self.commission_evidence_searches()
         changed=lifecycle.acquire()
         self.receive_evidence_searches()
+        self.stage_evidence_experiment()
         self.reconcile_agenda()
         # The Executive chooses eligible new experience for bounded reflection.
         # A completed result is a durable checkpoint, not another experience.
@@ -779,6 +865,7 @@ class LearningExecutive:
         self.commission_evidence_searches()
         lifecycle.respond_to_requests()
         self.receive_evidence_searches()
+        self.stage_evidence_experiment()
         lifecycle.operational_feedback()
         projects=self.projects()
         pending=lifecycle.pending_work()

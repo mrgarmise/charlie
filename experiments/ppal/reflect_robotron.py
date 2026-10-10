@@ -72,7 +72,7 @@ def reflect_actuator_evidence(root, journal, episode, gateway):
         fires=sorted({r['fire'] for r in rows})
         distribution=Counter(r['result'] for r in rows)
         ranked_results=distribution.most_common()
-        if len(rows)<2 or len(fires)<2 or (len(ranked_results)>1 and ranked_results[0][1]==ranked_results[1][1]):
+        if not rows or not fires:
             continue
         expected,support=ranked_results[0]
         for alternate in sorted(set(AXES)-{'STAY'}):
@@ -87,7 +87,7 @@ def reflect_actuator_evidence(root, journal, episode, gateway):
                       setting_frequency=fire_counts[alternate],setting_evidence=fire_sources.get(alternate,[]),
                       evidence_windows=len(rows),joint_observations=len(joint),
                       proposal_rank=[int(untested),support/len(rows),len(rows),fire_counts[alternate]],
-                      hypothesis_status='tentative; SELF unverified',score_claim=None,
+                      hypothesis_status='exploratory; SELF unverified',admission='bounded exploration only; no improvement qualification',score_claim=None,
                       confidence_note='heuristic hypothesis score, not calibrated probability')
             derived=journal.append('event',dict(category='actuator_response_hypothesis_proposal',proposal=spec),
                 episode=episode,sources=tuple(dict.fromkeys(spec['source_evidence']+spec['setting_evidence'])),

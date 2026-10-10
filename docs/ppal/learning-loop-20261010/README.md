@@ -74,3 +74,32 @@ Existing acquisition now retains hash-bound score, controller, event, planning a
 Durable discovery receipts contain filesystem change stamps, permitting unchanged diagnostic inspections to be reused after restart without rehashing or decoding images. These stamps are cache invalidation, never measurement proof; independent qualification still verifies original hashes. Missing or changed referenced artifacts invalidate the receipt. Each turn inspects at most 128 changed episodes; cached episodes no longer prevent later episodes from being reached. Lightweight report-path enumeration and metadata checks still occur.
 
 Host command: `python -m pytest -q tests/test_request_source_discovery.py tests/test_acquisition_investigation.py tests/test_ala_acquisition.py`. [Focused results](history-focused.txt). Fixtures cover missing/corrupt inputs, changes, original request identity, nonfinite timestamps, provenance, restart, request-driven filtering and advancement beyond the processing bound. No authentic independent measurements or native acceptance are established by these fixtures.
+
+## Exploratory admission and Executive-owned staging
+
+Reflection's existing actuator adapter now admits one valid diagnostic response window and a single firing condition for bounded one-action exploration. Tied or weak observations remain explicitly exploratory; no score or reliable-identity claim is made. Existing candidate qualification, deployment, independent final evaluation and frozen SCORE requirements are unchanged.
+
+The existing Executive's read-only portfolio selection can consider held projects for proposal staging. This mode cannot commission execution or clear a hold. The normal `develop` turn calls `stage_evidence_experiment` after acquisition results. Only retained temporal investigations with unresolved ModelFoundry evaluations and hash-consistent Reflection specifications are eligible. The normal portfolio chooses the investigation; no project or episode is supplied by the human collaborator.
+
+A staged proposal retains the exact question, meditation, bookmark, acquisition result, candidate alternatives, expected observation, measurements, one-game scope, independent support/contradiction/inconclusive criteria, constraints, stopping and rollback. It appears in normal `development-status.json` authorization requests. All permissions remain false, and the staged record cannot pass `CapabilityDeployment.activate`, even when supplied with a fixture approval. It creates no prospective deadline. Original candidate paths remain preserved; missing derived checkpoints require exact specification reconstruction in preflight. Changed existing checkpoint bytes reject staging.
+
+This release stages a baseline evidence-collection game with unactivated temporal shadow alternatives. It does not provide a new physical runner or an experiment-specific approval consumer. Before physical execution, the existing runner needs a reviewed binding to the specific proposal, current revision, frozen baseline, calibration/camera and controller configuration. Current preflight is incomplete; no physical authorization is requested or assumed here. Generalized proposal adapters for other investigation methods remain a gap.
+
+Focused command: `python -m pytest -q tests/test_exploratory_proposals.py tests/test_experiment_return.py tests/test_learning_projects.py tests/test_meditation_candidate.py`. [Results](proposal-focused.txt). Fixtures test weak admission, exact source-spec hashes, durable staging, unchanged execution holds, status delivery and deployment refusal. An initial test exposed an invalid cross-episode source reference; it was corrected through the existing consolidation interface and rerun.
+
+## Authentic normal offline continuation
+
+A separate copy of the older preserved host notebook was made at `learning-loop-authentic-continuation`; previous copies and original evidence were retained. No project, candidate or episode was supplied to the Executive.
+
+```bash
+/workspace/scratch/a5d7375d8e4e/ala-loop-env/bin/python main.py --offline --learning-state /workspace/scratch/a5d7375d8e4e/learning-loop-authentic-continuation --episode-root /workspace/scratch/a5d7375d8e4e/authentic-original --learning-turns 3 --learning-budget 2 --learning-interval 0.05
+# Restart: same command with --learning-turns 2
+```
+
+The notebook advanced **593 → 638 records**. Charlie staged proposal `69a07dcf7f557c136da9b7f544b0c90a0e7ebcde7e658c9e2b9e821b657991d4` for retained project `aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c`: “Can temporal estimation improve without promoting uncertain track links?” Journal event `8457511a2a6766c3c175610e28e2caca94b99159d271694d801c2d6f2b02753d` retains the original meditation/evaluation/search links and all three temporal alternatives. Startup found no available originals in this recovered source root, retained the dependencies, and produced the proposal from existing developmental evidence.
+
+Restart retained **638 records**, one proposal and zero capability activations. All **67 original source files** remained hash-identical. The observed decision is a request for new baseline experience and independent measurement, not qualification or capability improvement. No authentic candidate comparison, complete-game SCORE improvement or native Pi behavior was measured. This uses an older transferred notebook, not the inaccessible latest 1,406-record Pi state. Historical recording discovery itself has fixture validation here; this recovered root lacks original report/frame streams for an authentic archive search demonstration.
+
+Evidence: [before](learning-loop-authentic-before.json), [after](learning-loop-authentic-after.json), [restart](learning-loop-authentic-restart.json), [normal-run log](learning-loop-authentic-first.txt), [restart log](learning-loop-authentic-restart.txt). Run provenance records a dirty host worktree; published clean-checkout replay remains a follow-up validation.
+
+Native access again failed with `ssh -o BatchMode=yes -o ConnectTimeout=5 five@charlie 'uname -m'`: hostname resolution failure. Native validation, actual source-layout discovery, environment preflight and specific physical authorization remain essential blockers. No physical execution, movement, flashing or policy activation occurred. ALA-2 remains open.

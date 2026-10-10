@@ -35,8 +35,8 @@ def select_experiment(gateway, journal, game_path, *, horizon_seconds, project_c
             continue
         if (spec.get('schema')=='charlie-actuator-test-v2' and spec.get('body') in AXES and spec.get('body')!='NONE'
                 and spec.get('fire') in AXES and spec.get('fire')!='STAY' and isinstance(spec.get('expected'),str)
-                and spec.get('evidence_windows',0)>=2 and len(spec.get('source_fire_settings',[]))>=2
-                and len(spec.get('source_evidence',[]))>=2 and len(spec.get('proposal_rank',[]))==4):
+                and spec.get('evidence_windows',0)>=1 and len(spec.get('source_fire_settings',[]))>=1
+                and len(spec.get('source_evidence',[]))>=1 and len(spec.get('proposal_rank',[]))==4):
             choices.append((row,spec))
     if not choices:
         return None

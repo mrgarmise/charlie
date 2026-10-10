@@ -109,7 +109,13 @@ python -m pytest -q tests/test_acquisition_investigation.py tests/test_developme
 ```
 
 The broad rerun uses `python -m pytest -q tests --junitxml=docs/ppal/evidence-investigation-20261010/full.xml`.
-Its result is pending at the wait-order repair checkpoint.
+Final result: **750 passed, 21 skipped, zero failures/errors in 230.13 seconds**.
+The final broad suite has 771 tests; it includes the two additional recovery tests.
+The tested code and test bytes match published checkpoint
+`2849346f3f888858bec248cd00b72b88e5e1f0d7`; `tested-source.json` records SHA-256
+values and byte-equality checks. The final qualification commit changes reports
+and restores the acceptance helper's original file mode only. Native Pi acceptance
+and full ALA-2 mission acceptance remain pending.
 
 Milestone A has host-tested routing and provenance-preserved responses. Milestone B
 has host-tested persistence and authentic durable waiting, but native resumption

@@ -1,0 +1,29 @@
+{
+  "published_code_revision": "2849346f3f888858bec248cd00b72b88e5e1f0d7",
+  "files": {
+    "learning/acquisition.py": {
+      "sha256": "63b411a33ddca72b29ddf5dc4a302ca309cab9c30fd81567ebf2a84f686f02a4",
+      "matches_published": true
+    },
+    "learning/lifecycle.py": {
+      "sha256": "2cdf6ea927cd79f2a8da47be18fa629640969698e22a4186b4d6464c8c412216",
+      "matches_published": true
+    },
+    "learning/continuity.py": {
+      "sha256": "2178aaabce3504a5c3ab08e515d3764ba68c896dc8d495dbf5741afbcac72292",
+      "matches_published": true
+    },
+    "memory/learning_projects.py": {
+      "sha256": "4dfcdf5933029f4059574d98d34adb86d0284c34a5f11843a9b8145ac8145987",
+      "matches_published": true
+    },
+    "tests/test_acquisition_investigation.py": {
+      "sha256": "e089ce01777ae738a99bb11ed606b2fa29a10bb450343d8289a29913dfaff9e3",
+      "matches_published": true
+    },
+    "tools/accept_episode_identity_pi.sh": {
+      "sha256": "3ac58d6b6b88844101420265561804597fac5de32f5eec0d64a320e15b8cb201",
+      "matches_published": true
+    }
+  }
+}

@@ -7,8 +7,8 @@ Use an isolated worktree at the implementation SHA shown in the final validation
 ```bash
 cd /home/five/charlie-ala2-bae659f60b0e
 git fetch origin feature/agency-first-self
-# Replace SHA with the pinned published implementation checkpoint:
-git worktree add --detach /home/five/charlie-learning-loop-validation SHA
+# Pinned implementation checkpoint validated on the host:
+git worktree add --detach /home/five/charlie-learning-loop-validation 72b3ce5a42f74fa41d8e25a50805636efeca7ea9
 cd /home/five/charlie-learning-loop-validation
 git rev-parse HEAD
 uname -a

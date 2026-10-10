@@ -1,0 +1,40 @@
+{
+  "timestamp_utc": "2026-10-10T20:09:17.640019+00:00",
+  "implementation_sha": "72b3ce5a42f74fa41d8e25a50805636efeca7ea9",
+  "environment": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "architecture": "x86_64",
+  "command": "CODEX_PRIMARY_RUNTIME_NODE=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node /workspace/scratch/a5d7375d8e4e/ala-loop-env/bin/python -m pytest -q tests --junitxml=/workspace/scratch/a5d7375d8e4e/final-loop-full.xml",
+  "exit_code": 0,
+  "xml": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "21",
+    "tests": "877",
+    "time": "207.688",
+    "timestamp": "2026-10-10T17:04:59.854490-03:00",
+    "hostname": "e9e8ea20b4f5"
+  },
+  "passed": 856,
+  "source_hashes": {
+    "experiments/ppal/controller.py": "8c00f77c26536878604dc1947e0d3d794e1fc3a3744e72eb15457bcc862b6172",
+    "experiments/ppal/controller_sandbox.py": "92d0bdf45db6189a735bba2b2b796c7c491d0fdea5d9afc7c476508b9c8dc234",
+    "experiments/ppal/experiment_return.py": "007ae288c1672fcd2f7e85de88e14b95ea44a5893fa78c81acae5e1de6cb7d78",
+    "experiments/ppal/reflect_robotron.py": "6bb7f593b25c062962052da378fbda714de1d349feb37cde4a3a6dc8ba2a9e9b",
+    "experiments/robotron/live.py": "6d998937f87f445148d4533a0b1efcac71bc2892b5d67dd778e8b80b2236ff01",
+    "learning/acquisition.py": "2a121e87c122a4fe4efaf0a1027d7defadbf8a7dda337119d9a5ab54b10ad85a",
+    "learning/continuity.py": "d1245a5b32df95d7f53cfb7ee38213b22d56e37e549ff2f59dc92c9d46a28a66",
+    "learning/lifecycle.py": "d364200e6cb1ad148fe38e8c60e58cdb2fb9d2c6231a795f0864cedd3df1eca4",
+    "memory/learning_projects.py": "eaec4330f7b80cd9894ec1603af49c7272ca9b9e63777c8e0f921227ff2d7422",
+    "tests/test_controller_sandbox.py": "e0e6059378e74d5a0c9752c8557247425f52cf3eadf1983ae12b99e509ccf609",
+    "tests/test_experiment_return.py": "7a4e93ef18ccdb59750bfa445df13696b1bc51ffbe3904ad47c7ae579918cd7d",
+    "tests/test_exploratory_proposals.py": "b45f867e7969ffcfaa54d8dc13c660531172ab7a749db4d92bb0c77f4a3c7d29",
+    "tests/test_request_source_discovery.py": "2e7779c5a593022003ddfc3e7952a5a40a8a722d4a23e07065850014eb876710"
+  },
+  "xml_sha256": "5c04f9f1bd2651a45b878c931018d87e02c33c21b7e62ba74f40c0444a67c530",
+  "native_validated": false,
+  "physical_execution": false,
+  "learning_improvement": "UNKNOWN",
+  "robotron_complete_game_score_improvement": "UNKNOWN"
+}

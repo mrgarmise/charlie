@@ -57,3 +57,32 @@ Normal command:
 ```
 
 No authentic qualifying corpus, newly eligible motion experiment, learning improvement or complete-game SCORE improvement was obtained. Native source access and independently verified identity/geometry/separated evidence remain essential blockers. The causal sequence through qualified corpus resumption has not been authentically demonstrated.
+
+## Final host validation of published implementation
+
+Published implementation commit: `d1fc96070cdabdf0c5760e819b5b70eb16d123dc`. The nine implementation files are byte-identical between the tested worktree and a separate clean checkout of that published commit (`environment.json`).
+
+Final suite command:
+
+```
+CODEX_PRIMARY_RUNTIME_NODE=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node /workspace/scratch/a5d7375d8e4e/test-env/bin/python -m pytest -q tests --junitxml=docs/ppal/motion-evidence-20261010/full-suite.xml
+```
+
+Result: **795 passed, 21 skipped**, 260.95s; 816 JUnit cases, zero errors/failures. Skips reflect existing unavailable optional dependencies/archives; they do not supply acceptance evidence. Earlier full-suite report predates the stricter corpus gates and is retained under `full-suite-before-corpus-gates`; its results are not substituted for this final validation. The failed focused reports remain preserved.
+
+Unchanged-code restart:593 ->593, identical record IDs, zero appended. Clean published-commit normal application restart:593 ->593, identical record IDs, zero appended (`authentic-published-restart.json`). The original 548-record prefix and all original source bytes remained preserved. These restarts demonstrate durable identity and an evidence-limited wait, not successful developmental learning continuation.
+
+| Claim | Result |
+|---|---|
+| Request-driven source-change discovery and durable failure reports | Implemented; host fixture tests |
+| Original diary/image provenance, alias reuse, invalid/correlated measurement gates | Implemented; host fixture tests |
+| Deferred human identity/position assistance on existing review server | Implemented; real HTTP and JS/DOM-double tests; no authentic operator annotations collected |
+| Provisional pixel displacement and diagnostic feedback to existing Reflection | Implemented; fixture-tested; no independent board-motion qualification |
+| Exact qualified-corpus request receipt and existing agenda continuation | Implemented; synthetic corpus/restart interfaces exercised; no authentic qualified corpus delivered |
+| Authentic normal Executive request/deficiency/receipt/persistence | Older preserved host notebook;548 ->592 ->593; final restart zero |
+| Independently qualified automatic board measurement | Still unavailable; no qualified autonomous measurement method demonstrated |
+| Native acceptance directory/latest Pi notebook | Not accessed; hostname unresolved; supplied native285-test results not independently inspected |
+| Authentic resumed learning experiment or measured learning improvement | Not demonstrated; original dependencies retained |
+| Complete-game physical Robotron SCORE improvement | Not demonstrated; ALA-2 open |
+
+The next essential access input is a reachable SSH hostname/IP for Charlie's Pi, or an exported copy of the stated native acceptance directory and preserved source/notebook artifacts. Inspect those before attributing the native yielded result to resource exhaustion, evidence absence or a handoff failure. No physical gameplay/movement/calibration/policy activation is authorized by this software work.

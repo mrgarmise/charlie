@@ -17,8 +17,12 @@ def test_forbidden_commands_never_reach_wire(token):
 
 @pytest.mark.parametrize('first,second',[('GUIDE_DOWN','BACK'),('BACK_DOWN','GUIDE_DOWN'),('MODE_DOWN','COIN'),('SELECT_DOWN','BTN_MODE')])
 def test_sequential_exit_combo_rejected(first,second):
-    s=ControllerSandbox();wire,held=s.prepare(first);s.commit(held)
-    with pytest.raises(ValueError):s.prepare(second)
+    s=ControllerSandbox()
+    if first in ('GUIDE_DOWN','MODE_DOWN'):
+        with pytest.raises(ValueError):s.prepare(first)
+    else:
+        wire,held=s.prepare(first);s.commit(held)
+        with pytest.raises(ValueError):s.prepare(second)
     wire,held=s.prepare('NEUTRAL');s.commit(held)
     assert not s.held
 
@@ -59,5 +63,56 @@ def test_alternate_live_client_enforces_shared_boundary_without_socket():
     c=Other('not-connected')
     for token in ('RT_DOWN','GUIDE+BACK','A\nQUIT'):
         with pytest.raises(ValueError):c.command(token)
-    c.sandbox.commit({'GUIDE'})
-    with pytest.raises(ValueError):c.command('COIN')
+    with pytest.raises(ValueError):c.sandbox.commit({'GUIDE'})
+    assert not c.sandbox.held
+    with pytest.raises(ValueError):c.command('GUIDE')
+
+
+GUIDE_ALIASES = ('GUIDE','guide','HOME','home','MODE','BTN_MODE','BTN_HOME',
+                 'GUIDE_BUTTON','HOME_BUTTON','XBOX_GUIDE','XBOX_HOME')
+
+@pytest.mark.parametrize('alias', GUIDE_ALIASES)
+@pytest.mark.parametrize('suffix', ('','_DOWN','_UP'))
+def test_guide_home_all_state_transitions_rejected_before_wire(alias,suffix):
+    # In-process stream mock: no actual arcade or controller connection.
+    from unittest.mock import Mock
+    c=ArcadeController.__new__(ArcadeController)
+    c.sandbox=ControllerSandbox();c.closed=False;c.stream=Mock();c.connection=Mock()
+    c._wire_lock=threading.RLock();c._hold_timer=None
+    with pytest.raises(ValueError):c._command(alias+suffix)
+    c.stream.write.assert_not_called()
+    assert not c.sandbox.held
+
+@pytest.mark.parametrize('controls',[('GUIDE',),('HOME','A'),('BACK','GUIDE'),('GUIDE','BACK'),('A','BTN_MODE')])
+def test_both_gameplay_clients_reject_guide_actions_before_any_stick_output(controls):
+    from experiments.robotron.live import ArcadeController as Other
+    from unittest.mock import Mock
+    a=ArcadeController.__new__(ArcadeController);a.closed=False;a.sandbox=ControllerSandbox();a._command=Mock()
+    b=Other('not-connected');b.command=Mock()
+    for c in (a,b):
+        with pytest.raises(ValueError):c.execute(Action('E','N',controls=controls))
+    a._command.assert_not_called();b.command.assert_not_called()
+
+@pytest.mark.parametrize('alias',GUIDE_ALIASES)
+def test_invalid_held_commit_fails_closed_and_neutral_can_recover(alias):
+    s=ControllerSandbox()
+    with pytest.raises(ValueError):s.commit({'A',alias})
+    assert not s.held
+    s.held={alias}  # Defensive check of an externally corrupted state.
+    with pytest.raises(ValueError):s.prepare('LS_UP')
+    wire,held=s.prepare('NEUTRAL');s.commit(held)
+    assert wire=='NEUTRAL' and not s.held
+
+
+def test_exploratory_planner_never_offers_guide_and_rejects_explicit_alias():
+    from experiments.ppal.forebrain import Forebrain
+    from experiments.ppal.controller import DryRunController
+    from experiments.ppal.controller_sandbox import BUTTONS
+    f=Forebrain()
+    assert 'GUIDE' not in BUTTONS
+    for _ in range(len(BUTTONS)+8):
+        action=f.exploratory_action({'context':'unresolved'})
+        validate_controls(action.controls)
+        assert not any(c in GUIDE_ALIASES for c in action.controls)
+    with pytest.raises(ValueError):f.exploratory_action({'context':'unresolved'},controls=['HOME'])
+    with pytest.raises(ValueError):DryRunController().execute(Action(controls=('GUIDE',)))

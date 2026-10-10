@@ -6,13 +6,15 @@ Machine QUIT/operator-selection commands are outside a controller session.
 """
 import re
 
-BUTTONS = ('A', 'B', 'X', 'Y', 'LB', 'RB', 'BACK', 'START', 'GUIDE',
+BUTTONS = ('A', 'B', 'X', 'Y', 'LB', 'RB', 'BACK', 'START',
            'LS_CLICK', 'RS_CLICK', 'LT')
 DEVICES = ('LS', 'RS', 'DPAD')
 POSITIONS = ('CENTER', 'UP', 'UP_RIGHT', 'RIGHT', 'DOWN_RIGHT', 'DOWN',
              'DOWN_LEFT', 'LEFT', 'UP_LEFT')
 ALIASES = {'COIN': 'BACK', 'SELECT': 'BACK', 'BTN_SELECT': 'BACK',
-           'BTN_MODE': 'GUIDE', 'MODE': 'GUIDE', 'RIGHT_TRIGGER': 'RT',
+           'BTN_MODE': 'GUIDE', 'MODE': 'GUIDE', 'HOME': 'GUIDE',
+           'BTN_HOME': 'GUIDE', 'GUIDE_BUTTON': 'GUIDE', 'HOME_BUTTON': 'GUIDE',
+           'XBOX_GUIDE': 'GUIDE', 'XBOX_HOME': 'GUIDE', 'RIGHT_TRIGGER': 'RT',
            'R2': 'RT', 'ABS_RZ': 'RT', 'LEFT_TRIGGER': 'LT', 'L2': 'LT'}
 
 
@@ -20,6 +22,8 @@ def control_name(value):
     if not isinstance(value, str) or not re.fullmatch(r'[A-Za-z0-9_]+', value):
         raise ValueError('one controller token required')
     name = ALIASES.get(value.upper(), value.upper())
+    if name == 'GUIDE':
+        raise ValueError('Guide/Home prohibited unconditionally')
     if name == 'RT':
         raise ValueError('right trigger prohibited')
     if name not in BUTTONS and name not in {d+'_'+p for d in DEVICES for p in POSITIONS}:
@@ -31,8 +35,9 @@ def validate_controls(controls, held=()):
     if isinstance(controls, str):
         raise ValueError('controls must be a sequence of tokens')
     names = tuple(control_name(c) for c in controls)
-    if {'GUIDE', 'BACK'} <= set(names) | set(held):
-        raise ValueError('Guide + Back prohibited')
+    # Held-state aliases are checked as strictly as newly requested controls.
+    for value in held:
+        control_name(value)
     return names
 
 
@@ -48,6 +53,7 @@ class ControllerSandbox:
         command = command.upper()
         if command == 'NEUTRAL':
             return command, set()
+        validate_controls((), self.held)
         # Absolute positions take precedence over legacy UP/DOWN suffixes.
         if command in {d+'_'+p for d in DEVICES for p in POSITIONS}:
             return command, set(self.held)
@@ -63,7 +69,11 @@ class ControllerSandbox:
         return name+suffix, held
 
     def commit(self, held):
-        self.held = held
+        try:
+            self.held = set(validate_controls(held))
+        except ValueError:
+            self.held.clear()
+            raise
 
 
 def validate_bridge_message(message):

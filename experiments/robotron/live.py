@@ -9,7 +9,7 @@ import time
 import threading
 
 from experiments.ppal.models import Action
-from experiments.ppal.controller_sandbox import ControllerSandbox
+from experiments.ppal.controller_sandbox import ControllerSandbox, validate_controls
 
 DIRECTIONS = {'STAY': 'CENTER', 'NONE': 'CENTER', 'N': 'UP', 'NE': 'UP_RIGHT',
               'E': 'RIGHT', 'SE': 'DOWN_RIGHT', 'S': 'DOWN', 'SW': 'DOWN_LEFT',
@@ -63,6 +63,7 @@ class ArcadeController:
         except (OSError,RuntimeError):self._disconnect()
 
     def execute(self, action: Action):
+        validate_controls(action.controls, self.sandbox.held)
         if action.move not in DIRECTIONS or action.fire not in DIRECTIONS:
             raise ValueError('Unsupported PPAL direction')
         self.command('LS_' + DIRECTIONS[action.move])

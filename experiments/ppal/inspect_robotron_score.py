@@ -180,12 +180,21 @@ def queue_rows(journal):
                 timestamp=proposal['timestamp'],terminal_support=proposal['context'].get('terminal_support',False))
         else:p.update(proposed_score=None,confidence=None,timestamp=None,terminal_support=False)
         p.update(review_status=status,review=statuses.get(p['attempt_id']),
+            annotation_history=[dict(id=r.id,**r.data['payload']) for r in annotations if r.data['payload']['proposal_id']==p['proposal_id']],
             annotations=[dict(id=r.id,**r.data['payload']) for r in peers])
         result.append(p)
     return sorted(result,key=lambda p:(p['session'],str(p['number']).zfill(5)))
 
 
 def review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False):
+    if (journal.path.parent/'capture-manifest.json').is_file():
+        raise ValueError('review must use consolidated notebook; sealed original diary is immutable')
+    with journal.batch():
+        return _review_game(journal,identifier,annotator=annotator,verdict=verdict,
+            value=value,reason=reason,independent=independent)
+
+
+def _review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False):
     from .score_observer import ScoreObserver
     from datetime import datetime,timezone
     row=journal.get(identifier);p=row.data['payload']
@@ -214,6 +223,7 @@ def serve_review(journal_path, root=None, port=8769):
     from http.server import BaseHTTPRequestHandler,HTTPServer
     from memory.evidence import EvidenceJournal
     import secrets
+    if (Path(journal_path).parent/'capture-manifest.json').is_file():raise ValueError('sealed original diary cannot be used for review')
     token=secrets.token_urlsafe(24)
     class Handler(BaseHTTPRequestHandler):
         def reply(self,code,body,mime='application/json'):
@@ -235,7 +245,8 @@ def serve_review(journal_path, root=None, port=8769):
                 if url.path=='/image':
                     key=parse_qs(url.query).get('id',[''])[0];p=j.get(key).data['payload']
                     if p.get('category')!='score_review_proposal':raise ValueError('original proposal required')
-                    path=Path(p['artifact']['path']);raw=path.read_bytes()
+                    from .score_observer import ScoreObserver
+                    path=ScoreObserver.review_artifact(j,p);raw=path.read_bytes()
                     if hashlib.sha256(raw).hexdigest()!=p['artifact']['sha256']:raise ValueError('original image changed')
                     return self.reply(200,raw,'image/png' if path.suffix.lower()=='.png' else 'image/jpeg')
                 self.reply(404,b'Not found','text/plain')

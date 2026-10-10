@@ -118,3 +118,47 @@ def test_http_batch_review_preserves_originals_and_restart(tmp_path):
     assert rows[4]['review_status']=='corrected' and rows[4]['proposed_score']==500
     assert rows[4]['annotations'][0]['value']==1234
     j.verify();j.close()
+
+
+def test_review_cannot_mutate_sealed_source_and_annotation_is_atomic(tmp_path):
+    from experiments.ppal.inspect_robotron_score import review_game
+    import pytest
+    root=game(tmp_path/'original');j=EvidenceJournal(root/'session-evidence.sqlite3')
+    row=ScoreObserver.queue_game(j,root,session='fixture',number=1,synthetic=True)
+    before=[r.id for r in j.records()]
+    (root/'capture-manifest.json').write_text('{}')
+    with pytest.raises(ValueError,match='sealed'):review_game(j,row.id,annotator='fixture',verdict='confirm')
+    assert [r.id for r in j.records()]==before
+    j.close()
+
+
+def test_legacy_alias_and_relocated_original_review(tmp_path):
+    import shutil
+    from experiments.ppal.inspect_robotron_score import queue_rows,review_game
+    root=game(tmp_path/'one');alias=tmp_path/'alias';shutil.copytree(root,alias)
+    j=EvidenceJournal(tmp_path/'j.sqlite3')
+    first=ScoreObserver.queue_game(j,root,session='fixture',number=1,synthetic=True)
+    ScoreObserver.queue_game(j,alias,session='fixture',number=2,synthetic=True)
+    assert len(queue_rows(j))==1
+    (root/'original.png').unlink()
+    review_game(j,first.id,annotator='fixture',verdict='confirm')
+    annotation=j.category_records('observation','score_human_annotation')[-1]
+    assert annotation.data['payload']['proposal_id']==first.data['payload']['proposal_id']
+    j.close()
+
+
+def test_preserved_historical_photograph_bytes_and_provenance(tmp_path):
+    """Historical pixels, fixture review metadata; no authentic score label."""
+    import hashlib
+    fixture=Path(__file__).parent/'fixtures'/'robotron-developmental'
+    origin=json.loads((fixture/'provenance.json').read_text())[0]
+    photo=fixture/origin['path']
+    assert hashlib.sha256(photo.read_bytes()).hexdigest()==origin['sha256']
+    j=EvidenceJournal(tmp_path/'j.sqlite3')
+    p=ScoreObserver.review_proposal(j,photo,source_episode=origin['source_run'],timestamp=0.,
+        clock='fixture metadata; original capture time unavailable',proposed=None,confidence=0.,
+        synthetic=True,context={'historical_provenance':origin,'original_capture_time_available':False})
+    assert ScoreObserver.review_artifact(j,p.data['payload']).read_bytes()==photo.read_bytes()
+    assert p.data['payload']['artifact']['sha256']==origin['sha256']
+    assert ScoreObserver.review_metrics(j,partition='diagnostic')['eligible']==0
+    j.verify();j.close()

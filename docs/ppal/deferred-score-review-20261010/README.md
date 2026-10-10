@@ -65,3 +65,25 @@ change current eligibility without deleting the immutable baseline.
 23 tests passed in 0.72s (milestone-d.xml). The 30 certified-game test uses explicitly
 controlled qualification-interface fixtures, not real games. No genuine qualified
 30-game baseline, rolling trend, score-reader gain or Robotron score gain is claimed.
+
+Final integration corrections: the first broad run found 17 failures (retained in
+full-before-finalization-fix.xml): a removed local digest import in perception
+reconciliation, a forbidden direct gameplay journal import, and post-completion
+journal writes invalidating camera-writer receipts. These are repaired without
+weakening the recording gate. Standalone gameplay now stores pending review
+metadata and the exact final-observation image hash in its existing report;
+marathon/acquisition deliver queue records into their existing journal. The sealed
+camera diary is never amended after its writer completion receipt.
+54 integration tests passed in 81.21s, including mocked normal gameplay/controller
+release, original writer completion, startup failure and perception reconciliation.
+These are offline hardware doubles, not armed physical gameplay. 19 feedback tests
+passed in 0.97s. Diagnostic/training reviews now enter existing Reflection context
+and recurring-question interfaces; validation/final labels are not passed to the
+generator. These contexts do not create a human-selected candidate or priority.
+Reviews commit annotation/status atomically, retain superseded history, and reject
+sealed source-diary writes. Hash-matching recorded aliases remain reviewable after
+path relocation. The historical-pixel test preserves
+`003511-review-000-0-gameplay.jpg`, SHA-256
+`bf52abb6f741e8d3e042cf1944adadc6ed7450eb7104e8b2fc068d04741c6c32`.
+Its synthetic review metadata explicitly has no authentic source clock or score
+label; it contributes zero qualified reader examples and zero complete games.

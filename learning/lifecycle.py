@@ -202,6 +202,8 @@ class DevelopmentLifecycle:
         for root in roots:
             if root.is_dir():import_queue(self.journal,root)
         MemoryEvaluator.reconcile_score_reviews(self.journal)
+        from experiments.ppal.reflect_robotron import expose_score_review_contexts
+        expose_score_review_contexts(self.dataset)
         changed |= len(self.journal.records())!=before
         self.acquisition_roots=roots
         changed |= bool(self.respond_to_requests())

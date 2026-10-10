@@ -86,8 +86,8 @@ class MemoryEvaluator:
             if len(values)!=1 or None in values:continue
             revision=p.get('context',{}).get('reader_revision')
             if not revision:deficiencies.append('frozen original reader revision missing');continue
-            raw=Path(p['artifact']['path']).read_bytes()
-            if hashlib.sha256(raw).hexdigest()!=p['artifact']['sha256']:raise ValueError('original score image changed')
+            from experiments.ppal.score_observer import ScoreObserver
+            ScoreObserver.review_artifact(journal,p)
             # All merged diaries must obey the same partition boundary.
             if any(q['partition']!=partition and identity(q)&identity(p) for q in proposals.values()):
                 raise ValueError('source crosses evaluation partitions')
@@ -103,7 +103,7 @@ class MemoryEvaluator:
         outcomes=[]
         for key,p,label,labels in samples:
             begin=time.monotonic()
-            with Image.open(p['artifact']['path']) as original:answer=reader(original.copy())
+            with Image.open(ScoreObserver.review_artifact(journal,p)) as original:answer=reader(original.copy())
             seconds=time.monotonic()-begin
             if not isinstance(answer,(tuple,list)) or len(answer)!=2:raise ValueError('candidate must return score and confidence')
             value,confidence=answer
@@ -354,6 +354,7 @@ class MemoryEvaluator:
         witness, never the independent measurement of itself.
         """
         import math
+        from .evidence import digest
         root=Path(capture_root).resolve()
         cameras={r.id:r for r in journal.category_records('observation','camera_observation')}
         captures={r.data['payload']['observation_id']:r for r in journal.category_records('observation','camera_capture')}

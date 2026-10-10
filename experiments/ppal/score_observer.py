@@ -124,6 +124,28 @@ class ScoreObserver:
                 self.frames.append(self.latest_frame)
 
     @staticmethod
+    def deferred_review_metadata(root, report):
+        """Publish a durable pending record in the existing original report.
+
+        The camera writer's completion receipt is immutable. Review proposals
+        join the existing marathon/notebook journal through normal acquisition.
+        """
+        from pathlib import Path
+        import hashlib
+        root=Path(root).resolve()
+        final=(report.get('score_summary') or {}).get('final_observation') or {}
+        artifact=None;name=final.get('raw_frame')
+        if isinstance(name,str):
+            path=(root/name).resolve()
+            if path.is_relative_to(root) and path.is_file():
+                artifact=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+        return dict(schema='deferred-score-review-v1',status='pending',
+            artifact=artifact,timestamp=final.get('timestamp'),camera_observation_id=final.get('observation_id'),
+            proposed_score=final.get('observed_score'),confidence=final.get('confidence'),
+            qualification='pending original-image inspection; no complete-game score certificate',
+            journal_delivery='existing marathon diary or normal evidence acquisition',physical_authorization=False)
+
+    @staticmethod
     def queue_game(journal, root, *, session, number, interrupted=False, synthetic=False):
         """Append a game attempt to the existing diary; never certify its score.
 
@@ -214,7 +236,7 @@ class ScoreObserver:
             capture_created_at=origin.get('created_at'),
             report_sha256=report_hash,proposal_id=proposal.id if proposal else None,artifact=artifact,
             reported_score=summary.get('self_score',report.get('score')),reader_status=summary.get('status','unmeasured'),
-            start_timestamp=timing.get('started_at'),end_timestamp=timing.get('stopped_at'),
+            start_timestamp=timing.get('started_at',timing.get('gameplay_timer_started_at',timing.get('application_started'))),end_timestamp=timing.get('stopped_at'),
             provenance=report.get('provenance',{}),policy=report.get('policy_identity','unknown'),
             experimental_status=report.get('experiment_status'),
             configuration={k:report.get(k) for k in ('seconds','pulse_ms','armed','learned_semantics')},
@@ -260,6 +282,22 @@ class ScoreObserver:
             episode=source_episode,at=timestamp,sources=[source_id] if source_id else [],producer='ScoreObserver',version='human-review-v1')
 
     @staticmethod
+    def review_artifact(journal,proposal):
+        """Resolve exact bytes at recorded aliases without rewriting original identity."""
+        import hashlib
+        from pathlib import Path
+        expected=proposal['artifact']['sha256']
+        paths=[Path(proposal['artifact']['path'])]
+        paths.extend(Path(r.data['payload']['artifact']['path']) for r in
+            journal.category_records('observation','score_review_proposal')
+            if r.data['payload']['artifact']['sha256']==expected)
+        for path in paths:
+            try:
+                if hashlib.sha256(path.read_bytes()).hexdigest()==expected:return path
+            except OSError:continue
+        raise ValueError('original score image missing or changed')
+
+    @staticmethod
     def annotate_review(journal,proposal_id,*,annotator,verdict,value=None,reason,independent=False,supersedes=None):
         import hashlib
         from datetime import datetime,timezone
@@ -267,8 +305,7 @@ class ScoreObserver:
         row=journal.get(proposal_id);p=row.data['payload']
         if p.get('category')!='score_review_proposal' or not annotator.strip() or not reason.strip():
             raise ValueError('original score proposal, annotator and rationale required')
-        if hashlib.sha256(Path(p['artifact']['path']).read_bytes()).hexdigest()!=p['artifact']['sha256']:
-            raise ValueError('original score image changed')
+        ScoreObserver.review_artifact(journal,p)
         if verdict=='confirm':value=p['proposed_score']
         elif verdict=='unreadable':value=None
         elif verdict!='correct':raise ValueError('confirm, correct or unreadable required')
@@ -317,8 +354,8 @@ class ScoreObserver:
             import hashlib
             p=proposals[key]
             try:
-                if hashlib.sha256(Path(p['artifact']['path']).read_bytes()).hexdigest()!=image:continue
-            except OSError:continue
+                ScoreObserver.review_artifact(journal,p)
+            except (OSError,ValueError):continue
             eligible+=1;prediction=p['proposed_score']
             if prediction is None:abstained+=1;continue
             accepted+=1;correct+=int(prediction==value)

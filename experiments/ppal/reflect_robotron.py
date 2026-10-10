@@ -609,11 +609,43 @@ def reflect_training_extensions(dataset,gateway,registry):
     return output
 
 
+def expose_score_review_contexts(dataset):
+    """Reflection interprets diagnostic feedback; no reviewer chooses a project."""
+    from learning.datasets import SCOPE
+    from experiments.ppal.score_observer import ScoreObserver
+    journal=dataset.journal
+    proposals={r.id:r.data['payload'] for r in journal.category_records('observation','score_review_proposal')}
+    annotations=journal.category_records('observation','score_human_annotation')
+    superseded={r.data['payload'].get('supersedes') for r in annotations}
+    groups={}
+    for r in annotations:
+        a=r.data['payload'];p=proposals[a['proposal_id']]
+        # Validation/final labels are not offered to the generator as training context.
+        if r.id in superseded or p['synthetic'] or p['partition'] not in ('diagnostic','training'):continue
+        try:ScoreObserver.review_artifact(journal,p)
+        except (OSError,ValueError):continue
+        groups.setdefault(p['source_episode'],[]).append(dict(annotation_id=r.id,proposal_id=a['proposal_id'],
+            proposed_score=p['proposed_score'],confidence=p['confidence'],reviewed_value=a['value'],verdict=a['verdict'],
+            independent_review=a['independence_attested'],artifact_sha256=p['artifact']['sha256']))
+    output=[]
+    for episode,rows in sorted(groups.items()):
+        context=dict(score_reviews=rows,questions=[dict(category='score_reader_review_uncertainty',
+            question='Which original observations explain the agreement, disagreement or unreadability in these score reviews?',
+            measured=dict(reviews=len(rows),mismatches=sum(r['proposed_score']!=r['reviewed_value'] for r in rows)))],
+            complete_game_score=False,causal_performance_change='UNKNOWN')
+        output.append(journal.append('observation',dict(category='learning_context_reference',source_episode=episode,
+            source_journal=str(journal.path.resolve()),context=context,prior_use='diagnostic',
+            interpretation='Reflection-originated diagnostic context; reviewer labels do not qualify a game'),
+            episode=SCOPE,producer='existing-evidence-consolidation',version='score-feedback-v1'))
+    return output
+
+
 def reflect_question_investigations(dataset,gateway,registry):
     """Use any existing question category, without assigning a gameplay remedy."""
     from learning.datasets import SCOPE
     from memory.evidence import digest,canonical
     from learning.episode_identity import eligible, canonical_experience
+    expose_score_review_contexts(dataset)
     grouped={}
     for record in dataset.journal.records('observation'):
         p=record.data['payload']

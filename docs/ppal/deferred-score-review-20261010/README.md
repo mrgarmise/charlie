@@ -49,3 +49,19 @@ review statuses. Legacy content aliases do not create extra queue games.
 32 tests passed in 3.79s (milestone-c.xml), including normal acquisition/restart and
 candidate interface fixtures. There are no new authentic independent reviews,
 Charlie-originated score-reader candidates or native Pi results in this environment.
+
+Milestone D: the same inspector exposes policy-separated qualified history and
+rolling 10/30 batches with variability, standard error, exact contributing records
+and descriptive uncertainty. Every measurement passes the existing independent
+complete-game certificate validator. Duplicate or conflicting capture aliases,
+unqualified scores, noninteger values and mixed-condition rolling batches are
+excluded. Evidence order is journal order; clocks from different sessions are not
+silently treated as globally synchronized capture chronology.
+Freeze a reproducible collection with:
+`python -m experiments.ppal.inspect_robotron_score --review-journal /existing/notebook/learning-evidence.sqlite3 --freeze-baseline NAME --baseline-policy EXACT_POLICY --baseline-count 10`.
+This freezes the last 10 currently qualified records for that policy. The named
+snapshot cannot be replaced; policy and conditions must agree. Invalidated proofs
+change current eligibility without deleting the immutable baseline.
+23 tests passed in 0.72s (milestone-d.xml). The 30 certified-game test uses explicitly
+controlled qualification-interface fixtures, not real games. No genuine qualified
+30-game baseline, rolling trend, score-reader gain or Robotron score gain is claimed.

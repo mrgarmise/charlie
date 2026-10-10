@@ -40,8 +40,22 @@ def main() -> None:
     ap.add_argument('--queue-root',type=Path,help='authorized saved marathon/game tree')
     ap.add_argument('--serve-review',action='store_true',help='deferred review on loopback; no gameplay capability')
     ap.add_argument('--review-port',type=int,default=8769)
+    ap.add_argument('--freeze-baseline',help='immutable baseline name from qualified complete games')
+    ap.add_argument('--baseline-policy',help='exact qualified policy identity')
+    ap.add_argument('--baseline-count',type=int,default=10)
     args=ap.parse_args()
     from .score_observer import ScoreObserver
+    if args.freeze_baseline:
+        if not args.review_journal or not args.review_journal.is_file() or not args.baseline_policy:ap.error('existing journal and exact baseline policy required')
+        from memory.evidence import EvidenceJournal
+        j=EvidenceJournal(args.review_journal)
+        try:
+            rows=performance_history(j).get(args.baseline_policy,{}).get('records',[])
+            if args.baseline_count<1 or len(rows)<args.baseline_count:raise ValueError('insufficient qualified complete games')
+            result=freeze_baseline(j,args.freeze_baseline,args.baseline_policy,[r['id'] for r in rows[-args.baseline_count:]])
+            print(json.dumps(result.data,indent=2))
+        finally:j.close()
+        return
     if args.queue_root or args.serve_review:
         if not args.review_journal or not args.review_journal.is_file():ap.error('existing operator review journal required')
         if args.serve_review:
@@ -217,7 +231,7 @@ def serve_review(journal_path, root=None, port=8769):
             try:
                 if url.path=='/queue':
                     if root:import_queue(j,root)
-                    return self.reply(200,json.dumps(dict(games=queue_rows(j),history=performance_history(j))))
+                    return self.reply(200,json.dumps(dict(games=queue_rows(j),history=performance_history(j),baselines=baseline_history(j))))
                 if url.path=='/image':
                     key=parse_qs(url.query).get('id',[''])[0];p=j.get(key).data['payload']
                     if p.get('category')!='score_review_proposal':raise ValueError('original proposal required')
@@ -245,26 +259,82 @@ def serve_review(journal_path, root=None, port=8769):
 
 
 def performance_history(journal):
-    """Only existing independent certificates admit complete-game averages."""
+    """Existing independent certificates alone admit complete-game averages."""
     from experiments.comparison.robotron import validate_certificates
     from learning.episode_identity import canonical_experience
+    from memory.evidence import digest
     import statistics
-    groups={};seen=set()
+    experiences={}
     for r in journal.category_records('observation','robotron_evaluation_episode'):
         p=r.data['payload']
         try:
             validate_certificates(journal,p)
             identity=canonical_experience(journal,p['source_episode'])
             values={m['value'] for m in p['score_observations']}
-            if p.get('confirmed_terminal') is not True or len(values)!=1 or identity in seen:continue
+            boundary=journal.get(p['boundary_certificate']).data['payload']
+            if p.get('synthetic') or p.get('confirmed_terminal') is not True or len(values)!=1:continue
+            if boundary.get('policy')!=p['policy']:continue
             value=values.pop()
-            if type(value) is not int or value<0:continue
-            seen.add(identity);groups.setdefault(p['policy'],[]).append(dict(id=r.id,value=value,experience=identity))
+            if type(value) is not int or value<0 or not isinstance(p['policy'],str):continue
+            row=dict(id=r.id,value=value,experience=identity,policy=p['policy'],
+                conditions=p.get('conditions',{}),sequence=r.sequence,
+                terminal_timestamp=max(f['timestamp'] for f in boundary['terminal_frames']))
+            experiences.setdefault(identity,[]).append(row)
         except (ValueError,KeyError,OSError,TypeError):continue
-    return {policy:dict(qualified_games=len(rows),records=rows,
-        rolling={str(n):dict(mean=statistics.mean([r['value'] for r in rows[-n:]]),
-            standard_deviation=statistics.stdev([r['value'] for r in rows[-n:]]),count=n,
-            uncertainty='descriptive complete-game batch; no causal improvement inferred') if len(rows)>=n else None for n in (10,30)}) for policy,rows in groups.items()}
+    groups={}
+    for peers in experiences.values():
+        # Conflicting relabelings of one capture are not separate policy trials.
+        if len({(r['policy'],r['value'],digest(r['conditions'])) for r in peers})!=1:continue
+        row=min(peers,key=lambda r:r['sequence']);groups.setdefault(row['policy'],[]).append(row)
+    result={}
+    for policy,rows in groups.items():
+        rows.sort(key=lambda r:r['sequence'])
+        rolling={}
+        for n in (10,30):
+            batch=rows[-n:]
+            if len(batch)<n or len({digest(r['conditions']) for r in batch})!=1:rolling[str(n)]=None;continue
+            values=[r['value'] for r in batch]
+            rolling[str(n)]=dict(mean=statistics.mean(values),standard_deviation=statistics.stdev(values),
+                standard_error=statistics.stdev(values)/(n**.5),count=n,record_ids=[r['id'] for r in batch],
+                uncertainty='descriptive complete-game batch; no causal improvement inferred')
+        result[policy]=dict(qualified_games=len(rows),records=rows,rolling=rolling,
+            order='durable evidence sequence; capture clocks are not comparable across sessions',
+            exclusions='duplicates, conflicts, uncertified games and mixed-condition rolling batches')
+    return result
+
+
+def freeze_baseline(journal,name,policy,record_ids):
+    """Freeze a reproducible qualified collection; grant no gameplay authority."""
+    from memory.evidence import digest
+    import statistics
+    if not isinstance(name,str) or not name.strip() or not record_ids or len(record_ids)!=len(set(record_ids)):
+        raise ValueError('named distinct qualified baseline games required')
+    available={r['id']:r for r in performance_history(journal).get(policy,{}).get('records',[])}
+    if any(i not in available for i in record_ids):raise ValueError('baseline requires independently qualified games of one policy')
+    rows=[available[i] for i in record_ids]
+    if len({digest(r['conditions']) for r in rows})!=1:raise ValueError('baseline conditions must remain frozen')
+    prior=[r for r in journal.category_records('observation','score_baseline_snapshot') if r.data['payload']['name']==name]
+    if prior:
+        if prior[-1].data['payload']['record_ids']!=record_ids or prior[-1].data['payload']['policy']!=policy:
+            raise ValueError('named frozen baseline cannot be replaced')
+        return prior[-1]
+    values=[r['value'] for r in rows]
+    return journal.append('observation',dict(category='score_baseline_snapshot',name=name,policy=policy,
+        record_ids=record_ids,records=rows,collection_sha256=digest(rows),conditions=rows[0]['conditions'],
+        mean=statistics.mean(values),standard_deviation=statistics.stdev(values) if len(values)>1 else None,
+        count=len(rows),physical_authorization=False,
+        uncertainty='frozen descriptive collection; prospective independent comparison still required'),
+        episode='qualified-score-history',producer='existing-comparison',version='deferred-score-history-v1')
+
+
+def baseline_history(journal):
+    """Original snapshot remains frozen even if a certificate later fails."""
+    current=performance_history(journal)
+    result=[]
+    for row in journal.category_records('observation','score_baseline_snapshot'):
+        p=row.data['payload'];available={r['id'] for r in current.get(p['policy'],{}).get('records',[])}
+        result.append(dict(id=row.id,**p,currently_qualified=all(i in available for i in p['record_ids'])))
+    return result
 
 
 if __name__=="__main__":main()

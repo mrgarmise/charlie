@@ -123,6 +123,97 @@ class ScoreObserver:
                 self.frames.append(self.latest_frame)
 
     @staticmethod
+    def queue_game(journal, root, *, session, number, interrupted=False, synthetic=False):
+        """Append a game attempt to the existing diary; never certify its score.
+
+        This is called before and after the game child, without human interaction.
+        An interrupted/missing report remains an inspectable immutable record.
+        """
+        from pathlib import Path
+        import hashlib,math
+        from memory.evidence import digest
+        root=Path(root).resolve()
+        attempt='score-attempt:'+digest(dict(session=str(session),number=number))
+        old=[r for r in journal.category_records('observation','score_game_record')
+             if r.data['payload']['attempt_id']==attempt]
+        deficiencies=[];report={};report_hash=None;origin={}
+        try:
+            raw=(root/'report.json').read_bytes();report=json.loads(raw)
+            if not isinstance(report,dict):raise ValueError('report object required')
+            report_hash=hashlib.sha256(raw).hexdigest()
+        except (OSError,ValueError) as exc:
+            report={};deficiencies.append('Report unavailable: '+str(exc))
+        try:origin=json.loads((root/'capture-origin.json').read_text())
+        except (OSError,ValueError):pass
+        source_episode=origin.get('capture_id') or attempt
+        if report_hash:source_episode='episode:'+report_hash
+        capture_key=origin.get('capture_id') or attempt
+        summary=report.get('score_summary') or {};boundary=report.get('episode_end') or {}
+        terminal_times=(boundary.get('evidence') or {}).get('terminal_capture_timestamps',[])
+        observations=[]
+        try:
+            with (root/'score.jsonl').open() as stream:
+                for line,text in enumerate(stream,1):
+                    try:
+                        row=json.loads(text)
+                        if row.get('raw_frame'):observations.append(dict(row,line=line))
+                        observations=observations[-64:]
+                    except (ValueError,AttributeError):deficiencies.append('Unreadable score row '+str(line))
+        except OSError:pass
+        final=summary.get('final_observation')
+        if isinstance(final,dict) and final.get('raw_frame'):
+            match=next((r for r in reversed(observations) if r.get('sample')==final.get('sample')),None)
+            if not match:observations.append(dict(final,p1=dict(observed_score=final.get('observed_score'),confidence=final.get('confidence',0))))
+        selected=None;artifact=None
+        # Prefer score observations actually bound to the terminal sequence.
+        ordered=sorted(observations,key=lambda r:r.get('timestamp') in terminal_times)
+        for row in reversed(ordered):
+            name=row.get('raw_frame')
+            if not isinstance(name,str):continue
+            path=(root/name).resolve()
+            if not path.is_relative_to(root):deficiencies.append('Frame escapes original capture');continue
+            try:
+                from PIL import Image
+                with Image.open(path) as image:image.verify()
+                artifact=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+            except (OSError,ValueError):continue
+            selected=row;break
+        proposal=None
+        if selected:
+            at=selected.get('timestamp',selected.get('t'));channel=selected.get('p1') or {}
+            value=channel.get('observed_score',channel.get('observed'));confidence=channel.get('confidence',0)
+            if type(value) is not int or value<0:value=None
+            if type(confidence) not in (int,float) or not math.isfinite(confidence) or not 0<=confidence<=1:confidence=0
+            if type(at) in (int,float) and math.isfinite(at) and at>=0:
+                source=journal.append('observation',dict(category='score_review_source',artifact=artifact,
+                    camera_observation_id=selected.get('observation_id'),score_row=selected,
+                    score_log_sha256=hashlib.sha256((root/'score.jsonl').read_bytes()).hexdigest() if (root/'score.jsonl').exists() else None),
+                    episode=source_episode,at=at,producer='ScoreObserver',version='deferred-review-v1')
+                proposal=ScoreObserver.review_proposal(journal,artifact['path'],source_episode=source_episode,
+                    timestamp=at,clock='original camera capture monotonic',source_id=source.id,
+                    proposed=value,confidence=confidence,synthetic=synthetic or report.get('simulation',False),
+                    context=dict(source_session=str(session),reader_revision=(report.get('provenance') or {}).get('code_revision'),
+                        capture_key=capture_key,terminal_support=at in terminal_times and boundary.get('confirmed') is True))
+            else:deficiencies.append('Original capture timestamp unavailable')
+        else:deficiencies.append('Original readable image unavailable')
+        timing=report.get('session_timing') or {}
+        payload=dict(category='score_game_record',attempt_id=attempt,capture_key=capture_key,
+            session=str(session),number=number,source_root=str(root),source_episode=source_episode,
+            report_sha256=report_hash,proposal_id=proposal.id if proposal else None,artifact=artifact,
+            reported_score=summary.get('self_score',report.get('score')),reader_status=summary.get('status','unmeasured'),
+            start_timestamp=timing.get('started_at'),end_timestamp=timing.get('stopped_at'),
+            provenance=report.get('provenance',{}),policy=report.get('planning_mode','unknown'),
+            configuration={k:report.get(k) for k in ('seconds','pulse_ms','armed','learned_semantics')},
+            result=report.get('result','interrupted' if interrupted else 'awaiting report'),
+            boundary=boundary,complete_game_claim=boundary.get('confirmed') is True,
+            synthetic=synthetic or report.get('simulation',False),deficiencies=deficiencies,
+            previous=old[-1].id if old else None,physical_authorization=False,
+            qualification='reported attempt only; no independent complete-game score certificate')
+        if old and all(old[-1].data['payload'].get(k)==v for k,v in payload.items() if k!='previous'):return old[-1]
+        return journal.append('observation',payload,episode=source_episode,
+            sources=[proposal.id] if proposal else [],producer='ScoreObserver',version='deferred-review-v1')
+
+    @staticmethod
     def review_proposal(journal,frame,*,source_episode,timestamp,clock,proposed,confidence,
                         source_id=None,context=None,partition='diagnostic',synthetic=False):
         """Immutable score proposal for existing offline inspection; never a certificate."""
@@ -155,7 +246,7 @@ class ScoreObserver:
             episode=source_episode,at=timestamp,sources=[source_id] if source_id else [],producer='ScoreObserver',version='human-review-v1')
 
     @staticmethod
-    def annotate_review(journal,proposal_id,*,annotator,verdict,value=None,reason,independent=False):
+    def annotate_review(journal,proposal_id,*,annotator,verdict,value=None,reason,independent=False,supersedes=None):
         import hashlib
         from datetime import datetime,timezone
         from pathlib import Path
@@ -168,11 +259,15 @@ class ScoreObserver:
         elif verdict=='unreadable':value=None
         elif verdict!='correct':raise ValueError('confirm, correct or unreadable required')
         if verdict!='unreadable' and (type(value) is not int or value<0):raise ValueError('readable annotation requires exact nonnegative digits')
+        if supersedes:
+            prior=journal.get(supersedes).data['payload']
+            if prior.get('category')!='score_human_annotation' or prior.get('proposal_id')!=proposal_id or prior.get('annotator')!=annotator:
+                raise ValueError('correction must supersede this reviewer and proposal')
         return journal.append('observation',dict(category='score_human_annotation',proposal_id=proposal_id,
             annotator=annotator,verdict=verdict,value=value,reason=reason,independence_attested=bool(independent),
             reviewed_at=datetime.now(timezone.utc).isoformat(),artifact_sha256=p['artifact']['sha256'],
             source_episode=p['source_episode'],timestamp=p['timestamp'],partition=p['partition'],synthetic=p['synthetic'],
-            qualification='human annotation; complete-game boundary and independent qualification still required'),
+            supersedes=supersedes,qualification='human annotation; complete-game boundary and independent qualification still required'),
             episode=row.data['episode'],sources=[proposal_id],producer='human-score-review',version='1')
 
     @staticmethod
@@ -181,7 +276,10 @@ class ScoreObserver:
         proposals={r.id:r.data['payload'] for r in journal.category_records('observation','score_review_proposal')
                    if r.data['payload']['partition']==partition and not r.data['payload']['synthetic']}
         annotations={}
-        for r in journal.category_records('observation','score_human_annotation'):
+        all_annotations=journal.category_records('observation','score_human_annotation')
+        superseded={r.data['payload'].get('supersedes') for r in all_annotations}
+        for r in all_annotations:
+            if r.id in superseded:continue
             p=r.data['payload']
             if p['proposal_id'] in proposals and p['independence_attested']:
                 annotations.setdefault(p['proposal_id'],[]).append(p)

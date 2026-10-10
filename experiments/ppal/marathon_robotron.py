@@ -291,8 +291,11 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 doc['games'].append(dict(path=str(game),experiment=plan,status='recording',
                     reason_for_experiment=reason))
                 write_session(session/'session.json',doc)
+            from .score_observer import ScoreObserver
+            ScoreObserver.queue_game(commitments,game,session=session,number=index)
             rc=driver(cmd,30.)
             report=load_report(game/'report.json')
+            ScoreObserver.queue_game(commitments,game,session=session,number=index)
             entry={'path':str(game),'returncode':rc,'result':report.get('result') if report else 'missing report',
                    'experiment':plan,'reason_for_experiment':reason,
                    'supervision':load_report(game.parent/(game.name+'-progress-supervisor.json'))}
@@ -361,6 +364,10 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
         print(f"DEVELOPMENT STOP: {doc['error']}",flush=True)
     finally:
         if primary_claim:primary_claim.__exit__(None,None,None)
+        if 'game' in locals():
+            from .score_observer import ScoreObserver
+            ScoreObserver.queue_game(commitments,game,session=session,number=index,
+                interrupted=doc['status'] in ('interrupted','between_game_failure','child_timeout'))
         if plan and not play_first and not any(r.data['payload']['prediction_id']==plan['prediction_id'] for r in commitments.records('resolution')):
             try:
                 unresolved=commitments.resolve(plan['prediction_id'],sources=(),result='unresolved',

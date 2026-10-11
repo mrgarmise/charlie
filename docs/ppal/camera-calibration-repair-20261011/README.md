@@ -47,7 +47,7 @@ git worktree add --detach "$repair_dir" "$repair_sha"
 cd "$repair_dir"
 python -m pytest -q tests/test_robotron_autofocus.py tests/test_robotron_changed_installation.py tests/test_robotron_preflight.py tests/test_robotron_exposure.py tests/test_ppal_settle.py tests/test_robotron_startup_boundaries.py tests/test_sensory_recording.py
 run_dir="/home/five/Projects/charlie/robotron-runs/camera-only-$(date -u +%Y%m%d-%H%M%S)"
-python -m experiments.ppal.preflight --output "$run_dir" --timeout 120
+timeout --signal=INT --kill-after=5s 150s python -m experiments.ppal.preflight --output "$run_dir" --timeout 120
 sha256sum "$run_dir"/*.json "$run_dir"/*.png
 ```
 
@@ -86,3 +86,9 @@ The first broad regression run passed **876 tests, 21 skipped, zero failures/err
 `git diff --check`, compilation of the changed Python modules and `python -m experiments.ppal.preflight --help` passed. Native acceptance and camera-on-Pi performance are pending. Full-suite final evidence is recorded alongside this report.
 
 Final maintained regression: **882 passed, 21 skipped, zero failures/errors** (903 cases), 205.958 seconds; exit 0. Command and evidence hashes: [machine report](VALIDATION.json); [full JUnit](full.xml). Skips are existing optional Torch coverage unavailable on this host. Captured full stdout is partial; the complete JUnit XML and exit code are authoritative. The final focused suite additionally verifies the last strict boolean-state metadata guard. No native acceptance is implied.
+
+Camera request completion still depends on the existing Picamera2 driver. The native acceptance command therefore also uses an external 150-second interrupt/kill bound; it does not authorize controller or servo operations. Normal gameplay retains its existing out-of-process observation supervision. libcamera control semantics were checked against the [official controls reference](https://docs.libcamera.org/master/internal-api/namespacelibcamera_1_1controls.html): Focused is the AF algorithm’s belief; manual mode reports Idle. These reports do not replace image-quality validation.
+
+## Clean published-revision verification
+
+A separate clean worktree at implementation commit **`bd605d9f794a52850d614f89df7b2a495ebdf607`**, tree `e694446d28e7fb4b9276cc4e8976915fe4e2dd19`, independently reran the maintained suite: **882 passed, 21 skipped, zero failures/errors**, 208.870 seconds, exit 0. All 13 recorded Python source hashes matched, compilation passed and Git status remained clean. [Machine report](PUBLISHED-VALIDATION.json), [complete JUnit](published-full.xml). This includes the final strict metadata guard at the exact recoverable published revision. The later reporting commit changes documentation/evidence only; no native behavior or deployment is claimed.

@@ -40,6 +40,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         def close(self): closed.append('camera')
     class Recognizer:
         def detect(self,frame):
+            if persistent=='empty_attract':return []
             # Only the wrong stationary center object looks like PLAYER.
             return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
                      {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
@@ -86,6 +87,8 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         def screen(frame):
             if 'START' not in commands:return dict(state='not_gameplay',phase='startable')
             elapsed_reads=reads[0]-start_read[0]
+            if persistent=='empty_attract' and 100<=elapsed_reads<110:
+                return dict(state='not_gameplay',phase='unknown',reason='unrecognized_striped_page')
             return dict(state='gameplay' if elapsed_reads<100 else 'not_gameplay',
                         phase='gameplay' if elapsed_reads<100 else 'terminal' if elapsed_reads<104 else 'startable')
         monkeypatch.setattr(play,'classify_screen_state',screen)
@@ -287,3 +290,8 @@ def test_initial_discovery_failure_escalates_recovers_and_completes_without_iden
 def test_initial_discovery_failure_keeps_playing_until_fresh_confirmed_terminal(monkeypatch,tmp_path):
     test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
         False,False,False,False,False,False,False,False,persistent='terminal_without_self')
+
+
+def test_no_plausible_self_qualifies_generic_failure_and_observes_attract(monkeypatch,tmp_path):
+    test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+        False,False,False,False,False,False,False,False,persistent='empty_attract')

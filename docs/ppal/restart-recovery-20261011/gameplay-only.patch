@@ -1,0 +1,192 @@
+diff --git a/experiments/ppal/episode_end.py b/experiments/ppal/episode_end.py
+index c0d288f..20f622f 100644
+--- a/experiments/ppal/episode_end.py
++++ b/experiments/ppal/episode_end.py
+@@ -7,6 +7,7 @@ corroborated by failure to demonstrate a controllable SELF.
+ from __future__ import annotations
+ 
+ from dataclasses import dataclass
++import math
+ 
+ 
+ @dataclass
+@@ -25,6 +26,8 @@ class EpisodeEndObserver:
+     terminal_captures: list | None = None
+     attract_captures: list | None = None
+ 
++    discovery_evidence: dict | None = None
++
+     def observe_phase(self, screen: dict) -> None:
+         """Fresh positive page transitions; UNKNOWN/SELF absence never suffice."""
+         at=screen.get('capture_timestamp')
+@@ -37,7 +40,11 @@ class EpisodeEndObserver:
+         if self.phase_history is None:self.phase_history=[]
+         if not self.phase_history or self.phase_history[-1]['phase']!=phase:
+             self.phase_history.append(dict(phase=phase,capture_timestamp=at,reason=screen.get('reason'),label_scores=screen.get('label_scores')))
+-        self.observe_screen(screen.get('state','unknown') if phase in ('gameplay','terminal','startable','title') else 'unknown')
++        # Positive striped-border evidence remains useful even without a page
++        # heading. It is never itself START authorization.
++        state = screen.get('state','unknown')
++        self.observe_screen(state if phase in ('gameplay','terminal','startable','title')
++                            or (state=='not_gameplay' and screen.get('reason')=='unrecognized_striped_page') else 'unknown')
+         if phase=='gameplay':
+             self.established_gameplay=True;self.terminal_streak=0;self.terminal_corroborated=False;self.attract_streak=0
+             self.terminal_captures=[];self.attract_captures=[]
+@@ -77,16 +84,36 @@ class EpisodeEndObserver:
+         else:
+             self.agency_failures += 1
+ 
++    def observe_discovery(self, result: dict) -> bool:
++        """Qualify bounded generic probes, not appearance or absence of sprites."""
++        times=result.get('capture_timestamps') or []
++        commands=result.get('commands') or []
++        valid=(result.get('schema')=='causal-discovery-result-v1'
++               and result.get('complete') is True
++               and result.get('confirmed_self') is False
++               and all(x in commands for x in ('E','W','S','N'))
++               and commands.count('STAY')>=4 and len(times)>=9
++               and all(isinstance(t,(int,float)) and not isinstance(t,bool) and math.isfinite(t) for t in times)
++               and all(b>a for a,b in zip(times,times[1:]))
++               and (self.discovery_evidence is None or times[-1]>self.discovery_evidence['capture_timestamps'][-1]))
++        if valid:
++            self.discovery_evidence=dict(result)
++            self.observe_agency(False)
++        return valid
++
+     def self_reacquired(self) -> None:
+         """A trustworthy SELF observation clears accumulated terminal suspicion."""
+         if not self.phase_history or self.phase_history[-1]['phase']=='gameplay':self.not_gameplay_streak = 0
+         self.agency_failures = 0
++        self.discovery_evidence = None
+ 
+     @property
+     def confirmed(self) -> bool:
+         return self.visual_boundary or (
+             self.not_gameplay_streak >= self.required_not_gameplay
+             and self.agency_failures >= 1
++            and (not self.phase_history or (self.phase_history[-1]['phase'] in ('terminal','startable','title')
++                 and max(self.terminal_streak,self.attract_streak)>=3))
+         )
+ 
+     def evidence(self, *, screen: dict, self_lost_frames: int) -> dict:
+@@ -99,6 +126,7 @@ class EpisodeEndObserver:
+             "terminal_capture_timestamps":self.terminal_captures or [],"attract_capture_timestamps":self.attract_captures or [],
+             "not_gameplay_streak": self.not_gameplay_streak,
+             "agency_failures": self.agency_failures,
++            "generic_discovery": self.discovery_evidence,
+             "screen": screen,
+             "self_lost_frames": self_lost_frames,
+         }
+diff --git a/experiments/ppal/play_robotron.py b/experiments/ppal/play_robotron.py
+index ef40953..ede3a37 100644
+--- a/experiments/ppal/play_robotron.py
++++ b/experiments/ppal/play_robotron.py
+@@ -854,6 +854,7 @@ def main():
+         tick = 0
+         lost = 0
+         recovery_round = 0
++        recovery_since = None
+         pending_move = None
+         pending_at = None
+         pending_origin = None
+@@ -969,12 +970,29 @@ def main():
+                 recovered = None  # Global resemblance is not proof of a new SELF.
+ 
+                 recovery = "generic_visual_agency"
++                if recovery_since is None:recovery_since=time.monotonic()
++                recovery_elapsed=time.monotonic()-recovery_since
++                # Experimental observation cadence, never an episode deadline.
++                # Beyond the initial budget, sample a quiet fresh-frame window
++                # before another bounded fallback probe batch.
++                if recovery_elapsed>=30.:
++                    recorder.event('agency_boundary_observation',dict(elapsed_seconds=recovery_elapsed,
++                        initial_budget_seconds=30., fallback_budget_seconds=120.,
++                        stage='fallback' if recovery_elapsed<120. else 'continued_observation',
++                        interpretation='cadence only; no time-derived game-over or START authority'),at=time.monotonic())
++                    for _ in range(8):
++                        read_agency_pairs()
++                        if episode_observer.confirmed:break
+                 recovery_round += 1
+                 pulse_ms = (60, 120, 240)[min(recovery_round-1, 2)]
+                 response_frames = 2 if recovery_round == 1 else 3
+                 # Recovery probes are declared diagnostic interventions, not a
+                 # learned policy, a new baseline or proof that longer is better.
++                probe_deadline=min(deadline,time.monotonic()+30.)
++                if recovery_elapsed<30.:probe_deadline=min(probe_deadline,recovery_since+30.)
++                elif recovery_elapsed<120.:probe_deadline=min(probe_deadline,recovery_since+120.)
+                 proposal = dict(round=recovery_round, baseline_pulse_ms=60,
++                    initial_budget_seconds=30., fallback_budget_seconds=120., batch_deadline=probe_deadline,
+                     pulse_ms=pulse_ms,response_frames=response_frames,
+                     question='can a longer bounded BODY response window establish causal SELF?',
+                     reason='prior discovery did not establish controllable SELF',
+@@ -982,9 +1000,12 @@ def main():
+                 recorder.event('agency_recovery_plan',proposal,at=time.monotonic())
+                 recovered = visual_agency.discover(
+                     read_agency_pairs, controller, pulse_ms=pulse_ms,
+-                    response_frames=response_frames,deadline=deadline,record=record_agency,
++                    response_frames=response_frames,deadline=probe_deadline,record=record_agency,
+                     observation_time=lambda: source.timestamp,
+                     should_stop=lambda: episode_observer.confirmed)
++                probe_result=visual_agency.last_discovery
++                negative_qualified=episode_observer.observe_discovery(probe_result)
++                recorder.event('agency_discovery_result',dict(probe_result,negative_qualified=negative_qualified),at=time.monotonic())
+                 recorder.event('agency_recovery_outcome',dict(proposal,
+                     self_established=visual_agency.agency.self_id is not None,
+                     identity_status=visual_agency.agency.last_snapshot.get('identity_status','unknown'),
+@@ -1130,6 +1151,7 @@ def main():
+                 phase(SessionState.PLAYING, 'SELF reacquired; no new-game inference')
+                 lost = 0
+                 recovery_round = 0
++                recovery_since = None
+                 tick += 1
+                 continue
+ 
+diff --git a/experiments/ppal/robotron_agency.py b/experiments/ppal/robotron_agency.py
+index 661cfdb..580ef25 100644
+--- a/experiments/ppal/robotron_agency.py
++++ b/experiments/ppal/robotron_agency.py
+@@ -1,5 +1,6 @@
+ """Robotron BODY control adapter for generic agency inference."""
+ import time
++import math
+ 
+ from .agency import AgencyTracker
+ from .eyes.tracking import SpriteTracker
+@@ -90,6 +91,8 @@ class VisualAgency:
+         reference to the second endpoint, then an independent neutral interval.
+         The intermediate exposure is retained without scoring an early response.
+         """
++        self.last_discovery = dict(schema='causal-discovery-result-v1', commands=[], capture_timestamps=[],
++                                   confirmed_self=False, complete=False)
+         if response_frames not in (2, 3):
+             raise ValueError('agency response window must contain two or three fresh frames')
+         def stopped():
+@@ -98,6 +101,7 @@ class VisualAgency:
+         if stopped():return self.player
+         pairs = read_pairs()
+         initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
++        self.last_discovery['capture_timestamps'].append(self.tracker.last_update['observed_at'])
+         if record:
+             record(initial)  # pre-command detections are essential for exact replay
+         if stopped():return self.player
+@@ -150,6 +154,8 @@ class VisualAgency:
+                 snapshot = self.observe(pairs, direction, time.monotonic()-start,
+                                         observed_at=at,
+                                         reference_positions=origin if direction != 'STAY' else None)
++                self.last_discovery['commands'].append(direction)
++                self.last_discovery['capture_timestamps'].append(at)
+                 snapshot['actuators'] = {'body':direction, 'fire':fire, 'pulse_ms':pulse_ms}
+                 if direction != 'STAY':
+                     snapshot['phase'] = 'action_response_window'
+@@ -160,4 +166,11 @@ class VisualAgency:
+                     record(snapshot)
+             if self.player is not None:
+                 break
++        self.last_discovery['confirmed_self'] = self.agency.self_id is not None
++        times = self.last_discovery['capture_timestamps']
++        commands = self.last_discovery['commands']
++        self.last_discovery['complete'] = (all(x in commands for x in ('E','W','S','N'))
++            and commands.count('STAY') >= 4 and len(times) >= 9
++            and all(isinstance(t,(float,int)) and math.isfinite(t) for t in times)
++            and all(b>a for a,b in zip(times,times[1:])))
+         return self.player

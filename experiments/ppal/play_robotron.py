@@ -854,6 +854,7 @@ def main():
         tick = 0
         lost = 0
         recovery_round = 0
+        recovery_since = None
         pending_move = None
         pending_at = None
         pending_origin = None
@@ -969,12 +970,29 @@ def main():
                 recovered = None  # Global resemblance is not proof of a new SELF.
 
                 recovery = "generic_visual_agency"
+                if recovery_since is None:recovery_since=time.monotonic()
+                recovery_elapsed=time.monotonic()-recovery_since
+                # Experimental observation cadence, never an episode deadline.
+                # Beyond the initial budget, sample a quiet fresh-frame window
+                # before another bounded fallback probe batch.
+                if recovery_elapsed>=30.:
+                    recorder.event('agency_boundary_observation',dict(elapsed_seconds=recovery_elapsed,
+                        initial_budget_seconds=30., fallback_budget_seconds=120.,
+                        stage='fallback' if recovery_elapsed<120. else 'continued_observation',
+                        interpretation='cadence only; no time-derived game-over or START authority'),at=time.monotonic())
+                    for _ in range(8):
+                        read_agency_pairs()
+                        if episode_observer.confirmed:break
                 recovery_round += 1
                 pulse_ms = (60, 120, 240)[min(recovery_round-1, 2)]
                 response_frames = 2 if recovery_round == 1 else 3
                 # Recovery probes are declared diagnostic interventions, not a
                 # learned policy, a new baseline or proof that longer is better.
+                probe_deadline=min(deadline,time.monotonic()+30.)
+                if recovery_elapsed<30.:probe_deadline=min(probe_deadline,recovery_since+30.)
+                elif recovery_elapsed<120.:probe_deadline=min(probe_deadline,recovery_since+120.)
                 proposal = dict(round=recovery_round, baseline_pulse_ms=60,
+                    initial_budget_seconds=30., fallback_budget_seconds=120., batch_deadline=probe_deadline,
                     pulse_ms=pulse_ms,response_frames=response_frames,
                     question='can a longer bounded BODY response window establish causal SELF?',
                     reason='prior discovery did not establish controllable SELF',
@@ -982,9 +1000,12 @@ def main():
                 recorder.event('agency_recovery_plan',proposal,at=time.monotonic())
                 recovered = visual_agency.discover(
                     read_agency_pairs, controller, pulse_ms=pulse_ms,
-                    response_frames=response_frames,deadline=deadline,record=record_agency,
+                    response_frames=response_frames,deadline=probe_deadline,record=record_agency,
                     observation_time=lambda: source.timestamp,
                     should_stop=lambda: episode_observer.confirmed)
+                probe_result=visual_agency.last_discovery
+                negative_qualified=episode_observer.observe_discovery(probe_result)
+                recorder.event('agency_discovery_result',dict(probe_result,negative_qualified=negative_qualified),at=time.monotonic())
                 recorder.event('agency_recovery_outcome',dict(proposal,
                     self_established=visual_agency.agency.self_id is not None,
                     identity_status=visual_agency.agency.last_snapshot.get('identity_status','unknown'),
@@ -1130,6 +1151,7 @@ def main():
                 phase(SessionState.PLAYING, 'SELF reacquired; no new-game inference')
                 lost = 0
                 recovery_round = 0
+                recovery_since = None
                 tick += 1
                 continue
 

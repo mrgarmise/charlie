@@ -7,6 +7,7 @@ corroborated by failure to demonstrate a controllable SELF.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 
 
 @dataclass
@@ -25,6 +26,8 @@ class EpisodeEndObserver:
     terminal_captures: list | None = None
     attract_captures: list | None = None
 
+    discovery_evidence: dict | None = None
+
     def observe_phase(self, screen: dict) -> None:
         """Fresh positive page transitions; UNKNOWN/SELF absence never suffice."""
         at=screen.get('capture_timestamp')
@@ -37,7 +40,11 @@ class EpisodeEndObserver:
         if self.phase_history is None:self.phase_history=[]
         if not self.phase_history or self.phase_history[-1]['phase']!=phase:
             self.phase_history.append(dict(phase=phase,capture_timestamp=at,reason=screen.get('reason'),label_scores=screen.get('label_scores')))
-        self.observe_screen(screen.get('state','unknown') if phase in ('gameplay','terminal','startable','title') else 'unknown')
+        # Positive striped-border evidence remains useful even without a page
+        # heading. It is never itself START authorization.
+        state = screen.get('state','unknown')
+        self.observe_screen(state if phase in ('gameplay','terminal','startable','title')
+                            or (state=='not_gameplay' and screen.get('reason')=='unrecognized_striped_page') else 'unknown')
         if phase=='gameplay':
             self.established_gameplay=True;self.terminal_streak=0;self.terminal_corroborated=False;self.attract_streak=0
             self.terminal_captures=[];self.attract_captures=[]
@@ -77,16 +84,36 @@ class EpisodeEndObserver:
         else:
             self.agency_failures += 1
 
+    def observe_discovery(self, result: dict) -> bool:
+        """Qualify bounded generic probes, not appearance or absence of sprites."""
+        times=result.get('capture_timestamps') or []
+        commands=result.get('commands') or []
+        valid=(result.get('schema')=='causal-discovery-result-v1'
+               and result.get('complete') is True
+               and result.get('confirmed_self') is False
+               and all(x in commands for x in ('E','W','S','N'))
+               and commands.count('STAY')>=4 and len(times)>=9
+               and all(isinstance(t,(int,float)) and not isinstance(t,bool) and math.isfinite(t) for t in times)
+               and all(b>a for a,b in zip(times,times[1:]))
+               and (self.discovery_evidence is None or times[-1]>self.discovery_evidence['capture_timestamps'][-1]))
+        if valid:
+            self.discovery_evidence=dict(result)
+            self.observe_agency(False)
+        return valid
+
     def self_reacquired(self) -> None:
         """A trustworthy SELF observation clears accumulated terminal suspicion."""
         if not self.phase_history or self.phase_history[-1]['phase']=='gameplay':self.not_gameplay_streak = 0
         self.agency_failures = 0
+        self.discovery_evidence = None
 
     @property
     def confirmed(self) -> bool:
         return self.visual_boundary or (
             self.not_gameplay_streak >= self.required_not_gameplay
             and self.agency_failures >= 1
+            and (not self.phase_history or (self.phase_history[-1]['phase'] in ('terminal','startable','title')
+                 and max(self.terminal_streak,self.attract_streak)>=3))
         )
 
     def evidence(self, *, screen: dict, self_lost_frames: int) -> dict:
@@ -99,6 +126,7 @@ class EpisodeEndObserver:
             "terminal_capture_timestamps":self.terminal_captures or [],"attract_capture_timestamps":self.attract_captures or [],
             "not_gameplay_streak": self.not_gameplay_streak,
             "agency_failures": self.agency_failures,
+            "generic_discovery": self.discovery_evidence,
             "screen": screen,
             "self_lost_frames": self_lost_frames,
         }

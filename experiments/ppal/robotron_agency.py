@@ -1,5 +1,6 @@
 """Robotron BODY control adapter for generic agency inference."""
 import time
+import math
 
 from .agency import AgencyTracker
 from .eyes.tracking import SpriteTracker
@@ -90,6 +91,8 @@ class VisualAgency:
         reference to the second endpoint, then an independent neutral interval.
         The intermediate exposure is retained without scoring an early response.
         """
+        self.last_discovery = dict(schema='causal-discovery-result-v1', commands=[], capture_timestamps=[],
+                                   confirmed_self=False, complete=False)
         if response_frames not in (2, 3):
             raise ValueError('agency response window must contain two or three fresh frames')
         def stopped():
@@ -98,6 +101,7 @@ class VisualAgency:
         if stopped():return self.player
         pairs = read_pairs()
         initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
+        self.last_discovery['capture_timestamps'].append(self.tracker.last_update['observed_at'])
         if record:
             record(initial)  # pre-command detections are essential for exact replay
         if stopped():return self.player
@@ -150,6 +154,8 @@ class VisualAgency:
                 snapshot = self.observe(pairs, direction, time.monotonic()-start,
                                         observed_at=at,
                                         reference_positions=origin if direction != 'STAY' else None)
+                self.last_discovery['commands'].append(direction)
+                self.last_discovery['capture_timestamps'].append(at)
                 snapshot['actuators'] = {'body':direction, 'fire':fire, 'pulse_ms':pulse_ms}
                 if direction != 'STAY':
                     snapshot['phase'] = 'action_response_window'
@@ -160,4 +166,11 @@ class VisualAgency:
                     record(snapshot)
             if self.player is not None:
                 break
+        self.last_discovery['confirmed_self'] = self.agency.self_id is not None
+        times = self.last_discovery['capture_timestamps']
+        commands = self.last_discovery['commands']
+        self.last_discovery['complete'] = (all(x in commands for x in ('E','W','S','N'))
+            and commands.count('STAY') >= 4 and len(times) >= 9
+            and all(isinstance(t,(float,int)) and math.isfinite(t) for t in times)
+            and all(b>a for a,b in zip(times,times[1:])))
         return self.player

@@ -16,10 +16,10 @@ Python 3.12.14; pytest 9.1.1; OpenCV 5.0.0; NumPy 2.5.4. Commands run from the i
 
 ```sh
 python -m pytest -q tests/test_ppal_agency.py tests/test_robotron_agency_integration.py tests/test_robotron_startup_boundaries.py tests/test_robotron_developmental_evidence.py tests/test_progress_supervision.py tests/test_agency_recovery_boundaries.py tests/test_marathon_deferred.py tests/test_recording_handoff.py -o faulthandler_timeout=60 --junitxml=agency-final-focused.xml
-python -m pytest -q tests --junitxml=agency-full.xml
+python -m pytest -v tests -o faulthandler_timeout=45 --junitxml=agency-full-rerun.xml
 ```
 
-Focused: 127 passed in 106.16 seconds. Simulations cover initial failure followed by causal recovery, and never identifying SELF followed by corroborated terminal/attract evidence; both survive more than 60 simulated seconds, issue only one START and satisfy the existing recording-qualified restart checker. Additional tests cover no regions, terminal callback, source/controller failures, invalid response windows and positive gameplay without recognized sprites. Existing ambiguity, respawn, provenance, transport, cleanup and marathon tests are retained. Fixtures are not authentic games or learning improvement.
+Focused: 127 passed in 106.16 seconds. Full suite: 863 passed, 21 skipped, zero failures/errors in 250.30 seconds. Skips require optional Torch, the full 119-original archive or original October 1 artifacts; retained original-image regressions ran. Passing JUnit receipts and logs are retained here. The first full-suite attempt stalled around desktop-launcher tests and was interrupted; the suspected test passed independently and the complete rerun passed. The interrupted log is retained, and no passing result is attributed to that run. Simulations cover initial failure followed by causal recovery, and never identifying SELF followed by corroborated terminal/attract evidence; both survive more than 60 simulated seconds, issue only one START and satisfy the existing recording-qualified restart checker. Additional tests cover no regions, terminal callback, source/controller failures, invalid response windows and positive gameplay without recognized sprites. Existing ambiguity, respawn, provenance, transport, cleanup and marathon tests are retained. Fixtures are not authentic games or learning improvement.
 
 An intermediate test exposed missing early-frame terminal observation: a short high-score display did not reach the required corroboration count. The integration now delivers those frames without lowering requirements. Initial test iterations also found parser validation still assumed a numeric uncertainty default; corrected before the final suite.
 
@@ -41,7 +41,8 @@ cp -a experiments/ppal/preflight.py "$backup/preflight.py"
 # Copy the actual untracked backup named by git status into this directory too.
 sha256sum experiments/ppal/preflight.py > "$backup/preflight.sha256"
 git fetch origin feature/persistent-agency-recovery
-git show FETCH_HEAD:docs/ppal/agency-recovery-20261011/gameplay-only.patch > "$backup/gameplay-only.patch"
+published=$(git rev-parse FETCH_HEAD)
+git show "$published":docs/ppal/agency-recovery-20261011/gameplay-only.patch > "$backup/gameplay-only.patch"
 # New worktree based on the current native commit, not remote agency base.
 git worktree add -b feature/native-persistent-agency /home/five/charlie-agency-recovery HEAD
 cp -a experiments/ppal/preflight.py /home/five/charlie-agency-recovery/experiments/ppal/preflight.py
@@ -53,7 +54,16 @@ sha256sum experiments/ppal/preflight.py
 git diff --check
 ```
 
-If apply-check fails, stop and inspect the native source differences; do not force/reset or replace camera files. Copy the three changed/new tests from the published branch into this native worktree and run the focused command above with the existing native virtualenv. Preserve native version, timestamps, logs, source hashes and camera overlay hash. Native tests and camera-only verification are pending; installation and live acceptance are not claimed.
+If apply-check fails, stop and inspect the native source differences; do not force/reset or replace camera files. Copy the three changed/new tests into this native worktree:
+
+```sh
+for testfile in tests/test_ppal_agency.py tests/test_robotron_agency_integration.py tests/test_agency_recovery_boundaries.py; do
+    git show "$published":"$testfile" > "$testfile"
+done
+/home/five/Projects/charlie/.venv/bin/python -m pytest -q tests/test_ppal_agency.py tests/test_robotron_agency_integration.py tests/test_robotron_startup_boundaries.py tests/test_robotron_developmental_evidence.py tests/test_progress_supervision.py tests/test_agency_recovery_boundaries.py tests/test_marathon_deferred.py tests/test_recording_handoff.py --junitxml="$backup/native-focused.xml"
+```
+
+Verify the existing virtualenv path before invoking it; do not install or replace the native camera stack. Run the existing native regression suite as well before live acceptance. Preserve native version, timestamps, logs, source hashes and camera overlay hash. Native tests and camera-only verification are pending; installation and live acceptance are not claimed.
 
 Rollback: stop the new runner safely, neutralize through its existing cleanup, and use the original /home/five/charlie-camera-calibration checkout and original invocation. Do not delete failed episodes, journals, either worktree or camera backups. No installed service was changed here.
 

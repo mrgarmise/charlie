@@ -1,0 +1,42 @@
+{
+  "tested_implementation": "5ea06854285cab791fe8b8c2dd4e7312e7d7d9f5",
+  "recorded_utc": "2026-10-11T04:21:12.054174+00:00",
+  "environment": {
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "opencv": "5.0.0",
+    "numpy": "2.5.4",
+    "platform": "host container; mocked camera/controller, not native Pi"
+  },
+  "sha256": {
+    "experiments/ppal/play_robotron.py": "26629b7e8ce165ef09265613f28c8e6f71dac335d5efc5ea47ae6e2a6b274d0b",
+    "experiments/ppal/robotron_agency.py": "943d4544b4fb70b4e8abeea5a1997820373512a94324dfa627e53b5c306e08bc",
+    "tests/test_ppal_agency.py": "0ffa3ac9a559519a770c7d42806f762656dc98ff89295239407f38ea3bc52ad4",
+    "tests/test_robotron_agency_integration.py": "3dea63668a287032261027c5c11ed39a6db65339a7606cf778d5064bdd85fba6",
+    "tests/test_agency_recovery_boundaries.py": "a153af04077b2e563c575933323cb016d3feba3563afa50840d4d7909ff461ac",
+    "docs/ppal/agency-recovery-20261011/host-focused.xml": "31857e5666a2dbf80cf345305a945a9fcbff235972e25af03a5d96027af0c397",
+    "docs/ppal/agency-recovery-20261011/host-full.xml": "7276f43e84fd298d7c29817c501db4c1070e6907fb3fc75bf48cb1c8c863720b",
+    "docs/ppal/agency-recovery-20261011/host-focused.log": "45f9ad0a7bfb052eaed85d60e88b68d0ee3ac2d1c08c119d4642e14084fee0eb",
+    "docs/ppal/agency-recovery-20261011/host-full.log": "6c0454c8bf10e9b9db3c44affb8f2939f201c302fd03989a5d2e5f99baba23d3",
+    "docs/ppal/agency-recovery-20261011/host-interrupted.log": "1cf27541b4777773cc1d65da887820325544f8a60e9c592c19418a683c2aa978",
+    "docs/ppal/agency-recovery-20261011/gameplay-only.patch": "e58fbbd16e070dfaed1f3a858ae96137326555b3222c01aaa276fdcf44fb4b58"
+  },
+  "native_acceptance": "pending; charlie SSH DNS unavailable",
+  "live_games_completed": 0,
+  "learning_improvement": "not established",
+  "physical_movement": "none",
+  "host_results": {
+    "focused": {
+      "passed": 127,
+      "seconds": 106.16
+    },
+    "full": {
+      "passed": 863,
+      "skipped": 21,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 250.3
+    },
+    "first_full_run": "interrupted after stalled output; not a passing result"
+  }
+}

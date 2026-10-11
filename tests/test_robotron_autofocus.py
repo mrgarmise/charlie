@@ -127,7 +127,7 @@ def test_camera_only_acceptance_closes_owner_on_failure(monkeypatch,tmp_path):
     assert source.closed
 
 
-def test_operational_defaults_and_reacquisition_do_not_inherit_manual_focus():
+def test_operational_defaults_and_live_session_have_no_midgame_recalibration():
     # Audit parser defaults and every real call site; historical evidence remains.
     root = Path(__file__).parents[1]
     for name in ('play_robotron.py', 'marathon_robotron.py'):
@@ -141,8 +141,13 @@ def test_operational_defaults_and_reacquisition_do_not_inherit_manual_focus():
     tree = ast.parse((root/'experiments/ppal/play_robotron.py').read_text())
     calls = sorted((n for n in ast.walk(tree) if isinstance(n, ast.Call)
                     and isinstance(n.func, ast.Name) and n.func.id=='sensory_preflight'),key=lambda n:n.lineno)
-    assert len(calls)==2
-    assert not any(k.arg=='seed_position' for k in calls[1].keywords)
+    assert len(calls)==1  # standalone startup only; no midgame optics mutation
+    session_calls=[n for n in ast.walk(tree) if isinstance(n,ast.Call)
+                   and isinstance(n.func,ast.Attribute) and n.func.attr=='establish']
+    assert len(session_calls)==1
+    monitor_calls=[n for n in ast.walk(tree) if isinstance(n,ast.Call)
+                   and isinstance(n.func,ast.Name) and n.func.id=='request_recovery']
+    assert monitor_calls  # unavailable CAL replaces silent reacquisition
 
 
 def test_fresh_metadata_and_pixels_share_request_and_buffer_always_released():

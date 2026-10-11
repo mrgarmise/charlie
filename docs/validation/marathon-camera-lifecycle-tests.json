@@ -1,0 +1,221 @@
+{
+  "schema": "charlie-marathon-camera-validation-v1",
+  "recorded_at": "2026-10-11T19:26:26.561622+00:00",
+  "baseline": "a785c9f745bd0645dd01ac70af3beb5a8d44d37b",
+  "branch": "feature/marathon-camera-lifecycle",
+  "environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "opencv": "5.0.0",
+    "numpy": "2.5.4",
+    "pillow": "12.3.0"
+  },
+  "source_sha256": {
+    "experiments/ppal/camera_session.py": "ef83471ae915a623be5cbe7a6789da1387bf7d008598e37725415a207cc8cdcd",
+    "experiments/ppal/cal_recovery.py": "40ffbf598d9fb36dc51132a7b74e13c51864f1a7893fe92454f92a2852562f63",
+    "experiments/ppal/game_evidence.py": "487eb30f40d10a6ac5db2700019874c7d4f646f6f3aff4b1192ca1801d50b8bc",
+    "experiments/ppal/live_view.py": "3bb33bfb6fdf6de0213ecde69e0fc4b4f80b5f231c8ab756eeb62ba899c56dc8",
+    "experiments/ppal/play_robotron.py": "f9c452dbb7727fed8cce12dc8a4efe65b1162e8b653817630067a51a270b3811",
+    "experiments/ppal/marathon_robotron.py": "3236434b745172c8bc945da2b50d71ab8ce189ae62167ec3401a432abb6e61c9",
+    "tests/test_marathon_camera_session.py": "ec738d7347e2be53473f9a89a495757f0a796a609fec0d3d743e7dc71dbde7c7",
+    "tests/test_robotron_autofocus.py": "1c9f9c04d9002777cf2fe818c6c136e750b36da3c3867f302686cfb0a7d2acfb"
+  },
+  "preserved_preflight_sha256": "8cd902f89603394fe3e492370e37f88854ee8d2e0904b49bdc2ee03aca665bb8",
+  "runs": [
+    {
+      "name": "serial broader regression",
+      "command": "/workspace/scratch/a5d7375d8e4e/camera-test-env/bin/python -m pytest tests -q --junitxml=/tmp/charlie-lifecycle-serial.xml",
+      "tests": 937,
+      "failures": 15,
+      "errors": 0,
+      "skipped": 21,
+      "seconds": 239.954,
+      "timestamp": "2026-10-11T13:17:21.803642-06:00",
+      "junit_sha256": "8de290ad93bddb1a0a0f8b26dbda02cf98a960c00c9dd6936701fdf98b22d31f",
+      "failed_cases": [
+        {
+          "test": "tests.test_robotron_autofocus::test_automatic_start_uses_observed_position_then_confirms_idle_manual_lock",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[None]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[nan]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[inf]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[-1.0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[11.0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[True]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[None]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[1]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[3]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_repeated_or_unstable_metadata_cannot_settle",
+          "message": "AttributeError: 'Unstable' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_manual_lock_requires_reported_idle_and_matching_position",
+          "message": "AttributeError: 'Unlocked' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_diagnostic_manual_seed_is_explicit_validated_and_verified",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_geometry_replay::test_six_actual_consecutive_originals_stabilize_without_looser_gate",
+          "message": "assert (6 == 6 and 12.0 == 8)\n +  where 6 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).stable_views\n +  and   12.0 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).max_jitter_pixels"
+        }
+      ]
+    },
+    {
+      "name": "final focused regression",
+      "command": "/workspace/scratch/a5d7375d8e4e/camera-test-env/bin/python -m pytest tests/test_marathon_camera_session.py tests/test_marathon_deferred.py tests/test_restart_discovery_evidence.py tests/test_recording_handoff.py tests/test_robotron_startup_boundaries.py tests/test_progress_supervision.py tests/test_robotron_agency_integration.py tests/test_robotron_autofocus.py::test_operational_defaults_and_live_session_have_no_midgame_recalibration -q --junitxml=/tmp/charlie-lifecycle-final-focused.xml",
+      "tests": 89,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 120.611,
+      "timestamp": "2026-10-11T13:21:52.986979-06:00",
+      "junit_sha256": "d2ae38ce9d759e5b7a13e5ab45f3867c588d8be43c5ce25e14482738c5552a07",
+      "failed_cases": []
+    },
+    {
+      "name": "final lifecycle and evidence regression",
+      "command": "/workspace/scratch/a5d7375d8e4e/camera-test-env/bin/python -m pytest tests/test_marathon_camera_session.py -q --junitxml=/tmp/charlie-lifecycle-final-module.xml",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 10.021,
+      "timestamp": "2026-10-11T13:24:43.192830-06:00",
+      "junit_sha256": "401d62d5694bf38b931844e6ed72aabb32a5a650d54210d85d014f78b28bf39e",
+      "failed_cases": []
+    },
+    {
+      "name": "untouched baseline autofocus comparison",
+      "command": "/workspace/scratch/a5d7375d8e4e/camera-test-env/bin/python -m pytest tests/test_robotron_autofocus.py tests/test_ppal_focus.py tests/test_robotron_preflight.py -q",
+      "tests": 39,
+      "failures": 14,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.671,
+      "timestamp": "2026-10-11T13:13:06.698882-06:00",
+      "junit_sha256": "31ac9c2b951890214630449145f830151a4abacb85fa738c562e7f963a446243",
+      "failed_cases": [
+        {
+          "test": "tests.test_robotron_autofocus::test_automatic_start_uses_observed_position_then_confirms_idle_manual_lock",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[None]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[nan]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[inf]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[-1.0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[11.0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[True]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[None]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[1]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[3]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_repeated_or_unstable_metadata_cannot_settle",
+          "message": "AttributeError: 'Unstable' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_manual_lock_requires_reported_idle_and_matching_position",
+          "message": "AttributeError: 'Unlocked' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_diagnostic_manual_seed_is_explicit_validated_and_verified",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        }
+      ]
+    },
+    {
+      "name": "untouched baseline identity/proposals/geometry comparison",
+      "command": "/workspace/scratch/a5d7375d8e4e/camera-test-env/bin/python -m pytest tests/test_episode_identity.py tests/test_exploratory_proposals.py tests/test_robotron_geometry_replay.py -q",
+      "tests": 37,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 2,
+      "seconds": 31.11,
+      "timestamp": "2026-10-11T13:15:33.790735-06:00",
+      "junit_sha256": "ab783a767f95ee82702c41fd55a1c06dce4bc9f468399e202b1f9705aa9d67b0",
+      "failed_cases": [
+        {
+          "test": "tests.test_robotron_geometry_replay::test_six_actual_consecutive_originals_stabilize_without_looser_gate",
+          "message": "assert (6 == 6 and 12.0 == 8)\n +  where 6 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).stable_views\n +  and   12.0 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).max_jitter_pixels"
+        }
+      ]
+    }
+  ],
+  "baseline_failure_sets_match": true,
+  "limitations": [
+    "No native Pi tests, deployment, camera use or gameplay performed.",
+    "Software fixture episodes do not establish authentic physical experience or score improvement.",
+    "Broader serial run preceded final focused hardening; final changed paths were rerun with focused tests.",
+    "First overlapping broad run had ownership-lock contention and is excluded from acceptance evidence.",
+    "Native preflight manual 2.0 seed and jitter 12 preserved unchanged.",
+    "Conservative visual monitoring cannot qualify physical movement or every failure on ambiguous screens."
+  ],
+  "release_acceptance": "pending supervised native playable game-one to game-two transition and independent endings"
+}

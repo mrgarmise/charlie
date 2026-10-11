@@ -36,7 +36,7 @@ from .episode_end import EpisodeEndObserver
 from .robotron_agency import VisualAgency
 from .score_observer import ScoreObserver
 from .observation_camera import ObservedCamera
-from .preflight import sensory_preflight, ImagingMonitor
+from .preflight import sensory_preflight
 from PIL import ImageDraw
 
 HUMANS = {"dad", "mom", "kid"}
@@ -415,7 +415,7 @@ def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.
     return None, None, collected, watch, first_visual
 
 
-def main():
+def main(argv=None, *, camera_session=None, progress_path=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--seconds", "--diagnostic-seconds", dest="seconds", type=float, default=None,
                         help="opt-in diagnostic duration limit; not normal game completion")
@@ -460,7 +460,7 @@ def main():
     parser.add_argument('--evidence-frame-capacity',type=int,default=16)
     parser.add_argument('--evidence-record-capacity',type=int,default=512)
     parser.add_argument('--evidence-memory-mib',type=int,default=128)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     screen_classifier=classify_screen_state
     if args.title_reference:
         from .robotron_screen_state import TaughtTitleReference
@@ -486,7 +486,7 @@ def main():
     if args.output is None:
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         args.output = Path(f"robotron-runs/play-{stamp}")
-    if args.arm and not args.supervised_child:
+    if args.arm and not args.supervised_child and camera_session is None:
         import sys
         from .progress_supervision import supervise
         # Parent remains independent of camera/perception/controller operations.
@@ -548,10 +548,23 @@ def main():
             if progress:
                 progress.update(mode=state.value, mode_started_at=time.monotonic())
     from .progress_supervision import Progress, SupervisedController, ObservationFailure, UncertaintyWindow
-    progress = Progress(args.output.parent/(args.output.name+"-progress.json")) if args.arm else None
+    progress = Progress(progress_path or args.output.parent/(args.output.name+"-progress.json")) if args.arm else None
     if progress: progress.enter("camera")
     mark('camera_initialization_started')
-    source = ObservedCamera(PiCameraSource(), require_fresh=args.arm, progress=progress)
+    try:
+        source = ObservedCamera(camera_session.borrow() if camera_session else PiCameraSource(), require_fresh=args.arm, progress=progress)
+    except Exception as exc:
+        from .cal_recovery import request_recovery
+        from learning.foundry import atomic_json
+        recovery=request_recovery(episode=args.output,symptoms={'camera_initialization_failure':str(exc)},
+            camera_session=camera_session.id if camera_session else None)
+        if camera_session:camera_session.invalid=True
+        diary.event('cal_recovery_unavailable',evidence=recovery);diary.close()
+        atomic_json(args.output/'report.json',dict(result=f'ERROR: camera initialization: {exc}',
+            armed=args.arm,acquisition=None,steps=[],episode_end={'state':'unknown','confirmed':False},
+            failure_kind='observation_failure',cal_recovery=recovery,
+            score_summary={'status':'unmeasured','self_score':None}))
+        raise
     publisher = None
     try:
         from .eyes.passive import PassivePublisher
@@ -577,6 +590,8 @@ def main():
     agency_frames = []
     latest_agency_frame = None
     episode_observer = None
+    imaging_monitor = None
+    cal_recovery = None
     buffered_frames = []
     raw_frames = []
     recorder=None
@@ -647,10 +662,22 @@ def main():
                                       "identity_status":snapshot.get("identity_status"),
                                       "actuators":snapshot.get("actuators")} if preceding_action or snapshot.get("command") is not None or getattr(controller, "last_execution", None) is not None else None)
     def observe_episode(frame):
+        nonlocal cal_recovery
+        screen = screen_classifier(frame)
+        screen['capture_timestamp'] = source.timestamp
         if episode_observer is not None:
-            screen = screen_classifier(frame)
-            screen['capture_timestamp'] = source.timestamp
             episode_observer.observe_phase(screen)
+        if imaging_monitor is not None:
+            drift=imaging_monitor.observe(frame,screen,source.timestamp)
+            if drift:
+                if controller is not None:controller._command('NEUTRAL')
+                from .cal_recovery import request_recovery
+                cal_recovery=request_recovery(episode=args.output,symptoms=drift,
+                    camera_session=camera_session.id if camera_session else None)
+                recorder.event('cal_recovery_request',cal_recovery,at=source.timestamp)
+                diary.event('cal_recovery_unavailable',evidence=cal_recovery)
+                if camera_session:camera_session.invalid=True
+                raise ObservationFailure('persistent measured camera degradation; CAL unavailable; episode invalid')
     def observe_unmeasured(pairs, frame):
         nonlocal latest_agency_frame
         latest_agency_frame = frame
@@ -708,7 +735,10 @@ def main():
         # Task-aware optics preflight runs before START, with neutral controls,
         # and never inside the time-critical tracking/score observation loop.
         mark('calibration_started')
-        calibration,sensory_report=sensory_preflight(source,args.output,seed_position=args.focus)
+        if camera_session is None:
+            calibration,sensory_report=sensory_preflight(source,args.output,seed_position=args.focus)
+        else:
+            calibration,sensory_report=camera_session.establish(source,args.output,sensory_preflight,seed_position=args.focus)
         original_detect=recognizer.detect
         def trace_detect(frame):
             pairs=original_detect(frame)
@@ -720,12 +750,15 @@ def main():
             return pairs
         recognizer.detect=trace_detect
         exposure_preflight=sensory_report.get('exposure')
-        calibration_mode='fresh_session'
+        calibration_mode='live_session_reuse' if (sensory_report.get('camera_session') or {}).get('reused') else 'fresh_session'
         mark('calibration_finished', mode=calibration_mode)
         recorder.ready()
         mark('evidence_ready',raw_frames=recorder.count)
         phase(SessionState.CAMERA_READY, 'optics and geometric calibration complete')
         mark('camera_ready')
+        from .live_view import LiveViewMonitor
+        reference=camera_session.reference if camera_session and camera_session.reference is not None else calibration.apply(source.raw)
+        imaging_monitor=LiveViewMonitor(reference)
 
         auto_start = args.arm and not args.no_start_game
         if auto_start:
@@ -848,7 +881,6 @@ def main():
         pending_at = None
         pending_origin = None
         pending_origin_at = None
-        imaging_monitor=ImagingMonitor(calibration.apply(source.raw))
         print(f"CHARLIE LOOSE: diagnostic limit {args.seconds:.1f}s" if args.seconds else "CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state")
 
         while time.monotonic() < deadline:
@@ -905,26 +937,6 @@ def main():
                 diary.event('episode_boundary_confirmed',evidence=episode_end['evidence'])
                 print('GAME OVER CONFIRMED: gameplay → rankings → attract evidence')
                 break
-            drift=imaging_monitor.observe(playfield)
-            if drift and screen.get('phase') not in ('title','terminal','startable'):
-                controller._command('NEUTRAL')
-                diary.event('sensory_reacquisition_requested',evidence=drift)
-                if not drift['allowed']:
-                    raise ObservationFailure('bounded sensory reacquisition exhausted; assistance required')
-                recorder.preparing=True
-                calibration,reacquired_optics=sensory_preflight(source,args.output/f'reacquisition-{imaging_monitor.reacquisitions+1}')
-                recorder.ready();imaging_monitor.reacquired(calibration.apply(source.raw))
-                recorder.event('sensory_reacquired',reacquired_optics,at=time.monotonic())
-                interrupted=hindbrain.interrupt_tactic('new imaging coordinates; previous response window interrupted')
-                if interrupted:recorder.event('tactical_outcome',interrupted,at=time.monotonic())
-                retired=visual_agency.reframe()
-                diary.event('coordinate_epoch_changed',retired_track_ids=retired,reason='fresh independently observed geometry')
-                if score_observer is not None:score_observer.reframe(calibration)
-                if policy:policy.reset_predictions()
-                pending_move=None;pending_origin_at=None
-                self_tracker.player_track_id=None
-                shadow_predictor=ShadowPredictor(horizon_seconds=.15,max_speed=100.)
-                continue # fresh geometry requires ordinary agency recovery
             self_obs = self_tracker.observe_tracks(tick + 1, visual_agency.positions)
             agency_player = visual_agency.player
             new_player = None
@@ -1324,8 +1336,22 @@ def main():
         print("INTERRUPTED; neutralizing")
     except Exception as exc:
         result = f'ERROR: {type(exc).__name__}: {exc}'
-        if isinstance(exc, ObservationFailure) or (progress and progress.data['phase'] == 'camera'):
+        recording_state=recorder.telemetry()
+        if recording_state.get('writer_error') or recording_state.get('paused'):
+            failure_kind='recording_failure'
+        elif isinstance(exc, ObservationFailure) or (progress and progress.data['phase'] == 'camera'):
             failure_kind = 'observation_failure'
+            if camera_session:camera_session.invalid=True
+            if cal_recovery is None:
+                if controller is not None:
+                    try:controller._command('NEUTRAL')
+                    except (OSError,ConnectionError):pass
+                from .cal_recovery import request_recovery
+                cal_recovery=request_recovery(episode=args.output,symptoms={'failure':str(exc)},
+                    camera_session=camera_session.id if camera_session else None)
+                if recorder.latest_observation is not None:
+                    recorder.event('cal_recovery_request',cal_recovery,at=source.timestamp)
+                diary.event('cal_recovery_unavailable',evidence=cal_recovery)
         elif progress:
             failure_kind = progress.data.get('failure_kind',
                 'controller_failure' if progress.data['phase'] == 'controller' else 'player_failure')
@@ -1381,6 +1407,7 @@ def main():
         (args.output / "tracks.json").write_text(json.dumps({"tracks":tracks}, indent=2)+"\n")
         report = {"session_timing":timing, "session_transitions":[vars(r) for r in session.transitions], "session_events":"events.jsonl", "provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
                   "failure_kind": locals().get("failure_kind"),
+                  "cal_recovery":locals().get("cal_recovery"),
                   "progress": dict(progress.data, publication_seconds=progress.cost_seconds) if progress else None,
                   "partial_action_evidence":"steps.jsonl",
                   "pulse_ms": args.pulse_ms, "ticks": len(rows),

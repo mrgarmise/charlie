@@ -243,7 +243,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 from .progress_supervision import Progress
                 heartbeat=Progress(args.marathon_progress)
                 heartbeat.enter('processing')
-                pulse=heartbeat.cycle
+                pulse=lambda:heartbeat.checkpoint({'operation':'offline_committed_work'})
             return process_supervised(*values, **options, budget=getattr(args,'processing_budget',300.),
                 ala_root=(getattr(args,'learning_root',None) or gateway.evaluator.path.with_name('autonomous-learning')) if getattr(args,'ala_learning',False) else None,
                 ala_budget=getattr(args,'ala_budget',60.),ala_authority=authority,on_progress=pulse)
@@ -271,6 +271,12 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
     else:
         episode_driver=driver
     game_journal=EvidenceJournal(Path(doc['learning_root'])/'game-evidence.sqlite3')
+    handoff_progress=None
+    def handoff(name,fn,*values,**options):
+        if handoff_progress:handoff_progress.operation(name)
+        result=fn(*values,**options)
+        if handoff_progress:handoff_progress.operation_completed()
+        return result
     primary_claim=None
     if play_first:
         from learning.cycle import gameplay_session
@@ -283,6 +289,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             else:
                 doc['seed_processing']=processor(args.seed_episode,session/'seed-evidence',gateway,commitments,executive=executive)
         for index in range(1,args.max_games+1):
+            rc=None
             game=session/f'game-{index:02d}'
             selection = None
             context = None
@@ -323,9 +330,16 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             ScoreObserver.queue_game(commitments,game,session=session,number=index)
             rc=episode_driver(cmd,30.)
             report=load_report(game/'report.json')
-            ScoreObserver.queue_game(commitments,game,session=session,number=index)
+            from .progress_supervision import Progress
+            handoff_progress=Progress(progress_path or game.parent/(game.name+'-progress.json'))
+            handoff_progress.enter('finalizing')
+            callback=handoff_progress.checkpoint
+            if play_first:doc['games'][-1].update(status='postgame_handoff',returncode=rc)
+            handoff('session_postgame_bookmark',write_session,session/'session.json',doc)
+            handoff('score_evidence_processing',ScoreObserver.queue_game,commitments,game,session=session,number=index,on_progress=callback)
             from .game_evidence import preserve_game
-            completion=preserve_game(game_journal,game,marathon=session,returncode=rc,report=report)
+            completion=handoff('game_completion_evidence',preserve_game,game_journal,game,marathon=session,returncode=rc,report=report,
+                on_progress=callback,on_operation=handoff_progress.operation)
             entry={'path':str(game),'returncode':rc,'result':report.get('result') if report else 'missing report',
                    'experiment':plan,'reason_for_experiment':reason,'durable_game_evidence':completion,
                    'supervision':load_report(game.parent/(game.name+'-progress-supervisor.json'))}
@@ -333,7 +347,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 entry['project_selection'] = selection
             if play_first:doc['games'][-1]=entry
             else:doc['games'].append(entry)
-            write_session(session/'session.json',doc)
+            handoff('session_state_update',write_session,session/'session.json',doc)
             if report:
                 entry['score_evidence']=report.get('score_summary',{'self_score':report.get('score'),'status':report.get('score_status','unknown')})
                 entry['score_attribution']='unknown; accepted reading is not independently verified score'
@@ -374,18 +388,18 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                       f"goal={project_state.get('goal','UNKNOWN')}; status={project_state.get('status','UNKNOWN')}; "
                       f"selection={selection['reason']}; progress={project_state.get('progress','UNKNOWN')}; "
                       f"next={project_state.get('next_direction','no justified experiment yet')}", flush=True)
-            write_session(session/'session.json',doc)
+            handoff('session_state_update',write_session,session/'session.json',doc)
             if rc==124:
                 doc['status']='child_timeout';break
             qualified=sum((g.get('durable_game_evidence') or {}).get('classification')=='completed' for g in doc['games'])
             if getattr(args,'qualified_games',None) is not None and qualified>=args.qualified_games:
                 doc['status']='qualified_target_complete';break
             if index>=args.max_games:
-                doc['status']='bounded_attempts_complete' if safe_to_restart(report,rc,capture_root=game) else 'unverified_episode_boundary'
+                doc['status']='bounded_attempts_complete' if handoff('restart_boundary_validation',safe_to_restart,report,rc,capture_root=game,on_progress=callback) else 'unverified_episode_boundary'
                 break
-            entry['recording_readiness']=recording_readiness(game,report)
-            write_session(session/'session.json',doc)
-            if not safe_to_restart(report,rc,capture_root=game):
+            entry['recording_readiness']=handoff('recording_readiness',recording_readiness,game,report,on_progress=callback)
+            handoff('session_state_update',write_session,session/'session.json',doc)
+            if not handoff('restart_boundary_validation',safe_to_restart,report,rc,capture_root=game,on_progress=callback):
                 doc['status']='unverified_episode_boundary'
                 print('DEVELOPMENT STOP: no confirmed game-over evidence; no further START',flush=True)
                 break
@@ -405,8 +419,10 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 g.get('path')==str(game) and g.get('durable_game_evidence') for g in doc['games']):
             try:
                 from .game_evidence import preserve_game
-                completion=preserve_game(game_journal,game,marathon=session,returncode=130,
-                    report=load_report(game/'report.json'))
+                completion=handoff('interrupted_completion_reconciliation',preserve_game,game_journal,game,marathon=session,
+                    returncode=rc if rc is not None else 130,report=load_report(game/'report.json'),
+                    on_progress=handoff_progress.checkpoint if handoff_progress else None,
+                    on_operation=handoff_progress.operation if handoff_progress else None)
                 retained=next((g for g in doc['games'] if g.get('path')==str(game)),None)
                 if retained is None:
                     retained={'path':str(game)};doc['games'].append(retained)
@@ -428,8 +444,8 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
         if primary_claim:primary_claim.__exit__(None,None,None)
         if 'game' in locals():
             from .score_observer import ScoreObserver
-            ScoreObserver.queue_game(commitments,game,session=session,number=index,
-                interrupted=doc['status'] in ('interrupted','between_game_failure','child_timeout'))
+            handoff('final_score_evidence_processing',ScoreObserver.queue_game,commitments,game,session=session,number=index,
+                on_progress=handoff_progress.checkpoint if handoff_progress else None,interrupted=doc['status'] in ('interrupted','between_game_failure','child_timeout'))
         if plan and not play_first and not any(r.data['payload']['prediction_id']==plan['prediction_id'] for r in commitments.records('resolution')):
             try:
                 unresolved=commitments.resolve(plan['prediction_id'],sources=(),result='unresolved',
@@ -442,7 +458,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                         commitments, episode='orchestration-stop:'+plan['scope'])
             except Exception as exc:
                 doc['resolution_persistence_error']=f'{type(exc).__name__}: {exc}'
-        write_session(session/'session.json',doc)
+        handoff('session_final_state_update',write_session,session/'session.json',doc)
         commitments.close()
         if project_journal:
             doc['learning_project_evidence'] = str(project_journal.path)
@@ -606,7 +622,7 @@ def established_gameplay(report):
     return bool(report.get("armed") and report.get("acquisition") and
                 any("action" in s for s in steps))
 
-def recording_readiness(root,report):
+def recording_readiness(root,report,*,on_progress=None):
     """Between-game barrier; no controller or permission authority."""
     from memory.episode_identity import verify_recording_completion,inspect_capture
     try:
@@ -614,9 +630,9 @@ def recording_readiness(root,report):
             raise ValueError('recording failure or live previous writer')
         if report.get('score_summary',{}).get('worker_finished') is False:
             raise ValueError('previous score instrumentation writer unfinished')
-        state=verify_recording_completion(root)
+        state=verify_recording_completion(root,on_progress=on_progress)
         if state is None:raise ValueError('no verified new recording receipt')
-        identity=inspect_capture(root)
+        identity=inspect_capture(root,on_progress=on_progress)
         if identity.get('status')=='quarantined':raise ValueError('capture identity quarantined')
         return dict(status='ready',completion_sha256=state['completion']['sha256'],
             incident_requests='durably resolved',previous_writer='terminated and source sealed',
@@ -625,11 +641,11 @@ def recording_readiness(root,report):
         return dict(status='blocked',reason=str(exc),physical_authorization=False)
 
 
-def safe_to_restart(report, returncode=0,*,capture_root=None):
+def safe_to_restart(report, returncode=0,*,capture_root=None,on_progress=None):
     """Only an explicit, evidenced terminal screen may authorize another START."""
     if returncode != 0 or not report:
         return False
-    if capture_root is not None and recording_readiness(capture_root,report)['status']!='ready':return False
+    if capture_root is not None and recording_readiness(capture_root,report,on_progress=on_progress)['status']!='ready':return False
     if capture_root is None and report.get('recording_pipeline'):return False
     end = report.get('episode_end', {})
     evidence = end.get('evidence') or {}
@@ -654,8 +670,14 @@ def safe_to_restart(report, returncode=0,*,capture_root=None):
 
 def write_session(path, doc):
     temporary = path.with_suffix(path.suffix+".tmp")
-    temporary.write_text(json.dumps(doc,indent=2)+"\n")
+    import os
+    with temporary.open('w') as stream:
+        stream.write(json.dumps(doc,indent=2)+"\n")
+        stream.flush();os.fsync(stream.fileno())
     temporary.replace(path)
+    descriptor=os.open(path.parent,os.O_RDONLY)
+    try:os.fsync(descriptor)
+    finally:os.close(descriptor)
 
 def meditate_session(session_dir, games):
     """Never merge games. Analyze each episode separately, then summarize metadata."""

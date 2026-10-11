@@ -8,14 +8,19 @@ import json
 from memory.episode_identity import inspect_capture, validate_origin, artifact_manifest
 
 
-def preserve_game(journal, game, *, marathon, returncode, report):
+def preserve_game(journal, game, *, marathon, returncode, report, on_progress=None, on_operation=None):
     from .marathon_robotron import established_gameplay, recording_readiness, safe_to_restart
     game = Path(game)
     report = report or {}
+    def operation(name):
+        if on_operation:on_operation(name)
+    def completed(**detail):
+        if on_progress:on_progress(detail)
+    operation('capture_identity_verification')
     try:
         if not (game/'capture-origin.json').exists() and not (game/'report.json').exists():
             raise ValueError('no captured episode identity or report')
-        identity = inspect_capture(game)
+        identity = inspect_capture(game,on_progress=on_progress)
     except (OSError, ValueError, KeyError) as exc:
         identity = {'status':'unavailable', 'reason':str(exc)}
         # An interrupted seal must not erase the original occurrence identity.
@@ -24,16 +29,18 @@ def preserve_game(journal, game, *, marathon, returncode, report):
             origin=json.loads((game/'capture-origin.json').read_text())
             validate_origin(origin)
             identity.update(capture_id=origin['capture_id'],provenance=origin.get('provenance'),
-                            artifacts=artifact_manifest(game))
+                            artifacts=artifact_manifest(game,on_progress=on_progress))
         except (OSError,ValueError,KeyError):pass
     try:
         report_matches=json.loads((game/'report.json').read_text())==report
     except (OSError,ValueError):report_matches=False
-    readiness = recording_readiness(game, report)
+    operation('recording_verification')
+    readiness = recording_readiness(game, report,on_progress=on_progress)
     invalid = bool(report.get('cal_recovery') or report.get('recording_error')
                    or report.get('failure_kind') in ('observation_failure','recording_failure'))
     playable = established_gameplay(report)
-    terminal = safe_to_restart(report, returncode, capture_root=game)
+    operation('restart_boundary_validation')
+    terminal = safe_to_restart(report, returncode, capture_root=game,on_progress=on_progress)
     classification = 'invalid' if invalid else 'completed' if playable and terminal and report_matches else 'incomplete_unverified'
     capture_id = identity.get('capture_id') or identity.get('legacy_episode_id') or str(game.resolve())
     prior = [r for r in journal.records('game_completion')
@@ -65,7 +72,10 @@ def preserve_game(journal, game, *, marathon, returncode, report):
     if prior:
         if prior[-1].data['payload'] != payload:
             raise ValueError('conflicting finalized game evidence; preserve original record')
+        completed(operation='game_completion_idempotence_verified',record_id=prior[-1].id)
         return dict(record_id=prior[-1].id, classification=classification, duplicate=True)
+    operation('game_completion_journal_commit')
     record = journal.append('game_completion', payload, episode=capture_id,
         producer='independent-recording-boundary-validator',version='1')
+    completed(operation='game_completion_committed',record_id=record.id)
     return dict(record_id=record.id, classification=classification, duplicate=False)

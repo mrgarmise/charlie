@@ -26,14 +26,29 @@ class IdentityIntegrityError(ValueError):
     pass
 
 
-def artifact_manifest(root):
+def _progress(callback, operation, **detail):
+    if callback:callback(dict(operation=operation,**detail))
+
+
+def _artifact_hash(path, on_progress=None):
+    """Hash exact original bytes with checkpoints after completed chunks."""
+    value=hashlib.sha256();done=0
+    with Path(path).open('rb') as stream:
+        while chunk:=stream.read(1024*1024):
+            value.update(chunk);done+=len(chunk)
+            _progress(on_progress,'artifact_hash_chunk',path=str(path),bytes_hashed=done)
+    _progress(on_progress,'artifact_hash_complete',path=str(path),bytes_hashed=done)
+    return value.hexdigest()
+
+
+def artifact_manifest(root, *, on_progress=None):
     root = Path(root).resolve()
     result = {}
     for p in sorted(root.rglob('*')):
         if p.is_symlink():
             raise IdentityIntegrityError('source contains symlink; association requires resolution')
         if p.is_file() and p.name not in OVERLAYS | {MANIFEST, MANIFEST+'.pending', ORIGIN+'.pending'}:
-            result[p.relative_to(root).as_posix()] = hashlib.sha256(p.read_bytes()).hexdigest()
+            result[p.relative_to(root).as_posix()] = _artifact_hash(p,on_progress)
     return result
 
 
@@ -88,10 +103,11 @@ def content_identity(root, artifacts):
     return 'content:'+digest(core)
 
 
-def recording_completion(root):
+def recording_completion(root, *, on_progress=None):
     """Compute an exact writer-owned receipt only after writer termination."""
     from .evidence import EvidenceJournal
-    root=Path(root);journal=EvidenceJournal(root/'session-evidence.sqlite3',read_only=True)
+    root=Path(root);journal=EvidenceJournal(root/'session-evidence.sqlite3',read_only=True,
+        on_progress=lambda:_progress(on_progress,'recording_journal_record_verified'))
     try:
         rows=journal.records();captures=journal.category_records('observation','camera_capture')
         observations=journal.category_records('observation','camera_observation')
@@ -112,6 +128,7 @@ def recording_completion(root):
                     raise IdentityIntegrityError('unretained observation falsely claims original pixels')
             elif r.id not in bindings:
                 raise IdentityIntegrityError('observation has no completed original frame')
+            _progress(on_progress,'observation_binding_verified',record_id=r.id)
         requests=journal.category_records('observation','incident_request')
         resolved={r.data['payload'].get('request_id') for r in journal.category_records('observation','incident_resolution')}
         if any(r.id not in resolved for r in requests):raise IdentityIntegrityError('incident request unresolved')
@@ -122,7 +139,7 @@ def recording_completion(root):
                 if request.id not in resolved or not start<=row.data['at']<=end:
                     raise IdentityIntegrityError('incident artifact outside its resolved request')
             ref=row.data['payload']['artifact'];path=root/ref['path']
-            if path.is_symlink() or path.resolve().parent!=(root/'observations').resolve() or hashlib.sha256(path.read_bytes()).hexdigest()!=ref['sha256']:
+            if path.is_symlink() or path.resolve().parent!=(root/'observations').resolve() or _artifact_hash(path,on_progress)!=ref['sha256']:
                 raise IdentityIntegrityError('recorded pixels corrupt or missing')
         if list((root/'observations').glob('*.pending')):
             raise IdentityIntegrityError('interrupted image publication remains')
@@ -130,12 +147,12 @@ def recording_completion(root):
         names += [name for name in ('steps.jsonl','agency.jsonl') if (root/name).exists()]
         body=dict(schema='charlie-writer-completion-v1',records=len(rows),captures=len(captures),
             last_record_id=rows[-1].id if rows else None,
-            artifacts={name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in sorted(names)})
+            artifacts={name:_artifact_hash(root/name,on_progress) for name in sorted(names)})
         return dict(body,sha256=digest(body))
     finally:journal.close()
 
 
-def verify_recording_completion(root):
+def verify_recording_completion(root, *, on_progress=None):
     """New buffered captures fail closed; historical captures are untouched."""
     root=Path(root);path=root/'recording-state.json'
     if not path.exists():
@@ -146,7 +163,8 @@ def verify_recording_completion(root):
         journal_path=root/'session-evidence.sqlite3'
         if journal_path.exists():
             from .evidence import EvidenceJournal
-            original=EvidenceJournal(journal_path,read_only=True)
+            original=EvidenceJournal(journal_path,read_only=True,
+                on_progress=lambda:_progress(on_progress,'legacy_journal_record_verified'))
             try:
                 if original.category_records('observation','camera_observation'):
                     raise IdentityIntegrityError('buffered writer marker missing for new observation records')
@@ -155,16 +173,16 @@ def verify_recording_completion(root):
     state=json.loads(path.read_text())
     if state.get('schema')!='charlie-buffered-recording-v1' or state.get('status')!='complete':
         raise IdentityIntegrityError('buffered writer incomplete; exclude from sealing/evaluation')
-    if state.get('completion')!=recording_completion(root):
+    if state.get('completion')!=recording_completion(root,on_progress=on_progress):
         raise IdentityIntegrityError('buffered writer completion receipt inconsistent')
     return state
 
 
-def finalize_capture(root):
+def finalize_capture(root, *, on_progress=None):
     root = Path(root)
     origin = begin_capture(root)
-    verify_recording_completion(root)
-    artifacts = artifact_manifest(root)
+    verify_recording_completion(root,on_progress=on_progress)
+    artifacts = artifact_manifest(root,on_progress=on_progress)
     if 'report.json' not in artifacts:
         raise IdentityIntegrityError('capture finalization requires a completed report')
     body = dict(schema=SCHEMA, capture_id=origin['capture_id'], artifacts=artifacts,
@@ -173,17 +191,18 @@ def finalize_capture(root):
     # Finalization is after all writers terminate; sync source bytes before durable seal.
     for name in artifacts:
         with (root/name).open('rb') as stream:os.fsync(stream.fileno())
+        _progress(on_progress,'artifact_synced',path=str(root/name))
     _publish_once(root/MANIFEST, manifest)
-    if artifact_manifest(root) != artifacts:
+    if artifact_manifest(root,on_progress=on_progress) != artifacts:
         raise IdentityIntegrityError('source artifacts changed during finalization')
     return manifest
 
 
-def inspect_capture(root):
+def inspect_capture(root, *, on_progress=None):
     """Read only. Missing legacy identifiers are derived in the journal, not source."""
     root = Path(root).resolve()
-    verify_recording_completion(root)
-    artifacts = artifact_manifest(root)
+    verify_recording_completion(root,on_progress=on_progress)
+    artifacts = artifact_manifest(root,on_progress=on_progress)
     origin = None
     if (root/(ORIGIN+'.pending')).exists() and not (root/ORIGIN).exists():
         raise IdentityIntegrityError('capture origin publication interrupted; producer must resume')
@@ -206,6 +225,7 @@ def inspect_capture(root):
     # Finalization is after all writers terminate; sync source bytes before durable seal.
     for name in artifacts:
         with (root/name).open('rb') as stream:os.fsync(stream.fileno())
+        _progress(on_progress,'artifact_synced',path=str(root/name))
         status = 'legacy; occurrence unknown'
     content = manifest['content_id']
     legacy = ('episode:'+artifacts['report.json'] if 'report.json' in artifacts

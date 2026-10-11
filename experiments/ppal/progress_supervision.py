@@ -15,6 +15,12 @@ class Progress:
         self.data = dict(pid=os.getpid(), phase='startup', phase_started_at=now,
                          updated_at=now, fresh_at=now, sensor_at=None,
                          perception_at=now, cycle_at=now, cycles=0)
+        try:
+            previous=json.loads(self.path.read_text())
+            if previous.get('pid')==os.getpid():
+                self.data['work_sequence']=previous.get('work_sequence',0)
+        except (OSError,ValueError):pass
+        self._work_published_at=now
         self.cost_seconds = 0.
         self.enter('startup')
 
@@ -28,6 +34,23 @@ class Progress:
 
     def enter(self, phase):
         self.update(phase=phase, phase_started_at=self.clock())
+
+    def operation(self, name):
+        """Name the pending operation; starting it is not completed work."""
+        self.update(operation=name, operation_started_at=self.clock())
+
+    def checkpoint(self, event):
+        """Call only after real work completes; no timer/background heartbeat."""
+        now=self.clock()
+        self.data.update(work_sequence=self.data.get('work_sequence',0)+1,
+                         work_completed_at=now,last_work=event)
+        if now-self._work_published_at>=.25:
+            self.update()
+            self._work_published_at=now
+
+    def operation_completed(self):
+        self.checkpoint({'completed_operation':self.data.get('operation')})
+        self.update()  # Durable commits/state transitions are published immediately.
 
     def fresh(self, sensor_at):
         # Repeated/stale exposures must not keep the watchdog alive.
@@ -56,7 +79,7 @@ def stalled_reason(row, now, *, silence=30., camera=10., controller=10., process
         return 'observation_failure'
     if phase in ('perception', 'startup') and age > silence:
         return 'subprocess_hang'
-    if phase == 'finalizing' and age > processing:
+    if phase == 'finalizing' and now-row.get('work_completed_at',row['phase_started_at']) > processing:
         return 'processing_stall'
     if now-row['updated_at'] > (processing if phase in ('processing', 'finalizing') else silence):
         return 'processing_stall' if phase in ('processing','finalizing') else 'subprocess_hang'
@@ -108,6 +131,30 @@ def stop_process(child, *, grace=5.):
     return True
 
 
+class WorkWatchdog:
+    """Parent-clock inactivity limit; unchanged reports cannot refresh it."""
+    def __init__(self):
+        self.last_forward_at=None
+
+    def observe(self, row, now, *, processing):
+        if row.get('phase') not in ('finalizing','processing'):
+            self.last_forward_at=None
+            return None
+        # Preserve legacy offline processing_units, which count committed work.
+        sequence=row.get('work_sequence',0)
+        units=row.get('processing_units',0)
+        sequence=sequence if type(sequence) is int and sequence>=0 else 0
+        units=units if type(units) is int and units>=0 else 0
+        marker=(sequence,units)
+        if self.last_forward_at is None:
+            self.last_forward_at=now
+            self.marker=marker
+        elif marker[0]>self.marker[0] or marker[1]>self.marker[1]:
+            self.last_forward_at=now
+            self.marker=(max(marker[0],self.marker[0]),max(marker[1],self.marker[1]))
+        return 'processing_stall' if now-self.last_forward_at>processing else None
+
+
 def supervise(cmd, progress_path, *, silence=30., camera=10., controller=10.,
               processing=60., budget=None, poll=.2, grace=5., on_progress=None):
     """Parent watchdog works even if capture, transport or the child loop blocks.
@@ -123,6 +170,7 @@ def supervise(cmd, progress_path, *, silence=30., camera=10., controller=10.,
     reason = None
     row = None
     reported_units = 0
+    work_watchdog=WorkWatchdog()
     try:
         while child.poll() is None:
             try:
@@ -136,7 +184,11 @@ def supervise(cmd, progress_path, *, silence=30., camera=10., controller=10.,
             except (OSError, ValueError):
                 pass
             now = time.monotonic()
-            reason = (stalled_reason(row, now, silence=silence, camera=camera,
+            if row and row.get('phase') in ('processing','finalizing'):
+                reason=work_watchdog.observe(row,now,processing=processing)
+            else:
+                work_watchdog.last_forward_at=None
+                reason = (stalled_reason(row, now, silence=silence, camera=camera,
                                     controller=controller, processing=processing)
                       if row else ('subprocess_hang' if now-began > silence else None))
             if budget is not None and now-began > budget:

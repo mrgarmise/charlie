@@ -359,7 +359,7 @@ class CaptureEvidence:
     def ready(self):
         self.flush();self.preparing=False
 
-    def close(self):
+    def close(self, *, on_progress=None):
         if self._closed:return
         error=None
         try:
@@ -379,7 +379,7 @@ class CaptureEvidence:
                     emergency_item_uncommitted=bool(self.overflow))
             else:
                 from memory.episode_identity import recording_completion
-                completion=recording_completion(self.output)
+                completion=recording_completion(self.output,on_progress=on_progress)
                 self._save_state('complete',completion=completion)
         self._rolling.clear();self._rolling_bytes=0
         if error:raise error

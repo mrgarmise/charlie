@@ -1367,7 +1367,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         try:source.close()
         except Exception as exc:recording_error=f'camera close: {type(exc).__name__}: {exc}'
         if progress:
-            try:progress.enter('finalizing')
+            try:progress.enter('finalizing');progress.operation('episode_writer_finalize')
             except OSError as exc:recording_error=f'progress finalization: {exc}'
         timing['stopped_at'] = time.monotonic()
         start_transport = timing.get('start_transport') or {}
@@ -1378,7 +1378,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         try:
             diary.transition(session.stop(result));diary.close()
         except OSError as exc:recording_error=f'diary finalization: {exc}'
-        try:recorder.close()
+        try:recorder.close(on_progress=progress.checkpoint if progress else None)
         except Exception as exc:
             recording_error=f'{type(exc).__name__}: {exc}'
             result='ERROR: evidence finalization failed; original partial records retained'
@@ -1391,7 +1391,9 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         if semantic_observer is not None:
             semantic_observer.close()
         if score_observer is not None:
+            if progress:progress.operation('score_writer_finalize')
             score_observer.close()
+            if progress:progress.operation_completed()
         if score_observer is not None and not score_observer.thread.is_alive():
             buffered_frames.extend(score_observer.frames)
         if score_observer is not None and score_observer.thread.is_alive():
@@ -1402,7 +1404,9 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             save_review(raw,locals().get('tick',0),'final-view')
         # Controllers are already neutral/closed before any image encoding.
         for name, frame in buffered_frames:
+            if progress:progress.operation('diagnostic_frame_save')
             frame.save(args.output / name)
+            if progress:progress.operation_completed()
         tracks = self_tracker.tracks() if args.arm else []
         (args.output / "tracks.json").write_text(json.dumps({"tracks":tracks}, indent=2)+"\n")
         report = {"session_timing":timing, "session_transitions":[vars(r) for r in session.transitions], "session_events":"events.jsonl", "provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
@@ -1456,7 +1460,10 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         # Finalized writer receipts remain immutable. Acquisition delivers the
         # pending report to the existing marathon/notebook journal.
         from memory.episode_identity import finalize_capture
-        if recording_error is None:finalize_capture(args.output)
+        if recording_error is None:
+            if progress:progress.operation('capture_seal')
+            finalize_capture(args.output,on_progress=progress.checkpoint if progress else None)
+            if progress:progress.operation_completed()
         print(f"Evidence: {args.output}/report.json")
         if recording_error:
             import sys

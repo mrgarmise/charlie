@@ -146,7 +146,7 @@ class ScoreObserver:
             journal_delivery='existing marathon diary or normal evidence acquisition',physical_authorization=False)
 
     @staticmethod
-    def queue_game(journal, root, *, session, number, interrupted=False, synthetic=False):
+    def queue_game(journal, root, *, session, number, interrupted=False, synthetic=False, on_progress=None):
         """Append a game attempt to the existing diary; never certify its score.
 
         This is called before and after the game child, without human interaction.
@@ -155,6 +155,9 @@ class ScoreObserver:
         from pathlib import Path
         import hashlib,math
         from memory.evidence import digest
+        from memory.episode_identity import _artifact_hash
+        def completed(**detail):
+            if on_progress:on_progress(detail)
         root=Path(root).resolve()
         attempt='score-attempt:'+digest(dict(session=str(session),number=number))
         old=[r for r in journal.category_records('observation','score_game_record')
@@ -188,6 +191,7 @@ class ScoreObserver:
                         if row.get('raw_frame'):observations.append(dict(row,line=line))
                         observations=observations[-64:]
                     except (ValueError,AttributeError):deficiencies.append('Unreadable score row '+str(line))
+                    completed(operation='score_row_processed',line=line)
         except OSError:pass
         final=summary.get('final_observation')
         if isinstance(final,dict) and final.get('raw_frame'):
@@ -204,7 +208,7 @@ class ScoreObserver:
             try:
                 from PIL import Image
                 with Image.open(path) as image:image.verify()
-                artifact=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+                artifact=dict(path=str(path),sha256=_artifact_hash(path,on_progress))
             except (OSError,ValueError):continue
             selected=row;break
         if not origin.get('capture_id') and report_hash:
@@ -221,7 +225,7 @@ class ScoreObserver:
             if type(at) in (int,float) and math.isfinite(at) and at>=0:
                 source=journal.append('observation',dict(category='score_review_source',artifact=artifact,
                     camera_observation_id=selected.get('observation_id'),score_row=selected,
-                    score_log_sha256=hashlib.sha256((root/'score.jsonl').read_bytes()).hexdigest() if (root/'score.jsonl').exists() else None),
+                    score_log_sha256=_artifact_hash(root/'score.jsonl',on_progress) if (root/'score.jsonl').exists() else None),
                     episode=source_episode,at=at,producer='ScoreObserver',version='deferred-review-v1')
                 proposal=ScoreObserver.review_proposal(journal,artifact['path'],source_episode=source_episode,
                     timestamp=at,clock='original camera capture monotonic',source_id=source.id,
@@ -240,7 +244,7 @@ class ScoreObserver:
             try:
                 from PIL import Image
                 with Image.open(path) as image:image.verify()
-                key=hashlib.sha256(path.read_bytes()).hexdigest()
+                key=_artifact_hash(path,on_progress)
             except (OSError,ValueError):continue
             if key in seen:continue
             seen.add(key);additional.append(dict(path=str(path),sha256=key,timestamp=at,
@@ -260,9 +264,13 @@ class ScoreObserver:
             synthetic=synthetic or report.get('simulation',False),deficiencies=deficiencies,
             previous=old[-1].id if old else None,physical_authorization=False,
             qualification='reported attempt only; no independent complete-game score certificate')
-        if old and all(old[-1].data['payload'].get(k)==v for k,v in payload.items() if k!='previous'):return old[-1]
-        return journal.append('observation',payload,episode=source_episode,
+        if old and all(old[-1].data['payload'].get(k)==v for k,v in payload.items() if k!='previous'):
+            completed(operation='score_evidence_idempotence_verified',record_id=old[-1].id)
+            return old[-1]
+        record=journal.append('observation',payload,episode=source_episode,
             sources=[proposal.id] if proposal else [],producer='ScoreObserver',version='deferred-review-v1')
+        completed(operation='score_evidence_committed',record_id=record.id)
+        return record
 
     @staticmethod
     def review_proposal(journal,frame,*,source_episode,timestamp,clock,proposed,confidence,

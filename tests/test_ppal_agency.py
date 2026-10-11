@@ -206,11 +206,14 @@ def test_adapter_discovers_unknown_sprite_with_bounded_neutral_probes():
     assert snapshots[-1]['latency_seconds'] is None
 
 
-def test_adapter_no_candidates_does_not_send_blind_commands():
+def test_adapter_no_candidates_uses_only_bounded_exploratory_probes():
     from unittest.mock import Mock
     controller=Mock(); v=VisualAgency()
     assert v.discover(lambda:[],controller) is None
-    controller.execute.assert_not_called()
+    assert controller.execute.call_count==12
+    assert all(call.args[1]==60 for call in controller.execute.call_args_list)
+    assert all(call.args[0].fire=='NONE' for call in controller.execute.call_args_list)
+    assert v.agency.self_id is None
 
 
 def test_adapter_ambiguous_candidates_exhausts_bounded_probes():

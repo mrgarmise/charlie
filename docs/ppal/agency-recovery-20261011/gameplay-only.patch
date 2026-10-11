@@ -1,0 +1,352 @@
+diff --git a/experiments/ppal/play_robotron.py b/experiments/ppal/play_robotron.py
+index ec2c63b..ef40953 100644
+--- a/experiments/ppal/play_robotron.py
++++ b/experiments/ppal/play_robotron.py
+@@ -398,14 +398,10 @@ def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.
+         if frame_no < 4 or frame_no % 8 == 0 or center is not None:
+             playfield.save(evidence_dir / f"startup-{frame_no:03d}.png")
+         gameplay_confirmed = len(watch)>=3 and all(r['screen_state'].get('phase')=='gameplay' for r in watch[-3:])
+-        if generic_ready and gameplay_confirmed and len(collected) >= 3:
+-            recent = collected[-3:]
+-            stable = all(old and new and .5 <= len(new)/len(old) <= 2.
+-                         and sum(min(_distance(d.center, before.center) for before, _ in old) <= 3.
+-                                 for d, _ in new) / len(new) >= .8
+-                         for old, new in zip(recent, recent[1:]))
+-            if stable:
+-                return None, "generic_visual_ready", collected, watch, first_visual
++        if generic_ready and gameplay_confirmed:
++            # A fresh positive gameplay scene permits causal investigation;
++            # prior sprite identity or stable visual candidates are not required.
++            return None, "generic_visual_ready", collected, watch, first_visual
+         if gameplay_confirmed and center is not None:
+             return center, "new_game_center", collected, watch, first_visual
+         frame_no += 1
+@@ -423,8 +419,8 @@ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("--seconds", "--diagnostic-seconds", dest="seconds", type=float, default=None,
+                         help="opt-in diagnostic duration limit; not normal game completion")
+-    parser.add_argument("--uncertainty-seconds", type=float, default=60.,
+-                        help="stop after sustained inability to demonstrate controlled SELF; never authorize START")
++    parser.add_argument("--uncertainty-seconds", type=float, default=None,
++                        help="opt-in diagnostic SELF-uncertainty cutoff; normal gameplay keeps investigating")
+     parser.add_argument("--supervised-child", action="store_true", help=argparse.SUPPRESS)
+     parser.add_argument("--host", default="charlie-arcade.local")
+     parser.add_argument("--port", type=int, default=8765)
+@@ -481,7 +477,7 @@ def main():
+     if not (1<=args.evidence_frame_capacity<=64 and args.evidence_frame_capacity<=args.evidence_record_capacity<=4096
+             and 16<=args.evidence_memory_mib<=512):
+         parser.error('evidence budgets require frames 1..64, records frames..4096, memory 16..512 MiB')
+-    if not math.isfinite(args.uncertainty_seconds) or not 10 <= args.uncertainty_seconds <= 300:
++    if args.uncertainty_seconds is not None and (not math.isfinite(args.uncertainty_seconds) or not 10 <= args.uncertainty_seconds <= 300):
+         parser.error("--uncertainty-seconds must be 10..300")
+     if not 30 <= args.pulse_ms <= 200:
+         parser.error("--pulse-ms must be 30..200")
+@@ -580,6 +576,7 @@ def main():
+     agency_samples = 0
+     agency_frames = []
+     latest_agency_frame = None
++    episode_observer = None
+     buffered_frames = []
+     raw_frames = []
+     recorder=None
+@@ -630,7 +627,9 @@ def main():
+             row["frame"] = name
+             agency_frames.append({"sample": visual_agency.tick, "path": name,
+                                   "candidates": _pair_evidence(visual_agency.pairs)})
+-        if progress: progress.perception()
++        if progress:
++            progress.perception()
++            if session.state in (SessionState.ACQUIRING, SessionState.REACQUIRING):progress.cycle()
+         agency_samples += 1
+         recorder.append_line(args.output/'agency.jsonl',row)
+         if snapshot["event"]:
+@@ -647,13 +646,20 @@ def main():
+                                       "response_window":snapshot.get("response_window"),
+                                       "identity_status":snapshot.get("identity_status"),
+                                       "actuators":snapshot.get("actuators")} if preceding_action or snapshot.get("command") is not None or getattr(controller, "last_execution", None) is not None else None)
++    def observe_episode(frame):
++        if episode_observer is not None:
++            screen = screen_classifier(frame)
++            screen['capture_timestamp'] = source.timestamp
++            episode_observer.observe_phase(screen)
+     def observe_unmeasured(pairs, frame):
+         nonlocal latest_agency_frame
+         latest_agency_frame = frame
++        observe_episode(frame)
+         record_agency(visual_agency.observe(pairs, observed_at=source.timestamp))
+     def read_agency_pairs():
+         nonlocal latest_agency_frame
+         latest_agency_frame = calibration.apply(source.read())
++        observe_episode(latest_agency_frame)
+         return recognizer.detect(latest_agency_frame)
+     def save_review(raw, tick, reason):
+         if len(review_frames) >= (40 if reason == 'final-view' else 39):
+@@ -789,6 +795,10 @@ def main():
+             if all(r['screen_state'].get('phase')=='gameplay' for r in startup_watch[i-2:i+1])), None)
+         phase(SessionState.ACQUIRING, 'candidate watch complete; direct actuator evidence follows')
+ 
++        episode_observer = EpisodeEndObserver(required_not_gameplay=8)
++        for watched in startup_watch:
++            episode_observer.observe_phase(dict(watched['screen_state'],capture_timestamp=watched.get('capture_timestamp')))
++
+         # Appearance/center are proposals. Armed play requires direct agency.
+         if args.arm:
+             if controller is None:
+@@ -796,7 +806,8 @@ def main():
+             print("DISCOVERING SELF: short movement/neutral probes over all visual candidates")
+             mark('self_discovery_started')
+             player = visual_agency.discover(read_agency_pairs, controller, record=record_agency,
+-                                           observation_time=lambda: source.timestamp)
++                                           observation_time=lambda: source.timestamp,
++                                           should_stop=lambda: episode_observer.confirmed)
+             mark('self_discovery_finished', identity_status='confirmed' if visual_agency.agency.self_id is not None else 'provisional' if player is not None else 'unknown')
+             frames = [visual_agency.pairs]
+             acquisition = ("generic_visual_agency" if visual_agency.agency.self_id is not None else
+@@ -804,11 +815,16 @@ def main():
+             if acquisition == "provisional_body_agency":
+                 print(f"SELF PROVISIONAL: hypothesis={visual_agency.controlled_track_id}; FIRE outcomes unconfirmed")
+ 
+-        if player is None:
++        if player is None and not args.arm:
+             raise RuntimeError("could not identify the player; controls neutral")
++        if player is None:
++            acquisition = 'agency_unresolved'
++            diary.event('initial_self_unresolved',baseline_pulse_ms=60,
++                        next_direction='continue bounded causal exploration; retain episode observation')
++            print('SELF UNKNOWN: continuing agency discovery and terminal observation')
+ 
+         identity_word = "HYPOTHESIS" if acquisition == "provisional_body_agency" else "ACQUIRED"
+-        print(f"PLAYER {identity_word} ({acquisition}) x={player[0]:.2f} y={player[1]:.2f}")
++        if player is not None:print(f"PLAYER {identity_word} ({acquisition}) x={player[0]:.2f} y={player[1]:.2f}")
+ 
+         # Bind trusted startup acquisition to an identity-independent visual track.
+         seed_pairs = frames[-1] if frames else []
+@@ -832,25 +848,24 @@ def main():
+         deadline = started + args.seconds if args.seconds is not None else float("inf")
+         timing.update(gameplay_timer_started_at=started, gameplay_deadline=deadline if args.seconds else None,
+                       duration_limit_kind="diagnostic" if args.seconds else "none")
+-        uncertainty = UncertaintyWindow(args.uncertainty_seconds)
+-        phase(SessionState.PLAYING, 'ordinary policy enabled with acquired or provisional SELF')
++        uncertainty = UncertaintyWindow(args.uncertainty_seconds) if args.uncertainty_seconds is not None else None
++        phase(SessionState.PLAYING, 'recorded gameplay; agency exploration continues until SELF is available')
+         diary.event('gameplay_timer_started', at=started, deadline=deadline if args.seconds else None, identity=acquisition)
+         tick = 0
+         lost = 0
++        recovery_round = 0
+         pending_move = None
+         pending_at = None
+         pending_origin = None
+         pending_origin_at = None
+-        episode_observer = EpisodeEndObserver(required_not_gameplay=8)
+         imaging_monitor=ImagingMonitor(calibration.apply(source.raw))
+-        for watched in startup_watch:
+-            episode_observer.observe_phase(dict(watched['screen_state'],capture_timestamp=watched.get('capture_timestamp')))
+         print(f"CHARLIE LOOSE: diagnostic limit {args.seconds:.1f}s" if args.seconds else "CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state")
+ 
+         while time.monotonic() < deadline:
+             raw = source.read()
+             observed_at = time.monotonic()-started
+             playfield = calibration.apply(raw)
++            observe_episode(playfield)
+             pairs = recognizer.detect(playfield)
+             detections = [d for d, _ in pairs]
+ 
+@@ -870,6 +885,7 @@ def main():
+                 raw = source.read()
+                 observed_at = time.monotonic()-started
+                 playfield = calibration.apply(raw)
++                observe_episode(playfield)
+                 pairs = recognizer.detect(playfield)
+                 detections = [d for d, _ in pairs]
+             agency_snapshot = visual_agency.observe(
+@@ -953,26 +969,42 @@ def main():
+                 recovered = None  # Global resemblance is not proof of a new SELF.
+ 
+                 recovery = "generic_visual_agency"
+-                if lost == 1 or lost % 12 == 0:
+-                    recovered = visual_agency.discover(
+-                        read_agency_pairs, controller, deadline=deadline, record=record_agency,
+-                        observation_time=lambda: source.timestamp)
+-                    if recovered is not None and visual_agency.agency.self_id is None:
+-                        recovery = "provisional_body_agency"
+-                    recovery_frames = [visual_agency.pairs]
+-                    detections = [d for d, _ in visual_agency.pairs]
++                recovery_round += 1
++                pulse_ms = (60, 120, 240)[min(recovery_round-1, 2)]
++                response_frames = 2 if recovery_round == 1 else 3
++                # Recovery probes are declared diagnostic interventions, not a
++                # learned policy, a new baseline or proof that longer is better.
++                proposal = dict(round=recovery_round, baseline_pulse_ms=60,
++                    pulse_ms=pulse_ms,response_frames=response_frames,
++                    question='can a longer bounded BODY response window establish causal SELF?',
++                    reason='prior discovery did not establish controllable SELF',
++                    qualification='exploratory recovery; effectiveness unresolved')
++                recorder.event('agency_recovery_plan',proposal,at=time.monotonic())
++                recovered = visual_agency.discover(
++                    read_agency_pairs, controller, pulse_ms=pulse_ms,
++                    response_frames=response_frames,deadline=deadline,record=record_agency,
++                    observation_time=lambda: source.timestamp,
++                    should_stop=lambda: episode_observer.confirmed)
++                recorder.event('agency_recovery_outcome',dict(proposal,
++                    self_established=visual_agency.agency.self_id is not None,
++                    identity_status=visual_agency.agency.last_snapshot.get('identity_status','unknown'),
++                    interpretation='observed agency belief; no independent pulse efficacy claim'),at=time.monotonic())
++                if recovered is not None and visual_agency.agency.self_id is None:
++                    recovery = "provisional_body_agency"
++                recovery_frames = [visual_agency.pairs]
++                detections = [d for d, _ in visual_agency.pairs]
+ 
+                 # SELF loss never ends an episode.  It only changes what Charlie
+                 # does: remain neutral, keep looking, and gather independent
+                 # evidence about whether Robotron itself has left gameplay.
+-                screen = classify_screen_state(latest_agency_frame if latest_agency_frame is not None else playfield)
++                screen = screen_classifier(latest_agency_frame if latest_agency_frame is not None else playfield)
+                 screen['capture_timestamp'] = source.timestamp
+ 
+                 # A causal challenge is corroborating evidence, not a termination
+                 # rule.  Do it occasionally after sustained loss; failure means
+                 # "no controllable SELF demonstrated", never "the game is over".
+                 challenge = None
+-                if recovered is None and lost >= 3 and (lost == 3 or lost % 12 == 0):
++                if recovered is None and not episode_observer.confirmed and lost >= 3 and (lost == 3 or lost % 12 == 0):
+                     print(
+                         f"REACQUIRING: {lost} misses; "
+                         "checking for controllable SELF")
+@@ -1027,7 +1059,7 @@ def main():
+                 # deliberately makes a one-frame transition/glitch insufficient.
+                 # Recovery/challenge may have taken seconds: use its newest
+                 # already-calibrated evidence, not the frame preceding it.
+-                screen = classify_screen_state(latest_agency_frame if latest_agency_frame is not None else playfield)
++                screen = screen_classifier(latest_agency_frame if latest_agency_frame is not None else playfield)
+                 screen['capture_timestamp'] = source.timestamp
+                 episode_observer.observe_phase(screen)
+                 if recovered is None and episode_observer.confirmed:
+@@ -1047,7 +1079,7 @@ def main():
+                     break
+ 
+                 if recovered is None:
+-                    if uncertainty.observe(False, time.monotonic()):
++                    if uncertainty is not None and uncertainty.observe(False, time.monotonic()):
+                         result = 'OBSERVATION UNCERTAIN'
+                         diary.event('observation_uncertainty_stop', screen=screen, boundary='unverified',
+                                     duration=time.monotonic()-uncertainty.since)
+@@ -1058,7 +1090,7 @@ def main():
+                         "t": time.monotonic() - started,
+                         "status": "reacquiring",
+                         "lost": lost,
+-                        "last_player": list(player),
++                        "last_player": list(player) if player is not None else None,
+                         "screen_state": screen,
+                         "not_gameplay_streak": episode_observer.not_gameplay_streak,
+                     })
+@@ -1097,6 +1129,7 @@ def main():
+                 episode_observer.self_reacquired()
+                 phase(SessionState.PLAYING, 'SELF reacquired; no new-game inference')
+                 lost = 0
++                recovery_round = 0
+                 tick += 1
+                 continue
+ 
+@@ -1187,7 +1220,7 @@ def main():
+             if pulse_ms < 30:
+                 result = "DIAGNOSTIC LIMIT"
+                 break
+-            uncertainty.observe(True, time.monotonic())
++            if uncertainty is not None:uncertainty.observe(True, time.monotonic())
+             pending_origin = dict(visual_agency.positions)
+             pending_origin_at = source.timestamp
+             pending_at = time.monotonic()
+diff --git a/experiments/ppal/robotron_agency.py b/experiments/ppal/robotron_agency.py
+index 13d2405..661cfdb 100644
+--- a/experiments/ppal/robotron_agency.py
++++ b/experiments/ppal/robotron_agency.py
+@@ -82,7 +82,7 @@ class VisualAgency:
+     def player(self):
+         return self.positions.get(self.controlled_track_id)
+ 
+-    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None):
++    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None, response_frames=2, should_stop=None):
+         """Bounded reversal/orthogonal taps interleaved with measured neutral.
+ 
+         Controller.execute centers both sticks at each pulse's end. Read the
+@@ -90,10 +90,17 @@ class VisualAgency:
+         reference to the second endpoint, then an independent neutral interval.
+         The intermediate exposure is retained without scoring an early response.
+         """
++        if response_frames not in (2, 3):
++            raise ValueError('agency response window must contain two or three fresh frames')
++        def stopped():
++            return ((deadline is not None and time.monotonic() >= deadline)
++                    or (should_stop is not None and should_stop()))
++        if stopped():return self.player
+         pairs = read_pairs()
+         initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
+         if record:
+             record(initial)  # pre-command detections are essential for exact replay
++        if stopped():return self.player
+         if self.bootstrap_body_fire:
+             if deadline is not None and time.monotonic()+pulse_ms/1000 >= deadline:
+                 return self.player
+@@ -106,14 +113,15 @@ class VisualAgency:
+                                          'interpretation':'effects unknown; no projectile labels inferred'}
+                 if record:
+                     record(snapshot)
+-                if deadline is not None and time.monotonic() >= deadline:
+-                    return self.player
++                if stopped():return self.player
+         for probe, move in enumerate(('E', 'W', 'S', 'N', 'E', 'W')):
++            if stopped():break
+             if deadline is not None and time.monotonic() + 2*pulse_ms/1000 >= deadline:
+                 break
+-            if not self.positions:
+-                break
++            # A bounded probe can precede a new region appearing after respawn;
++            # absence of a track never fabricates a signed response.
+             for direction in (move, 'STAY'):
++                if stopped():return self.player
+                 if deadline is not None and time.monotonic() + pulse_ms/1000 >= deadline:
+                     return self.player
+                 origin = dict(self.positions)
+@@ -126,27 +134,27 @@ class VisualAgency:
+                 if direction != 'STAY':
+                     # Fresh sensor exposure does not guarantee the TV has yet
+                     # rendered the action. Preserve the early frame, associating
+-                    # exactly once, but withhold agency judgment until the fixed
+-                    # second endpoint. The reference remains the pre-pulse view.
+-                    early = self.observe(pairs, observed_at=at)
+-                    early['phase'] = 'response_window_early_unmeasured'
+-                    early['actuators'] = {'body':direction, 'fire':fire}
+-                    early['response_window'] = {'origin_at': origin_at, 'move': direction,
+-                                                'endpoint': 1, 'endpoints': 2}
+-                    if record:
+-                        record(early)
+-                    if deadline is not None and time.monotonic() >= deadline:
+-                        return self.player
+-                    pairs = read_pairs()
+-                    at = observation_time() if observation_time else time.monotonic()
++                    # exactly once, but withhold agency judgment until the declared
++                    # final endpoint. The reference remains the pre-pulse view.
++                    for endpoint in range(1, response_frames):
++                        early = self.observe(pairs, observed_at=at)
++                        early['phase'] = 'response_window_early_unmeasured'
++                        early['actuators'] = {'body':direction, 'fire':fire}
++                        early['response_window'] = {'origin_at': origin_at, 'move': direction,
++                                                    'endpoint': endpoint, 'endpoints': response_frames}
++                        if record:
++                            record(early)
++                        if stopped():return self.player
++                        pairs = read_pairs()
++                        at = observation_time() if observation_time else time.monotonic()
+                 snapshot = self.observe(pairs, direction, time.monotonic()-start,
+                                         observed_at=at,
+                                         reference_positions=origin if direction != 'STAY' else None)
+-                snapshot['actuators'] = {'body':direction, 'fire':fire}
++                snapshot['actuators'] = {'body':direction, 'fire':fire, 'pulse_ms':pulse_ms}
+                 if direction != 'STAY':
+                     snapshot['phase'] = 'action_response_window'
+                     snapshot['response_window'] = {'origin_at': origin_at, 'endpoint_at': at,
+-                                                    'move': direction, 'endpoint': 2, 'endpoints': 2,
++                                                    'move': direction, 'endpoint': response_frames, 'endpoints': response_frames,
+                                                     'duration_seconds': at-origin_at}
+                 if record:
+                     record(snapshot)

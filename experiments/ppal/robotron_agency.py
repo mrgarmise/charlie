@@ -82,7 +82,7 @@ class VisualAgency:
     def player(self):
         return self.positions.get(self.controlled_track_id)
 
-    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None):
+    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None, response_frames=2, should_stop=None):
         """Bounded reversal/orthogonal taps interleaved with measured neutral.
 
         Controller.execute centers both sticks at each pulse's end. Read the
@@ -90,10 +90,17 @@ class VisualAgency:
         reference to the second endpoint, then an independent neutral interval.
         The intermediate exposure is retained without scoring an early response.
         """
+        if response_frames not in (2, 3):
+            raise ValueError('agency response window must contain two or three fresh frames')
+        def stopped():
+            return ((deadline is not None and time.monotonic() >= deadline)
+                    or (should_stop is not None and should_stop()))
+        if stopped():return self.player
         pairs = read_pairs()
         initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
         if record:
             record(initial)  # pre-command detections are essential for exact replay
+        if stopped():return self.player
         if self.bootstrap_body_fire:
             if deadline is not None and time.monotonic()+pulse_ms/1000 >= deadline:
                 return self.player
@@ -106,14 +113,15 @@ class VisualAgency:
                                          'interpretation':'effects unknown; no projectile labels inferred'}
                 if record:
                     record(snapshot)
-                if deadline is not None and time.monotonic() >= deadline:
-                    return self.player
+                if stopped():return self.player
         for probe, move in enumerate(('E', 'W', 'S', 'N', 'E', 'W')):
+            if stopped():break
             if deadline is not None and time.monotonic() + 2*pulse_ms/1000 >= deadline:
                 break
-            if not self.positions:
-                break
+            # A bounded probe can precede a new region appearing after respawn;
+            # absence of a track never fabricates a signed response.
             for direction in (move, 'STAY'):
+                if stopped():return self.player
                 if deadline is not None and time.monotonic() + pulse_ms/1000 >= deadline:
                     return self.player
                 origin = dict(self.positions)
@@ -126,27 +134,27 @@ class VisualAgency:
                 if direction != 'STAY':
                     # Fresh sensor exposure does not guarantee the TV has yet
                     # rendered the action. Preserve the early frame, associating
-                    # exactly once, but withhold agency judgment until the fixed
-                    # second endpoint. The reference remains the pre-pulse view.
-                    early = self.observe(pairs, observed_at=at)
-                    early['phase'] = 'response_window_early_unmeasured'
-                    early['actuators'] = {'body':direction, 'fire':fire}
-                    early['response_window'] = {'origin_at': origin_at, 'move': direction,
-                                                'endpoint': 1, 'endpoints': 2}
-                    if record:
-                        record(early)
-                    if deadline is not None and time.monotonic() >= deadline:
-                        return self.player
-                    pairs = read_pairs()
-                    at = observation_time() if observation_time else time.monotonic()
+                    # exactly once, but withhold agency judgment until the declared
+                    # final endpoint. The reference remains the pre-pulse view.
+                    for endpoint in range(1, response_frames):
+                        early = self.observe(pairs, observed_at=at)
+                        early['phase'] = 'response_window_early_unmeasured'
+                        early['actuators'] = {'body':direction, 'fire':fire}
+                        early['response_window'] = {'origin_at': origin_at, 'move': direction,
+                                                    'endpoint': endpoint, 'endpoints': response_frames}
+                        if record:
+                            record(early)
+                        if stopped():return self.player
+                        pairs = read_pairs()
+                        at = observation_time() if observation_time else time.monotonic()
                 snapshot = self.observe(pairs, direction, time.monotonic()-start,
                                         observed_at=at,
                                         reference_positions=origin if direction != 'STAY' else None)
-                snapshot['actuators'] = {'body':direction, 'fire':fire}
+                snapshot['actuators'] = {'body':direction, 'fire':fire, 'pulse_ms':pulse_ms}
                 if direction != 'STAY':
                     snapshot['phase'] = 'action_response_window'
                     snapshot['response_window'] = {'origin_at': origin_at, 'endpoint_at': at,
-                                                    'move': direction, 'endpoint': 2, 'endpoints': 2,
+                                                    'move': direction, 'endpoint': response_frames, 'endpoints': response_frames,
                                                     'duration_seconds': at-origin_at}
                 if record:
                     record(snapshot)

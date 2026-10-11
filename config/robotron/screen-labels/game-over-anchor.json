@@ -1,0 +1,45 @@
+{
+  "schema": "recorded-robotron-game-over-anchor-v1",
+  "source_sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+  "source_path": "observations/camera-000153.png",
+  "observation_id": "8adeb336a602bcce2de25db64f56738d42344a6b71363b5f3d2642932ed12cc2",
+  "source_commit": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+  "calibration": {
+    "corners": [
+      [
+        0.11159162531705473,
+        0.16536658670945614
+      ],
+      [
+        0.8590565424387642,
+        0.09947376865258456
+      ],
+      [
+        0.8757073923536968,
+        0.9093307526890027
+      ],
+      [
+        0.12983964058179817,
+        0.9554173841030265
+      ]
+    ],
+    "output_size": [
+      640,
+      480
+    ]
+  },
+  "roi": [
+    252,
+    230,
+    384,
+    253
+  ],
+  "shape": [
+    23,
+    132
+  ],
+  "mask_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+  "zlib_base64": "eJztlMESAyEIQ/n/n6YXXTAEYe1Mpwc5raLhQXYUuXEjhqr+AcIT/ZVuBcZ+KrBBwEuarzQRsKTu4pQhmUNW4gXDbvoHDOZFrFsxzLvjAFQVklvuPzKEgdFyBiFzkAknIbcqI0vJABjrDmWQDoNvovQiYcjmIAWDvS9fM8x9HCzKx/esZGh7sVbNGQJCcsh1jhOPQj7TYKjm4Dzl/1rOoIxBlTKAwhRAE7x2j4F44QQ0RCbAGBzkjxicA/HaEYN50WZYn4xXDGMJueeLFQsQwBAbtBblhsUH6CALPA==",
+  "minimum_similarity": 0.85,
+  "qualification": "Single native anchor; neighbours are temporal holdouts, not independent episodes"
+}

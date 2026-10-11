@@ -114,6 +114,46 @@ def _title_evidence(mask):
         basis='complete recorded logo pixels; similarity is not a probability')
 
 
+_GAME_OVER_ANCHOR = None
+
+
+def _game_over_evidence(mask):
+    """Complete recorded GAME OVER words; similarity is not confidence."""
+    global _GAME_OVER_ANCHOR
+    import json, hashlib, base64, zlib
+    from pathlib import Path
+    if _GAME_OVER_ANCHOR is None:
+        d=json.loads((Path(__file__).resolve().parents[2]/
+            'config/robotron/screen-labels/game-over-anchor.json').read_text())
+        raw=zlib.decompress(base64.b64decode(d['zlib_base64']))
+        if d['schema']!='recorded-robotron-game-over-anchor-v1' or hashlib.sha256(raw).hexdigest()!=d['mask_sha256']:
+            raise ValueError('recorded GAME OVER anchor integrity mismatch')
+        anchor=np.frombuffer(raw,dtype=np.uint8).reshape(d['shape'])
+        _GAME_OVER_ANCHOR=([cv2.resize(anchor,None,fx=x,fy=x,interpolation=cv2.INTER_NEAREST)
+            for x in (.85,.925,1.,1.075,1.15)],d)
+    anchors,d=_GAME_OVER_ANCHOR
+    score=max(float(cv2.matchTemplate(mask[190:285,180:460],a,cv2.TM_CCOEFF_NORMED).max()) for a in anchors)
+    return dict(matched=score>=d['minimum_similarity'],similarity=score,
+        minimum_similarity=d['minimum_similarity'],sha256=d['source_sha256'],
+        anchor_sha256=d['mask_sha256'],basis='complete recorded GAME OVER pixels; similarity is not a probability')
+
+
+class CurrentScreenClassifier:
+    """Reuse only the exact current camera observation, never a later frame."""
+    def __init__(self,classifier,key):
+        self.classifier=classifier;self.key=key;self.previous=None;self.result=None
+        self.calls=0;self.cache_hits=0
+
+    def __call__(self,frame):
+        from copy import deepcopy
+        key=self.key()
+        if key is not None and key==self.previous and self.result is not None:
+            self.cache_hits+=1
+        else:
+            self.result=self.classifier(frame);self.previous=key;self.calls+=1
+        return deepcopy(self.result)
+
+
 def _geometric_border(gray):
     # Complete luminous ridge versus its interior neighbour. Hue-independent;
     # the four sides remain necessary, so bright walls/blank frames do not pass.
@@ -139,12 +179,18 @@ def classify_screen_state(playfield: Image.Image) -> dict:
     labels=_screen_labels(mask)
     border=_geometric_border(gray)
     title=_title_evidence(mask)
+    terminal=_game_over_evidence(mask)
     evidence=dict(base,border_state=base['state'],label_scores={k:round(v,4) for k,v in labels.items()},
-                  geometric_border_support=[round(v,4) for v in border],phase='unknown')
+                  geometric_border_support=[round(v,4) for v in border],phase='unknown',
+                  title_reference=title,terminal_reference=terminal)
     # Scores are template similarities, not probabilities. Simultaneous strong
     # conflicting labels remain UNKNOWN. Prefix similarity alone never suffices.
     heroes=labels['heroes']>=.78 and labels['all-time']>=.78
     pregame=labels['pregame']>=.74 and labels['pregame']-labels['heroes']>=.08
+    if terminal['matched']:
+        if title['matched'] or heroes or pregame:
+            return dict(evidence,state='unknown',reason='conflicting_screen_labels')
+        return dict(evidence,state='not_gameplay',phase='terminal',reason='recorded_game_over_message')
     if title['matched'] and (heroes or pregame):
         return dict(evidence,state='unknown',reason='conflicting_screen_labels')
     if title['matched']:

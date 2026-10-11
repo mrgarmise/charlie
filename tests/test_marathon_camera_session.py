@@ -146,7 +146,7 @@ def test_default_runner_failure_preserves_game_one_and_releases_camera(tmp_path,
 
 
 @pytest.mark.parametrize('camera_failure',[False,True])
-def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False):
+def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False,terminal_delay=False):
     """Real player + marathon; simulated pixels/controls, not Pi acceptance."""
     import time
     from experiments.ppal import marathon_robotron as m,play_robotron as play
@@ -162,6 +162,7 @@ def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,
         def read(self):
             real_sleep(.01);clock[0]+=.05
             if world['game']:world['reads']+=1
+            if terminal_delay and world['reads']==102:clock[0]+=25.
             if camera_failure and world['game']==2 and world['reads']>65:
                 raise RuntimeError('simulated capture disconnected')
             return Image.new('RGB',(100,100))

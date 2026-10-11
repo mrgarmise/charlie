@@ -57,7 +57,10 @@ class EpisodeEndObserver:
             self.gameplay_captures=((self.gameplay_captures or [])+[at])[-3:]
             self.last_gameplay_at=at
         strong=screen.get('state')=='not_gameplay' and ((phase=='terminal' and screen.get('reason')=='recorded_heroes_headings'
-                and all((screen.get('label_scores') or {}).get(k,0)>=.78 for k in ('heroes','all-time'))) or phase=='title')
+                and all((screen.get('label_scores') or {}).get(k,0)>=.78 for k in ('heroes','all-time'))) or (phase=='terminal' and screen.get('reason')=='recorded_game_over_message'
+                and (screen.get('terminal_reference') or {}).get('matched') is True
+                and type((screen.get('terminal_reference') or {}).get('similarity')) in (int,float)
+                and .85<=(screen.get('terminal_reference') or {})['similarity']<=1.) or phase=='title')
         if strong and self.entry_evidence is not None and len(self.gameplay_captures or [])>=3:
             self.terminal_suspected=True
             self.postgame_captures=((self.postgame_captures or [])+[dict(screen)])[-3:]
@@ -144,6 +147,16 @@ class EpisodeEndObserver:
             and (not self.phase_history or (self.phase_history[-1]['phase'] in ('terminal','startable','title')
                  and max(self.terminal_streak,self.attract_streak)>=3))
         )
+
+    def diagnostic(self,screen,observation_id=None):
+        return dict(camera_observation_id=observation_id,capture_timestamp=screen.get('capture_timestamp'),
+            state=screen.get('state'),phase=screen.get('phase'),reason=screen.get('reason'),
+            label_scores=screen.get('label_scores'),title_reference=screen.get('title_reference'),
+            terminal_reference=screen.get('terminal_reference'),
+            positive_postgame_pages=len(self.postgame_captures or []),
+            not_gameplay_streak=self.not_gameplay_streak,entry_established=self.entry_evidence is not None,
+            decision='confirmed' if self.confirmed else 'unresolved',
+            rejection_reason=None if self.confirmed else 'fresh supported postgame transition still required')
 
     def evidence(self, *, screen: dict, self_lost_frames: int) -> dict:
         if self.terminal_transition is not None:

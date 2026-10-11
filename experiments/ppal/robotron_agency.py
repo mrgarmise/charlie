@@ -83,7 +83,7 @@ class VisualAgency:
     def player(self):
         return self.positions.get(self.controlled_track_id)
 
-    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None, response_frames=2, should_stop=None):
+    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None, response_frames=2, should_stop=None, center_spawn=False):
         """Bounded reversal/orthogonal taps interleaved with measured neutral.
 
         Controller.execute centers both sticks at each pulse's end. Read the
@@ -92,7 +92,12 @@ class VisualAgency:
         The intermediate exposure is retained without scoring an early response.
         """
         self.last_discovery = dict(schema='causal-discovery-result-v1', commands=[], capture_timestamps=[],
-                                   confirmed_self=False, complete=False)
+                                   confirmed_self=False, complete=False,
+                                   spawn_prior='center candidate ordering only; causal evidence required' if center_spawn else None)
+        if center_spawn:
+            original_read=read_pairs
+            def read_pairs():
+                return sorted(original_read(),key=lambda pair:sum((float(v)-50.)**2 for v in pair[0].center))
         if response_frames not in (2, 3):
             raise ValueError('agency response window must contain two or three fresh frames')
         def stopped():

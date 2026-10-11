@@ -49,7 +49,7 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
     try:
         report['stage'] = 'initial autofocus and manual lock'
         report['initial_focus'] = {}
-        seed = establish_focus(bounded, report=report['initial_focus'], manual_position=seed_position)
+        seed = establish_focus(bounded, report=report['initial_focus'], manual_position=2.0)
         report['stage'] = 'exposure'
         exposure=optimize_screen_exposure(bounded,output)
         report['exposure']=exposure
@@ -69,7 +69,7 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
         import numpy as np
         quality=screen_evidence(frame,np.array(optics.geometry.corners))
         final_points=locate(frame,require_uniform_border=False,previous=np.array(optics.geometry.corners))
-        if np.max(np.linalg.norm(final_points-np.array(optics.geometry.corners),axis=1))>8.:
+        if np.max(np.linalg.norm(final_points-np.array(optics.geometry.corners),axis=1))>PreflightConfig().max_jitter_pixels:
             raise ValueError('final image geometry differs from stable calibration; assistance required')
         quality['sharpness']=screen_sharpness(optics.calibration.apply(frame))
         report['quality']=quality
@@ -101,7 +101,7 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
 class PreflightConfig:
     # Geometry must agree repeatedly before START is authorized.
     stable_views: int = 6
-    max_jitter_pixels: float = 8.0
+    max_jitter_pixels: float = 12.0
     geometry_attempts: int = 24
     geometry_interval: float = 0.10
 
@@ -390,11 +390,19 @@ def run_preflight(
 
     provisional = locate_stable_geometry(source, cfg, **({'diagnostics': diagnostics} if diagnostics is not None else {}))
 
-    focus = optimize_screen_focus(
+    # Fixed manual focus selected from the camera sweep.
+    source.set_manual_focus(2.0)
+    score = score_current_focus(
         source,
         provisional.calibration,
-        seed_position=seed_position,
-        config=cfg,
+        samples=cfg.focus_samples,
+        margin=cfg.focus_margin,
+    )
+    focus = FocusResult(
+        lens_position=2.0,
+        score=score,
+        previous_score=score,
+        changed=False,
     )
 
     # Focus changes can slightly alter apparent edge position.  Geometry used

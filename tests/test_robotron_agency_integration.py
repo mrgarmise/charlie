@@ -14,7 +14,7 @@ from experiments.ppal.robotron_agency import VECTORS
                           (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
                           (False,False,False,False,False,False,False,True)])
 
-def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False,finalization_disk_error=False,sampled=False):
+def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False,finalization_disk_error=False,sampled=False,persistent=None):
     from experiments.ppal import play_robotron as play
     import time as real_time
     real_sleep=real_time.sleep
@@ -25,7 +25,8 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     class Source:
         def read(self):
             real_sleep(.05)  # bounded 20 Hz host fixture; no native latency claim
-            clock[0]+=.01; reads[0]+=1
+            clock[0]+=1. if persistent else .01; reads[0]+=1
+            if persistent and reads[0]>200:raise AssertionError('bounded simulated scene did not reach terminal')
             if pending[0] is not None:
                 response_reads[0] += 1
                 if response_reads[0] == 2:
@@ -39,6 +40,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         def close(self): closed.append('camera')
     class Recognizer:
         def detect(self,frame):
+            if persistent=='empty_attract':return []
             # Only the wrong stationary center object looks like PLAYER.
             return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
                      {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
@@ -52,6 +54,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
             commands.append(action)
             self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
             u=VECTORS[action.move]
+            if persistent=='terminal_without_self' or persistent=='recover' and ms==60:u=(0,0)
             if delayed_render and action.move != "STAY":
                 pending[0] = u; response_reads[0] = 0
             else:
@@ -80,6 +83,15 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     if terminal:
         monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
             'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+    if persistent:
+        def screen(frame):
+            if 'START' not in commands:return dict(state='not_gameplay',phase='startable')
+            elapsed_reads=reads[0]-start_read[0]
+            if persistent=='empty_attract' and 100<=elapsed_reads<110:
+                return dict(state='not_gameplay',phase='unknown',reason='unrecognized_striped_page')
+            return dict(state='gameplay' if elapsed_reads<100 else 'not_gameplay',
+                        phase='gameplay' if elapsed_reads<100 else 'terminal' if elapsed_reads<104 else 'startable')
+        monkeypatch.setattr(play,'classify_screen_state',screen)
     if recalibrate:
         def prepare(source,output,**kwargs):
             assert 'START' not in commands
@@ -121,7 +133,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
             return transition(self,change)
         monkeypatch.setattr(play.GameDiary,'transition',faulty_diary)
     monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
-                        + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                        + ([] if extended or terminal or persistent else ['--seconds','3' if rejected_challenge else '1'])
                         + (['--bootstrap-body-fire'] if bootstrap else [])
                         + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
                         + (['--recalibrate'] if recalibrate else [])
@@ -135,6 +147,32 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
         play.main()
     report=json.loads((tmp_path/'run/report.json').read_text())
     t=report['session_timing']
+    if persistent:
+        from experiments.ppal.marathon_robotron import safe_to_restart
+        from memory.evidence import EvidenceJournal
+        assert report['acquisition']=='agency_unresolved'
+        assert report['result']=='GAME OVER' and safe_to_restart(report,capture_root=tmp_path/'run')
+        assert t['gameplay_deadline'] is None
+        assert t['stopped_at']-t['gameplay_timer_started_at']>60
+        assert commands.count('START')==1 and closed==['controller','camera']
+        journal=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        plans=journal.category_records('observation','agency_recovery_plan')
+        # Generic recorder events can have another journal kind; inspect payloads.
+        plans=[r for r in journal.records() if r.data.get('payload',{}).get('category')=='agency_recovery_plan']
+        assert plans
+        serialized=json.dumps([r.data for r in plans])
+        assert 'baseline_pulse_ms' in serialized and '120' in serialized
+        journal.verify();journal.close()
+        actions=[r for r in report['steps'] if 'action' in r]
+        if persistent=='recover':
+            assert actions and any(r.get('status')=='player_reacquired' for r in report['steps'])
+            assert all(r['agency']['controlled_track_id'] is not None for r in actions)
+        else:
+            assert not actions and any(getattr(c,'move','STAY')!='STAY' for c in commands)
+            assert max(c for c in [row.get('control_execution',{}).get('duration_ms',0)
+                for row in map(json.loads,(tmp_path/'run/agency.jsonl').read_text().splitlines())
+                if row.get('control_execution')])<=240
+        return
     assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
     from memory.evidence import EvidenceJournal
     recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
@@ -242,3 +280,18 @@ def test_finalization_storage_error_releases_before_any_disk_logging(monkeypatch
 def test_normal_player_opt_in_sampled_trace_uses_existing_chooser(monkeypatch,tmp_path):
     test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
         False,False,False,False,False,False,False,False,sampled=True)
+
+
+def test_initial_discovery_failure_escalates_recovers_and_completes_without_identity_timeout(monkeypatch,tmp_path):
+    test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+        False,False,False,False,False,False,False,False,persistent='recover')
+
+
+def test_initial_discovery_failure_keeps_playing_until_fresh_confirmed_terminal(monkeypatch,tmp_path):
+    test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+        False,False,False,False,False,False,False,False,persistent='terminal_without_self')
+
+
+def test_no_plausible_self_qualifies_generic_failure_and_observes_attract(monkeypatch,tmp_path):
+    test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+        False,False,False,False,False,False,False,False,persistent='empty_attract')

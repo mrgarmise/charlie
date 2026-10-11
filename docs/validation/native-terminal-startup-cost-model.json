@@ -1,0 +1,19 @@
+{
+  "qualification": "Synthetic cost model: 0.1 seconds/read, 0.2 seconds/classification; no native speedup or experience claim",
+  "results": [
+    {
+      "optimized": false,
+      "modeled_seconds": 1.5,
+      "fresh_reads": 3,
+      "classifications": 6,
+      "self_certified": false
+    },
+    {
+      "optimized": true,
+      "modeled_seconds": 0.3,
+      "fresh_reads": 1,
+      "classifications": 1,
+      "self_certified": false
+    }
+  ]
+}

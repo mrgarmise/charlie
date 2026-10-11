@@ -1,6 +1,6 @@
 # Native Robotron terminal investigation repair
 
-Status: implemented for host validation; **pending native Raspberry Pi acceptance**.
+Status: implemented and host-tested; **pending native Raspberry Pi acceptance**.
 Base: `9e423e982a2f9b9a244c7126543fb4b04debb465`, published
 `feature/prompt-terminal-restart`. This isolated branch preserves that worktree.
 No live gameplay, servo movement, CAL activation, deployment, or notebook edits
@@ -158,3 +158,38 @@ Rollback: stop the new process using the existing operator STOP, verify neutral
 controls and camera release, then use the unchanged previous native worktree.
 Do not reset learning notebooks, journals, game evidence or camera configuration.
 No running installation was changed by this work.
+
+## Completed host validation
+
+Source checkpoint: `8c001e7519e8bf7d8c92304449ae0eb75beb7134`.
+Exact commands, environment versions, source hashes, JUnit hashes and every
+failing case are retained in `native-terminal-forensics-tests.json`.
+
+| Run | Passed | Failed | Skipped |
+| --- | ---: | ---: | ---: |
+| Preliminary subset | 58 | 0 | 0 |
+| Expanded focused collection | 201 | 1 | 0 |
+| Final serial full host suite | 947 | 15 | 21 |
+
+All 22 new cases passed in the final suite. All 15 final failures exactly match
+the baseline receipt: 14 autofocus fixtures lacking the native fresh-frame
+interface, and one geometry fixture expecting the old 8-pixel gate instead of
+the preserved native 12-pixel configuration. No new failing case was introduced.
+The focused failure was the existing watchdog test's 150ms inactivity limit
+expiring during unchanged dependency import. That exact case passed in the
+serial full run. Its earlier failure is retained in the receipt. Three additional
+diagnostic/deadline/parent tests were added after focused collection and passed
+in the full suite. Camera fixtures were not rewritten to hide failures.
+
+A synthetic cost model compares the preserved startup watch with recent-evidence
+reuse plus exact-observation memoization: 3 reads/6 classifications/1.5 modeled
+seconds versus 1 read/1 classification/0.3 modeled seconds, using explicit costs
+of 0.1 seconds/read and 0.2 seconds/classification. Neither path certifies SELF.
+The receipt `native-terminal-startup-cost-model.json` labels this simulation;
+it is not a measured native startup speedup or capability improvement.
+
+No fresh native acceptance, completed games, physical score improvement or
+learning improvement is claimed. Earlier successful originals remain unavailable,
+and the single-episode GAME OVER reference needs native generalization testing.
+The release blocker remains actual game one → playable game two → verified
+second ending, followed by the qualified three-game/offline sequence.

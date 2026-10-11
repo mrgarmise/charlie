@@ -54,7 +54,7 @@ def _settle(source, report, *, config, limits, target=None):
     for _ in range(config.max_frames):
         if time.monotonic() >= deadline:
             break
-        source.read()
+        source.read_fresh()
         capture = getattr(source, 'capture', None)
         if not isinstance(capture, dict):
             capture = getattr(source, 'last_capture', None)

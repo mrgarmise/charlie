@@ -439,7 +439,7 @@ def main():
     parser.add_argument("--no-start-game", action="store_true",
                         help="do not tap START; use when Robotron gameplay is already running")
     parser.add_argument("--focus", type=float, default=None,
-                        help="lock camera to this manual lens position after warm-up and before START")
+                        help="diagnostic manual starting position; normal operation establishes autofocus")
     parser.add_argument("--start-wait", type=float, default=4.0,
                         help="seconds to wait after START for visual gameplay/self evidence")
     parser.add_argument('--exploration-seconds',type=float,default=30.)
@@ -699,17 +699,6 @@ def main():
             source.read()
             time.sleep(0.04)
 
-        if args.focus is not None:
-            if not 0.0 <= args.focus <= 32.0:
-                raise ValueError("--focus must be between 0.0 and 32.0")
-            source.set_manual_focus(args.focus)
-            # Discard a few frames after the lens move before gameplay begins.
-            for _ in range(4):
-                source.read()
-                time.sleep(0.04)
-            actual_focus = source.lens_position()
-            print(f"FOCUS LOCKED: requested={args.focus:.3f} actual={actual_focus}")
-
         # Task-aware optics preflight runs before START, with neutral controls,
         # and never inside the time-critical tracking/score observation loop.
         mark('calibration_started')
@@ -906,7 +895,7 @@ def main():
                 if not drift['allowed']:
                     raise ObservationFailure('bounded sensory reacquisition exhausted; assistance required')
                 recorder.preparing=True
-                calibration,reacquired_optics=sensory_preflight(source,args.output,seed_position=args.focus)
+                calibration,reacquired_optics=sensory_preflight(source,args.output/f'reacquisition-{imaging_monitor.reacquisitions+1}')
                 recorder.ready();imaging_monitor.reacquired(calibration.apply(source.raw))
                 recorder.event('sensory_reacquired',reacquired_optics,at=time.monotonic())
                 interrupted=hindbrain.interrupt_tactic('new imaging coordinates; previous response window interrupted')

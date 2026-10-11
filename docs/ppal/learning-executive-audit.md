@@ -1,3 +1,5 @@
+> Camera operation update (2026-10-11): historical focus values below describe prior sessions only. The changed installation uses current-observation autofocus before exposure and geometry. Future operation examples omit the obsolete manual seed.
+
 # Learning Executive: actual architecture and smallest vertical slice
 
 Audit baseline: `feature/agency-first-self`, `0da1b84f65a725105b0ba74e489a7c72d7fe744f`.
@@ -190,7 +192,7 @@ The smallest implemented milestone is opt-in:
 ```bash
 python -m experiments.ppal.marathon_robotron \
   --developmental --learning-projects --max-games 3 --game-seconds 20 \
-  --focus 1.30 --arm
+  --arm
 ```
 
 This is the invocation **when a physical campaign is appropriate**, not a claim

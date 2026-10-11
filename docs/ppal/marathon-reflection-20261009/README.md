@@ -25,10 +25,10 @@ The existing offline recovery rule is narrowed to actual offline trial histories
 For a **separately authorized physical arcade session only** (not executed or authorized by this Work session), from the checked-out repository and existing Python environment:
 
 ```bash
-python -m experiments.ppal.marathon_robotron --developmental --learning-projects --play-first --max-games 3 --focus 1.30 --retry-wait 5 --learning-root "$HOME/.local/share/charlie/development" --reflection-turns 12 --ala-budget 10 --arm
+python -m experiments.ppal.marathon_robotron --developmental --learning-projects --play-first --max-games 3 --retry-wait 5 --learning-root "$HOME/.local/share/charlie/development" --reflection-turns 12 --ala-budget 10 --arm
 ```
 
-This automatically enters reflection after the safe gameplay phase; no separate meditation app is required. Use the actual existing normal notebook path if it differs. Prior accepted optical settings remain session-specific; this does not certify focus 1.30 universally. Existing physical readiness/authority gates remain mandatory.
+This automatically enters reflection after the safe gameplay phase; no separate meditation app is required. Use the actual existing normal notebook path if it differs. Current startup establishes autofocus before exposure and fresh geometry; previous optical settings are historical evidence only. Existing physical readiness/authority gates remain mandatory.
 
 Offline reflection/resume, with **no --arm, camera or controller**:
 

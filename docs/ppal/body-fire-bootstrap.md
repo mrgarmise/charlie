@@ -100,7 +100,7 @@ mkdir -p robotron-runs
 run_dir="robotron-runs/body-fire-bootstrap-$(date +%Y%m%d-%H%M%S)"
 set -o pipefail
 PYTHONPATH="$PWD" python -m experiments.ppal.play_robotron \
-  --seconds 20 --focus 1.30 --recalibrate --bootstrap-body-fire --arm \
+  --seconds 20 --recalibrate --bootstrap-body-fire --arm \
   --output "$run_dir" 2>&1 | tee "$run_dir.console.log"
 if [ -f "$run_dir/agency.jsonl" ]; then
   python -m experiments.ppal.replay_tracking "$run_dir/agency.jsonl" \
@@ -115,3 +115,5 @@ bounded preflight and probes add time. Observe actual movement, firing/projectil
 visibility, provisional/confirmed transitions, deaths and official score. The
 point is to collect action/consequence evidence, not declare understanding in
 advance. Do not require score or FIRE recognition for continued play.
+
+Camera calibration now establishes autofocus from fresh current observations before exposure and arena discovery. Manual `--focus` is diagnostic only; no inherited lens position is used in normal operation.

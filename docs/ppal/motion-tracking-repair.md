@@ -118,8 +118,7 @@ Matching replay output establishes reproducibility, not correct physical identit
 
 Do one game before any marathon. Keep the same physical view if it has not moved.
 If the camera moved, add the existing `--recalibrate` option to the live command.
-`1.30` is the requested focus from the previous run; use the known best current
-focus if that differs.
+The previous manually requested position is obsolete for the changed installation. Normal operation now establishes autofocus from current observations before exposure and geometry.
 
 ```bash
 cd ~/Projects/charlie
@@ -133,7 +132,7 @@ mkdir -p robotron-runs
 run_dir="robotron-runs/tracking-repair-$(date +%Y%m%d-%H%M%S)"
 set -o pipefail
 PYTHONPATH="$PWD" python -m experiments.ppal.play_robotron \
-  --seconds 20 --focus 1.30 --arm --output "$run_dir" \
+  --seconds 20 --arm --output "$run_dir" \
   2>&1 | tee "$run_dir.console.log"
 python -m experiments.ppal.replay_tracking "$run_dir/agency.jsonl" \
   --output "$run_dir/tracking-replay.json"

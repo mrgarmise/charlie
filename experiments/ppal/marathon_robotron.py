@@ -272,7 +272,8 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             print(f'DEVELOPMENT GAME {index}/{args.max_games}: {reason}',flush=True)
             write_session(session/'session.json',doc)
             cmd=[sys.executable,'-m','experiments.ppal.play_robotron','--arm',
-                 '--focus',str(args.focus),'--output',str(game)]
+                 '--output',str(game)]
+            if args.focus is not None:cmd.extend(['--focus',str(args.focus)])
             if developmental:cmd.extend(['--bootstrap-body-fire','--recalibrate'])
             if args.game_seconds is not None:cmd.extend(['--diagnostic-seconds',str(args.game_seconds)])
             if plan:cmd.extend(['--experiment-plan',str(plan_path)])
@@ -617,8 +618,8 @@ def main():
                     help="opt-in diagnostic duration, never normal game completion")
     ap.add_argument("--failed-starts",type=int,default=2)
     ap.add_argument("--retry-wait",type=float,default=5.0)
-    ap.add_argument("--focus",type=float,default=1.30,
-                    help="manual camera lens position passed to each game")
+    ap.add_argument("--focus",type=float,default=None,
+                    help="optional diagnostic manual starting position; default is automatic calibration")
     ap.add_argument("--root",type=Path,default=Path("robotron-runs"))
     ap.add_argument("--arm",action="store_true",help="required to send controls")
     ap.add_argument('--processing-budget',type=float,default=300.,help='offline work budget; failure stops marathon and retains partial evidence')

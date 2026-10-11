@@ -75,7 +75,7 @@ mkdir -p robotron-runs
 run_dir="robotron-runs/tracking-score-$(date +%Y%m%d-%H%M%S)"
 set -o pipefail
 PYTHONPATH="$PWD" python -m experiments.ppal.play_robotron \
-  --seconds 20 --focus 1.30 --recalibrate --arm --output "$run_dir" \
+  --seconds 20 --recalibrate --arm --output "$run_dir" \
   2>&1 | tee "$run_dir.console.log"
 python -m experiments.ppal.replay_tracking "$run_dir/agency.jsonl" \
   --output "$run_dir/tracking-replay.json"
@@ -115,3 +115,5 @@ are zero, those points cannot be credited to Charlie's normal planner. Probes di
 send movement commands, so this is not evidence of no actuation whatsoever.
 Pi tests did not execute because pytest was absent; install it and explicitly
 stop on test failure before arming. The next command below guards that condition.
+
+Camera calibration now establishes autofocus from fresh current observations before exposure and arena discovery. Manual `--focus` is diagnostic only; no inherited lens position is used in normal operation.

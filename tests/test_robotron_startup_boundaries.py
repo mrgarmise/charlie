@@ -5,7 +5,8 @@ import pytest
 from PIL import Image
 
 
-def test_failed_prestart_calibration_never_constructs_controller(monkeypatch,tmp_path):
+@pytest.mark.parametrize('failure', ['geometry', 'autofocus'])
+def test_failed_prestart_calibration_never_constructs_controller(monkeypatch,tmp_path,failure):
     from experiments.ppal import play_robotron as play
     closed=[]
     class Source:
@@ -19,11 +20,12 @@ def test_failed_prestart_calibration_never_constructs_controller(monkeypatch,tmp
         assert kw['require_uniform_border'] is False
         raise ValueError('no stable geometry')
     monkeypatch.setattr(play,'prepare',prepare)
-    monkeypatch.setattr(play,'sensory_preflight',lambda source,output,**kw:prepare(source,output,require_uniform_border=False))
+    if failure=='geometry':
+        monkeypatch.setattr(play,'sensory_preflight',lambda source,output,**kw:prepare(source,output,require_uniform_border=False))
     def controller(*a,**kw):pytest.fail('No controller or START before successful geometry')
     monkeypatch.setattr(play,'ArcadeController',controller)
     monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--recalibrate','--output',str(tmp_path/'run')])
-    with pytest.raises(ValueError,match='no stable geometry'):play.main()
+    with pytest.raises(ValueError,match='no stable geometry' if failure=='geometry' else 'LensPosition limits'):play.main()
     report=json.loads((tmp_path/'run/report.json').read_text())
     assert 'start_requested' not in report['session_timing']
     assert not report['episode_end']['confirmed'] and not report['steps']

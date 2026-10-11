@@ -18,6 +18,15 @@ class ObservedCamera:
         self.sequence = 0
         self.observation_id = None
 
+    def read_fresh(self):
+        """Use the same recorder/ownership path for optics and fresh metadata."""
+        previous = self.require_fresh
+        self.require_fresh = True
+        try:
+            return self.read()
+        finally:
+            self.require_fresh = previous
+
     def read(self):
         if self.progress: self.progress.enter('camera')
         read = getattr(self.source, 'read_fresh', None) if self.require_fresh else None

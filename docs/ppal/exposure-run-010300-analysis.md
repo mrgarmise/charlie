@@ -1,3 +1,5 @@
+> Camera operation update (2026-10-11): historical focus values below describe prior sessions only. The changed installation uses current-observation autofocus before exposure and geometry. Future operation examples omit the obsolete manual seed.
+
 # exposure-calibration-20261001-010300: stable player, discarded delayed response
 
 Live follow-up: [response-window-012341 analysis](response-window-012341-analysis.md).
@@ -143,7 +145,7 @@ mkdir -p robotron-runs
 run_dir="robotron-runs/response-window-$(date +%Y%m%d-%H%M%S)"
 set -o pipefail
 PYTHONPATH="$PWD" python -m experiments.ppal.play_robotron \
-  --seconds 20 --focus 1.30 --recalibrate --arm --output "$run_dir" \
+  --seconds 20 --recalibrate --arm --output "$run_dir" \
   2>&1 | tee "$run_dir.console.log"
 if [ -f "$run_dir/agency.jsonl" ]; then
   python -m experiments.ppal.replay_tracking "$run_dir/agency.jsonl" \

@@ -54,6 +54,7 @@ class PiCameraSource:
                 "first_pixel_exposure_at": exposure_start,
                 "frame_duration_us": metadata.get("FrameDuration"),
                 "lens_position": metadata.get("LensPosition"),
+                "af_state": metadata.get("AfState"),
                 "analogue_gain": metadata.get("AnalogueGain"),
                 "digital_gain": metadata.get("DigitalGain"),
                 "colour_gains": metadata.get("ColourGains"),
@@ -63,6 +64,13 @@ class PiCameraSource:
             return Image.fromarray(rgb, mode="RGB")
         finally:
             request.release()
+
+    def focus_limits(self):
+        controls = self.camera.picam2.camera_controls
+        if not all(key in controls for key in ('AfMode', 'LensPosition')):
+            raise ValueError('camera does not advertise autofocus/manual lens controls')
+        low, high, _ = controls['LensPosition']
+        return float(low), float(high)
 
     def set_exposure_value(self, ev: float) -> bool:
         picam = self.camera.picam2

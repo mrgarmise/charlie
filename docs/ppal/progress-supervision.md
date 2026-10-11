@@ -146,7 +146,7 @@ git switch feature/agency-first-self
 git pull --ff-only origin feature/agency-first-self
 python -m pytest tests -q && PYTHONPATH="$PWD" python -m experiments.ppal.marathon_robotron \
   --developmental --learning-projects --max-games 3 \
-  --retry-wait 5 --focus 1.30 --arm
+  --retry-wait 5 --arm
 ```
 
 Return the complete `robotron-runs/development-<timestamp>` directory as a tarball,
@@ -167,3 +167,5 @@ physical findings. Productive offline work now yields/resumes at durable units;
 inactivity remains independently supervised. Positive gameplay → rankings →
 instruction/attract evidence adds corroboration when no SELF probe is eligible.
 UNKNOWN never authorizes START.
+
+Camera calibration now establishes autofocus from fresh current observations before exposure and arena discovery. Manual `--focus` is diagnostic only; no inherited lens position is used in normal operation.

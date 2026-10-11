@@ -52,19 +52,27 @@ def optimize_screen_exposure(source, output):
             # capture_metadata call or a claim that the EV is settled.
             for _ in range(6):
                 source.read()
-            frame = source.read()
-            name = f'exposure-ev-{abs(int(ev))}.png'
-            frame.save(output/name)
-            capture = getattr(source, 'capture', None)
-            row = {'ev': ev, 'frame': name,
-                   'capture': capture if isinstance(capture, dict) else None}
-            report['samples'].append(row)
-            try:
-                corners = locate(frame, require_uniform_border=False)
-                row['corners'] = corners.tolist()
-                row.update(screen_evidence(frame, corners))
-            except ValueError as exc:
-                row['reason'] = str(exc)
+            # Attract mode can temporarily replace the arena. Retain each
+            # failed view and try bounded additional fresh observations, without
+            # accepting geometry from a previous exposure or incomplete screen.
+            for attempt in range(3):
+                if attempt and time.monotonic() >= deadline:
+                    break
+                frame = source.read()
+                name = f'exposure-ev-{abs(int(ev))}' + (f'-retry-{attempt}' if attempt else '') + '.png'
+                frame.save(output/name)
+                capture = getattr(source, 'capture', getattr(source, 'last_capture', None))
+                row = {'ev': ev, 'frame': name, 'attempt': attempt,
+                       'capture': capture if isinstance(capture, dict) else None}
+                report['samples'].append(row)
+                try:
+                    row['geometry_diagnostics'] = {}
+                    corners = locate(frame, require_uniform_border=False, diagnostics=row['geometry_diagnostics'])
+                    row['corners'] = corners.tolist()
+                    row.update(screen_evidence(frame, corners))
+                    break
+                except ValueError as exc:
+                    row['reason'] = str(exc)
             if time.monotonic() >= deadline:
                 break
         valid = [r for r in report['samples'] if r.get('detail_pixels', 0) >= 50]
@@ -90,7 +98,7 @@ def optimize_screen_exposure(source, output):
                 source.read()
             # Lock the actual selected exposure/gain to prevent room/background
             # metering from changing it when gameplay starts. Do not lock AWB.
-            capture = getattr(source, 'capture', None)
+            capture = getattr(source, 'capture', getattr(source, 'last_capture', None))
             lock = getattr(source, 'lock_exposure', None)
             locked = bool(lock(capture)) if callable(lock) and isinstance(capture, dict) else False
             report.update(status='selected', selected_ev=best['ev'],

@@ -47,9 +47,19 @@ def test_actual_sensory_preflight_bounded_optics_and_quality(monkeypatch,tmp_pat
     image=_synthetic_robotron_border();ImageDraw.Draw(image).text((200,200),'OBSERVED DETAIL',fill='white')
     class Source:
         capture={}
-        def read(self):return image
-        def lens_position(self):return 1.3
-        def set_manual_focus(self,n):self.focus=n
+        position = 2.4
+        state = 2
+        sequence = 0
+        def read(self):
+            self.sequence += 1
+            self.capture = dict(lens_position=self.position, af_state=self.state,
+                                sensor_timestamp_ns=self.sequence*100_000_000)
+            return image
+        def read_fresh(self):return self.read()
+        def focus_limits(self):return (0.,10.)
+        def set_autofocus(self):self.state=2
+        def lens_position(self):return self.position
+        def set_manual_focus(self,n):self.focus=n;self.position=n;self.state=0
         def lock_white_balance(self,c):return False
     # Existing physical geometry/focus algorithms remain real; no controller,
     # camera hardware or motion interface is created.

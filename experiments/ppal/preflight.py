@@ -32,38 +32,66 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
     from dataclasses import asdict
     from learning.foundry import atomic_json
     from .eyes.exposure import optimize_screen_exposure, screen_evidence
+    from .eyes.autofocus import establish_focus, verify_focus_lock
+    output.mkdir(parents=True, exist_ok=True)
     started=time.monotonic();deadline=started+timeout
     class BoundedSource:
+        last_frame = None
         def read(self):
             if time.monotonic()>=deadline:raise ValueError('sensory preflight deadline; assistance required')
-            return source.read()
+            read = getattr(source, 'read_fresh', source.read)
+            self.last_frame = read()
+            return self.last_frame
         def __getattr__(self,name):return getattr(source,name)
     bounded=BoundedSource()
     report=dict(status='preparing',started_at=started,physical_motion=False,
                 color_fidelity='unqualified without an independent color reference')
     try:
+        report['stage'] = 'initial autofocus and manual lock'
+        report['initial_focus'] = {}
+        seed = establish_focus(bounded, report=report['initial_focus'], manual_position=seed_position)
+        report['stage'] = 'exposure'
         exposure=optimize_screen_exposure(bounded,output)
         report['exposure']=exposure
-        seed=seed_position if seed_position is not None else bounded.lens_position()
-        if seed is None:raise ValueError('focus metadata unavailable; assistance required')
-        optics=run_preflight(bounded,seed_position=seed)
+        low, high = report['initial_focus']['hardware_limits']
+        report['stage'] = 'geometry and playfield fine focus'
+        report['geometry_attempts'] = []
+        optics=run_preflight(bounded,seed_position=seed, config=PreflightConfig(lens_min=low,lens_max=high),
+                             diagnostics=report['geometry_attempts'])
+        report['stage'] = 'final manual lock'
+        report['final_focus_lock'] = {}
+        verify_focus_lock(bounded, optics.focus.lens_position, report=report['final_focus_lock'], limits=(low, high))
         report.update(geometry=asdict(optics.geometry),focus=asdict(optics.focus))
         # Require actual detail, not a successful method return or zero-valued
         # focus optimum. Limits reuse established exposure qualification.
+        report['stage'] = 'final geometry and image detail'
         frame=bounded.read()
         import numpy as np
         quality=screen_evidence(frame,np.array(optics.geometry.corners))
+        final_points=locate(frame,require_uniform_border=False,previous=np.array(optics.geometry.corners))
+        if np.max(np.linalg.norm(final_points-np.array(optics.geometry.corners),axis=1))>8.:
+            raise ValueError('final image geometry differs from stable calibration; assistance required')
+        quality['sharpness']=screen_sharpness(optics.calibration.apply(frame))
         report['quality']=quality
-        if quality['detail_pixels']<50 or optics.focus.score<=0:
+        if (quality['detail_pixels']<50 or not np.isfinite(optics.focus.score) or optics.focus.score<=0
+                or not np.isfinite(quality['sharpness']) or quality['sharpness']<=0):
             raise ValueError('insufficient visual detail for meaningful observation; assistance required')
         lock=getattr(bounded,'lock_white_balance',None)
-        report['white_balance_locked']=bool(lock(source.capture)) if callable(lock) else False
-        report['status']='usable'
+        report['white_balance_locked']=bool(lock(getattr(source,'capture',getattr(source,'last_capture',None)))) if callable(lock) else False
+        report.update(status='usable',stage='complete')
         report['finished_at']=time.monotonic()
+        report['final_capture']=getattr(source,'capture',getattr(source,'last_capture',None))
+        frame.save(output/'sensory-final.png')
+        optics.calibration.apply(frame).save(output/'sensory-playfield.png')
         optics.calibration.save(output/'calibration.json')
         return optics.calibration,report
     except Exception as exc:
         report.update(status='failed',reason=str(exc),finished_at=time.monotonic(),request='restore a complete readable display view')
+        if report['stage']=='initial autofocus and manual lock':
+            report['request']='inspect autofocus controls and fresh camera metadata; restore a focusable view; no manual default substituted'
+        frame = bounded.last_frame
+        if frame is not None:
+            frame.save(output/'sensory-failed.png')
         raise
     finally:
         atomic_json(output/'sensory-preflight.json',report)
@@ -175,7 +203,7 @@ def screen_sharpness(playfield: Image.Image, margin: float = 0.08) -> float:
     return float(cv2.Laplacian(gray, cv2.CV_64F).var())
 
 
-def locate_stable_geometry(source, config: PreflightConfig | None = None) -> GeometryResult:
+def locate_stable_geometry(source, config: PreflightConfig | None = None, *, diagnostics=None) -> GeometryResult:
     """Find Robotron anew from full FOV and require repeated stable geometry.
 
     Color uniformity is deliberately disabled here: attract mode has the same
@@ -190,14 +218,19 @@ def locate_stable_geometry(source, config: PreflightConfig | None = None) -> Geo
 
     for _attempt in range(cfg.geometry_attempts):
         frame = source.read()
+        diagnostic = {}
+        if diagnostics is not None:
+            diagnostics.append(diagnostic)
 
         try:
             points = locate(frame, require_uniform_border=False,
                 previous=np.median(observations,axis=0) if observations else None,
-                max_jitter_pixels=cfg.max_jitter_pixels)
+                max_jitter_pixels=cfg.max_jitter_pixels,
+                **({'diagnostics': diagnostic} if diagnostics is not None else {}))
         except ValueError as exc:
             observations.clear()
             last_reason = str(exc)
+            diagnostic['reason'] = last_reason
         else:
             observations.append(np.asarray(points, dtype=float))
             observations = observations[-cfg.stable_views:]
@@ -206,6 +239,7 @@ def locate_stable_geometry(source, config: PreflightConfig | None = None) -> Geo
             jitter = float(np.max(
                 np.linalg.norm(np.asarray(observations) - corners, axis=2)
             ))
+            diagnostic.update(corners=points.tolist(), stable_views=len(observations), jitter_pixels=jitter)
 
             if (
                 len(observations) >= cfg.stable_views
@@ -342,6 +376,7 @@ def run_preflight(
     *,
     seed_position: float,
     config: PreflightConfig | None = None,
+    diagnostics=None,
 ) -> PreflightResult:
     """Complete pre-START optics gate.
 
@@ -353,7 +388,7 @@ def run_preflight(
     """
     cfg = config or PreflightConfig()
 
-    provisional = locate_stable_geometry(source, cfg)
+    provisional = locate_stable_geometry(source, cfg, **({'diagnostics': diagnostics} if diagnostics is not None else {}))
 
     focus = optimize_screen_focus(
         source,
@@ -364,10 +399,37 @@ def run_preflight(
 
     # Focus changes can slightly alter apparent edge position.  Geometry used
     # for gameplay therefore comes from fresh post-focus observations.
-    final_geometry = locate_stable_geometry(source, cfg)
+    final_geometry = locate_stable_geometry(source, cfg, **({'diagnostics': diagnostics} if diagnostics is not None else {}))
 
     return PreflightResult(
         calibration=final_geometry.calibration,
         geometry=final_geometry,
         focus=focus,
     )
+
+
+def main(argv=None):
+    """Camera-only native acceptance through the same sensory gate as gameplay."""
+    import argparse
+    from pathlib import Path
+    from .eyes.sources import PiCameraSource
+    from .observation_camera import ObservedCamera
+    parser = argparse.ArgumentParser(description='Camera-only sensory preflight: no controller or movement')
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--timeout', type=float, default=60.)
+    args = parser.parse_args(argv)
+    if not 1 <= args.timeout <= 120:
+        parser.error('--timeout must be 1..120 seconds')
+    # Refuse to overwrite a prior acceptance attempt or historical evidence.
+    args.output.mkdir(parents=True, exist_ok=False)
+    source = None
+    try:
+        source = ObservedCamera(PiCameraSource(), require_fresh=True)
+        sensory_preflight(source, args.output, timeout=args.timeout)
+    finally:
+        if source is not None:
+            source.close()
+
+
+if __name__ == '__main__':
+    main()

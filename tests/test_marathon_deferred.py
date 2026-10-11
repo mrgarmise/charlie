@@ -81,8 +81,10 @@ def test_three_games_before_any_offline_processing_and_executive_handoff(tmp_pat
 @pytest.mark.parametrize('result,rc',[('TIME LIMIT',0),('missing',1),('GAME OVER',124)])
 def test_failed_start_uncertain_boundary_never_starts_second_game(tmp_path,monkeypatch,result,rc):
     a=args(tmp_path);g=gateway(tmp_path);played=[]
+    a.focus=None
     monkeypatch.setattr(m,'reflect_marathon',lambda *v,**kw:dict(phase='checkpointed'))
     def driver(cmd,*v):
+        assert '--focus' not in cmd  # automatic startup is the operational path
         game=Path(cmd[cmd.index('--output')+1]);game.mkdir();played.append(game)
         if result!='missing':(game/'report.json').write_text(json.dumps({'result':result,'steps':[],'episode_end':{'confirmed':False}}))
         return rc

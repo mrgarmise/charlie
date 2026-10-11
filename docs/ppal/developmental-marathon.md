@@ -196,7 +196,7 @@ mkdir -p "$dev_root"
 set -o pipefail
 PYTHONPATH="$PWD" python -m experiments.ppal.marathon_robotron \
   --developmental --max-games 3 --game-seconds 60 --retry-wait 3 \
-  --focus 1.30 --arm --root "$dev_root" \
+  --arm --root "$dev_root" \
   --seed-episode robotron-runs/body-fire-bootstrap-20261001-020552 \
   2>&1 | tee "$dev_root.console.log"
 
@@ -228,3 +228,5 @@ now precedes START, explicit recorded page evidence authorizes the initial START
 and failed SELF probes alone can never authorize a restart. Multiple physical
 games remain unvalidated; inspect the available/new physical archive before
 extending marathon operation.
+
+Camera calibration now establishes autofocus from fresh current observations before exposure and arena discovery. Manual `--focus` is diagnostic only; no inherited lens position is used in normal operation.

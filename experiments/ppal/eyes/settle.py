@@ -8,7 +8,11 @@ from PIL import ImageDraw
 from .calibration import Calibration
 
 
-def _border_candidates(frame, require_uniform_border=True):
+def _border_candidates(frame, require_uniform_border=True, *, diagnostics=None):
+    diagnostics = diagnostics if diagnostics is not None else {}
+    diagnostics.update(rejections={}, candidate_checks=0, accepted=0)
+    def reject(reason):
+        counts=diagnostics['rejections'];counts[reason]=counts.get(reason,0)+1
     rgb = np.asarray(frame.convert('RGB'))
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
     height, width = rgb.shape[:2]
@@ -22,6 +26,7 @@ def _border_candidates(frame, require_uniform_border=True):
     ridges = (mask - cv2.erode(mask, np.ones((15, 15), np.uint8))) | detail
     lines = cv2.HoughLinesP(ridges, 1, np.pi/180, 100,
                            minLineLength=min(width,height)*.35, maxLineGap=30)
+    diagnostics['hough_lines'] = 0 if lines is None else len(lines)
     if lines is None:
         raise ValueError('No game border found; show active Robotron and all four corners')
     groups = [[], []]
@@ -37,18 +42,27 @@ def _border_candidates(frame, require_uniform_border=True):
         line=np.cross([x1,y1,1.],[x2,y2,1.])
         groups[group].append((length,position,line))
     selected=[]
-    for group in groups:
+    for orientation, group in enumerate(groups):
         kept=[]
+        def intercepts(item):
+            a,b,c=item[2]
+            return ((-c/a, -(b*height+c)/a) if orientation else (-c/b, -(a*width+c)/b))
         for item in sorted(group,key=lambda x:x[0],reverse=True):
-            if all(abs(item[1]-other[1])>12 for other in kept):
+            # Position-only clustering loses a correctly tilted edge when a
+            # longer blurred ridge at the same midpoint has a different slope.
+            # Keep distinct endpoint fits; support gates, not Hough length,
+            # still independently decide whether all four corners exist.
+            if all(max(abs(a-b) for a,b in zip(intercepts(item),intercepts(other)))>4 for other in kept):
                 kept.append(item)
             if len(kept)==12:
                 break
         selected.append(sorted(kept,key=lambda x:x[1]))
+    diagnostics['selected_lines'] = [len(group) for group in selected]
     from itertools import combinations
     candidates=[]
     for top,bottom in combinations(selected[0],2):
         for left,right in combinations(selected[1],2):
+            diagnostics['candidate_checks'] += 1
             corners=[]
             for h,v in ((top,left),(top,right),(bottom,right),(bottom,left)):
                 intersection=np.cross(h[2],v[2])
@@ -57,9 +71,11 @@ def _border_candidates(frame, require_uniform_border=True):
             if (not np.all(np.isfinite(points)) or np.any(points[:,0]<3)
                 or np.any(points[:,0]>width-4) or np.any(points[:,1]<3)
                 or np.any(points[:,1]>height-4)):
+                reject('outside_frame_or_nonfinite')
                 continue
             area=cv2.contourArea(points.astype(np.float32))
             if not .15*width*height<area<.90*width*height:
+                reject('area')
                 continue
             support=[]
             endpoint_support=[]
@@ -98,7 +114,18 @@ def _border_candidates(frame, require_uniform_border=True):
                 full_hits[valid]=hits
                 endpoint_support.append(min(float(full_hits[:10].mean()),float(full_hits[-10:].mean())))
                 colors.append(np.median(pixels/np.maximum(pixels.sum(axis=1, keepdims=True), 1), axis=0))
+                # A failed edge already disqualifies this rectangle. Avoid
+                # spending bounded preflight time measuring its other sides.
+                if support[-1]<.65 or endpoint_support[-1]<.65:
+                    break
+            quality = (min(support), min(endpoint_support) if len(endpoint_support)==4 else 0.)
+            if len(support)==4 and quality > tuple(diagnostics.get('best_candidate_support', (-1.,-1.))):
+                diagnostics['best_candidate_support'] = list(quality)
+                diagnostics['best_support_corners'] = points.tolist()
+                diagnostics['best_edge_support'] = support
+                diagnostics['best_endpoint_support'] = endpoint_support
             if len(endpoint_support)!=4 or min(endpoint_support)<.65 or min(support)<.65:
+                reject('edge_or_endpoint_support')
                 continue
             color_spread = float(np.max(
                 np.linalg.norm(
@@ -107,17 +134,19 @@ def _border_candidates(frame, require_uniform_border=True):
                 )
             ))
             if require_uniform_border and color_spread > .10:
+                reject('color_uniformity')
                 continue
             candidates.append(((float(np.mean(support)),min(support)), points))
+    diagnostics['accepted'] = len(candidates)
     if not candidates:
         raise ValueError('No complete game border found; include all corners and aim more squarely at TV')
     candidates.sort(key=lambda item:item[0],reverse=True)
     return candidates
 
 
-def locate(frame, require_uniform_border=True, *, previous=None, max_jitter_pixels=8.):
+def locate(frame, require_uniform_border=True, *, previous=None, max_jitter_pixels=8., diagnostics=None):
     """Discover in the full frame; prior geometry only ranks fresh supported candidates."""
-    candidates=_border_candidates(frame,require_uniform_border)
+    candidates=_border_candidates(frame,require_uniform_border,diagnostics=diagnostics)
     if previous is not None:
         previous=np.asarray(previous,dtype=float)
         if previous.shape!=(4,2) or not np.all(np.isfinite(previous)):

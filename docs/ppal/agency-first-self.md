@@ -77,16 +77,13 @@ mkdir -p robotron-runs
 run_dir="robotron-runs/agency-first-$(date +%Y%m%d-%H%M%S)"
 set -o pipefail
 PYTHONPATH="$PWD" python -m experiments.ppal.play_robotron \
-  --seconds 20 --focus 1.30 --arm --output "$run_dir" \
+  --seconds 20 --arm --output "$run_dir" \
   2>&1 | tee "$run_dir.console.log"
 tar -czf "$run_dir.tar.gz" "$run_dir" "$run_dir.console.log"
 ```
 
 Stop if `git status` shows source changes you need to preserve before switching.
-The documented backup and simulation log need not be deleted. Reuse the focus
-value that produced the best current image if it differs from 1.30. Use
-`--recalibrate` if the viewing position changed; saved calibration remains the
-existing default, not proof that a moved camera is aligned.
+The documented backup and simulation log need not be deleted. Startup now establishes autofocus, then exposure and fresh playfield geometry; no inherited manual focus position is required. Existing calibration is not proof that a moved camera is aligned.
 
 Return the `.tar.gz` and your observed official score. Describe whether he moved
 and fired, whether the green SELF was actually the player, and what happened
@@ -107,3 +104,5 @@ The armed runner is exercised with a deterministic fake camera/controller,
 including a wrong PLAYER appearance, a respawn elsewhere and camera failure.
 No independent camera recordings were present in the checkout, so validation
 against recorded real play remains pending alongside the live test.
+
+Camera calibration now establishes autofocus from fresh current observations before exposure and arena discovery. Manual `--focus` is diagnostic only; no inherited lens position is used in normal operation.

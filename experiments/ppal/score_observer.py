@@ -18,7 +18,12 @@ class ScoreObserver:
         self.errors = 0
         self.frames = []
         self.latest_frame = None
+        self.latest_gameplay_frame=None
         self.final_observation = None
+        self.gameplay_report=None
+        self.gameplay_observations=[]
+        self.frozen_at=None
+        self.non_gameplay_system=RobotronScoreSystem(calibration,self_channel=1,confirm_baseline=True)
         self.late_change_frames = 0
         self.omitted_change_frames = 0
         self.accepted_confidence = {1:None, 2:None}
@@ -30,7 +35,7 @@ class ScoreObserver:
         # game score history; a viewpoint change is not a new game/reset.
         self.queue.put(('geometry',calibration),timeout=1.)
 
-    def submit(self, frame, *, timestamp, sample, preceding_action,observation_id=None):
+    def submit(self, frame, *, timestamp, sample, preceding_action,observation_id=None,screen=None):
         begin = time.monotonic()
         if self.queue.full():
             self.dropped += 1
@@ -39,7 +44,7 @@ class ScoreObserver:
         try:
             copied = frame.copy()
             self.queue.put_nowait((copied, timestamp, sample, preceding_action,
-                                  time.monotonic()-begin,observation_id))
+                                  time.monotonic()-begin,observation_id,screen))
         except Exception:
             self.errors += 1
 
@@ -51,28 +56,33 @@ class ScoreObserver:
                     return
                 if len(item)==2 and item[0]=='geometry':
                     self.system.reader.calibration=item[1]
+                    self.non_gameplay_system.reader.calibration=item[1]
                     continue
-                frame, timestamp, sample, action, copy_seconds, observation_id = item
+                frame, timestamp, sample, action, copy_seconds, observation_id, screen = item
+                eligible=(screen is None or (screen.get('phase')=='gameplay' and not screen.get('episode_retired')))
+                if self.frozen_at is not None and timestamp>self.frozen_at:eligible=False
+                system=self.system if eligible else self.non_gameplay_system
                 begin = time.monotonic()
                 error = None
                 try:
-                    channels = self.system.observe(frame, t=timestamp)
+                    channels = system.observe(frame, t=timestamp)
                 except Exception as exc:
                     self.errors += 1
                     error = f'{type(exc).__name__}: {exc}'
-                    channels = self.system.tracker.tracker.observe(
+                    channels = system.tracker.tracker.observe(
                         None, None, player1_confidence=0., player2_confidence=0.)
-                    self.system.latest = channels
+                    system.latest = channels
                 elapsed = time.monotonic()-begin
                 self.costs.append(elapsed)
                 # Build the canonical score evidence without a second disk write.
                 row = self._row(channels, timestamp)
                 for player, observation in ((1, channels.player1), (2, channels.player2)):
-                    if observation.status in ('baseline', 'changed'):
+                    if eligible and observation.status in ('baseline', 'changed'):
                         self.accepted_confidence[player] = observation.confidence
                     row[f'p{player}']['accepted_confidence'] = self.accepted_confidence[player]
                 name = f'score-raw-{sample:04d}.png'
                 self.latest_frame = (name, frame)
+                if eligible:self.latest_gameplay_frame=(name,frame)
                 changed = channels.player1.changed or channels.player2.changed
                 initial = sample <= 16
                 if initial or (changed and self.late_change_frames < 16):
@@ -85,19 +95,24 @@ class ScoreObserver:
                 row.update(sample=sample, timestamp=timestamp, preceding_action=action,observation_id=observation_id,
                            processing_seconds=elapsed, enqueue_copy_seconds=copy_seconds,
                            error=error, reward_evidence=channels.self_delta,
-                           attribution='temporal_association_only')
+                           attribution='temporal_association_only',score_partition='gameplay' if eligible else 'non_gameplay',
+                           screen=screen)
                 # The final image is retained at close even when this row did
                 # not trigger retention. Bind it explicitly without rewriting
                 # the append-only historical score row.
-                self.final_observation = dict(sample=sample, timestamp=timestamp,observation_id=observation_id,
+                observation = dict(sample=sample, timestamp=timestamp,observation_id=observation_id,
                     raw_frame=name, observed_score=channels.player1.observed_score,
                     confidence=channels.player1.confidence,
                     retained_score=channels.player1.score,
                     status=channels.player1.status, error=error)
+                if eligible:
+                    self.final_observation=observation
+                    self.gameplay_report=dict(self.system.report())
+                    self.gameplay_observations=(self.gameplay_observations+[(timestamp,self.gameplay_report,observation)])[-256:]
                 with self.log.path.open('a', encoding='utf-8') as stream:
                     stream.write(json.dumps(row)+'\n')
                 for player, observation in ((1, channels.player1), (2, channels.player2)):
-                    if observation.changed:
+                    if eligible and observation.changed:
                         print(f'SCORE: P{player}={observation.score} Δ=+{observation.delta} confidence={observation.confidence:.2f}')
             except Exception:
                 # Instrumentation and its output must never terminate gameplay.
@@ -122,6 +137,8 @@ class ScoreObserver:
         if not self.thread.is_alive() and self.latest_frame is not None:
             if all(name != self.latest_frame[0] for name, _ in self.frames):
                 self.frames.append(self.latest_frame)
+            if self.latest_gameplay_frame is not None and all(name!=self.latest_gameplay_frame[0] for name,_ in self.frames):
+                self.frames.append(self.latest_gameplay_frame)
 
     @staticmethod
     def deferred_review_metadata(root, report):
@@ -188,7 +205,8 @@ class ScoreObserver:
                 for line,text in enumerate(stream,1):
                     try:
                         row=json.loads(text)
-                        if row.get('raw_frame'):observations.append(dict(row,line=line))
+                        eligible=(row.get('score_partition')=='gameplay' if summary.get('score_scope')=='supported_gameplay_only' else row.get('score_partition')!='non_gameplay')
+                        if eligible and row.get('raw_frame'):observations.append(dict(row,line=line))
                         observations=observations[-64:]
                     except (ValueError,AttributeError):deficiencies.append('Unreadable score row '+str(line))
                     completed(operation='score_row_processed',line=line)
@@ -401,11 +419,21 @@ class ScoreObserver:
                 empirical_accuracy=b['correct']/b['samples']) for k,b in bins.items()},
             distinct_original_images=len(seen_pixels),target_99_supported=False)
 
+    def freeze(self,timestamp):
+        """Cutoff from supported camera gameplay, not a later attract OCR value."""
+        import math
+        if type(timestamp) in (int,float) and math.isfinite(timestamp):
+            self.frozen_at=timestamp
+
     def report(self):
-        return {**self.system.report(), 'log':'score.jsonl', 'samples':len(self.costs),
+        supported=[r for r in self.gameplay_observations if self.frozen_at is None or r[0]<=self.frozen_at]
+        summary=supported[-1][1] if supported else None
+        final=supported[-1][2] if supported else None
+        return {**(summary or dict(p1_score=None,p2_score=None,self_channel=None,self_score=None,status='unmeasured')),
+                'score_scope':'supported_gameplay_only','frozen_at':self.frozen_at, 'log':'score.jsonl', 'samples':len(self.costs),
                 'dropped_samples':self.dropped, 'errors':self.errors,
                 'worker_finished':not self.thread.is_alive(),
-                'final_observation':self.final_observation if not self.thread.is_alive() else None,
+                'final_observation':final if not self.thread.is_alive() else None,
                 'processing_seconds_total':sum(self.costs),
                 'processing_seconds_max':max(self.costs, default=0.),
                 'raw_frames':[name for name, _ in self.frames],

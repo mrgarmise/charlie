@@ -146,7 +146,7 @@ def test_default_runner_failure_preserves_game_one_and_releases_camera(tmp_path,
 
 
 @pytest.mark.parametrize('camera_failure',[False,True])
-def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure):
+def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False):
     """Real player + marathon; simulated pixels/controls, not Pi acceptance."""
     import time
     from experiments.ppal import marathon_robotron as m,play_robotron as play
@@ -173,6 +173,7 @@ def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,
             if command=='START':
                 world['game']+=1;world['reads']=0;points[0]=(25.,25.);starts.append(world['game'])
         def execute(self,action,ms):
+            if terminal_pages:assert world['reads']<100 # no postgame/demo agency probes
             self.last_execution=dict(started_at=clock[0],move=action.move,fire=action.fire,duration_ms=ms)
             clock[0]+=ms/1000
             if world['reads']<100:
@@ -183,6 +184,10 @@ def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,
             if world['reads']>=100:return []
             return [(Detection('unknown',p,(1,1,10,20),100),{'class_scores':{}}) for p in points]
     def screen(frame):
+        if terminal_pages and world['game']:
+            if 100<=world['reads']<104:return dict(state='not_gameplay',phase='terminal',reason='recorded_heroes_headings',label_scores={'heroes':.9,'all-time':.9})
+            if 104<=world['reads']<107 or 131<=world['reads']<134 or world['reads']>=146:return dict(state='not_gameplay',phase='title',title_reference={'matched':True,'sha256':'a'*64})
+            if world['reads']>=107:return dict(state='gameplay',phase='gameplay') # autonomous demonstration
         if not world['game'] or world['reads']>=106:return dict(state='not_gameplay',phase='startable')
         if world['reads']>=100:return dict(state='not_gameplay',phase='terminal')
         return dict(state='gameplay',phase='gameplay')
@@ -210,6 +215,10 @@ def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,
         assert reports[1]['failure_kind']=='observation_failure'
     else:
         assert all(r['result']=='GAME OVER' and r['acquisition']!='agency_unresolved' and r['ticks']>0 for r in reports)
+    if terminal_pages:
+        assert all(r['episode_end']['evidence']['rule']=='verified_gameplay_to_postgame_pages' for r in reports)
+        assert reports[1]['start_decision']['start_commands']==1
+        assert any(v['phase']=='gameplay' for v in reports[1]['start_decision']['observations'][:-3])
     assert reports[1]['calibration_mode']=='live_session_reuse'
     assert len({r['sensory_preflight']['camera_session']['id'] for r in reports})==1
     assert len({g['durable_game_evidence']['record_id'] for g in doc['games']})==2

@@ -91,6 +91,29 @@ def _screen_labels(mask):
     return scores
 
 
+_TITLE_ANCHOR=None
+
+def _title_evidence(mask):
+    """Match the complete recorded ROBOTRON + 2084 logo, not a text prefix."""
+    global _TITLE_ANCHOR
+    import json,hashlib,base64,zlib
+    from pathlib import Path
+    if _TITLE_ANCHOR is None:
+        path=Path(__file__).resolve().parents[2]/'config/robotron/screen-labels/title-anchor.json'
+        d=json.loads(path.read_text());raw=zlib.decompress(base64.b64decode(d['zlib_base64']))
+        if d['schema']!='recorded-robotron-title-anchor-v1' or hashlib.sha256(raw).hexdigest()!=d['mask_sha256']:
+            raise ValueError('recorded title anchor integrity mismatch')
+        _TITLE_ANCHOR=(np.frombuffer(raw,dtype=np.uint8).reshape(d['shape']),d)
+    anchor,d=_TITLE_ANCHOR
+    target=mask[:360,20:620]
+    score=max(float(cv2.matchTemplate(target,cv2.resize(anchor,None,fx=scale,fy=scale,
+        interpolation=cv2.INTER_NEAREST),cv2.TM_CCOEFF_NORMED).max())
+        for scale in (.65,.725,.8,.875,.95,1.,1.05,1.125,1.2,1.275,1.35))
+    return dict(matched=score>=d['minimum_similarity'],sha256=d['source_sha256'],
+        anchor_sha256=d['mask_sha256'],similarity=score,minimum_similarity=d['minimum_similarity'],
+        basis='complete recorded logo pixels; similarity is not a probability')
+
+
 def _geometric_border(gray):
     # Complete luminous ridge versus its interior neighbour. Hue-independent;
     # the four sides remain necessary, so bright walls/blank frames do not pass.
@@ -115,12 +138,17 @@ def classify_screen_state(playfield: Image.Image) -> dict:
     mask=((gray.astype(float)-cv2.GaussianBlur(gray,(31,31),0).astype(float))>25).astype(np.uint8)*255
     labels=_screen_labels(mask)
     border=_geometric_border(gray)
+    title=_title_evidence(mask)
     evidence=dict(base,border_state=base['state'],label_scores={k:round(v,4) for k,v in labels.items()},
                   geometric_border_support=[round(v,4) for v in border],phase='unknown')
     # Scores are template similarities, not probabilities. Simultaneous strong
     # conflicting labels remain UNKNOWN. Prefix similarity alone never suffices.
     heroes=labels['heroes']>=.78 and labels['all-time']>=.78
     pregame=labels['pregame']>=.74 and labels['pregame']-labels['heroes']>=.08
+    if title['matched'] and (heroes or pregame):
+        return dict(evidence,state='unknown',reason='conflicting_screen_labels')
+    if title['matched']:
+        return dict(evidence,state='not_gameplay',phase='title',reason='recorded_robotron_complete_logo',title_reference=title)
     if heroes and pregame:
         return dict(evidence,state='unknown',reason='conflicting_screen_labels')
     if heroes:

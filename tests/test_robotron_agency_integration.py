@@ -148,30 +148,18 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     report=json.loads((tmp_path/'run/report.json').read_text())
     t=report['session_timing']
     if persistent:
+        # This legacy fixture postpones any terminal page until 100 simulated
+        # seconds. The new deadline must stop unverified rather than keep probing.
         from experiments.ppal.marathon_robotron import safe_to_restart
         from memory.evidence import EvidenceJournal
         assert report['acquisition']=='agency_unresolved'
-        assert report['result']=='GAME OVER' and safe_to_restart(report,capture_root=tmp_path/'run')
-        assert t['gameplay_deadline'] is None
-        assert t['stopped_at']-t['gameplay_timer_started_at']>60
+        assert report['result']=='OBSERVATION UNCERTAIN'
+        assert not report['episode_end']['confirmed'] and not safe_to_restart(report,capture_root=tmp_path/'run')
+        assert t['stopped_at']-t['self_discovery_started']<25.
         assert commands.count('START')==1 and closed==['controller','camera']
         journal=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
-        plans=journal.category_records('observation','agency_recovery_plan')
-        # Generic recorder events can have another journal kind; inspect payloads.
-        plans=[r for r in journal.records() if r.data.get('payload',{}).get('category')=='agency_recovery_plan']
-        assert plans
-        serialized=json.dumps([r.data for r in plans])
-        assert 'baseline_pulse_ms' in serialized and '120' in serialized
         journal.verify();journal.close()
-        actions=[r for r in report['steps'] if 'action' in r]
-        if persistent=='recover':
-            assert actions and any(r.get('status')=='player_reacquired' for r in report['steps'])
-            assert all(r['agency']['controlled_track_id'] is not None for r in actions)
-        else:
-            assert not actions and any(getattr(c,'move','STAY')!='STAY' for c in commands)
-            assert max(c for c in [row.get('control_execution',{}).get('duration_ms',0)
-                for row in map(json.loads,(tmp_path/'run/agency.jsonl').read_text().splitlines())
-                if row.get('control_execution')])<=240
+        assert not any('action' in r for r in report['steps'])
         return
     assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
     from memory.evidence import EvidenceJournal
@@ -282,16 +270,16 @@ def test_normal_player_opt_in_sampled_trace_uses_existing_chooser(monkeypatch,tm
         False,False,False,False,False,False,False,False,sampled=True)
 
 
-def test_initial_discovery_failure_escalates_recovers_and_completes_without_identity_timeout(monkeypatch,tmp_path):
+def test_initial_discovery_failure_stops_unverified_before_delayed_terminal(monkeypatch,tmp_path):
     test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
         False,False,False,False,False,False,False,False,persistent='recover')
 
 
-def test_initial_discovery_failure_keeps_playing_until_fresh_confirmed_terminal(monkeypatch,tmp_path):
+def test_initial_discovery_failure_cannot_invent_terminal_at_deadline(monkeypatch,tmp_path):
     test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
         False,False,False,False,False,False,False,False,persistent='terminal_without_self')
 
 
-def test_no_plausible_self_qualifies_generic_failure_and_observes_attract(monkeypatch,tmp_path):
+def test_no_plausible_self_preserves_unverified_episode_at_deadline(monkeypatch,tmp_path):
     test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
         False,False,False,False,False,False,False,False,persistent='empty_attract')

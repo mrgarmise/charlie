@@ -9,7 +9,7 @@ from memory.episode_identity import inspect_capture, validate_origin, artifact_m
 
 
 def preserve_game(journal, game, *, marathon, returncode, report, on_progress=None, on_operation=None):
-    from .marathon_robotron import established_gameplay, recording_readiness, safe_to_restart
+    from .marathon_robotron import established_gameplay, recording_readiness, safe_to_restart,qualified_game_over
     game = Path(game)
     report = report or {}
     def operation(name):
@@ -41,7 +41,7 @@ def preserve_game(journal, game, *, marathon, returncode, report, on_progress=No
     playable = established_gameplay(report)
     operation('restart_boundary_validation')
     terminal = safe_to_restart(report, returncode, capture_root=game,on_progress=on_progress)
-    classification = 'invalid' if invalid else 'completed' if playable and terminal and report_matches else 'incomplete_unverified'
+    classification = 'invalid' if invalid else 'completed' if playable and qualified_game_over(report,returncode) and readiness['status']=='ready' and report_matches else 'incomplete_unverified'
     capture_id = identity.get('capture_id') or identity.get('legacy_episode_id') or str(game.resolve())
     prior = [r for r in journal.records('game_completion')
              if r.data['episode'] == capture_id]
@@ -55,7 +55,7 @@ def preserve_game(journal, game, *, marathon, returncode, report, on_progress=No
         manifest_id=identity.get('manifest_id'),classification=classification,
         independence=dict(duplicate_content=duplicate_content,
             scope='distinct capture content and origin; not independent physical score qualification'),
-        checks=dict(established_gameplay=playable, independently_supported_terminal=terminal,
+        checks=dict(established_gameplay=playable, independently_supported_terminal=qualified_game_over(report,returncode),
                     report_matches_original=report_matches,
                     recording=readiness, confirmed_invalidator=invalid),
         provenance=report.get('provenance'), artifacts=identity.get('artifacts',{}),

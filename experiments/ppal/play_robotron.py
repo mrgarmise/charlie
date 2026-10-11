@@ -363,6 +363,52 @@ def _explore_startup(source,calibration,controller,forebrain,recorder,*,timeout=
                 observations=history,gameplay_verified=False,request='additional readable observations or operator assistance')
 
 
+def _startable(screen):
+    return (screen.get('state')=='not_gameplay' and
+        (screen.get('phase')=='startable' or (screen.get('phase')=='title' and
+         (screen.get('title_reference') or {}).get('matched') is True and
+         bool((screen.get('title_reference') or {}).get('sha256')))))
+
+
+def _restart_permission(source,calibration,*,classifier=classify_screen_state,timeout=20.,on_observation=None):
+    deadline=time.monotonic()+timeout;last=None;streak=[]
+    while time.monotonic()<deadline:
+        frame=calibration.apply(source.read());screen=classifier(frame);at=source.timestamp
+        if type(at) not in (int,float) or not math.isfinite(at) or (last is not None and at<=last):continue
+        last=at
+        if on_observation:on_observation(frame)
+        streak=(streak+[dict(screen,capture_timestamp=at)])[-3:] if _startable(screen) else []
+        if len(streak)>=3:return dict(verified=True,observations=streak,screen=streak[-1])
+        time.sleep(.025)
+    return dict(verified=False,observations=streak,reason='no fresh recognized startable screen')
+
+
+def _verified_restart(source, calibration, controller, *, classifier=classify_screen_state,
+                      timeout=20., on_observation=None):
+    """Exactly one START, only after fresh recognized permission, never a demo attach."""
+    deadline=time.monotonic()+timeout;last=None;streak=0;history=[];sent=False;playing=0
+    controller._command('NEUTRAL')
+    while time.monotonic()<deadline:
+        raw=source.read();frame=calibration.apply(raw);screen=classifier(frame)
+        at=source.timestamp
+        fresh=type(at) in (int,float) and math.isfinite(at) and (last is None or at>last)
+        if not fresh:continue
+        last=at
+        if on_observation:on_observation(frame)
+        history.append(dict(screen,capture_timestamp=at))
+        if not sent:
+            valid=_startable(screen)
+            streak=streak+1 if valid else 0
+            if streak>=3:
+                controller._command('START');sent=True
+        else:
+            playing=playing+1 if screen.get('phase')=='gameplay' else 0
+            if playing>=3:
+                return dict(action='restart',gameplay_verified=True,start_commands=1,observations=history)
+        time.sleep(.025)
+    raise RuntimeError('restart waiting: no verified startable screen or no fresh gameplay after single START')
+
+
 def _wait_for_gameplay(source, calibration, recognizer, evidence_dir, timeout=4.0, on_observation=None, generic_ready=False,classifier=classify_screen_state):
     """Observe quietly after START and preserve why acquisition passed or failed."""
     deadline = time.monotonic() + timeout
@@ -436,6 +482,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                         help="do not tap START; use when Robotron gameplay is already running")
     parser.add_argument("--focus", type=float, default=None,
                         help="diagnostic manual starting position; normal operation establishes autofocus")
+    parser.add_argument("--restart-from",type=Path,help="prior sealed completed episode; requires fresh startable screen and one START")
     parser.add_argument("--start-wait", type=float, default=4.0,
                         help="seconds to wait after START for visual gameplay/self evidence")
     parser.add_argument('--exploration-seconds',type=float,default=30.)
@@ -651,8 +698,11 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             print(f"AGENCY {snapshot['event'].upper()}: self={snapshot['self_track_id']} "
                   f"candidate={snapshot['candidate_track_id']} confidence={snapshot['confidence']:.2f} "
                   f"runner={snapshot['runner_up_confidence']:.2f}")
+        if episode_observer is not None and current_screen.get('phase')=='gameplay' and snapshot.get('identity_status')=='confirmed':
+            episode_observer.entry_evidence=dict(method='causal_SELF',capture_timestamp=source.timestamp,agency=dict(snapshot))
         if score_observer is not None and source.raw is not None:
             score_observer.submit(source.raw, timestamp=source.timestamp,observation_id=source.observation_id,
+                                  screen=dict(current_screen,episode_retired=bool(episode_observer and episode_observer.terminal_suspected)),
                                   sample=visual_agency.tick, preceding_action={
                                       "action":preceding_action, "agency_command":snapshot.get("command"),
                                       "self_track_id":snapshot.get("self_track_id"),
@@ -661,12 +711,22 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                                       "response_window":snapshot.get("response_window"),
                                       "identity_status":snapshot.get("identity_status"),
                                       "actuators":snapshot.get("actuators")} if preceding_action or snapshot.get("command") is not None or getattr(controller, "last_execution", None) is not None else None)
+    current_screen={}
+    boundary_retired=False
     def observe_episode(frame):
-        nonlocal cal_recovery
-        screen = screen_classifier(frame)
+        nonlocal cal_recovery,current_screen,boundary_retired
+        current_screen=screen_classifier(frame)
+        screen=current_screen
         screen['capture_timestamp'] = source.timestamp
         if episode_observer is not None:
             episode_observer.observe_phase(screen)
+            if episode_observer.confirmed and not boundary_retired:
+                boundary_retired=True
+                if controller is not None:controller._command('NEUTRAL')
+                retired=visual_agency.reframe();self_tracker.player_track_id=None
+                if score_observer:score_observer.freeze(episode_observer.last_gameplay_at)
+                diary.event('verified_terminal_self_retired',tracks=retired,screen=screen,
+                    last_supported_gameplay_at=episode_observer.last_gameplay_at)
         if imaging_monitor is not None:
             drift=imaging_monitor.observe(frame,screen,source.timestamp)
             if drift:
@@ -687,7 +747,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         nonlocal latest_agency_frame
         latest_agency_frame = calibration.apply(source.read())
         observe_episode(latest_agency_frame)
-        return recognizer.detect(latest_agency_frame)
+        return [] if episode_observer is not None and not episode_observer.agency_allowed else recognizer.detect(latest_agency_frame)
     def save_review(raw, tick, reason):
         if len(review_frames) >= (40 if reason == 'final-view' else 39):
             return
@@ -760,7 +820,20 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         reference=camera_session.reference if camera_session and camera_session.reference is not None else calibration.apply(source.raw)
         imaging_monitor=LiveViewMonitor(reference)
 
-        auto_start = args.arm and not args.no_start_game
+        restart_completed=False
+        if args.restart_from is not None:
+            from .marathon_robotron import safe_to_restart,load_report
+            if not args.arm or args.no_start_game or not safe_to_restart(load_report(args.restart_from/'report.json'),capture_root=args.restart_from):
+                raise RuntimeError('restart authority unavailable: previous episode unverified')
+            controller=new_controller()
+            phase(SessionState.STARTING,'verified prior completion; waiting for fresh START permission')
+            decision=_verified_restart(source,calibration,controller,classifier=screen_classifier,
+                timeout=20.,on_observation=observe_episode)
+            mark('start_decision',decision=decision)
+            timing['start_transport']=getattr(controller,'last_command',None)
+            phase(SessionState.WAITING_FOR_GAMEPLAY,'single START followed by fresh gameplay')
+            restart_completed=True
+        auto_start = args.arm and not args.no_start_game and not restart_completed
         if auto_start:
             decision, decision_frames = _initial_start_decision(source, calibration, timeout=args.start_wait,classifier=screen_classifier)
             buffered_frames.extend(decision_frames)
@@ -771,7 +844,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                     reason='usable recorded view and explicit session authority; explore permitted inputs')
             if not auto_start:
                 print('GAMEPLAY ALREADY VISIBLE: attaching without START')
-        else:
+        elif not restart_completed:
             decision = {'action':'attach' if args.arm else 'observe', 'reason':'explicit --no-start-game or unarmed observation'}
             mark('start_decision', decision=decision)
         if auto_start:
@@ -821,15 +894,21 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         for watched in startup_watch:
             episode_observer.observe_phase(dict(watched['screen_state'],capture_timestamp=watched.get('capture_timestamp')))
 
+        transport=timing.get('start_transport') or {}
+        ack=transport.get('ack_at')
+        if type(ack) in (int,float) and math.isfinite(ack) and len(episode_observer.gameplay_captures or [])>=3 and ack<episode_observer.gameplay_captures[0]:
+            episode_observer.entry_evidence=dict(method='acknowledged_START',capture_timestamp=ack,transport=transport)
+
         # Appearance/center are proposals. Armed play requires direct agency.
         if args.arm:
             if controller is None:
                 controller = new_controller()
             print("DISCOVERING SELF: short movement/neutral probes over all visual candidates")
             mark('self_discovery_started')
+            initial_recovery_started=time.monotonic()
             player = visual_agency.discover(read_agency_pairs, controller, record=record_agency,
-                                           observation_time=lambda: source.timestamp,
-                                           should_stop=lambda: episode_observer.confirmed)
+                                           observation_time=lambda: source.timestamp,deadline=initial_recovery_started+20.,
+                                           should_stop=lambda: episode_observer.confirmed or not episode_observer.agency_allowed)
             mark('self_discovery_finished', identity_status='confirmed' if visual_agency.agency.self_id is not None else 'provisional' if player is not None else 'unknown')
             frames = [visual_agency.pairs]
             acquisition = ("generic_visual_agency" if visual_agency.agency.self_id is not None else
@@ -876,7 +955,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         tick = 0
         lost = 0
         recovery_round = 0
-        recovery_since = None
+        recovery_since = locals().get('initial_recovery_started') if player is None else None
         pending_move = None
         pending_at = None
         pending_origin = None
@@ -888,12 +967,20 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             observed_at = time.monotonic()-started
             playfield = calibration.apply(raw)
             observe_episode(playfield)
+            if episode_observer.confirmed:
+                result='GAME OVER';controller._command('NEUTRAL')
+                retired=visual_agency.reframe();self_tracker.player_track_id=None
+                if score_observer:score_observer.freeze(episode_observer.last_gameplay_at)
+                episode_end=dict(state='game_over',confirmed=True,evidence=episode_observer.evidence(screen=current_screen,self_lost_frames=lost))
+                diary.event('episode_boundary_confirmed',evidence=episode_end['evidence'],retired_tracks=retired)
+                save_review(raw,tick,'game-over')
+                break
             pairs = recognizer.detect(playfield)
             detections = [d for d, _ in pairs]
 
             # Normal movement is another causal experiment; right-stick firing
             # never enters the BODY evidence model. Track continuity supplies WHERE.
-            response_window = pending_move not in (None, 'STAY')
+            response_window = episode_observer.agency_allowed and pending_move not in (None, 'STAY')
             if response_window:
                 early = visual_agency.observe(pairs, observed_at=source.timestamp)
                 early['phase'] = 'response_window_early_unmeasured'
@@ -911,7 +998,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 pairs = recognizer.detect(playfield)
                 detections = [d for d, _ in pairs]
             agency_snapshot = visual_agency.observe(
-                pairs, pending_move,
+                pairs, pending_move if episode_observer.agency_allowed else None,
                 time.monotonic()-pending_at if pending_at is not None else None,
                 observed_at=source.timestamp,
                 reference_positions=pending_origin if response_window else None)
@@ -930,8 +1017,10 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             screen=screen_classifier(playfield)
             screen['capture_timestamp']=source.timestamp
             episode_observer.observe_phase(screen)
-            if episode_observer.visual_boundary:
+            if episode_observer.confirmed:
                 result='GAME OVER'
+                controller._command('NEUTRAL');visual_agency.reframe();self_tracker.player_track_id=None
+                if score_observer:score_observer.freeze(episode_observer.last_gameplay_at)
                 episode_end=dict(state='game_over',confirmed=True,evidence=episode_observer.evidence(screen=screen,self_lost_frames=lost))
                 save_review(raw,tick,'game-over')
                 diary.event('episode_boundary_confirmed',evidence=episode_end['evidence'])
@@ -948,7 +1037,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                     self_obs = self_tracker.bind_track(tick + 1, visual_agency.controlled_track_id, visual_agency.positions)
                     new_player = self_obs.center
 
-            if new_player is None:
+            if new_player is None or not episode_observer.agency_allowed:
                 lost += 1
                 phase(SessionState.REACQUIRING, 'SELF unavailable; life boundary UNKNOWN')
                 if lost in (1,3):
@@ -962,9 +1051,10 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 except (OSError, ConnectionError):
                     raise
 
+                if recovery_since is None:recovery_since=time.monotonic()
                 recovery_frames = _quick_frames(
                     source, calibration, recognizer, count=4, interval=0.025,
-                    on_observation=observe_unmeasured, deadline=deadline)
+                    on_observation=observe_unmeasured, deadline=min(deadline,recovery_since+20.))
                 if time.monotonic() >= deadline:
                     result = 'DIAGNOSTIC LIMIT'
                     break
@@ -973,27 +1063,27 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 recovery = "generic_visual_agency"
                 if recovery_since is None:recovery_since=time.monotonic()
                 recovery_elapsed=time.monotonic()-recovery_since
-                # Experimental observation cadence, never an episode deadline.
-                # Beyond the initial budget, sample a quiet fresh-frame window
-                # before another bounded fallback probe batch.
-                if recovery_elapsed>=30.:
-                    recorder.event('agency_boundary_observation',dict(elapsed_seconds=recovery_elapsed,
-                        initial_budget_seconds=30., fallback_budget_seconds=120.,
-                        stage='fallback' if recovery_elapsed<120. else 'continued_observation',
-                        interpretation='cadence only; no time-derived game-over or START authority'),at=time.monotonic())
-                    for _ in range(8):
-                        read_agency_pairs()
-                        if episode_observer.confirmed:break
+                if recovery_elapsed>=20.:
+                    result='OBSERVATION UNCERTAIN'
+                    diary.event('terminal_investigation_expired',seconds=recovery_elapsed,
+                        boundary='incomplete_unverified',screen=screen)
+                    break
+                if recovery_elapsed>=3. or not episode_observer.agency_allowed:
+                    # Quiet fresh observation promptly replaces prolonged probes.
+                    # A demonstration never supplies a new causal SELF.
+                    recorder.event('terminal_investigation',dict(elapsed_seconds=recovery_elapsed,
+                        recovery_budget_seconds=3.,deadline_seconds=20.,screen=current_screen),at=source.timestamp)
+                    if progress:progress.cycle()
+                    tick+=1;time.sleep(.025)
+                    continue
                 recovery_round += 1
                 pulse_ms = (60, 120, 240)[min(recovery_round-1, 2)]
                 response_frames = 2 if recovery_round == 1 else 3
                 # Recovery probes are declared diagnostic interventions, not a
                 # learned policy, a new baseline or proof that longer is better.
-                probe_deadline=min(deadline,time.monotonic()+30.)
-                if recovery_elapsed<30.:probe_deadline=min(probe_deadline,recovery_since+30.)
-                elif recovery_elapsed<120.:probe_deadline=min(probe_deadline,recovery_since+120.)
+                probe_deadline=min(deadline,recovery_since+3.)
                 proposal = dict(round=recovery_round, baseline_pulse_ms=60,
-                    initial_budget_seconds=30., fallback_budget_seconds=120., batch_deadline=probe_deadline,
+                    initial_budget_seconds=3., terminal_deadline_seconds=20., batch_deadline=probe_deadline,
                     pulse_ms=pulse_ms,response_frames=response_frames,
                     question='can a longer bounded BODY response window establish causal SELF?',
                     reason='prior discovery did not establish controllable SELF',
@@ -1003,7 +1093,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                     read_agency_pairs, controller, pulse_ms=pulse_ms,
                     response_frames=response_frames,deadline=probe_deadline,record=record_agency,
                     observation_time=lambda: source.timestamp,
-                    should_stop=lambda: episode_observer.confirmed)
+                    should_stop=lambda: episode_observer.confirmed or not episode_observer.agency_allowed)
+                if not episode_observer.agency_allowed:recovered=None
                 probe_result=visual_agency.last_discovery
                 negative_qualified=episode_observer.observe_discovery(probe_result)
                 recorder.event('agency_discovery_result',dict(probe_result,negative_qualified=negative_qualified),at=time.monotonic())
@@ -1032,7 +1123,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                         "checking for controllable SELF")
                     challenge = _control_challenge(
                         source, calibration, recognizer, controller,
-                        initial_frames=recovery_frames, on_observation=observe_unmeasured, deadline=deadline)
+                        initial_frames=recovery_frames, on_observation=observe_unmeasured, deadline=probe_deadline)
 
                     rows.append({
                         "tick": tick,
@@ -1084,7 +1175,9 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 screen = screen_classifier(latest_agency_frame if latest_agency_frame is not None else playfield)
                 screen['capture_timestamp'] = source.timestamp
                 episode_observer.observe_phase(screen)
-                if recovered is None and episode_observer.confirmed:
+                if episode_observer.confirmed:
+                    controller._command('NEUTRAL');visual_agency.reframe();self_tracker.player_track_id=None
+                    if score_observer:score_observer.freeze(episode_observer.last_gameplay_at)
                     result = "GAME OVER"
                     episode_end = {
                         "state": "game_over",
@@ -1167,6 +1260,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             if lost:
                 print(f"PLAYER REACQUIRED (local track) after {lost} misses")
                 episode_observer.self_reacquired()
+                recovery_since=None;recovery_round=0
             lost = 0
 
             planning_pairs=pairs;semantic_evidence=[]
@@ -1330,6 +1424,16 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         else:
             result = "DIAGNOSTIC LIMIT"
 
+        if result=='GAME OVER':
+            controller._command('NEUTRAL')
+            retired=visual_agency.reframe();self_tracker.player_track_id=None
+            if score_observer:score_observer.freeze(episode_observer.last_gameplay_at)
+            diary.event('completed_self_retired',tracks=retired,boundary=episode_end)
+            # Recognition is already complete; this quiet wait grants no START.
+            if episode_end['evidence'].get('rule')=='verified_gameplay_to_postgame_pages':
+                episode_end['evidence']['restart_permission']=_restart_permission(
+                    source,calibration,classifier=screen_classifier,timeout=20.,on_observation=observe_episode)
+                diary.event('restart_screen_permission',evidence=episode_end['evidence']['restart_permission'])
         print(f"RUN COMPLETE: {result}; ticks={tick}")
     except KeyboardInterrupt:
         result = "INTERRUPTED"

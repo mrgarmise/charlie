@@ -307,6 +307,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             write_session(session/'session.json',doc)
             cmd=[sys.executable,'-m','experiments.ppal.play_robotron','--arm',
                  '--output',str(game)]
+            if index>1:cmd.extend(['--restart-from',str(previous_game)])
             if args.focus is not None:cmd.extend(['--focus',str(args.focus)])
             if developmental:cmd.extend(['--bootstrap-body-fire','--recalibrate'])
             if args.game_seconds is not None:cmd.extend(['--diagnostic-seconds',str(args.game_seconds)])
@@ -329,6 +330,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             from .score_observer import ScoreObserver
             ScoreObserver.queue_game(commitments,game,session=session,number=index)
             rc=episode_driver(cmd,30.)
+            previous_game=game
             report=load_report(game/'report.json')
             from .progress_supervision import Progress
             handoff_progress=Progress(progress_path or game.parent/(game.name+'-progress.json'))
@@ -395,13 +397,13 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             if getattr(args,'qualified_games',None) is not None and qualified>=args.qualified_games:
                 doc['status']='qualified_target_complete';break
             if index>=args.max_games:
-                doc['status']='bounded_attempts_complete' if handoff('restart_boundary_validation',safe_to_restart,report,rc,capture_root=game,on_progress=callback) else 'unverified_episode_boundary'
+                doc['status']='bounded_attempts_complete' if completion['classification']=='completed' else 'unverified_episode_boundary'
                 break
             entry['recording_readiness']=handoff('recording_readiness',recording_readiness,game,report,on_progress=callback)
             handoff('session_state_update',write_session,session/'session.json',doc)
-            if not handoff('restart_boundary_validation',safe_to_restart,report,rc,capture_root=game,on_progress=callback):
-                doc['status']='unverified_episode_boundary'
-                print('DEVELOPMENT STOP: no confirmed game-over evidence; no further START',flush=True)
+            if completion['classification']!='completed' or not handoff('restart_boundary_validation',safe_to_restart,report,rc,capture_root=game,on_progress=callback):
+                doc['status']='restart_permission_unavailable' if completion['classification']=='completed' else 'unverified_episode_boundary'
+                print('DEVELOPMENT STOP: '+('completed episode retained; no restart permission' if completion['classification']=='completed' else 'no confirmed game-over evidence')+'; no further START',flush=True)
                 break
             time.sleep(args.retry_wait)
     except KeyboardInterrupt:
@@ -641,12 +643,53 @@ def recording_readiness(root,report,*,on_progress=None):
         return dict(status='blocked',reason=str(exc),physical_authorization=False)
 
 
-def safe_to_restart(report, returncode=0,*,capture_root=None,on_progress=None):
+def _fresh_times(times):
+    import math
+    return (isinstance(times,list) and len(times)>=3 and all(type(t) in (int,float) and math.isfinite(t) and t>=0 for t in times)
+        and all(b>a for a,b in zip(times,times[1:])))
+
+
+def _postgame_pages(evidence):
+    game=evidence.get('gameplay_capture_timestamps') or [];pages=evidence.get('postgame_observations') or []
+    if not isinstance(pages,list) or not all(isinstance(p,dict) for p in pages):return False
+    times=[p.get('capture_timestamp') for p in pages]
+    if not (_fresh_times(game) and _fresh_times(times) and times[0]>game[-1]):return False
+    for page in pages:
+        if page.get('state')!='not_gameplay':return False
+        if page.get('phase')=='terminal':
+            labels=page.get('label_scores') or {}
+            if page.get('reason')!='recorded_heroes_headings' or not all(
+                    type(labels.get(k)) in (int,float) and .78<=labels[k]<=1. for k in ('heroes','all-time')):return False
+        elif page.get('phase')=='title':
+            ref=page.get('title_reference') or {}
+            if ref.get('matched') is not True or not ref.get('sha256'):return False
+        else:return False
+    entry=evidence.get('entry_evidence') or {};at=entry.get('capture_timestamp')
+    import math
+    if type(at) not in (int,float) or not math.isfinite(at) or not 0<=at<times[0]:return False
+    if entry.get('method')=='causal_SELF':
+        agency=entry.get('agency') or {}
+        confidence=agency.get('confidence')
+        if agency.get('identity_status')!='confirmed' or type(agency.get('self_track_id')) is not int or type(confidence) not in (int,float) or not .72<=confidence<=1.:return False
+    elif entry.get('method')=='acknowledged_START':
+        transport=entry.get('transport') or {}
+        if transport.get('command')!='START' or transport.get('ack_at')!=at:return False
+    else:return False
+    return evidence.get('established_gameplay') is True
+
+
+def qualified_game_over(report,returncode=0):
+    if returncode!=0 or not report:return False
+    end=report.get('episode_end') or {};evidence=end.get('evidence') or {}
+    if not (report.get('result')=='GAME OVER' and end.get('state')=='game_over' and end.get('confirmed') is True):return False
+    if evidence.get('rule')=='verified_gameplay_to_postgame_pages':return _postgame_pages(evidence)
+    return _legacy_restart_evidence(report,returncode)
+
+
+def _legacy_restart_evidence(report, returncode=0,*,capture_root=None,on_progress=None):
     """Only an explicit, evidenced terminal screen may authorize another START."""
     if returncode != 0 or not report:
         return False
-    if capture_root is not None and recording_readiness(capture_root,report,on_progress=on_progress)['status']!='ready':return False
-    if capture_root is None and report.get('recording_pipeline'):return False
     end = report.get('episode_end', {})
     evidence = end.get('evidence') or {}
     terminal=(report.get('result')=='GAME OVER' and end.get('state')=='game_over' and end.get('confirmed') is True
@@ -665,6 +708,19 @@ def safe_to_restart(report, returncode=0,*,capture_root=None,on_progress=None):
         and bool((evidence.get('title_reference') or {}).get('sha256'))
         and (evidence.get('screen') or {}).get('phase')=='title')
     return terminal and (causal or visual or title)
+
+
+def safe_to_restart(report,returncode=0,*,capture_root=None,on_progress=None):
+    if not qualified_game_over(report,returncode):return False
+    if capture_root is not None and recording_readiness(capture_root,report,on_progress=on_progress)['status']!='ready':return False
+    if capture_root is None and report.get('recording_pipeline'):return False
+    evidence=report['episode_end']['evidence']
+    if evidence.get('rule')!='verified_gameplay_to_postgame_pages':return True
+    permission=evidence.get('restart_permission') or {};views=permission.get('observations') or []
+    if permission.get('verified') is not True or not _fresh_times([v.get('capture_timestamp') for v in views]):return False
+    if views[0]['capture_timestamp']<=evidence['postgame_observations'][-1]['capture_timestamp']:return False
+    from .play_robotron import _startable
+    return all(_startable(view) for view in views)
 
 
 

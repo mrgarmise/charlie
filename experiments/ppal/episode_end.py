@@ -27,11 +27,21 @@ class EpisodeEndObserver:
     attract_captures: list | None = None
 
     discovery_evidence: dict | None = None
+    gameplay_captures: list | None = None
+    postgame_captures: list | None = None
+    terminal_transition: dict | None = None
+    terminal_suspected: bool = False
+    last_gameplay_at: float | None = None
+    entry_evidence: dict | None = None
+
+    @property
+    def agency_allowed(self):
+        return not self.terminal_suspected and self.terminal_transition is None
 
     def observe_phase(self, screen: dict) -> None:
         """Fresh positive page transitions; UNKNOWN/SELF absence never suffice."""
         at=screen.get('capture_timestamp')
-        if at is None or (self.last_capture is not None and at<=self.last_capture):return
+        if type(at) not in (int,float) or not math.isfinite(at) or at<0 or (self.last_capture is not None and at<=self.last_capture):return
         self.last_capture=at
         phase=screen.get('phase','unknown')
         if phase=='title' and not ((screen.get('title_reference') or {}).get('matched') is True
@@ -40,6 +50,25 @@ class EpisodeEndObserver:
         if self.phase_history is None:self.phase_history=[]
         if not self.phase_history or self.phase_history[-1]['phase']!=phase:
             self.phase_history.append(dict(phase=phase,capture_timestamp=at,reason=screen.get('reason'),label_scores=screen.get('label_scores')))
+        # A verified transition is immutable even if an attract demonstration
+        # later looks like gameplay. It cannot resurrect the completed SELF.
+        if self.terminal_transition is not None:return
+        if phase=='gameplay' and not self.terminal_suspected:
+            self.gameplay_captures=((self.gameplay_captures or [])+[at])[-3:]
+            self.last_gameplay_at=at
+        strong=screen.get('state')=='not_gameplay' and ((phase=='terminal' and screen.get('reason')=='recorded_heroes_headings'
+                and all((screen.get('label_scores') or {}).get(k,0)>=.78 for k in ('heroes','all-time'))) or phase=='title')
+        if strong and self.entry_evidence is not None and len(self.gameplay_captures or [])>=3:
+            self.terminal_suspected=True
+            self.postgame_captures=((self.postgame_captures or [])+[dict(screen)])[-3:]
+            if len(self.postgame_captures)>=3:
+                self.terminal_transition=dict(rule='verified_gameplay_to_postgame_pages',
+                    gameplay_capture_timestamps=list(self.gameplay_captures),
+                    postgame_observations=list(self.postgame_captures),
+                    last_supported_gameplay_at=self.last_gameplay_at,
+                    screen=dict(screen),established_gameplay=True,entry_evidence=dict(self.entry_evidence))
+                return
+        else:self.postgame_captures=[]
         # Positive striped-border evidence remains useful even without a page
         # heading. It is never itself START authorization.
         state = screen.get('state','unknown')
@@ -109,7 +138,7 @@ class EpisodeEndObserver:
 
     @property
     def confirmed(self) -> bool:
-        return self.visual_boundary or (
+        return self.terminal_transition is not None or self.visual_boundary or (
             self.not_gameplay_streak >= self.required_not_gameplay
             and self.agency_failures >= 1
             and (not self.phase_history or (self.phase_history[-1]['phase'] in ('terminal','startable','title')
@@ -117,6 +146,9 @@ class EpisodeEndObserver:
         )
 
     def evidence(self, *, screen: dict, self_lost_frames: int) -> dict:
+        if self.terminal_transition is not None:
+            return dict(self.terminal_transition, restart_screen=dict(screen),
+                        self_lost_frames=self_lost_frames)
         return {
             "rule": "established_gameplay_then_verified_title" if self.visual_boundary and screen.get('phase')=='title' else
                 "gameplay_terminal_attract_sequence" if self.visual_boundary else "persistent_not_gameplay_plus_no_controlled_self",

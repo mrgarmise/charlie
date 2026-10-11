@@ -1,0 +1,50 @@
+{
+  "tested_implementation": "ca7bc48a36f4c4b55c5f1f2d1365e99226fea31a",
+  "parent": "0aadb65f4623f668f4e21631ed7b620e128d3ff2",
+  "recorded_utc": "2026-10-11T18:06:31.763514+00:00",
+  "environment": {
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "opencv": "5.0.0",
+    "numpy": "2.5.4",
+    "kind": "host container; simulated camera/controller"
+  },
+  "host_results": {
+    "focused": {
+      "passed": 73,
+      "seconds": 96.88
+    },
+    "boundaries": {
+      "passed": 33,
+      "seconds": 0.36
+    },
+    "full": {
+      "tests": 897,
+      "passed": 876,
+      "skipped": 21,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 224.272,
+      "process_exit_code": 0,
+      "receipt": "host-full.xml",
+      "stdout_limitation": "redirected live log ended at 46%; complete JUnit XML parsed and process returned zero"
+    }
+  },
+  "sha256": {
+    "experiments/ppal/episode_end.py": "b4466f577e7c5207f7e19045033fec1e243b4f6fe7fa371f172ec56dee298aaa",
+    "experiments/ppal/play_robotron.py": "a78a0ce8e373441d5084cd4409b09df8dd2e9dbb02a34def57437bfe695d867d",
+    "experiments/ppal/robotron_agency.py": "dfb30df75b50e63f22a62dde0a5e0977629f7f63874b2e10fc61bed06d8ce658",
+    "tests/test_robotron_agency_integration.py": "da88b76baca5e50fc26e09e608cecc4a659b4f105550ba6bb079b6082c38c60f",
+    "tests/test_restart_discovery_evidence.py": "1a5fcf9e7de396b4067ec2fe0835d896f4f0a3bc4c1d839c4bf9c540679f117f",
+    "docs/ppal/restart-recovery-20261011/gameplay-only.patch": "6c47386a45097eb1b7c6ecedb72ef5c410314d4d7215a999e39ba542faf0a0f9",
+    "docs/ppal/restart-recovery-20261011/host-boundaries.xml": "979984eed4bbc1325ca0e5d48ece9b1dd33cfbd7aa7d407475463bf69c9afe0a",
+    "docs/ppal/restart-recovery-20261011/host-full.xml": "5af0e9758dd35b45b9ce4935beeff8ff670ac613fb670facd59a5a929daf01a9",
+    "docs/ppal/restart-recovery-20261011/README.md": "21bb189249064e71b9842f18db92209cf503cabde7f2014652876df5f74e5ecf",
+    "docs/ppal/restart-recovery-20261011/host-focused.xml": "1b03ed6a39ae25b9847197bb6c24fd39c91051a78f28967965a7a9a66d922300"
+  },
+  "native_validation": "pending; SSH host charlie cannot resolve",
+  "physical_activity": "none",
+  "six_complete_games": "not demonstrated",
+  "score_discrepancy": "user 2200 vs machine 1100; originals unavailable, unresolved",
+  "inspected_cached_arcade_controller_sha256": "344e9886848b5bc437f257a272f08b0df9d6b49fe844dae8b7368dd527cadc8d"
+}

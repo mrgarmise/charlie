@@ -1,0 +1,20 @@
+{
+  "schema": "developmental-restart-acceptance-v1",
+  "continuity_passed": true,
+  "original_records_preserved": 1120,
+  "appended_records": 0,
+  "new_record_categories": {},
+  "substantive_progress": false,
+  "progress_records": [],
+  "advanced_meditations": [],
+  "runnable_work": [],
+  "blocked_work": [],
+  "completed_work": [
+    "a244d5c4f10b87b0633b9d80cf862881469948c3f4b718f07bd62abdb836f4ea"
+  ],
+  "classification": "waiting",
+  "steady_state_reached": true,
+  "restart_exact": true,
+  "physical_authorization": false,
+  "physical_score_improvement": "UNKNOWN"
+}

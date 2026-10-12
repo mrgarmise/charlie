@@ -276,3 +276,15 @@ test runs are retained as diagnostics, not acceptance. New regressions test
 independent outcome selection influence, repeated-evidence invariance, unknown
 legacy conservatism, authority/hold/stickiness, actual journal reload and read-only
 audit nonactivation. Torch skips leave Torch-dependent readiness unverified.
+
+Final implementation is published at `84de3ffedf5d25d82268b1b1ffe14447dd6b84a8`,
+parent `a6702541efac0a93402e0668d7e5fdd6220e136f`. Its tree
+`4ef93a6a1bbbbbf77f2be24770ddfd16e50a8483` exactly matches the locally tested
+tree. Final suite: **950 passed, 21 skipped**, zero failures/errors. A separate
+clean checkout reproduced the 14 priority influences and one changed-choice
+control. Its normal offline restart preserved **1,120 records, zero appended**;
+the independent validator reports exact restart, no additional substantive
+progress and false physical authority. `PUBLICATION.json`,
+`published-clean-controls.json` and `published-restart-validation.json` preserve
+the exact published revision, clean runtime and observed result. These host
+checks leave E1/P1/I1 and native/performance acceptance open.

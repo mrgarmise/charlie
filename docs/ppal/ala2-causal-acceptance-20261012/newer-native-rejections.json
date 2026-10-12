@@ -1,0 +1,252 @@
+{
+  "source_library_id": "libfile_73f8322bd4608191a23b7527c649bf70",
+  "source_name": "Pasted text(20261010-190005).txt",
+  "status": "operator-provided truncated October 10 status; not independently reproduced native acceptance",
+  "projects": {
+    "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c": {
+      "goal": "Can temporal estimation improve without promoting uncertain track links?",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343": {
+      "goal": "Can temporal estimation improve without promoting uncertain track links?",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252": {
+      "goal": "Can an available learned visual representation generalize to independent episodes, and what remains unrepresented?",
+      "status": "blocked",
+      "progress": {},
+      "next_direction": "await prerequisite; preserve hypotheses and history"
+    },
+    "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0": {
+      "goal": "The unresolved question may recur in independent experience: action_execution",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a": {
+      "goal": "The unresolved question may recur in independent experience: death_observability",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345": {
+      "goal": "The unresolved question may recur in independent experience: ownership_continuity",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf": {
+      "goal": "The unresolved question may recur in independent experience: score_attribution",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2": {
+      "goal": "The unresolved question may recur in independent experience: self_uncertainty",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f": {
+      "goal": "The unresolved question may recur in independent experience: semantic_coverage",
+      "status": "paused",
+      "progress": {
+        "attempts": 2,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 2,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d": {
+      "goal": "Can preserved observations support the existing motion candidates?",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0": {
+      "goal": "The unresolved question may recur in independent experience: perception_reconciliation",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 1,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 1,
+        "results": {
+          "contradicted": 1
+        },
+        "support_fraction": 0.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    }
+  },
+  "rejections": [
+    {
+      "id": "62f5b9f581e69ddab7fd8b2dd7d549cafee82a2f61eef3b3c9b22996c6e2d801",
+      "artifact_path": "/home/five/.local/share/charlie/development/preserved-findings/d2e8291a716b5b74c7af8006f8e6e9e0ddde184967b1beff1b6d91b54a78a4f3.json",
+      "artifact_sha256": "d2e8291a716b5b74c7af8006f8e6e9e0ddde184967b1beff1b6d91b54a78a4f3",
+      "category": "preserved_meditation_rejection",
+      "context_id": "60f0d9d7de40f7eca6590a9af19e0fe72338d7d1f9f391d48db4ab2360576bbd",
+      "original_path": "/home/five/.local/share/charlie/development/meditations/60f0d9d7de40f7eca6590a9af19e0fe72338d7d1f9f391d48db4ab2360576bbd/result.json",
+      "prior_use": "diagnostic",
+      "qualification": "No valid prediction-error finding; not independent evidence",
+      "reason": "finite preserved prediction errors required: adjacent",
+      "resumption_condition": "A distinct provenance-preserved artifact with finite nonnegative adjacent and gap errors; never interpolate missing measurements",
+      "source_episode": "episode:0bf19070ac16c159eca9ecc0fe27f96d84933da47925d466b545cceba372d967",
+      "source_producer": "unknown unless present in preserved bytes",
+      "status": "rejected",
+      "validator": "meditation-motion-v1"
+    },
+    {
+      "id": "132a464de18f03919b3f8608b72996c2525d813f248ec79236d16d025a3effc1",
+      "artifact_path": "/home/five/.local/share/charlie/development/preserved-findings/a7c79d72febd6e99200cc013846366e0203ac2b640f0c02642a9dbe2992ea154.json",
+      "artifact_sha256": "a7c79d72febd6e99200cc013846366e0203ac2b640f0c02642a9dbe2992ea154",
+      "category": "preserved_meditation_rejection",
+      "context_id": "9b1e65c9d5c50f5d33a95d747b56a89be69f142fa6117908bf8aaf38f178fc5e",
+      "original_path": "/home/five/.local/share/charlie/development/meditations/9b1e65c9d5c50f5d33a95d747b56a89be69f142fa6117908bf8aaf38f178fc5e/result.json",
+      "prior_use": "diagnostic",
+      "qualification": "No valid prediction-error finding; not independent evidence",
+      "reason": "finite preserved prediction errors required: adjacent",
+      "resumption_condition": "A distinct provenance-preserved artifact with finite nonnegative adjacent and gap errors; never interpolate missing measurements",
+      "source_episode": "episode:ea62567075533157f5f20e0fbe1311c74fd198d5aa54197a3e88cfa6478fa218",
+      "source_producer": "unknown unless present in preserved bytes",
+      "status": "rejected",
+      "validator": "meditation-motion-v1"
+    },
+    {
+      "id": "8e0e4dde5becca4e30c04191803bd1df28be30cba8fbba946d8e28e719b1a992",
+      "artifact_path": "/home/five/.local/share/charlie/development/preserved-findings/b1247bb0aa47253cf841f91e45a0765aa501edcd6079ae78aa2e95b81710848b.json",
+      "artifact_sha256": "b1247bb0aa47253cf841f91e45a0765aa501edcd6079ae78aa2e95b81710848b",
+      "category": "preserved_meditation_rejection",
+      "context_id": "b060ef72fef3a9b2233f17a92cf2911af973d61d72ecc6049f7bdf4000abd427",
+      "original_path": "/home/five/.local/share/charlie/development/meditations/b060ef72fef3a9b2233f17a92cf2911af973d61d72ecc6049f7bdf4000abd427/result.json",
+      "prior_use": "diagnostic",
+      "qualification": "No valid prediction-error finding; not independent evidence",
+      "reason": "finite preserved prediction errors required: adjacent",
+      "resumption_condition": "A distinct provenance-preserved artifact with finite nonnegative adjacent and gap errors; never interpolate missing measurements",
+      "source_episode": "episode:ca74c0e82ca1ddfc3ce455b185141cc980f44a936c023399cd4a06d336c01827",
+      "source_producer": "unknown unless present in preserved bytes",
+      "status": "rejected",
+      "validator": "meditation-motion-v1"
+    }
+  ],
+  "exact_october9_artifact_identified": false
+}

@@ -48,7 +48,9 @@ class Replay:
 
 def test_six_actual_consecutive_originals_stabilize_without_looser_gate():
     source=Replay([original(n) for n in range(1,7)])
-    cfg=PreflightConfig(geometry_interval=0)
+    # Preserve the earlier stricter eight-pixel replay assertion explicitly;
+    # the later camera repair changed the operational default to twelve.
+    cfg=PreflightConfig(geometry_interval=0,max_jitter_pixels=8)
     assert cfg.stable_views==6 and cfg.max_jitter_pixels==8
     result=locate_stable_geometry(source,cfg)
     assert source.count==6 and result.observations==6 and result.jitter_pixels<=8

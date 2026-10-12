@@ -1,0 +1,40 @@
+{
+  "schema": "ala2-host-copy-continuation-v1",
+  "before_records": 364,
+  "after_first_records": 458,
+  "after_restart_records": 458,
+  "source_sha256": "8b4c53f7ad8f0e3f656ab4aa25a7b40b208459e89f56a24f90b2950749278444",
+  "source_files": 47,
+  "source_files_unchanged": true,
+  "original_records_preserved": true,
+  "restart_original_records_preserved": true,
+  "original_project_ids": [
+    "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+    "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+    "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+    "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+    "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+    "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+    "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+    "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+    "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+    "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+    "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+    "215156bbcff2ed248997a1abc3ab36d2bd3eb9d9eacbab8021996f8c51bbb0bf"
+  ],
+  "new_gameplay_experience": 0,
+  "activations": 0,
+  "physical_authorization": false,
+  "native_acceptance": false,
+  "substantive_progress": false,
+  "first_run_provenance": {
+    "code_revision": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+    "dirty_worktree": false,
+    "test_environment": "offline process; no hardware capability initialized"
+  },
+  "restart_provenance": {
+    "code_revision": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+    "dirty_worktree": true,
+    "test_environment": "offline process; no hardware capability initialized"
+  }
+}

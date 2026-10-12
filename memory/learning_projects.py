@@ -410,7 +410,12 @@ class LearningExecutive:
                      if projects.get(d, {}).get('disposition') != 'achieved']
             blocked = (missing or unmet or p['method'] not in methods
                        or p['method'] not in authorized_methods or (p.get('hold', False) and exploratory_projects is None))
-            resolved = p.get('progress', {}).get('resolved', 0)
+            progress = p.get('progress', {})
+            # Correlated variants/replays are not additional experience. These
+            # counts come from assess()'s canonical overlapping evidence groups.
+            # Legacy states without those counts retain their prior uncertainty.
+            resolved = (progress.get('independent_physical_episodes', 0)
+                        + progress.get('independent_offline_evidence_units', 0))
             terms = dict(objective_contribution=p.get('objective_contribution', .5),
                 learning_value=p.get('learning_value', .5),
                 remaining_uncertainty=p.get('uncertainty', .5)/(1+resolved),
@@ -419,6 +424,10 @@ class LearningExecutive:
                      + terms['remaining_uncertainty'] - terms['cost'] - terms['risk'])
             alternatives.append(dict(project_id=p['id'], score=score, blocked=bool(blocked),
                 terms=terms, opportunity_cost='foregone eligible alternatives shown in this selection',
+                experience_basis=dict(independent_units=resolved,
+                    resolution_ids=[h['resolution_id'] for h in p.get('experiment_history', [])
+                                    if h['result'] != 'unresolved'],
+                    interpretation='retained diagnostic outcomes; independence accounting is not authenticity or score qualification'),
                 missing_resources=missing, unmet_dependencies=unmet,
                 method_available=p['method'] in methods, authorized=p['method'] in authorized_methods,
                 urgent=p['id'] in urgent_projects, status=p['status']))

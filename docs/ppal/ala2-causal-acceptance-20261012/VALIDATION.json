@@ -1,0 +1,65 @@
+{
+  "schema": "ala2-mission-validation-v1",
+  "implementation_base": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+  "preserved_ala_branch_head": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+  "branch": "feature/ala2-causal-acceptance",
+  "runtime": {
+    "python": "3.12.14",
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "dependencies": "pytest 9.1.1, numpy 2.5.4, Pillow 12.3.0, OpenCV headless 5.0.0.93; Torch unavailable"
+  },
+  "full_command": "../ala-env/bin/python -m pytest tests -q --junitxml=../mission-full-isolated.xml",
+  "suite": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "21",
+    "tests": "967",
+    "time": "250.509",
+    "timestamp": "2026-10-12T23:59:14.376204+09:00",
+    "hostname": "a17bc5f91e2f"
+  },
+  "passed": 946,
+  "skipped": 21,
+  "failures": 0,
+  "focused_isolated": {
+    "passed": 69,
+    "failed": 0
+  },
+  "camera_regression": {
+    "passed": 34,
+    "skipped": 1,
+    "failed": 0
+  },
+  "priority_and_audit": {
+    "passed": 20
+  },
+  "nonpassing_runs": {
+    "inherited_full": {
+      "failed": 15,
+      "passed": 931,
+      "skipped": 21
+    },
+    "contended_focused": {
+      "failed": 1,
+      "passed": 68,
+      "cause": "test suite overlap with global gameplay guard; sequential rerun passed"
+    }
+  },
+  "physical_authorization": false,
+  "native_pi_acceptance": false,
+  "gate_results": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED",
+    "Robotron score improvement": "NOT YET DEMONSTRATED"
+  },
+  "files": {
+    "memory/learning_projects.py": "c6e131979ef345750c54caccba3352662b815bc41ab627deb22f2eeac761da22",
+    "learning/causal_audit.py": "8dd7f740d79cd8f2e108e83f89b0cbd434d8818e7c8e5b1c0828dcc9e02b6221",
+    "tests/test_executive_experience_priority.py": "629d5368fd169e9eb7cff8dab6871a39294b7a6885779d3fa6e20ce392bfb72a",
+    "docs/ppal/ala2-causal-acceptance-20261012/full-isolated.xml": "8fa679c4ec2ab0a9640f8ff2c14f31b1657d094c0e7f3f13271d0218bbee7340",
+    "docs/ppal/ala2-causal-acceptance-20261012/full-isolated.txt": "64db7d1027e09eadc3eb39be7b6d2b83193cc4ba72f7bb24f8789b5d882e5c10"
+  }
+}

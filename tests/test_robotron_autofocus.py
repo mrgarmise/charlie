@@ -36,6 +36,12 @@ class FocusSource:
                             sensor_timestamp_ns=self.sequence*self.interval)
         return Image.new('RGB', (64, 64))
 
+    def read_fresh(self):
+        # The camera-session repair requires an explicitly fresh request. This
+        # test double has no cache; dispatch through read() so subclasses still
+        # supply unstable/malformed metadata to the real acceptance gates.
+        return self.read()
+
 
 def test_automatic_start_uses_observed_position_then_confirms_idle_manual_lock():
     source = FocusSource(interval=33_333_333)  # 30fps, six frames alone are too short

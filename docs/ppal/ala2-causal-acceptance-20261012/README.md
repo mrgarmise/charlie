@@ -102,14 +102,57 @@ inventory against the current Pi. Preserve the exact per-image hashes in
 `developmental-continuation-20261009/authentic-followup.json` and the original
 Evaluator promotion state. Generic replacement pictures do not satisfy it.
 
+## Additional authentic October 11 continuation and import repair
+
+A subsequent precise source search located `charlie-terminal-restart.tar.gz`
+(`libfile_d9404897c0cc8191b7061baac9ea7613`). Its 301 preserved gameplay files
+belong to `development-20261011-221727/game-01`, source revision `9e423e9` with
+reported clean source. The report ends **OBSERVATION UNCERTAIN**, reported score
+800. This is authentic archived experience, not a qualified complete game or a
+new physical trial. Archive and per-file hashes are retained in the source ledgers.
+
+The normal application over a fresh separate copy of the original notebook
+completed meditation `a244d5c4f10b87b0633b9d80cf862881469948c3f4b718f07bd62abdb836f4ea`
+and then selected/resolved **seven** existing diagnostic retrieval investigations.
+No project, candidate, hypothesis or result was manually supplied. The notebook
+advanced **364 → 1,120**, preserving all original documents/IDs/commitments and
+all source-file hashes, then reached a valid wait. Independent validation accepts
+this as substantive **analytical** continuation, not learned PPAL policy or SCORE
+improvement. It explicitly counts 491 imported original session records as
+historical preservation, giving them zero new-work or authority credit.
+
+The existing acceptance classifier initially rejected archived actuator
+predictions as unknown new work. The existing score acquisition owner now seals
+imports with original journal path/hash and exact record identities. Inspection
+and continuation validation re-open the original journals read-only and compare
+exact documents and original commitment timestamps. Forged producer names,
+retimed commitments, changed source bytes or rehashed authority/independence
+claims fail. Historical imports cannot supply current capability activation.
+The global current-runtime authority and work-accounting gates remain intact.
+
+The normal first/continuation/restart logs and `terminal-continuity.json` retain
+the successful run. A different earlier copied state had an acquisition missing-ID
+failure and then a read-only database write error; both exact logs are preserved
+as failed attempts, with cause unestablished. A fresh byte-preserving restoration
+succeeded. No original or failed copied state was erased or relabeled accepted;
+native original-state recovery still requires its own observations.
+
+The more recent October 10 status paste `libfile_73f8322bd4608191a23b7527c649bf70`
+was fully read. It is truncated mid-JSON, but its intact rejection array identifies
+three exact artifact hashes and source/context bindings in
+`newer-native-rejections.json`. These narrow the operator's delivery request;
+without original bytes/time/producer bindings they do not identify or reproduce
+the exact October 9 failure.
+
 Temporal qualification still needs source/pixel hashes, independently verified
 persistent identity, calibrated board trajectories and uncertainty at observed
 150ms ±25ms pairs; one validation and three nonoverlapping fresh final groups.
 The original October 5 pending commission also requires the exact original
 tracks artifact. A checkpoint's reconstructed tracks cannot replace that source.
-The next eligible authentic offline investigation therefore remains blocked;
-normal Executive execution and dependency reporting were attempted through
-existing interfaces, without manually fabricating an eligible project.
+The next independent candidate evaluation remains blocked. The newly available
+October 11 recording permitted the authentic meditation and seven retrieval
+investigations above through the existing interfaces; no missing qualifying
+trajectory or fresh final observation was fabricated.
 
 ## Native Pi acceptance and operator commands
 
@@ -204,7 +247,7 @@ specific separate approval; servo/firmware authority remains separate.
 | Original current native notebook acceptance | NOT YET DEMONSTRATED | Pi access, actual version/state, original failure and observed unarmed logs. |
 | Invalid-meditation host regression | Independently tested software only | Exact October 9 artifact and native recovery remain open. |
 | Distinct identities / history preservation | PASS for copied host history only | 364 original records preserved; 458-record exact restart; current native state unverified. |
-| Next authentic offline investigation | NOT YET DEMONSTRATED | Original source tracks/images and independent candidate measurements; Executive legitimately waits. |
+| Next authentic offline investigation | PASS for scoped host analytical continuation | One authentic meditation and seven retrieval resolutions accepted; independent candidate qualification and native continuation remain open. |
 | Original independent candidate qualification / integration / rollback | NOT YET DEMONSTRATED | Fixture interfaces verified separately; retained authentic candidates unresolved. |
 | Frozen complete-game baseline / independent SCORE improvement | NOT YET DEMONSTRATED | Qualified candidate, measurement, native conditions, prospective protocol and separately authorized complete-game trials. |
 | Authorization compliance during this mission | PASS for performed host operations | No physical operation, deployment or authentic policy activation; no authority inferred. |

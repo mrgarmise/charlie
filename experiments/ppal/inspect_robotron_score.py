@@ -154,9 +154,20 @@ def import_queue(journal, root):
         if path.resolve()==journal.path.resolve():continue
         import sqlite3
         try:
+            source_hash=hashlib.sha256(path.read_bytes()).hexdigest()
             source=EvidenceJournal(path,read_only=True)
-            try:journal.merge_from(source)
+            try:
+                identifiers=[r.id for r in source.records()]
+                journal.merge_from(source)
             finally:source.close()
+            if hashlib.sha256(path.read_bytes()).hexdigest()!=source_hash:
+                raise ValueError('original session journal changed during import')
+            journal.append('event',dict(category='preserved_session_history_import',
+                source_path=str(path.resolve()),source_root=str(root.resolve()),
+                source_sha256=source_hash,record_ids=identifiers,
+                new_independent_experience=False,physical_authorization=False),
+                episode='score-review-acquisition',producer='existing-evidence-consolidation',
+                version='session-history-binding-v1')
         except (OSError,ValueError,KeyError,sqlite3.DatabaseError) as exc:deficiency(path,exc)
     for path in sorted(root.rglob('report.json')):
         folder=path.parent

@@ -1,0 +1,13 @@
+Development: idle | no project | 
+Development: investigating | no project | 
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: waiting for evidence | no project | Committed developmental checkpoint or conclusion advanced
+Development: waiting for evidence | no project | No eligible work; retained dependencies unchanged
+Development: stopped | no project | No eligible work; retained dependencies unchanged

@@ -1,0 +1,36 @@
+Development: idle | no project | 
+Development: reflecting | Meditation 23f17fa1efc76d26e04a54484e6a222992f14d5d1eb35af64ee34645864fad94 for episode:6da3e3ad73aa0b877674961c4ebbd8342524e1fe7f2511efc345487c9ed98268 | 
+Development: investigating | no project | 
+Development: blocked | no project | OperationalError: attempt to write a readonly database
+Development: stopped | no project | OperationalError: attempt to write a readonly database
+Traceback (most recent call last):
+  File "/workspace/scratch/3d45fa74ce8b/charlie/main.py", line 98, in <module>
+    main()
+  File "/workspace/scratch/3d45fa74ce8b/charlie/main.py", line 42, in main
+    run(args.learning_state,roots,**kwargs)
+  File "/workspace/scratch/3d45fa74ce8b/charlie/learning/lifecycle.py", line 617, in run
+    lifecycle.turn()
+  File "/workspace/scratch/3d45fa74ce8b/charlie/learning/lifecycle.py", line 581, in turn
+    try:return self.executive.develop(self)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3d45fa74ce8b/charlie/memory/learning_projects.py", line 870, in develop
+    report = investigate(lifecycle.dataset,lifecycle.gateway,executive=self,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3d45fa74ce8b/charlie/learning/cycle.py", line 255, in investigate
+    identifier=executive.propose(item['proposal'],dataset.journal,[item['evidence_id']])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3d45fa74ce8b/charlie/memory/learning_projects.py", line 271, in propose
+    refs = [self._reference(source_journal, r.id) for r in fresh]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3d45fa74ce8b/charlie/memory/learning_projects.py", line 133, in _reference
+    return self.journal.append('observation', dict(category='consolidated_evidence_reference',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3d45fa74ce8b/charlie/memory/evidence.py", line 226, in append
+    return self._append(kind,payload,episode=episode,at=at,sources=sources,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/3d45fa74ce8b/charlie/memory/evidence.py", line 252, in _append
+    with self.conn: insert()
+                    ^^^^^^^^
+  File "/workspace/scratch/3d45fa74ce8b/charlie/memory/evidence.py", line 248, in insert
+    self.conn.execute("INSERT OR IGNORE INTO records(id,document,committed_at) VALUES (?,?,?)",
+sqlite3.OperationalError: attempt to write a readonly database

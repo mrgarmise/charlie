@@ -9,18 +9,18 @@
     "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
     "dependencies": "pytest 9.1.1, numpy 2.5.4, Pillow 12.3.0, OpenCV headless 5.0.0.93; Torch unavailable"
   },
-  "full_command": "../ala-env/bin/python -m pytest tests -q --junitxml=../mission-full-isolated.xml",
+  "full_command": "../ala-env/bin/python -m pytest tests -q --junitxml=../mission-final-full.xml",
   "suite": {
     "name": "pytest",
     "errors": "0",
     "failures": "0",
     "skipped": "21",
-    "tests": "967",
-    "time": "250.509",
-    "timestamp": "2026-10-12T23:59:14.376204+09:00",
+    "tests": "971",
+    "time": "247.748",
+    "timestamp": "2026-10-13T00:18:38.923965+09:00",
     "hostname": "a17bc5f91e2f"
   },
-  "passed": 946,
+  "passed": 950,
   "skipped": 21,
   "failures": 0,
   "focused_isolated": {
@@ -58,8 +58,27 @@
   "files": {
     "memory/learning_projects.py": "c6e131979ef345750c54caccba3352662b815bc41ab627deb22f2eeac761da22",
     "learning/causal_audit.py": "8dd7f740d79cd8f2e108e83f89b0cbd434d8818e7c8e5b1c0828dcc9e02b6221",
-    "tests/test_executive_experience_priority.py": "629d5368fd169e9eb7cff8dab6871a39294b7a6885779d3fa6e20ce392bfb72a",
-    "docs/ppal/ala2-causal-acceptance-20261012/full-isolated.xml": "8fa679c4ec2ab0a9640f8ff2c14f31b1657d094c0e7f3f13271d0218bbee7340",
-    "docs/ppal/ala2-causal-acceptance-20261012/full-isolated.txt": "64db7d1027e09eadc3eb39be7b6d2b83193cc4ba72f7bb24f8789b5d882e5c10"
+    "learning/continuity.py": "bf2f9e4050bfedce47b73877349f7c9d583c0f42fc4ee3010240bba5be602cd0",
+    "experiments/ppal/inspect_robotron_score.py": "16f1d3f5775073d57c105c8d9df3d893021316dbcb69314b8c6ad5e4810bd5c2",
+    "tools/inspect_developmental_progress.py": "9e41599f3c3a8537e4f5544786b52453ff5072b90cb1e60503b67846ae698615",
+    "tests/test_original_session_continuity.py": "6c203b6b43a34cfdaa894e3085ddd5cdb91a4f15b0d83b65e51da74254977f56",
+    "docs/ppal/ala2-causal-acceptance-20261012/final-full.xml": "2af9d5f9194d7b5ff65363ebe52970be33398ba3d951f5cd594678b4cfdf0e7e",
+    "docs/ppal/ala2-causal-acceptance-20261012/final-full.txt": "f8f7d391dc2e81572a17c4dcfd28ac1f5cb4ea75969eec62897b6d871eeaed3f"
+  },
+  "first_published_commit": "a6702541efac0a93402e0668d7e5fdd6220e136f",
+  "first_local_checkpoint": "0434f4d4a89029f39a3f77740dcf17655c84ce9a",
+  "first_published_and_local_tree": "f92e29e469106f28c8c0caae762284c71d2a5ce3",
+  "original_import_focused": {
+    "passed": 49,
+    "failed": 0
+  },
+  "authentic_continuation": {
+    "original_records": 364,
+    "final_records": 1120,
+    "meditations_completed": 1,
+    "diagnostic_retrievals_resolved": 7,
+    "independent_continuity_passed": true,
+    "fresh_physical_experiments": 0,
+    "score_improvement": "UNKNOWN"
   }
 }

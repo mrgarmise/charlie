@@ -55,6 +55,52 @@ def _unique(rows):
             keys[key]=identifier
 
 
+def _historical_imports(snapshot, rows):
+    """Exact source-journal imports are history, never newly executed work.
+
+    Check the still-present original bytes and immutable documents/commitments.
+    A producer name or a caller-supplied list alone cannot bypass classification.
+    """
+    from memory.evidence import EvidenceJournal
+    from .datasets import sha
+    originals={r['id']:r for r in snapshot['original_records']};accepted=set()
+    for proof in snapshot.get('historical_imports',[]):
+        if proof.get('status')!='hash_verified_original_history':continue
+        context=rows.get(proof.get('context_id'),{});p=context.get('payload',{})
+        expected=p.get('inventory',{}).get('session-evidence.sqlite3')
+        if proof.get('receipt_id'):
+            context=rows.get(proof['receipt_id'],{});p=context.get('payload',{})
+            expected=p.get('source_sha256')
+            require(context.get('producer')=='existing-evidence-consolidation' and
+                p.get('category')=='preserved_session_history_import' and
+                p.get('new_independent_experience') is False and p.get('physical_authorization') is False and
+                proof['path']==p.get('source_path') and proof['sha256']==expected and
+                Path(proof['path']).name in ('session-evidence.sqlite3','experiment-evidence.sqlite3') and
+                Path(proof['path']).resolve().is_relative_to(Path(p['source_root']).resolve()),
+                'historical session receipt lacks original path/hash or preserves authority')
+        else:
+            require(context.get('producer')=='existing-evidence-consolidation' and
+            p.get('category')=='learning_context_reference' and expected==proof.get('sha256') and
+            Path(proof['path']).resolve()==(Path(p['source_root'])/'session-evidence.sqlite3').resolve(),
+            'historical import lacks original context/journal binding')
+        try:
+            require(sha(proof['path'])==expected,'historical source journal changed')
+            source=EvidenceJournal(proof['path'],read_only=True)
+            try:
+                for entry in proof['records']:
+                    r=source.get(entry['id'])
+                    exact=dict(id=r.id,document=r.document,committed_at=r.committed_at)
+                    require(entry==exact and originals.get(r.id)==exact,
+                        'historical record content or original commitment changed')
+                    require(r.data['payload'].get('category')!='capability_activation',
+                        'historical imports cannot supply current capability activation')
+                    accepted.add(r.id)
+            finally:source.close()
+        except (OSError,ValueError,KeyError) as exc:
+            raise ContinuityError('historical import source verification failed: '+str(exc)) from exc
+    return accepted
+
+
 def _checkpoints(snapshot, rows):
     checkpoints={}
     for entry in snapshot['checkpoints']:
@@ -160,9 +206,16 @@ def compare_restart(before,after):
     progress={i:d['payload'] for i,d in old.items() if d['payload'].get('op')=='developmental_progress'}
     latest={p['work_id']:(i,p) for i,p in progress.items()}
     substantive=[];counts={};new_ids=list(rows)[len(old):]
+    historical=_historical_imports(after,rows)
     for identifier in new_ids:
         d=rows[identifier];p=d['payload'];category=p.get('category');op=p.get('op');producer=d['producer']
+        if identifier in historical:
+            counts['preserved_original_session_record']=counts.get('preserved_original_session_record',0)+1
+            continue  # No current authority, new prediction, or progress credit.
         allowed=(producer=='LearningExecutive' and op in EXECUTIVE_OPS or
+            producer=='existing-evidence-consolidation' and category=='preserved_session_history_import' and
+                any(proof.get('receipt_id')==identifier and proof.get('status')=='hash_verified_original_history'
+                    for proof in after.get('historical_imports',[])) or
             category in CATEGORIES.get(producer,set()) or
             d['kind'] in ('prediction','resolution') and producer in ('existing-memory-offline-test','ModelFoundry') or
             producer.startswith('CapabilityRegistry:') and category=='model_diagnostic_retrieval')

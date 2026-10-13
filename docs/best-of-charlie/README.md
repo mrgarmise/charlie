@@ -37,12 +37,12 @@ The 184-commit ALA/Robotron lineage ending at `f4800705df74ca496073f5e783d1b250d
 | Memory, PPAL framework, sprite recognition | memory → PPAL → score-tracker ancestry | Included; authentic PPAL policy learning remains open |
 | Causal SELF, reacquisition | agency-first-self `708a1f6` and later native camera history | Included; qualification and source identity boundaries retained |
 | Camera optics, persistent camera session | autonomous-camera-calibration `6e927e2`, camera lifecycle `9eeba7c` | Included; fresh metadata and episode recorder preserved |
-| Terminal transitions, fresh authorized restart | prompt-terminal-restart `9e423e9` | Included; high-score/attract pages alone grant no START |
+| Terminal transitions, fresh authorized restart | prompt-terminal-restart `9e423e9` plus native-terminal-forensics `8c001e7` | Included; recorded GAME OVER cue and positive transition required; high-score/attract pages alone grant no START |
 | Executive, history recovery, independent priority | causal-acceptance `4bca038` | Included; complete learning acceptance not inferred |
 | Thermal recovery | `1895bc7`, final `f480070` | Included in the same lifecycle, acquisition and supervised evaluation |
 | Active Vision / CAL-1 / neck health | active-vision `c08a9a5` | Included; commissioning, electrical, profile and motion gates preserved |
 | Human score review and bounded exemplars | score-feedback integration `721af8c`, report `b1d1ef1` | Selected paths integrated; no live activation, missing October 10 originals |
-| Alternate terminal forensics | native-terminal-forensics `ad613a9` | Deferred: competing screen/end/scheduling implementation requires a separate reconciled acceptance pass |
+| Native terminal forensics and scheduled handoff | implementation `8c001e7`, branch report `ad613a9` | Included after clean compatibility merge and targeted regression; native acceptance remains outstanding |
 | Alternate failed-discovery boundary recovery | persistent-agency-recovery `0aadb65`, marathon-boundary `6117531` | Deferred: conflicts with newer guarded terminal/SELF retirement; original branches preserved |
 | Early PPAL vision focus | `591c732` | Superseded by later PPAL/Active Vision architecture; branch retained |
 
@@ -113,7 +113,7 @@ PYTHON=/home/five/.local/share/charlie/environments/best-of-charlie-0.1.0/bin/py
 "$PYTHON" -m pip check
 # Only after approved application deployment, verified state backup and clean shutdown:
 "$PYTHON" "$APP/tools/charlie" --release-root "$RELEASE_ROOT" deploy "$REVISION" --approved
-"$PYTHON" "$RELEASE_ROOT/current/tools/charlie" --state "$STATE" --release-root "$RELEASE_ROOT" readiness
+"$PYTHON" "$APP/tools/charlie" --state "$STATE" --release-root "$RELEASE_ROOT" readiness
 ```
 
 A reviewed systemd unit should use the immutable resolved release path and the explicit Python environment, `Environment=PYTHONDONTWRITEBYTECODE=1`, `ExecStart=<PYTHON> <RELEASE>/main.py --offline --learning-state <STATE> --episode-root <ARCHIVE> --learning-require-thermal`. Do not replace the current service or restart it during discovery. Capture `systemctl show charlie.service --property=ActiveState,SubState,MainPID,ExecStart,FragmentPath,DropInPaths` first. A systemd/template example is `release/charlie-offline.service.example`; installing it requires separate deployment approval. This is the same Executive, not a second scheduler. Confirm old writer exit before starting another.
@@ -121,7 +121,7 @@ A reviewed systemd unit should use the immutable resolved release path and the e
 ```bash
 # Pointer rollback only, after separate rollback approval:
 "$PYTHON" "$APP/tools/charlie" --release-root "$RELEASE_ROOT" rollback --approved
-"$PYTHON" "$RELEASE_ROOT/current/tools/charlie" --state "$STATE" --release-root "$RELEASE_ROOT" readiness
+"$PYTHON" "$APP/tools/charlie" --state "$STATE" --release-root "$RELEASE_ROOT" readiness
 # Service stop/start is independently approved; no command here sends it automatically.
 ```
 
@@ -169,7 +169,7 @@ Recover score records using `docs/score-feedback/native-recovery.md` and `tools/
 
 `inventory-before.json` preserves remote branch SHAs and initial worktree status, including a locally modified camera fixture and unpublished local commits. `worktrees-after.json` reports actual local inventory after consolidation. Original verification directories contain unique historical execution/evidence dependencies; no directory has been retired merely because its Git tree resembles a remote commit. **No historical cleanup is eligible without additional provenance/process/rollback verification.** No deletion, reset, pruning or garbage collection was performed. New temporary verification worktrees can be removed only after their clean tree is published, evidence is archived and no process references them. Feature branches continue independently.
 
-Outstanding: native installed/running/service/environment inventory; original global backup verification; actual thermal and productive continuation; original October 10 labels and authentic before/after recognition; held-out and native performance; alternate terminal branch reconciliation; optional Torch worker tests; physical readiness; and complete ALA-2 causal gates. The release is a software-tested integration, **not production-ready native acceptance**.
+Outstanding: native installed/running/service/environment inventory; original global backup verification; actual thermal and productive continuation; original October 10 labels and authentic before/after recognition; held-out and native performance; older alternative SELF/boundary branch reconciliation; optional Torch worker tests; physical readiness; and complete ALA-2 causal gates. The release is a software-tested integration, **not production-ready native acceptance**.
 
 ## Final software validation
 
@@ -180,3 +180,20 @@ Focused interactions passed 80 checks, final operator/thermal changes 40, and fi
 The exact published thermal source and consolidated implementation were also staged into isolated local immutable release directories, hash-verified, switched through the atomic `current`/`previous` pointers and rolled back successfully. `release-rehearsal.json` records both commit identities and the successful rollback to `f480070`; no service was restarted and no notebook changed. This validates local operator mechanics, not deployment to Charlie or native compatibility of any unexamined state.
 
 The first GitHub runs exposed CI's default shallow checkout: the rollback safety test could not read preserved revision `8777955:rp2040/servos.py`. Local full-history tests passed. The software checkout now fetches complete history, retaining the mandatory rollback test rather than skipping it. Historical source regression tests belong in a full-history checkout; immutable installed release directories are validated by their manifests and the operator/native acceptance commands. The failed CI attempts remain inspectable in GitHub run history.
+
+## Additional terminal integration and operator bootstrap
+
+The native terminal implementation `8c001e7` has parent `9e423e9`; comparison established that it extends the selected terminal code rather than replacing the current ALA. It merged cleanly with the reconciled Active Vision recorder/neck lifecycle. It adds a fixed provenance-bound GAME OVER anchor, diagnostic rejection reasons, fresh supported terminal transitions and an eligible three-game learning handoff. Authentic recorded features are replayed as historical diagnostics, never new independent observations. Targeted and full final checks are reported in GitHub CI; no physical replay/gameplay is performed. The older SELF/boundary branches remain deferred because they conflict with the selected newer retirement and terminal safety behavior.
+
+If the old Pi checkout does not contain the new operator tool, do not switch or update a running checkout in place. After repository fetch, create one **temporary release preparation** worktree at the exact verified release SHA and use its tools. This is isolation for release preparation, not a permanent application checkout per feature. Keep it until deployment/rollback and artifact ownership are verified. The rollback readiness command deliberately uses the retained preparation tool: historical rollback releases may not contain `tools/charlie`.
+
+```bash
+REPO=/path/to/existing/charlie-git-repository
+git -C "$REPO" fetch origin --tags
+REVISION=$(git -C "$REPO" rev-parse best-of-charlie-v0.1.0^{commit})
+APP=/home/five/charlie-release-preparation-$REVISION
+git -C "$REPO" worktree add --detach "$APP" "$REVISION"
+# Continue the staged deployment procedure using this APP and explicit PYTHON.
+```
+
+A more precise PPAL audit: Forebrain's rescue/survive fallback and exploration counts are fixed rules/session-local bookkeeping. Hindbrain keeps at most eight signed-response outcomes per action and thirty-two action keys, revising contradicted tactics only for fresh, same-identity completed response windows; identity changes clear those session-local statistics. Its action-history logic is not a persisted SARSA/Q learner. Diary records retain those outcomes, while persistent later decision values require the separate qualified-policy loading pathway and independent runtime/evaluation authority. The optional shot model is a fitted logistic predictor over synthetic shot examples; synthetic success is not authentic PPAL acceptance. MemoryEvaluator separately retains helpful/harmful weighted evidence in SQLite and uses posterior `(1+helpful)/(2+helpful+harmful)` for memory usefulness; that is not a Robotron score reward or an automatically activated policy. Executive priority uses independently grouped retained resolutions to reduce remaining uncertainty as `uncertainty/(1+independent_units)` in its existing objective/value/cost/risk calculation. Thermal telemetry and process status update none of those learning states.

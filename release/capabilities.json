@@ -4,7 +4,7 @@
   "tag": "best-of-charlie-v0.1.0",
   "qualification": "software-verified consolidation; native acceptance pending",
   "default_mode": "offline",
-  "included": ["Learning Executive and retained notebook recovery", "Reflection and Meditation", "Evaluator and guarded candidate qualification", "75C thermal suspension, below-65C continuous-5s recovery", "Robotron sprite perception and causal SELF", "PPAL interfaces and guarded policy candidates", "terminal recognition and guarded restart", "score tracking and human review", "bounded offline score-feedback exemplars", "Active Vision camera ownership", "CAL-1 calibration and neck health", "operator status, backup, immutable staging and rollback"],
+  "included": ["Learning Executive and retained notebook recovery", "Reflection and Meditation", "Evaluator and guarded candidate qualification", "75C thermal suspension, below-65C continuous-5s recovery", "Robotron sprite perception and causal SELF", "PPAL interfaces and guarded policy candidates", "terminal recognition, recorded GAME OVER and guarded restart", "score tracking and human review", "bounded offline score-feedback exemplars", "Active Vision camera ownership", "CAL-1 calibration and neck health", "operator status, backup, immutable staging and rollback"],
   "disabled_by_default": ["physical gameplay", "neck and mobile motion", "firmware updates", "PPAL policy activation", "score-feedback live activation"],
   "native_acceptance": "not yet demonstrated on the current integrated release",
   "learning_acceptance": {"E1": "NOT YET DEMONSTRATED for complete mission", "P1": "NOT YET DEMONSTRATED", "I1": "NOT YET DEMONSTRATED"},

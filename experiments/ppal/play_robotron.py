@@ -19,6 +19,7 @@ from pathlib import Path
 import time
 import hashlib
 import subprocess
+import os
 
 from .arcade_transport import ArcadeController
 from .forebrain import Forebrain
@@ -498,6 +499,9 @@ def main(argv=None, *, camera_session=None, progress_path=None):
     parser.add_argument('--experiment-plan', type=Path,
                         help='one precommitted developmental actuator experiment')
     parser.add_argument('--observer-context', type=Path, help='optional display-only project context; never policy input')
+    parser.add_argument('--neck-state-directory', type=Path,
+                        default=os.environ.get('CHARLIE_NECK_STATE'),
+                        help='installed CAL-1 durable state; monitor only, never authorize neck motion')
     parser.add_argument('--learned-semantics',type=Path,help='separately authorized, independently validated candidate-crop activation manifest')
     parser.add_argument('--learned-policy',type=Path,help='qualified local PPAL decision policy; current acceptance is offline only')
     parser.add_argument('--rolling-seconds',type=float,default=0.,help='opt-in bounded original incident memory; native RAM tradeoff unmeasured')
@@ -783,8 +787,19 @@ def main(argv=None, *, camera_session=None, progress_path=None):
     controller = None
     result = "not started"
     episode_end = {"state": "unknown", "confirmed": False, "evidence": None}
+    neck = None
+    neck_controller = None
 
     try:
+        if args.neck_state_directory is not None:
+            from hardware.rp2040_controller import RP2040Controller
+            from hardware.calibration_service import CalibrationService
+            neck_controller = RP2040Controller()
+            neck = CalibrationService.open(neck_controller, args.neck_state_directory)
+            neck.refresh()
+            if not neck_controller.primary_ownership():
+                raise ConnectionError('CAL-1 primary ownership unavailable; no neck activation attempted')
+            source.neck_service = neck
         # Start the camera first. In normal operation this happens while Robotron
         # is still in attract/demo mode, giving exposure/AF time without costing
         # any gameplay. No demo-screen calibration is attempted.
@@ -1490,6 +1505,15 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         if progress:
             try:progress.enter('finalizing')
             except OSError:pass
+        if neck is not None:
+            try:
+                neck.close()
+            finally:
+                neck_controller.stop()
+                neck_controller.close()
+        elif neck_controller is not None:
+            neck_controller.stop()
+            neck_controller.close()
         if publisher is not None:
             publisher.close()
         if semantic_observer is not None:

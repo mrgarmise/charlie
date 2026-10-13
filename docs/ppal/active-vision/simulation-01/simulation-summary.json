@@ -1,0 +1,17 @@
+{
+  "schema": "charlie-active-vision-simulation-v1",
+  "simulated": true,
+  "initial_quality": 2.475621136688825,
+  "final_quality": 2.603695665872465,
+  "improvement": 0.12807452918363982,
+  "final_pose": [
+    108,
+    90
+  ],
+  "final_focus": 1.5,
+  "movements": 11,
+  "optimization_samples": 66,
+  "camera_released": true,
+  "state": "LOCKED",
+  "background_optimization_workers": 0
+}

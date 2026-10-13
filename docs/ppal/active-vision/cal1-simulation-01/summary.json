@@ -1,0 +1,12 @@
+{
+  "schema": "charlie-cal-1-simulation-v1",
+  "simulated": true,
+  "physical_actions": false,
+  "qualified": false,
+  "source_test": "tests/test_neck_calibration.py::test_simulated_grid_derives_conservative_candidate_never_qualifies",
+  "hardware": "fake GPIO/PWM/UART/time; actual authority and calibration logic",
+  "events": 44,
+  "evidence_sha256": "f5d3dc43f3cc767e9b2a5ca0ba702fac860e56e88091d77bac48af9aadf7c89a",
+  "state": "CLOSED",
+  "envelope_status": "CANDIDATE; physical qualification prohibited"
+}

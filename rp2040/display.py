@@ -69,6 +69,8 @@ class Display:
         self.last_message_page = 0
 
         self.progress = None
+        self.capability_message = None
+
 
         if DISPLAY_AVAILABLE:
             self.clear()
@@ -111,6 +113,13 @@ class Display:
 
         self.state = str(state).upper()
         self.frame = 0
+
+    def capability_status(self, text):
+        """Persistent capability notice below existing text/feedback priorities."""
+        if text != self.capability_message:
+            self.capability_message = text
+            self.message_page = 0
+            self.last_message_page = time.ticks_ms()
 
     # --------------------------------------------------
     # TRANSIENT FEEDBACK
@@ -640,6 +649,16 @@ class Display:
             self.clear_feedback()
 
         # Persistent attitude.
+
+        if self.capability_message and self.state != self.NO_BRAIN:
+            if time.ticks_diff(now, self.last_message_page) >= 700:
+                self.message_page += 1
+                self.last_message_page = now
+            temporary = self.message
+            self.message = self.capability_message
+            self._draw_message()
+            self.message = temporary
+            return
 
         self._draw_named_state(
             self.state

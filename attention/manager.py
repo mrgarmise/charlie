@@ -1,6 +1,6 @@
 class AttentionManager:
 
-    def __init__(self, bus):
+    def __init__(self, bus, *, mobile_enabled=True):
         self.bus = bus
         self.active = None
         self.priority = 0
@@ -9,8 +9,11 @@ class AttentionManager:
         # Independent Elegoo mobile-attention sidecar.
         # This does not replace or modify the RP2040 TrackBehavior.
         self.mobile = None
+        self.mobile_enabled = mobile_enabled
 
     def _ensure_mobile(self):
+        if not self.mobile_enabled:
+            return None
         if self.mobile is None:
             from behaviors.mobile_track import MobileTrackBehavior
 
@@ -24,7 +27,10 @@ class AttentionManager:
         self.pending = (behavior, priority)
 
     def handle_event(self, event, data):
-        if event == "scan":
+        if event in ('calibrate_neck', 'confirm_neck_start'):
+            self.deck.brain_calibration(confirm=event == 'confirm_neck_start')
+
+        elif event == "scan":
             from behaviors.scan import ScanBehavior
             self.set(ScanBehavior(), None, priority=50)
 
@@ -42,7 +48,9 @@ class AttentionManager:
 
             # Independent Elegoo mobile path.
             try:
-                self._ensure_mobile().set_target(*data)
+                mobile = self._ensure_mobile()
+                if mobile is not None:
+                    mobile.set_target(*data)
             except Exception as exc:
                 print(
                     f"MOBILE sidecar target error: {exc}",
@@ -79,7 +87,9 @@ class AttentionManager:
                 behavior.set_target(*data)
 
                 try:
-                    self._ensure_mobile().set_target(*data)
+                    mobile = self._ensure_mobile()
+                    if mobile is not None:
+                        mobile.set_target(*data)
                 except Exception as exc:
                     print(
                         f"MOBILE sidecar track error: {exc}",
@@ -89,6 +99,7 @@ class AttentionManager:
             self.set(behavior, None, priority=80)
 
     def update(self, deck):
+        self.deck = deck
 
         # Process stimuli first.
         for event, data in self.bus.get_all():

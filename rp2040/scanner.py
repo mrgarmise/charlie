@@ -1,53 +1,23 @@
-"""
-scanner.py
-
-Idle scanning behavior.
-
-The scanner generates target positions.
-The servo controller performs the motion.
-"""
-
-import random
-import time
-
-from config import *
+"""Propose bounded calibrated targets; never own or actuate servos."""
+from servos import MotionError
 
 
 class Scanner:
-
-    def __init__(self):
-
-        self.pan = HOME_PAN
-        self.tilt = HOME_TILT
-
+    def __init__(self, servos=None):
+        self.servos = servos
         self.direction = 1
 
-        self.last_micro = time.ticks_ms()
-
-    # ----------------------------------
-
     def update(self):
-
-        self.pan += self.direction
-
-        if self.pan > 140:
-
-            self.direction = -1
-
-        if self.pan < 40:
-
-            self.direction = 1
-
-        if time.ticks_diff(
-                time.ticks_ms(),
-                self.last_micro) > random.randint(*MICROSACCADE_INTERVAL):
-
-            self.last_micro = time.ticks_ms()
-
-            self.pan += random.randint(-3,3)
-            self.tilt += random.randint(-2,2)
-
-        self.pan = max(20,min(160,self.pan))
-        self.tilt = max(50,min(130,self.tilt))
-
-        return self.pan,self.tilt
+        if self.servos is None or self.servos.envelope is None:
+            raise MotionError('ASSEMBLED_CALIBRATION_REQUIRED')
+        pan,tilt = self.servos.a_pan.position,self.servos.a_tilt.position
+        low,high,_,_ = self.servos.envelope.axes[0]
+        step = min(.5,self.servos.envelope.step)
+        candidate = pan+self.direction*step
+        if not low <= candidate <= high:
+            self.direction *= -1
+            candidate = pan+self.direction*step
+        # Narrow profiles may have no full step left. Remain stationary rather
+        # than introducing an uncalibrated alternate target or clipping input.
+        if not low <= candidate <= high:candidate = pan
+        return candidate,tilt

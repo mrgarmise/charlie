@@ -87,6 +87,13 @@ class LearningExecutive:
         self.journal, self.gateway = journal, gateway
         self.consolidate()
 
+    def request_neck_calibration(self, service, reason, evidence, *, profile_id=None):
+        """Evidence-backed request only; this has no actuator/qualification API."""
+        return service.request(reason, evidence, profile_id=profile_id)
+
+    def pending_neck_calibrations(self, service):
+        return service.requests()
+
     def _remember_conclusion(self, event, project):
         p = event.data['payload']
         if p['op'] == 'assessment':

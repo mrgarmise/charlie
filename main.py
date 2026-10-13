@@ -2,6 +2,8 @@
 
 --offline runs the same lifecycle without initializing physical capabilities.
 """
+import os
+from contextlib import ExitStack
 import argparse
 import json
 import multiprocessing
@@ -11,7 +13,10 @@ import time
 
 def parser():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--offline',action='store_true',help='no camera, motion, firmware or game transport')
+    mode=p.add_mutually_exclusive_group()
+    mode.add_argument('--offline',dest='offline',action='store_true',help='no camera, motion, firmware or game transport (default)')
+    mode.add_argument('--hardware',dest='offline',action='store_false',help='explicit separately authorized hardware startup; CAL-1 gates still apply')
+    p.set_defaults(offline=True)
     p.add_argument('--learning-state',type=Path,default=Path.home()/'.local/share/charlie/development')
     p.add_argument('--episode-root',type=Path,action='append',default=[])
     p.add_argument('--history-root',type=Path,action='append',default=[],help='preserve and additively restore an existing notebook')
@@ -55,47 +60,59 @@ def main(argv=None):
     process=multiprocessing.get_context('spawn').Process(target=run,args=(args.learning_state,roots),kwargs=kwargs)
     process.start()
     next_worker_restart=0.
-    attention=camera=None
     try:
-        from motion.controller import Deck
-        from attention.manager import AttentionManager
-        from stimulus.bus import StimulusBus
-        from stimulus.keyboard import KeyboardStimulus
-        from vision.camera import Camera
-        from vision.detector import ColorDetector
-        from vision.stimulus import VisionStimulus
-        deck=Deck()
-        bus=StimulusBus()
-        attention=AttentionManager(bus)
-        KeyboardStimulus(bus)
-        camera=Camera()
-        detector=ColorDetector(lower=[105,150,70],upper=[125,255,160])
-        vision=VisionStimulus(camera,detector,bus)
-        bus.emit('idle')
-        previous=None
-        while True:
-            vision.update()
-            attention.update(deck)
-            # Existing status surface: console, plus consumable status JSON.
-            path=args.learning_state/'development-status.json'
-            try:
-                status=json.loads(path.read_text())
-                summary=(status['phase'],status['current_question'],status.get('error'))
-                if summary!=previous:
-                    print('Development:',*summary,flush=True)
-                    previous=summary
-            except (OSError,ValueError):
-                pass
-            if not process.is_alive() and time.monotonic()>=next_worker_restart:
-                process.join()
-                print('Development worker interrupted; resuming durable Executive state',flush=True)
-                process=multiprocessing.get_context('spawn').Process(target=run,args=(args.learning_state,roots),kwargs=kwargs)
-                process.start()
-                next_worker_restart=time.monotonic()+5.  # Supervision, not another learning scheduler.
-            time.sleep(.02)
+        with ExitStack() as lifecycle:
+            from motion.controller import Deck
+            from attention.manager import AttentionManager
+            from stimulus.bus import StimulusBus
+            from stimulus.keyboard import KeyboardStimulus
+            from vision.camera import Camera
+            from vision.detector import ColorDetector
+            from vision.stimulus import VisionStimulus
+            deck=Deck()
+            lifecycle.callback(deck.body.close)
+            lifecycle.callback(deck.stop)
+            from hardware.calibration_service import CalibrationService
+            neck=CalibrationService.open(deck.body,Path(os.environ.get('CHARLIE_NECK_STATE',str(Path.home()/'.local/share/charlie/neck'))))
+            lifecycle.callback(neck.close)
+            deck.calibration=neck
+            neck.refresh()
+            neck.attach_brain(authorized=os.environ.get('CHARLIE_NECK_MOTION_AUTHORIZED')=='1',
+                supervised=os.environ.get('CHARLIE_NECK_SUPERVISED')=='1')
+            bus=StimulusBus()
+            attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1')
+            lifecycle.callback(attention.close)
+            KeyboardStimulus(bus)
+            camera=Camera()
+            lifecycle.callback(camera.close)
+            detector=ColorDetector(lower=[105,150,70],upper=[125,255,160])
+            if os.environ.get('CHARLIE_VISION_TARGET')=='face':
+                from vision.detector import FaceDetector
+                detector=FaceDetector(Path(__file__).resolve().parent/'face_detection_yunet.onnx')
+            vision=VisionStimulus(camera,detector,bus,frame_observer=deck.observe_frame)
+            bus.emit('idle')
+            previous=None
+            while True:
+                vision.update()
+                attention.update(deck)
+                # Existing status surface: console, plus consumable status JSON.
+                path=args.learning_state/'development-status.json'
+                try:
+                    status=json.loads(path.read_text())
+                    summary=(status['phase'],status['current_question'],status.get('error'))
+                    if summary!=previous:
+                        print('Development:',*summary,flush=True)
+                        previous=summary
+                except (OSError,ValueError):
+                    pass
+                if not process.is_alive() and time.monotonic()>=next_worker_restart:
+                    process.join()
+                    print('Development worker interrupted; resuming durable Executive state',flush=True)
+                    process=multiprocessing.get_context('spawn').Process(target=run,args=(args.learning_state,roots),kwargs=kwargs)
+                    process.start()
+                    next_worker_restart=time.monotonic()+5.  # Supervision, not another learning scheduler.
+                time.sleep(.02)
     finally:
-        if attention: attention.close()
-        if camera: camera.close()
         if process.is_alive():
             process.terminate()  # SIGTERM lets bounded work persist/close normally.
         process.join(timeout=args.learning_budget+10)

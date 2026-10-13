@@ -1,0 +1,80 @@
+{
+  "schema": "charlie-cal-1-validation-v1",
+  "base": "b29ee2b3dc9b2a5c5eb353ee296c270f02601472",
+  "branch": "feature/active-vision",
+  "physical_authorization": false,
+  "physical_actions": false,
+  "firmware_flashed": false,
+  "pi_deployed": false,
+  "ala2_branch_modified": false,
+  "shipped_configuration": {
+    "calibrated_envelope": null,
+    "commissioning_profile": null,
+    "electrical_gate_cleared": false,
+    "local_arm_pin": null,
+    "calibration_input_enabled": false,
+    "autonomous_motion_enabled": false,
+    "persistent_profile_directory": null,
+    "startup_pwm": false,
+    "eligible_actuator_pins": [4, 5],
+    "inactive_head_b_pins": [14, 15],
+    "temporary_supervised_input": "GP10 to GND; not normal arming or emergency stop"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.2.4",
+    "opencv": "4.10.0",
+    "pillow": "12.3.0",
+    "pytest": "9.1.1",
+    "pyserial": "3.5",
+    "architecture": "x86_64",
+    "torch_available": false,
+    "real_micropython_execution": false
+  },
+  "cal1_suite": {
+    "command": "python -m pytest -q tests/test_neck_calibration.py",
+    "passed": 65,
+    "failed": 0,
+    "seconds": 4.63
+  },
+  "focused_suite": {
+    "command": "python -m pytest -q tests/test_neck_calibration.py tests/test_active_vision_firmware.py tests/test_head_recovery_lockout.py tests/test_active_vision.py tests/test_passive_eyes.py",
+    "passed": 159,
+    "failed": 0,
+    "seconds": 38.39,
+    "note": "The subsequent between-samples contact test passed in the final 65-test CAL-1 suite and broader suite."
+  },
+  "broader_suite": {
+    "command": "python -m pytest -q tests",
+    "passed": 609,
+    "skipped": 19,
+    "failed": 0,
+    "seconds": 68.80,
+    "skip_reason": "Torch-dependent ALA coverage unavailable"
+  },
+  "other_checks": ["git diff --check", "CPython compileall; not a MicroPython hardware qualification"],
+  "simulation_evidence": "cal1-simulation-01",
+  "verified_scope": [
+    "No startup PWM, no contact-only activation; first PWM uses a fresh operator-verified pose",
+    "GP10 debounce, held/bounced/repeated/stale contacts and between-samples race rejection",
+    "One prepared single-axis bounded step, mandatory visual/clearance confirmation",
+    "Combined-axis convex restrictions and inward commissioning margin",
+    "STOP, interruption, watchdog, reconnect, reboot, primary ownership, evidence/input failure",
+    "Direct servo and internal actuation-helper bypass rejection",
+    "Immutable profiles, independent qualification, conservative observed-grid derivation",
+    "Persistent digest/schema/version/history/quarantine and unclean-operation markers",
+    "Normal autonomous optimization and LOCKED resource release with no GP10, including 0.5 degree/second rate",
+    "Movement discrepancy, wrong visual direction, unsuccessful motion, false-trigger suppression and no obstruction retry",
+    "Existing Reflection/Executive project evidence gates; physical method remains blocked",
+    "Existing Robotron, PPAL, passive-viewer and recovery regressions"
+  ],
+  "remaining_physical_gates": [
+    "Keyestudio power/USB topology and independent servo cutoff",
+    "Actual initial joint alignment and pulse mapping",
+    "Reviewed assembled-head commissioning region, real debounce and interference",
+    "Real Pico/MicroPython PWM, rate, watchdog, filesystem and rollback measurements",
+    "Actual grid calibration, mechanical interval clearance and post-STOP stability",
+    "Visual-reference response reliability and live primary observation integration",
+    "Independent physical qualification before normal activation"
+  ]
+}

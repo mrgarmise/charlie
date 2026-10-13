@@ -6,10 +6,10 @@ Every command is one line terminated by newline.
 Examples:
 
 PING
-LOOK 90 40
-TRACK 103 37
-SCAN
-HOME
+LOOK <pan> <tilt> [rate] <session> <epoch>
+TRACK <pan> <tilt> [rate] <session> <epoch>
+SCAN <session> <epoch>
+HOME <session> <epoch>
 SLEEP
 THINK
 HAPPY
@@ -99,11 +99,28 @@ VALID_COMMANDS = {
     "TX",
 
     "STATUS",
+    "VIEWPOINT",
+    "MOTION_STATUS",
+    "SESSION",
+    "AUTHORIZE",
+    "PRIMARY",
+    "MOVE",
+    "ARM",
+    "CAL",
+    "CAL_STATUS",
+    "START_VERIFY",
+    "AUTOSTART",
+    "NECK_UNCERTAIN",
 }
 
 
 def parse(line):
 
+    if not isinstance(line, str) or not line.strip():
+        return None
+    limit = 2048 if (line.startswith('CAL ') or line.startswith('START_VERIFY ')) else COMMAND_BUFFER
+    if len(line) > limit:
+        return None
     cmd = Command(line)
 
     if cmd.name not in VALID_COMMANDS:

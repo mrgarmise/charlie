@@ -1,0 +1,9 @@
+........................................................................ [ 90%]
+........                                                                 [100%]
+=============================== warnings summary ===============================
+tests/test_thermal_recovery.py::test_restart_retains_same_investigation_checkpoint_and_no_duplicates
+  tests/test_thermal_recovery.py:127: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_restart_retains_same_investigation_checkpoint_and_no_duplicates(tmp_path,monkeypatch,record_property):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+80 passed, 1 warning in 15.61s

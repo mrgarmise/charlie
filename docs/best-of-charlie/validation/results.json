@@ -1,0 +1,23 @@
+{
+  "tested_source_tree": "d0db0c82c40bcb0204b05975ae3de97d3578f97a",
+  "published_source_commit": "b4cef5196209e2ddcc5f25d8b242d5579848c551",
+  "scope": "tests/ only; no physical capability initialized",
+  "python": "3.12.14",
+  "machine": "x86_64",
+  "system": "Linux",
+  "passed": 1229,
+  "skipped": 21,
+  "failed": 0,
+  "seconds": 296.66,
+  "skip_reasons": {
+    "collection skipped": 1,
+    "could not import 'torch': No module named 'torch'": 18,
+    "original October 1 artifacts required; use documented acceptance environment": 1,
+    "Optional full 119-original archive replay; retained nine originals always run": 1
+  },
+  "warning": "pytest record_property with xunit2; retained engineering control properties, not native observations",
+  "native_pi": false,
+  "physical_authorization": false,
+  "state_migration": false,
+  "learning_acceptance": "ALA-2 remains open"
+}

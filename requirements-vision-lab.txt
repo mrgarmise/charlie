@@ -1,0 +1,5 @@
+# Local editor/indexer; training dependencies are separate and optional.
+Pillow>=10,<13
+paramiko>=3.4,<6
+# Local sampled video support. No camera driver or controller dependency.
+opencv-python>=4.8,<6

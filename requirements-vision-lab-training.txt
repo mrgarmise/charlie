@@ -1,0 +1,5 @@
+# Install matching torch/torchvision CPU or CUDA wheels separately first.
+-r requirements-vision-lab.txt
+ultralytics==8.3.203
+onnx>=1.16,<2
+onnxruntime>=1.18,<2

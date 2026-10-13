@@ -1,0 +1,35 @@
+...............ss.ss.ss................s..sssss.ss..ssss................ [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 21%]
+....................................s................................... [ 28%]
+........................................................................ [ 36%]
+........................................................................ [ 43%]
+........................................................................ [ 50%]
+........................................................................ [ 57%]
+........................................................................ [ 65%]
+........................................................................ [ 72%]
+........................................................................ [ 79%]
+...........................s............................................ [ 86%]
+........................................................................ [ 93%]
+............................................................             [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_ala_foundry.py:6: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:33: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:60: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:75: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:84: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:114: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_cycle.py:128: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_operational.py:40: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_operational.py:95: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_operational.py:114: could not import 'torch': No module named 'torch'
+SKIPPED [3] tests/test_ala_portable.py:28: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_portable.py:57: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_portable.py:101: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_portable.py:145: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_refinement.py:13: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_refinement.py:44: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_ala_refinement.py:56: could not import 'torch': No module named 'torch'
+SKIPPED [1] tests/test_episode_identity.py:176: original October 1 artifacts required; use documented acceptance environment
+SKIPPED [1] tests/test_robotron_geometry_replay.py:99: Optional full 119-original archive replay; retained nine originals always run
+976 passed, 21 skipped in 249.24s (0:04:09)

@@ -1,0 +1,102 @@
+{
+  "schema": "charlie-thermal-engineering-validation-v1",
+  "published_source_commit": "1895bc7b92b92b8b53add5abc16631e9be22c7e4",
+  "source_tree": "221cf5de3f1faa0e78a4801c097ebc514ce22fd0",
+  "integration_base": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+  "environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "numpy": "2.5.4",
+    "pillow": "12.3.0",
+    "opencv_headless": "5.0.0.93",
+    "torch_available": false
+  },
+  "full_software_regression": {
+    "command": "python -m pytest -q tests --ignore=tests/test_memory_recall.py -rs -o junit_family=xunit1 --junitxml=thermal-regression-final.xml",
+    "passed": 976,
+    "skipped": 21,
+    "failed": 0,
+    "seconds": 249.24,
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "21",
+        "tests": "997",
+        "time": "249.221",
+        "timestamp": "2026-10-13T11:40:11.108211+09:00",
+        "hostname": "d6b0f3d54d36"
+      }
+    ]
+  },
+  "controls_and_stall": {
+    "passed": 43,
+    "failed": 0,
+    "seconds": 12.68,
+    "command": "python -m pytest -q tests/test_thermal_recovery.py tests/test_developmental_stall.py -o junit_family=xunit1 --junitxml=thermal-controls.xml"
+  },
+  "controlled_retention_ledger": [
+    {
+      "name": "retained_work_id",
+      "value": "1a6fbd4494d48e9c44127748c945f63756c0b50b5f30e408e05c36e6751a38a6"
+    },
+    {
+      "name": "retained_commission_id",
+      "value": "d2ed2493d3879ee1350fcbbbd17255e80100a683155af2d2de1b0c5302885019"
+    },
+    {
+      "name": "original_records_preserved",
+      "value": "11"
+    },
+    {
+      "name": "held_poll_record_delta",
+      "value": "0"
+    },
+    {
+      "name": "checkpoint_neighbor_before",
+      "value": "1"
+    },
+    {
+      "name": "resumed_status",
+      "value": "completed"
+    },
+    {
+      "name": "physical_authorization",
+      "value": "False"
+    },
+    {
+      "name": "controller_writes",
+      "value": "0"
+    }
+  ],
+  "original_collection": {
+    "errors": 6,
+    "skipped": 1,
+    "seconds": 16.52,
+    "scope": "unrestricted repository; existing MicroPython/behaviors/libcamera errors",
+    "legacy_device_open": "attempted /dev/ttyACM0, failed absent; zero commands sent"
+  },
+  "physical_authorization": false,
+  "controller_writes": 0,
+  "native_pi_observation": false,
+  "gate_status": {
+    "operational_software": "PASS",
+    "native_recovery": "NOT YET DEMONSTRATED",
+    "historical_hour_root_cause": "NOT YET DEMONSTRATED",
+    "E1": "NOT YET DEMONSTRATED by this repair",
+    "P1": "NOT YET DEMONSTRATED by this repair",
+    "I1": "NOT YET DEMONSTRATED by this repair",
+    "ALA2": "OPEN"
+  },
+  "clean_published_replay": {
+    "passed": 97,
+    "skipped": 0,
+    "failed": 0,
+    "seconds": 33.32,
+    "code_revision": "1895bc7b92b92b8b53add5abc16631e9be22c7e4",
+    "dirty_worktree": false,
+    "command": "python -m pytest -q tests/test_thermal_recovery.py tests/test_development_resources.py tests/test_meditation_yield.py tests/test_normal_learning_lifecycle.py tests/test_development_efficiency.py tests/test_development_profile.py tests/test_progress_supervision.py tests/test_developmental_stall.py -o junit_family=xunit1 --junitxml=thermal-published.xml"
+  }
+}

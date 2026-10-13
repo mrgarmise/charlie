@@ -1,0 +1,29 @@
+{
+  "master_target": {
+    "passed": 56,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 1.12,
+    "command": "python -m pytest -q tests --junitxml=score-targeted-final.xml"
+  },
+  "current_architecture_overlay": {
+    "base": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+    "passed": 74,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 13.89,
+    "command": "python -m pytest -q tests/test_score_human_review.py tests/test_score_feedback_learning.py tests/test_score_tracker.py tests/test_score_observer.py tests/test_deferred_measurement_review.py tests/test_normal_learning_lifecycle.py tests/test_score_review_queue.py tests/test_score_feedback_recovery.py tests/test_score_review_navigation.py"
+  },
+  "environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "numpy": "2.5.4",
+    "pillow": "12.3.0",
+    "opencv": "5.0.0.93"
+  },
+  "physical_authorization": false,
+  "native_pi": false,
+  "browser_visual_acceptance": false,
+  "source_encoding": "Host software and DOM/HTTP doubles; no new authentic correction substituted"
+}

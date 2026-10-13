@@ -20,6 +20,7 @@ def main() -> None:
     ap.add_argument("frames", nargs="*", type=Path)
     ap.add_argument("--calibration", type=Path,
                     default=Path("config/robotron/playfield-latest.json"))
+    ap.add_argument('--feedback-candidate',type=Path,help='explicit unqualified offline replay only; never changes the live observer')
     ap.add_argument("--output", type=Path)
     ap.add_argument("--self-channel", type=int, choices=(1,2), default=1)
     ap.add_argument('--review-journal',type=Path)
@@ -37,6 +38,7 @@ def main() -> None:
     ap.add_argument('--reason')
     ap.add_argument('--independent-review',action='store_true',help='reviewer attests independent annotation; does not qualify a game')
     ap.add_argument('--review-metrics',action='store_true')
+    ap.add_argument('--import-review-source',type=Path,help='additively acquire an existing human-review notebook into a copied working journal')
     ap.add_argument('--queue-root',type=Path,help='authorized saved marathon/game tree')
     ap.add_argument('--serve-review',action='store_true',help='deferred review on loopback; no gameplay capability')
     ap.add_argument('--review-port',type=int,default=8769)
@@ -45,6 +47,13 @@ def main() -> None:
     ap.add_argument('--baseline-count',type=int,default=10)
     args=ap.parse_args()
     from .score_observer import ScoreObserver
+    if args.import_review_source:
+        if not args.review_journal:ap.error('working review journal required')
+        from memory.evidence import EvidenceJournal
+        j=EvidenceJournal(args.review_journal)
+        try:print(json.dumps(import_reviews(j,args.import_review_source),indent=2))
+        finally:j.close()
+        return
     if args.freeze_baseline:
         if not args.review_journal or not args.review_journal.is_file() or not args.baseline_policy:ap.error('existing journal and exact baseline policy required')
         from memory.evidence import EvidenceJournal
@@ -87,7 +96,10 @@ def main() -> None:
         ap.error('new review proposal requires one original frame, source episode and exact timestamp')
 
     cal=Calibration.load(args.calibration)
-    reader=RobotronHUDReader(cal)
+    if args.feedback_candidate:
+        from .score_feedback import ScoreFeedbackReader
+        reader=ScoreFeedbackReader.load(args.feedback_candidate,cal)
+    else:reader=RobotronHUDReader(cal)
     tracker=VisualScoreTracker(reader, self_channel=args.self_channel)
     if args.output:
         args.output.mkdir(parents=True, exist_ok=True)
@@ -100,6 +112,8 @@ def main() -> None:
         scores=tracker.observe(image)
         row={
             "frame":str(path),
+            "feedback_state_digest":getattr(reader,'feedback_state_digest',None),
+            "qualification":"offline visual proposal; no live activation or complete-game certificate",
             "p1":{"score":scores.player1.score,
                   "observed":scores.player1.observed_score,
                   "confidence":round(scores.player1.confidence,4),
@@ -119,7 +133,7 @@ def main() -> None:
                     proposed=scores.player1.observed_score if args.self_channel==1 else scores.player2.observed_score,
                     confidence=scores.player1.confidence if args.self_channel==1 else scores.player2.confidence,
                     partition=args.partition,synthetic=args.synthetic,
-                    context=dict(source_session=args.source_session,calibration_sha256=hashlib.sha256(args.calibration.read_bytes()).hexdigest(),
+                    context=dict(source_session=args.source_session,score_channel=args.self_channel,calibration_geometry_digest=__import__('memory.evidence',fromlist=['digest']).digest(dict(corners=cal.corners,output_size=cal.output_size)),calibration_sha256=hashlib.sha256(args.calibration.read_bytes()).hexdigest(),
                         reader_revision=hashlib.sha256(Path(__file__).with_name('robotron_hud.py').read_bytes()).hexdigest()))
                 row['review_proposal_id']=proposal.id
                 if args.output:
@@ -134,6 +148,60 @@ def main() -> None:
                     (args.output/'score-review.html').write_text(page)
             finally:j.close()
         print(json.dumps(row,sort_keys=True))
+
+
+def import_reviews(journal,path):
+    """Additive existing acquisition; original IDs/timestamps survive relocation.
+
+    Imports are historical records, never new independent observations. No
+    agenda, candidate generation, selection or deployment is triggered.
+    """
+    from memory.evidence import EvidenceJournal
+    from memory.evaluator import MemoryEvaluator
+    from .score_observer import ScoreObserver
+    import shutil,os
+    path=Path(path).resolve()
+    if path==journal.path.resolve():raise ValueError('separate source and working journal required')
+    if (journal.path.parent/'capture-manifest.json').is_file():raise ValueError('sealed diary is immutable')
+    source=EvidenceJournal(path,read_only=True)
+    try:
+        source.conn.execute('BEGIN');source.verify()
+        originals=source.records();proposals=source.category_records('observation','score_review_proposal')
+        if len(proposals)>4096:raise ValueError('bounded reviewed source required')
+        location=journal.path.parent/'image-locations.json'
+        mapping=json.loads(location.read_text()) if location.exists() else {}
+        images=[];missing=[]
+        for r in proposals:
+            p=r.data['payload'];key=p['artifact']['sha256']
+            try:
+                original=ScoreObserver.review_artifact(source,p)
+                destination=journal.path.parent/'imported-score-images'/(key+original.suffix.lower())
+                destination.parent.mkdir(exist_ok=True)
+                if not destination.exists():
+                    temporary=destination.with_suffix(destination.suffix+'.pending')
+                    with temporary.open('xb') as stream:
+                        stream.write(original.read_bytes());stream.flush();os.fsync(stream.fileno())
+                    try:os.link(temporary,destination)
+                    finally:temporary.unlink(missing_ok=True)
+                if hashlib.sha256(destination.read_bytes()).hexdigest()!=key:raise ValueError('imported image changed')
+                mapping[key]=str(destination.relative_to(journal.path.parent));images.append(key)
+            except (OSError,ValueError) as exc:missing.append(dict(proposal_id=r.id,reason=str(exc)))
+        temporary=location.with_suffix('.pending')
+        with temporary.open('w') as stream:
+            stream.write(json.dumps(mapping,sort_keys=True)+'\n');stream.flush();os.fsync(stream.fileno())
+        temporary.replace(location)
+        with journal.batch():
+            added=journal.merge_from(source)
+            # Receipt identity is stable across identical retries, despite zero
+            # newly appended records on the second acquisition.
+            receipt=journal.append('event',dict(category='score_feedback_history_import',source_path=str(path),
+                original_record_ids=[r.id for r in originals],original_commit_times=[r.committed_at for r in originals],
+                recovered_image_hashes=sorted(set(images)),missing=missing,new_independent_experience=False,
+                physical_authorization=False),episode='score-review-acquisition',producer='existing-evidence-consolidation',version='score-feedback-import-v1')
+            MemoryEvaluator.reconcile_score_reviews(journal)
+        return dict(receipt_id=receipt.id,original_records=len(originals),added_records=len(added),images=len(set(images)),missing=missing,
+            physical_authorization=False,consumption='Historical import and reconciliation only; candidate training/inference is separate')
+    finally:source.close()
 
 
 def import_queue(journal, root):
@@ -202,24 +270,25 @@ def queue_rows(journal):
             p.update(proposed_score=proposal['proposed_score'],confidence=proposal['confidence'],
                 timestamp=proposal['timestamp'],terminal_support=proposal['context'].get('terminal_support',False))
         else:p.update(proposed_score=None,confidence=None,timestamp=None,terminal_support=False)
-        p.update(review_status=status,review=statuses.get(p['attempt_id']),
+        p.update(review_status=status,review=previous if previous.get('proposal_id')==p.get('proposal_id') else None,
             annotation_history=[dict(id=r.id,**r.data['payload']) for r in annotations if r.data['payload']['proposal_id']==p['proposal_id']],
             annotations=[dict(id=r.id,**r.data['payload']) for r in peers])
         result.append(p)
     return sorted(result,key=lambda p:(p['session'],str(p['number']).zfill(5)))
 
 
-def review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False):
+def review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
     if (journal.path.parent/'capture-manifest.json').is_file():
         raise ValueError('review must use consolidated notebook; sealed original diary is immutable')
     with journal.batch():
         return _review_game(journal,identifier,annotator=annotator,verdict=verdict,
-            value=value,reason=reason,independent=independent)
+            value=value,reason=reason,independent=independent,not_final_score=not_final_score,finality_unknown=finality_unknown)
 
 
-def _review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False):
+def _review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
     from .score_observer import ScoreObserver
     from datetime import datetime,timezone
+    if type(not_final_score) is not bool or type(finality_unknown) is not bool:raise ValueError('finality controls must be explicit booleans')
     if type(independent) is not bool:raise ValueError('independence attestation must be explicit boolean')
     row=journal.get(identifier);p=row.data['payload']
     if p.get('category')!='score_game_record' or not isinstance(annotator,str) or not annotator.strip():raise ValueError('game and reviewer identity required')
@@ -237,6 +306,7 @@ def _review_game(journal, identifier, *, annotator, verdict, value=None, reason=
     return journal.append('observation',dict(category='score_review_status',attempt_id=p['attempt_id'],
         proposal_id=p.get('proposal_id'),game_record_id=row.id,annotator=annotator,verdict=verdict,status=statuses[verdict],
         annotation_id=annotation.id if annotation else None,reason=reason,
+        not_final_score=not_final_score,finality_unknown=finality_unknown,
         reviewed_at=datetime.now(timezone.utc).isoformat(),independent_score_certificate=False),
         episode=row.data['episode'],sources=[row.id,*([annotation.id] if annotation else [])],
         producer='human-score-review',version='deferred-review-v1')
@@ -262,13 +332,17 @@ def serve_review(journal_path, root=None, port=8769):
                 page=Path(__file__).with_name('score-review.html').read_text().replace('__REVIEW_TOKEN__',token)
                 return self.reply(200,page,'text/html; charset=utf-8')
             if url.path=='/evidence':
-                page=Path(__file__).with_name('evidence-review.html').read_text().replace('__REVIEW_TOKEN__',token)
-                return self.reply(200,page,'text/html; charset=utf-8')
+                page=Path(__file__).with_name('evidence-review.html')
+                if not page.is_file():return self.reply(404,b'Motion review is outside this score-only integration','text/plain')
+                return self.reply(200,page.read_text().replace('__REVIEW_TOKEN__',token),'text/html; charset=utf-8')
             j=EvidenceJournal(journal_path)
             try:
                 if url.path=='/queue':
                     if root:import_queue(j,root)
-                    return self.reply(200,json.dumps(dict(games=queue_rows(j),history=performance_history(j),baselines=baseline_history(j),evidence=evidence_queue(j))))
+                    warning=None
+                    try:history=performance_history(j);baselines=baseline_history(j)
+                    except (ImportError,ValueError) as exc:history={};baselines=[];warning=str(exc)
+                    return self.reply(200,json.dumps(dict(games=queue_rows(j),history=history,baselines=baselines,history_warning=warning,evidence=evidence_queue(j))))
                 if url.path=='/image':
                     query=parse_qs(url.query)
                     from .score_observer import ScoreObserver
@@ -292,7 +366,7 @@ def serve_review(journal_path, root=None, port=8769):
             except (ValueError,KeyError,OSError) as exc:self.reply(400,json.dumps(dict(error=str(exc))))
             finally:j.close()
         def do_POST(self):
-            if self.path not in ('/review','/evidence-review') or self.headers.get('X-Review-Token')!=token:return self.reply(403,b'Forbidden','text/plain')
+            if self.path not in ('/review','/evidence-review') or (self.path=='/evidence-review' and not Path(__file__).with_name('evidence-review.html').is_file()) or self.headers.get('X-Review-Token')!=token:return self.reply(403,b'Forbidden','text/plain')
             try:
                 length=int(self.headers.get('Content-Length','0'))
                 if not 1<=length<=16384:raise ValueError('bounded review required')
@@ -380,6 +454,7 @@ def review_evidence(journal,identifier,*,annotator,verdict,objects=None,reason='
 
 def performance_history(journal):
     """Existing independent certificates alone admit complete-game averages."""
+    if not journal.category_records('observation','robotron_evaluation_episode'):return {}
     from experiments.comparison.robotron import validate_certificates
     from learning.episode_identity import canonical_experience
     from memory.evidence import digest

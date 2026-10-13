@@ -1,0 +1,90 @@
+{
+  "schema": "score-recognition-preserved-camera-regression-v1",
+  "original_reader_source": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+  "baseline_reader_sha256": "aada7fe015aa2d0561d0b8c364520dba5a6ec7391122dc2cb3a44b64c515783f",
+  "label_source": {
+    "run": "tracking-score-20260930-232827",
+    "commit": "4ffb9519d7385e146d2ac4a68297250747beef2e",
+    "scores": {
+      "camera-zero.jpg": 0,
+      "camera-100.jpg": 100
+    },
+    "diagnostic_corners_pixels": [
+      [
+        525,
+        70
+      ],
+      [
+        1275,
+        105
+      ],
+      [
+        1280,
+        650
+      ],
+      [
+        442,
+        565
+      ]
+    ],
+    "note": "JPEG reencodings of original full-camera PNGs; manually estimated partial-border geometry for diagnostic HUD regression only. Automatic full-board locator correctly rejects this obstructed/clipped scene."
+  },
+  "samples": [
+    {
+      "image": "camera-zero.jpg",
+      "sha256": "3f84670a7b457ff4b3d044768d56bf1eba5e6cf6fb339d82da2036fa34d70f52",
+      "label": 0,
+      "baseline": 0,
+      "baseline_confidence": 1.0,
+      "candidate": 0,
+      "confidence": 1.0,
+      "baseline_seconds": 0.034199234999960026,
+      "seconds": 0.007590327000116304
+    },
+    {
+      "image": "camera-100.jpg",
+      "sha256": "d7b6c62e1a8bd578b28ed98e814fa990d0abe7252fe8f094f774ae86683c8331",
+      "label": 100,
+      "baseline": 100,
+      "baseline_confidence": 0.9,
+      "candidate": 100,
+      "confidence": 0.9,
+      "baseline_seconds": 0.01272930000004635,
+      "seconds": 0.008607123000047068
+    }
+  ],
+  "baseline": {
+    "samples": 2,
+    "readable": 2,
+    "accepted": 2,
+    "abstained": 0,
+    "correct": 2,
+    "exact_accuracy": 1.0,
+    "exact_match_per_readable": 1.0,
+    "digit_accuracy": 1.0,
+    "digit_metric": "canonical numeric-string normalized edit accuracy; not individually annotated glyph accuracy",
+    "unreadable": 0,
+    "false_positive_unreadable": 0,
+    "false_high_confidence": 0
+  },
+  "candidate": {
+    "samples": 2,
+    "readable": 2,
+    "accepted": 2,
+    "abstained": 0,
+    "correct": 2,
+    "exact_accuracy": 1.0,
+    "exact_match_per_readable": 1.0,
+    "digit_accuracy": 1.0,
+    "digit_metric": "canonical numeric-string normalized edit accuracy; not individually annotated glyph accuracy",
+    "unreadable": 0,
+    "false_positive_unreadable": 0,
+    "false_high_confidence": 0
+  },
+  "feedback_applied": false,
+  "October10_reviews_recovered": false,
+  "independent_heldout": false,
+  "interpretation": "Authentic camera-derived JPEG regression only; existing historical labels, no recovered October 10 update or generalization claim",
+  "native_pi_measurement": false,
+  "physical_authorization": false
+}

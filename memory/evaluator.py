@@ -202,7 +202,7 @@ class MemoryEvaluator:
             peers=[r for r in annotations if r.id not in superseded and r.data['payload']['proposal_id'] in aliases
                 and r.data['payload']['independence_attested']]
             values={r.data['payload']['value'] for r in peers}
-            if len(values)!=1 or None in values:continue
+            if len(values)!=1:continue
             revision=p.get('context',{}).get('reader_revision')
             if not revision:deficiencies.append('frozen original reader revision missing');continue
             from experiments.ppal.score_observer import ScoreObserver
@@ -230,12 +230,10 @@ class MemoryEvaluator:
             if type(confidence) not in (float,int) or not math.isfinite(confidence) or not 0<=confidence<=1:
                 raise ValueError('invalid candidate confidence')
             outcomes.append(dict(proposal_id=key,label=label,annotation_ids=labels,baseline=p['proposed_score'],
-                candidate=value,confidence=confidence,seconds=seconds))
+                candidate=value,confidence=confidence,baseline_confidence=p['confidence'],seconds=seconds))
         n=len(outcomes)
         def metrics(field):
-            accepted=[r for r in outcomes if r[field] is not None]
-            return dict(samples=n,accepted=len(accepted),abstained=n-len(accepted),
-                exact_accuracy=sum(r[field]==r['label'] for r in accepted)/len(accepted) if accepted else None)
+            return MemoryEvaluator.score_recognition_metrics(outcomes,field)
         report=dict(status='measured_offline_batch' if n else 'unresolved',partition=partition,
             baseline=metrics('baseline'),candidate=metrics('candidate'),
             false_high_confidence=sum(r['candidate'] is not None and r['candidate']!=r['label'] and r['confidence']>=.99 for r in outcomes),
@@ -247,6 +245,35 @@ class MemoryEvaluator:
             baseline_id=frozen.id,training_consultation=training,report=report),episode=candidate.data['episode'],
             sources=[candidate_id,frozen.id],producer='MemoryEvaluator',version='score-feedback-v1')
 
+
+    @staticmethod
+    def score_recognition_metrics(outcomes,field):
+        """Descriptive labeled-batch metrics; numeric-string edit accuracy.
+
+        Null labels denote explicitly unreadable images, not zero scores. This
+        cannot establish digit-local annotation or independent generalization.
+        """
+        def distance(a,b):
+            previous=list(range(len(b)+1))
+            for i,x in enumerate(a,1):
+                current=[i]
+                for k,y in enumerate(b,1):current.append(min(current[-1]+1,previous[k]+1,previous[k-1]+(x!=y)))
+                previous=current
+            return previous[-1]
+        readable=[r for r in outcomes if r['label'] is not None]
+        accepted=[r for r in readable if r[field] is not None]
+        negative=[r for r in outcomes if r['label'] is None]
+        correct=sum(r[field]==r['label'] for r in accepted)
+        denom=sum(max(len(str(r['label'])),len(str(r[field])) if r[field] is not None else 0) for r in readable)
+        errors=sum(distance(str(r['label']),str(r[field]) if r[field] is not None else '') for r in readable)
+        confidence='baseline_confidence' if field=='baseline' else 'confidence'
+        return dict(samples=len(outcomes),readable=len(readable),accepted=len(accepted),
+            abstained=len(readable)-len(accepted),correct=correct,
+            exact_accuracy=correct/len(accepted) if accepted else None,
+            exact_match_per_readable=correct/len(readable) if readable else None,
+            digit_accuracy=1-errors/denom if denom else None,digit_metric='canonical numeric-string normalized edit accuracy; not individually annotated glyph accuracy',
+            unreadable=len(negative),false_positive_unreadable=sum(r[field] is not None for r in negative),
+            false_high_confidence=sum(r[field] is not None and r[field]!=r['label'] and r.get(confidence,0)>=.99 for r in outcomes))
 
     def __init__(self, path=DEFAULT_EVALUATIONS, exploration_rate=0.05):
         if not 0 <= exploration_rate <= 1:

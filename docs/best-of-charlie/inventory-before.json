@@ -1,0 +1,143 @@
+{
+  "master": "c322658586074462ffbded5ccd9db11f96448b0a",
+  "native_host": "inaccessible; no /home/five and no charlie.local resolution",
+  "branches": [
+    {
+      "ref": "origin",
+      "sha": "c322658586074462ffbded5ccd9db11f96448b0a",
+      "divergence_master": "0\t0"
+    },
+    {
+      "ref": "origin/feature/active-vision",
+      "sha": "c08a9a5331d06535439727863e3c6110237252a6",
+      "divergence_master": "0\t118"
+    },
+    {
+      "ref": "origin/feature/agency-first-self",
+      "sha": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+      "divergence_master": "0\t172"
+    },
+    {
+      "ref": "origin/feature/ala2-causal-acceptance",
+      "sha": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+      "divergence_master": "0\t182"
+    },
+    {
+      "ref": "origin/feature/ala2-thermal-recovery",
+      "sha": "f4800705df74ca496073f5e783d1b250d1e9ff3a",
+      "divergence_master": "0\t184"
+    },
+    {
+      "ref": "origin/feature/autonomous-camera-calibration",
+      "sha": "6e927e22b78670733944e28f3717bc4cb5e3d75d",
+      "divergence_master": "0\t174"
+    },
+    {
+      "ref": "origin/feature/charlie-memory",
+      "sha": "0115667c2d39bdf6c46594744952b512abb796e2",
+      "divergence_master": "0\t21"
+    },
+    {
+      "ref": "origin/feature/marathon-boundary-recovery",
+      "sha": "61175310b939fbb6286719430573ddb594f6cd81",
+      "divergence_master": "0\t176"
+    },
+    {
+      "ref": "origin/feature/marathon-camera-lifecycle",
+      "sha": "9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+      "divergence_master": "0\t177"
+    },
+    {
+      "ref": "origin/feature/native-marathon-restart",
+      "sha": "a785c9f745bd0645dd01ac70af3beb5a8d44d37b",
+      "divergence_master": "0\t176"
+    },
+    {
+      "ref": "origin/feature/native-terminal-forensics",
+      "sha": "ad613a9b7c7de4e44bdaa44dac0c127ef9be37a6",
+      "divergence_master": "0\t181"
+    },
+    {
+      "ref": "origin/feature/persistent-agency-recovery",
+      "sha": "0aadb65f4623f668f4e21631ed7b620e128d3ff2",
+      "divergence_master": "0\t174"
+    },
+    {
+      "ref": "origin/feature/ppal-integration",
+      "sha": "89e291a0cbdabf297d7d7f52d08f2af2e6170f65",
+      "divergence_master": "0\t61"
+    },
+    {
+      "ref": "origin/feature/ppal-vision-focus",
+      "sha": "591c7328084ca6930ecdbedc6e3d269adf21e686",
+      "divergence_master": "0\t1"
+    },
+    {
+      "ref": "origin/feature/progress-aware-marathon-watchdog",
+      "sha": "3723132e0a7643d24b7670c202aba0f4a1acee12",
+      "divergence_master": "0\t178"
+    },
+    {
+      "ref": "origin/feature/prompt-terminal-restart",
+      "sha": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+      "divergence_master": "0\t179"
+    },
+    {
+      "ref": "origin/feature/robotron-score-tracker",
+      "sha": "72f4958d73cae9d29dde81596313984bc51b93e6",
+      "divergence_master": "0\t83"
+    },
+    {
+      "ref": "origin/feature/score-feedback-master-integration",
+      "sha": "b1d1ef14fd9100a34a94519305db802c2b75d66e",
+      "divergence_master": "0\t2"
+    },
+    {
+      "ref": "origin/fix/robotron-learning-readiness",
+      "sha": "bec0667bbe4458619dbcb93c66848e887041a46b",
+      "divergence_master": "0\t54"
+    },
+    {
+      "ref": "origin/master",
+      "sha": "c322658586074462ffbded5ccd9db11f96448b0a",
+      "divergence_master": "0\t0"
+    }
+  ],
+  "worktrees": [
+    {
+      "git": "worktree /workspace/scratch/3d45fa74ce8b/charlie\nHEAD 6dd04b87653fbb836778704744424723b836815d\nbranch refs/heads/feature/ala2-causal-acceptance",
+      "status": " M tests/fixtures/robotron-geometry-004249/camera-000002.png\n",
+      "unique_file_hashes": [
+        {
+          "path": "tests/fixtures/robotron-geometry-004249/camera-000002.png",
+          "sha256": "1a74151c509686e8049ce64f2aa2ca9b251085e11353b5f54af407cea14ed670"
+        }
+      ],
+      "cleanup": "retain: history/process/evidence review required"
+    },
+    {
+      "git": "worktree /workspace/scratch/3d45fa74ce8b/best-of-charlie\nHEAD c322658586074462ffbded5ccd9db11f96448b0a\nbranch refs/heads/feature/best-of-charlie-consolidation",
+      "status": "",
+      "unique_file_hashes": [],
+      "cleanup": "retain: history/process/evidence review required"
+    },
+    {
+      "git": "worktree /workspace/scratch/3d45fa74ce8b/published-verification\nHEAD 84de3ffedf5d25d82268b1b1ffe14447dd6b84a8\ndetached",
+      "status": "",
+      "unique_file_hashes": [],
+      "cleanup": "retain: history/process/evidence review required"
+    },
+    {
+      "git": "worktree /workspace/scratch/3d45fa74ce8b/thermal-published-verification\nHEAD 1895bc7b92b92b8b53add5abc16631e9be22c7e4\ndetached",
+      "status": "",
+      "unique_file_hashes": [],
+      "cleanup": "retain: history/process/evidence review required"
+    },
+    {
+      "git": "worktree /workspace/scratch/3d45fa74ce8b/thermal-recovery\nHEAD 9cf9b6b6853423a98b8ec244ba42e0c6a8852aec\nbranch refs/heads/feature/ala2-thermal-recovery",
+      "status": "",
+      "unique_file_hashes": [],
+      "cleanup": "retain: history/process/evidence review required"
+    }
+  ]
+}

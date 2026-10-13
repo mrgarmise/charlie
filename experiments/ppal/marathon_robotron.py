@@ -473,9 +473,22 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
         heartbeat=Progress(progress_path)
         heartbeat.update(phase='finalizing',session=str(session.resolve()),
             gameplay_finished=not bool(doc.get('camera_cleanup_error')))
-    if play_first and doc['status']!='interrupted' and not doc.get('camera_cleanup_error') and not getattr(args,'supervised_marathon',False):
+    doc['scheduled_learning']=scheduled_learning(doc)
+    write_session(session/'session.json',doc)
+    if play_first and doc['scheduled_learning']['eligible'] and not getattr(args,'supervised_marathon',False):
         doc['reflection']=reflect_marathon(session,args,gateway=gateway)
     return doc
+
+def scheduled_learning(doc):
+    """Scheduled between-block work requires a qualified three-game block."""
+    target=doc.get('qualified_game_target',3)
+    completed=(doc.get('completion_counts') or {}).get('completed',0)
+    eligible=(type(target) is int and target>=3 and type(completed) is int and completed>=target
+        and doc.get('target_met') is True and not doc.get('camera_cleanup_error')
+        and doc.get('status') in ('qualified_target_complete','bounded_attempts_complete'))
+    return dict(eligible=eligible,completed=completed,required=target,
+        reason='qualified block complete' if eligible else 'qualified three-game block not complete or camera release failed')
+
 
 def reflect_marathon(session, args, *, gateway=None, processor=None, development=None):
     """Resume the existing offline adapters, then the normal Executive lifecycle.
@@ -658,7 +671,10 @@ def _postgame_pages(evidence):
         if page.get('state')!='not_gameplay':return False
         if page.get('phase')=='terminal':
             labels=page.get('label_scores') or {}
-            if page.get('reason')!='recorded_heroes_headings' or not all(
+            if page.get('reason')=='recorded_game_over_message':
+                ref=page.get('terminal_reference') or {};value=ref.get('similarity')
+                if ref.get('matched') is not True or not ref.get('sha256') or type(value) not in (int,float) or not .85<=value<=1.:return False
+            elif page.get('reason')!='recorded_heroes_headings' or not all(
                     type(labels.get(k)) in (int,float) and .78<=labels[k]<=1. for k in ('heroes','all-time')):return False
         elif page.get('phase')=='title':
             ref=page.get('title_reference') or {}
@@ -835,12 +851,16 @@ def main():
         if rc==0 and a.play_first and final.get('gameplay_finished'):
             session=Path(final['session'])
             state=load_report(session/'session.json') or {}
-            if state.get('status')!='interrupted':
+            if scheduled_learning(state)['eligible']:
                 reflect_marathon(session,a)
+            else:
+                print('SCHEDULED LEARNING DEFERRED: '+scheduled_learning(state)['reason'],flush=True)
+                rc=2
         raise SystemExit(rc)
     if a.developmental:
         if not 3<=a.max_games<=5:ap.error('developmental mode requires 3..5 bounded attempts')
-        developmental_marathon(a)
+        doc=developmental_marathon(a)
+        if a.play_first and not scheduled_learning(doc)['eligible']:raise SystemExit(2)
         return
     if a.seed_episode:ap.error('--seed-episode requires --developmental')
     # Normal and developmental episodes share the same safe orchestration and

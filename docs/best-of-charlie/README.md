@@ -144,7 +144,7 @@ vcgencmd get_throttled > "$OUT/throttled.txt"
 
 For each discovered checkout, collect exact HEAD, remote refs, `git status --porcelain --untracked-files=all`, `git worktree list --porcelain`, and commits not reachable from fetched remotes. Associate each active PID with `/proc/<PID>/exe`, `/proc/<PID>/cwd`, unit paths and whitelisted configuration. Do not print secrets. Directory names do not establish duplication.
 
-After separate approval for bounded **offline native software acceptance**, use a verified backup copy, no original writer and no hardware initialization:
+When native access is available, run the authorized bounded **offline software acceptance** from the prepared source, using a verified backup copy, no original writer and no hardware initialization. This requires no installed-pointer change or service restart:
 
 ```bash
 COPY="$OUT/validation-state"
@@ -152,7 +152,7 @@ cp -a "$BACKUP" "$COPY"
 "$PYTHON" "$APP/tools/inspect_developmental_progress.py" "$COPY" > "$OUT/before.json"
 "$PYTHON" "$APP/tools/observe_development_thermal.py" --state "$COPY" --output "$OUT/thermal.jsonl" --seconds 360 --interval 1 &
 OBSERVER_PID=$!
-nice -n 10 "$PYTHON" "$RELEASE_ROOT/current/main.py" --offline --learning-state "$COPY" --episode-root /home/five/Projects/charlie/robotron-runs --learning-turns 4 --learning-budget 2 --learning-interval .05 --learning-require-thermal --learning-wall-seconds 300 --learning-cooldown-seconds 120 > "$OUT/executive.txt" 2>&1
+nice -n 10 "$PYTHON" "$APP/main.py" --offline --learning-state "$COPY" --episode-root /home/five/Projects/charlie/robotron-runs --learning-turns 4 --learning-budget 2 --learning-interval .05 --learning-require-thermal --learning-wall-seconds 300 --learning-cooldown-seconds 120 > "$OUT/executive.txt" 2>&1
 wait "$OBSERVER_PID"
 "$PYTHON" "$APP/tools/inspect_developmental_progress.py" "$COPY" > "$OUT/after.json"
 "$PYTHON" "$APP/tools/validate_developmental_restart.py" "$OUT/before.json" "$OUT/after.json" > "$OUT/continuity.json"
@@ -197,3 +197,7 @@ git -C "$REPO" worktree add --detach "$APP" "$REVISION"
 ```
 
 A more precise PPAL audit: Forebrain's rescue/survive fallback and exploration counts are fixed rules/session-local bookkeeping. Hindbrain keeps at most eight signed-response outcomes per action and thirty-two action keys, revising contradicted tactics only for fresh, same-identity completed response windows; identity changes clear those session-local statistics. Its action-history logic is not a persisted SARSA/Q learner. Diary records retain those outcomes, while persistent later decision values require the separate qualified-policy loading pathway and independent runtime/evaluation authority. The optional shot model is a fitted logistic predictor over synthetic shot examples; synthetic success is not authentic PPAL acceptance. MemoryEvaluator separately retains helpful/harmful weighted evidence in SQLite and uses posterior `(1+helpful)/(2+helpful+harmful)` for memory usefulness; that is not a Robotron score reward or an automatically activated policy. Executive priority uses independently grouped retained resolutions to reduce remaining uncertainty as `uncertainty/(1+independent_units)` in its existing objective/value/cost/risk calculation. Thermal telemetry and process status update none of those learning states.
+
+The final terminal cross-feature checks passed **159 tests**. A controlled read-only replay used the same 65 archived October 11 camera observations and source identity with the frozen `9e423e9` classifier versus the integrated recognizer. The baseline found no terminal transition; the integrated reader found a supported transition at capture time `15840.790938`. Both reports explicitly deny physical/START authorization. Exact compressed traces, source hashes and control summary are retained under `validation/terminal-*`. This is a historical recognition-code repair on the recorded scene, not learning or unseen-scene generalization.
+
+After terminal integration, the final available local regression passed **1,251 tests, 21 skipped, zero failures in 303.74 seconds**, against published source `2930086581f7155b87f47413e081255d4927bf5e` / tree `6faa9d418124fc7ca464c21c126f0928fcf8a609`. The earlier 1,229-test receipt remains historical evidence for the preceding core tree; the final full receipt is `validation/final-results.json` and `final-terminal-full.*`. Subsequent report-only commits do not change the tested application code. Native status and ALA acceptance remain unchanged: outstanding.

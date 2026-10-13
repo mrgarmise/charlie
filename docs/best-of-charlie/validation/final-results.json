@@ -1,0 +1,14 @@
+{
+  "published_source_commit": "2930086581f7155b87f47413e081255d4927bf5e",
+  "tested_tree": "6faa9d418124fc7ca464c21c126f0928fcf8a609",
+  "passed": 1251,
+  "skipped": 21,
+  "failed": 0,
+  "seconds": 303.74,
+  "environment": "Linux x86_64 Python 3.12.14; no Torch, Pi or physical controller",
+  "scope": "tests/",
+  "native_pi": false,
+  "physical_authorization": false,
+  "policy_activation": false,
+  "state_migration": false
+}

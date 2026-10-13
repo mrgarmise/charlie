@@ -1,0 +1,30 @@
+{
+  "host": "isolated Linux x86_64 workspace; not Charlie Pi",
+  "staged": [
+    {
+      "commit": "f4800705df74ca496073f5e783d1b250d1e9ff3a",
+      "files": 1133,
+      "verified": true
+    },
+    {
+      "commit": "b4cef5196209e2ddcc5f25d8b242d5579848c551",
+      "files": 1357,
+      "verified": true
+    }
+  ],
+  "deploy": {
+    "commit": "b4cef5196209e2ddcc5f25d8b242d5579848c551",
+    "changed": false,
+    "running_services_restarted": false
+  },
+  "rollback": {
+    "commit": "f4800705df74ca496073f5e783d1b250d1e9ff3a",
+    "changed": true,
+    "rollback_target": "/workspace/scratch/3d45fa74ce8b/consolidation-release-rehearsal/releases/b4cef5196209e2ddcc5f25d8b242d5579848c551",
+    "running_services_restarted": false,
+    "notebook_modified": false,
+    "next": "verify readiness; service shutdown/start requires separate approval; existing process keeps its old version"
+  },
+  "current_pointer": "/workspace/scratch/3d45fa74ce8b/consolidation-release-rehearsal/releases/f4800705df74ca496073f5e783d1b250d1e9ff3a",
+  "native_deployment": false
+}

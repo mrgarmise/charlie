@@ -1,0 +1,34 @@
+{
+  "schema": "charlie-active-vision-validation-v1",
+  "base": "bae659f60b0e396999caa85b763ce0f1622bd540",
+  "branch": "feature/active-vision",
+  "physical_actions": false,
+  "pi_deployed": false,
+  "ala2_branch_modified": false,
+  "final_suite": {
+    "command": "python -m pytest -q tests",
+    "passed": 492,
+    "skipped": 19,
+    "failed": 0,
+    "seconds": 69.45,
+    "python": "3.12.14",
+    "numpy": "2.2.4",
+    "opencv": "4.10.0",
+    "pillow": "12.3.0",
+    "architecture": "x86_64",
+    "torch_available": false
+  },
+  "active_vision_tests": 31,
+  "simulation_bundle": "simulation-01",
+  "simulation_environment": {
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "opencv": "5.0.0",
+    "pillow": "12.3.0"
+  },
+  "remaining": [
+    "Physical optimization and mechanical calibration",
+    "Live camera focus and STOP/lease handoff validation",
+    "Stable ALA-2 task-yield and reacquisition scheduling integration"
+  ]
+}

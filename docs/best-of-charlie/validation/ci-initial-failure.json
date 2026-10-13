@@ -1,0 +1,10 @@
+{
+  "run_id": 38427988789,
+  "job_id": 115402341222,
+  "failed_test": "test_rollback_boots_recovery_without_pwm",
+  "reason": "shallow Actions checkout omitted 8777955 historical firmware source",
+  "passed": 1228,
+  "skipped": 21,
+  "failed": 1,
+  "repair": "fetch-depth: 0; no test skipped or qualification relaxed"
+}

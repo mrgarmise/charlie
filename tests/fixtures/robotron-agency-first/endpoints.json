@@ -1,0 +1,3118 @@
+{
+  "source": "play-20260930-024128, commit a70149c",
+  "limits": "Endpoint centers only; rounded to 0.001; initial pre-command frame, boxes and absolute timestamps were not recorded. No physical identity ground truth.",
+  "samples": [
+    {
+      "frame": "agency-000.png",
+      "command": [
+        1.0,
+        0.0
+      ],
+      "interval_seconds": 0.19008326099999806,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            33.203,
+            50.0
+          ],
+          "player_score": 0.4386,
+          "mine_score": 0.7017,
+          "best_score": 0.7017,
+          "runner_up": 0.6761
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            60.547,
+            1.771
+          ],
+          "player_score": 0.5067,
+          "mine_score": 0.7838,
+          "best_score": 0.7838,
+          "runner_up": 0.7118
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            66.016,
+            1.771
+          ],
+          "player_score": 0.5226,
+          "mine_score": 0.777,
+          "best_score": 0.777,
+          "runner_up": 0.7262
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            85.625,
+            19.688
+          ],
+          "player_score": 0.5849,
+          "mine_score": 0.7487,
+          "best_score": 0.7487,
+          "runner_up": 0.6937
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            66.406,
+            3.854
+          ],
+          "player_score": 0.4875,
+          "mine_score": 0.7874,
+          "best_score": 0.7874,
+          "runner_up": 0.7056
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            81.016,
+            4.479
+          ],
+          "player_score": 0.4881,
+          "mine_score": 0.7883,
+          "best_score": 0.7883,
+          "runner_up": 0.7061
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            82.734,
+            6.042
+          ],
+          "player_score": 0.4865,
+          "mine_score": 0.785,
+          "best_score": 0.785,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            64.844,
+            15.208
+          ],
+          "player_score": 0.4941,
+          "mine_score": 0.7938,
+          "best_score": 0.7938,
+          "runner_up": 0.7093
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            79.062,
+            22.396
+          ],
+          "player_score": 0.4883,
+          "mine_score": 0.788,
+          "best_score": 0.788,
+          "runner_up": 0.7061
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            97.578,
+            44.375
+          ],
+          "player_score": 0.4867,
+          "mine_score": 0.7858,
+          "best_score": 0.7858,
+          "runner_up": 0.705
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            96.875,
+            46.25
+          ],
+          "player_score": 0.4894,
+          "mine_score": 0.7875,
+          "best_score": 0.7875,
+          "runner_up": 0.7055
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            95.703,
+            45.833
+          ],
+          "player_score": 0.4857,
+          "mine_score": 0.7865,
+          "best_score": 0.7865,
+          "runner_up": 0.7052
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            60.391,
+            50.833
+          ],
+          "player_score": 0.8454,
+          "mine_score": 0.8528,
+          "best_score": 0.8705,
+          "runner_up": 0.8528
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            97.031,
+            51.667
+          ],
+          "player_score": 0.4886,
+          "mine_score": 0.7879,
+          "best_score": 0.7879,
+          "runner_up": 0.7054
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            95.156,
+            53.125
+          ],
+          "player_score": 0.4865,
+          "mine_score": 0.786,
+          "best_score": 0.786,
+          "runner_up": 0.7048
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            97.422,
+            59.896
+          ],
+          "player_score": 0.4872,
+          "mine_score": 0.7864,
+          "best_score": 0.7864,
+          "runner_up": 0.7056
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.969,
+            59.583
+          ],
+          "player_score": 0.4868,
+          "mine_score": 0.786,
+          "best_score": 0.786,
+          "runner_up": 0.7047
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            24.922,
+            60.521
+          ],
+          "player_score": 0.4885,
+          "mine_score": 0.7879,
+          "best_score": 0.7879,
+          "runner_up": 0.7062
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            98.047,
+            65.0
+          ],
+          "player_score": 0.4453,
+          "mine_score": 0.5761,
+          "best_score": 0.6726,
+          "runner_up": 0.6266
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            15.469,
+            63.542
+          ],
+          "player_score": 0.4891,
+          "mine_score": 0.788,
+          "best_score": 0.788,
+          "runner_up": 0.7055
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            66.094,
+            69.375
+          ],
+          "player_score": 0.8326,
+          "mine_score": 0.7896,
+          "best_score": 0.8326,
+          "runner_up": 0.8221
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.229
+          ],
+          "player_score": 0.8616,
+          "mine_score": 0.9045,
+          "best_score": 0.9045,
+          "runner_up": 0.8979
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            64.453,
+            84.167
+          ],
+          "player_score": 0.8091,
+          "mine_score": 0.812,
+          "best_score": 0.9136,
+          "runner_up": 0.8798
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            87.5,
+            85.729
+          ],
+          "player_score": 0.8263,
+          "mine_score": 0.8302,
+          "best_score": 0.9256,
+          "runner_up": 0.8842
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.656,
+            92.708
+          ],
+          "player_score": 0.8113,
+          "mine_score": 0.8148,
+          "best_score": 0.9154,
+          "runner_up": 0.879
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.891,
+            93.125
+          ],
+          "player_score": 0.8484,
+          "mine_score": 0.8972,
+          "best_score": 0.9007,
+          "runner_up": 0.8991
+        }
+      ]
+    },
+    {
+      "frame": "agency-001.png",
+      "command": [
+        0.0,
+        0.0
+      ],
+      "interval_seconds": 0.13733558500000242,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4207,
+          "mine_score": 0.6817,
+          "best_score": 0.6851,
+          "runner_up": 0.6817
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            81.094,
+            32.083
+          ],
+          "player_score": 0.4887,
+          "mine_score": 0.789,
+          "best_score": 0.789,
+          "runner_up": 0.707
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            46.953,
+            32.708
+          ],
+          "player_score": 0.4882,
+          "mine_score": 0.7874,
+          "best_score": 0.7874,
+          "runner_up": 0.7064
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            57.266,
+            32.708
+          ],
+          "player_score": 0.4862,
+          "mine_score": 0.788,
+          "best_score": 0.788,
+          "runner_up": 0.706
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            89.062,
+            33.958
+          ],
+          "player_score": 0.4887,
+          "mine_score": 0.7883,
+          "best_score": 0.7883,
+          "runner_up": 0.707
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            63.281,
+            50.833
+          ],
+          "player_score": 0.8708,
+          "mine_score": 0.841,
+          "best_score": 0.8708,
+          "runner_up": 0.851
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            18.75,
+            65.521
+          ],
+          "player_score": 0.8076,
+          "mine_score": 0.8057,
+          "best_score": 0.8439,
+          "runner_up": 0.8076
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            64.766,
+            70.417
+          ],
+          "player_score": 0.8522,
+          "mine_score": 0.8261,
+          "best_score": 0.854,
+          "runner_up": 0.8522
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            94.453,
+            72.917
+          ],
+          "player_score": 0.4874,
+          "mine_score": 0.7876,
+          "best_score": 0.7876,
+          "runner_up": 0.706
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            97.969,
+            78.75
+          ],
+          "player_score": 0.4859,
+          "mine_score": 0.7837,
+          "best_score": 0.7837,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            95.859,
+            76.979
+          ],
+          "player_score": 0.4864,
+          "mine_score": 0.7855,
+          "best_score": 0.7855,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.969,
+            82.396
+          ],
+          "player_score": 0.8297,
+          "mine_score": 0.8499,
+          "best_score": 0.9116,
+          "runner_up": 0.8829
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            85.859,
+            83.854
+          ],
+          "player_score": 0.8508,
+          "mine_score": 0.8612,
+          "best_score": 0.9132,
+          "runner_up": 0.883
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.229
+          ],
+          "player_score": 0.8598,
+          "mine_score": 0.9013,
+          "best_score": 0.9024,
+          "runner_up": 0.9013
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            97.734,
+            85.729
+          ],
+          "player_score": 0.4904,
+          "mine_score": 0.7926,
+          "best_score": 0.7926,
+          "runner_up": 0.7087
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.656,
+            92.708
+          ],
+          "player_score": 0.8168,
+          "mine_score": 0.8216,
+          "best_score": 0.9179,
+          "runner_up": 0.8838
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.969,
+            93.125
+          ],
+          "player_score": 0.8552,
+          "mine_score": 0.9,
+          "best_score": 0.9067,
+          "runner_up": 0.9036
+        }
+      ]
+    },
+    {
+      "frame": "agency-002.png",
+      "command": [
+        -1.0,
+        0.0
+      ],
+      "interval_seconds": 0.15680600700000014,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.421,
+          "mine_score": 0.6849,
+          "best_score": 0.687,
+          "runner_up": 0.6849
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            74.531,
+            24.896
+          ],
+          "player_score": 0.4864,
+          "mine_score": 0.7842,
+          "best_score": 0.7842,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            80.938,
+            30.208
+          ],
+          "player_score": 0.4878,
+          "mine_score": 0.7869,
+          "best_score": 0.7869,
+          "runner_up": 0.7055
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            63.203,
+            50.833
+          ],
+          "player_score": 0.8522,
+          "mine_score": 0.8066,
+          "best_score": 0.8522,
+          "runner_up": 0.8336
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            19.062,
+            65.625
+          ],
+          "player_score": 0.8146,
+          "mine_score": 0.7928,
+          "best_score": 0.8474,
+          "runner_up": 0.8146
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.891,
+            71.771
+          ],
+          "player_score": 0.8264,
+          "mine_score": 0.8489,
+          "best_score": 0.8489,
+          "runner_up": 0.8363
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            93.594,
+            71.458
+          ],
+          "player_score": 0.4859,
+          "mine_score": 0.7857,
+          "best_score": 0.7857,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            96.094,
+            75.0
+          ],
+          "player_score": 0.4903,
+          "mine_score": 0.7906,
+          "best_score": 0.7906,
+          "runner_up": 0.7079
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.969,
+            82.396
+          ],
+          "player_score": 0.8278,
+          "mine_score": 0.8461,
+          "best_score": 0.912,
+          "runner_up": 0.882
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            85.938,
+            83.958
+          ],
+          "player_score": 0.8529,
+          "mine_score": 0.8543,
+          "best_score": 0.919,
+          "runner_up": 0.8867
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.333
+          ],
+          "player_score": 0.8449,
+          "mine_score": 0.8896,
+          "best_score": 0.8896,
+          "runner_up": 0.8859
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            64.219,
+            91.146
+          ],
+          "player_score": 0.8242,
+          "mine_score": 0.8449,
+          "best_score": 0.9084,
+          "runner_up": 0.8822
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.734,
+            93.229
+          ],
+          "player_score": 0.8643,
+          "mine_score": 0.8997,
+          "best_score": 0.8997,
+          "runner_up": 0.8987
+        }
+      ]
+    },
+    {
+      "frame": "agency-003.png",
+      "command": [
+        0.0,
+        0.0
+      ],
+      "interval_seconds": 0.14237505600000588,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4287,
+          "mine_score": 0.696,
+          "best_score": 0.696,
+          "runner_up": 0.6886
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            82.188,
+            36.875
+          ],
+          "player_score": 0.4906,
+          "mine_score": 0.7896,
+          "best_score": 0.7896,
+          "runner_up": 0.7072
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            85.156,
+            38.438
+          ],
+          "player_score": 0.4867,
+          "mine_score": 0.7858,
+          "best_score": 0.7858,
+          "runner_up": 0.7048
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            89.297,
+            42.292
+          ],
+          "player_score": 0.4882,
+          "mine_score": 0.7873,
+          "best_score": 0.7873,
+          "runner_up": 0.7062
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            1.797,
+            45.521
+          ],
+          "player_score": 0.4867,
+          "mine_score": 0.786,
+          "best_score": 0.786,
+          "runner_up": 0.7048
+        },
+        {
+          "kind": "player",
+          "center": [
+            61.797,
+            50.625
+          ],
+          "player_score": 0.8894,
+          "mine_score": 0.8114,
+          "best_score": 0.8894,
+          "runner_up": 0.8299
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            26.25,
+            56.875
+          ],
+          "player_score": 0.4922,
+          "mine_score": 0.7933,
+          "best_score": 0.7933,
+          "runner_up": 0.7096
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            18.906,
+            65.625
+          ],
+          "player_score": 0.8215,
+          "mine_score": 0.801,
+          "best_score": 0.8546,
+          "runner_up": 0.8241
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            6.172,
+            62.604
+          ],
+          "player_score": 0.4906,
+          "mine_score": 0.791,
+          "best_score": 0.791,
+          "runner_up": 0.7071
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.797,
+            76.354
+          ],
+          "player_score": 0.7326,
+          "mine_score": 0.7633,
+          "best_score": 0.8128,
+          "runner_up": 0.7804
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            86.016,
+            83.75
+          ],
+          "player_score": 0.8869,
+          "mine_score": 0.8698,
+          "best_score": 0.9299,
+          "runner_up": 0.8931
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.229
+          ],
+          "player_score": 0.8479,
+          "mine_score": 0.877,
+          "best_score": 0.8806,
+          "runner_up": 0.877
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            64.219,
+            91.146
+          ],
+          "player_score": 0.8268,
+          "mine_score": 0.8486,
+          "best_score": 0.9077,
+          "runner_up": 0.8821
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            98.906,
+            90.208
+          ],
+          "player_score": 0.4842,
+          "mine_score": 0.7836,
+          "best_score": 0.7836,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.812,
+            93.229
+          ],
+          "player_score": 0.8519,
+          "mine_score": 0.8787,
+          "best_score": 0.8917,
+          "runner_up": 0.8787
+        }
+      ]
+    },
+    {
+      "frame": "agency-004.png",
+      "command": [
+        0.0,
+        1.0
+      ],
+      "interval_seconds": 0.15456334099999935,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4405,
+          "mine_score": 0.7188,
+          "best_score": 0.7188,
+          "runner_up": 0.6945
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            66.562,
+            32.917
+          ],
+          "player_score": 0.487,
+          "mine_score": 0.7858,
+          "best_score": 0.7858,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            51.328,
+            33.646
+          ],
+          "player_score": 0.4864,
+          "mine_score": 0.7866,
+          "best_score": 0.7866,
+          "runner_up": 0.7052
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            48.516,
+            35.417
+          ],
+          "player_score": 0.4871,
+          "mine_score": 0.787,
+          "best_score": 0.787,
+          "runner_up": 0.7056
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            45.547,
+            36.042
+          ],
+          "player_score": 0.4887,
+          "mine_score": 0.7878,
+          "best_score": 0.7878,
+          "runner_up": 0.7057
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.562,
+            50.313
+          ],
+          "player_score": 0.839,
+          "mine_score": 0.7583,
+          "best_score": 0.839,
+          "runner_up": 0.806
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            36.172,
+            51.042
+          ],
+          "player_score": 0.4841,
+          "mine_score": 0.7852,
+          "best_score": 0.7852,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.625,
+            51.458
+          ],
+          "player_score": 0.4873,
+          "mine_score": 0.7869,
+          "best_score": 0.7869,
+          "runner_up": 0.7056
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            35.781,
+            66.667
+          ],
+          "player_score": 0.6798,
+          "mine_score": 0.6864,
+          "best_score": 0.7585,
+          "runner_up": 0.7558
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.359,
+            66.146
+          ],
+          "player_score": 0.4882,
+          "mine_score": 0.7922,
+          "best_score": 0.7922,
+          "runner_up": 0.7086
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.016,
+            76.875
+          ],
+          "player_score": 0.7098,
+          "mine_score": 0.7142,
+          "best_score": 0.7746,
+          "runner_up": 0.765
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            23.281,
+            74.062
+          ],
+          "player_score": 0.489,
+          "mine_score": 0.7886,
+          "best_score": 0.7886,
+          "runner_up": 0.7069
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            4.531,
+            80.312
+          ],
+          "player_score": 0.4894,
+          "mine_score": 0.7897,
+          "best_score": 0.7897,
+          "runner_up": 0.7069
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            85.859,
+            83.958
+          ],
+          "player_score": 0.8526,
+          "mine_score": 0.8518,
+          "best_score": 0.9126,
+          "runner_up": 0.8798
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            13.828,
+            80.833
+          ],
+          "player_score": 0.4855,
+          "mine_score": 0.7847,
+          "best_score": 0.7847,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            15.391,
+            81.354
+          ],
+          "player_score": 0.4878,
+          "mine_score": 0.7863,
+          "best_score": 0.7863,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.333
+          ],
+          "player_score": 0.8474,
+          "mine_score": 0.8823,
+          "best_score": 0.8823,
+          "runner_up": 0.8763
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            95.625,
+            81.25
+          ],
+          "player_score": 0.4885,
+          "mine_score": 0.788,
+          "best_score": 0.788,
+          "runner_up": 0.7062
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            11.719,
+            83.646
+          ],
+          "player_score": 0.4878,
+          "mine_score": 0.7865,
+          "best_score": 0.7865,
+          "runner_up": 0.7052
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            2.656,
+            88.125
+          ],
+          "player_score": 0.486,
+          "mine_score": 0.7853,
+          "best_score": 0.7853,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            64.219,
+            91.146
+          ],
+          "player_score": 0.8252,
+          "mine_score": 0.8452,
+          "best_score": 0.9085,
+          "runner_up": 0.883
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.812,
+            93.229
+          ],
+          "player_score": 0.8508,
+          "mine_score": 0.8773,
+          "best_score": 0.8945,
+          "runner_up": 0.8804
+        }
+      ]
+    },
+    {
+      "frame": "agency-005.png",
+      "command": [
+        0.0,
+        0.0
+      ],
+      "interval_seconds": 0.14926105099999631,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4442,
+          "mine_score": 0.7178,
+          "best_score": 0.7178,
+          "runner_up": 0.6971
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            59.219,
+            34.271
+          ],
+          "player_score": 0.487,
+          "mine_score": 0.786,
+          "best_score": 0.786,
+          "runner_up": 0.7047
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            67.266,
+            35.104
+          ],
+          "player_score": 0.4826,
+          "mine_score": 0.7812,
+          "best_score": 0.7812,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            46.719,
+            36.667
+          ],
+          "player_score": 0.4916,
+          "mine_score": 0.7929,
+          "best_score": 0.7929,
+          "runner_up": 0.7091
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            55.156,
+            36.979
+          ],
+          "player_score": 0.4881,
+          "mine_score": 0.787,
+          "best_score": 0.787,
+          "runner_up": 0.7056
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            40.156,
+            45.521
+          ],
+          "player_score": 0.4884,
+          "mine_score": 0.7876,
+          "best_score": 0.7876,
+          "runner_up": 0.7061
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.313,
+            47.396
+          ],
+          "player_score": 0.4885,
+          "mine_score": 0.789,
+          "best_score": 0.789,
+          "runner_up": 0.7061
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            46.016,
+            46.667
+          ],
+          "player_score": 0.484,
+          "mine_score": 0.7837,
+          "best_score": 0.7837,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.25,
+            51.979
+          ],
+          "player_score": 0.7827,
+          "mine_score": 0.7622,
+          "best_score": 0.791,
+          "runner_up": 0.7827
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            88.984,
+            47.604
+          ],
+          "player_score": 0.4853,
+          "mine_score": 0.7852,
+          "best_score": 0.7852,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            55.391,
+            49.583
+          ],
+          "player_score": 0.4892,
+          "mine_score": 0.7885,
+          "best_score": 0.7885,
+          "runner_up": 0.7064
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            48.672,
+            48.229
+          ],
+          "player_score": 0.4862,
+          "mine_score": 0.7851,
+          "best_score": 0.7851,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            47.578,
+            48.854
+          ],
+          "player_score": 0.4925,
+          "mine_score": 0.7927,
+          "best_score": 0.7927,
+          "runner_up": 0.7087
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            60.156,
+            77.396
+          ],
+          "player_score": 0.6598,
+          "mine_score": 0.6696,
+          "best_score": 0.7439,
+          "runner_up": 0.7349
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            20.859,
+            75.938
+          ],
+          "player_score": 0.4861,
+          "mine_score": 0.785,
+          "best_score": 0.785,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            84.688,
+            81.354
+          ],
+          "player_score": 0.8467,
+          "mine_score": 0.8534,
+          "best_score": 0.9367,
+          "runner_up": 0.8913
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.333
+          ],
+          "player_score": 0.8471,
+          "mine_score": 0.8824,
+          "best_score": 0.8824,
+          "runner_up": 0.8756
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            95.391,
+            85.833
+          ],
+          "player_score": 0.4897,
+          "mine_score": 0.7899,
+          "best_score": 0.7899,
+          "runner_up": 0.707
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            97.891,
+            87.188
+          ],
+          "player_score": 0.4908,
+          "mine_score": 0.7883,
+          "best_score": 0.7883,
+          "runner_up": 0.7052
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            1.25,
+            86.146
+          ],
+          "player_score": 0.4881,
+          "mine_score": 0.7873,
+          "best_score": 0.7873,
+          "runner_up": 0.7057
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            63.438,
+            90.104
+          ],
+          "player_score": 0.8175,
+          "mine_score": 0.8238,
+          "best_score": 0.8967,
+          "runner_up": 0.8714
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            2.812,
+            88.125
+          ],
+          "player_score": 0.4906,
+          "mine_score": 0.7913,
+          "best_score": 0.7913,
+          "runner_up": 0.7085
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            96.172,
+            89.271
+          ],
+          "player_score": 0.4858,
+          "mine_score": 0.7842,
+          "best_score": 0.7842,
+          "runner_up": 0.7044
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.812,
+            93.229
+          ],
+          "player_score": 0.8505,
+          "mine_score": 0.8771,
+          "best_score": 0.8948,
+          "runner_up": 0.8807
+        }
+      ]
+    },
+    {
+      "frame": "agency-006.png",
+      "command": [
+        0.0,
+        -1.0
+      ],
+      "interval_seconds": 0.1941042439999876,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4485,
+          "mine_score": 0.719,
+          "best_score": 0.719,
+          "runner_up": 0.6966
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            45.859,
+            33.646
+          ],
+          "player_score": 0.4864,
+          "mine_score": 0.7864,
+          "best_score": 0.7864,
+          "runner_up": 0.7051
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            51.797,
+            34.479
+          ],
+          "player_score": 0.4883,
+          "mine_score": 0.7888,
+          "best_score": 0.7888,
+          "runner_up": 0.7064
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.703,
+            34.479
+          ],
+          "player_score": 0.4868,
+          "mine_score": 0.7867,
+          "best_score": 0.7867,
+          "runner_up": 0.7052
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            46.875,
+            35.0
+          ],
+          "player_score": 0.4874,
+          "mine_score": 0.787,
+          "best_score": 0.787,
+          "runner_up": 0.7055
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            56.328,
+            35.625
+          ],
+          "player_score": 0.4885,
+          "mine_score": 0.7872,
+          "best_score": 0.7872,
+          "runner_up": 0.7057
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            51.875,
+            36.979
+          ],
+          "player_score": 0.4888,
+          "mine_score": 0.7868,
+          "best_score": 0.7868,
+          "runner_up": 0.7053
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.234,
+            37.708
+          ],
+          "player_score": 0.487,
+          "mine_score": 0.7861,
+          "best_score": 0.7861,
+          "runner_up": 0.7051
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            51.094,
+            38.333
+          ],
+          "player_score": 0.4858,
+          "mine_score": 0.785,
+          "best_score": 0.785,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            38.672,
+            40.833
+          ],
+          "player_score": 0.4914,
+          "mine_score": 0.7917,
+          "best_score": 0.7917,
+          "runner_up": 0.7089
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            52.5,
+            41.458
+          ],
+          "player_score": 0.4869,
+          "mine_score": 0.7877,
+          "best_score": 0.7877,
+          "runner_up": 0.7062
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            57.734,
+            51.25
+          ],
+          "player_score": 0.5201,
+          "mine_score": 0.7106,
+          "best_score": 0.7106,
+          "runner_up": 0.6636
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            59.062,
+            46.146
+          ],
+          "player_score": 0.488,
+          "mine_score": 0.7849,
+          "best_score": 0.7849,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            48.281,
+            50.208
+          ],
+          "player_score": 0.4861,
+          "mine_score": 0.7865,
+          "best_score": 0.7865,
+          "runner_up": 0.7055
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            88.672,
+            50.625
+          ],
+          "player_score": 0.4847,
+          "mine_score": 0.7837,
+          "best_score": 0.7837,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            48.906,
+            51.25
+          ],
+          "player_score": 0.485,
+          "mine_score": 0.7845,
+          "best_score": 0.7845,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            88.281,
+            55.104
+          ],
+          "player_score": 0.4866,
+          "mine_score": 0.7869,
+          "best_score": 0.7869,
+          "runner_up": 0.7053
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            88.203,
+            58.333
+          ],
+          "player_score": 0.4865,
+          "mine_score": 0.7854,
+          "best_score": 0.7854,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            58.672,
+            77.292
+          ],
+          "player_score": 0.776,
+          "mine_score": 0.7911,
+          "best_score": 0.8511,
+          "runner_up": 0.8257
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            95.625,
+            75.312
+          ],
+          "player_score": 0.4871,
+          "mine_score": 0.786,
+          "best_score": 0.786,
+          "runner_up": 0.7047
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            84.609,
+            81.562
+          ],
+          "player_score": 0.8659,
+          "mine_score": 0.8624,
+          "best_score": 0.94,
+          "runner_up": 0.8899
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.125
+          ],
+          "player_score": 0.8544,
+          "mine_score": 0.8993,
+          "best_score": 0.9033,
+          "runner_up": 0.902
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.266,
+            85.521
+          ],
+          "player_score": 0.487,
+          "mine_score": 0.7862,
+          "best_score": 0.7862,
+          "runner_up": 0.7051
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.813,
+            88.854
+          ],
+          "player_score": 0.8224,
+          "mine_score": 0.828,
+          "best_score": 0.9198,
+          "runner_up": 0.8845
+        }
+      ]
+    },
+    {
+      "frame": "agency-007.png",
+      "command": [
+        0.0,
+        0.0
+      ],
+      "interval_seconds": 0.14959963399999765,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4526,
+          "mine_score": 0.7296,
+          "best_score": 0.7296,
+          "runner_up": 0.6984
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            65.781,
+            38.646
+          ],
+          "player_score": 0.4889,
+          "mine_score": 0.7884,
+          "best_score": 0.7884,
+          "runner_up": 0.7064
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            47.109,
+            39.583
+          ],
+          "player_score": 0.4857,
+          "mine_score": 0.7849,
+          "best_score": 0.7849,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            51.406,
+            40.312
+          ],
+          "player_score": 0.4872,
+          "mine_score": 0.7869,
+          "best_score": 0.7869,
+          "runner_up": 0.7055
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            56.797,
+            40.938
+          ],
+          "player_score": 0.4851,
+          "mine_score": 0.7867,
+          "best_score": 0.7867,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.094,
+            41.042
+          ],
+          "player_score": 0.4914,
+          "mine_score": 0.7907,
+          "best_score": 0.7907,
+          "runner_up": 0.708
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            65.703,
+            41.458
+          ],
+          "player_score": 0.4877,
+          "mine_score": 0.7874,
+          "best_score": 0.7874,
+          "runner_up": 0.706
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            55.312,
+            48.958
+          ],
+          "player_score": 0.4744,
+          "mine_score": 0.7097,
+          "best_score": 0.7097,
+          "runner_up": 0.6726
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            42.969,
+            47.188
+          ],
+          "player_score": 0.4888,
+          "mine_score": 0.7885,
+          "best_score": 0.7885,
+          "runner_up": 0.7063
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            68.516,
+            50.521
+          ],
+          "player_score": 0.4855,
+          "mine_score": 0.7864,
+          "best_score": 0.7864,
+          "runner_up": 0.7047
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            46.172,
+            53.75
+          ],
+          "player_score": 0.4866,
+          "mine_score": 0.786,
+          "best_score": 0.786,
+          "runner_up": 0.7047
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            76.797,
+            54.688
+          ],
+          "player_score": 0.4854,
+          "mine_score": 0.7842,
+          "best_score": 0.7842,
+          "runner_up": 0.7044
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            54.375,
+            54.792
+          ],
+          "player_score": 0.4884,
+          "mine_score": 0.7871,
+          "best_score": 0.7871,
+          "runner_up": 0.7051
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            74.766,
+            55.625
+          ],
+          "player_score": 0.4872,
+          "mine_score": 0.7862,
+          "best_score": 0.7862,
+          "runner_up": 0.705
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            73.75,
+            56.667
+          ],
+          "player_score": 0.4871,
+          "mine_score": 0.7858,
+          "best_score": 0.7858,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            78.203,
+            58.229
+          ],
+          "player_score": 0.4879,
+          "mine_score": 0.7878,
+          "best_score": 0.7878,
+          "runner_up": 0.706
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            81.562,
+            58.125
+          ],
+          "player_score": 0.4958,
+          "mine_score": 0.7996,
+          "best_score": 0.7996,
+          "runner_up": 0.7142
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            74.141,
+            58.646
+          ],
+          "player_score": 0.4854,
+          "mine_score": 0.7837,
+          "best_score": 0.7837,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            76.094,
+            58.854
+          ],
+          "player_score": 0.4859,
+          "mine_score": 0.7856,
+          "best_score": 0.7856,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            37.266,
+            59.375
+          ],
+          "player_score": 0.4878,
+          "mine_score": 0.7867,
+          "best_score": 0.7867,
+          "runner_up": 0.7053
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            76.641,
+            60.417
+          ],
+          "player_score": 0.4853,
+          "mine_score": 0.7878,
+          "best_score": 0.7878,
+          "runner_up": 0.7057
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            36.641,
+            64.479
+          ],
+          "player_score": 0.4875,
+          "mine_score": 0.7888,
+          "best_score": 0.7888,
+          "runner_up": 0.7068
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            80.234,
+            66.875
+          ],
+          "player_score": 0.4868,
+          "mine_score": 0.7862,
+          "best_score": 0.7862,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            82.578,
+            75.312
+          ],
+          "player_score": 0.5848,
+          "mine_score": 0.6423,
+          "best_score": 0.6872,
+          "runner_up": 0.6708
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            75.703,
+            69.271
+          ],
+          "player_score": 0.4881,
+          "mine_score": 0.7905,
+          "best_score": 0.7905,
+          "runner_up": 0.7078
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            76.719,
+            70.104
+          ],
+          "player_score": 0.4875,
+          "mine_score": 0.786,
+          "best_score": 0.786,
+          "runner_up": 0.7048
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.328,
+            76.042
+          ],
+          "player_score": 0.8253,
+          "mine_score": 0.8317,
+          "best_score": 0.9029,
+          "runner_up": 0.8631
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            55.859,
+            77.292
+          ],
+          "player_score": 0.8691,
+          "mine_score": 0.8015,
+          "best_score": 0.8691,
+          "runner_up": 0.8411
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.333
+          ],
+          "player_score": 0.8628,
+          "mine_score": 0.9014,
+          "best_score": 0.9016,
+          "runner_up": 0.9014
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.328,
+            86.771
+          ],
+          "player_score": 0.8469,
+          "mine_score": 0.866,
+          "best_score": 0.922,
+          "runner_up": 0.8897
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.969,
+            85.417
+          ],
+          "player_score": 0.4882,
+          "mine_score": 0.7881,
+          "best_score": 0.7881,
+          "runner_up": 0.7057
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            17.656,
+            89.375
+          ],
+          "player_score": 0.4943,
+          "mine_score": 0.7954,
+          "best_score": 0.7954,
+          "runner_up": 0.7116
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            97.969,
+            93.646
+          ],
+          "player_score": 0.4859,
+          "mine_score": 0.7844,
+          "best_score": 0.7844,
+          "runner_up": 0.7046
+        }
+      ]
+    },
+    {
+      "frame": "agency-008.png",
+      "command": [
+        1.0,
+        0.0
+      ],
+      "interval_seconds": 0.15028954100000647,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4598,
+          "mine_score": 0.7374,
+          "best_score": 0.7374,
+          "runner_up": 0.6992
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            68.75,
+            37.5
+          ],
+          "player_score": 0.4896,
+          "mine_score": 0.7888,
+          "best_score": 0.7888,
+          "runner_up": 0.7067
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            71.094,
+            37.917
+          ],
+          "player_score": 0.4872,
+          "mine_score": 0.7863,
+          "best_score": 0.7863,
+          "runner_up": 0.7048
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            66.562,
+            40.312
+          ],
+          "player_score": 0.4903,
+          "mine_score": 0.7902,
+          "best_score": 0.7902,
+          "runner_up": 0.7069
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            73.984,
+            39.896
+          ],
+          "player_score": 0.4864,
+          "mine_score": 0.7854,
+          "best_score": 0.7854,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            65.391,
+            40.938
+          ],
+          "player_score": 0.4874,
+          "mine_score": 0.7867,
+          "best_score": 0.7867,
+          "runner_up": 0.7052
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            79.062,
+            54.688
+          ],
+          "player_score": 0.4869,
+          "mine_score": 0.7854,
+          "best_score": 0.7854,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            51.484,
+            56.667
+          ],
+          "player_score": 0.4866,
+          "mine_score": 0.7854,
+          "best_score": 0.7854,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            39.062,
+            58.125
+          ],
+          "player_score": 0.4894,
+          "mine_score": 0.7891,
+          "best_score": 0.7891,
+          "runner_up": 0.7069
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            72.109,
+            60.208
+          ],
+          "player_score": 0.4878,
+          "mine_score": 0.7881,
+          "best_score": 0.7881,
+          "runner_up": 0.7059
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            30.625,
+            68.75
+          ],
+          "player_score": 0.4936,
+          "mine_score": 0.7945,
+          "best_score": 0.7945,
+          "runner_up": 0.7103
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            78.594,
+            71.354
+          ],
+          "player_score": 0.487,
+          "mine_score": 0.7859,
+          "best_score": 0.7859,
+          "runner_up": 0.7048
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            73.828,
+            72.292
+          ],
+          "player_score": 0.4865,
+          "mine_score": 0.7868,
+          "best_score": 0.7868,
+          "runner_up": 0.7051
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.641,
+            76.354
+          ],
+          "player_score": 0.8315,
+          "mine_score": 0.839,
+          "best_score": 0.9239,
+          "runner_up": 0.8865
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            74.531,
+            73.75
+          ],
+          "player_score": 0.4894,
+          "mine_score": 0.7896,
+          "best_score": 0.7896,
+          "runner_up": 0.7074
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            54.531,
+            78.229
+          ],
+          "player_score": 0.8769,
+          "mine_score": 0.8008,
+          "best_score": 0.8769,
+          "runner_up": 0.8397
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            88.672,
+            79.896
+          ],
+          "player_score": 0.4865,
+          "mine_score": 0.7875,
+          "best_score": 0.7875,
+          "runner_up": 0.7057
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            21.797,
+            80.312
+          ],
+          "player_score": 0.4907,
+          "mine_score": 0.7916,
+          "best_score": 0.7916,
+          "runner_up": 0.7077
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            20.625,
+            81.25
+          ],
+          "player_score": 0.4887,
+          "mine_score": 0.7885,
+          "best_score": 0.7885,
+          "runner_up": 0.7064
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.229
+          ],
+          "player_score": 0.8597,
+          "mine_score": 0.9036,
+          "best_score": 0.9046,
+          "runner_up": 0.9036
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.328,
+            87.083
+          ],
+          "player_score": 0.835,
+          "mine_score": 0.8504,
+          "best_score": 0.9118,
+          "runner_up": 0.8851
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            19.141,
+            87.083
+          ],
+          "player_score": 0.4855,
+          "mine_score": 0.7856,
+          "best_score": 0.7856,
+          "runner_up": 0.7046
+        }
+      ]
+    },
+    {
+      "frame": "agency-009.png",
+      "command": [
+        0.0,
+        0.0
+      ],
+      "interval_seconds": 0.14714149199998872,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4569,
+          "mine_score": 0.7305,
+          "best_score": 0.7305,
+          "runner_up": 0.6974
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            67.188,
+            34.896
+          ],
+          "player_score": 0.4911,
+          "mine_score": 0.7909,
+          "best_score": 0.7909,
+          "runner_up": 0.7081
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.734,
+            37.812
+          ],
+          "player_score": 0.4866,
+          "mine_score": 0.7854,
+          "best_score": 0.7854,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            66.953,
+            39.688
+          ],
+          "player_score": 0.4887,
+          "mine_score": 0.7893,
+          "best_score": 0.7893,
+          "runner_up": 0.7066
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            53.75,
+            40.521
+          ],
+          "player_score": 0.4873,
+          "mine_score": 0.7866,
+          "best_score": 0.7866,
+          "runner_up": 0.705
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.187,
+            49.271
+          ],
+          "player_score": 0.6641,
+          "mine_score": 0.7328,
+          "best_score": 0.7328,
+          "runner_up": 0.68
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            54.609,
+            47.604
+          ],
+          "player_score": 0.4828,
+          "mine_score": 0.7854,
+          "best_score": 0.7854,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.859,
+            48.438
+          ],
+          "player_score": 0.4885,
+          "mine_score": 0.7857,
+          "best_score": 0.7857,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            45.469,
+            49.167
+          ],
+          "player_score": 0.488,
+          "mine_score": 0.7875,
+          "best_score": 0.7875,
+          "runner_up": 0.7054
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            55.781,
+            50.417
+          ],
+          "player_score": 0.487,
+          "mine_score": 0.7859,
+          "best_score": 0.7859,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            72.031,
+            51.354
+          ],
+          "player_score": 0.4868,
+          "mine_score": 0.7855,
+          "best_score": 0.7855,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            75.312,
+            52.5
+          ],
+          "player_score": 0.489,
+          "mine_score": 0.7879,
+          "best_score": 0.7879,
+          "runner_up": 0.7055
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            78.594,
+            54.792
+          ],
+          "player_score": 0.4911,
+          "mine_score": 0.7872,
+          "best_score": 0.7872,
+          "runner_up": 0.7053
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            74.531,
+            63.333
+          ],
+          "player_score": 0.487,
+          "mine_score": 0.7865,
+          "best_score": 0.7865,
+          "runner_up": 0.7052
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            75.156,
+            64.896
+          ],
+          "player_score": 0.4872,
+          "mine_score": 0.787,
+          "best_score": 0.787,
+          "runner_up": 0.7059
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            73.594,
+            69.583
+          ],
+          "player_score": 0.4867,
+          "mine_score": 0.7861,
+          "best_score": 0.7861,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            73.828,
+            72.604
+          ],
+          "player_score": 0.4857,
+          "mine_score": 0.7842,
+          "best_score": 0.7842,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.641,
+            76.354
+          ],
+          "player_score": 0.8317,
+          "mine_score": 0.8392,
+          "best_score": 0.9236,
+          "runner_up": 0.8861
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            53.359,
+            79.167
+          ],
+          "player_score": 0.8587,
+          "mine_score": 0.78,
+          "best_score": 0.8587,
+          "runner_up": 0.8347
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            87.031,
+            78.646
+          ],
+          "player_score": 0.4878,
+          "mine_score": 0.7865,
+          "best_score": 0.7865,
+          "runner_up": 0.7051
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.516,
+            83.333
+          ],
+          "player_score": 0.8524,
+          "mine_score": 0.8826,
+          "best_score": 0.8826,
+          "runner_up": 0.8809
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.813,
+            85.0
+          ],
+          "player_score": 0.8106,
+          "mine_score": 0.8151,
+          "best_score": 0.9167,
+          "runner_up": 0.8843
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            91.328,
+            88.021
+          ],
+          "player_score": 0.4869,
+          "mine_score": 0.7863,
+          "best_score": 0.7863,
+          "runner_up": 0.7052
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.891,
+            92.917
+          ],
+          "player_score": 0.8351,
+          "mine_score": 0.8663,
+          "best_score": 0.8873,
+          "runner_up": 0.8822
+        }
+      ]
+    },
+    {
+      "frame": "agency-010.png",
+      "command": [
+        -1.0,
+        0.0
+      ],
+      "interval_seconds": 0.1831225920000037,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4607,
+          "mine_score": 0.729,
+          "best_score": 0.729,
+          "runner_up": 0.6982
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            42.969,
+            35.208
+          ],
+          "player_score": 0.4859,
+          "mine_score": 0.7854,
+          "best_score": 0.7854,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            66.562,
+            39.062
+          ],
+          "player_score": 0.4872,
+          "mine_score": 0.7866,
+          "best_score": 0.7866,
+          "runner_up": 0.7051
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            51.641,
+            41.458
+          ],
+          "player_score": 0.4875,
+          "mine_score": 0.7871,
+          "best_score": 0.7871,
+          "runner_up": 0.7055
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.5,
+            48.854
+          ],
+          "player_score": 0.6805,
+          "mine_score": 0.74,
+          "best_score": 0.74,
+          "runner_up": 0.6851
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.078,
+            46.354
+          ],
+          "player_score": 0.4876,
+          "mine_score": 0.7864,
+          "best_score": 0.7864,
+          "runner_up": 0.705
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            54.062,
+            47.708
+          ],
+          "player_score": 0.4873,
+          "mine_score": 0.7868,
+          "best_score": 0.7868,
+          "runner_up": 0.706
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            57.578,
+            47.812
+          ],
+          "player_score": 0.4863,
+          "mine_score": 0.7851,
+          "best_score": 0.7851,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            35.859,
+            49.688
+          ],
+          "player_score": 0.4864,
+          "mine_score": 0.7867,
+          "best_score": 0.7867,
+          "runner_up": 0.7051
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            54.141,
+            50.208
+          ],
+          "player_score": 0.4851,
+          "mine_score": 0.7868,
+          "best_score": 0.7868,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            28.047,
+            64.375
+          ],
+          "player_score": 0.4909,
+          "mine_score": 0.7915,
+          "best_score": 0.7915,
+          "runner_up": 0.7082
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            63.203,
+            74.688
+          ],
+          "player_score": 0.8343,
+          "mine_score": 0.8471,
+          "best_score": 0.9174,
+          "runner_up": 0.886
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            75.234,
+            71.875
+          ],
+          "player_score": 0.4872,
+          "mine_score": 0.7867,
+          "best_score": 0.7867,
+          "runner_up": 0.7053
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            77.188,
+            75.625
+          ],
+          "player_score": 0.4867,
+          "mine_score": 0.787,
+          "best_score": 0.787,
+          "runner_up": 0.7055
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            51.719,
+            80.625
+          ],
+          "player_score": 0.8502,
+          "mine_score": 0.8324,
+          "best_score": 0.8502,
+          "runner_up": 0.8471
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            86.953,
+            79.062
+          ],
+          "player_score": 0.4847,
+          "mine_score": 0.7834,
+          "best_score": 0.7834,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.333
+          ],
+          "player_score": 0.8602,
+          "mine_score": 0.8971,
+          "best_score": 0.9016,
+          "runner_up": 0.8971
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.891,
+            85.0
+          ],
+          "player_score": 0.8231,
+          "mine_score": 0.8232,
+          "best_score": 0.9207,
+          "runner_up": 0.8853
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            16.406,
+            84.271
+          ],
+          "player_score": 0.4875,
+          "mine_score": 0.7864,
+          "best_score": 0.7864,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            17.5,
+            86.562
+          ],
+          "player_score": 0.4882,
+          "mine_score": 0.7874,
+          "best_score": 0.7874,
+          "runner_up": 0.7058
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.891,
+            93.125
+          ],
+          "player_score": 0.8561,
+          "mine_score": 0.8869,
+          "best_score": 0.8885,
+          "runner_up": 0.8869
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            98.047,
+            93.646
+          ],
+          "player_score": 0.4946,
+          "mine_score": 0.7962,
+          "best_score": 0.7962,
+          "runner_up": 0.7113
+        }
+      ]
+    },
+    {
+      "frame": "agency-011.png",
+      "command": [
+        0.0,
+        0.0
+      ],
+      "interval_seconds": 0.15117909500000337,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.0,
+            50.0
+          ],
+          "player_score": 0.4577,
+          "mine_score": 0.7333,
+          "best_score": 0.7333,
+          "runner_up": 0.6934
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            72.969,
+            39.479
+          ],
+          "player_score": 0.4866,
+          "mine_score": 0.7857,
+          "best_score": 0.7857,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            74.922,
+            46.458
+          ],
+          "player_score": 0.4847,
+          "mine_score": 0.7843,
+          "best_score": 0.7843,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            66.016,
+            46.771
+          ],
+          "player_score": 0.4866,
+          "mine_score": 0.786,
+          "best_score": 0.786,
+          "runner_up": 0.7047
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            76.797,
+            46.562
+          ],
+          "player_score": 0.4864,
+          "mine_score": 0.784,
+          "best_score": 0.784,
+          "runner_up": 0.7045
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            75.625,
+            49.896
+          ],
+          "player_score": 0.4878,
+          "mine_score": 0.7885,
+          "best_score": 0.7885,
+          "runner_up": 0.7053
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            74.297,
+            51.458
+          ],
+          "player_score": 0.4857,
+          "mine_score": 0.7856,
+          "best_score": 0.7856,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            38.75,
+            53.438
+          ],
+          "player_score": 0.4893,
+          "mine_score": 0.7887,
+          "best_score": 0.7887,
+          "runner_up": 0.7066
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            78.125,
+            53.854
+          ],
+          "player_score": 0.4873,
+          "mine_score": 0.7864,
+          "best_score": 0.7864,
+          "runner_up": 0.705
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            75.859,
+            59.479
+          ],
+          "player_score": 0.4879,
+          "mine_score": 0.7874,
+          "best_score": 0.7874,
+          "runner_up": 0.7057
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            77.891,
+            60.0
+          ],
+          "player_score": 0.4877,
+          "mine_score": 0.7895,
+          "best_score": 0.7895,
+          "runner_up": 0.7068
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            74.297,
+            61.979
+          ],
+          "player_score": 0.4851,
+          "mine_score": 0.7847,
+          "best_score": 0.7847,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            77.266,
+            62.083
+          ],
+          "player_score": 0.4862,
+          "mine_score": 0.7851,
+          "best_score": 0.7851,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            83.281,
+            63.438
+          ],
+          "player_score": 0.4876,
+          "mine_score": 0.7865,
+          "best_score": 0.7865,
+          "runner_up": 0.7054
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            75.469,
+            65.0
+          ],
+          "player_score": 0.4884,
+          "mine_score": 0.7883,
+          "best_score": 0.7883,
+          "runner_up": 0.7056
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            79.844,
+            65.104
+          ],
+          "player_score": 0.4891,
+          "mine_score": 0.7885,
+          "best_score": 0.7885,
+          "runner_up": 0.7065
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            85.234,
+            65.312
+          ],
+          "player_score": 0.4902,
+          "mine_score": 0.7899,
+          "best_score": 0.7899,
+          "runner_up": 0.7075
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            82.578,
+            66.875
+          ],
+          "player_score": 0.4852,
+          "mine_score": 0.7852,
+          "best_score": 0.7852,
+          "runner_up": 0.7046
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            21.25,
+            67.188
+          ],
+          "player_score": 0.4884,
+          "mine_score": 0.7887,
+          "best_score": 0.7887,
+          "runner_up": 0.7063
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            80.469,
+            67.708
+          ],
+          "player_score": 0.4898,
+          "mine_score": 0.7893,
+          "best_score": 0.7893,
+          "runner_up": 0.7071
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            81.016,
+            73.854
+          ],
+          "player_score": 0.7256,
+          "mine_score": 0.7061,
+          "best_score": 0.7703,
+          "runner_up": 0.7537
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            63.203,
+            74.688
+          ],
+          "player_score": 0.8344,
+          "mine_score": 0.8468,
+          "best_score": 0.9172,
+          "runner_up": 0.8851
+        },
+        {
+          "kind": "player",
+          "center": [
+            50.0,
+            81.875
+          ],
+          "player_score": 0.8748,
+          "mine_score": 0.7952,
+          "best_score": 0.8748,
+          "runner_up": 0.8345
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.594,
+            83.229
+          ],
+          "player_score": 0.8471,
+          "mine_score": 0.8775,
+          "best_score": 0.8843,
+          "runner_up": 0.8775
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            62.813,
+            85.0
+          ],
+          "player_score": 0.8127,
+          "mine_score": 0.8181,
+          "best_score": 0.9177,
+          "runner_up": 0.8832
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            94.141,
+            82.5
+          ],
+          "player_score": 0.4894,
+          "mine_score": 0.7912,
+          "best_score": 0.7912,
+          "runner_up": 0.7078
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            14.688,
+            83.229
+          ],
+          "player_score": 0.4888,
+          "mine_score": 0.7894,
+          "best_score": 0.7894,
+          "runner_up": 0.7072
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            16.25,
+            82.604
+          ],
+          "player_score": 0.4865,
+          "mine_score": 0.7853,
+          "best_score": 0.7853,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            2.969,
+            86.458
+          ],
+          "player_score": 0.4868,
+          "mine_score": 0.7862,
+          "best_score": 0.7862,
+          "runner_up": 0.7049
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            12.891,
+            93.229
+          ],
+          "player_score": 0.8604,
+          "mine_score": 0.8829,
+          "best_score": 0.8922,
+          "runner_up": 0.8829
+        }
+      ]
+    }
+  ]
+}

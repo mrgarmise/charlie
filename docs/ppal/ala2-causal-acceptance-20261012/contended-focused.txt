@@ -1,0 +1,41 @@
+......................F..............................................    [100%]
+=================================== FAILURES ===================================
+__________ test_normal_executive_continues_unrelated_work_and_restart __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_normal_executive_continue0')
+
+    def test_normal_executive_continues_unrelated_work_and_restart(tmp_path):
+        root=experience(tmp_path);saved(root,payload(None));state=tmp_path/'state'
+        process=startup(state,[root],authorize=False,turns=8)
+>       assert process.returncode==0,process.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/workspace/scratch/3d45fa74ce8b/charlie/main.py", line 98, in <module>
+E             main()
+E           File "/workspace/scratch/3d45fa74ce8b/charlie/main.py", line 42, in main
+E             run(args.learning_state,roots,**kwargs)
+E           File "/workspace/scratch/3d45fa74ce8b/charlie/learning/lifecycle.py", line 617, in run
+E             lifecycle.turn()
+E           File "/workspace/scratch/3d45fa74ce8b/charlie/learning/lifecycle.py", line 581, in turn
+E             try:return self.executive.develop(self)
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/3d45fa74ce8b/charlie/memory/learning_projects.py", line 870, in develop
+E             report = investigate(lifecycle.dataset,lifecycle.gateway,executive=self,
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/3d45fa74ce8b/charlie/learning/cycle.py", line 308, in investigate
+E             result=registry.invoke(project['method'],resources={'RGB-examples','verified-labels','three-independent-groups','model-evaluation','context-evidence','meditation-evidence'},
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/3d45fa74ce8b/charlie/learning/capabilities.py", line 35, in invoke
+E             return execute(**inputs)
+E                    ^^^^^^^^^^^^^^^^^
+E           File "/workspace/scratch/3d45fa74ce8b/charlie/learning/diagnostics.py", line 99, in execute
+E             if gameplay_active(): raise RuntimeError('offline diagnostic unavailable during gameplay')
+E                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         RuntimeError: offline diagnostic unavailable during gameplay
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/workspace/scratch/3d45fa74ce8b/charlie/../ala-env/bin/python', 'main.py', '--offline', '--lea...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: offline diagnostic unavailable during gameplay\n').returncode
+
+tests/test_preserved_meditation_recovery.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_preserved_meditation_recovery.py::test_normal_executive_continues_unrelated_work_and_restart
+1 failed, 68 passed in 16.35s

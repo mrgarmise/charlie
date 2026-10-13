@@ -1,0 +1,106 @@
+{
+  "schema": "charlie-tactical-benchmark-v1",
+  "environment": {
+    "machine": "x86_64",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "revision": "c97e4978aa0b91335a94ab5e5531273e9d2cd8a8",
+    "dirty_worktree": true
+  },
+  "provenance": "controlled software WorldStates; repeated original failed-start pixels for storage cost only",
+  "baseline": {
+    "wall_seconds": 0.07463868200011348,
+    "cpu_seconds": 0.074635017,
+    "process_cpu_percent": 99.99508967734255,
+    "system_core_busy_percent": {
+      "cpu": 11.764705882352942,
+      "cpu0": 0.0,
+      "cpu1": 0.0,
+      "cpu2": 0.0,
+      "cpu3": 0.0,
+      "cpu4": 0.0,
+      "cpu5": 0.0,
+      "cpu6": 0.0,
+      "cpu7": 100.0,
+      "cpu8": 0.0
+    },
+    "peak_process_rss_kib": 15616,
+    "result": {
+      "latency": {
+        "samples": 10000,
+        "median_ns": 4418.0,
+        "p95_ns": 4939,
+        "p99_ns": 14247,
+        "max_ns": 239037
+      },
+      "qualified_response_windows": 0,
+      "tactical_revisions": 0,
+      "independently_qualified_findings": 0,
+      "controller_commands": 0
+    }
+  },
+  "tactical": {
+    "wall_seconds": 0.6876109330000872,
+    "cpu_seconds": 0.6875932140000001,
+    "process_cpu_percent": 99.99742310669642,
+    "system_core_busy_percent": {
+      "cpu": 11.003236245954692,
+      "cpu0": 0.0,
+      "cpu1": 0.0,
+      "cpu2": 0.0,
+      "cpu3": 0.0,
+      "cpu4": 0.0,
+      "cpu5": 0.0,
+      "cpu6": 0.0,
+      "cpu7": 100.0,
+      "cpu8": 0.0
+    },
+    "peak_process_rss_kib": 15616,
+    "result": {
+      "latency": {
+        "samples": 10000,
+        "median_ns": 54702.0,
+        "p95_ns": 104315,
+        "p99_ns": 263212,
+        "max_ns": 2024097
+      },
+      "qualified_response_windows": 9999,
+      "tactical_revisions": 56,
+      "independently_qualified_findings": 0,
+      "controller_commands": 0
+    }
+  },
+  "recording": {
+    "wall_seconds": 1.8204070629999478,
+    "cpu_seconds": 1.8201274239999998,
+    "process_cpu_percent": 99.98463865551658,
+    "system_core_busy_percent": {
+      "cpu": 11.843711843711844,
+      "cpu0": 0.0,
+      "cpu1": 0.0,
+      "cpu2": 0.546448087431694,
+      "cpu3": 0.0,
+      "cpu4": 2.7472527472527473,
+      "cpu5": 3.8043478260869565,
+      "cpu6": 0.0,
+      "cpu7": 4.891304347826087,
+      "cpu8": 96.17486338797814
+    },
+    "peak_process_rss_kib": 27672,
+    "result": {
+      "latency": {
+        "samples": 20,
+        "median_ns": 85198460.0,
+        "p95_ns": 101752217,
+        "p99_ns": 101752217,
+        "max_ns": 110750496
+      },
+      "source_sha256": "60a53ec71812431a4edb5e8a5524da104a66f7e8a16ccca62362572ff173c2bb",
+      "retained_frames": 20,
+      "restart_next_index": 21,
+      "original_unchanged": true,
+      "independent_experiences": 0
+    }
+  },
+  "limitations": "System core counters include unrelated load; RSS is cumulative process high water. No Pi, physical gameplay, causal or score qualification implied."
+}

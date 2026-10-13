@@ -1,0 +1,11 @@
+[Unit]
+Description=Deliver Charlie's queued memories to MARM
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=60s
+Persistent=true
+Unit=charlie-memory-sync.service
+
+[Install]
+WantedBy=timers.target

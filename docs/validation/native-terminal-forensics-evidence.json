@@ -1,0 +1,539 @@
+{
+  "schema": "native-terminal-forensics-evidence-v1",
+  "archive_sha256": "5e95637c06ace5faa826d97a22b38c6d6e2aa8b9f84b7d23ebdd050f5076f33f",
+  "baseline_commit": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+  "capture_id": "capture:4b5feb18af64c2d54065b4dc45b005205dfdd3b6f043e2ba6892034e0b97f0b6",
+  "source_report_sha256": "6da3e3ad73aa0b877674961c4ebbd8342524e1fe7f2511efc345487c9ed98268",
+  "original_result": "OBSERVATION UNCERTAIN",
+  "original_episode_end": {
+    "state": "unknown",
+    "confirmed": false,
+    "evidence": null
+  },
+  "post_start_observations": 65,
+  "baseline_phase_counts": {
+    "gameplay": 62,
+    "terminal": 0,
+    "unknown": 3
+  },
+  "first_terminal_at": 15840.790938,
+  "original_recovery_deadline": 15842.713142799,
+  "start_authorized": false,
+  "physical_authorization": false,
+  "qualification": "Read-only replay of one original episode; no new native acceptance or independent learning evidence",
+  "selected_comparisons": [
+    {
+      "observation_id": "68220a0f642cce91040ba13341dd1fdd3da57e008a87f9377e5d419dbbc379a9",
+      "source_path": "observations/camera-000120.png",
+      "source_sha256": "37f21189d71b155d7e2b08ff70a167dc789a86d69050a953999589494c122877",
+      "capture_timestamp": 15817.299727000001,
+      "baseline": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.1842,
+        "hue_concentration": 0.9308,
+        "occupied_hue_bins": 3,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1621,
+          "heroes": 0.1464,
+          "all-time": 0.1934
+        },
+        "geometric_border_support": [
+          0.918,
+          1.0,
+          0.9311,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 24
+      },
+      "repaired": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.1842,
+        "hue_concentration": 0.9308,
+        "occupied_hue_bins": 3,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1621,
+          "heroes": 0.1464,
+          "all-time": 0.1934
+        },
+        "geometric_border_support": [
+          0.918,
+          1.0,
+          0.9311,
+          1.0
+        ],
+        "phase": "gameplay",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.16485074162483215,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": false,
+          "similarity": 0.2033759206533432,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "interior_regions": 24,
+        "capture_timestamp": 15817.299727000001
+      }
+    },
+    {
+      "observation_id": "2466ac10a9a5b71414464d625be816220c3602298b789b902bbc279538a1f47f",
+      "source_path": "observations/camera-000145.png",
+      "source_sha256": "96f57e38bb2e1dba66e2419774600f7e28a43631d4d5ed44ab220e0b2176a38e",
+      "capture_timestamp": 15835.044159000001,
+      "baseline": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.1802,
+        "hue_concentration": 0.9885,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1644,
+          "heroes": 0.1557,
+          "all-time": 0.1995
+        },
+        "geometric_border_support": [
+          0.9361,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 17
+      },
+      "repaired": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.1802,
+        "hue_concentration": 0.9885,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1644,
+          "heroes": 0.1557,
+          "all-time": 0.1995
+        },
+        "geometric_border_support": [
+          0.9361,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.16651904582977295,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": false,
+          "similarity": 0.2140234410762787,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "interior_regions": 17,
+        "capture_timestamp": 15835.044159000001
+      }
+    },
+    {
+      "observation_id": "d7440b970474caa5bbb1e54e8981492712b5534323b844a08319f8dcb953abf7",
+      "source_path": "observations/camera-000151.png",
+      "source_sha256": "86d696c1364692bd44cca5da3812a0bc0cdb3748dc8bd13be5df434b9aa26b24",
+      "capture_timestamp": 15838.724114,
+      "baseline": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.1812,
+        "hue_concentration": 0.9922,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1512,
+          "heroes": 0.1264,
+          "all-time": 0.1986
+        },
+        "geometric_border_support": [
+          0.9426,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 17
+      },
+      "repaired": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.1812,
+        "hue_concentration": 0.9922,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1512,
+          "heroes": 0.1264,
+          "all-time": 0.1986
+        },
+        "geometric_border_support": [
+          0.9426,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.16154325008392334,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": false,
+          "similarity": 0.20684808492660522,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "interior_regions": 17,
+        "capture_timestamp": 15838.724114
+      }
+    },
+    {
+      "observation_id": "af860e7f36ac3d115a7989ca2d23b0ffb74a9a7da74a87901dda26efea2cddd3",
+      "source_path": "observations/camera-000152.png",
+      "source_sha256": "5c617091d2ebd84d07301b14373ade4c0ab4591921117a48239a976ce7a4b3c9",
+      "capture_timestamp": 15839.329036000001,
+      "baseline": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.1807,
+        "hue_concentration": 0.9908,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1512,
+          "heroes": 0.1254,
+          "all-time": 0.4016
+        },
+        "geometric_border_support": [
+          0.9377,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 18
+      },
+      "repaired": {
+        "state": "not_gameplay",
+        "reason": "recorded_game_over_message",
+        "coverage": 0.1807,
+        "hue_concentration": 0.9908,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1512,
+          "heroes": 0.1254,
+          "all-time": 0.4016
+        },
+        "geometric_border_support": [
+          0.9377,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "terminal",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.17902927100658417,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": true,
+          "similarity": 0.9905754923820496,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "capture_timestamp": 15839.329036000001
+      }
+    },
+    {
+      "observation_id": "8adeb336a602bcce2de25db64f56738d42344a6b71363b5f3d2642932ed12cc2",
+      "source_path": "observations/camera-000153.png",
+      "source_sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+      "capture_timestamp": 15840.236423,
+      "baseline": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.1825,
+        "hue_concentration": 0.9898,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1533,
+          "heroes": 0.1272,
+          "all-time": 0.4011
+        },
+        "geometric_border_support": [
+          0.9311,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 17
+      },
+      "repaired": {
+        "state": "not_gameplay",
+        "reason": "recorded_game_over_message",
+        "coverage": 0.1825,
+        "hue_concentration": 0.9898,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1533,
+          "heroes": 0.1272,
+          "all-time": 0.4011
+        },
+        "geometric_border_support": [
+          0.9311,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "terminal",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.1793789267539978,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": true,
+          "similarity": 0.9999996423721313,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "capture_timestamp": 15840.236423
+      }
+    },
+    {
+      "observation_id": "ed381fa6df5ef5d7910c6a2d24623989e1214aa769dddaf3df8f4eefcb318529",
+      "source_path": "observations/camera-000154.png",
+      "source_sha256": "d48b45ffacc1094eb21cea284013c0f3d3863f293796190e05b88c2dd158602c",
+      "capture_timestamp": 15840.790938,
+      "baseline": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.1829,
+        "hue_concentration": 0.9905,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1523,
+          "heroes": 0.1272,
+          "all-time": 0.401
+        },
+        "geometric_border_support": [
+          0.9361,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "interior_regions": 17
+      },
+      "repaired": {
+        "state": "not_gameplay",
+        "reason": "recorded_game_over_message",
+        "coverage": 0.1829,
+        "hue_concentration": 0.9905,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.1523,
+          "heroes": 0.1272,
+          "all-time": 0.401
+        },
+        "geometric_border_support": [
+          0.9361,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "terminal",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.17957329750061035,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": true,
+          "similarity": 0.993277370929718,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "capture_timestamp": 15840.790938
+      }
+    },
+    {
+      "observation_id": "3c512326c992ef19b7851e850b03da2409f5a7d89458378083a431ee86da64f0",
+      "source_path": "observations/camera-000155.png",
+      "source_sha256": "022cb65df536261caf797fd9fae1876b114fc121c91130e07bd52121041a7418",
+      "capture_timestamp": 15841.345452000001,
+      "baseline": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.1432,
+        "hue_concentration": 0.9987,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.3992,
+          "heroes": 0.3546,
+          "all-time": 0.3252
+        },
+        "geometric_border_support": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase": "unknown",
+        "interior_regions": 427
+      },
+      "repaired": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.1432,
+        "hue_concentration": 0.9987,
+        "occupied_hue_bins": 2,
+        "border_state": "gameplay",
+        "label_scores": {
+          "pregame": 0.3992,
+          "heroes": 0.3546,
+          "all-time": 0.3252
+        },
+        "geometric_border_support": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "phase": "unknown",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.09035125374794006,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": false,
+          "similarity": 0.3059355914592743,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "interior_regions": 427,
+        "capture_timestamp": 15841.345452000001
+      }
+    },
+    {
+      "observation_id": "d2ee5eac54cfd72b8b3764bfa39339d6c17caa5e751517303d4638d4539a4afa",
+      "source_path": "observations/camera-000156.png",
+      "source_sha256": "44f67e5f1e807a57b70a14c04117f9af170ed8baf5455e0b77cf164acc940f57",
+      "capture_timestamp": 15842.000785,
+      "baseline": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.0137,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.2431,
+          "heroes": 0.2031,
+          "all-time": 0.0276
+        },
+        "geometric_border_support": [
+          0.4525,
+          0.2443,
+          0.7956,
+          0.7267
+        ],
+        "phase": "unknown",
+        "interior_regions": 453
+      },
+      "repaired": {
+        "state": "unknown",
+        "reason": "insufficient_screen_phase_evidence",
+        "coverage": 0.0137,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.2431,
+          "heroes": 0.2031,
+          "all-time": 0.0276
+        },
+        "geometric_border_support": [
+          0.4525,
+          0.2443,
+          0.7956,
+          0.7267
+        ],
+        "phase": "unknown",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.1070142537355423,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": false,
+          "similarity": 0.025549249723553658,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "interior_regions": 453,
+        "capture_timestamp": 15842.000785
+      }
+    }
+  ]
+}

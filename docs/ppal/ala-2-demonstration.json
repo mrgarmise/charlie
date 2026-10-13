@@ -1,0 +1,203 @@
+{
+  "schema": "ala-2-real-evidence-investigation-v1",
+  "baseline": "4d86d4d",
+  "original_learning_records_unchanged": 44,
+  "new_physical_games": 0,
+  "elapsed_host_seconds": 0.05095383799971387,
+  "restart_new_experiments": 0,
+  "results": [
+    {
+      "project_id": "539e3d5e9e7d4156d0bc3d2b8ab34279b666c0eb02694cec9957ad856532ffb9",
+      "predicate": "improving_at_budget",
+      "source_evidence": [
+        "392d1f3672874dfa3f73d312eae94b00e1d5436299f5c57140e3ca9455f39d99"
+      ],
+      "prediction_id": "66e41f2c8de6ed8cefcb6ee945a50e7605f0b990b203a5e7d0fe23f3c0649594",
+      "competing_explanations": [
+        {
+          "explanation": "A fitting/generalization gap may contribute",
+          "predicate": "validation_exceeds_training"
+        },
+        {
+          "explanation": "Optimization may still be progressing at the resource boundary",
+          "predicate": "improving_at_budget"
+        }
+      ],
+      "reason": "Existing Evaluator priority; retrieve discriminating evidence before expensive new fitting",
+      "evaluator_alternatives": [
+        {
+          "memory_id": "8198a0e3458a4a0919715ad1c569dfed199f53021773d04bde02fe0014de7bbb",
+          "evaluator_priority": 0.65,
+          "rank": [
+            1
+          ]
+        }
+      ],
+      "portfolio_selection": "generic value/uncertainty minus cost/risk policy",
+      "resolution": "supported",
+      "resolution_id": "0d8a476aed74191cf0a872708059c1eb0d032b86039c315908c1f258218488b7",
+      "measurements": {
+        "best_epoch": 59,
+        "epochs_observed": 59,
+        "evaluation_id": "392d1f3672874dfa3f73d312eae94b00e1d5436299f5c57140e3ca9455f39d99",
+        "historical_test_reused": false,
+        "improving_at_budget": true,
+        "validation_exceeds_training": false
+      },
+      "followup": {
+        "evidence_id": "7b0d98eccd87f11d616886eb19d935ea1c3f9a7db657c9093c5c855eefaa74e0",
+        "question": "Would a bounded continuation improve validation performance, and would that improvement survive a new independent final evaluation?",
+        "operational_change": null
+      }
+    },
+    {
+      "project_id": "232edf4d7ce4053f36d80e89181378ea3e53cd5687dd5038fdd887046c0da3ba",
+      "predicate": "validation_exceeds_training",
+      "source_evidence": [
+        "392d1f3672874dfa3f73d312eae94b00e1d5436299f5c57140e3ca9455f39d99"
+      ],
+      "prediction_id": "2750a9bb470f49a28618adcc049cc0a21e770c1404ec5dac4d7b8e194feb66b3",
+      "competing_explanations": [
+        {
+          "explanation": "A fitting/generalization gap may contribute",
+          "predicate": "validation_exceeds_training"
+        },
+        {
+          "explanation": "Optimization may still be progressing at the resource boundary",
+          "predicate": "improving_at_budget"
+        }
+      ],
+      "reason": "Existing Evaluator priority; retrieve discriminating evidence before expensive new fitting",
+      "evaluator_alternatives": [
+        {
+          "memory_id": "fd79a8e8227a854b7fc4ac4421dcfb22b5a8b5e6a860acf74e5a5d8dd1644aca",
+          "evaluator_priority": 0.7666666666666666,
+          "rank": [
+            1
+          ]
+        }
+      ],
+      "portfolio_selection": "generic value/uncertainty minus cost/risk policy",
+      "resolution": "contradicted",
+      "resolution_id": "71b7c27403b8ffd5756226fa60370b8e252ae1d417b78cacade986735f512381",
+      "measurements": {
+        "best_epoch": 59,
+        "epochs_observed": 59,
+        "evaluation_id": "392d1f3672874dfa3f73d312eae94b00e1d5436299f5c57140e3ca9455f39d99",
+        "historical_test_reused": false,
+        "improving_at_budget": true,
+        "validation_exceeds_training": false
+      },
+      "followup": {
+        "evidence_id": "61480860dce2b93f48e51fee11d486b8d045b5996180dfe2439b2e66fa50a225",
+        "question": "Which alternative measurement or independent intervention could distinguish the remaining model-failure explanations?",
+        "operational_change": null
+      }
+    },
+    {
+      "project_id": "800cdae11b8da136b6ae828932fbbc459f9d4b85df43737e74bb3df13c7eebfd",
+      "predicate": "recurrent_context_gap",
+      "source_evidence": [
+        "6d7419b291426a2a6965a003e469d5c900d6efab65c2e8e7050a94f447bc9eea",
+        "341b88027e92451f230eabaf4442d2465b13bdd022fd2f6bd397612911bf1d6b",
+        "7ba289cdb495442624c36ed6fc460114074fab61a145a4bbac3fa2a60e2ddffb",
+        "431df858b2b8bb46e613810d6b3d791ea25df3bd777fbf372beaa7fbbd95df16"
+      ],
+      "prediction_id": "568c0d5ffdc3a15649695347b38c2f9ef32a3c6d482b87219742857134a8d01c",
+      "competing_explanations": [
+        {
+          "explanation": "The unresolved question may recur in independent experience",
+          "predicate": "recurrent_context_gap"
+        },
+        {
+          "explanation": "The recorded gap may be confined to one source episode",
+          "predicate": "isolated_context_gap"
+        }
+      ],
+      "reason": "Existing Evaluator priority; retrieve discriminating evidence before expensive new fitting",
+      "evaluator_alternatives": [
+        {
+          "memory_id": "ecf5a491a4ae9892080d3ecc13fdf6852b2fa168d8f6ac4327d531bd3e162267",
+          "evaluator_priority": 0.65,
+          "rank": [
+            1
+          ]
+        }
+      ],
+      "portfolio_selection": "generic value/uncertainty minus cost/risk policy",
+      "resolution": "supported",
+      "resolution_id": "0a39e6eeb15154b67b0a97d191d99d23559f8763b2449340cf5a1c481d109108",
+      "measurements": {
+        "distinct_source_episodes": 4,
+        "finding": "recurrence of reported questions, not verification of the proposed cause",
+        "isolated_context_gap": false,
+        "matching_references": [
+          "6d7419b291426a2a6965a003e469d5c900d6efab65c2e8e7050a94f447bc9eea",
+          "341b88027e92451f230eabaf4442d2465b13bdd022fd2f6bd397612911bf1d6b",
+          "7ba289cdb495442624c36ed6fc460114074fab61a145a4bbac3fa2a60e2ddffb",
+          "431df858b2b8bb46e613810d6b3d791ea25df3bd777fbf372beaa7fbbd95df16"
+        ],
+        "recurrent_context_gap": true
+      },
+      "followup": {
+        "evidence_id": "3faa47f768bc845c25b74782ddb79db8ff9dfa3d4ff543bb14a451c1bca56335",
+        "question": "Which independently observed conditions distinguish the recurring episode_boundary question?",
+        "operational_change": null
+      }
+    },
+    {
+      "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "predicate": "recurrent_context_gap",
+      "source_evidence": [
+        "6d7419b291426a2a6965a003e469d5c900d6efab65c2e8e7050a94f447bc9eea",
+        "341b88027e92451f230eabaf4442d2465b13bdd022fd2f6bd397612911bf1d6b",
+        "7ba289cdb495442624c36ed6fc460114074fab61a145a4bbac3fa2a60e2ddffb",
+        "431df858b2b8bb46e613810d6b3d791ea25df3bd777fbf372beaa7fbbd95df16"
+      ],
+      "prediction_id": "c4478e13c95f74e2a19a0420c0a87e11168681272bd1be0889bff88ff04245c8",
+      "competing_explanations": [
+        {
+          "explanation": "The unresolved question may recur in independent experience",
+          "predicate": "recurrent_context_gap"
+        },
+        {
+          "explanation": "The recorded gap may be confined to one source episode",
+          "predicate": "isolated_context_gap"
+        }
+      ],
+      "reason": "Existing Evaluator priority; retrieve discriminating evidence before expensive new fitting",
+      "evaluator_alternatives": [
+        {
+          "memory_id": "7c092c451dfa55ba54f48f5d808671ee0240cacb207ed8fe742f13e031758ec3",
+          "evaluator_priority": 0.7666666666666666,
+          "rank": [
+            1
+          ]
+        }
+      ],
+      "portfolio_selection": "generic value/uncertainty minus cost/risk policy",
+      "resolution": "supported",
+      "resolution_id": "5d9a4833cdd2179d4e2ba939ae1aee8ec8c854352491ea053a23b73f2fad7fa0",
+      "measurements": {
+        "distinct_source_episodes": 4,
+        "finding": "recurrence of reported questions, not verification of the proposed cause",
+        "isolated_context_gap": false,
+        "matching_references": [
+          "6d7419b291426a2a6965a003e469d5c900d6efab65c2e8e7050a94f447bc9eea",
+          "341b88027e92451f230eabaf4442d2465b13bdd022fd2f6bd397612911bf1d6b",
+          "7ba289cdb495442624c36ed6fc460114074fab61a145a4bbac3fa2a60e2ddffb",
+          "431df858b2b8bb46e613810d6b3d791ea25df3bd777fbf372beaa7fbbd95df16"
+        ],
+        "recurrent_context_gap": true
+      },
+      "followup": {
+        "evidence_id": "0e593bd8b65f2e1fe3dad7f0c8953e7ee6847fe26e8715fa8686bdd8ed9c067a",
+        "question": "Which independently observed conditions distinguish the recurring self_uncertainty question?",
+        "operational_change": null
+      }
+    }
+  ],
+  "capability_improvement": "not demonstrated",
+  "robotron_score_improvement": "not demonstrated",
+  "production_deployment": null
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="18" time="4.892" timestamp="2026-10-05T19:26:33.258172-04:00" hostname="c6264b05f99b"><testcase classname="tests.test_developmental_continuity" name="test_real_owner_advances_same_commission_across_restart" time="1.490" /><testcase classname="tests.test_developmental_continuity" name="test_history_cannot_be_lost_or_recommitted[lost]" time="0.072" /><testcase classname="tests.test_developmental_continuity" name="test_history_cannot_be_lost_or_recommitted[reordered]" time="0.070" /><testcase classname="tests.test_developmental_continuity" name="test_history_cannot_be_lost_or_recommitted[recommitted]" time="0.072" /><testcase classname="tests.test_developmental_continuity" name="test_duplicate_causal_work_is_rejected[reflection_commission]" time="0.070" /><testcase classname="tests.test_developmental_continuity" name="test_duplicate_causal_work_is_rejected[learning_context_reference]" time="0.070" /><testcase classname="tests.test_developmental_continuity" name="test_duplicate_causal_work_is_rejected[normal_meditation_yield]" time="0.072" /><testcase classname="tests.test_developmental_continuity" name="test_duplicate_causal_work_is_rejected[resolution]" time="0.070"><failure message="StopIteration">advancing = (PosixPath('/tmp/pytest-of-root/pytest-0/test_duplicate_causal_work_is_3/state'), PosixPath('/tmp/pytest-of-root/pytes...d82ed667b20cbdb720f7daf6c8e9d0639ea81fb30cfe9db6fae8f43663ac5c', 'next_direction': 'Resume retained work', ...}}, ...})
+category = 'resolution'
+
+    @pytest.mark.parametrize('category',['reflection_commission','learning_context_reference','normal_meditation_yield','resolution'])
+    def test_duplicate_causal_work_is_rejected(advancing,category):
+        _,_,before,after=advancing;after=deepcopy(after)
+&gt;       document=next(json.loads(r['document']) for r in after['original_records']
+            if json.loads(r['document'])['payload'].get('category')==category or json.loads(r['document'])['kind']==category)
+E       StopIteration
+
+tests/test_developmental_continuity.py:69: StopIteration</failure></testcase><testcase classname="tests.test_developmental_continuity" name="test_checkpoint_reset_or_identity_loss_fails[cursor]" time="0.070" /><testcase classname="tests.test_developmental_continuity" name="test_checkpoint_reset_or_identity_loss_fails[commission]" time="0.069" /><testcase classname="tests.test_developmental_continuity" name="test_checkpoint_reset_or_identity_loss_fails[missing]" time="0.070" /><testcase classname="tests.test_developmental_continuity" name="test_checkpoint_reset_or_identity_loss_fails[integrity]" time="0.070" /><testcase classname="tests.test_developmental_continuity" name="test_checkpoint_reset_or_identity_loss_fails[history]" time="0.070" /><testcase classname="tests.test_developmental_continuity" name="test_arbitrary_timestamped_pseudo_evidence_is_not_continuation" time="0.069" /><testcase classname="tests.test_developmental_continuity" name="test_runnable_work_cannot_be_hidden_as_waiting" time="0.068" /><testcase classname="tests.test_developmental_continuity" name="test_nonprogress_becomes_durable_block_and_status_churn_is_not_progress" time="0.334" /><testcase classname="tests.test_developmental_continuity" name="test_completed_findings_continue_to_candidate_evaluation_under_normal_owner" time="1.758"><failure message="learning.continuity.ContinuityError: unclassified restart evidence requires review: ModelFoundry/motion_final_consultation">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_completed_findings_contin0')
+
+    def test_completed_findings_continue_to_candidate_evaluation_under_normal_owner(tmp_path):
+        root=experience(tmp_path);state=tmp_path/'state'
+        assert startup(state,[root],authorize=False).returncode==0
+        before=inspect(state);delivered_corpus(tmp_path,state)
+        assert startup(state,[root],authorize=True).returncode==0
+&gt;       after=inspect(state);report=compare_restart(before,after)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_developmental_continuity.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/continuity.py:162: in compare_restart
+    require(allowed,'unclassified restart evidence requires review: '+producer+'/'+str(category or op or d['kind']))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+reason = 'unclassified restart evidence requires review: ModelFoundry/motion_final_consultation'
+
+    def require(condition, reason):
+&gt;       if not condition:raise ContinuityError(reason)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       learning.continuity.ContinuityError: unclassified restart evidence requires review: ModelFoundry/motion_final_consultation
+
+learning/continuity.py:18: ContinuityError</failure></testcase><testcase classname="tests.test_developmental_continuity" name="test_offline_acceptance_rejects_authority_escalation" time="0.073" /></testsuite></testsuites>

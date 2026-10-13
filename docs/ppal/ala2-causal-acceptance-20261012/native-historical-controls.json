@@ -1,0 +1,659 @@
+{
+  "schema": "ala2-causal-audit-v1",
+  "source_journal_sha256": "85ed732eeb42a4363d2c3764758ea80132734334bc359fa70eeb982945b08b44",
+  "source_records": 823,
+  "project_ids": [
+    "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+    "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+    "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252",
+    "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+    "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+    "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+    "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+    "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+    "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+    "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf"
+  ],
+  "source_content_digest": "b5cdf4ddd9dd8c05a3d1eaf9b330fa705d21e3f860d482e0f75785243c0abbd5",
+  "source_unchanged": true,
+  "controls": [
+    {
+      "selection_id": "951cadd17e49ed0dc1713f45a8f6f8e9615253209cfe0f23fa2a598175c5ec77",
+      "sequence": 11,
+      "observed_historical_choice": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+      "environment": {
+        "methods": [
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "meditation-motion"
+        ],
+        "resources": [
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+      "ablated_choice": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+      "choice_changed": false,
+      "priority_changes": [],
+      "context_digest": "efef31b31d01a64890a5eca8588fbd6004f93c1cb70ca925f050dc76fedfe8eb",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "dae54e8003921c08e693b8c33349209f1dbe5f4c194285ee9301b395c6082232",
+      "sequence": 22,
+      "observed_historical_choice": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+      "environment": {
+        "methods": [
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "meditation-motion"
+        ],
+        "resources": [
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+      "ablated_choice": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+      "choice_changed": false,
+      "priority_changes": [],
+      "context_digest": "47565c3c2c7e92f108fd2ad589a87444b79976e1fe6d9c496df7f99bc7fb2f80",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "93fc4644c42784139129addd876775965d9a0806378e894c7e46ff58bde46cb7",
+      "sequence": 400,
+      "observed_historical_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "RGB-examples",
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot",
+          "torch"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "ablated_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "choice_changed": false,
+      "priority_changes": [],
+      "context_digest": "f0571f5dc376d8b985df76391a7ab61de23a3c44e1d54585c7061d3ce86e4006",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "7cbfbeaf7e142056fbedefe5b804871aa10a9cd2122498bece1707044b7d0f56",
+      "sequence": 466,
+      "observed_historical_choice": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "RGB-examples",
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot",
+          "torch"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "ablated_choice": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4aac760d56c577968e0c222b2fad31edc30fa467e98af92ae5f412df1b2dcaba",
+                "33c25faf0ca401b83bb74c8878ccd2cbacec3b2909f40b87dfc0ff410f03d77c"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "85c4e225738c5815d25d60666e6f044d4a8fecdf3332305d93a60e97d94fc2ff",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "af45ce80b2af3b2a6b18eef758f1c371f84885f265c28d45a02ff01ab0d3d2b9",
+      "sequence": 482,
+      "observed_historical_choice": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "RGB-examples",
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot",
+          "torch"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "ablated_choice": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "6e416f1ff3d952468c5331e99ba7be1a207941ca48012f4437ba214f83544e98",
+                "e6cb6274f74fa16765aaf644744f049dc3b78742749c968f4a621f605bb979eb"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4aac760d56c577968e0c222b2fad31edc30fa467e98af92ae5f412df1b2dcaba",
+                "33c25faf0ca401b83bb74c8878ccd2cbacec3b2909f40b87dfc0ff410f03d77c"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "27e3bd72e9a6351248aa356ec2f3fb3c13e10844ef96576bce81f47427bb4aa3",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "2a334d392d3c72d2ecc6aaacd52994f295b6feaad8c6ac57a12ba72a308ed880",
+      "sequence": 517,
+      "observed_historical_choice": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "RGB-examples",
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot",
+          "torch"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+      "ablated_choice": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "6e416f1ff3d952468c5331e99ba7be1a207941ca48012f4437ba214f83544e98",
+                "e6cb6274f74fa16765aaf644744f049dc3b78742749c968f4a621f605bb979eb"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4aac760d56c577968e0c222b2fad31edc30fa467e98af92ae5f412df1b2dcaba",
+                "33c25faf0ca401b83bb74c8878ccd2cbacec3b2909f40b87dfc0ff410f03d77c"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "57a5e07c68695696a60b557939bc8454904d4ceda43a2154da67d846943896e6",
+                "d30370ba75c98d9e6efd5caa5b8248a1d586af2d2430872aea424abf0cd7ff4c"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "de95fe7b431f967bea950ad3ad3456457e7546e38f315b62a01d8a2da8e337d7",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "2c16ad6621db679a0fd634c47d8f73825cd9430f07fc04ae7ab8fae6815438d8",
+      "sequence": 672,
+      "observed_historical_choice": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "RGB-examples",
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot",
+          "torch"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "ablated_choice": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "6e416f1ff3d952468c5331e99ba7be1a207941ca48012f4437ba214f83544e98",
+                "e6cb6274f74fa16765aaf644744f049dc3b78742749c968f4a621f605bb979eb"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4aac760d56c577968e0c222b2fad31edc30fa467e98af92ae5f412df1b2dcaba",
+                "33c25faf0ca401b83bb74c8878ccd2cbacec3b2909f40b87dfc0ff410f03d77c"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "57a5e07c68695696a60b557939bc8454904d4ceda43a2154da67d846943896e6",
+                "d30370ba75c98d9e6efd5caa5b8248a1d586af2d2430872aea424abf0cd7ff4c"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "aadc0fb6d24f7fa50f6d5d1dc158ee8f162202a6ddd599717a359a670d50ba04",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "61285308b649e84750782e9615a24866c7834be537e2b14c5de461f11c081ead",
+      "sequence": 694,
+      "observed_historical_choice": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "RGB-examples",
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot",
+          "torch"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "ablated_choice": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "6e416f1ff3d952468c5331e99ba7be1a207941ca48012f4437ba214f83544e98",
+                "e6cb6274f74fa16765aaf644744f049dc3b78742749c968f4a621f605bb979eb"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4aac760d56c577968e0c222b2fad31edc30fa467e98af92ae5f412df1b2dcaba",
+                "33c25faf0ca401b83bb74c8878ccd2cbacec3b2909f40b87dfc0ff410f03d77c"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "db9b42f6941952f207f8d419251fd9af444bc96b8fc4fa0732a17f2df1abe2e7",
+                "960e3aedcee31858d6971c483d183e658fc1a213146ffa39c8ed5494abd8da7c"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "57a5e07c68695696a60b557939bc8454904d4ceda43a2154da67d846943896e6",
+                "d30370ba75c98d9e6efd5caa5b8248a1d586af2d2430872aea424abf0cd7ff4c"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "3f62d447489e82f32d9d53ce8fe6e73396850e290245a625e96dce73bb9c9ea2",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "fbdce9273a0435053b793cdda72a554ee9a9d276050beeb8113ed5c55fd31521",
+      "sequence": 710,
+      "observed_historical_choice": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "RGB-examples",
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot",
+          "torch"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "ablated_choice": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "6e416f1ff3d952468c5331e99ba7be1a207941ca48012f4437ba214f83544e98",
+                "e6cb6274f74fa16765aaf644744f049dc3b78742749c968f4a621f605bb979eb"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "938039fb7ff20c7e103b99fe7a71ace04c7f592661c88979a17cc2bc3e3e6653",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "416c6d5470d30eef7909a3e04c377c188c98eb3c34015873c4d851a4e548b828",
+                "a5da3d0b2050fd8c114dbaa4d6afbf21258210d68b48a663ca030ff55c86e14f"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4aac760d56c577968e0c222b2fad31edc30fa467e98af92ae5f412df1b2dcaba",
+                "33c25faf0ca401b83bb74c8878ccd2cbacec3b2909f40b87dfc0ff410f03d77c"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "db9b42f6941952f207f8d419251fd9af444bc96b8fc4fa0732a17f2df1abe2e7",
+                "960e3aedcee31858d6971c483d183e658fc1a213146ffa39c8ed5494abd8da7c"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "57a5e07c68695696a60b557939bc8454904d4ceda43a2154da67d846943896e6",
+                "d30370ba75c98d9e6efd5caa5b8248a1d586af2d2430872aea424abf0cd7ff4c"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "c9a75a3f48c455118f24ca74edd5d3d0bc7468400df19f11eec130df0d2141e3",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    }
+  ],
+  "matching_eligibility_controls": 9,
+  "priority_influence_controls": 6,
+  "changed_choice_controls": 0,
+  "retained_activation_records": [],
+  "gates": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  },
+  "limitations": [
+    "Hash integrity does not certify authentic observations or measurement independence",
+    "Priority ablation does not remove outcome-dependent lifecycle/hold or Evaluator feedback",
+    "Archived choice may differ from current runtime; no historical equivalence inferred",
+    "P1 requires authentic transitions, retained learning update, reload and comparable PPAL decisions",
+    "I1 requires independent qualification, separate authority, downstream influence and rollback",
+    "This report cannot activate, commission, supply observations or close acceptance gates"
+  ],
+  "physical_authorization": false,
+  "runtime_revision": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+  "runtime_dirty": true,
+  "selection_runtime_sha256": "c6e131979ef345750c54caccba3352662b815bc41ab627deb22f2eeac761da22"
+}

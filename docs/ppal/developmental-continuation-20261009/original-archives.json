@@ -1,0 +1,26 @@
+{
+  "archives": [
+    {
+      "name": "charlie-game-20261004.tar.gz",
+      "library_id": "libfile_681e7f7956d481919c52689209afd4dc",
+      "sha256": "6c5ee17f6d9aa968c326fbbc51b51de20797517f3415b91fadf7696ca2a3d36e"
+    },
+    {
+      "name": "development-20261002-003511.tar.gz",
+      "library_id": "libfile_a36b3a693af881919dab1ebc9fb711a3",
+      "sha256": "0ec32e4ab56c9fe2a4f73c31fc0822d48e816e94965f64c36bf137cb06a831ec"
+    },
+    {
+      "name": "development-20261002-005944.tar.gz",
+      "library_id": "libfile_5df6d2e40c1c81918b642fd7c264d4f6",
+      "sha256": "68ba09254926ee13d7cbc7813d82f52f139e79f8279505f3f888fddab9d49137"
+    },
+    {
+      "name": "development-20261002-012801.tar.gz",
+      "library_id": "libfile_1ead58a8a1708191a75d14a8d4c9e72d",
+      "sha256": "43059f380110ea979fe7a570bd04f1ee512f5d429ca82091078c9102b1fb325f"
+    }
+  ],
+  "qualification": "Original preserved captures; transfer is not independent new experience",
+  "physical_authorization": false
+}

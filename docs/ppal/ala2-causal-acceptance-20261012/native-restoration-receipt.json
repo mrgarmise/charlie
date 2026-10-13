@@ -1,0 +1,63 @@
+{
+  "source_export_sha256": "be2754892cdf86af401eae8db37833985e79566906ed59c6e126b5ed292fcc0d",
+  "source_section": "AFTER RESTART + SECOND 12 TURNS",
+  "records": 823,
+  "exact_artifacts": [
+    {
+      "path": "../native-inspection-restored/meditations/04f4a1c62c4646e56493454de0072e98e380b415554108a77e10cabd53eafcfd/checkpoint.json",
+      "sha256": "611a5c02c162fb51aaa791020429b6aa52991bf48c4bbfed11ee816a6716622f"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01/checkpoint.json",
+      "sha256": "7ae51f511a6f643ce7c1a42f28f0287c4930a356b3fd93045fe5573762a06915"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/3e017cbdcf6e81fc0a1cb17904074e320fd2d0dd7ffa4a8fdba4efd44d7d1ea3/checkpoint.json",
+      "sha256": "d8da8da56fcf0c795b08511f500be05e0cf9a732b72a60b0a32ad3a79f985800"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/4b12283ea4a1e5b0e2c59a31b9a59db69b384661b95aafc6040ab46ec9e6c212/checkpoint.json",
+      "sha256": "147e710ddc845dbc27c6958a8819efbff03d80a2f1662fbcd7b59168af58b9d1"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/7ecc8949293ee480b1685ad6f78606cd18a464d22389bae4a4b6507355cafdc5/checkpoint.json",
+      "sha256": "9267fa2d05f1241f9ae5d841eab799e168c2bf2487a4ca1f9f377f5e957b0285"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/d7ba0af50f9fa1301efb05534236296c63884abdd3722f36be32731e5d00393c/checkpoint.json",
+      "sha256": "8bb8fb73541f1b37fbaff96602ed08aae2faa3081fc2d5bc17a78d623c828624"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/e8e1028f0c6cda025f86f96ea3bed0527c3c087ddf1cce8e5a6aeef2fed1e722/checkpoint.json",
+      "sha256": "68b5e5a03d209485a11e8dd07af6296c6d34b8fcd76126c198f0eb5489654005"
+    }
+  ],
+  "missing": [
+    {
+      "path": "../native-inspection-restored/meditations/04f4a1c62c4646e56493454de0072e98e380b415554108a77e10cabd53eafcfd/result.json",
+      "expected_sha256": "fac234e816a169a6dad70d6e67ced4197938fc5e05e039014c5a0d88fff88ba8"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/d7ba0af50f9fa1301efb05534236296c63884abdd3722f36be32731e5d00393c/result.json",
+      "expected_sha256": "1264d65cc76931ebcac66abb770e1173a2164b22246db6a13c62342387ef7ea9"
+    },
+    {
+      "path": "/home/five/.local/share/charlie/development/meditations/3e017cbdcf6e81fc0a1cb17904074e320fd2d0dd7ffa4a8fdba4efd44d7d1ea3/result.json",
+      "expected_sha256": "93ca031c7b6f93736c18c788b57b995822d4a54fc8b34c1009d27a3e55e14cd1"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/e8e1028f0c6cda025f86f96ea3bed0527c3c087ddf1cce8e5a6aeef2fed1e722/result.json",
+      "expected_sha256": "870dbb20a87b917f6817d19c69298fdb52dd07e5cd7360fb3a1a64f37277a75a"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/4b12283ea4a1e5b0e2c59a31b9a59db69b384661b95aafc6040ab46ec9e6c212/result.json",
+      "expected_sha256": "6381bf6c88c1e6bbf395ad9d8928b9206ce576abdbe02c94fe52f0ee2e47c2c4"
+    },
+    {
+      "path": "../native-inspection-restored/meditations/7ecc8949293ee480b1685ad6f78606cd18a464d22389bae4a4b6507355cafdc5/result.json",
+      "expected_sha256": "3e67064b0f68ae00b5ff63650204c3a78e6aeb5ee9e12e12760698729a514829"
+    }
+  ],
+  "original_evaluator": "not supplied; never substituted",
+  "new_physical_experience": false
+}

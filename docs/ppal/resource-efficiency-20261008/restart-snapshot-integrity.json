@@ -1,0 +1,10 @@
+{
+  "perf-m2-before.json": {
+    "sha256": "bd96e95028acc16c71095794f5c8880b2384eeefc5f2127ed5d14a1471f943ad",
+    "bytes": 20063603
+  },
+  "perf-m2-after.json": {
+    "sha256": "f20beaa60a691f5fa023f397dfbf4cf4608272b0e022659c5b4e4dd2b7cf28cc",
+    "bytes": 20064375
+  }
+}

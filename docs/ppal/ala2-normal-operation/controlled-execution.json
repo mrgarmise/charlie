@@ -1,0 +1,636 @@
+{
+  "simulation": true,
+  "fixture": "tests/test_normal_learning_lifecycle.py",
+  "manual_intermediate_commands": false,
+  "normal_startup": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "main.py",
+    "--offline",
+    "--learning-state",
+    "/workspace/scratch/c81a2d35e2bc/controlled-acceptance/state",
+    "--learning-turns",
+    "8",
+    "--learning-interval",
+    ".05",
+    "--learning-budget",
+    "10",
+    "--episode-root",
+    "/workspace/scratch/c81a2d35e2bc/controlled-acceptance/episodes/controlled-game",
+    "--allow-offline-improvements"
+  ],
+  "records": 92,
+  "restart_records": 92,
+  "trace": {
+    "retrospective_ingestion": [
+      {
+        "id": "f8e6ef029c257f912c96fdbfa42b666f24ca83d2f4c6b39f8f02155407852337",
+        "producer": "existing-evidence-consolidation",
+        "payload": {
+          "category": "retrospective_ingestion",
+          "context_id": "1a4c100a3628987d4b9020183193bf0c8e876d0f29664ac8d3b9ce381823e3fe",
+          "inventory_digest": "21412f4989d89bc2d29d0eca2bd24d4435166e41aad88fbddf33fafa5f7f3292",
+          "meditation_id": null,
+          "physical_episode": "episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3",
+          "preserved_bytes_unchanged": true,
+          "prior_use": "diagnostic",
+          "source_episode": "episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3"
+        }
+      }
+    ],
+    "reflection_commission": [
+      {
+        "id": "bec26800d28cb5bd9642575c6d7fd1b92e7b8005e5987e2a3a959135c9393803",
+        "producer": "LearningExecutive",
+        "payload": {
+          "category": "reflection_commission",
+          "context_id": "1a4c100a3628987d4b9020183193bf0c8e876d0f29664ac8d3b9ce381823e3fe",
+          "physical_authorization": false,
+          "reason": "New preserved experience warrants bounded retrospective reflection"
+        }
+      }
+    ],
+    "normal_meditation_result": [
+      {
+        "id": "b9d5fc724bfcbd3240c6af2c3ea010c3d7f5653bdb4e55b95326f409c9d1a05e",
+        "producer": "Reflection",
+        "payload": {
+          "category": "normal_meditation_result",
+          "context_id": "1a4c100a3628987d4b9020183193bf0c8e876d0f29664ac8d3b9ce381823e3fe",
+          "result_path": "/workspace/scratch/c81a2d35e2bc/controlled-acceptance/state/meditations/1a4c100a3628987d4b9020183193bf0c8e876d0f29664ac8d3b9ce381823e3fe/result.json",
+          "result_sha256": "cf3b61674d6a8466c3be3b990ee438b1626aa0d969b08b8ad995029571861b5c",
+          "source_episode": "episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3",
+          "status": "completed"
+        }
+      }
+    ],
+    "perceptual_experiment_proposal": [
+      {
+        "id": "b2ec68ec2f30bfa49f26515736c731c61f66546ddb00725a5546ef7d4c35b4c1",
+        "producer": "Reflection",
+        "payload": {
+          "category": "perceptual_experiment_proposal",
+          "proposal": {
+            "alternatives": [
+              {
+                "explanation": "The unresolved question may recur in independent experience",
+                "predicate": "recurrent_context_gap"
+              },
+              {
+                "explanation": "The recorded gap may be confined to one source episode",
+                "predicate": "isolated_context_gap"
+              }
+            ],
+            "dataset_id": "eab01fb120c5985011008652b0bdb5a50811b0b10c287e05995b7035aceb3138",
+            "evidence_groups": [
+              "episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3"
+            ],
+            "expected": "recurrent_context_gap is observed",
+            "independence_unit": "eab01fb120c5985011008652b0bdb5a50811b0b10c287e05995b7035aceb3138",
+            "method": "evidence-review",
+            "predicate": "recurrent_context_gap",
+            "question_category": "death_observability",
+            "rank": [
+              1
+            ],
+            "scope": {
+              "predicate": "recurrent_context_gap",
+              "question_category": "death_observability"
+            },
+            "source_evidence": [
+              "1a4c100a3628987d4b9020183193bf0c8e876d0f29664ac8d3b9ce381823e3fe"
+            ]
+          }
+        }
+      },
+      {
+        "id": "4d6f930c64fc771beacf1b4a52e589147082f79a99e982326a3f4ae9f39f05a8",
+        "producer": "Reflection",
+        "payload": {
+          "category": "perceptual_experiment_proposal",
+          "proposal": {
+            "alternatives": [
+              {
+                "explanation": "The unresolved question may recur in independent experience",
+                "predicate": "recurrent_context_gap"
+              },
+              {
+                "explanation": "The recorded gap may be confined to one source episode",
+                "predicate": "isolated_context_gap"
+              }
+            ],
+            "dataset_id": "eab01fb120c5985011008652b0bdb5a50811b0b10c287e05995b7035aceb3138",
+            "evidence_groups": [
+              "episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3"
+            ],
+            "expected": "recurrent_context_gap is observed",
+            "independence_unit": "eab01fb120c5985011008652b0bdb5a50811b0b10c287e05995b7035aceb3138",
+            "method": "evidence-review",
+            "predicate": "recurrent_context_gap",
+            "question_category": "score_attribution",
+            "rank": [
+              1
+            ],
+            "scope": {
+              "predicate": "recurrent_context_gap",
+              "question_category": "score_attribution"
+            },
+            "source_evidence": [
+              "1a4c100a3628987d4b9020183193bf0c8e876d0f29664ac8d3b9ce381823e3fe"
+            ]
+          }
+        }
+      },
+      {
+        "id": "79bef6c6f001bcd117ec20d2ae492435de9c32244871d80ced378be10f34cde8",
+        "producer": "Reflection",
+        "payload": {
+          "category": "perceptual_experiment_proposal",
+          "proposal": {
+            "alternatives": [
+              {
+                "explanation": "Preserved captures may support the frozen motion-evaluation horizon",
+                "predicate": "capture_horizon_supported"
+              },
+              {
+                "explanation": "Capture spacing or provenance may require new observations"
+              }
+            ],
+            "dataset_id": "a8a088cea0e07ee94208dc1d5f84d816dbb76fb97242a4a1871ebb8bfc94b4e5",
+            "evidence_groups": [
+              "episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3"
+            ],
+            "expected": "Preserved captures support the frozen motion-evaluation horizon",
+            "independence_unit": "2591947c290ef6ab16b8383d48f84ff4ce0237c4a290e906ed8c57d196a5d535",
+            "method": "evidence-review",
+            "predicate": "capture_horizon_supported",
+            "question_category": "motion_evidence_availability",
+            "rank": [
+              1
+            ],
+            "scope": {
+              "predicate": "capture_horizon_supported",
+              "question_category": "motion_evidence_availability"
+            },
+            "source_evidence": [
+              "81d6bb8da11360d9ffca3ad15231ea526fb2116d686a0752e5dce615a031ae07"
+            ]
+          }
+        }
+      },
+      {
+        "id": "3e850e130a0082eea1bfb18686a5a55a1aa4493b9b3672058aebdd49a2c98f6a",
+        "producer": "Reflection",
+        "payload": {
+          "category": "perceptual_experiment_proposal",
+          "proposal": {
+            "alternatives": [
+              {
+                "explanation": "Temporal estimates may fail across gaps"
+              },
+              {
+                "explanation": "Retrospective associations may be wrong"
+              }
+            ],
+            "dataset_id": "760b626f6c8324babdd6685c0344df46d92ecb1b2fff7095b72411abdc08f9f8",
+            "evidence_groups": [
+              "episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3"
+            ],
+            "expected": "An independently qualified temporal candidate improves held-out motion error",
+            "independence_unit": "episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3",
+            "method": "meditation-motion",
+            "predicate": "independent_motion_improvement",
+            "question": "Can temporal estimation improve without promoting uncertain track links?",
+            "rank": [
+              1
+            ],
+            "scope": {
+              "corpus_id": "760b626f6c8324babdd6685c0344df46d92ecb1b2fff7095b72411abdc08f9f8",
+              "meditation_id": "dc5b75749643b7aa47ba4c7188835c17717168a4bac61e91397fa029ad64f22b"
+            },
+            "source_evidence": [
+              "dc5b75749643b7aa47ba4c7188835c17717168a4bac61e91397fa029ad64f22b"
+            ]
+          }
+        }
+      }
+    ],
+    "meditation_candidate_evaluation": [
+      {
+        "id": "a0cdefef5536e1bb0a22e1b842bee5f85193a92cf69fd8940256168f4266ffe5",
+        "producer": "ModelFoundry",
+        "payload": {
+          "category": "meditation_candidate_evaluation",
+          "ee_episode": "autonomous-learning-v1",
+          "prediction_id": "93f866fbc5a424fb40938694addbe4b0b9b881b12bc6d34f7a2620223d893bee",
+          "result": {
+            "baseline_preserved": true,
+            "candidates": [
+              {
+                "checkpoint": "/workspace/scratch/c81a2d35e2bc/controlled-acceptance/state/models/93f866fbc5a424fb40938694addbe4b0b9b881b12bc6d34f7a2620223d893bee/ef69ee06b3bc91ac789790160a717299b0b9783dfc52089ed524eb59b9143da6.json",
+                "checkpoint_sha256": "8de707093fe770a4aa2306478fb9d6e6c3dab87f5d07ee89aefc652b3651a7de",
+                "identifier": "ef69ee06b3bc91ac789790160a717299b0b9783dfc52089ed524eb59b9143da6",
+                "originator": "Reflection",
+                "source_evidence": [
+                  "dc5b75749643b7aa47ba4c7188835c17717168a4bac61e91397fa029ad64f22b"
+                ],
+                "spec": {
+                  "adapter": "meditation-motion-v1",
+                  "horizon_seconds": 0.15,
+                  "max_speed": 100.0,
+                  "velocity_alpha": 0.35
+                }
+              },
+              {
+                "checkpoint": "/workspace/scratch/c81a2d35e2bc/controlled-acceptance/state/models/93f866fbc5a424fb40938694addbe4b0b9b881b12bc6d34f7a2620223d893bee/fd7745e08480f35c09c405142b9e914622eaaec98ea8810d90fe50348096f451.json",
+                "checkpoint_sha256": "e479616930c0db271f756361ef453423decf2217063d97a35aafc2fa98531239",
+                "identifier": "fd7745e08480f35c09c405142b9e914622eaaec98ea8810d90fe50348096f451",
+                "originator": "Reflection",
+                "source_evidence": [
+                  "dc5b75749643b7aa47ba4c7188835c17717168a4bac61e91397fa029ad64f22b"
+                ],
+                "spec": {
+                  "adapter": "meditation-motion-v1",
+                  "horizon_seconds": 0.15,
+                  "max_speed": 100.0,
+                  "velocity_alpha": 0.65
+                }
+              },
+              {
+                "checkpoint": "/workspace/scratch/c81a2d35e2bc/controlled-acceptance/state/models/93f866fbc5a424fb40938694addbe4b0b9b881b12bc6d34f7a2620223d893bee/80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a.json",
+                "checkpoint_sha256": "e4a9fa75a07b1bcafc7865074480a7ec76eb63c83651ad6381df9be3ae18964c",
+                "identifier": "80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a",
+                "originator": "Reflection",
+                "source_evidence": [
+                  "dc5b75749643b7aa47ba4c7188835c17717168a4bac61e91397fa029ad64f22b"
+                ],
+                "spec": {
+                  "adapter": "meditation-motion-v1",
+                  "horizon_seconds": 0.15,
+                  "max_speed": 100.0,
+                  "velocity_alpha": 0.85
+                }
+              }
+            ],
+            "deployment_proposal": "54f3d51d74f900d0090e2ddb74913d0e8c5e43b019f649eea3b78d0252d46687",
+            "metrics": {
+              "baseline": 1.0,
+              "candidate": 0.0,
+              "fresh_final_evidence": true,
+              "improved": true,
+              "independence_groups": [
+                "episode:a4571684890a77cbc37727acd184720d0ae112504bf11bfe9ced1f2480ff0c30",
+                "episode:b3963c7384dc072fabc855e68d65f55a619a3cb286d39805f430c3872b7ebf16",
+                "episode:ec293f28b875b61ce6cb4ebf6a9928511e292e4d9b952ae42b364364fcdcb9ac"
+              ],
+              "per_episode": [
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ],
+                [
+                  0.0,
+                  1.0
+                ]
+              ],
+              "qualified_observations": 18,
+              "score_improvement": "UNKNOWN",
+              "selected_by": "validation only",
+              "validation_scores": [
+                {
+                  "baseline": 1.0,
+                  "candidate": 0.0,
+                  "independence_groups": [
+                    "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484"
+                  ],
+                  "per_episode": [
+                    [
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "qualified_observations": 6
+                },
+                {
+                  "baseline": 1.0,
+                  "candidate": 0.0,
+                  "independence_groups": [
+                    "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484"
+                  ],
+                  "per_episode": [
+                    [
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "qualified_observations": 6
+                },
+                {
+                  "baseline": 1.0,
+                  "candidate": 0.0,
+                  "independence_groups": [
+                    "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484"
+                  ],
+                  "per_episode": [
+                    [
+                      0.0,
+                      1.0
+                    ]
+                  ],
+                  "qualified_observations": 6
+                }
+              ]
+            },
+            "operational_proposal": null,
+            "reason": "Independent held-out motion comparison; physical score utility remains UNKNOWN",
+            "result": "supported",
+            "selected_candidate": {
+              "checkpoint": "/workspace/scratch/c81a2d35e2bc/controlled-acceptance/state/models/93f866fbc5a424fb40938694addbe4b0b9b881b12bc6d34f7a2620223d893bee/80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a.json",
+              "checkpoint_sha256": "e4a9fa75a07b1bcafc7865074480a7ec76eb63c83651ad6381df9be3ae18964c",
+              "dataset_digest": "760b626f6c8324babdd6685c0344df46d92ecb1b2fff7095b72411abdc08f9f8",
+              "identifier": "80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a",
+              "originator": "Reflection",
+              "source_evidence": [
+                "dc5b75749643b7aa47ba4c7188835c17717168a4bac61e91397fa029ad64f22b"
+              ],
+              "spec": {
+                "adapter": "meditation-motion-v1",
+                "horizon_seconds": 0.15,
+                "max_speed": 100.0,
+                "velocity_alpha": 0.85
+              }
+            }
+          }
+        }
+      }
+    ],
+    "motion_operational_shadow": [
+      {
+        "id": "1d5ba12efbd472042775cea6d8dbdd17f2424bb4b5bea26a4bebbde826a8c65a",
+        "producer": "controlled-motion-adapter",
+        "payload": {
+          "candidate_id": "80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a",
+          "category": "motion_operational_shadow",
+          "checkpoint_sha256": "e4a9fa75a07b1bcafc7865074480a7ec76eb63c83651ad6381df9be3ae18964c",
+          "controller_writes": 0,
+          "limitation": "executable compatibility only; no physical readiness or score utility",
+          "passed": true,
+          "proposal_id": "54f3d51d74f900d0090e2ddb74913d0e8c5e43b019f649eea3b78d0252d46687",
+          "steps": 5
+        }
+      }
+    ],
+    "capability_activation": [
+      {
+        "id": "2115e36566f4a0c8b5347a112a5a3ff3b6b2c2292d83eb466e9e49c5162bf4f2",
+        "producer": "authorized-capability-deployment",
+        "payload": {
+          "activation_key": "1410249fc524af7cb92b5a65dc3676fde48a168caea59fa78c8983514a3ffe2a",
+          "authorization": {
+            "execution": "offline",
+            "proposal_id": "54f3d51d74f900d0090e2ddb74913d0e8c5e43b019f649eea3b78d0252d46687",
+            "source": "normal application startup: explicit offline-improvement authorization",
+            "target": "offline-shadow"
+          },
+          "candidate": {
+            "checkpoint": "/workspace/scratch/c81a2d35e2bc/controlled-acceptance/state/models/93f866fbc5a424fb40938694addbe4b0b9b881b12bc6d34f7a2620223d893bee/80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a.json",
+            "checkpoint_sha256": "e4a9fa75a07b1bcafc7865074480a7ec76eb63c83651ad6381df9be3ae18964c",
+            "dataset_digest": "760b626f6c8324babdd6685c0344df46d92ecb1b2fff7095b72411abdc08f9f8",
+            "identifier": "80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a",
+            "originator": "Reflection",
+            "source_evidence": [
+              "dc5b75749643b7aa47ba4c7188835c17717168a4bac61e91397fa029ad64f22b"
+            ],
+            "spec": {
+              "adapter": "meditation-motion-v1",
+              "horizon_seconds": 0.15,
+              "max_speed": 100.0,
+              "velocity_alpha": 0.85
+            }
+          },
+          "candidate_id": "80c2b0ef8279fca4220dd263a9093e1cdccf395901781ba1596a5d54ff529e2a",
+          "category": "capability_activation",
+          "contract": null,
+          "evidence_scope": "autonomous-learning-v1:boot-e0ce1ede-c76a-4a77-aa0d-b8f451fb543b",
+          "physical_readiness": null,
+          "previous_activation": null,
+          "proposal_id": "54f3d51d74f900d0090e2ddb74913d0e8c5e43b019f649eea3b78d0252d46687",
+          "shadow_id": "1d5ba12efbd472042775cea6d8dbdd17f2424bb4b5bea26a4bebbde826a8c65a",
+          "target": "offline-shadow"
+        }
+      }
+    ],
+    "offline_operational_outcome": [
+      {
+        "id": "bd5745316162d5a51c8d33a1d589fd8c9383403eba91c158deda6af8da497701",
+        "producer": "existing-planner-offline-outcome",
+        "payload": {
+          "activation_key": "1410249fc524af7cb92b5a65dc3676fde48a168caea59fa78c8983514a3ffe2a",
+          "category": "offline_operational_outcome",
+          "changed_decisions": 1,
+          "controller_writes": 0,
+          "decisions": [
+            {
+              "action": {
+                "fire": "NONE",
+                "move": "E",
+                "reason": "approach target"
+              },
+              "artifact_sha256": "0c86ee841ef41df14e806958f67aa87ebfe92ab21b40acf1bf08832717206e16",
+              "baseline_action": {
+                "fire": "NONE",
+                "move": "E",
+                "reason": "approach target"
+              },
+              "baseline_intent": {
+                "destination": {
+                  "x": 24,
+                  "y": 20
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "intent": {
+                "destination": {
+                  "x": 24.0,
+                  "y": 20.0
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "source_episode": "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484",
+              "timestamp": 0.0
+            },
+            {
+              "action": {
+                "fire": "NONE",
+                "move": "STAY",
+                "reason": "approach target"
+              },
+              "artifact_sha256": "f4dc2355421c1817ffd0557d5a0e26cdf330b65ef822b4d8837629b5c9ce655d",
+              "baseline_action": {
+                "fire": "NONE",
+                "move": "STAY",
+                "reason": "approach target"
+              },
+              "baseline_intent": {
+                "destination": {
+                  "x": 23,
+                  "y": 20
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "intent": {
+                "destination": {
+                  "x": 22.0,
+                  "y": 20.0
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "source_episode": "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484",
+              "timestamp": 0.15
+            },
+            {
+              "action": {
+                "fire": "NONE",
+                "move": "STAY",
+                "reason": "approach target"
+              },
+              "artifact_sha256": "9729d82e2d5b6dae03352914b80d71ee5f66514a2ab2e2eebfa2db8bf2c4b0ed",
+              "baseline_action": {
+                "fire": "NONE",
+                "move": "STAY",
+                "reason": "approach target"
+              },
+              "baseline_intent": {
+                "destination": {
+                  "x": 22,
+                  "y": 20
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "intent": {
+                "destination": {
+                  "x": 21.0,
+                  "y": 20.0
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "source_episode": "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484",
+              "timestamp": 0.3
+            },
+            {
+              "action": {
+                "fire": "NONE",
+                "move": "W",
+                "reason": "approach target"
+              },
+              "artifact_sha256": "1685f18646143f65e7fada661224a70a1791c49c16cf66ad36211f73ebbb38b2",
+              "baseline_action": {
+                "fire": "NONE",
+                "move": "STAY",
+                "reason": "approach target"
+              },
+              "baseline_intent": {
+                "destination": {
+                  "x": 21,
+                  "y": 20
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "intent": {
+                "destination": {
+                  "x": 20.0,
+                  "y": 20.0
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "source_episode": "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484",
+              "timestamp": 0.44999999999999996
+            },
+            {
+              "action": {
+                "fire": "NONE",
+                "move": "W",
+                "reason": "approach target"
+              },
+              "artifact_sha256": "8f5866adf234901df84135a5689d29025d98a418c64dbebecfca60471dcc1ec1",
+              "baseline_action": {
+                "fire": "NONE",
+                "move": "W",
+                "reason": "approach target"
+              },
+              "baseline_intent": {
+                "destination": {
+                  "x": 20,
+                  "y": 20
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "intent": {
+                "destination": {
+                  "x": 19.0,
+                  "y": 20.0
+                },
+                "kind": "approach",
+                "target_id": "human"
+              },
+              "source_episode": "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484",
+              "timestamp": 0.6
+            }
+          ],
+          "evidence_use": "reused validation diagnostic",
+          "metrics": {
+            "baseline": 1.0,
+            "candidate": 0.0,
+            "independence_groups": [
+              "episode:12491c9972778471a1193af54b0b0a839521c831cae997e207e077c054897484"
+            ],
+            "per_episode": [
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            "qualified_observations": 6
+          },
+          "physical_score_improvement": "UNKNOWN",
+          "prediction_id": "93f866fbc5a424fb40938694addbe4b0b9b881b12bc6d34f7a2620223d893bee",
+          "proposal_id": "54f3d51d74f900d0090e2ddb74913d0e8c5e43b019f649eea3b78d0252d46687"
+        }
+      }
+    ]
+  },
+  "executive_feedback": [
+    {
+      "id": "43427b404167a63abdb4e2cfaf6046498a4c8b8572e0d83978904154b4239661",
+      "payload": {
+        "next_direction": "Seek fresh task-outcome evidence; offline temporal accuracy does not establish score utility",
+        "op": "operational_feedback",
+        "outcome_id": "bd5745316162d5a51c8d33a1d589fd8c9383403eba91c158deda6af8da497701",
+        "physical_authorization": false,
+        "project_id": "945360eed7ca4cb5b9479070c7509f4c1f4e5fa1b6ed61369a90094ec58eeb6d"
+      }
+    }
+  ],
+  "physical_authorization": false,
+  "physical_performance": "not tested",
+  "code_sha256": {
+    "main.py": "cfa2d28c37caa9f537459c4118601b1a3e5f19d2d379f45f62a3fbc35856fd94",
+    "learning/lifecycle.py": "e6f04cf1925a8846be5e7e0eda92ccf6ccac830675661a9531d43f835b8280be",
+    "memory/learning_projects.py": "17415450aca62b409a331c865c53fe7493cd6b6f5486a83ed67d2d63abc5686a",
+    "learning/cycle.py": "647979e44f577079bb89069e79eb9e18b22b3a9d24d3a435a22a443040ef825f",
+    "learning/meditation.py": "cfc371a38e1baf74c8e76edc930807e7c420a6f4fccd3d522ceac70222156b6b",
+    "tests/test_normal_learning_lifecycle.py": "d18ae3eee13cd8f63801dfb95e619e3ec40af2e35b13594938b242964877d40f"
+  }
+}

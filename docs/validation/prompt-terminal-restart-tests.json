@@ -1,0 +1,138 @@
+{
+  "schema": "charlie-prompt-terminal-validation-v1",
+  "recorded_at": "2026-10-11T21:10:13.714226+00:00",
+  "baseline": "3723132e0a7643d24b7670c202aba0f4a1acee12",
+  "branch": "feature/prompt-terminal-restart",
+  "environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "numpy": "2.5.4",
+    "opencv": "5.0.0",
+    "pillow": "12.3.0"
+  },
+  "source_sha256": {
+    "experiments/ppal/episode_end.py": "b629ac26173609f4259dcfe08604addd2af55744ad114cd07bc7c91ec17b7025",
+    "experiments/ppal/robotron_screen_state.py": "96e5c710647e7428ea6aed95ec03bb3c8b88d3603985fa096cbc252c94e33598",
+    "experiments/ppal/play_robotron.py": "7de613956cebd298fca8538fb5d3c6a305b50ab1155921c8d16d3ebba03a3d10",
+    "experiments/ppal/marathon_robotron.py": "8a0219e58aac103b7cb32212c6a8997fb82dbb3d8f5bdf0ba6a2f672a3b705ab",
+    "experiments/ppal/game_evidence.py": "94d02e34ce952cf03f98c391ccc2b2f85d9496079266bf999db6db4349157724",
+    "experiments/ppal/score_observer.py": "e57d722a4cd6459cc763c82376dcf2fb6a837d69a6a6d8dc4a0b9203068ab526",
+    "config/robotron/screen-labels/title-anchor.json": "857fd14a882c13b659afd168256a71bdb2b8d5f3106328e9e419a934f7169ea2",
+    "tests/test_prompt_terminal_restart.py": "e106151fb763a94be87c50383f4f778a467ca1070c25dd45b74950d75d19d594",
+    "tests/test_marathon_camera_session.py": "35b6b019aa21cf07d9df8cac86f05d3546f31564f331730337c62dbae4db2445",
+    "tests/test_robotron_agency_integration.py": "60b820958b44ad6642062b5aa198dce5262e9f2d29a501126df72f07089ac1b7"
+  },
+  "unchanged_protected_source_sha256": {
+    "experiments/ppal/preflight.py": "8cd902f89603394fe3e492370e37f88854ee8d2e0904b49bdc2ee03aca665bb8",
+    "experiments/ppal/camera_session.py": "ef83471ae915a623be5cbe7a6789da1387bf7d008598e37725415a207cc8cdcd",
+    "experiments/ppal/cal_recovery.py": "40ffbf598d9fb36dc51132a7b74e13c51864f1a7893fe92454f92a2852562f63",
+    "experiments/ppal/progress_supervision.py": "614161637c4a29fd6ade8b2aeaec7c71260af6c829d03133c87d25fd1e25f36e"
+  },
+  "runs": [
+    {
+      "name": "focused",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "124",
+      "time": "111.994",
+      "timestamp": "2026-10-11T17:01:38.216965-04:00",
+      "hostname": "76683c0e2a9b",
+      "command": "python -m pytest -q tests/test_prompt_terminal_restart.py tests/test_robotron_agency_integration.py tests/test_marathon_camera_session.py tests/test_robotron_episode_end.py tests/test_restart_discovery_evidence.py tests/test_progress_handoff.py tests/test_progress_supervision.py tests/test_score_observer.py tests/test_score_review_queue.py tests/test_score_feedback_learning.py tests/test_recording_handoff.py tests/test_robotron_recorded_screen_states.py --junitxml=terminal-focused.xml",
+      "passed": 124,
+      "failed_cases": [],
+      "junit_sha256": "13fab3f471bbfde7b3558f7384baaa3cb640582db7529081b8dc356c42ec3dce"
+    },
+    {
+      "name": "final_full_host",
+      "errors": "0",
+      "failures": "15",
+      "skipped": "21",
+      "tests": "961",
+      "time": "231.095",
+      "timestamp": "2026-10-11T17:04:05.419604-04:00",
+      "hostname": "76683c0e2a9b",
+      "command": "python -m pytest -q tests --junitxml=terminal-full.xml",
+      "passed": 925,
+      "failed_cases": [
+        {
+          "test": "tests.test_robotron_autofocus::test_automatic_start_uses_observed_position_then_confirms_idle_manual_lock",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[None]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[nan]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[inf]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[-1.0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[11.0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[True]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[None]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[1]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[3]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_repeated_or_unstable_metadata_cannot_settle",
+          "message": "AttributeError: 'Unstable' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_manual_lock_requires_reported_idle_and_matching_position",
+          "message": "AttributeError: 'Unlocked' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_diagnostic_manual_seed_is_explicit_validated_and_verified",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_geometry_replay::test_six_actual_consecutive_originals_stabilize_without_looser_gate",
+          "message": "assert (6 == 6 and 12.0 == 8)\n +  where 6 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).stable_views\n +  and   12.0 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).max_jitter_pixels"
+        }
+      ],
+      "junit_sha256": "862c3be02f47ca68689d563f04baf863238de469e4245feafd13266fccb58ac7"
+    }
+  ],
+  "baseline_failure_sets_match": true,
+  "native_validation": "not performed",
+  "release_acceptance": "pending supervised game-one to actual playable game-two and game-two ending",
+  "authentic_pixel_evidence": [
+    "tests/fixtures/robotron-calibration-20261011/exposure-ev-3.png",
+    "tests/fixtures/robotron-screen-states/provenance.json"
+  ],
+  "limitations": [
+    "Title source is a recognition anchor, not held-out acceptance",
+    "Temporal sequence, 1100/1300 score and controls in tests are simulated",
+    "Latest reported native run unavailable; no corrected score or live acceptance claimed",
+    "Final full suite includes late-added durable completion/no-restart regression and final source guards",
+    "Native CPU/capture-cadence/title generalization pending",
+    "No gameplay, camera-only native operation, servo actuation or deployment performed"
+  ]
+}

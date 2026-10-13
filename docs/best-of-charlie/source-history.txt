@@ -1,0 +1,184 @@
+f480070 Record thermal engineering controls and native acceptance handoff
+1895bc7 Add automatic thermal suspension and recovery to the existing Executive
+4bca038 Record clean published causal replay and exact authentic notebook restart
+84de3ff Verify original session imports and preserve authentic Executive continuation evidence
+a670254 Use independent experience in Executive priority and add causal acceptance audit
+9e423e9 Recognize verified Robotron terminal transitions and require one fresh authorized restart
+3723132 Supervise marathon finalization by completed work and preserve interrupted handoffs
+9eeba7c Reuse live camera across Robotron marathon games and preserve qualified episode evidence
+a785c9f Integrate native camera, agency, and marathon restart recovery
+5429298 Fix autofocus qualification using fresh camera metadata
+6e927e2 Record clean published-camera-repair regression and guarded native acceptance instructions
+bd605d9 Establish current-observation autofocus before Robotron geometry and exposure
+708a1f6 Publish 856-test clean regression and independently accepted authentic proposal restart
+72b3ce5 Validate staged proposal continuity independently and invalidate retargeted source aliases
+c5e222b Allow bounded exploratory hypotheses and stage Executive-owned experience proposals
+12c155d Reuse durable historical inspections and search non-image evidence by retained requirements
+15ae9c3 Forbid Guide and Home at shared gameplay controller boundaries
+6ba21fb Publish full motion evidence host validation and clean-checkout retained-notebook restart
+d1fc960 Connect retained motion deficiencies to deferred review and independent corpus provenance gates
+b4ebd3e Inspect retained evidence request sources and reconsider changed original artifacts
+de1b95e Publish full offline acceptance and authentic retained-notebook restart evidence
+49ad061 Validate batch review navigation, supporting originals and durable acquisition failures
+b3a7753 Preserve camera completion receipts and connect diagnostic reviews to existing Reflection
+966988b Add independently qualified score history, immutable baselines and rolling performance batches
+6cb7b18 Integrate immutable score feedback with normal acquisition and independent offline evaluator
+c709ddc Extend score inspector with persistent deferred batch review and original photographs
+b044e55 Persist Robotron marathon score attempts and original photographic review provenance
+177b0b2 Publish complete offline qualification and preserve authentic dependency-search restart evidence
+2849346 Reconcile new acquisition requests before durable waiting and qualify interruption recovery
+f1e8d1c Route retained Executive dependencies through acquisition and preserve durable search responses
+1263b33 Qualify CPU learning interfaces and preserve authentic Executive meditation continuation
+3fe5979 Bind CNN experiment method before Executive commissioning; preserve authentic blocked continuation
+cf80092 Preserve original native failure status and inspect distinct Executive project lineage
+804a6d5 Qualify meditation recovery with full offline regression and completion gates
+830c54b Preserve invalid meditation as durable evidence dependencies
+6fcd5b2 Qualify gameplay-first marathon with full offline regression records
+95b2787 Defer marathon development to the existing Executive after gameplay
+f422718 Fix Robotron geometry candidate support and fresh-frame temporal selection
+7991731 Qualify recorder handoff fixtures and preserve exact visual dependencies
+8a0198d Preserve auditable score reviews and enforce recorder readiness between games
+05e1643 Preserve bounded incident originals and reconcile exact independent perception witnesses
+13f6595 Separate full-rate PPAL witnesses from opt-in sampled original pixels
+29df690 Document witness contracts and staged ALA-2 evidence acceptance before semantic changes
+751c05e Buffer original evidence and remove routine recorder waits from PPAL
+70e5b71 Integrate bounded tactical prediction feedback and retain original recording history
+c97e497 Prepare recorded sensory sessions and discover startup through permitted interaction
+f6f23a7 Enforce the shared arcade controller sandbox and bounded release
+71deae2 Reduce developmental reconstruction and checkpoint overhead while preserving recovery
+2e11d3b Bound Executive resource checks and profile normal developmental throughput
+99d5613 Keep evidence-blocked reviews dormant until meaningful qualification changes
+f4bb1f2 Record independently verified ALA-2 recovery and native acceptance gate
+1f77d17 Preserve input dependencies and complete normal Executive continuation
+c2afb79 Verify developmental restart by causal continuation instead of frozen state
+7c99f10 Preserve qualified PPAL policy authority across rollback and restart
+da8d603 Qualify exact PPAL runtime shadows and validate autonomous policy feedback, latency and guarded readiness
+f6cf02b Integrate qualified local policy into existing PPAL Forebrain and Hindbrain
+214d370 Wake retained Executive investigations on substantive dependencies and exclude quarantined pending work
+718cf50 Clarify retained raw snapshot path and completed dependency recovery validation
+e0af947 Preserve final stall-recovery validation and authentic continuity snapshots
+c62c155 Recover tested Executive progress accounting and durable stall recovery
+d6eea1c Independently revalidate recovered identity and Executive continuation against authentic collision evidence
+94af719 Record postpublication Executive continuation and preserve acceptance script mode
+d161415 Persist bounded meditation yields and resume reconstruction within the existing Executive
+eb6dce7 Preserve frozen historical evaluation partitions through identity alias reconciliation
+e7a81df Retain verified-copy audit availability across quarantine and notebook restoration
+b144df4 Qualify identity across evaluation and prove preserved Executive resumption through normal application
+89ce5e3 Separate capture, manifest and experience identities; restore autonomous developmental continuity
+821ea84 Qualify normal autonomous offline learning, durable recovery and guarded feedback
+29e7054 Integrate normal Executive lifecycle with autonomous offline planner feedback
+f3f3cd9 ALA-2: unify repeat-safe ingestion, persistent history recovery and evidence exports
+3b84176 ALA-2: recover 177-record history and execute October 4 retrospective
+0460147 Record concurrent CAL-1 remote advance without changing its branch
+cd9c812 Qualify preserved Robotron capture timing and retain Executive acquisition bookmarks
+5212a7e Restore ALA-2 retrospective recovery and Executive-owned investigation dispatch
+b750a9f Preserve Charlie retrospective findings and explicit runtime recovery gap
+bb40d02 Connect preserved meditation to executable guarded offline candidates
+bae659f Continue ALA-2 with verified Torch-free transport and fresh-final deployment guards
+d10cc2f Execute evidence-generated bounded model refinement and preserve clock/recovery provenance
+b35501f Connect evaluated learning to guarded ordinary semantic decisions
+fd01ad2 Preserve real ALA-2 follow-up trace and outcome-derived questions
+577a2aa Extend evidence-directed investigations and preregister physical score comparisons
+4d86d4d Document ALA-1 audit, real-evidence rejection and autonomy boundaries
+d094964 ALA-1: preserve isolated evaluation, resumable model evidence and optional postgame scheduling
+cedf129 ALA-1: connect evidence-generated perceptual projects to bounded CNN experiments
+8f8b0eb ALA-1: version experience datasets through existing immutable evidence
+6ddba67 Audit physical learning, preserve uncertainty, and corroborate Robotron episode boundaries
+05ec6ab Recover productive postgame processing with durable checkpoints and retry regressions
+b9624ce Supervise Robotron progress instead of healthy game duration
+49632c4 Add passive Charlie Eyes viewer and Mint application launcher
+0bd08c1 Add persistent learning projects above the existing experiment chooser
+0da1b84 Complete geometry before evidence-authorized START and preserve uncertain episode boundaries
+7b4bb55 Connect evidence-derived actuator experiments through existing memory and bounded marathon
+a46398d Preserve PPAL evidence and prospective replay resolutions beneath existing memory
+dfdccde Explore BODY and FIRE with explicitly provisional agency during bootstrap
+fccf5a9 Keep unresolved physical objects in planning and replace no-rescue idle fallback
+4e29db2 Measure delayed action responses and recover consistently dim HUD glyphs
+2188d5a Add screen exposure preflight and preserve every calibration attempt
+bce4e95 Repair unmatched-track ambiguity, neutral evidence and real-camera HUD glyphs
+4ffb951 Use fresh exposures for agency probes based on second Pi run evidence
+9485068 Merge Robotron score subsystem as isolated observational telemetry
+a7a5ab2 Repair motion-aware sprite persistence and record replayable tracking evidence
+72f4958 Test hue independence and explicit missing-seven coverage
+2cd0c18 Add real-camera score regression validator
+aa9189f Document real-camera Robotron score regression corpus
+8062770 Make Robotron score reading hue-independent and mark 7 inferred
+892687b Test packaged Robotron score subsystem
+5e1ffc1 Package Robotron score perception as one-call subsystem
+fb97a35 Exercise cyan camera-score localization in HUD tests
+5e6b107 Segment connected camera score words into digit cells
+1c3b484 Test timestamped score evidence log
+8af1999 Add offline Robotron score inspection tool
+91a0528 Add timestamped dual-channel score event log
+d8b6287 Use compact geometry-relative Robotron HUD strip
+24d909d Test real Robotron HUD geometry and digit reader
+4f130ea Read Robotron P1 and P2 scores from raw camera frames
+76ced5a Test dual Robotron score channels
+97f6225 Support independent P1 and P2 score channels
+f5914eb Add raw Robotron HUD capture helper
+0b67b04 Test visual score tracker adapter
+568d031 Connect HUD reader to temporal score belief
+5804a10 Test temporal score validation
+8c7c6fa Add temporal Robotron score tracker
+a70149c Discover SELF from generic visual agency before Robotron control
+89e291a Require robust failed agency before Robotron game over
+3bfc201 Pass manual focus through Robotron marathon
+43ae64c Lock Robotron camera focus before gameplay
+c940dd8 Harden Robotron episode end and add optics preflight
+8426909 Test Robotron gameplay vs attract border evidence
+1626b1a Add conservative Robotron screen-state classifier
+312e1a0 Robotron: persist through SELF loss until confirmed non-gameplay
+bec0667 Audit Robotron learning readiness and guard episode, identity, and prediction evidence
+2905b05 Use causal control challenge for Robotron self identity
+aa9db47 Allow long Robotron gameplay sessions
+51a8334 Add autonomous Robotron marathon orchestrator
+81b8eb3 Add Robotron score ledger and shadow evaluation
+870994a Add live Robotron shadow predictor
+5871d4b Add iterative Robotron predictive meditation
+c5fdf3f Add Robotron trajectory prediction model
+a845aa0 Add offline Robotron track reconstruction
+febbbc8 Add replay quality reasoning to Robotron reflection
+f335ff0 Add iterative Robotron reflection
+91780df Add offline Robotron replay laboratory
+490cf0b Integrate persistent Robotron object tracking
+24001bd Persistently reacquire Robotron player
+6515a60 Add Robotron session and persistent self foundation
+169fdf1 Watch for stable Robotron center spawn after START
+30e73a0 Let Charlie start Robotron when vision is ready
+919629d Speed Robotron startup and add causal self acquisition
+7df40ce Normalize neutral Robotron firing action
+64b3a26 Add bounded live Robotron runner
+153cf05 Add causal Robotron player self-identification
+1587f72 Bootstrap Robotron player from known center spawn
+84f049b Add human-grounded Robotron visual control probe
+1ab461a Use recorded crop paths for Robotron review
+327efd5 Add human review queue for Robotron recognition
+b580662 Fix taught sprite validation result handling
+78ebcb5 Validate taught sprites across independent tracks
+fb08c98 Add human-grounded Robotron sprite teaching
+b498c1f Track sprite candidates across observation frames
+44edb1a Tolerate real-camera Robotron border jitter
+3c864a7 Merge remote-tracking branch 'origin/feature/charlie-memory' into feature/ppal-integration
+60257e0 Refine PPAL focus recovery around known-good position
+fa3b323 Integrate PPAL task-aware IMX708 focus
+0115667 Add asynchronous recording sound cues and explicit unknown game state
+33493e8 Add post-calibration countdown and adjustable timed observation recordings
+43c85f8 Handle washed-out Robotron borders and retry transient calibration failures
+1982848 Fix cluttered-room border search and add uncalibrated raw preview
+07f35fa Recalibrate Robotron geometry before each Pi recording
+461eae9 Add observation-only real-camera sprite detector and Pi audit recorder
+9bc1192 Calibrate Robotron playfield and add bounded Pi vision timing
+fc93829 Enable supported continuous autofocus for Robotron camera
+b418c07 Fix 32-bit Pi experiment seeds and close memory database connections
+a6fdb5f Integrate PPAL-7 camera gameplay with Charlie memory and Pi setup
+34b16a6 Add camera-only live Robotron controller and capture adapter
+5c4a536 Add paired experiment runner with uncertainty and memory feedback
+4de6016 Add revisable evidence-based memory evaluator
+e0144ba Restore MARM writer in combined memory tree
+7c3a638 Automate memory delivery and connect reusable recall to head search
+14955fa Add durable MARM write outbox and HTTP delivery command
+0f564fa Add selective Charlie memory former and PPAL adapter
+a8b809a Add Charlie durable memory subsystem
+9e1810f Add Charlie durable memory subsystem
+c0e6249 Add Charlie durable memory subsystem
+0f6c7cc Add Charlie durable memory subsystem

@@ -96,8 +96,9 @@ class MobileFaceTrackBehavior:
     PREDICT_STEP_FAST = 30
     PREDICT_COOLDOWN = 0.70
 
-    def __init__(self):
+    def __init__(self, search_preference=None):
         self.mobile = MobileBase()
+        self.search_preference = search_preference if search_preference in ("LEFT", "RIGHT") else None
 
         self.pan = self.PAN_CENTER
 
@@ -340,7 +341,7 @@ class MobileFaceTrackBehavior:
         if self.last_seen_side in ("LEFT", "RIGHT"):
             return self.last_seen_side
 
-        return "LEFT"
+        return self.search_preference or "LEFT"
 
     def _sentry_offsets(self):
         # Expanding search around the yaw where global search began:

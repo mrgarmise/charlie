@@ -1,0 +1,2359 @@
+{
+  "schema": "ala2-causal-audit-v1",
+  "source_journal_sha256": "5cc8a198694678e7ef4e3c7ae4a66a20cea574f3ce3049457841c6c8733b344d",
+  "source_records": 364,
+  "project_ids": [
+    "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+    "215156bbcff2ed248997a1abc3ab36d2bd3eb9d9eacbab8021996f8c51bbb0bf",
+    "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+    "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+    "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+    "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+    "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+    "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+    "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+    "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+    "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+    "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf"
+  ],
+  "source_content_digest": "c6e318f3c791dec073654a154981e25dc26d5bfbaf149b7247b54a27503ebef0",
+  "source_unchanged": true,
+  "controls": [
+    {
+      "selection_id": "951cadd17e49ed0dc1713f45a8f6f8e9615253209cfe0f23fa2a598175c5ec77",
+      "sequence": 11,
+      "observed_historical_choice": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+      "environment": {
+        "methods": [
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "meditation-motion"
+        ],
+        "resources": [
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+      "ablated_choice": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+      "choice_changed": false,
+      "priority_changes": [],
+      "context_digest": "b677bc04d62a825fef148abbac82c801265ce109de3af4c466431a50a2bc4fc8",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "dae54e8003921c08e693b8c33349209f1dbe5f4c194285ee9301b395c6082232",
+      "sequence": 22,
+      "observed_historical_choice": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+      "environment": {
+        "methods": [
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "meditation-motion"
+        ],
+        "resources": [
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+      "ablated_choice": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+      "choice_changed": false,
+      "priority_changes": [],
+      "context_digest": "fb83bd58c6ac00e923e19f4a3ad5017f49fba37f01cea9d28cd16a68f8d43d59",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "444d9c1d865e418fde825421854e322c76baea783544ec8791821824a3acbeb4",
+      "sequence": 84,
+      "observed_historical_choice": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+      "ablated_choice": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+      "choice_changed": false,
+      "priority_changes": [],
+      "context_digest": "e8eeae8d9860260e6369133072b9e160455f99f2b2196cb8eba6a022356f600d",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "0c33e27a086b119fd5dd7abf46e8524c1ca992bc22be4d47835bf9ec8ed4b7c4",
+      "sequence": 95,
+      "observed_historical_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "ablated_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "choice_changed": false,
+      "priority_changes": [],
+      "context_digest": "4d4e29a7ae0de13723ffb5171f504e53247b03e9da1b1b4e073e562a127c4a07",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "d18e63997276bcd67372e51578db5c108346fd80c1ce7b0aa88b816b0325fcd6",
+      "sequence": 110,
+      "observed_historical_choice": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "ablated_choice": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "742c14b0bcdb80498cebbbf79780e1544c76e09e5d18e619c8b6ed284c334d3e",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "bd909b01d0d6db1558410c6956a690eee27b7cedbc5a2952e8d7f5767df2a6a0",
+      "sequence": 121,
+      "observed_historical_choice": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+      "ablated_choice": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "cf0044dd86ae98bf9720ff3aa9c29919dc4d37799f46acc4d4aee2b181430b59",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "0a27e4117909a1eb23846b45c305e9eedbedeb3a7cc3f50940da79a420a507e5",
+      "sequence": 132,
+      "observed_historical_choice": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "ablated_choice": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "1a10b903354b03652f1af2fc5f3d8bac9ee9e7fee9df2d415b4cc2321cc36644",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "112aa6e8c1eca16270a1c79054386fb33f9ddc4cd0e915e749b3f2f83e55eb6d",
+      "sequence": 143,
+      "observed_historical_choice": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "ablated_choice": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "0d4a451c449eb812d8a8809b836251c1930bd687defc2eb57b1ba657e993dce1",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "ed189c9fc6a49037b76082fc6f5cc2637616742fc3a9f3b09b4b6d4d90849aa0",
+      "sequence": 154,
+      "observed_historical_choice": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "ablated_choice": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "cebd1757dd5e5666e9ca64f03e4deb78efae191c8222272558d2d075945517c7",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "c7d48c316e3d19dd0c3afa0c70abf02c765a86da293e0e8b2d03914851d272d1",
+      "sequence": 165,
+      "observed_historical_choice": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "ablated_choice": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+                "04d4373acdff3630fd223db5dbca5e3b68e7dbb78eeb03ee220223d6f348c189"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "138a9931eb7edd4b04ae05d803e4276faedd0d773792c17d88053c284351ad94",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "89fb28e1ae0db1e1bd630d41315216e55c00851d758fc6bcea3cbf85649f7c3c",
+      "sequence": 215,
+      "observed_historical_choice": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+      "ablated_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "choice_changed": true,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "d482b84ae89a56659fe377492c3241214ee6c510275bc9ede39173adde6a1c40",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4e54b3ead4a0f0542310d6c6c43d198f68fe42e166b890ee5bf25a51dbcd6965",
+                "896ad3afa190708da4dcc6cd163850cf9a722ccd45375463c3868c706d0d95e7"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+                "04d4373acdff3630fd223db5dbca5e3b68e7dbb78eeb03ee220223d6f348c189"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "8a84f3544ddbdbc528f2cef1a9fa8a510cc7b4016c24d96fe3c30edadcdbbbb8",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "63eee008517fbe549d005188e09901b0ae819e932719998551de72b0cc3b0a7e",
+      "sequence": 230,
+      "observed_historical_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "ablated_choice": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "d482b84ae89a56659fe377492c3241214ee6c510275bc9ede39173adde6a1c40",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4e54b3ead4a0f0542310d6c6c43d198f68fe42e166b890ee5bf25a51dbcd6965",
+                "896ad3afa190708da4dcc6cd163850cf9a722ccd45375463c3868c706d0d95e7"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+                "04d4373acdff3630fd223db5dbca5e3b68e7dbb78eeb03ee220223d6f348c189"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "08410c3d8f56b833280e19d757959474bc7be012c60e44be852ae623a1e711c5",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "262ea3128ee8b4133eb610c295ebf30e1f4dba07730e6ef498328619fd792345",
+                "e2303a4e6b3fb9a43aedfbfc54171888e06b05d24bd3e942a6e8f72413647834"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "c25be4bce450d47d820e39f62c8b74fb83d8c51d53666ad76c4cf7a3ef10fb46",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "e648ab09ab3835215fe8004c165ab5a4fa6c2058a4efc7dd0dc7dd7d61bd0004",
+      "sequence": 253,
+      "observed_historical_choice": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "ablated_choice": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "d482b84ae89a56659fe377492c3241214ee6c510275bc9ede39173adde6a1c40",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4e54b3ead4a0f0542310d6c6c43d198f68fe42e166b890ee5bf25a51dbcd6965",
+                "896ad3afa190708da4dcc6cd163850cf9a722ccd45375463c3868c706d0d95e7"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+                "04d4373acdff3630fd223db5dbca5e3b68e7dbb78eeb03ee220223d6f348c189"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            },
+            {
+              "resolution_id": "dd94a56938bdbd22f8c50066ce980f8b0b8f932801bcecbede782fcd0ddc352e",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "da3d87d578284a24aa4c93491266697181966311fc263ae83834261c7a25dceb",
+                "d1c49dab7eb4b00f82ba9790bf68f81e9bb3ee4192ccfbaed5c176e882689a99"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "08410c3d8f56b833280e19d757959474bc7be012c60e44be852ae623a1e711c5",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "262ea3128ee8b4133eb610c295ebf30e1f4dba07730e6ef498328619fd792345",
+                "e2303a4e6b3fb9a43aedfbfc54171888e06b05d24bd3e942a6e8f72413647834"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "c8668cd5e8ef332c3a3aa3b2b357404019d5e05c96c6dd496a0cc110a535ce0b",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "7033669b49f955b905fa6efe85d886f554b85c2ed88dbd4d2f4528b3091fc3cf",
+      "sequence": 266,
+      "observed_historical_choice": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "ablated_choice": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            },
+            {
+              "resolution_id": "1b58f4816111137371774738f6557cc526fde29ef0956579c82a00ab4985b1c2",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "b6aa05f89302696f71625c5d46cd4fd0ae779b6c95c2f0a84f4e8101130af2ca",
+                "b03c417f5cdadb1c7879fe0cb0f1a770cb36b7f747e4677e6f8c16c1cc1ea4c8"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "d482b84ae89a56659fe377492c3241214ee6c510275bc9ede39173adde6a1c40",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4e54b3ead4a0f0542310d6c6c43d198f68fe42e166b890ee5bf25a51dbcd6965",
+                "896ad3afa190708da4dcc6cd163850cf9a722ccd45375463c3868c706d0d95e7"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+                "04d4373acdff3630fd223db5dbca5e3b68e7dbb78eeb03ee220223d6f348c189"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            },
+            {
+              "resolution_id": "dd94a56938bdbd22f8c50066ce980f8b0b8f932801bcecbede782fcd0ddc352e",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "da3d87d578284a24aa4c93491266697181966311fc263ae83834261c7a25dceb",
+                "d1c49dab7eb4b00f82ba9790bf68f81e9bb3ee4192ccfbaed5c176e882689a99"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "08410c3d8f56b833280e19d757959474bc7be012c60e44be852ae623a1e711c5",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "262ea3128ee8b4133eb610c295ebf30e1f4dba07730e6ef498328619fd792345",
+                "e2303a4e6b3fb9a43aedfbfc54171888e06b05d24bd3e942a6e8f72413647834"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "6a7d66c8970a471c5d2fb75347b246291579fe50ee0c3095902fa77ed6588a91",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "60381f28fdc9a72ab640fe2f5fa1b342f6b2a8503b826b79de391724e4b6a042",
+      "sequence": 279,
+      "observed_historical_choice": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "ablated_choice": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            },
+            {
+              "resolution_id": "1b58f4816111137371774738f6557cc526fde29ef0956579c82a00ab4985b1c2",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "b6aa05f89302696f71625c5d46cd4fd0ae779b6c95c2f0a84f4e8101130af2ca",
+                "b03c417f5cdadb1c7879fe0cb0f1a770cb36b7f747e4677e6f8c16c1cc1ea4c8"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "d482b84ae89a56659fe377492c3241214ee6c510275bc9ede39173adde6a1c40",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4e54b3ead4a0f0542310d6c6c43d198f68fe42e166b890ee5bf25a51dbcd6965",
+                "896ad3afa190708da4dcc6cd163850cf9a722ccd45375463c3868c706d0d95e7"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+                "04d4373acdff3630fd223db5dbca5e3b68e7dbb78eeb03ee220223d6f348c189"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            },
+            {
+              "resolution_id": "dd94a56938bdbd22f8c50066ce980f8b0b8f932801bcecbede782fcd0ddc352e",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "da3d87d578284a24aa4c93491266697181966311fc263ae83834261c7a25dceb",
+                "d1c49dab7eb4b00f82ba9790bf68f81e9bb3ee4192ccfbaed5c176e882689a99"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            },
+            {
+              "resolution_id": "29b34b5a3c75284b4db763ae3453a40439564ac2031fa3b278602bc2a5acf213",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "e355951323063a8599ff67c629cddbe7d82eed933867935a3f0c389d916e4d5a",
+                "1dd6ae6972fd8299bdde5f5c5f3774cf41e8dae5e9642851e259c060c277687e"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "08410c3d8f56b833280e19d757959474bc7be012c60e44be852ae623a1e711c5",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "262ea3128ee8b4133eb610c295ebf30e1f4dba07730e6ef498328619fd792345",
+                "e2303a4e6b3fb9a43aedfbfc54171888e06b05d24bd3e942a6e8f72413647834"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "cf26898de9443ba0c090c0abb7530a47f6541de0468298d6be5982d9c32d1bfb",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "80bdcce51dd1c13e186184c3f2dcc802aa2942095aa71012eb0a6b4c7fd44467",
+      "sequence": 292,
+      "observed_historical_choice": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "ablated_choice": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            },
+            {
+              "resolution_id": "1b58f4816111137371774738f6557cc526fde29ef0956579c82a00ab4985b1c2",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "b6aa05f89302696f71625c5d46cd4fd0ae779b6c95c2f0a84f4e8101130af2ca",
+                "b03c417f5cdadb1c7879fe0cb0f1a770cb36b7f747e4677e6f8c16c1cc1ea4c8"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "d482b84ae89a56659fe377492c3241214ee6c510275bc9ede39173adde6a1c40",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4e54b3ead4a0f0542310d6c6c43d198f68fe42e166b890ee5bf25a51dbcd6965",
+                "896ad3afa190708da4dcc6cd163850cf9a722ccd45375463c3868c706d0d95e7"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+                "04d4373acdff3630fd223db5dbca5e3b68e7dbb78eeb03ee220223d6f348c189"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            },
+            {
+              "resolution_id": "dd94a56938bdbd22f8c50066ce980f8b0b8f932801bcecbede782fcd0ddc352e",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "da3d87d578284a24aa4c93491266697181966311fc263ae83834261c7a25dceb",
+                "d1c49dab7eb4b00f82ba9790bf68f81e9bb3ee4192ccfbaed5c176e882689a99"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            },
+            {
+              "resolution_id": "f1ad513eabe5db47273be6c6239ecf04f94ece19228b89d79d0d9e39ca475a73",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "8b8f8ec6e474cf2fa3477b34c8837c5a95b6e805e488441d18326faaaa0352a8",
+                "806e4766a224307e4f30582572b994b43d292a5c2610e8803ae18332eeb9a762"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            },
+            {
+              "resolution_id": "29b34b5a3c75284b4db763ae3453a40439564ac2031fa3b278602bc2a5acf213",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "e355951323063a8599ff67c629cddbe7d82eed933867935a3f0c389d916e4d5a",
+                "1dd6ae6972fd8299bdde5f5c5f3774cf41e8dae5e9642851e259c060c277687e"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "08410c3d8f56b833280e19d757959474bc7be012c60e44be852ae623a1e711c5",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "262ea3128ee8b4133eb610c295ebf30e1f4dba07730e6ef498328619fd792345",
+                "e2303a4e6b3fb9a43aedfbfc54171888e06b05d24bd3e942a6e8f72413647834"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "93e69911b9fae0c8a0a4c8b4deb018d67dd0e7068f946a3c9edb03186fc82310",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "cc6fd9f4881c8e29b4e3959d71e204ac6b5ba2f47a74eeab3a114ab460c8daa8",
+      "sequence": 305,
+      "observed_historical_choice": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "ablated_choice": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            },
+            {
+              "resolution_id": "1b58f4816111137371774738f6557cc526fde29ef0956579c82a00ab4985b1c2",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "b6aa05f89302696f71625c5d46cd4fd0ae779b6c95c2f0a84f4e8101130af2ca",
+                "b03c417f5cdadb1c7879fe0cb0f1a770cb36b7f747e4677e6f8c16c1cc1ea4c8"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "d482b84ae89a56659fe377492c3241214ee6c510275bc9ede39173adde6a1c40",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4e54b3ead4a0f0542310d6c6c43d198f68fe42e166b890ee5bf25a51dbcd6965",
+                "896ad3afa190708da4dcc6cd163850cf9a722ccd45375463c3868c706d0d95e7"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+                "04d4373acdff3630fd223db5dbca5e3b68e7dbb78eeb03ee220223d6f348c189"
+              ]
+            },
+            {
+              "resolution_id": "8da919fdb7ffd570d7f81a5ff03e35707150f32d75ab7dc5ec17cb55586ab4c0",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "f6f335061416fcb176f3367ec50658d74f39218790ff0e8a7aa63994eb5686c6",
+                "924f31dcac4748279bb7c4dd5d76d5b736bec6da5779ab9219036b389e087b5c"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            },
+            {
+              "resolution_id": "dd94a56938bdbd22f8c50066ce980f8b0b8f932801bcecbede782fcd0ddc352e",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "da3d87d578284a24aa4c93491266697181966311fc263ae83834261c7a25dceb",
+                "d1c49dab7eb4b00f82ba9790bf68f81e9bb3ee4192ccfbaed5c176e882689a99"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            },
+            {
+              "resolution_id": "f1ad513eabe5db47273be6c6239ecf04f94ece19228b89d79d0d9e39ca475a73",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "8b8f8ec6e474cf2fa3477b34c8837c5a95b6e805e488441d18326faaaa0352a8",
+                "806e4766a224307e4f30582572b994b43d292a5c2610e8803ae18332eeb9a762"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            },
+            {
+              "resolution_id": "29b34b5a3c75284b4db763ae3453a40439564ac2031fa3b278602bc2a5acf213",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "e355951323063a8599ff67c629cddbe7d82eed933867935a3f0c389d916e4d5a",
+                "1dd6ae6972fd8299bdde5f5c5f3774cf41e8dae5e9642851e259c060c277687e"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "08410c3d8f56b833280e19d757959474bc7be012c60e44be852ae623a1e711c5",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "262ea3128ee8b4133eb610c295ebf30e1f4dba07730e6ef498328619fd792345",
+                "e2303a4e6b3fb9a43aedfbfc54171888e06b05d24bd3e942a6e8f72413647834"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "9b3b158318b044111bb49c2a486496c13076c98d3af3b489cd503bec35b2c5f3",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    },
+    {
+      "selection_id": "3dbbbb71d709f265f17571010a68ddc09b18ec466bffaa02363b956bcd705bb9",
+      "sequence": 349,
+      "observed_historical_choice": "215156bbcff2ed248997a1abc3ab36d2bd3eb9d9eacbab8021996f8c51bbb0bf",
+      "environment": {
+        "methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "authorized_methods": [
+          "evidence-review",
+          "meditation-motion"
+        ],
+        "resources": [
+          "context-evidence",
+          "meditation-evidence",
+          "offline-slot"
+        ],
+        "urgent_projects": []
+      },
+      "eligibility_reproduced": true,
+      "retained_choice": "215156bbcff2ed248997a1abc3ab36d2bd3eb9d9eacbab8021996f8c51bbb0bf",
+      "ablated_choice": "215156bbcff2ed248997a1abc3ab36d2bd3eb9d9eacbab8021996f8c51bbb0bf",
+      "choice_changed": false,
+      "priority_changes": [
+        {
+          "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "72fa9d611416934ef34026a9e65d4f3ea31c9e4f6633c83df9efce9d7fe583a6",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "eabb5caf85a67df14cb668394fc61aa067a086dcdb21b506e9be48138e331598",
+                "373816056e44808fe92a22b0dde9dae4183882c2f86c78caa0405b515d4ccc21"
+              ]
+            },
+            {
+              "resolution_id": "1b58f4816111137371774738f6557cc526fde29ef0956579c82a00ab4985b1c2",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "b6aa05f89302696f71625c5d46cd4fd0ae779b6c95c2f0a84f4e8101130af2ca",
+                "b03c417f5cdadb1c7879fe0cb0f1a770cb36b7f747e4677e6f8c16c1cc1ea4c8"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "d482b84ae89a56659fe377492c3241214ee6c510275bc9ede39173adde6a1c40",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "4e54b3ead4a0f0542310d6c6c43d198f68fe42e166b890ee5bf25a51dbcd6965",
+                "896ad3afa190708da4dcc6cd163850cf9a722ccd45375463c3868c706d0d95e7"
+              ]
+            },
+            {
+              "resolution_id": "1b6444cec2d3043deca573cbe5b5e4125324bab4377467769879785cd8ea26b3",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "d274f48488c36cd87cfab8a39709155a54110ddb125ea5059bebd4a164fc3050",
+                "e9761ca1fd4e1940f9e209d87ba576cecb493e1cfa4ceb3328753edae7814cab"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "053de0da7e017723ea0efbc760c18f2e1e736e2d1008545121182d1563265c16",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "123565fc2deb10d64821cd64d28c92ba650550009665336f4c7b3385d5dbb67b",
+                "04d4373acdff3630fd223db5dbca5e3b68e7dbb78eeb03ee220223d6f348c189"
+              ]
+            },
+            {
+              "resolution_id": "8da919fdb7ffd570d7f81a5ff03e35707150f32d75ab7dc5ec17cb55586ab4c0",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "f6f335061416fcb176f3367ec50658d74f39218790ff0e8a7aa63994eb5686c6",
+                "924f31dcac4748279bb7c4dd5d76d5b736bec6da5779ab9219036b389e087b5c"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "f53dcb29344f21d68a0adf204ac6801db90a7afbcb226ef7d74dfd5e8928f751",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "97e95a6622d7e20cc778909dfb949f47286901d1d8b5d255ddab02c77afed3b8",
+                "37b850a2e70c05f75f7bc05f8eae39333ac74a6fb8e4c4e5a74c47558890ae68"
+              ]
+            },
+            {
+              "resolution_id": "dd94a56938bdbd22f8c50066ce980f8b0b8f932801bcecbede782fcd0ddc352e",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "da3d87d578284a24aa4c93491266697181966311fc263ae83834261c7a25dceb",
+                "d1c49dab7eb4b00f82ba9790bf68f81e9bb3ee4192ccfbaed5c176e882689a99"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "c41c7e985803ec71960688ddd9605473de29b558e3e37d26f8e9591a48197beb",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "0b976b193b7706a73c1b28749372784959ccc16996c756664c8a2aac80e39956",
+                "f0dce1f2b0f6d074cda51e24283dc789ddb877a5c2e1de6da442b7925b9831b0"
+              ]
+            },
+            {
+              "resolution_id": "f1ad513eabe5db47273be6c6239ecf04f94ece19228b89d79d0d9e39ca475a73",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "8b8f8ec6e474cf2fa3477b34c8837c5a95b6e805e488441d18326faaaa0352a8",
+                "806e4766a224307e4f30582572b994b43d292a5c2610e8803ae18332eeb9a762"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "ea0343aedaaec1682eba47444303af69ad64737237b96f9491fe25f1af12791a",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "409ea79d9834af928b70eaeb8ffbe02e37e4d8271ee53025fa46a6c9b9b381f7",
+                "56a0bf6c1909982dd95d79505295b8623e116bb2548dca993b4ff4e516d6901d"
+              ]
+            },
+            {
+              "resolution_id": "29b34b5a3c75284b4db763ae3453a40439564ac2031fa3b278602bc2a5acf213",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "e355951323063a8599ff67c629cddbe7d82eed933867935a3f0c389d916e4d5a",
+                "1dd6ae6972fd8299bdde5f5c5f3774cf41e8dae5e9642851e259c060c277687e"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "9a1095e894fa56b7b2a5fa0390bebf5368a430b8acb8956ad27e320d05bba156",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "3d91da095a8244790ac5be19a7ce4d9df6352bcac4753aca985c9b37398dc55c",
+                "d19b47b6d7f4be328d924716777dc5819e94421b6c4fdf473b6d67159d74c7bc"
+              ]
+            }
+          ]
+        },
+        {
+          "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+          "retained_score": 1.5,
+          "ablated_score": 2.0000000000000004,
+          "retained_uncertainty": 0.5,
+          "ablated_uncertainty": 1.0,
+          "independent_units": 1,
+          "outcome_bindings": [
+            {
+              "resolution_id": "08410c3d8f56b833280e19d757959474bc7be012c60e44be852ae623a1e711c5",
+              "available": true,
+              "matched": true,
+              "sources": [
+                "262ea3128ee8b4133eb610c295ebf30e1f4dba07730e6ef498328619fd792345",
+                "e2303a4e6b3fb9a43aedfbfc54171888e06b05d24bd3e942a6e8f72413647834"
+              ]
+            }
+          ]
+        }
+      ],
+      "context_digest": "dc1d148f4ce7da44876b608dea4b5741d08864591c77f7bbbd27857f55348480",
+      "control": "Only independent experience counts ablated; histories, opportunities, lifecycle, permissions, resources and runtime fixed",
+      "limitation": "Current-runtime retrospective control; not a new investigation, archived-runtime equivalence, authenticity certification or E1 pass"
+    }
+  ],
+  "matching_eligibility_controls": 18,
+  "priority_influence_controls": 14,
+  "changed_choice_controls": 1,
+  "retained_activation_records": [],
+  "gates": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  },
+  "limitations": [
+    "Hash integrity does not certify authentic observations or measurement independence",
+    "Priority ablation does not remove outcome-dependent lifecycle/hold or Evaluator feedback",
+    "Archived choice may differ from current runtime; no historical equivalence inferred",
+    "P1 requires authentic transitions, retained learning update, reload and comparable PPAL decisions",
+    "I1 requires independent qualification, separate authority, downstream influence and rollback",
+    "This report cannot activate, commission, supply observations or close acceptance gates"
+  ],
+  "physical_authorization": false,
+  "runtime_revision": "0434f4d4a89029f39a3f77740dcf17655c84ce9a",
+  "runtime_dirty": false,
+  "selection_runtime_sha256": "c6e131979ef345750c54caccba3352662b815bc41ab627deb22f2eeac761da22"
+}

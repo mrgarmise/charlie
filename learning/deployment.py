@@ -1,0 +1,255 @@
+"""Externally authorized, versioned shadow activation; no production PPAL swap."""
+from memory.evidence import digest
+from .datasets import SCOPE, sha
+
+class CapabilityDeployment:
+    def __init__(self,journal): self.journal=journal
+    def active(self,target):
+        active=None
+        for row in self.journal.records('event'):
+            p=row.data['payload']
+            if p.get('category')=='capability_activation' and p['target']==target: active=p
+        return active
+    def activate(self, proposal_id, *, target, authorization, adapters=('offline-shadow','ppal-semantics','ppal-policy'),shadow_id=None,readiness_id=None):
+        proposal_record=self.journal.get(proposal_id);p=proposal_record.data['payload'];scope=proposal_record.data['episode']
+        if p.get('category')!='model_deployment_proposal' or not p['eligible'] or p['target']!=target:
+            raise ValueError('supported independent deployment proposal required')
+        if target not in adapters or target not in ('offline-shadow','ppal-semantics','ppal-policy'): raise ValueError('production integration is not authorized or implemented')
+        if not authorization or authorization.get('target')!=target or authorization.get('proposal_id')!=proposal_id or not authorization.get('source'):
+            raise ValueError('separate explicit execution authorization required')
+        activation_key=digest(dict(proposal=proposal_id,authorization=authorization))
+        if any(r.data['payload'].get('revoked_activation')==activation_key for r in self.journal.records('event')):
+            raise ValueError('rollback revoked this activation grant; new authorization required')
+        evaluation=self.journal.get(p['evaluation_id'])
+        measured=evaluation.data['payload']
+        if evaluation.data['producer']!='ModelFoundry' or measured.get('category')!='offline_model_evaluation' or not measured.get('metrics',{}).get('improved') or not measured['metrics'].get('independence_groups'):
+            raise ValueError('independent model evaluation required')
+        if measured['metrics'].get('fresh_final_evidence') is False:
+            raise ValueError('fresh independent final evidence required; repeated test groups cannot deploy')
+        candidate=measured['candidate']
+        if candidate.get('identifier') and p['candidate_id']!=candidate['identifier']:
+            raise ValueError('candidate identity differs from evaluation')
+        if sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']: raise ValueError('candidate weights changed')
+        contract=None;readiness=None;sources=[proposal_id]
+        policy_metadata={}
+        if candidate.get('spec',{}).get('adapter') in ('meditation-motion-v1','decision-parameters-v1'):
+            from .policy import revision,dirty,runtime_hash
+            policy_metadata=dict(policy_code_revision=revision(),
+                policy_code_dirty=dirty(),policy_runtime_sha256=runtime_hash(),
+                policy_provenance_kind=measured['metrics'].get('provenance_kind','unclassified'))
+        if target=='ppal-policy':
+            if candidate.get('spec',{}).get('adapter')!='decision-parameters-v1':
+                raise ValueError('evaluated decision parameters required')
+            # Reuse the same proposal/evaluation/activation gate. No physical
+            # adapter or self-granted authority is added.
+            provisional=dict(candidate=candidate,proposal_id=proposal_id,target=target,
+                authorization=authorization,shadow_id=shadow_id,activation_key='qualification-check',
+                previous_activation=None,physical_readiness_id=readiness_id,**policy_metadata)
+            from .policy import policy_payload
+            qualified=policy_payload(self.journal,provisional)
+            readiness=qualified['physical_readiness']
+            if any(r.data['payload'].get('revoked_proposal')==proposal_id for r in self.journal.records('event')):
+                raise ValueError('rollback revoked decision proposal; new evaluation required')
+            contract=measured['metrics']['decision_contract'];sources.append(shadow_id)
+        if candidate.get('spec',{}).get('adapter')=='meditation-motion-v1':
+            if target!='offline-shadow': raise ValueError('motion candidate has no physical activation authority')
+            resolution=self.journal.resolution_for(p.get('prediction_id'))
+            if not resolution or resolution.data['payload']['result']!='supported':
+                raise ValueError('supported committed motion resolution required')
+            if any(r.data['payload'].get('revoked_proposal')==proposal_id for r in self.journal.records('event')):
+                raise ValueError('rollback revoked motion proposal; new evaluation required')
+            if not shadow_id: raise ValueError('candidate-specific motion shadow required')
+            s=self.journal.get(shadow_id)
+            payload=s.data['payload']
+            if (s.data['producer']!='controlled-motion-adapter' or payload.get('category')!='motion_operational_shadow'
+                    or payload.get('proposal_id')!=proposal_id or not payload.get('passed')
+                    or payload.get('candidate_id')!=candidate['identifier']
+                    or payload.get('checkpoint_sha256')!=candidate['checkpoint_sha256']):
+                raise ValueError('candidate-specific motion shadow required')
+            sources.append(shadow_id)
+        if target=='ppal-semantics':
+            contract=measured['metrics'].get('operational')
+            if not contract or not contract.get('eligible') or p.get('contract')!=contract:
+                raise ValueError('independently evaluated semantic contract required')
+            if p['candidate_id']!=candidate['identifier']:raise ValueError('candidate identity differs from evaluation')
+            if not shadow_id:raise ValueError('passing operational shadow evidence required')
+            s=self.journal.get(shadow_id)
+            if s.data['producer']!='controlled-semantic-adapter' or s.data['payload'].get('category')!='operational_shadow_evaluation' or s.data['payload'].get('proposal_id')!=proposal_id or s.data['payload'].get('dataset_digest')!=candidate['dataset_digest'] or not s.data['payload'].get('passed'):
+                raise ValueError('passing operational shadow evidence required')
+            sources.append(shadow_id)
+            if readiness_id:
+                readiness=self.journal.get(readiness_id).data['payload']
+                required={'processing_recovery','controller_release','terminal_boundaries','camera_ownership','operational_cadence'}
+                if readiness.get('category')!='physical_readiness_validation' or not readiness.get('passed') or readiness.get('candidate_id')!=candidate['identifier'] or not readiness.get('source_evidence') or any(readiness.get('checks',{}).get(k) is not True for k in required):
+                    raise ValueError('candidate-specific offline readiness evidence required')
+                if self.journal.get(readiness_id).data['episode']!=scope:
+                    readiness_id=self.journal.append('observation',dict(category='consolidated_evidence_reference',record_id=readiness_id,
+                        source_episode=self.journal.get(readiness_id).data['episode'],journal=str(self.journal.path.resolve())),
+                        episode=scope,producer='existing-evidence-consolidation',version='ala-2').id
+                sources.append(readiness_id)
+        previous=self.active(target)
+        return self.journal.append('event',dict(category='capability_activation',target=target,
+            candidate_id=p['candidate_id'],candidate=candidate,proposal_id=proposal_id,authorization=authorization,
+            contract=contract,shadow_id=shadow_id,physical_readiness=readiness,evidence_scope=scope,
+            physical_readiness_id=readiness_id if target=='ppal-policy' else None,
+            previous_activation=previous['activation_key'] if previous else None,
+            activation_key=activation_key,**policy_metadata),episode=scope,
+            sources=sources,producer='authorized-capability-deployment',version='ala-2')
+    def rollback(self, target, *, reason, authorization, to_baseline=False):
+        current=self.active(target)
+        if not current or not reason or not authorization or authorization.get('target')!=target or not authorization.get('source'): raise ValueError('explicit rollback required')
+        request=digest(dict(target=target,reason=reason,authorization=authorization,to_baseline=to_baseline))
+        if current.get('rollback_request')==request:
+            return next(r for r in self.journal.records('event')
+                if r.data['payload'].get('activation_key')==current['activation_key'])
+        prior=None
+        if current['previous_activation'] and not to_baseline:
+            prior=next(r.data['payload'] for r in self.journal.records('event') if r.data['payload'].get('activation_key')==current['previous_activation'])
+            if sha(prior['candidate']['checkpoint'])!=prior['candidate']['checkpoint_sha256']: raise ValueError('rollback weights changed')
+            if prior.get('authorization',{}).get('execution')=='physical' and authorization.get('execution')!='physical':
+                raise ValueError('restoring physical policy requires separate physical rollback authority')
+            if target=='ppal-policy':
+                from .policy import policy_payload,runtime_hash
+                policy_payload(self.journal,prior)
+                if prior['policy_runtime_sha256']!=runtime_hash():
+                    raise ValueError('rollback runtime changed; new qualification required')
+                if any(r.data['payload'].get('revoked_proposal')==prior['proposal_id'] for r in self.journal.records('event')):
+                    raise ValueError('rollback cannot restore a revoked proposal')
+        return self.journal.append('event',dict(category='capability_activation',target=target,
+            candidate_id=prior['candidate_id'] if prior else None,candidate=prior['candidate'] if prior else None,
+            contract=prior.get('contract') if prior else None,shadow_id=prior.get('shadow_id') if prior else None,
+            physical_readiness=prior.get('physical_readiness') if prior else None,
+            physical_readiness_id=prior.get('physical_readiness_id') if prior else None,
+            policy_code_revision=prior.get('policy_code_revision') if prior else None,
+            policy_provenance_kind=prior.get('policy_provenance_kind') if prior else None,
+            policy_code_dirty=prior.get('policy_code_dirty') if prior else None,
+            policy_runtime_sha256=prior.get('policy_runtime_sha256') if prior else None,
+            proposal_id=prior.get('proposal_id') if prior else None,
+            revoked_proposal=current.get('proposal_id') if not prior or prior.get('proposal_id')!=current.get('proposal_id') else None,
+            revoked_activation=current['activation_key'],
+            authorization=prior['authorization'] if prior else authorization,
+            rollback_authorization=authorization,
+            rollback_request=request,
+            rollback_source_activation=prior['activation_key'] if prior else None,
+            reason=reason,previous_activation=None,
+            activation_key=digest(dict(rollback=current['activation_key'],reason=reason,authorization=authorization))),
+            episode=SCOPE,producer='authorized-capability-deployment',version='ala-1')
+
+    def export_policy(self,target,path):
+        from .policy import export_policy
+        return export_policy(self,target,path)
+
+    def export(self,target,path):
+        """Freeze a separately authorized version for an episode; rollback applies next load."""
+        from .foundry import atomic_json
+        active=self.active(target)
+        if not active or not active.get('candidate') or target!='ppal-semantics':raise ValueError('active semantic capability required')
+        if sha(active['candidate']['checkpoint'])!=active['candidate']['checkpoint_sha256']:raise ValueError('candidate weights changed')
+        payload=dict(active,journal=str(self.journal.path.resolve()))
+        atomic_json(path,dict(payload=payload,sha256=digest(payload)))
+        return payload
+
+    def apply_authority(self,result,authority,path):
+        """Execute a pre-existing, externally granted policy; never self-authorize."""
+        proposal=result.get('operational_proposal')
+        if not proposal or not authority:return {'status':'proposed_only','manifest':None}
+        if any(r.data['payload'].get('revoked_proposal')==proposal for r in self.journal.records('event')):
+            return {'status':'blocked','reason':'explicit rollback revoked this proposal; new evaluation/authorization required','manifest':None}
+        if authority.get('target')=='ppal-policy':
+            p=self.journal.get(proposal).data['payload']
+            if p.get('target')!='ppal-policy':
+                return {'status':'blocked','reason':'decision authority cannot authorize another capability','manifest':None}
+            if not authority.get('source') or authority.get('execution') not in ('offline','physical'):
+                raise ValueError('external bounded decision deployment authority required')
+            from .policy import shadow_policy,policy_payload,runtime_hash
+            from pathlib import Path
+            previous=self.active('ppal-policy')
+            authorization=dict(authority,proposal_id=proposal)
+            try:
+                domains=p['contract']['domains']
+                if not isinstance(authority.get('allowed_domains'),list) or not set(domains)<=set(authority['allowed_domains']):
+                    raise ValueError('decision domain outside authorization')
+                reuse=previous and previous.get('proposal_id')==proposal and previous.get('authorization')==authorization
+                if reuse:
+                    policy_payload(self.journal,previous)
+                    if previous['policy_runtime_sha256']!=runtime_hash():
+                        raise ValueError('policy runtime changed; new qualification required')
+                else:
+                    # Check the requested grant even if this proposal was previously
+                    # activated under a different authority. Never inherit permission.
+                    if previous and previous.get('proposal_id')==proposal:
+                        policy_payload(self.journal,dict(previous,authorization=authorization,
+                            physical_readiness_id=authority.get('readiness_id')))
+                    s=shadow_policy(self.journal,proposal)
+                    self.activate(proposal,target='ppal-policy',authorization=authorization,
+                        shadow_id=s.id,readiness_id=authority.get('readiness_id'))
+            except (ValueError,KeyError,TypeError,OSError) as exc:
+                from .acquisition import retain_dependency_request
+                request=retain_dependency_request(self.journal,proposal,work_id=proposal,
+                    required_evidence=[dict(capability='ppal-policy',authority_digest=digest(authority),
+                        dependency='bounded authority and candidate/runtime-specific qualification')],reason=str(exc))
+                return dict(status='blocked',reason=str(exc),manifest=None,request_id=request.id)
+            manifest=Path(path).with_name('ppal-policy.json')
+            self.export_policy('ppal-policy',manifest)
+            return dict(status='activated',manifest=str(manifest),proposal_id=proposal,
+                activation_key=self.active('ppal-policy')['activation_key'],
+                objective_evidence='diagnostic only; score UNKNOWN')
+        if not authority.get('source') or authority.get('target')!='ppal-semantics' or not isinstance(authority.get('allowed_domains'),list):
+            raise ValueError('external bounded deployment authority required')
+        p=self.journal.get(proposal).data['payload'];domains=set(p['contract']['domains'])
+        if not domains or not domains<=set(authority['allowed_domains']):
+            return {'status':'blocked','reason':'model domains outside granted authority','manifest':None}
+        previous=self.active('ppal-semantics')
+        authorization=dict(source=authority['source'],target='ppal-semantics',proposal_id=proposal,
+                           policy=authority,policy_digest=digest(authority))
+        if not previous or previous.get('proposal_id')!=proposal:
+            self.activate(proposal,target='ppal-semantics',authorization=authorization,
+                shadow_id=result['shadow_id'],readiness_id=authority.get('readiness_id'))
+        self.export('ppal-semantics',path)
+        return dict(status='activated',manifest=str(path),proposal_id=proposal,
+                    activation_key=self.active('ppal-semantics')['activation_key'],objective_evidence='diagnostic only; score UNKNOWN')
+
+    def observe(self, target, image):
+        """Offline shadow inference returns interpretations, never identity facts."""
+        from .cycle import gameplay_active
+        from .foundry import build,checked_load
+        if gameplay_active(): raise RuntimeError('offline shadow unavailable during gameplay')
+        active=self.active(target)
+        if not active or active.get('candidate') is None: return {'status':'unavailable'}
+        candidate=active['candidate']
+        if candidate.get('spec',{}).get('adapter')=='meditation-motion-v1':
+            raise ValueError('motion candidate requires the offline planning adapter')
+        if sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']: raise ValueError('candidate weights changed')
+        import torch
+        import numpy as np
+        from PIL import Image
+        torch.set_num_threads(1)
+        spec=candidate['spec'];classes=candidate['classes'];model=build(spec,len(classes))
+        model.load_state_dict(checked_load(candidate['checkpoint'])['weights']);model.eval()
+        pixels=np.array(image.convert('RGB').resize((spec['size'],spec['size']),Image.Resampling.BILINEAR),dtype=np.float32)/255.
+        x=torch.from_numpy(pixels.transpose(2,0,1)).unsqueeze(0)
+        with torch.no_grad():
+            value=model(x)
+            if spec['objective']=='classification':
+                probabilities=value.softmax(1)[0]; label=classes[int(probabilities.argmax())]
+                return dict(status='unverified_model_prediction',label=label,confidence=float(probabilities.max()),
+                    calibrated=False,candidate_id=candidate['identifier'],activation=active['activation_key'])
+            error=float(torch.nn.functional.mse_loss(value,x))
+            return dict(status='unverified_representation',reconstruction_mse=error,
+                candidate_id=candidate['identifier'],activation=active['activation_key'],semantic_label=None)
+
+    def planning_adapter(self):
+        """Load an authorized offline motion version. Never install physical policy."""
+        from .cycle import gameplay_active
+        from .meditation import PlanningCandidate
+        import json
+        from pathlib import Path
+        if gameplay_active(): raise RuntimeError('offline motion unavailable during gameplay')
+        active=self.active('offline-shadow')
+        if not active or not active.get('candidate'): return None
+        candidate=active['candidate']
+        if sha(candidate['checkpoint'])!=candidate['checkpoint_sha256']:
+            raise ValueError('candidate artifact changed')
+        spec=json.loads(Path(candidate['checkpoint']).read_text())
+        if spec!=candidate['spec']: raise ValueError('candidate specification changed')
+        return PlanningCandidate(spec)

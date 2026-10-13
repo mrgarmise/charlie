@@ -324,9 +324,10 @@ class Led():
 class Music():
     def __init__(self):
         self.tones = {'1': 262, '2': 294, '3': 330, '4': 349, '5': 392, '6': 440, '7': 494, '-': 0}
-        self.buzzer = PWM(Pin(0))
+        self.buzzer = None  # No PWM creation while importing the display library.
 
     def phonate(self,melody):
+        self.buzzer = PWM(Pin(0))
         for tone in melody:
             freq = self.tones[tone]
             if freq:
@@ -339,6 +340,7 @@ class Music():
             self.buzzer.duty_u16(0)  # 设备占空比为0，即不上电
             utime.sleep_ms(100)
         self.buzzer.deinit()  # 释放PWM
+        self.buzzer = None
 
 class PinEFencoding:
     def __init__(self):

@@ -1,0 +1,546 @@
+...............ss.ss.ss................s..sssss.ss..ssss................ [  7%]
+........................................................................ [ 14%]
+........................................................................ [ 22%]
+....................................s................................... [ 29%]
+........................................................................ [ 37%]
+........................................................................ [ 44%]
+........................................................................ [ 52%]
+........................................................................ [ 59%]
+........................................................................ [ 67%]
+........................................................................ [ 74%]
+......FFFFFFFFFFFFF...F................................................. [ 81%]
+.......................F...s............................................ [ 89%]
+........................................................................ [ 96%]
+..............................                                           [100%]
+=================================== FAILURES ===================================
+__ test_automatic_start_uses_observed_position_then_confirms_idle_manual_lock __
+
+    def test_automatic_start_uses_observed_position_then_confirms_idle_manual_lock():
+        source = FocusSource(interval=33_333_333)  # 30fps, six frames alone are too short
+        report = {}
+>       position = establish_focus(source, report=report)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_robotron_autofocus.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fcb79280>
+report = {'status': 'failed', 'started_at': 2099.466921582, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=90, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+___ test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[None] ___
+
+lens = None
+
+    @pytest.mark.parametrize('lens', [None, float('nan'), float('inf'), -1., 11., True])
+    def test_invalid_autofocus_lens_metadata_fails_without_manual_fallback(lens):
+        source = FocusSource(lens=lens)
+        report = {}
+        with pytest.raises(ValueError, match='metadata'):
+>           establish_focus(source, report=report, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fcb78e90>
+report = {'status': 'failed', 'started_at': 2099.491469834, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+___ test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[nan] ____
+
+lens = nan
+
+    @pytest.mark.parametrize('lens', [None, float('nan'), float('inf'), -1., 11., True])
+    def test_invalid_autofocus_lens_metadata_fails_without_manual_fallback(lens):
+        source = FocusSource(lens=lens)
+        report = {}
+        with pytest.raises(ValueError, match='metadata'):
+>           establish_focus(source, report=report, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fc5b25a0>
+report = {'status': 'failed', 'started_at': 2099.499050812, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+___ test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[inf] ____
+
+lens = inf
+
+    @pytest.mark.parametrize('lens', [None, float('nan'), float('inf'), -1., 11., True])
+    def test_invalid_autofocus_lens_metadata_fails_without_manual_fallback(lens):
+        source = FocusSource(lens=lens)
+        report = {}
+        with pytest.raises(ValueError, match='metadata'):
+>           establish_focus(source, report=report, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fc5b38f0>
+report = {'status': 'failed', 'started_at': 2099.506216315, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+___ test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[-1.0] ___
+
+lens = -1.0
+
+    @pytest.mark.parametrize('lens', [None, float('nan'), float('inf'), -1., 11., True])
+    def test_invalid_autofocus_lens_metadata_fails_without_manual_fallback(lens):
+        source = FocusSource(lens=lens)
+        report = {}
+        with pytest.raises(ValueError, match='metadata'):
+>           establish_focus(source, report=report, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fc6dc5c0>
+report = {'status': 'failed', 'started_at': 2099.513627919, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+___ test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[11.0] ___
+
+lens = 11.0
+
+    @pytest.mark.parametrize('lens', [None, float('nan'), float('inf'), -1., 11., True])
+    def test_invalid_autofocus_lens_metadata_fails_without_manual_fallback(lens):
+        source = FocusSource(lens=lens)
+        report = {}
+        with pytest.raises(ValueError, match='metadata'):
+>           establish_focus(source, report=report, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fc5b1d60>
+report = {'status': 'failed', 'started_at': 2099.521937174, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+___ test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[True] ___
+
+lens = True
+
+    @pytest.mark.parametrize('lens', [None, float('nan'), float('inf'), -1., 11., True])
+    def test_invalid_autofocus_lens_metadata_fails_without_manual_fallback(lens):
+        source = FocusSource(lens=lens)
+        report = {}
+        with pytest.raises(ValueError, match='metadata'):
+>           establish_focus(source, report=report, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fcb7aba0>
+report = {'status': 'failed', 'started_at': 2099.528866832, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+______________ test_stable_lens_is_not_successful_autofocus[None] ______________
+
+state = None
+
+    @pytest.mark.parametrize('state', [None, 0, 1, 3])
+    def test_stable_lens_is_not_successful_autofocus(state):
+        with pytest.raises(ValueError, match='not focused'):
+>           establish_focus(FocusSource(state=state), report={}, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fc6ddee0>
+report = {'status': 'failed', 'started_at': 2099.535787046, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+_______________ test_stable_lens_is_not_successful_autofocus[0] ________________
+
+state = 0
+
+    @pytest.mark.parametrize('state', [None, 0, 1, 3])
+    def test_stable_lens_is_not_successful_autofocus(state):
+        with pytest.raises(ValueError, match='not focused'):
+>           establish_focus(FocusSource(state=state), report={}, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fc6dee10>
+report = {'status': 'failed', 'started_at': 2099.544177783, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+_______________ test_stable_lens_is_not_successful_autofocus[1] ________________
+
+state = 1
+
+    @pytest.mark.parametrize('state', [None, 0, 1, 3])
+    def test_stable_lens_is_not_successful_autofocus(state):
+        with pytest.raises(ValueError, match='not focused'):
+>           establish_focus(FocusSource(state=state), report={}, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fc6dcc50>
+report = {'status': 'failed', 'started_at': 2099.552127696, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+_______________ test_stable_lens_is_not_successful_autofocus[3] ________________
+
+state = 3
+
+    @pytest.mark.parametrize('state', [None, 0, 1, 3])
+    def test_stable_lens_is_not_successful_autofocus(state):
+        with pytest.raises(ValueError, match='not focused'):
+>           establish_focus(FocusSource(state=state), report={}, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fc6de990>
+report = {'status': 'failed', 'started_at': 2099.559273601, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+_______________ test_repeated_or_unstable_metadata_cannot_settle _______________
+
+    def test_repeated_or_unstable_metadata_cannot_settle():
+        class Unstable(FocusSource):
+            def read(self):
+                self.lens = 2. if self.sequence%2 else 3.
+                return super().read()
+        for source in (Unstable(), FocusSource(interval=0)):
+            with pytest.raises(ValueError):
+>               establish_focus(source, report={}, config=AutofocusConfig(max_frames=12))
+
+tests/test_robotron_autofocus.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:126: in establish_focus
+    position = _settle(source, report, config=cfg, limits=limits)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.test_repeated_or_unstable_metadata_cannot_settle.<locals>.Unstable object at 0x7f79fcb7b9e0>
+report = {'status': 'failed', 'started_at': 2099.567611898, 'mode': 'automatic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=12, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = None
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Unstable' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+________ test_manual_lock_requires_reported_idle_and_matching_position _________
+
+    def test_manual_lock_requires_reported_idle_and_matching_position():
+        class Unlocked(FocusSource):
+            def set_manual_focus(self, position):
+                self.calls.append(('unacknowledged', position))
+        with pytest.raises(ValueError, match='manual mode'):
+>           verify_focus_lock(Unlocked(), 2.4, config=AutofocusConfig(max_frames=8))
+
+tests/test_robotron_autofocus.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:107: in verify_focus_lock
+    return _settle(source, report if report is not None else {},
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.test_manual_lock_requires_reported_idle_and_matching_position.<locals>.Unlocked object at 0x7f79fc6ded20>
+report = {'lock_samples': []}
+config = AutofocusConfig(timeout=10.0, max_frames=8, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = 2.4
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'Unlocked' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+________ test_diagnostic_manual_seed_is_explicit_validated_and_verified ________
+
+    def test_diagnostic_manual_seed_is_explicit_validated_and_verified():
+        source = FocusSource()
+        report = {}
+>       assert establish_focus(source, report=report, manual_position=3.) == 3.
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_robotron_autofocus.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/eyes/autofocus.py:132: in establish_focus
+    report['locked_position'] = verify_focus_lock(source, position, report=report, config=cfg, limits=limits)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments/ppal/eyes/autofocus.py:107: in verify_focus_lock
+    return _settle(source, report if report is not None else {},
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = <test_robotron_autofocus.FocusSource object at 0x7f79fc6ddbe0>
+report = {'status': 'failed', 'started_at': 2099.584386593, 'mode': 'manual diagnostic', 'image_sharpness': 'unqualified until playfield refinement and final quality gates', ...}
+config = AutofocusConfig(timeout=10.0, max_frames=90, stable_frames=6, stable_seconds=0.25, tolerance=0.05)
+limits = (0.0, 10.0), target = 3.0
+
+    def _settle(source, report, *, config, limits, target=None):
+        deadline = time.monotonic() + config.timeout
+        observations = []
+        previous_timestamp = None
+        reason = 'no fresh autofocus metadata'
+        rows = report.setdefault('lock_samples' if target is not None else 'samples', [])
+        for _ in range(config.max_frames):
+            if time.monotonic() >= deadline:
+                break
+>           source.read_fresh()
+            ^^^^^^^^^^^^^^^^^
+E           AttributeError: 'FocusSource' object has no attribute 'read_fresh'
+
+experiments/ppal/eyes/autofocus.py:57: AttributeError
+_____ test_six_actual_consecutive_originals_stabilize_without_looser_gate ______
+
+    def test_six_actual_consecutive_originals_stabilize_without_looser_gate():
+        source=Replay([original(n) for n in range(1,7)])
+        cfg=PreflightConfig(geometry_interval=0)
+>       assert cfg.stable_views==6 and cfg.max_jitter_pixels==8
+E       assert (6 == 6 and 12.0 == 8)
+E        +  where 6 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).stable_views
+E        +  and   12.0 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).max_jitter_pixels
+
+tests/test_robotron_geometry_replay.py:52: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_robotron_autofocus.py::test_automatic_start_uses_observed_position_then_confirms_idle_manual_lock
+FAILED tests/test_robotron_autofocus.py::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[None]
+FAILED tests/test_robotron_autofocus.py::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[nan]
+FAILED tests/test_robotron_autofocus.py::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[inf]
+FAILED tests/test_robotron_autofocus.py::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[-1.0]
+FAILED tests/test_robotron_autofocus.py::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[11.0]
+FAILED tests/test_robotron_autofocus.py::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[True]
+FAILED tests/test_robotron_autofocus.py::test_stable_lens_is_not_successful_autofocus[None]
+FAILED tests/test_robotron_autofocus.py::test_stable_lens_is_not_successful_autofocus[0]
+FAILED tests/test_robotron_autofocus.py::test_stable_lens_is_not_successful_autofocus[1]
+FAILED tests/test_robotron_autofocus.py::test_stable_lens_is_not_successful_autofocus[3]
+FAILED tests/test_robotron_autofocus.py::test_repeated_or_unstable_metadata_cannot_settle
+FAILED tests/test_robotron_autofocus.py::test_manual_lock_requires_reported_idle_and_matching_position
+FAILED tests/test_robotron_autofocus.py::test_diagnostic_manual_seed_is_explicit_validated_and_verified
+FAILED tests/test_robotron_geometry_replay.py::test_six_actual_consecutive_originals_stabilize_without_looser_gate
+15 failed, 931 passed, 21 skipped in 245.93s (0:04:05)

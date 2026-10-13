@@ -1,0 +1,15 @@
+{
+  "returncode": 0,
+  "junit": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "21",
+    "tests": "728",
+    "time": "222.763",
+    "timestamp": "2026-10-09T02:19:48.109417+02:00",
+    "hostname": "0175432ce6cd"
+  },
+  "pytest_summary": "707 passed, 21 skipped in 222.75s",
+  "environment": "host x86_64 Python 3.12.14; no native Pi or physical execution"
+}

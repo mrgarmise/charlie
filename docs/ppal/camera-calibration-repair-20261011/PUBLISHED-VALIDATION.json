@@ -1,0 +1,27 @@
+{
+  "tested_revision": "bd605d9f794a52850d614f89df7b2a495ebdf607",
+  "tested_tree": "e694446d28e7fb4b9276cc4e8976915fe4e2dd19",
+  "isolated_clean_worktree": "/workspace/scratch/a5d7375d8e4e/charlie-camera-published-validation",
+  "command": "/workspace/scratch/a5d7375d8e4e/camera-test-env/bin/python -m pytest -q tests -o faulthandler_timeout=60 --junitxml=/workspace/scratch/a5d7375d8e4e/camera-published.xml",
+  "exit_code": 0,
+  "suite": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "21",
+      "tests": "903",
+      "time": "208.870",
+      "timestamp": "2026-10-11T09:28:01.111660+07:00",
+      "hostname": "e9d376ec7fc1"
+    }
+  ],
+  "source_fingerprint_verification": "all 13 changed Python files matched recorded source-sha256.json",
+  "compileall": "passed for eight modified/new implementation modules",
+  "git_diff_check": "passed",
+  "initial_git_status": "clean",
+  "final_git_status": "clean",
+  "junit_sha256": "9a307f17909c1545016e1b425a8b86376bc3a77faa95c8b35bdc02ac4bc1c4ad",
+  "native_camera_acceptance": "not executed; Pi hostname unavailable",
+  "installed_or_gameplay": "neither"
+}

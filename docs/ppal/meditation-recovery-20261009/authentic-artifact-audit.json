@@ -1,0 +1,103 @@
+{
+  "base_revision": "6fcd5b21432dc0da8dd6afab52c446b6d1c55b0a",
+  "source_manifest": "docs/ppal/native-cycle-20261005/authentic-recovery-manifest.json",
+  "source_manifest_sha256": "f156ac97bc956c31cbd981c123395a2859c1446a03008d7a34880863edf5e353",
+  "original_manifest_code_parent": "c2afb792f52f5dc9121eac9676ebbd4b608f9de1",
+  "records": [
+    {
+      "context_id": "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01",
+      "commission_id": "a30b3e66c82e22fc962360e1ff4d991d234854fb4b072c423bca6d0a3bef3421",
+      "artifact_sha256": "f6dff1fe55b4b24c30977df8e766dbb373ec07ff16e2c052124ffc9519de31c6",
+      "compressed_artifact": "authentic-19fab8e8ace09f70-result.json.gz",
+      "source_episode": "episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da",
+      "source_sha256": "cbc3fbc63a477c08c65c6500a790cbce9ba1923329ac7e123cc951110f6eb255",
+      "recorded_origin": "Executive-commissioned existing predictive meditation",
+      "quality": {
+        "adjacent": {
+          "predictions": 10552,
+          "mean_error": 0.6843040033929519,
+          "median_error": 0.0390625,
+          "p90_error": 2.173592087645832,
+          "within_2": 89.01630022744503,
+          "within_4": 95.65011372251706,
+          "within_7": 98.33206974981046
+        },
+        "gaps": {
+          "predictions": 632,
+          "mean_error": 3.745411839314743,
+          "median_error": 2.796006673346491,
+          "p90_error": 8.312188342632927,
+          "within_2": 42.08860759493671,
+          "within_4": 61.075949367088604,
+          "within_7": 83.38607594936708
+        }
+      },
+      "validation": "valid diagnostic finding"
+    },
+    {
+      "context_id": "1f448239f69240b7aca67992c1b7c5b08eec484647dea45c63930415de115dd5",
+      "commission_id": "d08ade2579283a4d8cdcb735c7b14dfd7163b57f6bdbbeb6abf5811ecdc69ce4",
+      "artifact_sha256": "926bf29cae4cc20179de799eda307eca6a10fd55ef1b2c793ff1797fe864aa1e",
+      "compressed_artifact": "authentic-1f448239f69240b7-result.json.gz",
+      "source_episode": "episode:98b8525bd70d050918d597a5c56c15f08a2c9abbcb2fbd379bf4a1bb87ac98fb",
+      "source_sha256": "b7364b69c6cc80b4f5bbb88951f7f6c88713d003312308ece0a21751ec77c685",
+      "recorded_origin": "Executive-commissioned existing predictive meditation",
+      "quality": {
+        "adjacent": {
+          "predictions": 3481,
+          "mean_error": 1.076619580262316,
+          "median_error": 0.4239276196901011,
+          "p90_error": 2.6435819243263468,
+          "within_2": 82.16029876472278,
+          "within_4": 94.97270899166907,
+          "within_7": 98.19017523700086
+        },
+        "gaps": {
+          "predictions": 202,
+          "mean_error": 3.5697268427888806,
+          "median_error": 3.216618294449232,
+          "p90_error": 7.5850685006897764,
+          "within_2": 34.65346534653465,
+          "within_4": 56.43564356435643,
+          "within_7": 88.11881188118812
+        }
+      },
+      "validation": "valid diagnostic finding"
+    },
+    {
+      "context_id": "9b1e65c9d5c50f5d33a95d747b56a89be69f142fa6117908bf8aaf38f178fc5e",
+      "commission_id": "3856173c1945006e714a8661c527b68b7182254c70c8229e9bf4b345b07eef4e",
+      "artifact_sha256": "a7c79d72febd6e99200cc013846366e0203ac2b640f0c02642a9dbe2992ea154",
+      "compressed_artifact": "authentic-9b1e65c9d5c50f5d-result.json.gz",
+      "source_episode": "episode:ea62567075533157f5f20e0fbe1311c74fd198d5aa54197a3e88cfa6478fa218",
+      "source_sha256": "91052ddf8d48de070eab853fcb38b9ff57a5a1435dad08c76004e4543fb3a885",
+      "recorded_origin": "Executive-commissioned existing predictive meditation",
+      "quality": {
+        "adjacent": {
+          "predictions": 0,
+          "mean_error": null,
+          "median_error": null,
+          "p90_error": null,
+          "within_2": 0.0,
+          "within_4": 0.0,
+          "within_7": 0.0
+        },
+        "gaps": {
+          "predictions": 0,
+          "mean_error": null,
+          "median_error": null,
+          "p90_error": null,
+          "within_2": 0.0,
+          "within_4": 0.0,
+          "within_7": 0.0
+        }
+      },
+      "validation": "rejected",
+      "reason": "finite preserved prediction errors required: adjacent"
+    }
+  ],
+  "physical_authorization": false,
+  "latest_native_failure_artifact_available": false,
+  "new_independent_experiences": 0,
+  "note": "Read-only byte/hash/validator audit of earlier published authentic meditations; not a reconstruction of the October 9 notebook or a rerun of completed investigations."
+}

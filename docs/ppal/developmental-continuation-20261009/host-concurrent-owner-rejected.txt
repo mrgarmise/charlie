@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/c81a2d35e2bc/charlie/main.py", line 98, in <module>
+    main()
+  File "/workspace/scratch/c81a2d35e2bc/charlie/main.py", line 42, in main
+    run(args.learning_state,roots,**kwargs)
+  File "/workspace/scratch/c81a2d35e2bc/charlie/learning/lifecycle.py", line 587, in run
+    lifecycle = DevelopmentLifecycle(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,history_roots=history_roots,resources=resources)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/c81a2d35e2bc/charlie/learning/lifecycle.py", line 40, in __init__
+    fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+BlockingIOError: [Errno 11] Resource temporarily unavailable

@@ -1,0 +1,30 @@
+..............................s................F..............           [100%]
+=================================== FAILURES ===================================
+___ test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-13/test_normal_main_autonomously_0')
+
+    def test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart(tmp_path):
+        from test_normal_learning_lifecycle import experience,delivered_corpus,startup,rows
+        root=experience(tmp_path);state=tmp_path/'state';delivered_corpus(tmp_path,state)
+        inbox=state/'acquisition-inbox'/'motion.json';c=json.loads(inbox.read_text())
+        c['provenance_kind']='simulated-controlled-trajectories'
+        for episode in c['episodes']:
+            for i,frame in enumerate(episode['frames']):
+                frame['targets'][0]['position']=[25-i,20]
+        inbox.write_text(json.dumps(c))
+        process=startup(state,[root]);assert process.returncode==0,process.stderr
+        policy=load_policy(state/'ppal-policy.json')
+        assert policy.identity['provenance_kind']=='simulated-controlled-trajectories'
+        original=rows(state)
+        outcomes=[r for r in original if r.data['payload'].get('category')=='offline_operational_outcome']
+        assert len(outcomes)==1
+        decisions=outcomes[0].data['payload']['decisions']
+>       assert any(d['qualified_policy_action']['move']!=d['baseline_action']['move'] for d in decisions)
+E       assert False
+E        +  where False = any(<generator object test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart.<locals>.<genexpr> at 0x7f8a505512f0>)
+
+tests/test_qualified_ppal_policy.py:249: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_qualified_ppal_policy.py::test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart
+1 failed, 60 passed, 1 skipped in 50.69s

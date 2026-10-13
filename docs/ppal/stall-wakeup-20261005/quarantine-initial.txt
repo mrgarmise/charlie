@@ -1,0 +1,45 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_quarantined_partial_meditation_does_not_keep_waiting_portfolio_busy ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_quarantined_partial_medit0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f38b60f2120>
+
+    def test_quarantined_partial_meditation_does_not_keep_waiting_portfolio_busy(tmp_path,monkeypatch):
+        root=experience(tmp_path);state=tmp_path/'state';life=DevelopmentLifecycle(state,[root])
+        monkeypatch.setattr(meditation,'meditate',lambda *args,**kwargs:(_ for _ in ()).throw(MeditationYield('controlled interruption')))
+        life.turn()
+        assert life.executive.work_states()
+        (root/'tracks.json').write_text(json.dumps(dict(tracks=[]))) # genuine preserved-source modification
+        for _ in range(8):life.turn()
+>       assert life.phase=='waiting for evidence'
+E       AssertionError: assert 'idle' == 'waiting for evidence'
+E         
+E         - waiting for evidence
+E         + idle
+
+tests/test_developmental_stall.py:228: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: reflecting | no project | 
+Development: investigating | no project | 
+Development: idle | The unresolved question may recur in independent experience: score_attribution | Committed developmental checkpoint or conclusion advanced
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | Committed developmental checkpoint or conclusion advanced
+Development: idle | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: idle | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: idle | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: idle | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: idle | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: idle | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: idle | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+Development: idle | The unresolved question may recur in independent experience: score_attribution | No justified executable investigation under current evidence and capabilities
+=========================== short test summary info ============================
+FAILED tests/test_developmental_stall.py::test_quarantined_partial_meditation_does_not_keep_waiting_portfolio_busy
+1 failed in 0.60s

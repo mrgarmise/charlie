@@ -1,0 +1,792 @@
+{
+  "schema": "developmental-restart-acceptance-v1",
+  "continuity_passed": true,
+  "original_records_preserved": true,
+  "appended_records": 0,
+  "new_record_categories": {},
+  "substantive_progress": false,
+  "progress_records": [],
+  "advanced_meditations": [],
+  "runnable_work": [],
+  "blocked_work": [],
+  "completed_work": [],
+  "classification": "waiting",
+  "steady_state_reached": true,
+  "restart_exact": true,
+  "physical_authorization": false,
+  "physical_score_improvement": "UNKNOWN",
+  "original_archive_sha256": "465fe4768ef6f47786836715f859ff0e63abfabd55214de8bd81768e2f7b4012",
+  "original_records": 455,
+  "after_records": 507,
+  "environment": {
+    "python": "3.12.14",
+    "machine": "x86_64"
+  },
+  "native_pi": false,
+  "searches": [
+    {
+      "id": "0fd2c8ef576f53eb9b607cb028a169fb1f30f14969a5accccda338a993069cc5",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+        "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+        "Independent persistent player/object identities and board coordinates",
+        "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "b303a1456626b6c97e645c48c3ff0705139a3cda9c97e9d1f55294761b18f7f0",
+      "required_evidence": [
+        "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+        "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+        "Independent persistent player/object identities and board coordinates",
+        "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "b837554037c178dad860671829fa7d57b27137651646b216a96ae452070841ad",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "823acd556d8b3ed9313d12250755ae28ef77e4ca8d74b985d1c1b59f60c747ef",
+      "required_evidence": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "f46f52c819646390b20c00b5ddaed732ecce5eaa124728155012b792f4e07670",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "cedc9944378b591481a5b6a21cc43ea8ec48e374cdf292b182ac20ee8a720a25",
+      "required_evidence": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "11061837e4a430b74441b7cb07e5bf614c62d9849b851cf468235b6e49e585c8",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "5a368f57a8795ef8c0cb29a4979d15b77efd76dae5a635c4597d918ae773ca8e",
+      "required_evidence": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "51c8d8df7bf66366585d8de94b80daba4e1d446e9a16b3f67b6185c945fd00da",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "9f2568da6a1daec1cc2579c573b288006f3c9d5573bc66f743d524ac970fbba5",
+      "required_evidence": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "9ad3ebd54c87c3e6ea9f3d22a2d58a7ab519b394a6e106cd691864209684a00d",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "a1832aa02d75d7c27945d17abab8e62343a656046b2e30f825e464b9bf9acbda",
+      "required_evidence": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "ee03ded1ec7afd671ddb0d026ff5b7ce203f02f11d7cdd79c28fea6d9a8bf44e",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "2287ce0dfbb0d017c73530330456213e79d721d50b1b90cb475195970775b2ee",
+      "required_evidence": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "1a66a445276d89104ff4da70eb601ae3a30168e119ce9cd36f659bd01b280afc",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "edb1c136c7ab447ea93399c77e9415c0f393a810b23358971c6ea162f7ea6b4f",
+      "required_evidence": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "6f49468796481b1d578e24c9df51046f28251f2e1c6b5c15312360cd87d29916",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "bdd6732b268e758b2b7c7980eff99bc2d2c696c97591a05c28a1c0b8bc20ff83",
+      "required_evidence": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "0cd7425a0a3b4874494b0ec1532a4a24ca48b4800724c36b2714fffca1635ee5",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "eedc626452b030808917bb50e3e616ac661981bb9ba2edde771f489e75ffa03a",
+      "required_evidence": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    },
+    {
+      "id": "c9022b281cbc1ea0248c717b558d7f0d21f9c552175747b540b2518b46faa4c6",
+      "availability": "d715289eb913a64eebaea24cd93e914ad3b46619ec4169a00bf2274115130010",
+      "category": "acquisition_search_result",
+      "delivery_id": null,
+      "firmware_authorization": false,
+      "inspected_evidence": [
+        "f35bd2d57ad8164ce3cbb169c963717c37645938526764a7ae5b6b13c5541a66",
+        "e0845cf48e16f37f4c4973bfc61cc47c92a21eb223ca0a62df5b11a54487ef20",
+        "3d80c00e601ce143ed510a080f6e9579ce52941943901d22523860d039678da0",
+        "1cbf04b2fcbe60a939b394d605db654d051556a2d63c525c48f0e5d6a8039c7c",
+        "5302628500adfef8cfa8240501714eb8204a7c4f1e0edb77bf702c53d6efe196",
+        "f863e30e26442f455d9d4a1040ba3f3f0e45a1b6869015d3f7af5958af4ef340",
+        "dc7db7afdbbb323983ae6f63c1de5b684bfedf13117d56f953a86e7dc147b706",
+        "f82e9237a7044a9f5256759533ed26fd04b8d081294ff164d3f11cede5ee9ae2",
+        "e6c04ead03671c9a5c080e646b6f1392d1c042a1644e4bfae8bf2794232ad6ef",
+        "8c587f124b1e048f9164fbed4c007f043999a55e63aefaff1ab3f6e4ed780bd3",
+        "e322647fabeb32c55412db7909ab9dc3227bf925ffeeba7ad5821ea866de2ef8",
+        "b7accbcf284b951ed10ab6e0621ce6eabe6efc0ab20292acbb34bf3bd50ad150",
+        "b17df1f6bee4caf386fae3930626f0b6fc7a7698e6226183b17c7f4c25272cf7",
+        "a5d81bce9040160c2444b292423dddf489c770eaf3251823b3021268ee01de07",
+        "70c58bdc171b75986270db23963f4a42e51540b830cb5c9618edc52becd1d29c",
+        "4b39c461479248737f747863646f293c8972c167556ef943b659dca79deedf69",
+        "378a29b70c15ef78b191da4b04720c255dead7914cd2723ba9918a34e445e27c"
+      ],
+      "new_independent_experience": false,
+      "next_requirement": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "physical_authorization": false,
+      "qualification_authority": "existing artifact/corpus validators and independent Evaluator",
+      "reason": "Configured source discovery completed; no validator has delivered evidence satisfying this exact dependency",
+      "request_id": "14bbf92ef431c7cb22beb119f9eb71ae10f0f3bfd6fd177acbf9c0de25f68f4f",
+      "required_evidence": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "searched_sources": [
+        {
+          "available": true,
+          "path": "/workspace/scratch/a5d7375d8e4e/authentic-original"
+        }
+      ],
+      "servo_authorization": false,
+      "status": "unsatisfied",
+      "work_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a",
+      "provenance": {
+        "code_revision": "1263b333365ba87da363964af034daad139eacc1",
+        "dirty_worktree": true,
+        "test_environment": "offline process; no hardware capability initialized"
+      }
+    }
+  ],
+  "executive_receipts": [
+    {
+      "id": "dd5cb9e360e18e4987ff07cfefa73d6e8998951199becf2601ea8c3dfbbdaf7a",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "b303a1456626b6c97e645c48c3ff0705139a3cda9c97e9d1f55294761b18f7f0",
+      "search_id": "0fd2c8ef576f53eb9b607cb028a169fb1f30f14969a5accccda338a993069cc5",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+        "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+        "Independent persistent player/object identities and board coordinates",
+        "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+      ],
+      "work_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d"
+    },
+    {
+      "id": "c20da7f5d106e83a1f0905362274ba6248da6316825c3e25245ac0437f883b0e",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "823acd556d8b3ed9313d12250755ae28ef77e4ca8d74b985d1c1b59f60c747ef",
+      "search_id": "b837554037c178dad860671829fa7d57b27137651646b216a96ae452070841ad",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ],
+      "work_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c"
+    },
+    {
+      "id": "2bd802c67afa6f212c16b9f25fff8aa1e7e642eec6928c50395c4ce9ef39ac0d",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "cedc9944378b591481a5b6a21cc43ea8ec48e374cdf292b182ac20ee8a720a25",
+      "search_id": "f46f52c819646390b20c00b5ddaed732ecce5eaa124728155012b792f4e07670",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ],
+      "work_id": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343"
+    },
+    {
+      "id": "4d55055ff5a0533100505ddf18851c2a6441b5875c5c51324890a2669a32f043",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "5a368f57a8795ef8c0cb29a4979d15b77efd76dae5a635c4597d918ae773ca8e",
+      "search_id": "11061837e4a430b74441b7cb07e5bf614c62d9849b851cf468235b6e49e585c8",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Hash-bound independently verified persistent identities and measured board trajectories",
+        "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+        "One validation and at least three distinct unconsulted final experience groups",
+        "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+      ],
+      "work_id": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df"
+    },
+    {
+      "id": "aea050f7fcb9f4102e40fe830ebf2d4df48f4804a8b75bf603c3d9dcd7ba7e5f",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "9f2568da6a1daec1cc2579c573b288006f3c9d5573bc66f743d524ac970fbba5",
+      "search_id": "51c8d8df7bf66366585d8de94b80daba4e1d446e9a16b3f67b6185c945fd00da",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "work_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0"
+    },
+    {
+      "id": "d882fbf51b2e0ed59deddc26acc23de97dea7ab46d982896397b41b7bfcbe3da",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "a1832aa02d75d7c27945d17abab8e62343a656046b2e30f825e464b9bf9acbda",
+      "search_id": "9ad3ebd54c87c3e6ea9f3d22a2d58a7ab519b394a6e106cd691864209684a00d",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "work_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a"
+    },
+    {
+      "id": "429a1afde55522d93da1fd6db46655f648a09d270b1e5bff36e0047ff10b797c",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "2287ce0dfbb0d017c73530330456213e79d721d50b1b90cb475195970775b2ee",
+      "search_id": "ee03ded1ec7afd671ddb0d026ff5b7ce203f02f11d7cdd79c28fea6d9a8bf44e",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "work_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345"
+    },
+    {
+      "id": "659dda306b88c1272ffafa0539cea76dd64c772c4c940aafb38d307f88f580c9",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "edb1c136c7ab447ea93399c77e9415c0f393a810b23358971c6ea162f7ea6b4f",
+      "search_id": "1a66a445276d89104ff4da70eb601ae3a30168e119ce9cd36f659bd01b280afc",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "work_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf"
+    },
+    {
+      "id": "2041b2c85d5016f347b8e7a1060fa28f9845c1c6348b25067e835459088d4c29",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "bdd6732b268e758b2b7c7980eff99bc2d2c696c97591a05c28a1c0b8bc20ff83",
+      "search_id": "6f49468796481b1d578e24c9df51046f28251f2e1c6b5c15312360cd87d29916",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "work_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2"
+    },
+    {
+      "id": "5c0972b44238e3acac941d5632cc6c7dd39bcdaf61efb7b2b005d4850cbc03ce",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "eedc626452b030808917bb50e3e616ac661981bb9ba2edde771f489e75ffa03a",
+      "search_id": "0cd7425a0a3b4874494b0ec1532a4a24ca48b4800724c36b2714fffca1635ee5",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "work_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f"
+    },
+    {
+      "id": "379de524ed0e67f96ea05265a7826f59faa310953c89ef94142d5cac62337d44",
+      "evidence_qualified": false,
+      "hypothesis_result": "unchanged",
+      "next_direction": "Preserve original question; select other eligible work or await changed evidence/capability",
+      "op": "evidence_search_received",
+      "physical_authorization": false,
+      "request_id": "14bbf92ef431c7cb22beb119f9eb71ae10f0f3bfd6fd177acbf9c0de25f68f4f",
+      "search_id": "c9022b281cbc1ea0248c717b558d7f0d21f9c552175747b540b2518b46faa4c6",
+      "status": "unsatisfied",
+      "unresolved_dependency": [
+        "Offline result awaits independent new evidence; preserve questions"
+      ],
+      "work_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+..............................F....                                      [100%]
+=================================== FAILURES ===================================
+________ ArcadeTransportTests.test_rejected_command_stops_and_releases _________
+
+self = <test_ppal_arcade_transport.ArcadeTransportTests testMethod=test_rejected_command_stops_and_releases>
+
+    def test_rejected_command_stops_and_releases(self):
+        with LegacyServer(("127.0.0.1", 0), reject=("RS_RIGHT_DOWN",)) as server:
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                with self.assertRaises(ConnectionError):
+                    with ArcadeController("127.0.0.1", server.server_address[1], sleep=lambda _: None,
+                                          protocol="legacy", pulse=False) as ctrl:
+                        ctrl.execute(Action("STAY", "E"))
+>               self.assertEqual(server.commands, ["NEUTRAL", "RS_RIGHT_DOWN", "NEUTRAL"])
+E               AssertionError: Lists differ: ['NEUTRAL', 'RS_RIGHT_DOWN'] != ['NEUTRAL', 'RS_RIGHT_DOWN', 'NEUTRAL']
+E               
+E               Second list contains 1 additional elements.
+E               First extra element 2:
+E               'NEUTRAL'
+E               
+E               - ['NEUTRAL', 'RS_RIGHT_DOWN']
+E               + ['NEUTRAL', 'RS_RIGHT_DOWN', 'NEUTRAL']
+E               ?                            +++++++++++
+
+tests/test_ppal_arcade_transport.py:55: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_ppal_arcade_transport.py::ArcadeTransportTests::test_rejected_command_stops_and_releases
+1 failed, 34 passed in 10.15s

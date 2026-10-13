@@ -1,0 +1,580 @@
+{
+  "master_base": "c322658586074462ffbded5ccd9db11f96448b0a",
+  "score_tracker_head": "72f4958d73cae9d29dde81596313984bc51b93e6",
+  "behind_master": 0,
+  "ahead_master": 83,
+  "full_diff_files": 157,
+  "chosen_strategy": "selected score modules and necessary immutable-evidence/evaluator dependencies on a fresh master branch; no full feature merge",
+  "excluded": [
+    "play_robotron and marathon executables",
+    "controller/firmware/motion changes",
+    "planning/SELF/active vision",
+    "CNN/foundry/Executive scheduling",
+    "sprite-knowledge corpus and unrelated development branches"
+  ],
+  "files": [
+    {
+      "path": "config/robotron/playfield-latest.json",
+      "sha256": "79ca606d7211a9eae00edaed365505cd54dae320a8080342dc91d716d41cda1a",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "79ca606d7211a9eae00edaed365505cd54dae320a8080342dc91d716d41cda1a",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "79ca606d7211a9eae00edaed365505cd54dae320a8080342dc91d716d41cda1a",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "79ca606d7211a9eae00edaed365505cd54dae320a8080342dc91d716d41cda1a",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/eyes/__init__.py",
+      "sha256": "686208ee4021d78e26494ef915a4489dc4d10e768abcac9cd45f1d275122e3cd",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "686208ee4021d78e26494ef915a4489dc4d10e768abcac9cd45f1d275122e3cd",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "686208ee4021d78e26494ef915a4489dc4d10e768abcac9cd45f1d275122e3cd",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "686208ee4021d78e26494ef915a4489dc4d10e768abcac9cd45f1d275122e3cd",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/eyes/calibration.py",
+      "sha256": "3ee7dd275f9a821063dd5f06d83a45259786fc6afb475c2f4f2666c133b79518",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "3ee7dd275f9a821063dd5f06d83a45259786fc6afb475c2f4f2666c133b79518",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "3ee7dd275f9a821063dd5f06d83a45259786fc6afb475c2f4f2666c133b79518",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "3ee7dd275f9a821063dd5f06d83a45259786fc6afb475c2f4f2666c133b79518",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/eyes/hud.py",
+      "sha256": "668e0b940eabcc64c2cd89eb430d910327c5bbc4fe7994ac0b435c629bf26817",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "668e0b940eabcc64c2cd89eb430d910327c5bbc4fe7994ac0b435c629bf26817",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "668e0b940eabcc64c2cd89eb430d910327c5bbc4fe7994ac0b435c629bf26817",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "668e0b940eabcc64c2cd89eb430d910327c5bbc4fe7994ac0b435c629bf26817",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/inspect_robotron_score.py",
+      "sha256": "5a3b358b9d0cc045f9526c7782b00d42e13164b47604163426ab3c1f0122a654",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "1c4112751084771a8f7c8f498d67f68ed4b17299ed6b4c0877de3cfb9f72ddf6",
+          "identical": false
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "16f1d3f5775073d57c105c8d9df3d893021316dbcb69314b8c6ad5e4810bd5c2",
+          "identical": false
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "0c08e9352bf7ad5173a81a873e9ca247e48b7f7b106f78e2fd21afc42945a126",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/robotron_hud.py",
+      "sha256": "ec8a77a4c79e7405ed2605efad6aacf6aace9a5e4d85a35e392da196f5aa8135",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "aada7fe015aa2d0561d0b8c364520dba5a6ec7391122dc2cb3a44b64c515783f",
+          "identical": false
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "aada7fe015aa2d0561d0b8c364520dba5a6ec7391122dc2cb3a44b64c515783f",
+          "identical": false
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "c433b382c9d962bb90da32aeb9428c1fc2b17354bca218d3c09b12bdac3c7889",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/robotron_score_corpus.py",
+      "sha256": "c0e3ec79489256f811a33b552166dcb482b898dca44355856e1f8aac1017410d",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "c0e3ec79489256f811a33b552166dcb482b898dca44355856e1f8aac1017410d",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "c0e3ec79489256f811a33b552166dcb482b898dca44355856e1f8aac1017410d",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "c0e3ec79489256f811a33b552166dcb482b898dca44355856e1f8aac1017410d",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/robotron_score_system.py",
+      "sha256": "6f82b1e3657bb78bf1797c3c5676fb8c48fec593320449ddf93bcbaf09438aa9",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "6f82b1e3657bb78bf1797c3c5676fb8c48fec593320449ddf93bcbaf09438aa9",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "6f82b1e3657bb78bf1797c3c5676fb8c48fec593320449ddf93bcbaf09438aa9",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "5359fb9c5199e748f1f41c1c88d96408e746fac74ca176971298926da16c3906",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/score-review.html",
+      "sha256": "f2a5d5be9856ec67075e6dde10678d811153e6e69a9ec85baaf00a9455431964",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "cd3cbec9fa41e448e14e7d92aa3284ad2fc844f492918f879d72a1739f02382b",
+          "identical": false
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "cd3cbec9fa41e448e14e7d92aa3284ad2fc844f492918f879d72a1739f02382b",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/score_events.py",
+      "sha256": "e8bdce36eb9993a4909d4616ccf391a9481961becf65bc759a10d37f6c9613d1",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "e8bdce36eb9993a4909d4616ccf391a9481961becf65bc759a10d37f6c9613d1",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "e8bdce36eb9993a4909d4616ccf391a9481961becf65bc759a10d37f6c9613d1",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "e8bdce36eb9993a4909d4616ccf391a9481961becf65bc759a10d37f6c9613d1",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/score_feedback.py",
+      "sha256": "c20d60389ffa40daee03524058119b386fc28760f4f2bf3afbc62e718d01f6fa",
+      "source_versions": []
+    },
+    {
+      "path": "experiments/ppal/score_observer.py",
+      "sha256": "c5a0b41fefb8bb9ab822b893762571827c904ec884183a3b1878d334b2b01066",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "e47158b50911316a7ef3c2d50a7d79b6bd082cb2805cea740ff844fde44c9af3",
+          "identical": false
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "e57d722a4cd6459cc763c82376dcf2fb6a837d69a6a6d8dc4a0b9203068ab526",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "path": "experiments/ppal/score_tracker.py",
+      "sha256": "98694cc60807273245182bf0c758359b861c9b1c9edfdccddf1eaa69f9ae2d36",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "98694cc60807273245182bf0c758359b861c9b1c9edfdccddf1eaa69f9ae2d36",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "98694cc60807273245182bf0c758359b861c9b1c9edfdccddf1eaa69f9ae2d36",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "8ab9ab74657001a55d664d4b87677ea2c0445910ed7343f4797e4ec5fd919d10",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "path": "memory/__init__.py",
+      "sha256": "20e1e544ef0c64794fca92a94410d75686f43d17c1666d6b7ff7e8eced05f529",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "20e1e544ef0c64794fca92a94410d75686f43d17c1666d6b7ff7e8eced05f529",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "20e1e544ef0c64794fca92a94410d75686f43d17c1666d6b7ff7e8eced05f529",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "20e1e544ef0c64794fca92a94410d75686f43d17c1666d6b7ff7e8eced05f529",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "memory/episode_identity.py",
+      "sha256": "f9c3d3038926ce95e14dc8ebf318d416ec1e3f0a3137fa5ff9538fe7785ab6fc",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "d64926e49a168c33e79b6564beb318a222e6f5c01d00431efb504848175bea52",
+          "identical": false
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "f9c3d3038926ce95e14dc8ebf318d416ec1e3f0a3137fa5ff9538fe7785ab6fc",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "memory/evaluator.py",
+      "sha256": "715cf769132a3704ded2c32c99461e316fce7091f3f2e2230eb02c28f9b25fe6",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "a697239f1fe6f040d2cba67382053169abc3b3991782ba5b7b3c7a954ed9cbcc",
+          "identical": false
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "a697239f1fe6f040d2cba67382053169abc3b3991782ba5b7b3c7a954ed9cbcc",
+          "identical": false
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "79587d08c2f2522ce2d9d095bd027e93fcbfeb331b4479501857d4d67f71af0c",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "path": "memory/evidence.py",
+      "sha256": "a1869634407f5e355925bf1f10077ff585130b409d702f0ccfd910695053748b",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "a1869634407f5e355925bf1f10077ff585130b409d702f0ccfd910695053748b",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "a1869634407f5e355925bf1f10077ff585130b409d702f0ccfd910695053748b",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "memory/former.py",
+      "sha256": "32ae5d3f6f26f837483d983dd64b4e6a41e78a17039bcf938c6e436e65915cb5",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "32ae5d3f6f26f837483d983dd64b4e6a41e78a17039bcf938c6e436e65915cb5",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "32ae5d3f6f26f837483d983dd64b4e6a41e78a17039bcf938c6e436e65915cb5",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "32ae5d3f6f26f837483d983dd64b4e6a41e78a17039bcf938c6e436e65915cb5",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "memory/marm.py",
+      "sha256": "0a369b9705d6e5076305ef7daa004994c6e104603eae08375c368ed480ec41d6",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "0a369b9705d6e5076305ef7daa004994c6e104603eae08375c368ed480ec41d6",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "0a369b9705d6e5076305ef7daa004994c6e104603eae08375c368ed480ec41d6",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "0a369b9705d6e5076305ef7daa004994c6e104603eae08375c368ed480ec41d6",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "requirements-score-review.txt",
+      "sha256": "0a1d64e91529d48771226050dc8b9933e19b1c680493729ef9b9a6ffba0a449b",
+      "source_versions": []
+    },
+    {
+      "path": "tests/fixtures/robotron-developmental/003511-review-000-0-gameplay.jpg",
+      "sha256": "bf52abb6f741e8d3e042cf1944adadc6ed7450eb7104e8b2fc068d04741c6c32",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "bf52abb6f741e8d3e042cf1944adadc6ed7450eb7104e8b2fc068d04741c6c32",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "bf52abb6f741e8d3e042cf1944adadc6ed7450eb7104e8b2fc068d04741c6c32",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tests/fixtures/robotron-developmental/provenance.json",
+      "sha256": "d6b7958ad5a506af0bcd7f1726eb03dc8a54f7e5ad4d9a669fda7abe54cfd6de",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "d6b7958ad5a506af0bcd7f1726eb03dc8a54f7e5ad4d9a669fda7abe54cfd6de",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "d6b7958ad5a506af0bcd7f1726eb03dc8a54f7e5ad4d9a669fda7abe54cfd6de",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tests/fixtures/robotron-tracking-score/camera-100.jpg",
+      "sha256": "d7b6c62e1a8bd578b28ed98e814fa990d0abe7252fe8f094f774ae86683c8331",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "d7b6c62e1a8bd578b28ed98e814fa990d0abe7252fe8f094f774ae86683c8331",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "d7b6c62e1a8bd578b28ed98e814fa990d0abe7252fe8f094f774ae86683c8331",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tests/fixtures/robotron-tracking-score/camera-zero.jpg",
+      "sha256": "3f84670a7b457ff4b3d044768d56bf1eba5e6cf6fb339d82da2036fa34d70f52",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "3f84670a7b457ff4b3d044768d56bf1eba5e6cf6fb339d82da2036fa34d70f52",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "3f84670a7b457ff4b3d044768d56bf1eba5e6cf6fb339d82da2036fa34d70f52",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tests/fixtures/robotron-tracking-score/labels.json",
+      "sha256": "e38a1f2b06aef62a57ed5137598d1db1d16da97069560f3a87a93986f7fbf804",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "e38a1f2b06aef62a57ed5137598d1db1d16da97069560f3a87a93986f7fbf804",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "e38a1f2b06aef62a57ed5137598d1db1d16da97069560f3a87a93986f7fbf804",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_robotron_hud.py",
+      "sha256": "17171560ff6dbb482bdb7ccf9dc4206b85c2ad373f8ae7ac55e5ea9ff3eefb6f",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "17171560ff6dbb482bdb7ccf9dc4206b85c2ad373f8ae7ac55e5ea9ff3eefb6f",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "17171560ff6dbb482bdb7ccf9dc4206b85c2ad373f8ae7ac55e5ea9ff3eefb6f",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "17171560ff6dbb482bdb7ccf9dc4206b85c2ad373f8ae7ac55e5ea9ff3eefb6f",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_score_feedback_recovery.py",
+      "sha256": "77f94009ccbc9ad4ff65d48ff42c94a483165cce08cea5d4a727bca2051e9253",
+      "source_versions": []
+    },
+    {
+      "path": "tests/test_score_human_review.py",
+      "sha256": "c49e7b77ec96b66d1190f0281ac13d4e207b4fe127d15174ee0a1d81c3f52c05",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "c49e7b77ec96b66d1190f0281ac13d4e207b4fe127d15174ee0a1d81c3f52c05",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "c49e7b77ec96b66d1190f0281ac13d4e207b4fe127d15174ee0a1d81c3f52c05",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_score_observer.py",
+      "sha256": "e60cd989d1e4c0a0ccb346fb598d30da26b8e58518d3f117bbcf6fa9cab11531",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "e60cd989d1e4c0a0ccb346fb598d30da26b8e58518d3f117bbcf6fa9cab11531",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "e60cd989d1e4c0a0ccb346fb598d30da26b8e58518d3f117bbcf6fa9cab11531",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_score_review_navigation.py",
+      "sha256": "0ca24539e75100fe4b691161029c4ac2a6204c655f6bcf82e58627213072569f",
+      "source_versions": []
+    },
+    {
+      "path": "tests/test_score_review_queue.py",
+      "sha256": "bd5402fcaee35b16197bf1d2227e5b17fac704a85450692e2cc2de483452f1f8",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "bd5402fcaee35b16197bf1d2227e5b17fac704a85450692e2cc2de483452f1f8",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "bd5402fcaee35b16197bf1d2227e5b17fac704a85450692e2cc2de483452f1f8",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tests/test_score_tracker.py",
+      "sha256": "63ced8b5dd1e529af7744450647df349a5d6fe89017607eddb6b22e5fe7df4ef",
+      "source_versions": [
+        {
+          "commit": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+          "source_sha256": "63ced8b5dd1e529af7744450647df349a5d6fe89017607eddb6b22e5fe7df4ef",
+          "identical": true
+        },
+        {
+          "commit": "4bca038591a586c70a7f97f50f1af25ef42f6794",
+          "source_sha256": "63ced8b5dd1e529af7744450647df349a5d6fe89017607eddb6b22e5fe7df4ef",
+          "identical": true
+        },
+        {
+          "commit": "72f4958d73cae9d29dde81596313984bc51b93e6",
+          "source_sha256": "63ced8b5dd1e529af7744450647df349a5d6fe89017607eddb6b22e5fe7df4ef",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "path": "tools/recover_score_reviews.py",
+      "sha256": "a02df3c259c5ce6534d88a9f1992d2e3eee2c53670506bf941359f46ba945e59",
+      "source_versions": []
+    },
+    {
+      "path": "tools/score_feedback_candidate.py",
+      "sha256": "d467fb8de6883bb0675fbebb5177e6cc6f3346f09ad2317709ec1bac86c5f0d1",
+      "source_versions": []
+    },
+    {
+      "path": "tools/validate_score_camera_regression.py",
+      "source_versions": [],
+      "sha256": "aaa3accfd9bfef936d4a58924d418361223691b6c3900b4c0f3d372bf1568d25"
+    }
+  ]
+}

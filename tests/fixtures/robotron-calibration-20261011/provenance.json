@@ -1,0 +1,28 @@
+{
+  "source_session": "robotron-runs/development-20261011-001506/game-01",
+  "obtained": "Library original files, unchanged copies",
+  "qualification": "saved observations for offline geometry regression only; not a successful calibration or AF experiment",
+  "capture_metadata": "original sensory-preflight.json and exposure.json unavailable in host environment; camera timestamp/revision not inferred",
+  "observations": [
+    {
+      "file": "exposure-ev-0.png",
+      "sha256": "ce8c728d199df1a7a5cd8e0d7e0616f90c7de8f80c4aecd0c4d3dc31940c0e62",
+      "library_file_id": "libfile_835b9ad238548191ab19be4e8a66d549"
+    },
+    {
+      "file": "exposure-ev-1.png",
+      "sha256": "df227888e445a1c88bf818bc95aee5c575e871f09cdbe44eb2d544cafa8ad41e",
+      "library_file_id": "libfile_639a1ac679bc8191b713cdf8d222b6e9"
+    },
+    {
+      "file": "exposure-ev-2.png",
+      "sha256": "b210651fbb4afdbe29ea59696392c44bd734d5b5495f767ff809af2f6d05ed8d",
+      "library_file_id": "libfile_5820a00c92ec8191b84b2ae20bb93d7c"
+    },
+    {
+      "file": "exposure-ev-3.png",
+      "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+      "library_file_id": "libfile_1558899bc31c8191b4add53a3cfb1042"
+    }
+  ]
+}

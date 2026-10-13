@@ -1,0 +1,44 @@
+name: Best of Charlie software validation
+on:
+  push:
+    branches: [master, feature/best-of-charlie-consolidation]
+  pull_request:
+    branches: [master]
+permissions:
+  contents: read
+jobs:
+  software:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest
+      - run: python -m pytest tests -q --junitxml=software-tests.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: software-tests
+          path: software-tests.xml
+  tag:
+    needs: software
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag verified software release without deployment
+        run: |
+          TAG=$(python -c "import json; print(json.load(open('release/capabilities.json'))['tag'])")
+          if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Existing release tag preserved; increment release version for another release."
+            exit 0
+          fi
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/$TAG"

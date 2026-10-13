@@ -1,0 +1,195 @@
+{
+  "schema": "charlie-passive-eyes-benchmark-v1",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "methodology": "unthrottled offline real-frame replay, normal calibration/detection/single tracker/agency and archived provisional world planning; localhost HTTP consumption at 3 FPS",
+  "limitations": "No physical camera, sensor timing, display or controller transport. Replay action-ready latency is not measured live Pi command latency.",
+  "source": "../evidence/body-fire-bootstrap-20261001-020552/robotron-runs/body-fire-bootstrap-20261001-020552/score-raw-0001.png",
+  "rounds": 3,
+  "trials": [
+    {
+      "mode": "attached",
+      "frames": 34,
+      "elapsed_seconds": 2.041080537000198,
+      "fps": 16.657843423449734,
+      "frame_to_action_ready_ms_mean": 60.03124635293823,
+      "frame_to_action_ready_ms_p95": 74.77036299997053,
+      "observer": {
+        "offers": 34,
+        "dropped": 28,
+        "published": 6,
+        "errors": 0,
+        "submit_seconds": 0.0020075049997103633,
+        "encode_seconds": 0.1427078819997405,
+        "max_pending": 1,
+        "fps_limit": 3.0
+      },
+      "http_requests": 6,
+      "passive_frames_received": 4,
+      "http_bytes": 300588,
+      "action_sequence_digest": "d3c8753eaf4160f1d1c818c642caea510089279cd39134cf7d29e02c34d2598a"
+    },
+    {
+      "mode": "baseline",
+      "frames": 26,
+      "elapsed_seconds": 2.0192523149999033,
+      "fps": 12.876053085025804,
+      "frame_to_action_ready_ms_mean": 77.66305065386476,
+      "frame_to_action_ready_ms_p95": 93.84064300002137,
+      "observer": null,
+      "http_requests": 0,
+      "passive_frames_received": 0,
+      "http_bytes": 0,
+      "action_sequence_digest": "d3c8753eaf4160f1d1c818c642caea510089279cd39134cf7d29e02c34d2598a"
+    },
+    {
+      "mode": "detached",
+      "frames": 40,
+      "elapsed_seconds": 2.0297084119997635,
+      "fps": 19.707264237324676,
+      "frame_to_action_ready_ms_mean": 50.74233372497474,
+      "frame_to_action_ready_ms_p95": 58.73118699992119,
+      "observer": {
+        "offers": 40,
+        "dropped": 39,
+        "published": 0,
+        "errors": 0,
+        "submit_seconds": 0.0016911140010051895,
+        "encode_seconds": 0.0,
+        "max_pending": 1,
+        "fps_limit": 3.0
+      },
+      "http_requests": 0,
+      "passive_frames_received": 0,
+      "http_bytes": 0,
+      "action_sequence_digest": "d3c8753eaf4160f1d1c818c642caea510089279cd39134cf7d29e02c34d2598a"
+    },
+    {
+      "mode": "baseline",
+      "frames": 39,
+      "elapsed_seconds": 2.0306796970003234,
+      "fps": 19.205392193367555,
+      "frame_to_action_ready_ms_mean": 52.06769633333608,
+      "frame_to_action_ready_ms_p95": 61.17001300026459,
+      "observer": null,
+      "http_requests": 0,
+      "passive_frames_received": 0,
+      "http_bytes": 0,
+      "action_sequence_digest": "d3c8753eaf4160f1d1c818c642caea510089279cd39134cf7d29e02c34d2598a"
+    },
+    {
+      "mode": "attached",
+      "frames": 40,
+      "elapsed_seconds": 2.048146625999834,
+      "fps": 19.529851765604615,
+      "frame_to_action_ready_ms_mean": 51.20321922501034,
+      "frame_to_action_ready_ms_p95": 57.83482600008938,
+      "observer": {
+        "offers": 40,
+        "dropped": 34,
+        "published": 6,
+        "errors": 0,
+        "submit_seconds": 0.0019472269996185787,
+        "encode_seconds": 0.09073280899974634,
+        "max_pending": 1,
+        "fps_limit": 3.0
+      },
+      "http_requests": 7,
+      "passive_frames_received": 6,
+      "http_bytes": 450552,
+      "action_sequence_digest": "d3c8753eaf4160f1d1c818c642caea510089279cd39134cf7d29e02c34d2598a"
+    },
+    {
+      "mode": "detached",
+      "frames": 40,
+      "elapsed_seconds": 2.033658736000234,
+      "fps": 19.668983439508306,
+      "frame_to_action_ready_ms_mean": 50.84100862501373,
+      "frame_to_action_ready_ms_p95": 56.438050999986444,
+      "observer": {
+        "offers": 40,
+        "dropped": 39,
+        "published": 0,
+        "errors": 0,
+        "submit_seconds": 0.002042554999661661,
+        "encode_seconds": 0.0,
+        "max_pending": 1,
+        "fps_limit": 3.0
+      },
+      "http_requests": 0,
+      "passive_frames_received": 0,
+      "http_bytes": 0,
+      "action_sequence_digest": "d3c8753eaf4160f1d1c818c642caea510089279cd39134cf7d29e02c34d2598a"
+    },
+    {
+      "mode": "attached",
+      "frames": 40,
+      "elapsed_seconds": 2.033698792999985,
+      "fps": 19.668596026943845,
+      "frame_to_action_ready_ms_mean": 50.84202452496811,
+      "frame_to_action_ready_ms_p95": 57.42542699999831,
+      "observer": {
+        "offers": 40,
+        "dropped": 34,
+        "published": 6,
+        "errors": 0,
+        "submit_seconds": 0.0017713219995130203,
+        "encode_seconds": 0.11792412699924171,
+        "max_pending": 1,
+        "fps_limit": 3.0
+      },
+      "http_requests": 7,
+      "passive_frames_received": 5,
+      "http_bytes": 375649,
+      "action_sequence_digest": "d3c8753eaf4160f1d1c818c642caea510089279cd39134cf7d29e02c34d2598a"
+    },
+    {
+      "mode": "detached",
+      "frames": 36,
+      "elapsed_seconds": 2.0229843150000306,
+      "fps": 17.79549140992695,
+      "frame_to_action_ready_ms_mean": 56.193468416697414,
+      "frame_to_action_ready_ms_p95": 80.68892200026312,
+      "observer": {
+        "offers": 36,
+        "dropped": 35,
+        "published": 0,
+        "errors": 0,
+        "submit_seconds": 0.002571408001585951,
+        "encode_seconds": 0.0,
+        "max_pending": 1,
+        "fps_limit": 3.0
+      },
+      "http_requests": 0,
+      "passive_frames_received": 0,
+      "http_bytes": 0,
+      "action_sequence_digest": "d3c8753eaf4160f1d1c818c642caea510089279cd39134cf7d29e02c34d2598a"
+    },
+    {
+      "mode": "baseline",
+      "frames": 39,
+      "elapsed_seconds": 2.0070607739999105,
+      "fps": 19.4313996393224,
+      "frame_to_action_ready_ms_mean": 51.46260923078071,
+      "frame_to_action_ready_ms_p95": 56.37852399968324,
+      "observer": null,
+      "http_requests": 0,
+      "passive_frames_received": 0,
+      "http_bytes": 0,
+      "action_sequence_digest": "d3c8753eaf4160f1d1c818c642caea510089279cd39134cf7d29e02c34d2598a"
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "fps_mean": 17.170948305905252,
+      "action_ready_ms_mean": 60.39778540599385
+    },
+    "detached": {
+      "fps_mean": 19.05724636225331,
+      "action_ready_ms_mean": 52.592270255561964
+    },
+    "attached": {
+      "fps_mean": 18.618763738666065,
+      "action_ready_ms_mean": 54.02549670097223
+    }
+  }
+}

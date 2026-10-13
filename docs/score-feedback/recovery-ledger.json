@@ -1,0 +1,38 @@
+{
+  "status": "ORIGINAL OCTOBER 10 REVIEW STORE NOT RECOVERED",
+  "original_store": "/home/five/.local/share/charlie/score-review/learning-evidence.sqlite3",
+  "original_development": "/home/five/.local/share/charlie/development/learning-evidence.sqlite3",
+  "historical_handoff": {
+    "file": "Pasted text(20261010-172832).txt",
+    "status_records_reported": 16,
+    "annotation_records_reported": 8,
+    "known_reported_values": [
+      1200,
+      1300,
+      1500
+    ],
+    "caution": "Counts are reported records, not verified distinct images; no full review documents/image associations examined"
+  },
+  "distinct_images": null,
+  "accepted_vs_corrected_rows": null,
+  "finalization": null,
+  "previously_consumed": null,
+  "uploaded_archive": {
+    "name": "charlie-terminal-restart.tar.gz",
+    "sha256": "5e95637c06ace5faa826d97a22b38c6d6e2aa8b9f84b7d23ebdd050f5076f33f",
+    "members": 1560,
+    "databases": [
+      "development-20261011-221727/game-01/session-evidence.sqlite3",
+      "development-20261011-221727/experiment-evidence.sqlite3"
+    ],
+    "human_annotations": 0,
+    "original_review_store_present": false
+  },
+  "native_access": {
+    "pi_filesystem_available": false,
+    "charlie_local_resolved": false,
+    "credentials_or_remote_session_available": false
+  },
+  "remaining": "Use native-recovery.md to export read-only SQLite/WAL-consistent records and exact images; inspect update artifacts and actual inference separately from imported IDs",
+  "physical_authorization": false
+}

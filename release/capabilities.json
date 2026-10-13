@@ -1,0 +1,17 @@
+{
+  "name": "Best of Charlie",
+  "version": "0.1.0",
+  "tag": "best-of-charlie-v0.1.0",
+  "qualification": "software-verified consolidation; native acceptance pending",
+  "default_mode": "offline",
+  "included": ["Learning Executive and retained notebook recovery", "Reflection and Meditation", "Evaluator and guarded candidate qualification", "75C thermal suspension, below-65C continuous-5s recovery", "Robotron sprite perception and causal SELF", "PPAL interfaces and guarded policy candidates", "terminal recognition, recorded GAME OVER and guarded restart", "score tracking and human review", "bounded offline score-feedback exemplars", "Active Vision camera ownership", "CAL-1 calibration and neck health", "operator status, backup, immutable staging and rollback"],
+  "disabled_by_default": ["physical gameplay", "neck and mobile motion", "firmware updates", "PPAL policy activation", "score-feedback live activation"],
+  "native_acceptance": "not yet demonstrated on the current integrated release",
+  "learning_acceptance": {"E1": "NOT YET DEMONSTRATED for complete mission", "P1": "NOT YET DEMONSTRATED", "I1": "NOT YET DEMONSTRATED"},
+  "authoritative_state": "$HOME/.local/share/charlie/development; existing operator-confirmed original only",
+  "state_migration": "none",
+  "baseline_master": "c322658586074462ffbded5ccd9db11f96448b0a",
+  "thermal_defaults": {"ceiling_c": 75, "recovery_strictly_below_c": 65, "stabilization_seconds": 5},
+  "dependencies": "requirements.txt; hardware OS camera packages separately installed; Torch optional via requirements-foundry.txt",
+  "rollback": "previous immutable installed-release pointer; state restoration independently controlled"
+}

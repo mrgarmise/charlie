@@ -1,0 +1,66 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_missing_source_preserves_partial_commission_and_other_context_runs ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_missing_source_preserves_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f0fc72ebcb0>
+
+    def test_missing_source_preserves_partial_commission_and_other_context_runs(tmp_path,monkeypatch):
+        without_torch(monkeypatch)
+        root=experience(tmp_path);state=tmp_path/'state'
+        (root/'tracks.json').write_text(json.dumps({'tracks':fragments()}))
+        life=DevelopmentLifecycle(state,[root],budget_seconds=1)
+        original=__import__('experiments.ppal.meditate_robotron',fromlist=['predicted_link'])
+        clock=[0.];predict=original.predicted_link
+        from types import SimpleNamespace
+        import learning.lifecycle as lifecycle
+        monkeypatch.setattr(lifecycle,'time',SimpleNamespace(monotonic=lambda:clock[0]))
+        def compute(*args):
+            answer=predict(*args);clock[0]+=2;return answer
+        monkeypatch.setattr(original,'predicted_link',compute)
+        life.turn();before=inspect(state);checkpoint=next((state/'meditations').glob('*/checkpoint.json'))
+        raw=checkpoint.read_bytes();context=checkpoint.parent.name
+        episode=life.journal.get(context).data['payload']['source_episode']
+        monkeypatch.undo();without_torch(monkeypatch)
+        second=tmp_path/'second';second.mkdir()
+        (second/'report.json').write_text(json.dumps({'simulation':True,'distinct':2,'steps':[]}))
+        (second/'tracks.json').write_text((root/'tracks.json').read_text());life.roots.append(second)
+        acquire=life.acquire
+        def missing_source():
+            changed=acquire();life.available_tracks.pop(episode,None);return changed
+        monkeypatch.setattr(life,'acquire',missing_source)
+        for _ in range(6):life.turn()
+        assert checkpoint.read_bytes()==raw
+        assert life.executive.work_states()[context]['status']=='blocked'
+        results=life.journal.category_records('observation','normal_meditation_result')
+        assert results and not any(r.data['payload']['context_id']==context for r in results)
+        assert any(r.data['payload']['work_id']==context for r in life.journal.category_records('event','learning_evidence_request'))
+>       assert life.phase=='waiting for evidence'
+E       AssertionError: assert 'idle' == 'waiting for evidence'
+E         
+E         - waiting for evidence
+E         + idle
+
+tests/test_developmental_dependencies.py:81: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: reflecting | no project | 
+Development: investigating | no project | 
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: reflecting | no project | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: idle | no project | No justified executable investigation under current evidence and capabilities
+Development: reflecting | no project | No justified executable investigation under current evidence and capabilities
+Development: investigating | no project | No justified executable investigation under current evidence and capabilities
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development: investigating | no project | Committed developmental checkpoint or conclusion advanced
+Development: idle | no project | No justified executable investigation under current evidence and capabilities
+Development: investigating | no project | No justified executable investigation under current evidence and capabilities
+Development: idle | no project | No justified executable investigation under current evidence and capabilities
+Development: investigating | no project | No justified executable investigation under current evidence and capabilities
+Development: idle | no project | No justified executable investigation under current evidence and capabilities
+Development: investigating | no project | No justified executable investigation under current evidence and capabilities
+Development: idle | no project | No justified executable investigation under current evidence and capabilities
+=========================== short test summary info ============================
+FAILED tests/test_developmental_dependencies.py::test_missing_source_preserves_partial_commission_and_other_context_runs
+1 failed, 1 passed in 0.96s

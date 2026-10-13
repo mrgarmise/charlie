@@ -26,6 +26,11 @@ class WorldState:
     targets: tuple[Object, ...]
     threats: tuple[Object, ...]
     alive: bool = True
+    # Physical objects whose semantic role is unresolved; never silently drop
+    # them or rename their track when a later label becomes available.
+    unresolved: tuple[Object, ...] = ()
+    # Optional explicit conservative gate; perception/agency owns its value.
+    observation_safe: bool = True
 
 
 @dataclass(frozen=True)
@@ -46,3 +51,4 @@ class Action:
     move: str = "STAY"
     fire: str = "NONE"
     reason: str = ""
+    controls: tuple[str, ...] = ()

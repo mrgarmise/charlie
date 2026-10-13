@@ -14,23 +14,26 @@ def test_batch_navigation_correction_filters_and_keyboard(tmp_path):
     harness=tmp_path/'harness.js';harness.write_text(r'''
 const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
 const elements={};const element=()=>({value:'',hidden:false,disabled:false,style:{},children:[],textContent:'',
- replaceChildren(){this.children=[]},append(x){this.children.push(x)},click(){this.onclick?.()},focus(){}});
+ removeAttribute(k){delete this[k]},replaceChildren(){this.children=[]},append(x){this.children.push(x)},click(){this.onclick?.()},focus(){}});
 const games=Array.from({length:30},(_,i)=>({id:'game-'+i,number:i+1,session:'fixture-session',
  proposed_score:i*100,confidence:i===4?.5:.99,reader_status:'fixture',review_status:'pending',
  complete_game_claim:i!==9,proposal_id:i===9?null:'photo-'+i,annotations:[]}));
 const context={document:{getElementById(id){return elements[id]??=(element())},createElement:element},
+ URL:{createObjectURL(){return 'fixture-blob'},revokeObjectURL(){}},Image:class{set src(x){this.onload()}},
  localStorage:{getItem(){return ''},setItem(){}},fetch:async(url,opt)=>{
  if(url==='/queue')return {ok:true,json:async()=>({games,history:{},baselines:[]})};
+ if(url.startsWith('/image'))return {ok:true,blob:async()=>({})};
  assert.equal(url,'/review');const data=JSON.parse(opt.body);const g=games.find(g=>g.id===data.id);
  g.review_status={confirm:'confirmed',correct:'corrected',unreadable:'unreadable',defer:'pending'}[data.verdict];
  g.annotations=[data];return {ok:true,json:async()=>({id:'saved'})};}};
 vm.createContext(context);vm.runInContext(fs.readFileSync(process.argv[2],'utf8'),context);
 elements.filter.value='all';
-async function run(){await vm.runInContext('load()',context);assert.equal(elements.list.children.length,30);
+const tick=()=>new Promise(r=>setImmediate(r));
+async function run(){await vm.runInContext('load()',context);await tick();assert.equal(elements.list.children.length,30);
  assert.equal(elements.progress.textContent,'0 of 30 reviewed');elements.reviewer.value='fixture reviewer';
  await vm.runInContext("save('confirm')",context);assert.equal(games[0].review_status,'confirmed');
  assert.equal(elements.progress.textContent,'1 of 30 reviewed');
- elements.list.children[4].click();assert.match(elements.game.textContent,/Game 5/);
+ elements.list.children[4].click();await tick();assert.match(elements.game.textContent,/Game 5/);
  elements.value.value='1234';await vm.runInContext("save('correct')",context);
  assert.equal(games[4].annotations[0].value,1234);assert.equal(games[4].proposed_score,400);
  elements.filter.value='pending';elements.filter.onchange();assert.equal(elements.list.children.length,28);

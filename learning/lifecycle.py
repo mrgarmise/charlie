@@ -68,7 +68,8 @@ class DevelopmentLifecycle:
         repo=Path(__file__).resolve().parents[1]
         revision=subprocess.run(['git','rev-parse','HEAD'],cwd=repo,capture_output=True,text=True)
         dirty=subprocess.run(['git','status','--porcelain'],cwd=repo,capture_output=True,text=True)
-        self.provenance=dict(code_revision=revision.stdout.strip() if revision.returncode==0 else None,
+        installed=json.loads((repo/'installed-release.json').read_text()) if (repo/'installed-release.json').is_file() else {}
+        self.provenance=dict(code_revision=installed.get('commit') or (revision.stdout.strip() if revision.returncode==0 else None),
             dirty_worktree=bool(dirty.stdout),test_environment='offline process; no hardware capability initialized')
         self.error = None
         self.reflection_dependency_blocked = False
@@ -90,7 +91,8 @@ class DevelopmentLifecycle:
                 temperature_c=self.resources.sample.get('temperature_c'))
             self.operational['events']=(self.operational['events']+[event])[-100:]
             print('Development operational:',state,'|',reason or '',flush=True)
-        self.operational.update(state=state,reason=reason,thermal=self.resources.thermal_snapshot(),
+        self.operational.update(pid=__import__('os').getpid(),process_start_ticks=Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19],checkout=str(Path(__file__).resolve().parents[1]),
+            code_revision=getattr(self,'provenance',{}).get('code_revision'),state=state,reason=reason,thermal=self.resources.thermal_snapshot(),
             resources=self.resources.sample,updated_at=telemetry_time.time(),**updates)
         atomic_json(self.output/'development-operational-status.json',self.operational)
 
@@ -302,7 +304,7 @@ class DevelopmentLifecycle:
                 reason='Original tracks unavailable; context questions retained, no tracks reconstructed from summaries')
             atomic_json(result_path,result)
         else:
-            source_hash=sha(source)
+            source_hash=sha(source,check=self.resources.check)
             if checkpoint.exists():
                 saved=json.loads(checkpoint.read_text())
                 if 'state_digest' in saved and saved['state_digest'] != digest({k:v for k,v in saved.items() if k!='state_digest'}):

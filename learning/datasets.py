@@ -32,8 +32,15 @@ def scientific_content(journal,identifier):
         (r['id'],r['pixel_sha256'],r['partition'],r['annotation']['id'] if r.get('annotation') else None)
         for r in p['examples'])))
 
-def sha(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def sha(path,check=None):
+    h=hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        while True:
+            if check:check()
+            block=stream.read(1024*1024)
+            if not block:break
+            h.update(block)
+    return h.hexdigest()
 
 class ExperienceDataset:
     def __init__(self, journal, artifacts):

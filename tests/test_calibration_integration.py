@@ -295,6 +295,14 @@ def test_normal_pi_main_keeps_idle_camera_and_request_lifecycle(service, monkeyp
     import motion.controller
     import vision.detector
     f = service
+    import main
+    class Worker:
+        def __init__(self, **kwargs): self.alive = True
+        def start(self): pass
+        def is_alive(self): return self.alive
+        def terminate(self): self.alive = False
+        def join(self, **kwargs): pass
+    monkeypatch.setattr(main.multiprocessing,'get_context',lambda *a:SimpleNamespace(Process=Worker))
     calls = []
     f.host.display = lambda state: calls.append(('display', state))
     f.host.close = lambda: calls.append(('body', 'closed'))
@@ -313,7 +321,7 @@ def test_normal_pi_main_keeps_idle_camera_and_request_lifecycle(service, monkeyp
         if len(ticks) == 3: raise Finished()
     monkeypatch.setattr('time.sleep', sleep)
     with pytest.raises(Finished):
-        runpy.run_path(str(Path(__file__).resolve().parents[1] / 'main.py'), run_name='__main__')
+        main.main(['--hardware','--learning-state',str(f.root/'application-state')])
     assert calls.count(('camera', 'read')) == 3
     assert ('display', 'IDLE') in calls
     assert ('camera', 'closed') in calls and ('body', 'closed') in calls

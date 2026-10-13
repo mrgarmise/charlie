@@ -248,19 +248,20 @@ def test_normal_attention_lifecycle_survives_worker_interruption(tmp_path,monkey
         def join(self,**kwargs):calls.append('worker joined')
     monkeypatch.setattr(main.multiprocessing,'get_context',lambda *a:SimpleNamespace(Process=Worker))
     class Attention:
-        def __init__(self,*a):pass
+        def __init__(self,*a,**kw):pass
         def update(self,*a):calls.append('attention update')
         def close(self):calls.append('attention closed')
     class Camera:
         def __init__(self):calls.append('simulated camera')
         def close(self):calls.append('camera closed')
     class Vision:
-        def __init__(self,*a):self.steps=0
+        def __init__(self,*a,**kw):self.steps=0
         def update(self):
             self.steps+=1
             if self.steps>2:raise KeyboardInterrupt()
     replacements={
-        'motion.controller':dict(Deck=lambda:object()),
+        'motion.controller':dict(Deck=lambda:SimpleNamespace(body=SimpleNamespace(close=lambda:None),stop=lambda:None,observe_frame=lambda *a:None)),
+        'hardware.calibration_service':dict(CalibrationService=SimpleNamespace(open=lambda *a:SimpleNamespace(close=lambda:None,refresh=lambda:None,attach_brain=lambda **kw:None))),
         'attention.manager':dict(AttentionManager=Attention),
         'stimulus.keyboard':dict(KeyboardStimulus=lambda bus:None),
         'vision.camera':dict(Camera=Camera),
@@ -268,7 +269,7 @@ def test_normal_attention_lifecycle_survives_worker_interruption(tmp_path,monkey
         'vision.stimulus':dict(VisionStimulus=Vision)}
     for name,contents in replacements.items():
         module=ModuleType(name);module.__dict__.update(contents);monkeypatch.setitem(sys.modules,name,module)
-    with pytest.raises(KeyboardInterrupt):main.main(['--learning-state',str(tmp_path/'state')])
+    with pytest.raises(KeyboardInterrupt):main.main(['--hardware','--learning-state',str(tmp_path/'state')])
     assert calls.count('worker started')==2
-    assert calls.count('attention update')==2
+    assert calls.count('attention update')==3
     assert 'attention closed' in calls and 'camera closed' in calls

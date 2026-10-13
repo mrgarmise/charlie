@@ -248,7 +248,7 @@ class ScoreObserver:
                 proposal=ScoreObserver.review_proposal(journal,artifact['path'],source_episode=source_episode,
                     timestamp=at,clock='original camera capture monotonic',source_id=source.id,
                     proposed=value,confidence=confidence,synthetic=synthetic or report.get('simulation',False),
-                    context=dict(source_session=str(session),reader_revision=(report.get('provenance') or {}).get('git_commit'),
+                    context=dict(source_session=str(session),score_channel=1,reader_revision=(report.get('provenance') or {}).get('git_commit'),
                         capture_key=capture_key,terminal_support=at in terminal_times and boundary.get('confirmed') is True))
             else:deficiencies.append('Original capture timestamp unavailable')
         else:deficiencies.append('Original readable image unavailable')
@@ -329,6 +329,12 @@ class ScoreObserver:
         from pathlib import Path
         expected=proposal['artifact']['sha256']
         paths=[Path(proposal['artifact']['path'])]
+        overlay=journal.path.parent/'image-locations.json'
+        if overlay.is_file():
+            mapping=json.loads(overlay.read_text());relative=mapping.get(expected)
+            if isinstance(relative,str):
+                relocated=(journal.path.parent/relative).resolve()
+                if relocated.is_relative_to(journal.path.parent.resolve()):paths.append(relocated)
         paths.extend(Path(r.data['payload']['artifact']['path']) for r in
             journal.category_records('observation','score_review_proposal')
             if r.data['payload']['artifact']['sha256']==expected)

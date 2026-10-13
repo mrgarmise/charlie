@@ -175,7 +175,7 @@ class RobotronHUDReader:
         return None, 0.
 
     @classmethod
-    def _read_channel_at_threshold(cls, channel: np.ndarray, threshold=200) -> tuple[int | None, float]:
+    def _glyphs_at_threshold(cls, channel: np.ndarray, threshold=200):
         """Locate a bright score word independent of its current arcade hue."""
         bright = ((channel.max(axis=2) >= threshold).astype(np.uint8)
                   if threshold != 200 else cls._bright_mask(channel))
@@ -196,7 +196,7 @@ class RobotronHUDReader:
             position_bonus = 1.25 if y < h * .60 else 1.0
             words.append((area * position_bonus, x, y, bw, bh))
         if not words:
-            return None, 0.0
+            return []
         _, x, y, bw, bh = max(words, key=lambda b: (b[0], b[3]))
         aligned = sorted((b for b in words if abs(b[2]-y) <= max(2, bh*.2)
                           and abs(b[4]-bh) <= max(2, bh*.25)), key=lambda b:b[1])
@@ -204,41 +204,30 @@ class RobotronHUDReader:
         # Scores are right-aligned in their channel. Isolated left fragments
         # of a dim number must not be promoted to a shorter, confident score.
         if h >= cls.HUD_HEIGHT and right < w*.8:
-            return None, 0.
+            return []
+        glyphs=[]
         if len(aligned) > 1:
-            digits, confidences = [], []
             for _, gx, gy, gw, gh in aligned:
                 count = max(1, int(round(gw / (gh*.46))))
                 for i in range(count):
                     x0, x1 = gx+round(i*gw/count), gx+round((i+1)*gw/count)
                     pad = max(1, int(round(gh*.04)))
-                    glyph = np.pad(bright[gy:gy+gh, x0:x1], pad)
-                    read = cls._read_digit(glyph)
-                    if read.digit is None:
-                        return None, 0.
-                    digits.append(read.digit)
-                    confidences.append(read.confidence)
-            return int(''.join(digits)), min(confidences)
-        estimated = int(round(bw / max(1.0, bh * .46)))
-        count = max(1, min(7, estimated))
-        pad_y = max(1, int(bh * .03))
-        y0, y1 = max(0, y-pad_y), min(h, y+bh+pad_y)
-        digits, confidences = [], []
-        for index in range(count):
-            gx0 = int(round(x + index * bw / count))
-            gx1 = int(round(x + (index + 1) * bw / count))
-            if gx1 <= gx0:
-                continue
-            read = cls._read_digit(bright[y0:y1, gx0:gx1])
-            if read.digit is None:
-                return None, max(0.0, float(sum(confidences) / max(1, len(confidences))) * .5)
-            digits.append(read.digit)
-            confidences.append(read.confidence)
-        if not digits:
-            return None, 0.0
-        value = int("".join(digits))
-        confidence = min(confidences)
-        return value, confidence
+                    glyphs.append(np.pad(bright[gy:gy+gh, x0:x1], pad))
+        else:
+            count=max(1,min(7,int(round(bw/max(1.,bh*.46)))))
+            pad_y=max(1,int(bh*.03));y0,y1=max(0,y-pad_y),min(h,y+bh+pad_y)
+            for index in range(count):
+                gx0=int(round(x+index*bw/count));gx1=int(round(x+(index+1)*bw/count))
+                if gx1>gx0:glyphs.append(bright[y0:y1,gx0:gx1])
+        return glyphs
+
+    @classmethod
+    def _read_channel_at_threshold(cls,channel,threshold=200):
+        glyphs=cls._glyphs_at_threshold(channel,threshold)
+        if not glyphs:return None,0.
+        reads=[cls._read_digit(g) for g in glyphs]
+        if any(r.digit is None for r in reads):return None,0.
+        return int(''.join(r.digit for r in reads)),min(r.confidence for r in reads)
 
     def read(self, raw: Image.Image) -> RobotronHUDObservation:
         hud = np.asarray(self.rectify(raw).convert("RGB"))

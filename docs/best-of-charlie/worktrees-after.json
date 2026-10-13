@@ -1,0 +1,72 @@
+[
+  {
+    "git": [
+      "worktree /workspace/scratch/3d45fa74ce8b/charlie",
+      "HEAD 6dd04b87653fbb836778704744424723b836815d",
+      "branch refs/heads/feature/ala2-causal-acceptance"
+    ],
+    "path": "/workspace/scratch/3d45fa74ce8b/charlie",
+    "uncommitted": "M tests/fixtures/robotron-geometry-004249/camera-000002.png",
+    "unpublished_commits": "6dd04b87653fbb836778704744424723b836815d\n1483a534c7a536037fca51c496901248dbabf92c\n0434f4d4a89029f39a3f77740dcf17655c84ce9a",
+    "evidence": [],
+    "active_pids": [],
+    "cleanup_eligible": false,
+    "cleanup": "inventory only; retain until rollback and historical provenance reviewed"
+  },
+  {
+    "git": [
+      "worktree /workspace/scratch/3d45fa74ce8b/best-of-charlie",
+      "HEAD 14f67e8b85dd34bf5d9a9a54f18b09b0637b342a",
+      "branch refs/heads/feature/best-of-charlie-consolidation"
+    ],
+    "path": "/workspace/scratch/3d45fa74ce8b/best-of-charlie",
+    "uncommitted": "M  experiments/ppal/robotron_hud.py\nM  experiments/ppal/score_observer.py\n M learning/datasets.py\n M learning/lifecycle.py\n M main.py\n M requirements.txt\n M tests/test_brain_calibration.py\n M tests/test_normal_learning_lifecycle.py\n?? .github/workflows/best-of-charlie.yml\n?? behaviors/__init__.py\n?? charlie_ops/__init__.py\n?? charlie_ops/__main__.py\n?? charlie_ops/operator.py\n?? release/capabilities.json\n?? tests/test_charlie_operations.py\n?? tools/charlie",
+    "unpublished_commits": "14f67e8b85dd34bf5d9a9a54f18b09b0637b342a\naad1a10400211bf59d01c3010eef6f59c7ea4af5\n7316a429434a87e90b2af431d36cf1a370ba6f5a",
+    "evidence": [],
+    "active_pids": [],
+    "cleanup_eligible": false,
+    "cleanup": "inventory only; retain until rollback and historical provenance reviewed"
+  },
+  {
+    "git": [
+      "worktree /workspace/scratch/3d45fa74ce8b/published-verification",
+      "HEAD 84de3ffedf5d25d82268b1b1ffe14447dd6b84a8",
+      "detached"
+    ],
+    "path": "/workspace/scratch/3d45fa74ce8b/published-verification",
+    "uncommitted": "",
+    "unpublished_commits": "",
+    "evidence": [],
+    "active_pids": [],
+    "cleanup_eligible": true,
+    "cleanup": "inventory only; retain until rollback and historical provenance reviewed"
+  },
+  {
+    "git": [
+      "worktree /workspace/scratch/3d45fa74ce8b/thermal-published-verification",
+      "HEAD 1895bc7b92b92b8b53add5abc16631e9be22c7e4",
+      "detached"
+    ],
+    "path": "/workspace/scratch/3d45fa74ce8b/thermal-published-verification",
+    "uncommitted": "",
+    "unpublished_commits": "",
+    "evidence": [],
+    "active_pids": [],
+    "cleanup_eligible": true,
+    "cleanup": "inventory only; retain until rollback and historical provenance reviewed"
+  },
+  {
+    "git": [
+      "worktree /workspace/scratch/3d45fa74ce8b/thermal-recovery",
+      "HEAD 9cf9b6b6853423a98b8ec244ba42e0c6a8852aec",
+      "branch refs/heads/feature/ala2-thermal-recovery"
+    ],
+    "path": "/workspace/scratch/3d45fa74ce8b/thermal-recovery",
+    "uncommitted": "",
+    "unpublished_commits": "9cf9b6b6853423a98b8ec244ba42e0c6a8852aec\n58392cf57cbbb916819e7a768eb72360bfb94097",
+    "evidence": [],
+    "active_pids": [],
+    "cleanup_eligible": false,
+    "cleanup": "inventory only; retain until rollback and historical provenance reviewed"
+  }
+]

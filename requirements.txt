@@ -1,9 +1,7 @@
-# Charlie Python dependencies
-#
-# This file contains Python packages required by Charlie
-# and its development/deployment tools.
-#
-# Operating-system packages belong in setup scripts.
-# RP2040/MicroPython modules do not belong here.
+# Core Pi/offline application. picamera2/libcamera are native OS packages.
 pyserial==3.5
-mpremote
+numpy>=1.26,<3
+Pillow>=10,<13
+opencv-python-headless>=4.8,<6
+# Firmware maintenance tool only; never invoked by release deployment.
+mpremote>=1.24,<2

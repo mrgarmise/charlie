@@ -1,0 +1,20 @@
+# Example only. Replace all placeholders after independent deployment approval.
+[Unit]
+Description=Best of Charlie application-owned offline Executive
+After=local-fs.target
+[Service]
+Type=simple
+User=five
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=CHARLIE_NECK_MOTION_AUTHORIZED=0
+Environment=CHARLIE_NECK_SUPERVISED=0
+Environment=CHARLIE_MOBILE_ENABLED=0
+WorkingDirectory=/REPLACE/WITH/IMMUTABLE/RELEASE
+ExecStart=/REPLACE/WITH/PYTHON /REPLACE/WITH/IMMUTABLE/RELEASE/main.py --offline --learning-state /home/five/.local/share/charlie/development --episode-root /home/five/Projects/charlie/robotron-runs --learning-require-thermal
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=75
+KillMode=control-group
+Nice=10
+[Install]
+WantedBy=multi-user.target

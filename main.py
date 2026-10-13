@@ -3,6 +3,8 @@
 --offline runs the same lifecycle without initializing physical capabilities.
 """
 import os
+import sys
+sys.dont_write_bytecode = True
 from contextlib import ExitStack
 import argparse
 import json
@@ -91,6 +93,7 @@ def main(argv=None):
                 detector=FaceDetector(Path(__file__).resolve().parent/'face_detection_yunet.onnx')
             vision=VisionStimulus(camera,detector,bus,frame_observer=deck.observe_frame)
             bus.emit('idle')
+            attention.update(deck)
             previous=None
             while True:
                 vision.update()

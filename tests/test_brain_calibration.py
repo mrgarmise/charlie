@@ -214,6 +214,14 @@ def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, mo
     import motion.controller
     import vision.detector
     f = integrated
+    import main
+    class Worker:
+        def __init__(self, **kwargs): self.alive = True
+        def start(self): pass
+        def is_alive(self): return self.alive
+        def terminate(self): self.alive = False
+        def join(self, **kwargs): pass
+    monkeypatch.setattr(main.multiprocessing, 'get_context', lambda *a: SimpleNamespace(Process=Worker))
     camera = SimpleNamespace(read=f.frame, close=lambda: None)
     f.s.request('uncertain', dict(reason='simulated normal-brain calibration request'))
     monkeypatch.setitem(sys.modules, 'vision.camera', SimpleNamespace(Camera=lambda: camera))
@@ -245,7 +253,8 @@ def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, mo
         if ticks[0] > 150: pytest.fail('normal application failed to complete calibration')
     monkeypatch.setattr('time.sleep', sleep)
     with pytest.raises(EndApplication):
-        runpy.run_path(str(Path(__file__).resolve().parents[1]/'main.py'), run_name='__main__')
+        import main
+        main.main(['--hardware','--learning-state',str(f.root/'application-state')])
     assert len(f.s.brain.responses) >= 4
     assert any(e['kind'] == 'normal_resumed' for e in f.a.calibration.events)
     assert not f.a.status()['armed']  # Normal application finally sends STOP.
@@ -325,6 +334,14 @@ def test_normal_application_startup_failure_releases_transport_and_camera(integr
     import motion.controller
     import vision.detector
     f = integrated
+    import main
+    class Worker:
+        def __init__(self, **kwargs): self.alive = True
+        def start(self): pass
+        def is_alive(self): return self.alive
+        def terminate(self): self.alive = False
+        def join(self, **kwargs): pass
+    monkeypatch.setattr(main.multiprocessing, 'get_context', lambda *a: SimpleNamespace(Process=Worker))
     calls = []
     def unavailable(*args, **kwargs): raise RuntimeError('injected startup failure')
     camera = SimpleNamespace(read=f.frame, close=lambda: calls.append('camera closed'))
@@ -339,6 +356,7 @@ def test_normal_application_startup_failure_releases_transport_and_camera(integr
     monkeypatch.setenv('CHARLIE_VISION_TARGET', 'face')
     monkeypatch.setattr(vision.detector, 'FaceDetector', unavailable)
     with pytest.raises(RuntimeError, match='startup failure'):
-        runpy.run_path(str(Path(__file__).resolve().parents[1]/'main.py'), run_name='__main__')
+        import main
+        main.main(['--hardware','--learning-state',str(f.root/'application-state')])
     assert calls[-2:] == ['STOP', 'transport closed']
     assert ('camera closed' in calls) is (failure == 'detector')

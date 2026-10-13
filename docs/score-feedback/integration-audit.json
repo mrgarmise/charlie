@@ -570,6 +570,11 @@
       "path": "tools/score_feedback_candidate.py",
       "sha256": "d467fb8de6883bb0675fbebb5177e6cc6f3346f09ad2317709ec1bac86c5f0d1",
       "source_versions": []
+    },
+    {
+      "path": "tools/validate_score_camera_regression.py",
+      "source_versions": [],
+      "sha256": "aaa3accfd9bfef936d4a58924d418361223691b6c3900b4c0f3d372bf1568d25"
     }
   ]
 }

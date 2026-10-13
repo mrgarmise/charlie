@@ -1,0 +1,20 @@
+{
+  "implementation_commit": "721af8c0ea838e1f759594a9424ca030e3ebdf2e",
+  "implementation_tree": "44161e6316321aa9423d28320f7a5522e723ffb1",
+  "branch": "feature/score-feedback-master-integration",
+  "pull_request": "https://github.com/mrgarmise/charlie/pull/3",
+  "draft": true,
+  "merged": false,
+  "master_sha": "c322658586074462ffbded5ccd9db11f96448b0a",
+  "master_changed": false,
+  "repository_protection": "master unprotected; no required status contexts advertised",
+  "merge_blocker": "Authentic October 10 original feedback and retained-update recognition comparison are not available for acceptance; native costs remain unmeasured",
+  "clean_published_replay": {
+    "passed": 56,
+    "failed": 0,
+    "skipped": 0,
+    "source_tree_equal": true,
+    "dirty": false
+  },
+  "physical_authorization": false
+}

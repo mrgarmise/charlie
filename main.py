@@ -17,10 +17,16 @@ def parser():
     p.add_argument('--history-root',type=Path,action='append',default=[],help='preserve and additively restore an existing notebook')
     p.add_argument('--learning-budget',type=float,default=10.)
     p.add_argument('--learning-interval',type=float,default=5.)
-    p.add_argument('--learning-turns',type=int,help='bounded offline acceptance run')
+    p.add_argument('--learning-turns',type=int,help='bound nonthermal attempt slots; progress counted separately')
     p.add_argument('--learning-cpu-cores',type=int,default=2)
     p.add_argument('--learning-memory-mb',type=int,default=768)
     p.add_argument('--learning-temperature-c',type=float,default=75.)
+    p.add_argument('--learning-recovery-temperature-c',type=float,default=65.)
+    p.add_argument('--learning-thermal-stabilization',type=float,default=5.)
+    p.add_argument('--learning-cooldown-poll',type=float,default=1.)
+    p.add_argument('--learning-require-thermal',action='store_true',help='fail closed without thermal telemetry; automatic on ARM Linux')
+    p.add_argument('--learning-wall-seconds',type=float,help='cooperative wall deadline; bounded runs default 300s')
+    p.add_argument('--learning-cooldown-seconds',type=float,help='maximum continuous cooldown; bounded runs default 120s')
     p.add_argument('--allow-offline-improvements',action='store_true',
         help='external authority for independently qualified offline-shadow candidates only')
     return p
@@ -33,11 +39,15 @@ def main(argv=None):
     roots=args.episode_root or [Path(__file__).resolve().parent/'robotron-runs']
     from learning.lifecycle import run
     from learning.resources import DevelopmentResources
-    resources=DevelopmentResources(args.learning_cpu_cores,args.learning_memory_mb,args.learning_temperature_c)
+    resources=DevelopmentResources(args.learning_cpu_cores,args.learning_memory_mb,args.learning_temperature_c,
+        recovery_temperature_c=args.learning_recovery_temperature_c,
+        stabilization_seconds=args.learning_thermal_stabilization,cooldown_poll_seconds=args.learning_cooldown_poll,
+        require_thermal=args.learning_require_thermal)
     authority=(dict(source='normal application startup: explicit offline-improvement authorization',
         target='offline-shadow',execution='offline') if args.allow_offline_improvements else None)
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
-                turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources)
+                turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources,
+                wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
     if args.offline:
         run(args.learning_state,roots,**kwargs)
         return

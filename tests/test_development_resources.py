@@ -41,7 +41,14 @@ def test_resource_pressure_preserves_work_and_recovers(tmp_path,monkeypatch,limi
     assert [r.id for r in life.journal.records()]==before
     assert life.phase=='waiting for resources'
     assert not life.executive.work_states()
-    hot[0]=False;life.turn()
+    hot[0]=False
+    if limitation=='temperature':
+        clock=[0.]
+        life.resources.clock=lambda:clock[0]
+        life.turn() # A cool sample alone cannot release a retained thermal latch.
+        assert not life.executive.work_states()
+        clock[0]=5.
+    life.turn()
     assert life.executive.work_states()
     assert life.resources.sample['ownership_poll_seconds']==.05
     life.close()
@@ -53,6 +60,7 @@ def test_resource_preemption_inside_reconstruction_is_not_stall(tmp_path,monkeyp
     root=experience(tmp_path);(root/'tracks.json').write_text(json.dumps({'tracks':fragments()}))
     state=tmp_path/'state';life=DevelopmentLifecycle(state,[root]);calls=[]
     def pressure():
+        if life.phase!='reflecting':return
         calls.append(1)
         if len(calls)>3:raise ResourceUnavailable('controlled memory pressure')
     monkeypatch.setattr(life,'yield_for_primary',pressure)

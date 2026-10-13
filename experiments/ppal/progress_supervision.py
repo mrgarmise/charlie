@@ -156,7 +156,7 @@ class WorkWatchdog:
 
 
 def supervise(cmd, progress_path, *, silence=30., camera=10., controller=10.,
-              processing=60., budget=None, poll=.2, grace=5., on_progress=None):
+              processing=60., budget=None, poll=.2, grace=5., on_progress=None, on_poll=None):
     """Parent watchdog works even if capture, transport or the child loop blocks.
 
     Optional budget is for offline processing only, never healthy gameplay.
@@ -165,6 +165,7 @@ def supervise(cmd, progress_path, *, silence=30., camera=10., controller=10.,
     path = Path(progress_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.unlink(missing_ok=True)
+    if on_poll:on_poll()  # Resource admission before launching heavy offline work.
     child = subprocess.Popen(cmd, start_new_session=True)
     began = time.monotonic()
     reason = None
@@ -173,6 +174,7 @@ def supervise(cmd, progress_path, *, silence=30., camera=10., controller=10.,
     work_watchdog=WorkWatchdog()
     try:
         while child.poll() is None:
+            if on_poll:on_poll()  # Independent of child progress / heartbeat availability.
             try:
                 candidate = json.loads(path.read_text())
                 if candidate.get('pid') == child.pid:
@@ -196,6 +198,9 @@ def supervise(cmd, progress_path, *, silence=30., camera=10., controller=10.,
             if reason:
                 break
             time.sleep(poll)
+    except InterruptedError:
+        reason = 'resource_preemption'
+        raise
     except KeyboardInterrupt:
         reason = 'interrupted'
     finally:

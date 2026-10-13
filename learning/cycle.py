@@ -130,13 +130,14 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
     output=Path(output)/plan['prediction_id']; output.mkdir(parents=True,exist_ok=True)
     training=[]
     for spec in plan['candidates']:
+        if on_progress:on_progress()
         identifier=digest(dict(spec=spec,dataset_digest=digest(snapshot))); candidate=output/identifier; candidate.mkdir(exist_ok=True)
         config=dict(snapshot=snapshot,spec=spec,output=str(candidate.resolve()),budget_seconds=plan['budget_seconds']/len(plan['candidates']))
         config_path=candidate/'worker.json'; atomic_json(config_path,config)
         if not (candidate/'training.json').exists():
             cmd=[sys.executable,'-m','learning.worker',str(config_path)]
             rc=(driver(cmd,candidate/'progress.json',budget=config['budget_seconds']+40) if driver else
-                supervise(cmd,candidate/'progress.json',silence=30.,processing=30.,budget=config['budget_seconds']+40,on_progress=on_progress))
+                supervise(cmd,candidate/'progress.json',silence=30.,processing=30.,budget=config['budget_seconds']+40,on_progress=on_progress,on_poll=on_progress))
             if rc!=0:
                 journal.append('event',dict(category='offline_experiment_deferred',prediction_id=plan['prediction_id'],returncode=rc,
                     checkpoint=str(candidate/'last.pt'),reason='worker yielded, failed or stopped; no verdict fabricated'),
@@ -166,6 +167,7 @@ def run_plan(plan, dataset, output, *, driver=None, on_progress=None):
                 improved=extended['validation_loss']<control['validation_loss'],independence_groups=[],operational=None,
                 test_consulted=False,limitations=['reused validation is correlated, not independent confirmation','not eligible for deployment','no score claim'])
         else:
+            if on_progress:on_progress()
             metric=evaluate(snapshot,candidate)
             # A new dataset version or model does not make previously consulted
             # final evidence fresh. Preserve diagnostic measurements, but deny

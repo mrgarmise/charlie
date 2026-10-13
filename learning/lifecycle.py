@@ -23,9 +23,9 @@ class MeditationYield(Exception):
 
 
 class DevelopmentLifecycle:
-    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None):
+    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None, resource_guard=None):
         from .resources import ResourceGuard
-        self.resources=ResourceGuard(resources)
+        self.resources=resource_guard or ResourceGuard(resources)
         self._stage_cache={}
         self.output = Path(output).resolve()
         self.roots = [Path(r).resolve() for r in roots]
@@ -41,6 +41,22 @@ class DevelopmentLifecycle:
         except BaseException:
             self.lock.close()
             raise
+        self.operational=dict(schema='charlie-development-operational-v1',events=[],
+            state='running',physical_authorization=False,controller_writes=0)
+        operational_path=self.output/'development-operational-status.json'
+        if operational_path.exists():
+            try:
+                retained=json.loads(operational_path.read_text())
+                if (retained.get('schema')!=self.operational['schema'] or not isinstance(retained.get('thermal'),dict)
+                        or type(retained['thermal'].get('suspended')) is not bool
+                        or not isinstance(retained.get('events',[]),list)):
+                    raise ValueError('invalid retained operational state')
+                self.operational['events']=retained.get('events',[])[-99:]
+                self.resources.restore_suspension(retained['thermal'])
+            except (OSError,ValueError,TypeError,AttributeError):
+                self.resources.restore_suspension({'suspended':True})
+        self.resources.on_transition=lambda snapshot:self._operational(snapshot['state'],snapshot['reason'])
+        self._operational(self.resources.thermal_state,'application-owned Executive startup')
         self.journal = EvidenceJournal(self.output/'learning-evidence.sqlite3')
         self.dataset = ExperienceDataset(self.journal, self.output/'pixels')
         self.gateway = MemoryGateway(store=JsonlStore(self.output/'memory.jsonl'),
@@ -59,6 +75,24 @@ class DevelopmentLifecycle:
         self.reflection_dependency = None
         self.phase = 'idle'
         self._status()
+
+    def _operational(self,state,reason=None,**updates):
+        """Small bounded telemetry file; never evidence or an Executive commission.
+
+        Polling replaces the current sample, appending only state/reason changes.
+        The retained suspension bit survives clean shutdown and restart.
+        """
+        import time as telemetry_time
+        key=(state,reason)
+        prior=(self.operational.get('state'),self.operational.get('reason'))
+        if key!=prior:
+            event=dict(state=state,reason=reason,at=telemetry_time.time(),
+                temperature_c=self.resources.sample.get('temperature_c'))
+            self.operational['events']=(self.operational['events']+[event])[-100:]
+            print('Development operational:',state,'|',reason or '',flush=True)
+        self.operational.update(state=state,reason=reason,thermal=self.resources.thermal_snapshot(),
+            resources=self.resources.sample,updated_at=telemetry_time.time(),**updates)
+        atomic_json(self.output/'development-operational-status.json',self.operational)
 
     def _status(self, error=None):
         if error is not None: self.error=error
@@ -101,7 +135,7 @@ class DevelopmentLifecycle:
                 and r.id not in satisfied and work.get(r.data['payload'].get('work_id'),{}).get('status')!='completed'], identity_conflicts=current_conflicts(self.journal), activation=active,
             physical_authorization=False, physical_score_improvement='UNKNOWN', error=self.error,
             provenance=self.provenance,
-            resources=self.resources.sample,
+            resources=self.resources.sample,operational=self.operational,
             analytical_progress=[dict(context_id=p.parent.name,**self.meditation_stages(p))
                 for p in sorted((self.output/'meditations').glob('**/checkpoint.json'))],
             authorization_requests=[r.data['payload'] for r in rows if r.data['payload'].get('category') in ('offline_authorization_request','gameplay_experiment_proposal')
@@ -125,6 +159,7 @@ class DevelopmentLifecycle:
         # A marathon relinquishes primary resources and hands evidence to this
         # same owner. It never starts a competing Executive in an owned notebook.
         for handoff_path in sorted((self.output/'marathon-handoffs').glob('*.json')):
+            self.yield_for_primary()
             handoff=json.loads(handoff_path.read_text())
             if (handoff.get('schema')!='charlie-marathon-handoff-v1'
                     or handoff.get('physical_authorization') is not False
@@ -145,10 +180,12 @@ class DevelopmentLifecycle:
                 episode=SCOPE,producer='existing-evidence-consolidation',version='normal-lifecycle-v1')
             changed=True
         for source in self.history_roots:
+            self.yield_for_primary()
             receipt=merge_history(source,self.output)
             self.journal.append('event',dict(category='normal_history_restore',receipt=receipt),
                 episode=SCOPE,producer='existing-evidence-consolidation',version='normal-lifecycle-v1')
         for record in self.journal.records('observation'):
+            self.yield_for_primary()
             p=record.data['payload']
             if p.get('category')=='normal_meditation_result':
                 original=Path(p['result_path'])
@@ -157,6 +194,7 @@ class DevelopmentLifecycle:
                 if not any(path.is_file() and sha(path)==p['result_sha256'] for path in candidates):
                     raise ValueError('durable meditation result changed or unavailable')
         for root in discover_episodes(roots):
+            self.yield_for_primary()
             before = len(self.journal.records())
             identity=maintain_episode_identity(root,self.journal)
             if identity['status']!='verified':
@@ -165,9 +203,11 @@ class DevelopmentLifecycle:
             ingest_episode(root, self.dataset, self.gateway)
             qualification(self.journal, audit(root,identity=identity))
             changed |= len(self.journal.records()) != before
+        self.yield_for_primary()
         self.available_tracks = verified_tracks(self.journal)
         # Existing content-addressed acquisition inbox. Location receipts keep
         # old evidence IDs; these bytes cannot become another experience.
+        self.yield_for_primary()
         locations=self.dataset.locate_artifacts(self.output/'pixels',partial=True)
         from .acquisition import satisfy_artifact_requests
         fulfilled=satisfy_artifact_requests(self.dataset)
@@ -176,6 +216,7 @@ class DevelopmentLifecycle:
         # This adapter validates them; it never generates labels or authority.
         inbox = self.output/'acquisition-inbox'
         for path in sorted(inbox.glob('*.json')):
+            self.yield_for_primary()
             key = sha(path)
             from .acquisition import qualification_inputs
             inputs=qualification_inputs(path,self.journal)
@@ -200,6 +241,7 @@ class DevelopmentLifecycle:
         from experiments.ppal.inspect_robotron_score import import_queue
         before=len(self.journal.records())
         for root in roots:
+            self.yield_for_primary()
             if root.is_dir():import_queue(self.journal,root)
         MemoryEvaluator.reconcile_score_reviews(self.journal)
         MemoryEvaluator.reconcile_evidence_annotations(self.journal)
@@ -568,61 +610,137 @@ class DevelopmentLifecycle:
     def yield_for_primary(self):
         self.resources.check()
 
+    def resource_wait(self,exc):
+        from .resources import ThermalSuspended,DevelopmentInterrupted
+        if isinstance(exc,DevelopmentInterrupted):
+            state='shutdown requested'
+        elif isinstance(exc,ThermalSuspended):state=self.resources.thermal_state
+        else:state='other resource blockage'
+        self.last_turn=dict(progress_occurred=False,reason=str(exc),
+            next_direction='Yield resources; retain existing work')
+        self.current_activity=dict(kind='resource_wait',reason=str(exc))
+        self.phase='waiting for resources' if isinstance(exc,ResourceUnavailable) else 'experiencing'
+        self._operational(state,str(exc))
+
     def turn(self):
-        from .resources import ResourceUnavailable
         try:self.resources.check(force=True)
-        except (ResourceUnavailable,InterruptedError) as exc:
-            self.last_turn=dict(progress_occurred=False,reason=str(exc),next_direction='Yield resources; retain existing work')
-            self.current_activity=dict(kind='resource_wait',reason=str(exc))
-            self._phase('waiting for resources' if isinstance(exc,ResourceUnavailable) else 'experiencing')
-            return
+        except InterruptedError as exc:
+            self.resource_wait(exc)
+            return False  # Preflight failed: no developmental attempt started.
+        self.last_turn=dict(progress_occurred=False,reason='Executive developmental attempt running')
+        self._operational('running','Executive developmental attempt')
         self.reflection_dependency_blocked=False
         self.reflection_dependency=None
-        try:return self.executive.develop(self)
-        except ResourceUnavailable as exc:
-            # Existing worker supervision checkpoints/stops its child. The
-            # committed plan remains owned by the Executive for resumption.
-            self.last_turn=dict(progress_occurred=False,reason=str(exc),next_direction='Yield resources; resume retained work')
-            self.current_activity=dict(kind='resource_wait',reason=str(exc))
-            self._phase('waiting for resources')
+        try:self.executive.develop(self)
+        except InterruptedError as exc:
+            from .resources import DevelopmentInterrupted
+            if not isinstance(exc,(ResourceUnavailable,DevelopmentInterrupted)) and exc is not self.resources.blockage:
+                raise  # Unrelated worker failures are not resource recovery.
+            # Cooperative checkpoints remain owned by the existing Executive.
+            self.resource_wait(exc)
+        return True
 
     def close(self):
         self.last_activity=self.phase
-        self._phase('stopped')
-        self.journal.close()
-        self.lock.close()
+        try:
+            self._operational('clean shutdown',self.operational.get('termination_reason','Executive closed'))
+            self._phase('stopped')
+        finally:
+            self.journal.close()
+            self.lock.close()
 
 
-def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None, history_roots=(), resources=None):
-    """Application-owned worker; bounded polling delegates all decisions to Executive."""
+def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None,
+        history_roots=(), resources=None, wall_seconds=None, cooldown_seconds=None,
+        clock=None, sleep=None, lifecycle_factory=None):
+    """One existing Executive, with resource polling rather than a second scheduler.
+
+    ``turns`` bounds nonthermal attempt slots (including other resource refusals),
+    not a guarantee of scientific progress. Thermal refusals/polls/preemptions do
+    not consume slots. A bounded run defaults to a 300s wall / 120s cooldown limit.
+    Cancellation/deadlines are cooperative at existing resource checkpoints.
+    """
     import signal
-    if not .05 <= interval <= 300 or (turns is not None and turns<1):
-        raise ValueError('bounded cadence and positive turns required')
+    import math
     import os
-    from .resources import DevelopmentResources
+    from .resources import DevelopmentResources,DevelopmentInterrupted
+    if not .05<=interval<=300 or (turns is not None and turns<1):
+        raise ValueError('bounded cadence and positive turns required')
+    wall_seconds=300. if wall_seconds is None and turns is not None else wall_seconds
+    cooldown_seconds=120. if cooldown_seconds is None and turns is not None else cooldown_seconds
+    if any(v is not None and (not math.isfinite(v) or v<=0) for v in (wall_seconds,cooldown_seconds)):
+        raise ValueError('positive finite wall/cooldown deadlines required')
     resources=resources or DevelopmentResources()
     resources.apply()
     os.nice(10)  # Vision/control retain host CPU priority.
-    stopped = False
+    clock=clock or time.monotonic;sleep=sleep or time.sleep
+    started=clock();cool_started=None;stopped=False;termination=None
     def stop(*unused):
         nonlocal stopped
-        stopped = True
-    signal.signal(signal.SIGTERM,stop)
-    signal.signal(signal.SIGINT,stop)
-    lifecycle = DevelopmentLifecycle(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,history_roots=history_roots,resources=resources)
+        stopped=True
+    previous={sig:signal.getsignal(sig) for sig in (signal.SIGTERM,signal.SIGINT)}
+    for sig in previous:signal.signal(sig,stop)
+    lifecycle=None
+    counters=dict(developmental_attempts=0,nonthermal_attempt_slots=0,productive_turns=0,thermal_wait_polls=0)
+    def interrupt():
+        nonlocal termination
+        if stopped:termination='shutdown requested'
+        elif wall_seconds is not None and clock()-started>=wall_seconds:termination='wall-clock deadline reached'
+        elif cool_started is not None and cooldown_seconds is not None and clock()-cool_started>=cooldown_seconds:
+            termination='cooldown deadline reached'
+        if termination:raise DevelopmentInterrupted(termination)
     try:
-        count=0
-        while not stopped and (turns is None or count<turns):
-            try:
-                lifecycle.turn()
-            except Exception as exc:
-                lifecycle.phase='blocked'
-                lifecycle._status(error=type(exc).__name__+': '+str(exc))
-                if turns is not None:
-                    raise
-            count+=1
-            deadline=time.monotonic()+interval
-            while not stopped and (turns is None or count<turns) and time.monotonic()<deadline:
-                time.sleep(min(.1,max(0,deadline-time.monotonic())))
+        factory=lifecycle_factory or DevelopmentLifecycle
+        lifecycle=factory(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,
+            history_roots=history_roots,resources=resources)
+        lifecycle.resources.interruption_check=interrupt
+        while turns is None or counters['nonthermal_attempt_slots']<turns:
+            try:interrupt()
+            except DevelopmentInterrupted:break
+            # Poll only resources while latched; no archive scanning/status folding.
+            if lifecycle.resources.suspended:
+                if cool_started is None:cool_started=clock()
+                counters['thermal_wait_polls']+=1
+                try:lifecycle.resources.check(force=True)
+                except DevelopmentInterrupted:break
+                except InterruptedError as exc:lifecycle.resource_wait(exc)
+                if not lifecycle.resources.suspended:
+                    cool_started=None
+                    continue  # The retained Executive owns the next real attempt.
+            else:
+                cool_started=None
+                try:
+                    attempted=lifecycle.turn()
+                    counters['developmental_attempts']+=int(bool(attempted))
+                except Exception as exc:
+                    lifecycle.phase='blocked'
+                    lifecycle.last_turn=dict(progress_occurred=False,reason='worker failure')
+                    lifecycle._operational('worker failure',type(exc).__name__+': '+str(exc))
+                    lifecycle._status(error=type(exc).__name__+': '+str(exc))
+                    if turns is not None:raise
+                    counters['developmental_attempts']+=1
+                if termination:break
+                counters['productive_turns']+=int(bool(getattr(lifecycle,'last_turn',{}).get('progress_occurred')))
+                if lifecycle.resources.suspended:cool_started=clock()
+                else:counters['nonthermal_attempt_slots']+=1
+            lifecycle._operational(lifecycle.operational['state'],lifecycle.operational.get('reason'),
+                run_counters=counters.copy(),elapsed_seconds=clock()-started)
+            if turns is not None and counters['nonthermal_attempt_slots']>=turns:break
+            delay=resources.cooldown_poll_seconds if lifecycle.resources.suspended else interval
+            until=clock()+delay
+            while clock()<until:
+                try:interrupt()
+                except DevelopmentInterrupted:break
+                sleep(min(.1,max(0,until-clock())))
+            if termination:break
+        termination=termination or 'attempt limit reached'
     finally:
-        lifecycle.close()
+        try:
+            if lifecycle:
+                lifecycle._operational(lifecycle.operational['state'],lifecycle.operational.get('reason'),
+                    termination_reason=termination or 'worker failure',run_counters=counters.copy(),
+                    elapsed_seconds=clock()-started)
+                lifecycle.close()
+        finally:
+            for sig,handler in previous.items():signal.signal(sig,handler)
+    return dict(termination_reason=termination,**counters)

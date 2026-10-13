@@ -216,7 +216,9 @@ def test_waiting_experiment_reconsiders_changed_checkpoint_without_new_evidence(
 
 def test_primary_preemption_is_not_meditation_stagnation(tmp_path,monkeypatch):
     root=experience(tmp_path);life=DevelopmentLifecycle(tmp_path/'state',[root])
-    def primary():raise InterruptedError('primary owner preempted this slice')
+    def primary():
+        # Target the commissioned meditation; acquisition now checks resources too.
+        if life.phase=='reflecting':raise InterruptedError('primary owner preempted this slice')
     monkeypatch.setattr(life,'yield_for_primary',primary)
     for _ in range(6):
         life.turn()

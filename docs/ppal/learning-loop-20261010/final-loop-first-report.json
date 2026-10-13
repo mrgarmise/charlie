@@ -1,0 +1,25 @@
+{
+  "schema": "developmental-restart-acceptance-v1",
+  "continuity_passed": true,
+  "original_records_preserved": 593,
+  "appended_records": 45,
+  "new_record_categories": {
+    "experience_artifact_location": 7,
+    "acquisition_search_result": 11,
+    "consolidated_evidence_reference": 14,
+    "evidence_search_received": 11,
+    "gameplay_experiment_proposal": 1,
+    "developmental_wait": 1
+  },
+  "substantive_progress": false,
+  "progress_records": [],
+  "advanced_meditations": [],
+  "runnable_work": [],
+  "blocked_work": [],
+  "completed_work": [],
+  "classification": "waiting",
+  "steady_state_reached": true,
+  "restart_exact": false,
+  "physical_authorization": false,
+  "physical_score_improvement": "UNKNOWN"
+}

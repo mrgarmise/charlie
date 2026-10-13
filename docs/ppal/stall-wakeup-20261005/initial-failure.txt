@@ -1,0 +1,58 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_waiting_experiment_reconsiders_changed_checkpoint_without_new_evidence __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_waiting_experiment_recons0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe3dd5125a0>
+
+    def test_waiting_experiment_reconsiders_changed_checkpoint_without_new_evidence(tmp_path,monkeypatch):
+        from learning.capabilities import default_registry
+        import learning.cycle as cycle
+        registry=default_registry();original=registry.invoke;stuck=[];released=[False]
+        def invoke(method,**kwargs):
+            identifier=kwargs['plan']['project_id']
+            if not stuck:stuck.append(identifier)
+            if identifier==stuck[0] and not released[0]:return dict(status='deferred',returncode=75)
+            return original(method,**kwargs)
+        monkeypatch.setattr(cycle,'default_registry',lambda:registry)
+        monkeypatch.setattr(registry,'invoke',invoke)
+        root=experience(tmp_path);state=tmp_path/'state';life=DevelopmentLifecycle(state,[root])
+        for _ in range(10):life.turn()
+        assert life.executive.work_states()[stuck[0]]['status']=='blocked'
+        assert life.phase=='waiting for evidence'
+        plan=next(r.data['payload']['plan'] for r in life.journal.records('event')
+            if r.data['payload'].get('category')=='offline_experiment_plan'
+            and r.data['payload']['plan']['project_id']==stuck[0])
+        checkpoint=state/'models'/plan['prediction_id']/'candidate'/'progress.json'
+        checkpoint.parent.mkdir(parents=True,exist_ok=True)
+        checkpoint.write_text(json.dumps(dict(processing_units=1)))
+        life.close();released[0]=True
+        life=DevelopmentLifecycle(state,[root]);life.turn()
+>       assert life.executive.work_states()[stuck[0]]['status']=='completed'
+E       AssertionError: assert 'blocked' == 'completed'
+E         
+E         - completed
+E         + blocked
+
+tests/test_developmental_stall.py:166: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development: idle | no project | 
+Development: reflecting | no project | 
+Development: investigating | no project | 
+Development: idle | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can temporal estimation improve without promoting uncertain track links? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can temporal estimation improve without promoting uncertain track links? | No justified executable investigation under current evidence and capabilities
+Development: investigating | Can temporal estimation improve without promoting uncertain track links? | No justified executable investigation under current evidence and capabilities
+Development: idle | no project | No justified executable investigation under current evidence and capabilities
+Development: investigating | no project | No justified executable investigation under current evidence and capabilities
+Development: idle | The unresolved question may recur in independent experience: score_attribution | Committed developmental checkpoint or conclusion advanced
+Development: investigating | The unresolved question may recur in independent experience: score_attribution | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: investigating | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: stopped | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+Development: idle | Can preserved observations support the existing motion candidates? | 
+Development: waiting for evidence | Can preserved observations support the existing motion candidates? | Committed developmental checkpoint or conclusion advanced
+=========================== short test summary info ============================
+FAILED tests/test_developmental_stall.py::test_waiting_experiment_reconsiders_changed_checkpoint_without_new_evidence
+1 failed in 0.75s

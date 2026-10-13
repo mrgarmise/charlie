@@ -1,0 +1,140 @@
+{
+  "motion": {
+    "baseline": {
+      "samples": 10000,
+      "unit": "ns",
+      "median": 7716.5,
+      "p95": 37412,
+      "p99": 115041,
+      "minimum": 4145,
+      "maximum": 6103448,
+      "mean": 21061.0313
+    },
+    "policy_enabled": {
+      "samples": 10000,
+      "unit": "ns",
+      "median": 19961.5,
+      "p95": 61336,
+      "p99": 253887,
+      "minimum": 16776,
+      "maximum": 2819393,
+      "mean": 37934.4746
+    },
+    "median_delta_ns": 12245.0,
+    "policy": {
+      "candidate_id": "34e1f70531a12861b86d83b88c6520f10cf6710d2c1df00aa596827fbebe4f0f",
+      "investigation_id": "876b29c7e249c6152a3561bbe02de86b3530404bb8b0de4bbb63c2246e030fb7",
+      "evaluation_id": "6ca1f032d1592d67547257622903e6293b073587552c491e284f6053ae1dd684",
+      "activation_key": "68006f705978b18c02b1a8ffc8e5034f65ee8e26ed24dea41998875670ed1337",
+      "rollback_identity": "68006f705978b18c02b1a8ffc8e5034f65ee8e26ed24dea41998875670ed1337",
+      "code_revision": "f6cf02bf673df392067ae6ade9c455d2bbe9707b",
+      "provenance_kind": "simulated-controlled-trajectories",
+      "policy_version": "ppal-policy-v1",
+      "domains": [
+        "action_effect_prediction"
+      ],
+      "applied_domains": [],
+      "disposition": "eligible"
+    },
+    "python": "3.12.14",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "source": "controlled software WorldState fixtures; not Robotron performance evidence",
+    "boundary": "Forebrain.update + Hindbrain.decide including provenance; excludes capture, perception, transport and startup validation",
+    "implications": "Host distribution only; Pi contention, sustained cadence and end-to-end controller latency remain unqualified",
+    "controller_writes": 0,
+    "fixture_manifest_sha256": "37d857f46d22fdf7dc6fe7cbdffcd1148b28ad439d694229815c276a702438cc",
+    "fixture_kind": "controlled temporal-method execution"
+  },
+  "strategy": {
+    "baseline": {
+      "samples": 10000,
+      "unit": "ns",
+      "median": 7770.5,
+      "p95": 34341,
+      "p99": 104666,
+      "minimum": 3974,
+      "maximum": 2589335,
+      "mean": 19449.7923
+    },
+    "policy_enabled": {
+      "samples": 10000,
+      "unit": "ns",
+      "median": 25298.0,
+      "p95": 46876,
+      "p99": 189022,
+      "minimum": 6898,
+      "maximum": 7686204,
+      "mean": 30917.3639
+    },
+    "median_delta_ns": 17527.5,
+    "policy": {
+      "candidate_id": "39a326bc3890c60037ae212e6d01999177a19bd99b652c2f2b11b9a9207881d9",
+      "investigation_id": "374d8429a544c099b8b72c27d9f100bd89314c4b91b68bef7a36487796c01ff2",
+      "evaluation_id": "f30560367783c2c28a698e59e7563b7d32162fbd25020cd058513a2948531914",
+      "activation_key": "1ff9af618738fdc9fe79c07d7b5e71aa27cdd3cd23685dfc436144ea84259b6a",
+      "rollback_identity": "1ff9af618738fdc9fe79c07d7b5e71aa27cdd3cd23685dfc436144ea84259b6a",
+      "code_revision": "f6cf02bf673df392067ae6ade9c455d2bbe9707b",
+      "provenance_kind": "simulated-interface-fixture",
+      "policy_version": "ppal-policy-v1",
+      "domains": [
+        "goal_preference"
+      ],
+      "applied_domains": [],
+      "disposition": "eligible"
+    },
+    "python": "3.12.14",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "source": "controlled software WorldState fixtures; not Robotron performance evidence",
+    "boundary": "Forebrain.update + Hindbrain.decide including provenance; excludes capture, perception, transport and startup validation",
+    "implications": "Host distribution only; Pi contention, sustained cadence and end-to-end controller latency remain unqualified",
+    "controller_writes": 0,
+    "fixture_manifest_sha256": "8f50240d8b5dad60fc38799645c30b04d8fcaabb0d37e8b3818b1465a3a10e98",
+    "fixture_kind": "constructed decision contract, not Charlie learning"
+  },
+  "tactical": {
+    "baseline": {
+      "samples": 10000,
+      "unit": "ns",
+      "median": 7103.0,
+      "p95": 33385,
+      "p99": 86010,
+      "minimum": 3688,
+      "maximum": 1161906,
+      "mean": 16737.9187
+    },
+    "policy_enabled": {
+      "samples": 10000,
+      "unit": "ns",
+      "median": 9924.0,
+      "p95": 39023,
+      "p99": 99764,
+      "minimum": 6091,
+      "maximum": 1603191,
+      "mean": 20745.4156
+    },
+    "median_delta_ns": 2821.0,
+    "policy": {
+      "candidate_id": "ffa9cf9ad991f58517b7854c76e6ed625d365e2353ae1511832003ca91d60cfa",
+      "investigation_id": "8ee5170c1f0da6791051869a15f85a84f8d859da02634f187834a2007a8110bd",
+      "evaluation_id": "b66504b56433e3b76d40b895dd2906522c56b9aa2279e9ef5f312508830f44d5",
+      "activation_key": "3982a73394b805907a8810975d8eef35028a483b228560e58ad937e44f13142f",
+      "rollback_identity": "3982a73394b805907a8810975d8eef35028a483b228560e58ad937e44f13142f",
+      "code_revision": "f6cf02bf673df392067ae6ade9c455d2bbe9707b",
+      "provenance_kind": "simulated-interface-fixture",
+      "policy_version": "ppal-policy-v1",
+      "domains": [
+        "firing_behavior"
+      ],
+      "applied_domains": [],
+      "disposition": "eligible"
+    },
+    "python": "3.12.14",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "source": "controlled software WorldState fixtures; not Robotron performance evidence",
+    "boundary": "Forebrain.update + Hindbrain.decide including provenance; excludes capture, perception, transport and startup validation",
+    "implications": "Host distribution only; Pi contention, sustained cadence and end-to-end controller latency remain unqualified",
+    "controller_writes": 0,
+    "fixture_manifest_sha256": "d751d470eb1201a8bde33eeb8ca427fa897256b6b78d1a367ef3d664553ad3e9",
+    "fixture_kind": "constructed decision contract, not Charlie learning"
+  }
+}

@@ -1,0 +1,113 @@
+...........................................FsF...............F           [100%]
+=================================== FAILURES ===================================
+____ test_normal_application_conflict_does_not_block_development_or_restart ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_normal_application_confli0')
+
+    def test_normal_application_conflict_does_not_block_development_or_restart(tmp_path):
+        root=experience(tmp_path);bad=package(tmp_path,'bad');begin_capture(bad)
+        origin=json.loads((bad/ORIGIN).read_text());origin['capture_id']='malformed'
+        (bad/ORIGIN).write_text(json.dumps(origin))
+        state=tmp_path/'state'
+        first=startup(state,[root,bad],authorize=False,turns=12)
+        assert first.returncode==0,first.stderr
+        original=rows(state)
+        assert any(r.data['payload'].get('category')=='episode_identity_quarantine' for r in original)
+        assert any(r.data['payload'].get('category')=='normal_meditation_result' and r.data['payload']['status']=='completed' for r in original)
+        assert any(r.data['kind']=='resolution' for r in original)
+        requests=[r for r in original if r.data['payload'].get('op')=='evidence_continuation']
+        assert requests and requests[0].data['payload']['required_evidence']
+        for _ in range(2):
+            restarted=startup(state,[root,bad],authorize=False,turns=12)
+            assert restarted.returncode==0,restarted.stderr
+            assert [r.id for r in rows(state)]==[r.id for r in original]
+        delivered_corpus(tmp_path,state)
+        second=startup(state,[root,bad],authorize=False,turns=12)
+        assert second.returncode==0,second.stderr
+        after=rows(state)
+        evaluations=[r for r in after if r.data['payload'].get('category')=='meditation_candidate_evaluation']
+>       assert len(evaluations)==2 and evaluations[-1].data['payload']['result']['result']=='supported'
+E       assert (1 == 2)
+E        +  where 1 = len([EvidenceRecord(sequence=40, id='aac87bed903aca8a57af80930fff24996401e835c382418efba3d3cfe722ad96', document='{"at":18...c66de267fe7ed7db0ba15abe5942b0b"],"version":"meditation-motion-v1"}', committed_at='2026-10-10T15:29:36.031769+00:00')])
+
+tests/test_episode_identity.py:166: AssertionError
+______ test_original_distinct_temporal_projects_restore_defer_and_resume _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_original_distinct_tempora0')
+
+    def test_original_distinct_temporal_projects_restore_defer_and_resume(tmp_path):
+        from learning.lifecycle import DevelopmentLifecycle
+        from learning.retrospective import merge_history
+        from memory.learning_projects import LearningExecutive
+        source,original=original_notebook(tmp_path)
+        state=tmp_path/'state';merge_history(source,state)
+        root=experience(tmp_path)
+        ids=['aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c',
+             '63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343']
+        j=EvidenceJournal(state/'learning-evidence.sqlite3');before=LearningExecutive(j,None).projects()
+        assert before[ids[0]]['scope']['meditation_id']!=before[ids[1]]['scope']['meditation_id']
+        assert [j.get(before[i]['scope']['meditation_id']).data['payload']['prior_use'] for i in ids]==['consulted-test','train']
+        assert all(p['status']=='paused' and len(p['experiment_history'])==1 for p in (before[i] for i in ids))
+        j.close()
+        process=startup(state,[root],authorize=False,turns=12);assert process.returncode==0,process.stderr
+        j=EvidenceJournal(state/'learning-evidence.sqlite3');executive=LearningExecutive(j,None)
+        after=executive.projects()
+        assert all(after[i]['experiment_history']==before[i]['experiment_history'] for i in ids)
+        assert all(after[i]['scope']==before[i]['scope'] and after[i]['origins'][:len(before[i]['origins'])]==before[i]['origins'] for i in ids)
+        assert all(after[i]['developmental_bookmark']['required_evidence'] for i in ids)
+        assert all(after[i]['agenda_representative']==ids[0] for i in ids)
+        assert [(r.id,r.document,r.committed_at) for r in j.records()][:len(original)]==[
+            (r['id'],r['document'],r['committed_at']) for r in original]
+        count=len(j.records());j.close()
+        assert startup(state,[root],authorize=False,turns=12).returncode==0
+        assert len(rows(state))==count
+        delivered_corpus(tmp_path,state)
+        process=startup(state,[root],authorize=False,turns=12);assert process.returncode==0,process.stderr
+        j=EvidenceJournal(state/'learning-evidence.sqlite3');projects=LearningExecutive(j,None).projects()
+>       assert len(projects[ids[0]]['experiment_history'])==2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = len([{'condition': {'corpus_id': None, 'meditation_id': 'e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5'...us-learning-v1', 'evidence_groups': ['episode:d3ab93c8fed5349ec783987b1b09890fe3c5378ef28f8d54e3bc2166551812da'], ...}])
+
+tests/test_episode_identity.py:246: AssertionError
+___ test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_normal_main_autonomously_0')
+
+    def test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart(tmp_path):
+        from test_normal_learning_lifecycle import experience,delivered_corpus,startup,rows
+        root=experience(tmp_path);state=tmp_path/'state';delivered_corpus(tmp_path,state)
+        inbox=state/'acquisition-inbox'/'motion.json';c=json.loads(inbox.read_text())
+        c['provenance_kind']='simulated-controlled-trajectories'
+        for episode in c['episodes']:
+            for i,frame in enumerate(episode['frames']):
+                frame['targets'][0]['position']=[25-i,20]
+        inbox.write_text(json.dumps(c))
+        process=startup(state,[root]);assert process.returncode==0,process.stderr
+>       policy=load_policy(state/'ppal-policy.json')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_qualified_ppal_policy.py:243: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/qualified_policy.py:94: in load_policy
+    if location.stat().st_size > 65536:
+       ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-root/pytest-11/test_normal_main_autonomously_0/state/ppal-policy.json')
+follow_symlinks = True
+
+    def stat(self, *, follow_symlinks=True):
+        """
+        Return the result of the stat() system call on this path, like
+        os.stat() does.
+        """
+>       return os.stat(self, follow_symlinks=follow_symlinks)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-root/pytest-11/test_normal_main_autonomously_0/state/ppal-policy.json'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py:840: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_episode_identity.py::test_normal_application_conflict_does_not_block_development_or_restart
+FAILED tests/test_episode_identity.py::test_original_distinct_temporal_projects_restore_defer_and_resume
+FAILED tests/test_qualified_ppal_policy.py::test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart
+3 failed, 58 passed, 1 skipped in 21.90s

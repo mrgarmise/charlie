@@ -1,0 +1,315 @@
+{
+  "source_run": "body-fire-bootstrap-20261001-020552",
+  "source_provenance": {
+    "git_commit": "dfdccdefe6d875253e5b0ef32ae53accc1d5286e",
+    "dirty_worktree": true,
+    "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+  },
+  "source_hashes": {
+    "report.json": "71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+    "agency.jsonl": "49bf2fe84ab29b1ea1625bcd3815ff35d4d945d2b9d82f61bc310d1fd24b4d6d",
+    "setup-attempts.json": "dc6a55bbccb8ecc9c8bf4fdf28c9af503c824a9e716b2b4b650b87c2d6edf2c5",
+    "exposure.json": "9d0d21c656c4afe48fefe868aadd878c777d39d43d6f917af1a31288b8f4ac20"
+  },
+  "start_timestamp_status": "not recorded; bounded using last pre-START capture and first post-START setup exposure",
+  "start_bounds": [
+    10253.575487327,
+    10256.762654999999
+  ],
+  "calibration_first_frame_at": 10256.762654999999,
+  "calibration_last_frame_at": 10279.978216,
+  "calibration_frame_span_seconds": 23.21556100000089,
+  "calibration_attempts": 13,
+  "calibration_capture_seconds": 1.733976735999022,
+  "calibration_finish_bounds": [
+    10280.066575929,
+    10282.677392011
+  ],
+  "first_saved_gameplay_at": 10256.762654999999,
+  "first_life_loss_interpretation": {
+    "status": "visual interpretation; no runtime life tracker",
+    "evidence": "two reserve-player icons in attempt 6, one in attempt 7; supported by population reset",
+    "bounds": [
+      10266.156234,
+      10267.833658
+    ],
+    "source_frames": [
+      "setup-attempt-005.png",
+      "setup-attempt-006.png"
+    ]
+  },
+  "discovery_begin_bounds": [
+    10283.890053676,
+    10284.255152701
+  ],
+  "first_fire_probe_transport": {
+    "started_at": 10284.642819764,
+    "move": "STAY",
+    "fire": "E",
+    "duration_ms": 60,
+    "commands": [
+      {
+        "command": "RS_RIGHT",
+        "sent_at": 10284.642830431,
+        "ack_at": 10284.955009781
+      },
+      {
+        "command": "LS_CENTER",
+        "sent_at": 10285.015077203,
+        "ack_at": 10285.027090261
+      },
+      {
+        "command": "RS_CENTER",
+        "sent_at": 10285.027091891,
+        "ack_at": 10285.041484124
+      }
+    ],
+    "controls_ready_at": 10284.955014633,
+    "pulse_finished_at": 10285.015073462,
+    "returned_at": 10285.041486031
+  },
+  "first_body_probe_transport": {
+    "started_at": 10285.917010399,
+    "move": "E",
+    "fire": "N",
+    "duration_ms": 60,
+    "commands": [
+      {
+        "command": "LS_RIGHT",
+        "sent_at": 10285.917018047,
+        "ack_at": 10285.951190772
+      },
+      {
+        "command": "RS_UP",
+        "sent_at": 10285.951194735,
+        "ack_at": 10285.957548848
+      },
+      {
+        "command": "LS_CENTER",
+        "sent_at": 10286.017614622,
+        "ack_at": 10286.027221876
+      },
+      {
+        "command": "RS_CENTER",
+        "sent_at": 10286.027223265,
+        "ack_at": 10286.077334042
+      }
+    ],
+    "controls_ready_at": 10285.957552904,
+    "pulse_finished_at": 10286.017612289,
+    "returned_at": 10286.07733619
+  },
+  "first_provisional_self": {
+    "sample": 14,
+    "capture_timestamp": 10288.63373,
+    "identity_status": "provisional",
+    "controlled_track_id": 146,
+    "capture": {
+      "mode": "fresh_exposure",
+      "requested_at": 10288.630701138,
+      "completed_at": 10288.721064753,
+      "capture_seconds": 0.09036361499966006,
+      "sensor_timestamp_ns": 10288700385000,
+      "exposure_time_us": 66655,
+      "first_pixel_exposure_at": 10288.63373,
+      "frame_duration_us": 67106,
+      "lens_position": 1.2999999523162842,
+      "analogue_gain": 15.753846168518066,
+      "digital_gain": 1.0040022134780884,
+      "colour_gains": [
+        1.1707415580749512,
+        4.091019153594971
+      ],
+      "colour_temperature": 2492,
+      "ae_locked": null
+    }
+  },
+  "timer_start_estimate": 10289.299633,
+  "timer_start_basis": "control returned_at minus relative step t; agreement across eight actions within microseconds, not a saved phase event",
+  "first_ordinary_action": {
+    "tick": 0,
+    "observed_at": 0.09497127900067426,
+    "t": 0.4112600910011679,
+    "capture_timestamp": 10289.304699,
+    "action_timestamp": 10289.570422005,
+    "player": [
+      49.84375,
+      51.87500000000001
+    ],
+    "self_track_id": 146,
+    "identity_status": "provisional",
+    "action": {
+      "move": "NE",
+      "fire": "NW",
+      "reason": "seek open space; no current rescue target"
+    }
+  },
+  "first_ordinary_action_latency_bounds_seconds": [
+    32.807776375000685,
+    35.994944047999525
+  ],
+  "recovery_rows": [
+    {
+      "tick": 8,
+      "t": 12.410449255999993,
+      "status": "reacquiring",
+      "lost": 1,
+      "last_player": [
+        60.703125,
+        43.020833333333336
+      ],
+      "screen_state": {
+        "state": "gameplay",
+        "reason": "uniform_colored_border",
+        "coverage": 0.8808,
+        "hue_concentration": 0.9845,
+        "occupied_hue_bins": 2
+      },
+      "not_gameplay_streak": 0
+    },
+    {
+      "tick": 9,
+      "t": 14.298695302000851,
+      "status": "reacquiring",
+      "lost": 2,
+      "last_player": [
+        60.703125,
+        43.020833333333336
+      ],
+      "screen_state": {
+        "state": "unknown",
+        "reason": "insufficient_colored_border",
+        "coverage": 0.0361
+      },
+      "not_gameplay_streak": 0
+    },
+    {
+      "tick": 10,
+      "t": 15.987985317000494,
+      "status": "control_challenge",
+      "lost": 3,
+      "confirmed": false,
+      "eligible": false,
+      "hits": 0,
+      "attempts": 0,
+      "evidence": [],
+      "screen_state": {
+        "state": "unknown",
+        "reason": "border_ambiguous",
+        "coverage": 0.3897,
+        "hue_concentration": 0.942,
+        "occupied_hue_bins": 4
+      }
+    },
+    {
+      "tick": 10,
+      "t": 15.987991632000558,
+      "status": "reacquiring",
+      "lost": 3,
+      "last_player": [
+        60.703125,
+        43.020833333333336
+      ],
+      "screen_state": {
+        "state": "unknown",
+        "reason": "border_ambiguous",
+        "coverage": 0.3897,
+        "hue_concentration": 0.942,
+        "occupied_hue_bins": 4
+      },
+      "not_gameplay_streak": 0
+    },
+    {
+      "tick": 11,
+      "t": 17.7239399959999,
+      "status": "reacquiring",
+      "lost": 4,
+      "last_player": [
+        60.703125,
+        43.020833333333336
+      ],
+      "screen_state": {
+        "state": "unknown",
+        "reason": "border_ambiguous",
+        "coverage": 0.3947,
+        "hue_concentration": 0.9366,
+        "occupied_hue_bins": 4
+      },
+      "not_gameplay_streak": 0
+    },
+    {
+      "tick": 12,
+      "t": 19.414295861000937,
+      "status": "reacquiring",
+      "lost": 5,
+      "last_player": [
+        60.703125,
+        43.020833333333336
+      ],
+      "screen_state": {
+        "state": "unknown",
+        "reason": "border_ambiguous",
+        "coverage": 0.3962,
+        "hue_concentration": 0.9381,
+        "occupied_hue_bins": 4
+      },
+      "not_gameplay_streak": 0
+    },
+    {
+      "tick": 13,
+      "t": 21.096038685000167,
+      "status": "reacquiring",
+      "lost": 6,
+      "last_player": [
+        60.703125,
+        43.020833333333336
+      ],
+      "screen_state": {
+        "state": "unknown",
+        "reason": "border_ambiguous",
+        "coverage": 0.3955,
+        "hue_concentration": 0.9368,
+        "occupied_hue_bins": 4
+      },
+      "not_gameplay_streak": 0
+    }
+  ],
+  "episode_end": {
+    "state": "unknown",
+    "confirmed": false,
+    "evidence": null
+  },
+  "result": "TIME LIMIT",
+  "new_physical_run_status": "No later developmental archive provided or available at audit; no post-repair physical latency measurement claimed",
+  "first_ordinary_action_transport": {
+    "started_at": 10289.570431375,
+    "move": "NE",
+    "fire": "NW",
+    "duration_ms": 80,
+    "commands": [
+      {
+        "command": "LS_UP_RIGHT",
+        "sent_at": 10289.57043619,
+        "ack_at": 10289.600752883
+      },
+      {
+        "command": "RS_UP_LEFT",
+        "sent_at": 10289.600756754,
+        "ack_at": 10289.607494887
+      },
+      {
+        "command": "LS_CENTER",
+        "sent_at": 10289.687555357,
+        "ack_at": 10289.704283432
+      },
+      {
+        "command": "RS_CENTER",
+        "sent_at": 10289.704284376,
+        "ack_at": 10289.710891231
+      }
+    ],
+    "controls_ready_at": 10289.607496517,
+    "pulse_finished_at": 10289.687554098,
+    "returned_at": 10289.710892028
+  }
+}

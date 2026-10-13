@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Charlie Eyes</title>
+<style>
+body{background:#151820;color:#eee;font:16px system-ui;margin:24px}h1{margin-bottom:8px}
+.views{display:flex;flex-wrap:wrap;gap:20px}.view{flex:1;min-width:320px;max-width:900px}
+img{width:100%;display:block}#tracked{position:relative}svg{position:absolute;inset:0;width:100%;height:100%}
+pre{background:#222633;padding:15px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:480px;overflow:auto}
+.muted{color:#afb6c4}.warning{color:#ffc65c}button{padding:7px 12px}
+</style>
+<h1>Charlie Eyes</h1><p id="status" role="status">Connecting…</p>
+<p class="muted">Raw RGB evidence · solid green: confirmed SELF · dashed amber: provisional SELF · blue: physical tracks. UNKNOWN remains UNKNOWN.</p>
+<div class="views"><section class="view"><h2>Raw frame</h2><img id="raw" alt="Charlie's full captured frame"></section>
+<section class="view"><h2>Tracking evidence</h2><div id="tracked"><img id="crop" alt="Observed playfield"><svg id="boxes"></svg></div></section></div>
+<h2>Decision / evidence / learning project</h2><pre id="evidence">No current evidence.</pre>
+<script>
+const $=id=>document.getElementById(id);let last=0;
+async function poll(){
+ try{
+  const r=await fetch('/frame',{cache:'no-store',signal:AbortSignal.timeout(1800)});if(!r.ok)throw Error(r.status);
+  const p=await r.json();last=performance.now();
+  $('status').textContent=p.status+(p.reason?' — '+p.reason:'')+(p.capture_timestamp?' · captured at '+p.capture_timestamp.toFixed(3)+' monotonic seconds':'');
+  $('status').className=p.status==='unavailable'?'warning':'';
+  $('boxes').replaceChildren();
+  if(!p.raw){$('raw').removeAttribute('src');$('crop').removeAttribute('src');$('evidence').textContent=JSON.stringify(p,null,2);return;}
+  $('raw').src='data:image/jpeg;base64,'+p.raw.image;
+  const e=p.evidence,a=e.agency||{},crop=p.playfield;
+  $('crop').src='data:image/jpeg;base64,'+(crop||p.raw).image;
+  if(crop){
+   $('boxes').setAttribute('viewBox','0 0 '+crop.size.join(' '));
+   for(const t of e.tracks||[]){
+    const self=t.track_id===a.controlled_track_id&&['confirmed','provisional'].includes(a.identity_status);
+    const provisional=self&&a.identity_status==='provisional';
+    const color=self?(provisional?'#ffc65c':'#70ff9b'):'#73baff';
+    const [x,y,x2,y2]=t.box;
+    const box=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    for(const [k,v] of Object.entries({x,y,width:x2-x,height:y2-y,fill:'none',stroke:color,'stroke-width':2}))box.setAttribute(k,v);
+    if(provisional)box.setAttribute('stroke-dasharray','5 4');$('boxes').append(box);
+    const label=document.createElementNS('http://www.w3.org/2000/svg','text');label.setAttribute('x',x);label.setAttribute('y',Math.max(12,y-3));label.setAttribute('fill',color);label.setAttribute('font-size',12);
+    label.textContent='#'+t.track_id+(self?' SELF '+a.identity_status:'');$('boxes').append(label);
+   }
+  }
+  $('evidence').textContent=JSON.stringify(e,null,2);
+ }catch(err){$('status').textContent='Unavailable — connection lost; displayed frames are stale';$('status').className='warning';$('boxes').replaceChildren();$('raw').removeAttribute('src');$('crop').removeAttribute('src');}
+ finally{setTimeout(poll,333);}
+}
+poll();
+</script></html>

@@ -1,0 +1,1666 @@
+....ss.ss.ss................s..sssss.ss..ssss........................... [ 10%]
+........................................................................ [ 21%]
+........................s............................................... [ 32%]
+........................................................................ [ 42%]
+........................................................................ [ 53%]
+........................................................................ [ 64%]
+..............................................................FFFFFFFFFF [ 74%]
+F....................................................................... [ 85%]
+........................................................................ [ 96%]
+..........................                                               [100%]
+=================================== FAILURES ===================================
+_ test_armed_runner_uses_generic_agency_and_always_releases[False-False-False-False-False-False-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d7bda60>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic0')
+fail_during_play = False, respawn = False, delayed_render = False
+bootstrap = False, experiment = False, recalibrate = False
+rejected_challenge = False, already_gameplay = False, extended = False
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+PLAYER ACQUIRED (generic_visual_agency) x=20.00 y=21.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: diagnostic limit 1.0s
+RUN COMPLETE: DIAGNOSTIC LIMIT; ticks=10
+Evidence: /tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic0/run/report.json
+_ test_armed_runner_uses_generic_agency_and_always_releases[True-False-False-False-False-False-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d88c260>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic1')
+fail_during_play = True, respawn = False, delayed_render = False
+bootstrap = False, experiment = False, recalibrate = False
+rejected_challenge = False, already_gameplay = False, extended = False
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+PLAYER ACQUIRED (generic_visual_agency) x=20.00 y=21.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: diagnostic limit 1.0s
+Evidence: /tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic1/run/report.json
+_ test_armed_runner_uses_generic_agency_and_always_releases[False-True-False-False-False-False-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d88c320>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic2')
+fail_during_play = False, respawn = True, delayed_render = False
+bootstrap = False, experiment = False, recalibrate = False
+rejected_challenge = False, already_gameplay = False, extended = False
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+PLAYER ACQUIRED (generic_visual_agency) x=20.00 y=21.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: diagnostic limit 1.0s
+AGENCY LOST: self=None candidate=1 confidence=0.50 runner=0.00
+AGENCY REACQUIRED: self=3 candidate=3 confidence=0.74 runner=0.00
+PLAYER REACQUIRED (generic_visual_agency) after 1 misses x=80.00 y=81.00
+RUN COMPLETE: DIAGNOSTIC LIMIT; ticks=6
+Evidence: /tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic2/run/report.json
+_ test_armed_runner_uses_generic_agency_and_always_releases[False-False-True-False-False-False-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d882000>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic3')
+fail_during_play = False, respawn = False, delayed_render = True
+bootstrap = False, experiment = False, recalibrate = False
+rejected_challenge = False, already_gameplay = False, extended = False
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+PLAYER ACQUIRED (generic_visual_agency) x=20.00 y=21.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: diagnostic limit 1.0s
+RUN COMPLETE: DIAGNOSTIC LIMIT; ticks=10
+Evidence: /tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic3/run/report.json
+_ test_armed_runner_uses_generic_agency_and_always_releases[False-False-True-True-False-False-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d88cc80>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic4')
+fail_during_play = False, respawn = False, delayed_render = True
+bootstrap = True, experiment = False, recalibrate = False
+rejected_challenge = False, already_gameplay = False, extended = False
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+SELF PROVISIONAL: hypothesis=1; FIRE outcomes unconfirmed
+PLAYER HYPOTHESIS (provisional_body_agency) x=20.00 y=20.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: diagnostic limit 1.0s
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+RUN COMPLETE: DIAGNOSTIC LIMIT; ticks=10
+Evidence: /tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic4/run/report.json
+_ test_armed_runner_uses_generic_agency_and_always_releases[False-False-True-True-True-False-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74fd779e0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic5')
+fail_during_play = False, respawn = False, delayed_render = True
+bootstrap = True, experiment = True, recalibrate = False
+rejected_challenge = False, already_gameplay = False, extended = False
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+SELF PROVISIONAL: hypothesis=1; FIRE outcomes unconfirmed
+PLAYER HYPOTHESIS (provisional_body_agency) x=20.00 y=20.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: diagnostic limit 1.0s
+EXPERIMENT: BODY=NE FIRE=NONE; prediction=2b337f5da889
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+RUN COMPLETE: DIAGNOSTIC LIMIT; ticks=10
+Evidence: /tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic5/run/report.json
+_ test_armed_runner_uses_generic_agency_and_always_releases[False-False-False-True-False-True-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74fd77c50>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic6')
+fail_during_play = False, respawn = False, delayed_render = False
+bootstrap = True, experiment = False, recalibrate = True
+rejected_challenge = False, already_gameplay = False, extended = False
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+SELF PROVISIONAL: hypothesis=1; FIRE outcomes unconfirmed
+PLAYER HYPOTHESIS (provisional_body_agency) x=20.00 y=20.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: diagnostic limit 1.0s
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+RUN COMPLETE: DIAGNOSTIC LIMIT; ticks=10
+Evidence: /tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic6/run/report.json
+_ test_armed_runner_uses_generic_agency_and_always_releases[False-False-False-False-False-False-True-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74fdaa570>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic7')
+fail_during_play = False, respawn = False, delayed_render = False
+bootstrap = False, experiment = False, recalibrate = False
+rejected_challenge = True, already_gameplay = False, extended = False
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+PLAYER ACQUIRED (generic_visual_agency) x=20.00 y=21.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: diagnostic limit 3.0s
+PLAYER LOST: controls neutral; REACQUIRING
+REACQUIRING: 3 misses; checking for controllable SELF
+SELF CHALLENGE REJECTED; episode boundary remains unconfirmed
+REACQUIRING: 12 misses; checking for controllable SELF
+SELF CHALLENGE REJECTED; episode boundary remains unconfirmed
+RUN COMPLETE: DIAGNOSTIC LIMIT; ticks=19
+Evidence: /tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic7/run/report.json
+_ test_armed_runner_uses_generic_agency_and_always_releases[False-False-False-False-False-False-False-True] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d745550>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic8')
+fail_during_play = False, respawn = False, delayed_render = False
+bootstrap = False, experiment = False, recalibrate = False
+rejected_challenge = False, already_gameplay = True, extended = False
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY ALREADY VISIBLE: attaching without START
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+PLAYER ACQUIRED (generic_visual_agency) x=20.00 y=21.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: diagnostic limit 1.0s
+RUN COMPLETE: DIAGNOSTIC LIMIT; ticks=10
+Evidence: /tmp/pytest-of-root/pytest-9/test_armed_runner_uses_generic8/run/report.json
+_____________ test_real_player_loop_has_no_default_duration_limit ______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d91e750>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_real_player_loop_has_no_d0')
+
+    def test_real_player_loop_has_no_default_duration_limit(monkeypatch,tmp_path):
+>       test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+            False,False,False,False,False,False,False,False,extended=True)
+
+tests/test_robotron_agency_integration.py:207: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d91e750>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_real_player_loop_has_no_d0')
+fail_during_play = False, respawn = False, delayed_render = False
+bootstrap = False, experiment = False, recalibrate = False
+rejected_challenge = False, already_gameplay = False, extended = True
+terminal = False
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+PLAYER ACQUIRED (generic_visual_agency) x=20.00 y=21.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state
+INTERRUPTED; neutralizing
+Evidence: /tmp/pytest-of-root/pytest-9/test_real_player_loop_has_no_d0/run/report.json
+________________ test_real_player_confirmed_terminal_completion ________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d7f7dd0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_real_player_confirmed_ter0')
+
+    def test_real_player_confirmed_terminal_completion(monkeypatch,tmp_path):
+>       test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,
+            False,False,False,False,False,False,True,False,terminal=True)
+
+tests/test_robotron_agency_integration.py:212: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb74d7f7dd0>
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_real_player_confirmed_ter0')
+fail_during_play = False, respawn = False, delayed_render = False
+bootstrap = False, experiment = False, recalibrate = False
+rejected_challenge = True, already_gameplay = False, extended = False
+terminal = True
+
+    @pytest.mark.parametrize('fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay',
+                             [(False,False,False,False,False,False,False,False),(True,False,False,False,False,False,False,False),
+                              (False,True,False,False,False,False,False,False),(False,False,True,False,False,False,False,False),
+                              (False,False,True,True,False,False,False,False),(False,False,True,True,True,False,False,False),
+                              (False,False,False,True,False,True,False,False),(False,False,False,False,False,False,True,False),
+                              (False,False,False,False,False,False,False,True)])
+    
+    def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_path,fail_during_play,respawn,delayed_render,bootstrap,experiment,recalibrate,rejected_challenge,already_gameplay,extended=False,terminal=False):
+        from experiments.ppal import play_robotron as play
+        import time as real_time
+        real_sleep=real_time.sleep
+        start_read=[0]
+        clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
+        image=Image.new('RGB',(100,100))
+        pending = [None]; response_reads = [0]
+        class Source:
+            def read(self):
+                real_sleep(.004)  # simulated camera cadence permits bounded evidence writer
+                clock[0]+=.01; reads[0]+=1
+                if pending[0] is not None:
+                    response_reads[0] += 1
+                    if response_reads[0] == 2:
+                        u = pending[0]; p = points[0]
+                        points[0] = (p[0]+u[0],p[1]+u[1])
+                        pending[0] = None
+                if respawn and reads[0] == start_read[0]+26: points[0]=(80.,80.)
+                if fail_during_play and reads[0]>start_read[0]+28: raise RuntimeError('camera disconnected')
+                if extended and reads[0]>600: raise KeyboardInterrupt
+                return image
+            def close(self): closed.append('camera')
+        class Recognizer:
+            def detect(self,frame):
+                # Only the wrong stationary center object looks like PLAYER.
+                return [(Detection('unknown' if i==0 else 'player',p,(1,1,10,20),100),
+                         {'class_scores':{'player':.01 if i==0 else .99}}) for i,p in enumerate(points)]
+        class Controller:
+            def __init__(self,*a,**k): self.last_execution=None
+            def _command(self,command):
+                commands.append(command)
+                if command=='START':start_read[0]=reads[0]
+                self.last_command={'command':command,'write_started_at':clock[0],'write_completed_at':clock[0],'ack_at':clock[0]}
+            def execute(self,action,ms):
+                commands.append(action)
+                self.last_execution={'started_at':clock[0],'move':action.move,'fire':action.fire,'duration_ms':ms}
+                u=VECTORS[action.move]
+                if delayed_render and action.move != "STAY":
+                    pending[0] = u; response_reads[0] = 0
+                else:
+                    p=points[0]; points[0]=(p[0]+u[0],p[1]+u[1])
+                clock[0]+=ms/1000
+            def close(self): closed.append('controller')
+        monkeypatch.setattr(play,'PiCameraSource',Source)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play.Calibration,'load',lambda *a:type('Calibration',(),{'apply':lambda self,f:f})())
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(play.time,'sleep',lambda duration:None)
+        monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay',
+            'phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        challenges=[]
+        if rejected_challenge:
+            original_player=play.VisualAgency.player.fget
+            monkeypatch.setattr(play.VisualAgency,'player',property(
+                lambda self:None if reads[0]>start_read[0]+28 else original_player(self)))
+            def reject(*a,**kw):
+                challenges.append(True)
+                return dict(confirmed=False,rejected=True,eligible=True,hits=0,failures=2,
+                            attempts=2,evidence=[{'obeyed':False}]*2,frames=kw['initial_frames'])
+            monkeypatch.setattr(play,'_control_challenge',reject)
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'gameplay' if ('START' in commands or already_gameplay) else 'not_gameplay','phase':'gameplay' if ('START' in commands or already_gameplay) else 'startable'})
+        if terminal:
+            monkeypatch.setattr(play,'classify_screen_state',lambda f:{'state':'not_gameplay' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'not_gameplay',
+                'phase':'terminal' if reads[0]>start_read[0]+28 else 'gameplay' if 'START' in commands else 'startable'})
+        if recalibrate:
+            def prepare(source,output,**kwargs):
+                assert 'START' not in commands
+                assert kwargs['require_uniform_border'] is False
+                clock[0]+=20.  # Slow geometry must spend no armed game time.
+                return type('Calibration',(),{'apply':lambda self,f:f})()
+            monkeypatch.setattr(play,'prepare',prepare)
+            monkeypatch.setattr(play,'optimize_screen_exposure',lambda *a:{'status':'mock'})
+        def sensory(source,output,**kwargs):
+            assert 'START' not in commands
+            calibration=play.prepare(source,output,require_uniform_border=False) if recalibrate else play.Calibration.load(None)
+            return calibration,{'status':'usable','exposure':{'status':'simulated'},'physical_motion':False}
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        if experiment:
+            from pathlib import Path
+            from memory.evidence import EvidenceJournal
+            from memory.evaluator import MemoryEvaluator
+            from memory.gateway import MemoryGateway
+            from memory.store import JsonlStore
+            from experiments.ppal.episode_evidence import import_episode
+            from experiments.ppal.reflect_robotron import reflect_actuator_evidence
+            from experiments.ppal.experiment_return import select_experiment,resolve_experiment
+            fixture=Path(__file__).parent/'fixtures/robotron-body-fire-020552'
+            root=tmp_path/'real-seed';root.mkdir()
+            (root/'report.json').write_bytes((fixture/'report.json').read_bytes())
+            (root/'agency.jsonl').write_bytes((fixture/'agency-response-extract.jsonl').read_bytes())
+            gateway=MemoryGateway(evaluator=MemoryEvaluator(tmp_path/'eval.sqlite3',exploration_rate=0),store=JsonlStore(tmp_path/'memories.jsonl'))
+            journal=EvidenceJournal(tmp_path/'seed.sqlite3');ep=import_episode(root,journal)
+            reflect_actuator_evidence(root,journal,ep,gateway)
+            commitments=EvidenceJournal(tmp_path/'commitments.sqlite3')
+            plan=select_experiment(gateway,commitments,tmp_path/'run',horizon_seconds=30)
+            (tmp_path/'plan.json').write_text(json.dumps(plan))
+        monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
+                            + ([] if extended or terminal else ['--seconds','3' if rejected_challenge else '1'])
+                            + (['--bootstrap-body-fire'] if bootstrap else [])
+                            + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
+                            + (['--recalibrate'] if recalibrate else []))
+        if fail_during_play:
+            with pytest.raises(RuntimeError,match='camera disconnected'): play.main()
+        else:
+            play.main()
+        report=json.loads((tmp_path/'run/report.json').read_text())
+        t=report['session_timing']
+        assert t['evidence_recording_started']<=t['calibration_started']<=t['evidence_ready']<=t['camera_ready']
+        from memory.evidence import EvidenceJournal
+        recording=EvidenceJournal(tmp_path/'run/session-evidence.sqlite3',read_only=True)
+        captures=[r for r in recording.records('observation') if r.data['payload'].get('category')=='camera_capture']
+        assert captures and all((tmp_path/'run'/r.data['payload']['artifact']['path']).exists() for r in captures)
+        recording.verify()
+        predictions=[r for r in recording.records('prediction') if r.data['payload'].get('expected',{}).get('category')=='tactical_prediction']
+        executions=[r for r in recording.records('observation') if r.data['payload'].get('category')=='tactical_execution']
+>       assert predictions and executions
+E       assert ([])
+
+tests/test_robotron_agency_integration.py:134: AssertionError
+----------------------------- Captured stdout call -----------------------------
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+PLAYER ACQUIRED (generic_visual_agency) x=20.00 y=21.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state
+PLAYER LOST: controls neutral; REACQUIRING
+REACQUIRING: 3 misses; checking for controllable SELF
+SELF CHALLENGE REJECTED; episode boundary remains unconfirmed
+GAME OVER CONFIRMED: persistent non-gameplay appearance + no controllable SELF
+RUN COMPLETE: GAME OVER; ticks=9
+Evidence: /tmp/pytest-of-root/pytest-9/test_real_player_confirmed_ter0/run/report.json
+=========================== short test summary info ============================
+FAILED tests/test_robotron_agency_integration.py::test_armed_runner_uses_generic_agency_and_always_releases[False-False-False-False-False-False-False-False]
+FAILED tests/test_robotron_agency_integration.py::test_armed_runner_uses_generic_agency_and_always_releases[True-False-False-False-False-False-False-False]
+FAILED tests/test_robotron_agency_integration.py::test_armed_runner_uses_generic_agency_and_always_releases[False-True-False-False-False-False-False-False]
+FAILED tests/test_robotron_agency_integration.py::test_armed_runner_uses_generic_agency_and_always_releases[False-False-True-False-False-False-False-False]
+FAILED tests/test_robotron_agency_integration.py::test_armed_runner_uses_generic_agency_and_always_releases[False-False-True-True-False-False-False-False]
+FAILED tests/test_robotron_agency_integration.py::test_armed_runner_uses_generic_agency_and_always_releases[False-False-True-True-True-False-False-False]
+FAILED tests/test_robotron_agency_integration.py::test_armed_runner_uses_generic_agency_and_always_releases[False-False-False-True-False-True-False-False]
+FAILED tests/test_robotron_agency_integration.py::test_armed_runner_uses_generic_agency_and_always_releases[False-False-False-False-False-False-True-False]
+FAILED tests/test_robotron_agency_integration.py::test_armed_runner_uses_generic_agency_and_always_releases[False-False-False-False-False-False-False-True]
+FAILED tests/test_robotron_agency_integration.py::test_real_player_loop_has_no_default_duration_limit
+FAILED tests/test_robotron_agency_integration.py::test_real_player_confirmed_terminal_completion
+11 failed, 644 passed, 20 skipped in 121.82s (0:02:01)

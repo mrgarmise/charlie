@@ -1,0 +1,1204 @@
+five@charlie:~/charlie-ala2-bae659f60b0e $ cd /home/five/charlie-ala2-bae659f60b0e
+
+PYTHONPATH="$PWD" /home/five/Projects/charlie/.venv/bin/python - <<'PY'
+from tools.inspect_developmental_progress import inspect
+from pathlib import Path
+import json
+
+d = inspect(Path("/home/five/.local/share/charlie/development"))
+
+for name in ("status", "work", "checkpoints", "outcomes", "evidence_requests", "commissions"):
+    print(f"\n===== {name.upper()} =====")
+    value = d.get(name)
+    print(json.dumps(value, indent=2, default=str)[:12000])
+PY
+
+===== STATUS =====
+{
+  "schema": "charlie-development-status-v1",
+  "phase": "stopped",
+  "last_activity": "idle",
+  "current_project": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+  "current_question": "Can preserved observations support the existing motion candidates?",
+  "projects": {
+    "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c": {
+      "goal": "Can temporal estimation improve without promoting uncertain track links?",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343": {
+      "goal": "Can temporal estimation improve without promoting uncertain track links?",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252": {
+      "goal": "Can an available learned visual representation generalize to independent episodes, and what remains unrepresented?",
+      "status": "blocked",
+      "progress": {},
+      "next_direction": "await prerequisite; preserve hypotheses and history"
+    },
+    "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0": {
+      "goal": "The unresolved question may recur in independent experience: action_execution",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 1,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 1,
+        "results": {
+          "supported": 1
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a": {
+      "goal": "The unresolved question may recur in independent experience: death_observability",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 1,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 1,
+        "results": {
+          "supported": 1
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345": {
+      "goal": "The unresolved question may recur in independent experience: ownership_continuity",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 1,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 1,
+        "results": {
+          "supported": 1
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf": {
+      "goal": "The unresolved question may recur in independent experience: score_attribution",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 1,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 1,
+        "results": {
+          "supported": 1
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2": {
+      "goal": "The unresolved question may recur in independent experience: self_uncertainty",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 1,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 1,
+        "results": {
+          "supported": 1
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f": {
+      "goal": "The unresolved question may recur in independent experience: semantic_coverage",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "independent_offline_evidence_units": 1,
+        "independent_physical_episodes": 0,
+        "offline_trials": 1,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 1,
+        "results": {
+          "supported": 1
+        },
+        "support_fraction": 1.0
+      },
+      "next_direction": "continue scoped evidence collection"
+    },
+    "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d": {
+      "goal": "Can preserved observations support the existing motion candidates?",
+      "status": "paused",
+      "progress": {
+        "attempts": 1,
+        "conditions": 0,
+        "episodes": 0,
+        "independent_offline_evidence_units": 0,
+        "independent_physical_episodes": 0,
+        "offline_trials": 0,
+        "qualified_gameplay_experiences": 0,
+        "resolved": 0,
+        "results": {
+          "unresolved": 1
+        },
+        "support_fraction": null
+      },
+      "next_direction": "continue scoped evidence collection"
+    }
+  },
+  "latest_findings": [
+    {
+      "id": "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+      "error": null,
+      "prediction_id": "db9b42f6941952f207f8d419251fd9af444bc96b8fc4fa0732a17f2df1abe2e7",
+      "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+      "result": "supported"
+    },
+    {
+      "id": "938039fb7ff20c7e103b99fe7a71ace04c7f592661c88979a17cc2bc3e3e6653",
+      "error": null,
+      "prediction_id": "416c6d5470d30eef7909a3e04c377c188c98eb3c34015873c4d851a4e548b828",
+      "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+      "result": "supported"
+    },
+    {
+      "id": "0096e1116a5d60530f65bb1a07cdea1a6d1462bfad858983cfb9dda485fe2965",
+      "error": null,
+      "prediction_id": "172ba7c8c98558fc9782292fb006c531b239a8493ba9771e7474333280b1055e",
+      "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+      "result": "supported"
+    }
+  ],
+  "latest_operational_outcome": null,
+  "developmental_work": {
+    "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01": {
+      "after": "018dd586c2528a2f5708b16e364a31069a92b35bcd8d842902ad050b87f4cb82",
+      "before": "db25b8065a7db2ce2abd8677afe64441e59bf4cdbc979970917e789cf9f14b4a",
+      "dependency": "797401cf12132da40e791a45096bd4325dce5c8c06ab803d47148a377c944d72",
+      "next_direction": "Resume retained work",
+      "nonprogress_turns": 0,
+      "op": "developmental_progress",
+      "outcome": "completed",
+      "physical_authorization": false,
+      "previous": "74c412048693d1d5eb784fa773741bc237f36141d71a743bea4f18be28f83393",
+      "progress_occurred": true,
+      "reason": "Committed stage/checkpoint advanced",
+      "resumption_condition": "Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes",
+      "status": "completed",
+      "work_id": "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01",
+      "evidence_id": "6b3baf12fe9d2c55b13fe5f700424d8e52efb8ccbfea4df34fe1f6df2d40eb92"
+    },
+    "4b01abe81b784e87915658f8386386d5f29e91d8b43e96c0572a68561f0baaf8": {
+      "after": "726cb9b31aad4dca00e5414abc635095757537d35158030b59f91301b5e0cb14",
+      "before": "f1d0009a50ec64e3d6e25e253ecac58f2ca174432bb116799e5038b03a5a649c",
+      "dependency": "3cd37f456f39115910f337148ec88869e16e557f38387d164cb54e133ccffad6",
+      "next_direction": "Resume retained work",
+      "nonprogress_turns": 0,
+      "op": "developmental_progress",
+      "outcome": "yielded",
+      "physical_authorization": false,
+      "previous": "26be4763a362f566e67ce603e45776ded8ef93d94738449024c03a9565923f12",
+      "progress_occurred": true,
+      "reason": "Committed stage/checkpoint advanced",
+      "resumption_condition": "Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes",
+      "status": "advancing",
+      "work_id": "4b01abe81b784e87915658f8386386d5f29e91d8b43e96c0572a68561f0baaf8",
+      "evidence_id": "78443607ba9499a9840f99d427549da973271b96261a1a9390d9cf95877586b4"
+    }
+  },
+  "turn_outcome": {
+    "progress_occurred": true,
+    "runnable_work_remaining": true,
+    "reason": "Committed developmental checkpoint or conclusion advanced",
+    "next_direction": "Resume checkpointed work",
+    "meditation": {
+      "context_id": "4b01abe81b784e87915658f8386386d5f29e91d8b43e96c0572a68561f0baaf8",
+      "commission_id": "1ba3c4aa77ad81e37dd662675d874da6c94819d9cff4585cfd14c8a19e1a22d4",
+      "status": "advancing",
+      "outcome": "yielded",
+      "progress_occurred": true,
+      "reason": "Committed stage/checkpoint advanced",
+      "resumption_condition": "Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes"
+    },
+    "investigations": []
+  },
+  "current_activity": {
+    "kind": "runnable",
+    "next_direction": "Resume checkpointed work",
+    "meditation": {
+      "context_id": "4b01abe81b784e87915658f8386386d5f29e91d8b43e96c0572a68561f0baaf8",
+      "commission_id": "1ba3c4aa77ad81e37dd662675d874da6c94819d9cff4585cfd14c8a19e1a22d4",
+      "status": "advancing",
+      "outcome": "yielded",
+      "progress_occurred": true,
+      "reason": "Committed stage/checkpoint advanced",
+      "resumption_condition": "Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes"
+    },
+    "investigations": []
+  },
+  "evidence_requests": [
+    {
+      "acceptance_criteria": {
+        "duplicate_capture_overlap": "reject",
+        "identity_status": "independently_verified",
+        "interface": "existing independent_motion_corpus acquisition inbox",
+        "minimum_fresh_final": 3,
+        "minimum_validation": 1,
+        "physical_score_improvement": "UNKNOWN",
+        "source_kinds": [
+          "independent_measurement",
+          "external_annotation"
+        ]
+      },
+      "candidate_admitted": false,
+      "firmware_authorization": false,
+      "next_direction": "Acquisition verifies incoming evidence; existing Reflection selects new comparison and resumes this agenda",
+      "op": "evidence_continuation",
+      "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+      "physical_authorization": false,
+      "prediction_id": "16c49fc92028039dfbd8b4f7fddfd06387e32330e11b1d8b12bb8497a12c34c4",
+      "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+      "request_kind": 
+
+===== WORK =====
+{
+  "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01": {
+    "after": "018dd586c2528a2f5708b16e364a31069a92b35bcd8d842902ad050b87f4cb82",
+    "before": "db25b8065a7db2ce2abd8677afe64441e59bf4cdbc979970917e789cf9f14b4a",
+    "dependency": "797401cf12132da40e791a45096bd4325dce5c8c06ab803d47148a377c944d72",
+    "next_direction": "Resume retained work",
+    "nonprogress_turns": 0,
+    "op": "developmental_progress",
+    "outcome": "completed",
+    "physical_authorization": false,
+    "previous": "74c412048693d1d5eb784fa773741bc237f36141d71a743bea4f18be28f83393",
+    "progress_occurred": true,
+    "reason": "Committed stage/checkpoint advanced",
+    "resumption_condition": "Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes",
+    "status": "completed",
+    "work_id": "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01",
+    "record_id": "6b3baf12fe9d2c55b13fe5f700424d8e52efb8ccbfea4df34fe1f6df2d40eb92"
+  },
+  "4b01abe81b784e87915658f8386386d5f29e91d8b43e96c0572a68561f0baaf8": {
+    "after": "726cb9b31aad4dca00e5414abc635095757537d35158030b59f91301b5e0cb14",
+    "before": "f1d0009a50ec64e3d6e25e253ecac58f2ca174432bb116799e5038b03a5a649c",
+    "dependency": "3cd37f456f39115910f337148ec88869e16e557f38387d164cb54e133ccffad6",
+    "next_direction": "Resume retained work",
+    "nonprogress_turns": 0,
+    "op": "developmental_progress",
+    "outcome": "yielded",
+    "physical_authorization": false,
+    "previous": "26be4763a362f566e67ce603e45776ded8ef93d94738449024c03a9565923f12",
+    "progress_occurred": true,
+    "reason": "Committed stage/checkpoint advanced",
+    "resumption_condition": "Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes",
+    "status": "advancing",
+    "work_id": "4b01abe81b784e87915658f8386386d5f29e91d8b43e96c0572a68561f0baaf8",
+    "record_id": "78443607ba9499a9840f99d427549da973271b96261a1a9390d9cf95877586b4"
+  }
+}
+
+===== CHECKPOINTS =====
+[
+  {
+    "path": "/home/five/.local/share/charlie/development/meditations/04f4a1c62c4646e56493454de0072e98e380b415554108a77e10cabd53eafcfd/checkpoint.json",
+    "sha256": "611a5c02c162fb51aaa791020429b6aa52991bf48c4bbfed11ee816a6716622f",
+    "document": {
+      "source_sha256": "0b0db0d8d9f76dc232972f94b44a105b304ebb92fb31d5ebae780145465ab0df",
+      "tracks": [
+        {
+          "track_id": 1,
+          "first_tick": 0,
+          "last_tick": 52,
+          "age_frames": 53,
+          "observations": 48,
+          "displacement": 1.8766268983537993,
+          "start": [
+            10.3125,
+            1.3541666666666667
+          ],
+          "end": [
+            10.390625,
+            3.229166666666667
+          ],
+          "candidate_kinds": {
+            "unknown": 48
+          },
+          "path": [
+            {
+              "tick": 0,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 1,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 2,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 3,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 4,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 5,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 6,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 7,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 8,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 9,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 10,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 11,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 12,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 13,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 14,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 15,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 16,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 17,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 18,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 20,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 21,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 22,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 23,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 24,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 25,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 26,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 27,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 28,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 29,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 30,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 31,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 32,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 33,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 34,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 35,
+              "center": [
+                10.3125,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 36,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 37,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 38,
+              "center": [
+                11.015625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 39,
+              "center": [
+                11.171875,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 40,
+              "center": [
+                11.171875,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 41,
+              "center": [
+                11.171875,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 42,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 43,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 44,
+              "center": [
+                11.171875,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 45,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 46,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 47,
+              "center": [
+                10.390625,
+                1.3541666666666667
+              ]
+            },
+            {
+              "tick": 52,
+              "center": [
+                10.390625,
+                3.229166666666667
+              ]
+            }
+          ],
+          "merged_from": [
+            1,
+            274
+          ]
+        },
+        {
+          "track_id": 2,
+          "velocity": [
+            -0.15767362301356133,
+            2.2284538719250007
+          ],
+          "timed_path": [
+            {
+              "at": 10282.729191999999,
+              "center": [
+                80.546875,
+                8.541666666666666
+              ]
+            },
+            {
+              "at": 10283.265968,
+              "center": [
+                80.546875,
+                8.541666666666666
+              ]
+            },
+            {
+              "at": 10283.802743,
+              "center": [
+                80.546875,
+                8.541666666666666
+              ]
+            },
+            {
+              "at": 10285.413070999999,
+              "center": [
+                80.15625,
+                14.0625
+              ]
+            }
+          ],
+          "semantic_history": [
+            {
+              "tick": 0,
+              "kind": "unknown"
+            },
+            {
+              "tick": 1,
+              "kind": "unknown"
+            },
+            {
+              "tick": 2,
+              "kind": "unknown"
+            },
+            {
+              "tick": 5,
+              "kind": "unknown"
+            }
+          ],
+          "association_cost": 12.11616283950577,
+          "association_margin": 0.5169103312591741,
+          "identity_uncertain": false,
+          "first_tick": 0,
+          "last_tick": 5,
+          "age_frames": 6,
+          "observations": 4,
+          "displacement": 5.534635361527393,
+          "start": [
+            80.546875,
+            8.541666666666666
+          ],
+          "end": [
+            80.15625,
+            14.0625
+          ],
+          "candidate_kinds": {
+            "unknown": 4
+          },
+          "path": [
+            {
+              "tick": 0,
+              "center": [
+                80.546875,
+                8.541666666666666
+              ]
+            },
+            {
+              "tick": 1,
+              "center": [
+                80.546875,
+                8.541666666666666
+              ]
+            },
+            {
+              "tick": 2,
+              "center": [
+                80.546875,
+                8.541666666666666
+              ]
+            },
+            {
+              "tick": 5,
+              "center": [
+                80.15625,
+                14.0625
+              ]
+            }
+          ],
+          "merged_from": [
+            2
+          ]
+        },
+        {
+          "track_id": 3,
+          "velocity": [
+            -6.595262402622266,
+            3.9160583389592376
+          ],
+          "timed_path": [
+            {
+              "at": 10282.729191999999,
+              "center": [
+                16.875,
+                22.5
+              ]
+            },
+            {
+              "at": 10283.265968,
+              "center": [
+                16.875,
+                22.604166666666668
+              ]
+            },
+            {
+              "at": 10283.802743,
+              "center": [
+                16.875,
+                22.604166666666668
+              ]
+            },
+            {
+              "at": 10284.272422,
+              "center": [
+                12.109375,
+                25.416666666666664
+              ]
+            }
+          ],
+          "semantic_history": [
+            {
+              "tick": 0,
+              "kind": "unknown"
+            },
+            {
+              "tick": 1,
+              "kind": "unknown"
+            },
+            {
+        
+
+===== OUTCOMES =====
+[
+  {
+    "id": "2771c26e7451b74d3776bc76245dbf679d0f860b9dd94f01065c6753045ff7a2",
+    "error": null,
+    "prediction_id": "16c49fc92028039dfbd8b4f7fddfd06387e32330e11b1d8b12bb8497a12c34c4",
+    "reason": "No independently verified player/target/threat trajectories supplied; Meditation associations and error summaries are not independent ground truth; No fresh sealed final motion evaluation or operational shadow qualification; Source episode already used as consulted-test; not fresh final evidence",
+    "result": "unresolved"
+  },
+  {
+    "id": "51bee71e42f48915edceb9e035b9887e53563688313eb8059c3d61f51e571b6b",
+    "error": null,
+    "prediction_id": "b778814525c421869f825cd5dfda2572977485af27e3908aba429e5cec5d2db0",
+    "reason": "No independently verified player/target/threat trajectories supplied; Meditation associations and error summaries are not independent ground truth; No fresh sealed final motion evaluation or operational shadow qualification; Source episode already used as train; not fresh final evidence",
+    "result": "unresolved"
+  },
+  {
+    "id": "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+    "error": null,
+    "prediction_id": "4aac760d56c577968e0c222b2fad31edc30fa467e98af92ae5f412df1b2dcaba",
+    "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+    "result": "supported"
+  },
+  {
+    "id": "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+    "error": null,
+    "prediction_id": "6e416f1ff3d952468c5331e99ba7be1a207941ca48012f4437ba214f83544e98",
+    "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+    "result": "supported"
+  },
+  {
+    "id": "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+    "error": null,
+    "prediction_id": "57a5e07c68695696a60b557939bc8454904d4ceda43a2154da67d846943896e6",
+    "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+    "result": "supported"
+  },
+  {
+    "id": "c89a0f6c7927f4285f3071f23deb4ab45cbc252d11a064c63f1d93c04cc87e97",
+    "error": null,
+    "prediction_id": "1921fe7a8d8f3c46e29bce56c18cae0fd77cd6bf70deee58a6588add8ecd8100",
+    "reason": "Reconstructed hash-bound capture timing; frozen-horizon availability only, identities and performance remain unqualified",
+    "result": "unresolved"
+  },
+  {
+    "id": "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+    "error": null,
+    "prediction_id": "db9b42f6941952f207f8d419251fd9af444bc96b8fc4fa0732a17f2df1abe2e7",
+    "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+    "result": "supported"
+  },
+  {
+    "id": "938039fb7ff20c7e103b99fe7a71ace04c7f592661c88979a17cc2bc3e3e6653",
+    "error": null,
+    "prediction_id": "416c6d5470d30eef7909a3e04c377c188c98eb3c34015873c4d851a4e548b828",
+    "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+    "result": "supported"
+  },
+  {
+    "id": "0096e1116a5d60530f65bb1a07cdea1a6d1462bfad858983cfb9dda485fe2965",
+    "error": null,
+    "prediction_id": "172ba7c8c98558fc9782292fb006c531b239a8493ba9771e7474333280b1055e",
+    "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+    "result": "supported"
+  }
+]
+
+===== EVIDENCE_REQUESTS =====
+[
+  {
+    "id": "80307000241d62892382aeb02c70fdf29d8b6902580e4327bfc652e5e4924e5f",
+    "acceptance_criteria": {
+      "duplicate_capture_overlap": "reject",
+      "identity_status": "independently_verified",
+      "interface": "existing independent_motion_corpus acquisition inbox",
+      "minimum_fresh_final": 3,
+      "minimum_validation": 1,
+      "physical_score_improvement": "UNKNOWN",
+      "source_kinds": [
+        "independent_measurement",
+        "external_annotation"
+      ]
+    },
+    "candidate_admitted": false,
+    "firmware_authorization": false,
+    "next_direction": "Acquisition verifies incoming evidence; existing Reflection selects new comparison and resumes this agenda",
+    "op": "evidence_continuation",
+    "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+    "physical_authorization": false,
+    "prediction_id": "16c49fc92028039dfbd8b4f7fddfd06387e32330e11b1d8b12bb8497a12c34c4",
+    "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+    "request_kind": "evidence_acquisition_only",
+    "required_evidence": [
+      "Hash-bound independently verified persistent identities and measured board trajectories",
+      "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+      "One validation and at least three distinct unconsulted final experience groups",
+      "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+    ],
+    "resolution_id": "2771c26e7451b74d3776bc76245dbf679d0f860b9dd94f01065c6753045ff7a2",
+    "rollback": "Retain baseline and every prior attempt; no physical activation",
+    "servo_authorization": false,
+    "status": "AWAITING_QUALIFIED_EVIDENCE",
+    "uncertainty": "Retrospective track links remain unverified; temporal or association error unresolved"
+  },
+  {
+    "id": "a85e8aa1cce6d30fc18307225b1fb584e81d8727f469885907762b10ab377f34",
+    "acceptance_criteria": {
+      "duplicate_capture_overlap": "reject",
+      "identity_status": "independently_verified",
+      "interface": "existing independent_motion_corpus acquisition inbox",
+      "minimum_fresh_final": 3,
+      "minimum_validation": 1,
+      "physical_score_improvement": "UNKNOWN",
+      "source_kinds": [
+        "independent_measurement",
+        "external_annotation"
+      ]
+    },
+    "candidate_admitted": false,
+    "firmware_authorization": false,
+    "next_direction": "Acquisition verifies incoming evidence; existing Reflection selects new comparison and resumes this agenda",
+    "op": "evidence_continuation",
+    "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+    "physical_authorization": false,
+    "prediction_id": "b778814525c421869f825cd5dfda2572977485af27e3908aba429e5cec5d2db0",
+    "project_id": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+    "request_kind": "evidence_acquisition_only",
+    "required_evidence": [
+      "Hash-bound independently verified persistent identities and measured board trajectories",
+      "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+      "One validation and at least three distinct unconsulted final experience groups",
+      "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+    ],
+    "resolution_id": "51bee71e42f48915edceb9e035b9887e53563688313eb8059c3d61f51e571b6b",
+    "rollback": "Retain baseline and every prior attempt; no physical activation",
+    "servo_authorization": false,
+    "status": "AWAITING_QUALIFIED_EVIDENCE",
+    "uncertainty": "Retrospective track links remain unverified; temporal or association error unresolved"
+  },
+  {
+    "id": "73baaaa814d01716a5cb8b425c4a2a6f149100414c10d8bc17c5bdc26dfe9143",
+    "candidate_admitted": false,
+    "firmware_authorization": false,
+    "next_direction": "Await separately authorized acquisition; resume this project only after new qualified evidence",
+    "op": "evidence_continuation",
+    "original_question": "Can preserved observations support the existing motion candidates?",
+    "physical_authorization": false,
+    "prediction_id": "1921fe7a8d8f3c46e29bce56c18cae0fd77cd6bf70deee58a6588add8ecd8100",
+    "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+    "qualification_keys": [
+      "0250d58e66eab522f9e5d569b248802f7600c9fe5286b8298108dbe030290f4e",
+      "029be5cad6dfd519a3f3f3a5d84ca1d631d066b6fa8590ac09a27a071e27b7ad",
+      "0b84b65ce8b3b4cf0929e03559f7181cfac80708938a2829a6a108cb7a94eaed",
+      "0e5399d3eaf8c71dd2562916f447685e2b50fc7e9defbe234b14165fba7f1a3b",
+      "1502e780152162769a9645d912d57dcec330b7151d1cdcf60ae19504b2915c71",
+      "177add3672709478e54abef9d53018ba8574debb1c9caef60e83154f553ee996",
+      "17db938889807b283d278d0bff12855ad082e63877fa87b9ae714be940dbbc2c",
+      "190ee2149d80467e4c02e0103b7490629425994ef5646ceb4edb6b40e3f6a895",
+      "1921d9889c8f8da1f4b54a2788cf94fe0dbfc7c77f0724d6bf47da72edb08f56",
+      "19ab8fd2d734b464377f483b55afefe98f293ede7a60360ba87be53cd9c39128",
+      "238ad8facd3ee72cc7f3f9231e951dbfd87e3cd59895f99a6a9c37916ba5b380",
+      "2678f90b6bb138bf1fa6d22ca8d0076d9f82e9b13fb02b26d57c12cce3c04c29",
+      "26b114a8a7433b65588edd2e454c56d76cce38bc85c5c0e3e5efc2a9f2d8fbea",
+      "2c813b0df3004dafeef371887bda2be9b320c2158a36dc1ae4b9278ff9ff170d",
+      "3146ff38e97c3d7004055a65712b95e47ded85cf0ce06c8e25c9dd81ffaed1d4",
+      "324a7628760c5cdd51ddbed0a43d7a27345e37b6abd5acaf53048bac09b8e44e",
+      "35f0cccc0a482a562da5de1ae7857edbb02ce9af9423cd3003ec929aca5ccfb1",
+      "37f2fee7d84fa5b978181a022f0e5bd5d8776f34e63a6fd858129ab595b5fee0",
+      "3a755dc5bc9b3f72bfdf051e153cae452d88b4d2c5f867bd044b56ff16c93df4",
+      "429f355674678abf47d0fbb9f40d2111bdd5575e70c2a4f5290930b85fd62c9b",
+      "43d75ac9ef8e014cdc5d1257e4c65ce5c46fc93f77d1fb94473c8f78e055dfdf",
+      "4c2dd70e9e2ac5e3e3d97c2db0a708d04a8dd6495f295e9832b956c46980dce7",
+      "503934d4b52dd2dd31e0b63c6cc440154ffb3970dfecd8311cad4a56788f6316",
+      "539f920085e4dcb7cd3ca203e97632e14a3865a43511dfc72323ef581190bda5",
+      "5518b79b76bef23eee16a345c846a1e5ee25650049dc960dfcbf5b7dac6fe06d",
+      "565b4d4dc15d4e32ce42bad396e5b9ef98c1326c27078ea07186d226e754c7de",
+      "57d57b3454221c1d68546aa09c31e416adcd5f44cd02db27dcbc4c23de5feb07",
+      "59a51ef15b91a70bb8fac21aac5fb0e1bd74dd67d81422e8f6c066ddbda7692e",
+      "5e337ab45c13c47328f6b146439d40205b7b39e5e58adc81f7be8491f47859ea",
+      "616f335ac66365bed01d6b63e952b8e62234a76f81769b6a0072b6f6de42fea5",
+      "6cee694fa6bde9129a4af53882aea3d073e06b065bfbf3a1582497fd6b135a1c",
+      "6e2bc3f6d93ce008f9079db32d3b7a0cac1d94457074d7a59493765643a7b13e",
+      "6ffdef25e22bc45c8cf8850235d6caac80e9b4b420d59e3316a2498c458bf513",
+      "7095960cc38e6269ecfdd89e8a0eb7ffb0f41ad85ee1085ccb10e1caafb83dfa",
+      "73fa35ed3a8be9e91e9e2c338a0d8b1f956449db62e7762b4674a4a75eb40843",
+      "7a61ca95874acfd9a5af23e3a3ed9d52d171ca51bfe83d0a9ee694547ee9cec8",
+      "7b0861901f8ed316a3cc6cb02734ab0a5956f3ebb8d54cf9086b2b77f2105686",
+      "84de462a0b7f109f13f966cbba8faddf96e81e81569ead046ba4577770d978fa",
+      "87f3cc96d6846fe60dab2ffc16b6eb0bb0c1650af94a4643045687327aa3f47d",
+      "8987e17e3fc9dc9206cd3a42d7b7bca4c76494e59d212f9d856ad3abfe971b83",
+      "898b64a02c666bca339ef9125e08ac8e5de7fed9b5bd95e6b3556c9978a130fa",
+      "89a4262e1842830d23a87e510ba5bcf6b8ebf1d7329bc3eff22caadd5c055c5a",
+      "89f4ab9895355cdeab813d11d07215c893e549a1eb7d42141ca34686b9372952",
+      "8b7213d4742b3b212c89172d10c5c683bf450b83345587c2d95912d786751904",
+      "93143363e76b1fdbe9046516971d41453f9d61f18a8a7291d5ba28d20a194fe4",
+      "952d7fe1584bf9d439dff9be89e8473bdb4eadf0b0b6587add70f44c628924e5",
+      "9be58d1d96bb125687680ec10cb448ff1138c3c971ee5b915b130b6f397f7824",
+      "9d053ef268e9a9e48d8f47dbd10edaaf193e985a3f3f425892e0e670a6bec441",
+      "a9dcabb08fa732840111dc771a32776ed8b3dca54527c1d47c59bc5a9fc2db9b",
+      "b4d29e047c90ca5f26f2b1f517ad5fa21cf5dfc54ac0f92b41cf42f146393b9e",
+      "b569380c7a63df392a43490db1d5a5a10876f30c510f8c4c13e0161c7c297d4a",
+      "b618467938512f7231244641c80708e465d5c972005c45124f88f4ab088763cb",
+      "ba3f07077a91097f67417688273f6d606db93a3d7965579fcaf5e1ac21fd1e9d",
+      "bac477a893603f3d950a4921864961eccd662bac0c78018d2eda97653b1d9ccc",
+      "d08fc3957bf8345bc4579338cff3be953e3ec75195a794cb344f641994aff8ed",
+      "dfc26e5147c110b977f2350cd8797987f2418f9925d9a7d720e9bbf209d01759",
+      "e537efd815db4df0bf38c4cf6fa763cd0cd205c070902924d8fa28df76b9f7e3",
+      "ebb9de78b1aba42f80581f1b6d6a43a0b2367e5cc67016008a87f1b3272aab20",
+      "ee8e13fdd01e2c504d914421e58258460f28f19f9fe568d0f923807c72ff84cd",
+      "ef528a8dbead33a1a8236299e9f94cd4d0a15aef158a00f5aedfffb73469f5b8",
+      "f048d5c71cfced319a97959a7fb5d139dff9d6566c20ecc53ff45e94600c4eee",
+      "f0e0a524b0961922086bc872c29b89bec07d276fc796a013db8af9ed3d666e80",
+      "f630fdeaf7e566c4580cb7637bba18e0a02039f17eabf1f160b0247d546818db",
+      "f684184ccde151646a07455adbb7adede362455e22e2c6090fc420428d0cf81b",
+      "f8944f314b2430dbd40bd49d69d48ebd391d0dd3d94c6d7859e9b2519e9ea011",
+      "fe340fccc86a38b47c74d2ddcb304e3ad941d7e5e52d49c0fabd319a039383bc"
+    ],
+    "request_kind": "evidence_acquisition_only",
+    "required_evidence": [
+      "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+      "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+      "Independent persistent player/object identities and board coordinates",
+      "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+    ],
+    "resolution_id": "c89a0f6c7927f4285f3071f23deb4ab45cbc252d11a064c63f1d93c04cc87e97",
+    "rollback": "Keep baseline; no candidate activation or final-test reuse",
+    "servo_authorization": false,
+    "status": "READY_FOR_PLAY"
+  },
+  {
+    "id": "a03a9dd8e0c55cfd274a4b38bba5bd07b359e408bcb49bc51e5a83530f35861b",
+    "category": "learning_evidence_request",
+    "dependency_key": "ed62f802f4dc4753907e81b3ae87f7b21da12e718efe7b77d4fb6406fc2bfa5e",
+    "firmware_authorization": false,
+    "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+    "method": "developmental-dependency",
+    "physical_authorization": false,
+    "reason": "Existing portfolio prerequisites are unavailable",
+    "request_kind": "evidence_acquisition_only",
+    "required_evidence": [
+      "Available implementation/runtime for cnn-reconstruction",
+      "Existing method execution authorization for cnn-reconstruction"
+    ],
+    "servo_authorization": false,
+    "status": "AWAITING_DEPENDENCY",
+    "work_id": "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252"
+  },
+  {
+    "id": "d95395ef02d9df0a3142bebea785039c78ce7fd90363e5f4dcac8422aa32566a",
+    "category": "learning_evidence_request",
+    "dependency_key": "5ed2bb07d4249d99b489ad328c39645136af102e2d48b29f95818bfce8ac6d6f",
+    "firmware_authorization": false,
+    "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+    "method": "developmental-dependency",
+    "physical_authorization": false,
+    "reason": "Existing portfolio prerequisites are unavailable",
+    "request_kind": "evidence_acquisition_only",
+    "required_evidence": [
+      "Offline result awaits independent new evidence; preserve questions"
+    ],
+    "servo_authorization": false,
+    "status": "AWAITING_DEPENDENCY",
+    "work_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0"
+  },
+  {
+    "id": "72b1f6dee28d881903fe82ed452c36ef7a6379d75e479c2c60c7e41d4711f102",
+    "category": "learning_evidence_request",
+    "dependency_key": "25539765ff7bae08ad4a5b67579dd32e625957751dadd0a6c4192eb349421ec0"
+
+===== COMMISSIONS =====
+[
+  {
+    "id": "a483db384f32023f74a00617abf3420434b3d74fb6f15703040a8d28f703a9cc",
+    "category": "reflection_commission",
+    "context_id": "04f4a1c62c4646e56493454de0072e98e380b415554108a77e10cabd53eafcfd",
+    "physical_authorization": false,
+    "reason": "New preserved experience warrants bounded retrospective reflection"
+  },
+  {
+    "id": "54363bdbf228cbe9ee8010f4b34302e9cd59a98317fb28ea823562c1c82a20a4",
+    "category": "reflection_commission",
+    "context_id": "d7ba0af50f9fa1301efb05534236296c63884abdd3722f36be32731e5d00393c",
+    "physical_authorization": false,
+    "reason": "New preserved experience warrants bounded retrospective reflection"
+  },
+  {
+    "id": "5e6f669356c4b469847271656498a651f729e8a4373e54b40799a9c78c309cbc",
+    "category": "reflection_commission",
+    "context_id": "3e017cbdcf6e81fc0a1cb17904074e320fd2d0dd7ffa4a8fdba4efd44d7d1ea3",
+    "physical_authorization": false,
+    "reason": "New preserved experience warrants bounded retrospective reflection"
+  },
+  {
+    "id": "3f12ba99d7360524659870e9a130946d013da7b9373388614544a00b2b90032f",
+    "category": "reflection_commission",
+    "context_id": "e8e1028f0c6cda025f86f96ea3bed0527c3c087ddf1cce8e5a6aeef2fed1e722",
+    "physical_authorization": false,
+    "reason": "New preserved experience warrants bounded retrospective reflection"
+  },
+  {
+    "id": "7355ad5b9efcee3e615c3ddd5653158095eabba4f3b7c2565a9a92932b84dff7",
+    "category": "reflection_commission",
+    "context_id": "4b12283ea4a1e5b0e2c59a31b9a59db69b384661b95aafc6040ab46ec9e6c212",
+    "physical_authorization": false,
+    "reason": "New preserved experience warrants bounded retrospective reflection"
+  },
+  {
+    "id": "048dbcc051c32aa4779ee24dc48f0635bb0fd46382700c5fa7ef0f1b0d72faae",
+    "category": "reflection_commission",
+    "context_id": "7ecc8949293ee480b1685ad6f78606cd18a464d22389bae4a4b6507355cafdc5",
+    "physical_authorization": false,
+    "reason": "New preserved experience warrants bounded retrospective reflection"
+  },
+  {
+    "id": "a30b3e66c82e22fc962360e1ff4d991d234854fb4b072c423bca6d0a3bef3421",
+    "category": "reflection_commission",
+    "context_id": "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01",
+    "physical_authorization": false,
+    "reason": "New preserved experience warrants bounded retrospective reflection"
+  },
+  {
+    "id": "1ba3c4aa77ad81e37dd662675d874da6c94819d9cff4585cfd14c8a19e1a22d4",
+    "category": "reflection_commission",
+    "context_id": "4b01abe81b784e87915658f8386386d5f29e91d8b43e96c0572a68561f0baaf8",
+    "physical_authorization": false,
+    "reason": "New preserved experience warrants bounded retrospective reflection"
+  }
+]
+five@charlie:~/charlie-ala2-bae659f60b0e $ 

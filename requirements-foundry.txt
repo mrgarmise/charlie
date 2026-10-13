@@ -1,0 +1,4 @@
+# Optional offline worker only. Core Pi gameplay never imports PyTorch.
+torch>=2.6,<3
+numpy>=1.26
+Pillow>=10

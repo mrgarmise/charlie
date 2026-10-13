@@ -1,0 +1,45 @@
+Thu Oct  8 11:02:11 2026    /workspace/scratch/c81a2d35e2bc/perf-guard-profile/normal.prof
+
+         15091756 function calls (11689294 primitive calls) in 8.775 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1260 to 35 due to restriction <35>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    8.776    8.776 <frozen runpy>:262(run_path)
+    113/2    0.005    0.000    8.774    4.387 {built-in method builtins.exec}
+        1    0.000    0.000    8.774    8.774 <frozen runpy>:91(_run_module_code)
+        1    0.000    0.000    8.774    8.774 <frozen runpy>:65(_run_code)
+        1    0.000    0.000    8.774    8.774 main.py:1(<module>)
+        1    0.000    0.000    8.764    8.764 main.py:29(main)
+        1    0.000    0.000    8.759    8.759 lifecycle.py:511(run)
+        1    0.000    0.000    8.674    8.674 lifecycle.py:492(turn)
+        1    0.006    0.006    8.671    8.671 learning_projects.py:657(develop)
+        1    0.004    0.004    4.932    4.932 lifecycle.py:167(reflect_experience)
+        1    0.023    0.023    3.146    3.146 lifecycle.py:110(acquire)
+     1842    0.012    0.000    2.668    0.001 __init__.py:183(dumps)
+     1842    0.180    0.000    2.655    0.001 encoder.py:183(encode)
+       12    0.001    0.000    2.499    0.208 foundry.py:17(atomic_json)
+  1320719    0.247    0.000    2.291    0.000 encoder.py:414(_iterencode)
+        5    0.004    0.001    2.216    0.443 meditate_robotron.py:211(meditate)
+        5    0.000    0.000    2.177    0.435 lifecycle.py:237(save_checkpoint)
+3519022/1320719    0.975    0.000    2.044    0.000 encoder.py:334(_iterencode_dict)
+        1    0.000    0.000    2.043    2.043 cycle.py:42(ingest_episode)
+        5    0.089    0.018    1.918    0.384 meditate_robotron.py:117(reconstruct_once)
+2500738/1317565    0.725    0.000    1.780    0.000 encoder.py:278(_iterencode_list)
+    92097    0.207    0.000    1.596    0.000 meditate_robotron.py:55(predicted_link)
+     5661    0.005    0.000    1.583    0.000 __init__.py:299(loads)
+     5661    0.009    0.000    1.575    0.000 decoder.py:333(decode)
+     5662    1.556    0.000    1.556    0.000 decoder.py:344(raw_decode)
+        1    0.025    0.025    1.148    1.148 retrospective.py:137(ingest)
+   276699    0.157    0.000    1.051    0.000 meditate_robotron.py:21(_path)
+   291542    0.441    0.000    0.954    0.000 {built-in method builtins.sorted}
+        1    0.001    0.001    0.905    0.905 archive_audit.py:84(audit)
+        7    0.001    0.000    0.751    0.107 datasets.py:44(add)
+        4    0.005    0.001    0.729    0.182 retrospective.py:53(_rows)
+        7    0.000    0.000    0.703    0.100 Image.py:2592(save)
+        7    0.000    0.000    0.696    0.099 PngImagePlugin.py:1328(_save)
+        7    0.000    0.000    0.696    0.099 ImageFile.py:644(_save)
+        7    0.000    0.000    0.696    0.099 ImageFile.py:672(_encode_tile)
+
+

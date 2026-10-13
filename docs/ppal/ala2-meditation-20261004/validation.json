@@ -1,0 +1,171 @@
+{
+  "parent": "3b84176173c234415a79f016c38286bce916e20c",
+  "timestamp_utc": "2026-10-04T20:35:58.648279+00:00",
+  "environment": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "python": "Python 3.12.14",
+  "tests": [
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-continuity-broad.xml.gz",
+      "sha256": "9d8a81dee54c9efb6a405de81b11b52f93fe6bc70c88ee9d75940ad3cbfca124",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "19",
+        "tests": "515",
+        "time": "36.569",
+        "timestamp": "2026-10-04T16:29:29.055882-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    },
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-continuity-focused-final.xml.gz",
+      "sha256": "ec3bc1fd210f1131762350cfab4c59e401aa3989534ab42d51859305620eaf82",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "6",
+        "tests": "37",
+        "time": "1.038",
+        "timestamp": "2026-10-04T16:29:27.690971-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    },
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-continuity-focused-final2.xml.gz",
+      "sha256": "adf9ac32e49699b66fa6b87c26fb0a15e917e5733d66eb08a9846527a4771f37",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "6",
+        "tests": "37",
+        "time": "0.925",
+        "timestamp": "2026-10-04T16:30:12.287791-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    },
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-continuity-focused.xml.gz",
+      "sha256": "8b7a2a6804e6b1975ed5e479f91e9c05d150fa01ba6d0420ef725ad56af813ab",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "1",
+        "skipped": "6",
+        "tests": "24",
+        "time": "0.839",
+        "timestamp": "2026-10-04T16:29:04.057827-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    },
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-continuity-initial.xml.gz",
+      "sha256": "b175cbe0f74338c75fb33fa22a168344cde2fbc55a6b998a320338f052a41e2f",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "1",
+        "skipped": "6",
+        "tests": "20",
+        "time": "0.487",
+        "timestamp": "2026-10-04T16:28:00.158603-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    },
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-export-final.xml.gz",
+      "sha256": "080397e0daa237e7ca7d028dde1aa9ebcab6d16efc94fa383e6ab1cc68c1e94a",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "16",
+        "time": "0.611",
+        "timestamp": "2026-10-04T16:32:45.153829-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    },
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-final-broad.xml.gz",
+      "sha256": "b13b58dc353222f49a0bb7603bb60de9b80081772b7ae906e5c1bf9c3cab6c1c",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "19",
+        "tests": "515",
+        "time": "34.359",
+        "timestamp": "2026-10-04T16:31:09.770287-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    },
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-final-focused.xml.gz",
+      "sha256": "6b3ffc7c4a18673adfff2a4ffae586edab1567182c118fa0730d05e352684752",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "6",
+        "tests": "38",
+        "time": "0.944",
+        "timestamp": "2026-10-04T16:31:38.035843-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    },
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-final-validated.xml.gz",
+      "sha256": "6fe23558ea8757bc7dcce207e2a8c8b0edd918092d395c9d5169a22cc34d5fd2",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "19",
+        "tests": "516",
+        "time": "35.240",
+        "timestamp": "2026-10-04T16:33:07.659912-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    },
+    {
+      "file": "docs/ppal/ala2-meditation-20261004/ala2-published-broad.xml.gz",
+      "sha256": "1712d8cf38ca3a0148c2f8785b1be0289dfb83dd0e39e0198cede7f7a108f93b",
+      "result": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "19",
+        "tests": "516",
+        "time": "34.909",
+        "timestamp": "2026-10-04T16:31:54.412600-04:00",
+        "hostname": "3c1a37f27809"
+      }
+    }
+  ],
+  "source_sha256": {
+    "learning/acquisition.py": "b9d7fd0605745f30de88b71790f03e2ace598f2770225356ac041c393ab2f08e",
+    "learning/cycle.py": "53f55f460169a8aec98b2fe010094efd3f0f746aeb068aa804c85c0ac8bb6f9f",
+    "learning/retrospective.py": "99b6bfe6fefcd2e3365e2282e53690cdfc8d06054cc56601fc95f7e26374b74e",
+    "memory/evidence.py": "0e3165473864a24ee844871068e49d43ba1e8c56ac5276a30520284e56a9d10d",
+    "tests/test_ala_acquisition.py": "52507a94500bcc703a5d00a2c31d4b9226e072ca051772930adb0d66d2b773a4",
+    "tests/test_retrospective.py": "cc1e91461fec3b165eadf337083a402d47bf54690711a3a66e8f7b494890c60e"
+  },
+  "repeat_actual_retrospective": {
+    "new_investigations": 0,
+    "records": 319
+  },
+  "normal_cycle_resume": "actual notebook resumed; no new investigations or records",
+  "failures": [
+    "An intermediate hook rejected an existing partial synthetic postgame context; preserved the existing partial-context path while finalized episodes use repeat-safe ingestion",
+    "Export test initially omitted pathlib.Path import; corrected test fixture",
+    "Two commands named nonexistent test files and ran no tests; corrected file lists used actual repository paths"
+  ],
+  "compileall": "passed",
+  "git_diff_check": "passed",
+  "native_pi": "not accessed; no source notebook claimed inspected",
+  "physical_authorization": false,
+  "gameplay_behavior_changed": false
+}

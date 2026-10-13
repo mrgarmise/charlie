@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="10" time="2.857" timestamp="2026-10-10T17:30:39.354759+02:00" hostname="5c65b9d02f11"><testcase classname="tests.test_motion_measurement_provenance" name="test_protocol_binding_is_not_physical_admission" time="0.101" /><testcase classname="tests.test_motion_measurement_provenance" name="test_correlated_fabricated_and_incomplete_measurement_protocol_rejected[candidate-output]" time="0.003" /><testcase classname="tests.test_motion_measurement_provenance" name="test_correlated_fabricated_and_incomplete_measurement_protocol_rejected[tracker-truth]" time="0.006" /><testcase classname="tests.test_motion_measurement_provenance" name="test_correlated_fabricated_and_incomplete_measurement_protocol_rejected[training-overlap]" time="0.005" /><testcase classname="tests.test_motion_measurement_provenance" name="test_correlated_fabricated_and_incomplete_measurement_protocol_rejected[unresolved-correlation]" time="0.004" /><testcase classname="tests.test_motion_measurement_provenance" name="test_correlated_fabricated_and_incomplete_measurement_protocol_rejected[changed-trajectory]" time="0.005" /><testcase classname="tests.test_motion_measurement_provenance" name="test_correlated_fabricated_and_incomplete_measurement_protocol_rejected[nonfinite-uncertainty]" time="0.004" /><testcase classname="tests.test_motion_measurement_provenance" name="test_correlated_fabricated_and_incomplete_measurement_protocol_rejected[missing-observer]" time="0.065" /><testcase classname="tests.test_motion_measurement_provenance" name="test_correlated_fabricated_and_incomplete_measurement_protocol_rejected[opaque-proof]" time="0.087" /><testcase classname="tests.test_motion_measurement_provenance" name="test_fixture_corpus_cannot_satisfy_normal_executive_dependency" time="0.256"><failure message="AttributeError: 'MemoryEvaluator' object has no attribute 'close'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_fixture_corpus_cannot_sat0')
+
+    def test_fixture_corpus_cannot_satisfy_normal_executive_dependency(tmp_path):
+        life=DevelopmentLifecycle(tmp_path/'state',[])
+        bookmark=life.executive._event(dict(op='evidence_continuation',project_id='fixture-project',required_evidence=['Independent trajectories'],
+            acceptance_criteria={'interface':'existing independent_motion_corpus acquisition inbox'}),[])
+        request=retain_dependency_request(life.journal,bookmark.id,work_id='fixture-project',required_evidence=['Independent trajectories'],reason='Fixture dependency')
+        source=corpus(None,tmp_path);record=qualify_corpus(life.dataset,source,allow_fixture=True)
+        assert satisfy_motion_requests(life.dataset)==[]
+        assert not life.journal.category_records('event','acquisition_dependency_satisfied')
+        # Close the actual resources; the intentionally minimal fixture bookmark is not a full project.
+&gt;       life.journal.close();life.gateway.evaluator.close();life.lock.close()
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'MemoryEvaluator' object has no attribute 'close'
+
+tests/test_motion_measurement_provenance.py:63: AttributeError</failure></testcase></testsuite></testsuites>

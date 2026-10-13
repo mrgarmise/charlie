@@ -1,0 +1,54 @@
+.F..F............                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_orphaned_capture_survives_without_fake_observation ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-13/test_orphaned_capture_survives0')
+
+    def test_orphaned_capture_survives_without_fake_observation(tmp_path):
+        (tmp_path/'observations').mkdir();Image.new('RGB',(32,32)).save(tmp_path/'observations/camera-000007.png')
+        before=(tmp_path/'observations/camera-000007.png').read_bytes()
+        r=CaptureEvidence(tmp_path,'session:test',{});assert r.count==7
+        r.capture(Image.new('RGB',(32,32),'white'),dict(timestamp=1));r.close()
+        assert (tmp_path/'observations/camera-000007.png').read_bytes()==before
+        j=EvidenceJournal(tmp_path/'session-evidence.sqlite3',read_only=True)
+>       assert len(j.records())==1 and j.records()[0].data['payload']['sample']==8;j.close()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert (2 == 1)
+E        +  where 2 = len([EvidenceRecord(sequence=1, id='a1f8eccc3bd1bf9b6cb3a40bd8ad3840d707776c6acc3638efc02ec9a35b3247', document='{"at":1,"...9b6cb3a40bd8ad3840d707776c6acc3638efc02ec9a35b3247"],"version":"2"}', committed_at='2026-10-08T17:22:37.947780+00:00')])
+E        +    where [EvidenceRecord(sequence=1, id='a1f8eccc3bd1bf9b6cb3a40bd8ad3840d707776c6acc3638efc02ec9a35b3247', document='{"at":1,"...9b6cb3a40bd8ad3840d707776c6acc3638efc02ec9a35b3247"],"version":"2"}', committed_at='2026-10-08T17:22:37.947780+00:00')] = records()
+E        +      where records = <memory.evidence.EvidenceJournal object at 0x7f436df869f0>.records
+
+tests/test_sensory_recording.py:40: AssertionError
+________ test_live_prediction_history_enters_existing_acquisition_once _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-13/test_live_prediction_history_e0')
+
+    def test_live_prediction_history_enters_existing_acquisition_once(tmp_path):
+        import json,time
+        from experiments.ppal.episode_evidence import import_episode
+        root=tmp_path/'run';root.mkdir()
+        r=CaptureEvidence(root,'recording-not-qualified-game',{'source':'simulation'})
+        r.capture(Image.new('RGB',(32,32)),dict(timestamp=time.monotonic()));r.ready()
+        prediction=r.event('tactical_prediction',dict(question='test response',hypothesis={'move':'E'}),at=time.monotonic())
+        r.capture(Image.new('RGB',(32,32),'white'),dict(timestamp=time.monotonic()))
+        r.event('tactical_outcome',dict(prediction_id=prediction,eligible=True,resolved_result='contradicted'),at=time.monotonic());r.close()
+        (root/'report.json').write_text(json.dumps({'result':'simulated recording','steps':[]}))
+        original=EvidenceJournal(root/'session-evidence.sqlite3',read_only=True)
+        original_rows={row.id:row.document for row in original.records()};original.close()
+        j=EvidenceJournal(tmp_path/'learning.sqlite3');episode=import_episode(root,j)
+        assert all(j.get(k).document==v for k,v in original_rows.items())
+        before=[row.id for row in j.records()]
+        assert import_episode(root,j)==episode and [row.id for row in j.records()]==before
+        assert len(j.records('episode'))==1
+>       assert j.get(prediction).data['payload']['mode']=='live_prospective'
+E       AssertionError: assert 'buffered_live_prospective' == 'live_prospective'
+E         
+E         - live_prospective
+E         + buffered_live_prospective
+E         ? +++++++++
+
+tests/test_sensory_recording.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_sensory_recording.py::test_orphaned_capture_survives_without_fake_observation
+FAILED tests/test_sensory_recording.py::test_live_prediction_history_enters_existing_acquisition_once
+2 failed, 15 passed in 16.12s

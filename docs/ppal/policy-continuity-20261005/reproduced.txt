@@ -1,0 +1,136 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_________ test_previous_qualified_version_restores_its_original_grant __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_previous_qualified_versio0')
+
+    def test_previous_qualified_version_restores_its_original_grant(tmp_path):
+        ds,g,d,path=parameter_policy(tmp_path,{'goal_preference':{'rescue':-1,'survive':1}})
+        first=d.active('ppal-policy');old_bytes=path.read_bytes()
+        expected=decide(world(),load_policy(path))[:3]
+        second_version(ds,d,tmp_path)
+        assert decide(world(),load_policy(path))[0].kind=='rescue'
+        d.rollback('ppal-policy',reason='controlled regression; restore prior offline version',
+            authorization=dict(target='ppal-policy',source='explicit offline rollback test',execution='offline'))
+        restored=d.active('ppal-policy')
+        assert restored['candidate_id']==first['candidate_id']
+>       d.export_policy('ppal-policy',path)
+
+tests/test_ppal_policy_continuity.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+learning/deployment.py:119: in export_policy
+    return export_policy(self,target,path)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+learning/policy.py:132: in export_policy
+    payload = policy_payload(deployment.journal, active)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+journal = <memory.evidence.EvidenceJournal object at 0x7fbfffb8bd10>
+active = {'activation_key': 'ad9fa6ec61a40afe5721e2ed28a6bb8ac1b4f4539ad19bf6312473b80ca61ce7', 'authorization': {'execution': ...652c2f2b11b9a9207881d9', ...}, 'candidate_id': '39a326bc3890c60037ae212e6d01999177a19bd99b652c2f2b11b9a9207881d9', ...}
+
+    def policy_payload(journal, active):
+        required=('policy_code_revision','policy_code_dirty','policy_runtime_sha256','policy_provenance_kind')
+        if any(k not in active for k in required):
+            raise ValueError('legacy activation lacks runtime qualification; retain baseline policy')
+        candidate = active['candidate']; proposal_id = active['proposal_id']
+        proposal = journal.get(proposal_id); p = proposal.data['payload']
+        evaluation = journal.get(p['evaluation_id']); measured = evaluation.data['payload']
+        if (proposal.data['producer'] != 'Reflection' or
+            measured.get('category') != 'offline_model_evaluation' or
+            evaluation.data['producer'] != 'ModelFoundry' or
+            measured.get('candidate') != candidate or not measured['metrics'].get('improved') or
+            not measured['metrics'].get('fresh_final_evidence') or
+            not measured['metrics'].get('independence_groups')):
+            raise ValueError('Charlie proposal and independent fresh evaluation required')
+        if sha(candidate['checkpoint']) != candidate['checkpoint_sha256']:
+            raise ValueError('candidate artifact changed')
+        spec = json.loads(Path(candidate['checkpoint']).read_text())
+        if spec != candidate['spec'] or candidate.get('originator') != 'Reflection':
+            raise ValueError('Charlie-originated frozen candidate required')
+        domains = validate_spec(spec)
+        plan_rows = [r for r in journal.records('event')
+            if r.data['payload'].get('category') == 'offline_experiment_plan'
+            and r.data['payload']['plan']['prediction_id'] == p.get('prediction_id')]
+        if len(plan_rows) != 1:
+            raise ValueError('original committed investigation required')
+        plan = plan_rows[0].data['payload']['plan']
+        sources = candidate.get('source_evidence', [])
+        if not sources or sources != plan['source_evidence']:
+            raise ValueError('candidate investigation provenance mismatch')
+        for ref in sources:
+            journal.get(ref)
+        resolution = journal.resolution_for(p['prediction_id'])
+        if not resolution or resolution.data['payload']['result'] != 'supported':
+            raise ValueError('supported independent investigation outcome required')
+        if spec['adapter'] == DECISION_ADAPTER:
+            contract = measured['metrics'].get('decision_contract', {})
+            if (contract != p.get('contract') or not contract.get('eligible') or
+                contract.get('policy_version') != VERSION or contract.get('domains') != list(domains) or
+                contract.get('spec_sha256') != digest(spec)):
+                raise ValueError('independently evaluated decision contract required')
+        auth = active.get('authorization', {})
+        if (auth.get('target') != active['target'] or auth.get('proposal_id') != proposal_id or
+            auth.get('execution') not in ('offline','physical') or not auth.get('source')):
+>           raise ValueError('explicit bounded deployment authority required')
+E           ValueError: explicit bounded deployment authority required
+
+learning/policy.py:54: ValueError
+____________ test_changed_narrow_grant_cannot_reuse_old_activation _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_changed_narrow_grant_cann0')
+
+    def test_changed_narrow_grant_cannot_reuse_old_activation(tmp_path):
+        ds,g,d,path=parameter_policy(tmp_path,{'goal_preference':{'survive':1}})
+        active=d.active('ppal-policy');result={'operational_proposal':active['proposal_id']}
+        before=path.read_bytes()
+        narrower=dict(active['authorization'],allowed_domains=[])
+        blocked=d.apply_authority(result,narrower,path)
+>       assert blocked['status']=='blocked'
+E       AssertionError: assert 'activated' == 'blocked'
+E         
+E         - blocked
+E         + activated
+
+tests/test_ppal_policy_continuity.py:64: AssertionError
+________ test_changed_physical_request_cannot_reuse_offline_permission _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_changed_physical_request_0')
+
+    def test_changed_physical_request_cannot_reuse_offline_permission(tmp_path):
+        ds,g,d,path=parameter_policy(tmp_path,{'goal_preference':{'survive':1}})
+        active=d.active('ppal-policy');result={'operational_proposal':active['proposal_id']}
+        grant=dict(active['authorization'],execution='physical',operating_domain='robotron-camera')
+        blocked=d.apply_authority(result,grant,path)
+>       assert blocked['status']=='blocked' and 'physical policy' in blocked['reason']
+E       AssertionError: assert ('activated' == 'blocked'
+E         
+E         - blocked
+E         + activated)
+
+tests/test_ppal_policy_continuity.py:77: AssertionError
+_____ test_normal_synthetic_entry_discovers_persisted_policy_and_restarts ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_normal_synthetic_entry_di0')
+
+    def test_normal_synthetic_entry_discovers_persisted_policy_and_restarts(tmp_path):
+        ds,g,d,path=parameter_policy(tmp_path,{'goal_preference':{'rescue':-1,'survive':1}})
+        env=dict(os.environ,CHARLIE_LEARNING_STATE=str(tmp_path))
+        counts=len(ds.journal.records())
+        for i in range(2):
+            log=tmp_path/f'entry-{i}.jsonl'
+            process=subprocess.run([sys.executable,'-m','experiments.ppal.run_closed_loop','--mode','synthetic',
+                '--max-steps','2','--log',str(log)],capture_output=True,text=True,env=env)
+            assert process.returncode==0,process.stderr
+            records=[json.loads(line) for line in log.read_text().splitlines()]
+>           assert records and all(r['goal']['kind']=='survive' for r in records)
+E           AssertionError: assert ([{'run_id': '99a2a094e56b42a89cb0e60bb4d41aa2', 'tick': 0, 'status': 'UNCALIBRATED', 'goal': {'kind': 'rescue', 'targe...6b42a89cb0e60bb4d41aa2', 'tick': 1, 'status': 'UNCALIBRATED', 'goal': {'kind': 'rescue', 'target_id': 'human_1'}, ...}] and False)
+E            +  where False = all(<generator object test_normal_synthetic_entry_discovers_persisted_policy_and_restarts.<locals>.<genexpr> at 0x7fbffc791630>)
+
+tests/test_ppal_policy_continuity.py:94: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_ppal_policy_continuity.py::test_previous_qualified_version_restores_its_original_grant
+FAILED tests/test_ppal_policy_continuity.py::test_changed_narrow_grant_cannot_reuse_old_activation
+FAILED tests/test_ppal_policy_continuity.py::test_changed_physical_request_cannot_reuse_offline_permission
+FAILED tests/test_ppal_policy_continuity.py::test_normal_synthetic_entry_discovers_persisted_policy_and_restarts
+4 failed in 0.95s

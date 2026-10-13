@@ -1,0 +1,41 @@
+{
+  "base_revision": "708a1f6b5177497f4e765dd1900fa8407d266d8c",
+  "branch": "feature/autonomous-camera-calibration",
+  "environment": {
+    "arch": "x86_64",
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "numpy": "2.5.4",
+    "opencv": "5.0.0.93",
+    "pillow": "12.3.0"
+  },
+  "full_command": "/workspace/scratch/a5d7375d8e4e/camera-test-env/bin/python -m pytest -q tests -o faulthandler_timeout=60 --junitxml=/workspace/scratch/a5d7375d8e4e/camera-full-final.xml",
+  "full_exit_code": 0,
+  "full": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "21",
+      "tests": "903",
+      "time": "205.958",
+      "timestamp": "2026-10-11T09:23:01.113626+07:00",
+      "hostname": "e9d376ec7fc1"
+    }
+  ],
+  "focused_tests": 78,
+  "focused_failures": 0,
+  "focused_errors": 0,
+  "native_acceptance": "pending; hostname charlie cannot be resolved",
+  "deployed": false,
+  "gameplay_executed": false,
+  "servo_or_neck_motion": false,
+  "learning_or_score_improvement": "not demonstrated",
+  "evidence_hashes": {
+    "full.xml": "64bcb22f029bb46519df769af8c88cddc1cede70775cf0b01f16bdf8790857cf",
+    "focused.xml": "37adc428f56cd3a6484879f470de4bb7ccbdabb018babefdc5e6e38f2cfab585",
+    "original-detector-diagnosis.json": "ca7fa1b7770ec91079ce0c8649b1072b3414be25d44507c8ad993afb0e87fd56",
+    "repaired-detector-diagnosis.json": "93000cae4be16f9729e16136a9c778ac66dcfd5548ec97bff57d41f2fa4a3c8f",
+    "source-sha256.json": "4cd2cbdb4f8d729019eafe1d9c2218feefcc13277f3b35b7e1cbb22622a55fc0"
+  }
+}

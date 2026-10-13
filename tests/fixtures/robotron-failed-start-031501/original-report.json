@@ -1,0 +1,814 @@
+{
+  "session_timing": {
+    "clock": "monotonic",
+    "gameplay_timer_boundary": "after SELF discovery; includes reacquisition",
+    "first_life_lost_at": null,
+    "life_tracking": "unmeasured; SELF loss is not a life boundary",
+    "camera_initialization_started": 10281.652148363,
+    "calibration_started": 10284.494290796,
+    "calibration_finished": 10284.495374613,
+    "camera_ready": 10284.495727817,
+    "start_decision": 10288.621001874,
+    "stopped_at": 10288.621785505
+  },
+  "session_transitions": [
+    {
+      "at": 10284.495420409,
+      "old": "unknown",
+      "new": "camera_ready",
+      "reason": "optics and geometric calibration complete"
+    },
+    {
+      "at": 10288.621796524,
+      "old": "camera_ready",
+      "new": "stopped",
+      "reason": "ERROR: RuntimeError: initial START not authorized: no stable positive pregame or gameplay evidence"
+    }
+  ],
+  "session_events": "events.jsonl",
+  "provenance": {
+    "git_commit": "99d561382a0a55d0dc2bb4dea4b511350c8cdae5",
+    "dirty_worktree": true,
+    "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+  },
+  "review_frames": [],
+  "result": "ERROR: RuntimeError: initial START not authorized: no stable positive pregame or gameplay evidence",
+  "armed": true,
+  "seconds": null,
+  "failure_kind": "player_failure",
+  "progress": {
+    "pid": 4165,
+    "phase": "finalizing",
+    "phase_started_at": 10289.028828996,
+    "updated_at": 10289.028830848,
+    "fresh_at": 10288.465141351,
+    "sensor_at": 10288.374059,
+    "perception_at": 10281.651850955,
+    "cycle_at": 10281.651850955,
+    "cycles": 0,
+    "mode": "camera_ready",
+    "mode_started_at": 10284.495493206,
+    "publication_seconds": 0.05648945899156388
+  },
+  "partial_action_evidence": "steps.jsonl",
+  "pulse_ms": 80,
+  "ticks": 0,
+  "episode_end": {
+    "state": "unknown",
+    "confirmed": false,
+    "evidence": null
+  },
+  "score": null,
+  "score_status": "unmeasured",
+  "score_summary": {
+    "status": "unmeasured",
+    "self_score": null
+  },
+  "learning_mode": "fixed_policy_with_shadow_diagnostics",
+  "auto_start": true,
+  "start_decision": {
+    "action": "stop",
+    "reason": "no stable positive pregame or gameplay evidence",
+    "observations": [
+      {
+        "at": 10284.827770211,
+        "capture_timestamp": 10284.54953,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10284.496542523,
+          "completed_at": 10284.645198603,
+          "capture_seconds": 0.14865608000036445,
+          "sensor_timestamp_ns": 10284616185000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10284.54953,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.1304349899292,
+          "digital_gain": 1.0046998262405396,
+          "colour_gains": [
+            1.2347155809402466,
+            3.5140881538391113
+          ],
+          "colour_temperature": 2706,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.7946,
+          "hue_concentration": 0.9909,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3864,
+            "heroes": 0.3083,
+            "all-time": 0.2958
+          },
+          "geometric_border_support": [
+            0.523,
+            0.2361,
+            0.0844,
+            0.0333
+          ],
+          "phase": "unknown",
+          "interior_regions": 67
+        },
+        "consecutive": 1
+      },
+      {
+        "at": 10285.11642695,
+        "capture_timestamp": 10284.885015,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10284.855226801,
+          "completed_at": 10284.97345675,
+          "capture_seconds": 0.11822994899921468,
+          "sensor_timestamp_ns": 10284951670000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10284.885015,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.50561809539795,
+          "digital_gain": 1.000288963317871,
+          "colour_gains": [
+            1.2376515865325928,
+            3.492130994796753
+          ],
+          "colour_temperature": 2715,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.8123,
+          "hue_concentration": 0.991,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3866,
+            "heroes": 0.3063,
+            "all-time": 0.2943
+          },
+          "geometric_border_support": [
+            0.5164,
+            0.2426,
+            0.08,
+            0.0333
+          ],
+          "phase": "unknown",
+          "interior_regions": 66
+        },
+        "consecutive": 2
+      },
+      {
+        "at": 10285.377593987,
+        "capture_timestamp": 10285.153402,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10285.143354983,
+          "completed_at": 10285.241699393,
+          "capture_seconds": 0.09834441000020888,
+          "sensor_timestamp_ns": 10285220057000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10285.153402,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.50561809539795,
+          "digital_gain": 1.000288963317871,
+          "colour_gains": [
+            1.2417714595794678,
+            3.462193250656128
+          ],
+          "colour_temperature": 2728,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.8054,
+          "hue_concentration": 0.9893,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3857,
+            "heroes": 0.3078,
+            "all-time": 0.2931
+          },
+          "geometric_border_support": [
+            0.5131,
+            0.2443,
+            0.0822,
+            0.0333
+          ],
+          "phase": "unknown",
+          "interior_regions": 65
+        },
+        "consecutive": 3
+      },
+      {
+        "at": 10285.643732941,
+        "capture_timestamp": 10285.421789,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10285.404537464,
+          "completed_at": 10285.509972333,
+          "capture_seconds": 0.10543486899950949,
+          "sensor_timestamp_ns": 10285488444000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10285.421789,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.636363983154297,
+          "digital_gain": 1.0089898109436035,
+          "colour_gains": [
+            1.2451821565628052,
+            3.4374544620513916
+          ],
+          "colour_temperature": 2739,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.8124,
+          "hue_concentration": 0.9908,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3873,
+            "heroes": 0.3084,
+            "all-time": 0.2934
+          },
+          "geometric_border_support": [
+            0.518,
+            0.2492,
+            0.08,
+            0.0333
+          ],
+          "phase": "unknown",
+          "interior_regions": 65
+        },
+        "consecutive": 4
+      },
+      {
+        "at": 10285.911829233,
+        "capture_timestamp": 10285.690179,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10285.67089916,
+          "completed_at": 10285.778604237,
+          "capture_seconds": 0.10770507699999143,
+          "sensor_timestamp_ns": 10285756834000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10285.690179,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.50561809539795,
+          "digital_gain": 1.0103257894515991,
+          "colour_gains": [
+            1.2481095790863037,
+            3.4163434505462646
+          ],
+          "colour_temperature": 2748,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.7997,
+          "hue_concentration": 0.9888,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3873,
+            "heroes": 0.3087,
+            "all-time": 0.2928
+          },
+          "geometric_border_support": [
+            0.523,
+            0.2541,
+            0.08,
+            0.0333
+          ],
+          "phase": "unknown",
+          "interior_regions": 65
+        },
+        "consecutive": 5
+      },
+      {
+        "at": 10286.188313523,
+        "capture_timestamp": 10285.958567,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10285.938741026,
+          "completed_at": 10286.047034308,
+          "capture_seconds": 0.1082932819990674,
+          "sensor_timestamp_ns": 10286025222000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10285.958567,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.50561809539795,
+          "digital_gain": 1.0001181364059448,
+          "colour_gains": [
+            1.2504940032958984,
+            3.3991482257843018
+          ],
+          "colour_temperature": 2756,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.6897,
+          "hue_concentration": 0.9867,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3879,
+            "heroes": 0.3093,
+            "all-time": 0.2943
+          },
+          "geometric_border_support": [
+            0.5246,
+            0.2426,
+            0.08,
+            0.0333
+          ],
+          "phase": "unknown",
+          "interior_regions": 67
+        },
+        "consecutive": 6
+      },
+      {
+        "at": 10286.449697229,
+        "capture_timestamp": 10286.226953,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10286.215210797,
+          "completed_at": 10286.315148489,
+          "capture_seconds": 0.0999376920008217,
+          "sensor_timestamp_ns": 10286293608000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10286.226953,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.50561809539795,
+          "digital_gain": 1.0001181364059448,
+          "colour_gains": [
+            1.2451738119125366,
+            3.439234495162964
+          ],
+          "colour_temperature": 2739,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.6708,
+          "hue_concentration": 0.9934,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3878,
+            "heroes": 0.3091,
+            "all-time": 0.2937
+          },
+          "geometric_border_support": [
+            0.518,
+            0.0098,
+            0.08,
+            0.0289
+          ],
+          "phase": "unknown",
+          "interior_regions": 65
+        },
+        "consecutive": 7
+      },
+      {
+        "at": 10286.71590287,
+        "capture_timestamp": 10286.495341,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10286.475035852,
+          "completed_at": 10286.583541134,
+          "capture_seconds": 0.1085052819998964,
+          "sensor_timestamp_ns": 10286561996000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10286.495341,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.50561809539795,
+          "digital_gain": 1.0001181364059448,
+          "colour_gains": [
+            1.2386575937271118,
+            3.4881434440612793
+          ],
+          "colour_temperature": 2718,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.6751,
+          "hue_concentration": 0.9906,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3881,
+            "heroes": 0.3094,
+            "all-time": 0.2943
+          },
+          "geometric_border_support": [
+            0.5246,
+            0.0,
+            0.08,
+            0.0311
+          ],
+          "phase": "unknown",
+          "interior_regions": 64
+        },
+        "consecutive": 8
+      },
+      {
+        "at": 10286.985471722,
+        "capture_timestamp": 10286.763732,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10286.743770664,
+          "completed_at": 10286.852137632,
+          "capture_seconds": 0.10836696800106438,
+          "sensor_timestamp_ns": 10286830387000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10286.763732,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.50561809539795,
+          "digital_gain": 1.011230230331421,
+          "colour_gains": [
+            1.2353841066360474,
+            3.5123953819274902
+          ],
+          "colour_temperature": 2708,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.6626,
+          "hue_concentration": 0.9899,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3879,
+            "heroes": 0.3104,
+            "all-time": 0.2931
+          },
+          "geometric_border_support": [
+            0.523,
+            0.0033,
+            0.08,
+            0.0311
+          ],
+          "phase": "unknown",
+          "interior_regions": 68
+        },
+        "consecutive": 9
+      },
+      {
+        "at": 10287.262532977,
+        "capture_timestamp": 10287.03212,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10287.010885456,
+          "completed_at": 10287.12050713,
+          "capture_seconds": 0.10962167399884493,
+          "sensor_timestamp_ns": 10287098775000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10287.03212,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.906976699829102,
+          "digital_gain": 1.0000849962234497,
+          "colour_gains": [
+            1.2382299900054932,
+            3.4899158477783203
+          ],
+          "colour_temperature": 2717,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.6788,
+          "hue_concentration": 0.9935,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3897,
+            "heroes": 0.3082,
+            "all-time": 0.2922
+          },
+          "geometric_border_support": [
+            0.5213,
+            0.0,
+            0.08,
+            0.0289
+          ],
+          "phase": "unknown",
+          "interior_regions": 67
+        },
+        "consecutive": 10
+      },
+      {
+        "at": 10287.523495813,
+        "capture_timestamp": 10287.300506,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10287.287979045,
+          "completed_at": 10287.388614312,
+          "capture_seconds": 0.10063526699923386,
+          "sensor_timestamp_ns": 10287367161000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10287.300506,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.906976699829102,
+          "digital_gain": 1.0000849962234497,
+          "colour_gains": [
+            1.2405478954315186,
+            3.4716062545776367
+          ],
+          "colour_temperature": 2724,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.6893,
+          "hue_concentration": 0.9905,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3887,
+            "heroes": 0.3084,
+            "all-time": 0.2913
+          },
+          "geometric_border_support": [
+            0.5213,
+            0.0,
+            0.08,
+            0.0311
+          ],
+          "phase": "unknown",
+          "interior_regions": 64
+        },
+        "consecutive": 11
+      },
+      {
+        "at": 10287.790233216,
+        "capture_timestamp": 10287.568894,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10287.548824269,
+          "completed_at": 10287.657133348,
+          "capture_seconds": 0.10830907899980957,
+          "sensor_timestamp_ns": 10287635549000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10287.568894,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 12.047059059143066,
+          "digital_gain": 1.0011786222457886,
+          "colour_gains": [
+            1.2400836944580078,
+            3.473435163497925
+          ],
+          "colour_temperature": 2723,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.7165,
+          "hue_concentration": 0.9922,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3889,
+            "heroes": 0.3075,
+            "all-time": 0.2916
+          },
+          "geometric_border_support": [
+            0.5246,
+            0.0,
+            0.08,
+            0.0311
+          ],
+          "phase": "unknown",
+          "interior_regions": 65
+        },
+        "consecutive": 12
+      },
+      {
+        "at": 10288.058065269,
+        "capture_timestamp": 10287.837284,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10287.815611246,
+          "completed_at": 10287.924666401,
+          "capture_seconds": 0.10905515500053298,
+          "sensor_timestamp_ns": 10287903939000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10287.837284,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 12.047059059143066,
+          "digital_gain": 1.0071579217910767,
+          "colour_gains": [
+            1.238998532295227,
+            3.479956865310669
+          ],
+          "colour_temperature": 2720,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.7143,
+          "hue_concentration": 0.9925,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3862,
+            "heroes": 0.3071,
+            "all-time": 0.2925
+          },
+          "geometric_border_support": [
+            0.5246,
+            0.0,
+            0.0778,
+            0.0311
+          ],
+          "phase": "unknown",
+          "interior_regions": 67
+        },
+        "consecutive": 13
+      },
+      {
+        "at": 10288.337127919,
+        "capture_timestamp": 10288.105672,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10288.083508541,
+          "completed_at": 10288.19409418,
+          "capture_seconds": 0.11058563900041918,
+          "sensor_timestamp_ns": 10288172327000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10288.105672,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.906976699829102,
+          "digital_gain": 1.0094562768936157,
+          "colour_gains": [
+            1.2381443977355957,
+            3.4850473403930664
+          ],
+          "colour_temperature": 2717,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.6911,
+          "hue_concentration": 0.9902,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3882,
+            "heroes": 0.3082,
+            "all-time": 0.2934
+          },
+          "geometric_border_support": [
+            0.523,
+            0.0,
+            0.08,
+            0.0289
+          ],
+          "phase": "unknown",
+          "interior_regions": 71
+        },
+        "consecutive": 14
+      },
+      {
+        "at": 10288.594439989,
+        "capture_timestamp": 10288.374059,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 10288.362567505,
+          "completed_at": 10288.462454531,
+          "capture_seconds": 0.09988702599912358,
+          "sensor_timestamp_ns": 10288440714000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 10288.374059,
+          "frame_duration_us": 67106,
+          "lens_position": 1.2999999523162842,
+          "analogue_gain": 11.906976699829102,
+          "digital_gain": 1.0094562768936157,
+          "colour_gains": [
+            1.2375293970108032,
+            3.4885926246643066
+          ],
+          "colour_temperature": 2715,
+          "ae_locked": null
+        },
+        "screen": {
+          "state": "unknown",
+          "reason": "insufficient_screen_phase_evidence",
+          "coverage": 0.7815,
+          "hue_concentration": 0.9832,
+          "occupied_hue_bins": 2,
+          "border_state": "gameplay",
+          "label_scores": {
+            "pregame": 0.3822,
+            "heroes": 0.3001,
+            "all-time": 0.0
+          },
+          "geometric_border_support": [
+            0.5098,
+            0.0,
+            0.0156,
+            0.0289
+          ],
+          "phase": "unknown",
+          "interior_regions": 17
+        },
+        "consecutive": 15
+      }
+    ]
+  },
+  "calibration_mode": "saved",
+  "exposure_preflight": null,
+  "calibration": {
+    "corners": [
+      [
+        0.24609375,
+        0.06527777777777778
+      ],
+      [
+        0.8125,
+        0.11805555555555555
+      ],
+      [
+        0.8234375,
+        0.8263888888888888
+      ],
+      [
+        0.19375,
+        0.7694444444444445
+      ]
+    ],
+    "output_size": [
+      640,
+      480
+    ]
+  },
+  "acquisition": null,
+  "gameplay_visual_frame": null,
+  "startup_watch": [],
+  "agency_frames": [],
+  "raw_frames": [],
+  "tracking_log": "agency.jsonl",
+  "tracking_schema": "sprite-tracking-v3",
+  "capture_mode": "fresh_exposure",
+  "passive_observer": {
+    "offers": 25,
+    "dropped": 8,
+    "published": 17,
+    "errors": 0,
+    "submit_seconds": 0.0018458940012351377,
+    "encode_seconds": 0.49970418000339123,
+    "max_pending": 1,
+    "fps_limit": 3.0,
+    "attached": true,
+    "demand_checked_at": 10288.955284928
+  },
+  "camera_lease_handoff_seconds": 0.6576660460013954,
+  "agency_acquisition_protocol": "two_fresh_endpoints_then_independent_neutral",
+  "planning_mode": "rescue_with_open_space_fallback",
+  "learned_semantics": {
+    "status": "baseline",
+    "error": null
+  },
+  "bootstrap_body_fire": false,
+  "fire_agency_status": "exploratory evidence only; projectile/origin interpretation unvalidated",
+  "experiment_status": {
+    "status": "not_requested",
+    "attempted": false,
+    "reason": null
+  },
+  "tracks": "tracks.json",
+  "agency_samples": 0,
+  "agency_log": "agency.jsonl",
+  "steps": []
+}

@@ -1,0 +1,164 @@
+{
+  "schema": "charlie-progress-watchdog-validation-v1",
+  "recorded_at": "2026-10-11T20:21:47.885350+00:00",
+  "baseline": "9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+  "branch": "feature/progress-aware-marathon-watchdog",
+  "environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "numpy": "2.5.4",
+    "opencv": "5.0.0",
+    "pillow": "12.3.0"
+  },
+  "source_sha256": {
+    "experiments/ppal/progress_supervision.py": "614161637c4a29fd6ade8b2aeaec7c71260af6c829d03133c87d25fd1e25f36e",
+    "experiments/ppal/marathon_robotron.py": "29a0d5b19b0d141b355bcb90b023a978b88783776382acdabcc6c7e1fe638426",
+    "experiments/ppal/play_robotron.py": "7b47b94d51b64c132424bb76070cc1ad08f92bf1262509fc4757581fc65e0dfd",
+    "experiments/ppal/progress_evidence.py": "36cf7a703141e7a0e2d8a4319cf8e65cb2af35eaf0c881b2d2c0754bb6b9b87f",
+    "experiments/ppal/game_evidence.py": "872d3d809e697fae9fcb7db9a14f8264e731ef5ca4b5dadb88d09f2ed45a3fee",
+    "experiments/ppal/score_observer.py": "a02ab3e51b14cd1a764290d92f85942d93907df54d59defd07fb72df23996bb7",
+    "memory/episode_identity.py": "f9c3d3038926ce95e14dc8ebf318d416ec1e3f0a3137fa5ff9538fe7785ab6fc",
+    "tests/test_progress_handoff.py": "14691fcb28076d722256036f9495a7b18d57ebcc291aa3178d138356149e9112"
+  },
+  "preserved_preflight_sha256": "8cd902f89603394fe3e492370e37f88854ee8d2e0904b49bdc2ee03aca665bb8",
+  "runs": [
+    {
+      "name": "focused",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "1",
+      "tests": "117",
+      "time": "34.611",
+      "timestamp": "2026-10-11T16:20:25.565577-04:00",
+      "hostname": "76683c0e2a9b",
+      "command": "python -m pytest -q tests/test_progress_handoff.py tests/test_progress_supervision.py tests/test_marathon_camera_session.py tests/test_marathon_deferred.py tests/test_recording_handoff.py tests/test_restart_discovery_evidence.py tests/test_episode_identity.py tests/test_buffered_recording.py tests/test_score_observer.py tests/test_score_review_queue.py tests/test_score_feedback_learning.py --junitxml=watchdog-focused.xml",
+      "passed": 116,
+      "failed_cases": [],
+      "junit_sha256": "1a37ae44370dd43fa33b9bafb03a818893efa39b6e8b6ecadbf359dc1328585a"
+    },
+    {
+      "name": "host_tests",
+      "errors": "0",
+      "failures": "15",
+      "skipped": "21",
+      "tests": "948",
+      "time": "230.928",
+      "timestamp": "2026-10-11T16:16:08.948523-04:00",
+      "hostname": "76683c0e2a9b",
+      "command": "python -m pytest -q tests --junitxml=watchdog-tests-full.xml",
+      "passed": 912,
+      "failed_cases": [
+        {
+          "test": "tests.test_robotron_autofocus::test_automatic_start_uses_observed_position_then_confirms_idle_manual_lock",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[None]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[nan]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[inf]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[-1.0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[11.0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_invalid_autofocus_lens_metadata_fails_without_manual_fallback[True]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[None]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[0]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[1]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_stable_lens_is_not_successful_autofocus[3]",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_repeated_or_unstable_metadata_cannot_settle",
+          "message": "AttributeError: 'Unstable' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_manual_lock_requires_reported_idle_and_matching_position",
+          "message": "AttributeError: 'Unlocked' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_autofocus::test_diagnostic_manual_seed_is_explicit_validated_and_verified",
+          "message": "AttributeError: 'FocusSource' object has no attribute 'read_fresh'"
+        },
+        {
+          "test": "tests.test_robotron_geometry_replay::test_six_actual_consecutive_originals_stabilize_without_looser_gate",
+          "message": "assert (6 == 6 and 12.0 == 8)\n +  where 6 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).stable_views\n +  and   12.0 = PreflightConfig(stable_views=6, max_jitter_pixels=12.0, geometry_attempts=24, geometry_interval=0, focus_margin=0.08, focus_radius=1.5, focus_step=0.25, focus_samples=3, lens_min=0.0, lens_max=32.0, keep_focus_ratio=0.94).max_jitter_pixels"
+        }
+      ],
+      "junit_sha256": "4012934a03b6c6799d23e295e9aac571044f3444fb6a870597aba7437e8637f7"
+    },
+    {
+      "name": "repository_discovery",
+      "errors": "6",
+      "failures": "0",
+      "skipped": "1",
+      "tests": "7",
+      "time": "16.126",
+      "timestamp": "2026-10-11T16:15:39.053500-04:00",
+      "hostname": "76683c0e2a9b",
+      "command": "python -m pytest -q --junitxml=watchdog-full.xml",
+      "passed": 0,
+      "failed_cases": [
+        {
+          "test": "::OldPicoFiles.test_rp2040",
+          "message": "collection failure"
+        },
+        {
+          "test": "::test_mobile_track",
+          "message": "collection failure"
+        },
+        {
+          "test": "::tests.test_memory_recall",
+          "message": "collection failure"
+        },
+        {
+          "test": "::vision.hsv_test",
+          "message": "collection failure"
+        },
+        {
+          "test": "::vision.test_orange",
+          "message": "collection failure"
+        },
+        {
+          "test": "::vision.test_stimulus",
+          "message": "collection failure"
+        }
+      ],
+      "junit_sha256": "f070cdb434696fffc19650bd776be41f7e0491529852760d1d65754f3b7c708a"
+    }
+  ],
+  "baseline_failure_sets_match": true,
+  "native_validation": "not performed",
+  "physical_game_two_acceptance": "pending; release blocking",
+  "original_session": "user-reported development-20261011-203343; unavailable locally",
+  "limitations": [
+    "636-artifact test is a software fixture, not original native evidence",
+    "360-second progress test uses an accelerated clock",
+    "No gameplay, camera-only native run, servo activity or deployment performed"
+  ]
+}

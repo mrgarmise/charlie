@@ -1,0 +1,15 @@
+{
+  "experiments/ppal/eyes/autofocus.py": "be50f1ce16e376f3188b55c623d976d1204ada87b0173871ba98bd4b0a7fa0be",
+  "tests/test_robotron_autofocus.py": "58f23194e1dc652f7ca836806fd2b242afb1254218cba51099e8fb01af0f4142",
+  "tests/test_robotron_changed_installation.py": "e4bbcb7656c89a1581c49fe9fcab426b9cd7b0ea9ddd6aec190a9e8532d8e5f7",
+  "experiments/ppal/eyes/exposure.py": "4a10713b03f3c323c9a407ad7a1bac3df6cd00490f1be3fef722b61f16995e15",
+  "experiments/ppal/eyes/settle.py": "a626e1b34ce082dc47991bad7a964913020535db8a600667e5d9ceb1d4f12675",
+  "experiments/ppal/eyes/sources.py": "1b57672400a3cadc0af95c6e4f2d39500dbf7af5a6be40af897d5367048240bf",
+  "experiments/ppal/marathon_robotron.py": "3dc6a0fdfad64d6ebb4b5c227124279536be1cb424ee18ae7ee3faff18fe61e4",
+  "experiments/ppal/observation_camera.py": "742ddee5224b175c3717a5611266d0d4fe81b45cdc02027357ca1f006ce9dc25",
+  "experiments/ppal/play_robotron.py": "f558cc79a5feb7f8e9e8032881e6b208c50766737d164229083ae5942f62aa95",
+  "experiments/ppal/preflight.py": "eac7eb1c0075fd8d901131ac3d3362a3b657db678a94d50d8650d9882a918b0b",
+  "tests/test_marathon_deferred.py": "b1e91b05678abc6c76154e9b61b4b4c5a790d395a471e35facb93f84d4da8221",
+  "tests/test_robotron_startup_boundaries.py": "4f421e4865ccb5f6883b8f801998f5f6cabcf027f673010c99d668a9a00f0855",
+  "tests/test_sensory_recording.py": "29924b5e6d4d3eeeed412de5a297177c8ca48ce2ad6da06d8a64dd583bc06b7c"
+}

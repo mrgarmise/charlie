@@ -1,0 +1,43 @@
+{
+  "schema": "developmental-restart-acceptance-v1",
+  "continuity_passed": true,
+  "original_records_preserved": 799,
+  "appended_records": 24,
+  "new_record_categories": {
+    "normal_meditation_yield": 12,
+    "developmental_progress": 12
+  },
+  "substantive_progress": true,
+  "progress_records": [
+    "2b52d2d307b5e7c2eef6b49b9694f7123ed6d27cca2e1480eb5ae54e2cdc7649",
+    "db27f7475a7604beb7ee3081979ff70de6117046538a1c786df3d8090d362f72",
+    "85425f1a21d1e204c2131db6d292b6ccd4e4cbe28266978ee0c9e3159778f41f",
+    "717be9982dda70ded26108a0ed5f2b0168803403c2c3cee80f3a27c8d617227b",
+    "c00e60e3022a676fa405c8ea341d66a7b82c6085c3e4fa5a3b499cf8e2ea2a2a",
+    "27d341575dc7964c2be193699fe878d1ad5ff8685f787d614afadb88068b9d09",
+    "bc9ead52b63f179f9eebd512ab80923da38c3b106e8c883e8ca256b4ab68640c",
+    "2b0c90d2f31bb7ec571463b4212aa7c6148791f37174c7bccf8020db57770f60",
+    "e6fce1da9b90878c23b7ac3ecd63aff785073f24bb21b5e0a41d9bf39eb97635",
+    "3e31a0e36abd7f06dcababa56ca81ee543f7ae32a90b336624eb25b3f9fad22e",
+    "0e202d67d0454574debf41037e306991e9451fdd08ab541b362bc2706dd8d647",
+    "1c205f02c8d3b539017c53e14dbf6664a19af76eb543a7cac83610cec175e716"
+  ],
+  "advanced_meditations": [
+    "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01"
+  ],
+  "runnable_work": [
+    "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01"
+  ],
+  "blocked_work": [],
+  "completed_work": [],
+  "classification": "continued",
+  "steady_state_reached": false,
+  "restart_exact": false,
+  "physical_authorization": false,
+  "physical_score_improvement": "UNKNOWN",
+  "evidence": "Actual retained native snapshots, validated read-only on x86_64; not a new Pi run",
+  "native_release": "7c99f103b04e89dc5f8c22fb8ceb1b00db33f339",
+  "raw_sha256": "be2754892cdf86af401eae8db37833985e79566906ed59c6e126b5ed292fcc0d",
+  "raw_library_id": "libfile_ba180ff80c0c819180c1b41e6732d9bc",
+  "original_acceptance_passed": false
+}

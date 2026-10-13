@@ -1,0 +1,1068 @@
+{
+  "schema": "charlie-learning-executive-controlled-example-v1",
+  "audited_head": "0da1b84f65a725105b0ba74e489a7c72d7fe744f",
+  "demonstration": "Real archived origin; all later trial outcomes and terminal screens synthetic; not a physical campaign or proof of autonomous strategic learning",
+  "source_archive": "body-fire-bootstrap-20261001-020552",
+  "source_revision": "dfdccde (dirty)",
+  "source_artifacts": {
+    "report.json": "71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+    "agency.jsonl": "49bf2fe84ab29b1ea1625bcd3815ff35d4d945d2b9d82f61bc310d1fd24b4d6d"
+  },
+  "score": {
+    "human_reported": 400,
+    "observer_baseline": 888,
+    "accepted_increases": 0,
+    "causal_credit": null
+  },
+  "origin": {
+    "episode": "episode:71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+    "raw_proposals": 9,
+    "project_proposals": [
+      "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071"
+    ],
+    "samples": [
+      18,
+      24
+    ],
+    "source_track": 146,
+    "observed_fire_settings": [
+      "NW",
+      "SE"
+    ]
+  },
+  "first_selection": {
+    "project": {
+      "available_conditions": 9,
+      "completion_rationale": null,
+      "conditions": [
+        {
+          "body": "NE",
+          "fire": "E"
+        },
+        {
+          "body": "NE",
+          "fire": "N"
+        },
+        {
+          "body": "NE",
+          "fire": "NE"
+        },
+        {
+          "body": "NE",
+          "fire": "NONE"
+        },
+        {
+          "body": "NE",
+          "fire": "NW"
+        },
+        {
+          "body": "NE",
+          "fire": "S"
+        },
+        {
+          "body": "NE",
+          "fire": "SE"
+        },
+        {
+          "body": "NE",
+          "fire": "SW"
+        },
+        {
+          "body": "NE",
+          "fire": "W"
+        }
+      ],
+      "cost": 0.5,
+      "current_understanding": "tentative; no confirmed physical identity or causal score claim",
+      "dependencies": [],
+      "established_objective": "official_game_score",
+      "expected": "signed_command_response",
+      "experiment_history": [],
+      "goal": "Measure whether signed_command_response repeats across conditions for {'body': 'NE'}",
+      "hypothesis_evidence": [
+        "e6251f4fb68bc6ab3e40029bc6bd5f555604228607f7ec65295cc05e678f19d6"
+      ],
+      "id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+      "learning_value": 0.7777777777777778,
+      "method": "actuator-response",
+      "motivation": "Reduce uncertainty in an observed relationship before relying on it in later decisions; no performance benefit inferred",
+      "next_direction": "ask existing chooser for a scoped experiment",
+      "objective_contribution": 0.5,
+      "observed_conditions": 2,
+      "open_questions": [
+        "Does the measured relationship persist in new episodes and conditions?",
+        "Which unexamined conditions or interpretations remain?"
+      ],
+      "originator": "Reflection",
+      "origins": [
+        {
+          "episode": "episode:71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+          "evidence_id": "e6251f4fb68bc6ab3e40029bc6bd5f555604228607f7ec65295cc05e678f19d6",
+          "journal": "<controlled-workdir>/real-evidence/evidence.sqlite3"
+        }
+      ],
+      "priority_provenance": "declared generic reproducibility policy; uncovered-condition fraction, not learned score utility",
+      "progress": {},
+      "requires": [
+        "camera-evidence",
+        "actuator-experiment-slot"
+      ],
+      "revision": "1",
+      "risk": 0.5,
+      "scope": {
+        "body": "NE"
+      },
+      "status": "active",
+      "success_criteria": {
+        "max_attempts": 8,
+        "min_conditions": 2,
+        "min_episodes": 2,
+        "min_resolved": 3,
+        "stagnation_window": 3,
+        "support_fraction": 0.8
+      },
+      "tactical_hypothesis_evidence": [
+        "0186d354161bf61b666d74b8bdff68aa9077278f81b73c22ffb72a4eca88337b",
+        "be4f52f5190fed6193890955dc69a694ae63889d04be928a0eb562f216e462cc",
+        "8c4f05087d7c7e0f3171f70f2767a5557d4752a3359bfaa394adf831b02d7cf1",
+        "970c3dbfe4d486f238edbc7378f7050728a1ad94708c32aa5fb7f6e284e0e106",
+        "0c25b941450c75f43419d80eb151326ec3e43107231fff3cc513a1d442b6de2a",
+        "1ad8cd11b429cc2072a8cb2fb1ace2584ecd01ac067bb495f125d5e8533eb576",
+        "b8286d06ec329641f763eccc9238fddaf6577b1a6925248315bd5a8fb90997b4",
+        "af7dc6dd42b68077c7bb28d240c8105e7d2074752db6513c967913bb57edc6b2",
+        "371b771f61fd46778be1cb6978baf0d93c812110f3476e4997d72e3a043d8bb6"
+      ],
+      "uncertainty": 0.7777777777777778,
+      "selection": {
+        "alternatives": [
+          {
+            "authorized": true,
+            "blocked": false,
+            "method_available": true,
+            "missing_resources": [],
+            "opportunity_cost": "foregone eligible alternatives shown in this selection",
+            "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+            "score": 1.0555555555555554,
+            "status": "candidate",
+            "terms": {
+              "cost": 0.5,
+              "learning_value": 0.7777777777777778,
+              "objective_contribution": 0.5,
+              "remaining_uncertainty": 0.7777777777777778,
+              "risk": 0.5
+            },
+            "unmet_dependencies": [],
+            "urgent": false
+          }
+        ],
+        "interrupted_projects": [],
+        "op": "selected",
+        "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+        "reason": "generic value/uncertainty minus cost/risk policy"
+      }
+    },
+    "alternatives": [
+      {
+        "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+        "score": 1.0555555555555554,
+        "blocked": false,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.7777777777777778,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "candidate"
+      }
+    ],
+    "reason": "generic value/uncertainty minus cost/risk policy"
+  },
+  "trials": [
+    {
+      "synthetic": true,
+      "plan": {
+        "schema": "charlie-actuator-plan-v1",
+        "prediction_id": "2672ce9fc641768083fabb2abce36b7cd73748fd8147ebec0fc1cbf64d46efce",
+        "prediction_at": 1437.562767367,
+        "deadline": 1497.562767367,
+        "memory_id": "1388ef837128120856e75abe28050d446b9639416e96b741d1e43fb5517bb0ad",
+        "decision_id": "experiment:2672ce9fc641768083fabb2abce36b7cd73748fd8147ebec0fc1cbf64d46efce",
+        "scope": "planned-episode:<controlled-workdir>/controlled-game-0",
+        "body": "NE",
+        "fire": "NONE",
+        "max_actions": 1,
+        "intended_game": "<controlled-workdir>/controlled-game-0",
+        "source_episode": "episode:71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+        "source_evidence": [
+          "d800daaf30a24cdaf7b7c2cf3b11a8fbcee94e441b7d9d95c3c86ca6b26ea762",
+          "ad88c739aa56c753de3bb0a0c05e42758cff0037c1226f87481000a70f31fc22"
+        ],
+        "expected": "signed_command_response",
+        "alternatives": [
+          {
+            "memory_id": "647f62d43975a469d1d2aa9511cbf7a08b0fa886d6e4a0662423f977916f83df",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              1
+            ]
+          },
+          {
+            "memory_id": "36c375ed5916fa73f6d6c87169e0db31f6c50b7708e1ef4f01a20a9e02717c1f",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              2
+            ]
+          },
+          {
+            "memory_id": "3b3769b2f17ad31de7c53169064d0d1fc60577d478ebbe5b3ddf45fcd94296f4",
+            "evaluator_priority": 0.52,
+            "body": "NE",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              1
+            ]
+          },
+          {
+            "memory_id": "3db2021e920ad3593ecf9c3152d9d08584e7c5cb424f6b857030702e9a28b3f9",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              2
+            ]
+          },
+          {
+            "memory_id": "5bc603aa034301aeaacd0ecb8b70415d3fc347eb3cd1499d0eb7ed2b9150fe27",
+            "evaluator_priority": 0.52,
+            "body": "NE",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              4
+            ]
+          },
+          {
+            "memory_id": "1388ef837128120856e75abe28050d446b9639416e96b741d1e43fb5517bb0ad",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              7
+            ]
+          },
+          {
+            "memory_id": "0df49584dab9dac16f7a703b390871c466b8af935cb299161fdf9f031a85dd75",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              1
+            ]
+          },
+          {
+            "memory_id": "740dab2831c8b6821f22ba50c11c00dc44edd7f83619ad3ddfee48bda560d5d3",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              2
+            ]
+          },
+          {
+            "memory_id": "46d95ce4f07876ea182c4aeffa99af52158ff6fe8a75b2757b4978a426c56464",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              4
+            ]
+          }
+        ],
+        "reason": "Evaluator priority then evidence-based proposal rank: untested binding, modal-response support, window count, observed setting frequency",
+        "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+        "project_objective": "Measure whether signed_command_response repeats across conditions for {'body': 'NE'}",
+        "project_coverage_reason": "chooser explores unattempted conditions until project coverage criterion is met; Evaluator ranking within that set"
+      },
+      "resolution": {
+        "prediction_id": "2672ce9fc641768083fabb2abce36b7cd73748fd8147ebec0fc1cbf64d46efce",
+        "result": "supported",
+        "reason": "existing AgencyTracker matched the evidence-derived modal response",
+        "resolution_id": "07fd68ca70e49b8fe4a6dda2f9e9d53fca3de05e206c19820cbc280c810c8048",
+        "memory_id": "1388ef837128120856e75abe28050d446b9639416e96b741d1e43fb5517bb0ad",
+        "belief_change": "existing Evaluator received diagnostic predictive-usefulness feedback",
+        "memory_evaluation_before": {
+          "status": "promoted",
+          "priority": 0.65
+        },
+        "memory_evaluation_after": {
+          "status": "promoted",
+          "priority": 0.72
+        },
+        "hypothesis_status": "tentative; no physical identity or game-rule certification",
+        "attempted": true,
+        "score_attribution": null
+      },
+      "commitment_sequence": 2,
+      "resolution_sequence": 4,
+      "cumulative": {
+        "attempts": 1,
+        "conditions": 1,
+        "episodes": 1,
+        "resolved": 1,
+        "results": {
+          "supported": 1
+        },
+        "support_fraction": 1.0
+      },
+      "status": "active"
+    },
+    {
+      "synthetic": true,
+      "plan": {
+        "schema": "charlie-actuator-plan-v1",
+        "prediction_id": "cb0eb79ccd77b5989c17fc11f9760028b47e572c692893c051b7a30417d70195",
+        "prediction_at": 1437.570328368,
+        "deadline": 1497.570328368,
+        "memory_id": "46d95ce4f07876ea182c4aeffa99af52158ff6fe8a75b2757b4978a426c56464",
+        "decision_id": "experiment:cb0eb79ccd77b5989c17fc11f9760028b47e572c692893c051b7a30417d70195",
+        "scope": "planned-episode:<controlled-workdir>/controlled-game-1",
+        "body": "NE",
+        "fire": "E",
+        "max_actions": 1,
+        "intended_game": "<controlled-workdir>/controlled-game-1",
+        "source_episode": "episode:71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+        "source_evidence": [
+          "d800daaf30a24cdaf7b7c2cf3b11a8fbcee94e441b7d9d95c3c86ca6b26ea762",
+          "ad88c739aa56c753de3bb0a0c05e42758cff0037c1226f87481000a70f31fc22"
+        ],
+        "expected": "signed_command_response",
+        "alternatives": [
+          {
+            "memory_id": "647f62d43975a469d1d2aa9511cbf7a08b0fa886d6e4a0662423f977916f83df",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              1
+            ]
+          },
+          {
+            "memory_id": "36c375ed5916fa73f6d6c87169e0db31f6c50b7708e1ef4f01a20a9e02717c1f",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              2
+            ]
+          },
+          {
+            "memory_id": "3b3769b2f17ad31de7c53169064d0d1fc60577d478ebbe5b3ddf45fcd94296f4",
+            "evaluator_priority": 0.52,
+            "body": "NE",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              1
+            ]
+          },
+          {
+            "memory_id": "3db2021e920ad3593ecf9c3152d9d08584e7c5cb424f6b857030702e9a28b3f9",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              2
+            ]
+          },
+          {
+            "memory_id": "5bc603aa034301aeaacd0ecb8b70415d3fc347eb3cd1499d0eb7ed2b9150fe27",
+            "evaluator_priority": 0.52,
+            "body": "NE",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              4
+            ]
+          },
+          {
+            "memory_id": "1388ef837128120856e75abe28050d446b9639416e96b741d1e43fb5517bb0ad",
+            "evaluator_priority": 0.72,
+            "body": "NE",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              7
+            ]
+          },
+          {
+            "memory_id": "0df49584dab9dac16f7a703b390871c466b8af935cb299161fdf9f031a85dd75",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              1
+            ]
+          },
+          {
+            "memory_id": "740dab2831c8b6821f22ba50c11c00dc44edd7f83619ad3ddfee48bda560d5d3",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              2
+            ]
+          },
+          {
+            "memory_id": "46d95ce4f07876ea182c4aeffa99af52158ff6fe8a75b2757b4978a426c56464",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              4
+            ]
+          }
+        ],
+        "reason": "Evaluator priority then evidence-based proposal rank: untested binding, modal-response support, window count, observed setting frequency",
+        "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+        "project_objective": "Measure whether signed_command_response repeats across conditions for {'body': 'NE'}",
+        "project_coverage_reason": "chooser explores unattempted conditions until project coverage criterion is met; Evaluator ranking within that set"
+      },
+      "resolution": {
+        "prediction_id": "cb0eb79ccd77b5989c17fc11f9760028b47e572c692893c051b7a30417d70195",
+        "result": "supported",
+        "reason": "existing AgencyTracker matched the evidence-derived modal response",
+        "resolution_id": "04778110f062457aed8ea1006d756c277e582994e14e90465dd587c6c732d94f",
+        "memory_id": "46d95ce4f07876ea182c4aeffa99af52158ff6fe8a75b2757b4978a426c56464",
+        "belief_change": "existing Evaluator received diagnostic predictive-usefulness feedback",
+        "memory_evaluation_before": {
+          "status": "promoted",
+          "priority": 0.65
+        },
+        "memory_evaluation_after": {
+          "status": "promoted",
+          "priority": 0.72
+        },
+        "hypothesis_status": "tentative; no physical identity or game-rule certification",
+        "attempted": true,
+        "score_attribution": null
+      },
+      "commitment_sequence": 6,
+      "resolution_sequence": 8,
+      "cumulative": {
+        "attempts": 2,
+        "conditions": 2,
+        "episodes": 2,
+        "resolved": 2,
+        "results": {
+          "supported": 2
+        },
+        "support_fraction": 1.0
+      },
+      "status": "active"
+    },
+    {
+      "synthetic": true,
+      "plan": {
+        "schema": "charlie-actuator-plan-v1",
+        "prediction_id": "fa5676ace3fb87facc146e31fb72d4faea4ec524ac10b5df1d7e53959c18144d",
+        "prediction_at": 1437.577889108,
+        "deadline": 1497.577889108,
+        "memory_id": "1388ef837128120856e75abe28050d446b9639416e96b741d1e43fb5517bb0ad",
+        "decision_id": "experiment:fa5676ace3fb87facc146e31fb72d4faea4ec524ac10b5df1d7e53959c18144d",
+        "scope": "planned-episode:<controlled-workdir>/controlled-game-2",
+        "body": "NE",
+        "fire": "NONE",
+        "max_actions": 1,
+        "intended_game": "<controlled-workdir>/controlled-game-2",
+        "source_episode": "episode:71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+        "source_evidence": [
+          "d800daaf30a24cdaf7b7c2cf3b11a8fbcee94e441b7d9d95c3c86ca6b26ea762",
+          "ad88c739aa56c753de3bb0a0c05e42758cff0037c1226f87481000a70f31fc22"
+        ],
+        "expected": "signed_command_response",
+        "alternatives": [
+          {
+            "memory_id": "647f62d43975a469d1d2aa9511cbf7a08b0fa886d6e4a0662423f977916f83df",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "W",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              1
+            ]
+          },
+          {
+            "memory_id": "36c375ed5916fa73f6d6c87169e0db31f6c50b7708e1ef4f01a20a9e02717c1f",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "SW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              2
+            ]
+          },
+          {
+            "memory_id": "3b3769b2f17ad31de7c53169064d0d1fc60577d478ebbe5b3ddf45fcd94296f4",
+            "evaluator_priority": 0.52,
+            "body": "NE",
+            "fire": "SE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              1
+            ]
+          },
+          {
+            "memory_id": "3db2021e920ad3593ecf9c3152d9d08584e7c5cb424f6b857030702e9a28b3f9",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "S",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              2
+            ]
+          },
+          {
+            "memory_id": "5bc603aa034301aeaacd0ecb8b70415d3fc347eb3cd1499d0eb7ed2b9150fe27",
+            "evaluator_priority": 0.52,
+            "body": "NE",
+            "fire": "NW",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              0,
+              1.0,
+              2,
+              4
+            ]
+          },
+          {
+            "memory_id": "1388ef837128120856e75abe28050d446b9639416e96b741d1e43fb5517bb0ad",
+            "evaluator_priority": 0.72,
+            "body": "NE",
+            "fire": "NONE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              7
+            ]
+          },
+          {
+            "memory_id": "0df49584dab9dac16f7a703b390871c466b8af935cb299161fdf9f031a85dd75",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "NE",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              1
+            ]
+          },
+          {
+            "memory_id": "740dab2831c8b6821f22ba50c11c00dc44edd7f83619ad3ddfee48bda560d5d3",
+            "evaluator_priority": 0.65,
+            "body": "NE",
+            "fire": "N",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              2
+            ]
+          },
+          {
+            "memory_id": "46d95ce4f07876ea182c4aeffa99af52158ff6fe8a75b2757b4978a426c56464",
+            "evaluator_priority": 0.72,
+            "body": "NE",
+            "fire": "E",
+            "expected": "signed_command_response",
+            "proposal_rank": [
+              1,
+              1.0,
+              2,
+              4
+            ]
+          }
+        ],
+        "reason": "Evaluator priority then evidence-based proposal rank: untested binding, modal-response support, window count, observed setting frequency",
+        "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+        "project_objective": "Measure whether signed_command_response repeats across conditions for {'body': 'NE'}",
+        "project_coverage_reason": null
+      },
+      "resolution": {
+        "prediction_id": "fa5676ace3fb87facc146e31fb72d4faea4ec524ac10b5df1d7e53959c18144d",
+        "result": "supported",
+        "reason": "existing AgencyTracker matched the evidence-derived modal response",
+        "resolution_id": "cd60b175428716b1b12c812638292b518ea809875c2c8fe4ad45eb785878bcf2",
+        "memory_id": "1388ef837128120856e75abe28050d446b9639416e96b741d1e43fb5517bb0ad",
+        "belief_change": "existing Evaluator received diagnostic predictive-usefulness feedback",
+        "memory_evaluation_before": {
+          "status": "promoted",
+          "priority": 0.72
+        },
+        "memory_evaluation_after": {
+          "status": "promoted",
+          "priority": 0.7666666666666666
+        },
+        "hypothesis_status": "tentative; no physical identity or game-rule certification",
+        "attempted": true,
+        "score_attribution": null
+      },
+      "commitment_sequence": 10,
+      "resolution_sequence": 12,
+      "cumulative": {
+        "attempts": 3,
+        "conditions": 2,
+        "episodes": 3,
+        "resolved": 3,
+        "results": {
+          "supported": 3
+        },
+        "support_fraction": 1.0
+      },
+      "status": "completed"
+    }
+  ],
+  "completed_project": {
+    "available_conditions": 9,
+    "completion_rationale": "Cumulative diagnostic replication criterion met across episodes and conditions; not a causal score or SELF certification",
+    "conditions": [
+      {
+        "body": "NE",
+        "fire": "E"
+      },
+      {
+        "body": "NE",
+        "fire": "N"
+      },
+      {
+        "body": "NE",
+        "fire": "NE"
+      },
+      {
+        "body": "NE",
+        "fire": "NONE"
+      },
+      {
+        "body": "NE",
+        "fire": "NW"
+      },
+      {
+        "body": "NE",
+        "fire": "S"
+      },
+      {
+        "body": "NE",
+        "fire": "SE"
+      },
+      {
+        "body": "NE",
+        "fire": "SW"
+      },
+      {
+        "body": "NE",
+        "fire": "W"
+      }
+    ],
+    "cost": 0.5,
+    "current_understanding": "Diagnostic outcomes {'supported': 3}; provisional identity and score causation remain unresolved",
+    "dependencies": [],
+    "established_objective": "official_game_score",
+    "expected": "signed_command_response",
+    "experiment_history": [
+      {
+        "condition": {
+          "body": "NE",
+          "fire": "NONE"
+        },
+        "episode": "episode:498566cb50489cd72a649725d18c2fc54ca6412370c614c8e9668ef562c4a441",
+        "memory_id": "1388ef837128120856e75abe28050d446b9639416e96b741d1e43fb5517bb0ad",
+        "prediction_id": "2672ce9fc641768083fabb2abce36b7cd73748fd8147ebec0fc1cbf64d46efce",
+        "reason": "existing AgencyTracker matched the evidence-derived modal response",
+        "resolution_id": "07fd68ca70e49b8fe4a6dda2f9e9d53fca3de05e206c19820cbc280c810c8048",
+        "result": "supported"
+      },
+      {
+        "condition": {
+          "body": "NE",
+          "fire": "E"
+        },
+        "episode": "episode:7f0867171a5b319998bc9dcd7402f5806de3bc7f5c095ee60099c95842f0576a",
+        "memory_id": "46d95ce4f07876ea182c4aeffa99af52158ff6fe8a75b2757b4978a426c56464",
+        "prediction_id": "cb0eb79ccd77b5989c17fc11f9760028b47e572c692893c051b7a30417d70195",
+        "reason": "existing AgencyTracker matched the evidence-derived modal response",
+        "resolution_id": "04778110f062457aed8ea1006d756c277e582994e14e90465dd587c6c732d94f",
+        "result": "supported"
+      },
+      {
+        "condition": {
+          "body": "NE",
+          "fire": "NONE"
+        },
+        "episode": "episode:2b2553157346a8f0fdc44e124b62dd5492bb116e109f91c99b27cab517297bbf",
+        "memory_id": "1388ef837128120856e75abe28050d446b9639416e96b741d1e43fb5517bb0ad",
+        "prediction_id": "fa5676ace3fb87facc146e31fb72d4faea4ec524ac10b5df1d7e53959c18144d",
+        "reason": "existing AgencyTracker matched the evidence-derived modal response",
+        "resolution_id": "cd60b175428716b1b12c812638292b518ea809875c2c8fe4ad45eb785878bcf2",
+        "result": "supported"
+      }
+    ],
+    "goal": "Measure whether signed_command_response repeats across conditions for {'body': 'NE'}",
+    "hypothesis_evidence": [
+      "e6251f4fb68bc6ab3e40029bc6bd5f555604228607f7ec65295cc05e678f19d6"
+    ],
+    "id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+    "learning_value": 0.7777777777777778,
+    "method": "actuator-response",
+    "motivation": "Reduce uncertainty in an observed relationship before relying on it in later decisions; no performance benefit inferred",
+    "next_direction": "retain open questions for reconsideration",
+    "objective_contribution": 0.5,
+    "observed_conditions": 2,
+    "open_questions": [
+      "Does the measured relationship persist in new episodes and conditions?",
+      "Which unexamined conditions or interpretations remain?"
+    ],
+    "originator": "Reflection",
+    "origins": [
+      {
+        "episode": "episode:71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+        "evidence_id": "e6251f4fb68bc6ab3e40029bc6bd5f555604228607f7ec65295cc05e678f19d6",
+        "journal": "<controlled-workdir>/real-evidence/evidence.sqlite3"
+      }
+    ],
+    "priority_provenance": "declared generic reproducibility policy; uncovered-condition fraction, not learned score utility",
+    "progress": {
+      "attempts": 3,
+      "conditions": 2,
+      "episodes": 3,
+      "resolved": 3,
+      "results": {
+        "supported": 3
+      },
+      "support_fraction": 1.0
+    },
+    "requires": [
+      "camera-evidence",
+      "actuator-experiment-slot"
+    ],
+    "revision": "1",
+    "risk": 0.5,
+    "scope": {
+      "body": "NE"
+    },
+    "status": "completed",
+    "success_criteria": {
+      "max_attempts": 8,
+      "min_conditions": 2,
+      "min_episodes": 2,
+      "min_resolved": 3,
+      "stagnation_window": 3,
+      "support_fraction": 0.8
+    },
+    "tactical_hypothesis_evidence": [
+      "0186d354161bf61b666d74b8bdff68aa9077278f81b73c22ffb72a4eca88337b",
+      "be4f52f5190fed6193890955dc69a694ae63889d04be928a0eb562f216e462cc",
+      "8c4f05087d7c7e0f3171f70f2767a5557d4752a3359bfaa394adf831b02d7cf1",
+      "970c3dbfe4d486f238edbc7378f7050728a1ad94708c32aa5fb7f6e284e0e106",
+      "0c25b941450c75f43419d80eb151326ec3e43107231fff3cc513a1d442b6de2a",
+      "1ad8cd11b429cc2072a8cb2fb1ace2584ecd01ac067bb495f125d5e8533eb576",
+      "b8286d06ec329641f763eccc9238fddaf6577b1a6925248315bd5a8fb90997b4",
+      "af7dc6dd42b68077c7bb28d240c8105e7d2074752db6513c967913bb57edc6b2",
+      "371b771f61fd46778be1cb6978baf0d93c812110f3476e4997d72e3a043d8bb6"
+    ],
+    "uncertainty": 0.7777777777777778,
+    "selection": {
+      "alternatives": [
+        {
+          "authorized": true,
+          "blocked": false,
+          "method_available": true,
+          "missing_resources": [],
+          "opportunity_cost": "foregone eligible alternatives shown in this selection",
+          "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+          "score": 1.0555555555555554,
+          "status": "candidate",
+          "terms": {
+            "cost": 0.5,
+            "learning_value": 0.7777777777777778,
+            "objective_contribution": 0.5,
+            "remaining_uncertainty": 0.7777777777777778,
+            "risk": 0.5
+          },
+          "unmet_dependencies": [],
+          "urgent": false
+        }
+      ],
+      "interrupted_projects": [],
+      "op": "selected",
+      "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+      "reason": "generic value/uncertainty minus cost/risk policy"
+    },
+    "disposition": "achieved"
+  },
+  "next_selection": {
+    "project": {
+      "available_conditions": 9,
+      "completion_rationale": null,
+      "conditions": [
+        {
+          "body": "SE",
+          "fire": "E"
+        },
+        {
+          "body": "SE",
+          "fire": "N"
+        },
+        {
+          "body": "SE",
+          "fire": "NE"
+        },
+        {
+          "body": "SE",
+          "fire": "NONE"
+        },
+        {
+          "body": "SE",
+          "fire": "NW"
+        },
+        {
+          "body": "SE",
+          "fire": "S"
+        },
+        {
+          "body": "SE",
+          "fire": "SE"
+        },
+        {
+          "body": "SE",
+          "fire": "SW"
+        },
+        {
+          "body": "SE",
+          "fire": "W"
+        }
+      ],
+      "cost": 0.5,
+      "current_understanding": "tentative; no confirmed physical identity or causal score claim",
+      "dependencies": [],
+      "established_objective": "official_game_score",
+      "expected": "unexpected_motion",
+      "experiment_history": [],
+      "goal": "Measure whether unexpected_motion repeats across conditions for {'body': 'SE'}",
+      "hypothesis_evidence": [
+        "1ca98d46888e46a9fc7634ef186401fd8804256acb916815f1c89e0cad711fb5"
+      ],
+      "id": "2e7bd3a97a976721f9cf6f3066af25f423e49869b1a8d1d5f836085c2e0dd0f3",
+      "learning_value": 0.7777777777777778,
+      "method": "actuator-response",
+      "motivation": "Reduce uncertainty in an observed relationship before relying on it in later decisions; no performance benefit inferred",
+      "next_direction": "ask existing chooser for a scoped experiment",
+      "objective_contribution": 0.5,
+      "observed_conditions": 2,
+      "open_questions": [
+        "Does the measured relationship persist in new episodes and conditions?",
+        "Which unexamined conditions or interpretations remain?"
+      ],
+      "originator": "Reflection",
+      "origins": [
+        {
+          "episode": "episode:fd729e4f43711e9f818948d62ebaec50bb5dcdfba2d4d137b4351443949965ea",
+          "evidence_id": "1ca98d46888e46a9fc7634ef186401fd8804256acb916815f1c89e0cad711fb5",
+          "journal": "<controlled-workdir>/other-evidence/evidence.sqlite3"
+        }
+      ],
+      "priority_provenance": "declared generic reproducibility policy; uncovered-condition fraction, not learned score utility",
+      "progress": {},
+      "requires": [
+        "camera-evidence",
+        "actuator-experiment-slot"
+      ],
+      "revision": "1",
+      "risk": 0.5,
+      "scope": {
+        "body": "SE"
+      },
+      "status": "active",
+      "success_criteria": {
+        "max_attempts": 8,
+        "min_conditions": 2,
+        "min_episodes": 2,
+        "min_resolved": 3,
+        "stagnation_window": 3,
+        "support_fraction": 0.8
+      },
+      "tactical_hypothesis_evidence": [
+        "a19d84736d59cc9d7e92136c554712922c37410809cfa1e80396da19d0b29ae2",
+        "88f544a5f2ef42ef3c0d52e9cf9a12d8c62d8eb394323e21253bec2acadbde69",
+        "f94adf7b1c04ba9b730a858954feb204f24d64f36562ff00f6ea2d49324ee5c8",
+        "3f9c1386397d855a293c48f15687734441dce5fcd45421f9aac8c7e533857712",
+        "6c0185f5ab3bb73566d5743f322b523d8e5e40d0749b241feb1c75043d8c92b3",
+        "8131058ef673736c5df5357c3fb047c1002138cd0fd248e7867aa91d5831886e",
+        "a04ff6c74ba4049f7c5ef7e5da9d24a8333bd72752ba1b81affd910251614b8d",
+        "0c142aa7079d16aa40f85622bee0ecaab082cf531a1cc2fce05bbbddd16a1cbe",
+        "30100e7ecb839d4ea26fac48ae61579ae3a9fa9c7c342e00b97a1d61b093398d"
+      ],
+      "uncertainty": 0.7777777777777778,
+      "selection": {
+        "alternatives": [
+          {
+            "authorized": true,
+            "blocked": false,
+            "method_available": true,
+            "missing_resources": [],
+            "opportunity_cost": "foregone eligible alternatives shown in this selection",
+            "project_id": "2e7bd3a97a976721f9cf6f3066af25f423e49869b1a8d1d5f836085c2e0dd0f3",
+            "score": 1.0555555555555554,
+            "status": "candidate",
+            "terms": {
+              "cost": 0.5,
+              "learning_value": 0.7777777777777778,
+              "objective_contribution": 0.5,
+              "remaining_uncertainty": 0.7777777777777778,
+              "risk": 0.5
+            },
+            "unmet_dependencies": [],
+            "urgent": false
+          }
+        ],
+        "interrupted_projects": [],
+        "op": "selected",
+        "project_id": "2e7bd3a97a976721f9cf6f3066af25f423e49869b1a8d1d5f836085c2e0dd0f3",
+        "reason": "generic value/uncertainty minus cost/risk policy"
+      }
+    },
+    "alternatives": [
+      {
+        "project_id": "2e7bd3a97a976721f9cf6f3066af25f423e49869b1a8d1d5f836085c2e0dd0f3",
+        "score": 1.0555555555555554,
+        "blocked": false,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.7777777777777778,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "candidate"
+      }
+    ],
+    "reason": "generic value/uncertainty minus cost/risk policy"
+  },
+  "conclusion_memory": [
+    {
+      "id": "27cfed1559bce5f23a582125d35fcbb369b9bb0624627ee54f6611f035a61143",
+      "status": "promoted",
+      "priority": 0.65,
+      "text": "Learning project 3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071: achieved. Cumulative diagnostic replication criterion met across episodes and conditions; not a causal score or SELF certification. Goal: Measure whether signed_command_response repeats across conditions for {'body': 'NE'}. Outcome: {'attempts': 3, 'resolved': 3, 'results': {'supported': 3}, 'episodes': 3, 'conditions': 2, 'support_fraction': 1.0}.",
+      "source": "learning-project:assessment",
+      "tags": [
+        "learning-project",
+        "achieved",
+        "diagnostic"
+      ],
+      "confidence": 1.0,
+      "evidence": "<controlled-workdir>/projects.sqlite3#65c78623c7e613b1cedd63753562aa680f120dd728ee20a4badf11cc5577aa21"
+    }
+  ],
+  "evidence_unchanged": true
+}

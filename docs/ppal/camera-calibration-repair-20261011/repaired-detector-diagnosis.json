@@ -1,0 +1,115 @@
+[
+  {
+    "file": "exposure-ev-0.png",
+    "sha256": "ce8c728d199df1a7a5cd8e0d7e0616f90c7de8f80c4aecd0c4d3dc31940c0e62",
+    "rejections": {
+      "area": 1890,
+      "edge_or_endpoint_support": 1080
+    },
+    "candidate_checks": 2970,
+    "accepted": 0,
+    "hough_lines": 126,
+    "selected_lines": [
+      12,
+      10
+    ],
+    "reason": "No complete game border found; include all corners and aim more squarely at TV",
+    "host_processing_seconds": 1.2922069720000309
+  },
+  {
+    "file": "exposure-ev-1.png",
+    "sha256": "df227888e445a1c88bf818bc95aee5c575e871f09cdbe44eb2d544cafa8ad41e",
+    "rejections": {
+      "area": 1566,
+      "edge_or_endpoint_support": 783
+    },
+    "candidate_checks": 2376,
+    "accepted": 27,
+    "hough_lines": 97,
+    "selected_lines": [
+      12,
+      9
+    ],
+    "best_candidate_support": [
+      0.89,
+      0.9
+    ],
+    "best_support_corners": [
+      [
+        164.24647445286018,
+        100.72276854835334
+      ],
+      [
+        1153.0162098395037,
+        48.47471672832134
+      ],
+      [
+        1173.6356446829543,
+        652.3295942865212
+      ],
+      [
+        194.83196545929604,
+        686.7802413813498
+      ]
+    ],
+    "best_edge_support": [
+      0.97,
+      0.98,
+      0.89,
+      0.98
+    ],
+    "best_endpoint_support": [
+      0.9,
+      0.9,
+      0.9,
+      0.9
+    ],
+    "corners": [
+      [
+        164.5642252996711,
+        106.8112847743431
+      ],
+      [
+        1153.2207504767093,
+        54.46483538934506
+      ],
+      [
+        1173.6356446829543,
+        652.3295942865212
+      ],
+      [
+        194.83196545929604,
+        686.7802413813498
+      ]
+    ],
+    "host_processing_seconds": 1.083812007000006
+  },
+  {
+    "file": "exposure-ev-2.png",
+    "sha256": "b210651fbb4afdbe29ea59696392c44bd734d5b5495f767ff809af2f6d05ed8d",
+    "rejections": {},
+    "candidate_checks": 0,
+    "accepted": 0,
+    "hough_lines": 103,
+    "selected_lines": [
+      0,
+      12
+    ],
+    "reason": "No complete game border found; include all corners and aim more squarely at TV",
+    "host_processing_seconds": 0.11271347999991121
+  },
+  {
+    "file": "exposure-ev-3.png",
+    "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+    "rejections": {},
+    "candidate_checks": 0,
+    "accepted": 0,
+    "hough_lines": 63,
+    "selected_lines": [
+      12,
+      0
+    ],
+    "reason": "No complete game border found; include all corners and aim more squarely at TV",
+    "host_processing_seconds": 0.10259676200007561
+  }
+]

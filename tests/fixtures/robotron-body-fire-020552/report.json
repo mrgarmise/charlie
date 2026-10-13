@@ -1,0 +1,9 @@
+{
+  "result": "EXCERPT: real response samples 18/24 and neutral-setting samples 9/12/15; full archive demonstrated separately",
+  "provenance": {
+    "source_run": "body-fire-bootstrap-20261001-020552",
+    "source_revision": "dfdccde",
+    "fixture": "response fields only"
+  },
+  "steps": []
+}

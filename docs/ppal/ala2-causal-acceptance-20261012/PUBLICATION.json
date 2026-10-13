@@ -1,0 +1,29 @@
+{
+  "implementation_commit": "84de3ffedf5d25d82268b1b1ffe14447dd6b84a8",
+  "implementation_tree": "4ef93a6a1bbbbbf77f2be24770ddfd16e50a8483",
+  "clean_checkout_verified": true,
+  "code_matches_tested_tree": true,
+  "maintained_suite": {
+    "passed": 950,
+    "skipped": 21,
+    "failed": 0
+  },
+  "normal_restart": {
+    "original_records_preserved": 1120,
+    "appended_records": 0,
+    "restart_exact": true,
+    "physical_authorization": false
+  },
+  "causal_controls": {
+    "priority_influence": 14,
+    "changed_choice": 1,
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  },
+  "new_native_pi_acceptance": false,
+  "files": {
+    "published-restart-validation.json": "55da2d613858caa7a7d25acd3a2fce7920127b700cdf484edc4d3845009e26b0",
+    "published-clean-controls.json": "60cf8a1e8e67933c2d20943c55b05b39d4298df2688aab3fa5dc126c2924d210"
+  }
+}

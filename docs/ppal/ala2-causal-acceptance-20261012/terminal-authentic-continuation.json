@@ -1,0 +1,36 @@
+{
+  "records_before": 364,
+  "records_after": 1120,
+  "original_records_preserved": true,
+  "completed_work": {
+    "a244d5c4f10b87b0633b9d80cf862881469948c3f4b718f07bd62abdb836f4ea": {
+      "after": "b77e37e92bf14a465c96ea49f7a7f999cebc2650bf0b7a1df232f4f7e2b9ed32",
+      "before": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "dependency": "df9df32ee5ef9fbaedb5ec79120689311517a7d57aa82496ecaed7a790c8da8e",
+      "next_direction": "Resume retained work",
+      "nonprogress_turns": 0,
+      "op": "developmental_progress",
+      "outcome": "completed",
+      "physical_authorization": false,
+      "previous": null,
+      "progress_occurred": true,
+      "reason": "Committed stage/checkpoint advanced",
+      "resumption_condition": "Same commission resumes after source checkpoint, reviewed resource budget or reconstruction implementation changes",
+      "status": "completed",
+      "work_id": "a244d5c4f10b87b0633b9d80cf862881469948c3f4b718f07bd62abdb836f4ea",
+      "record_id": "66f19acd81c732f88391f8c844dafe5b9a1b0d08a1d9cdb8e040391665727525"
+    }
+  },
+  "status_error": null,
+  "phase": "stopped",
+  "physical_authorization": false,
+  "source_files_unchanged": true,
+  "source_run": "development-20261011-221727/game-01",
+  "source_result": "OBSERVATION UNCERTAIN",
+  "source_reported_score": 800,
+  "qualified_complete_game": false,
+  "source_revision": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+  "physical_score_improvement": "UNKNOWN",
+  "independence": "one preserved gameplay experience, not new physical play or repeated independent trials",
+  "policy_activations": 0
+}

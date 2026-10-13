@@ -1,0 +1,82 @@
+{
+  "original_source_library_id": "libfile_ba180ff80c0c819180c1b41e6732d9bc",
+  "original_source_sha256": "be2754892cdf86af401eae8db37833985e79566906ed59c6e126b5ed292fcc0d",
+  "original_records": 823,
+  "final_records": 1144,
+  "appended_records": 321,
+  "new_artifacts": [
+    {
+      "context_id": "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01",
+      "commission_id": "a30b3e66c82e22fc962360e1ff4d991d234854fb4b072c423bca6d0a3bef3421",
+      "name": "checkpoint",
+      "original_sha256": "283277c556fcb35d5af2a89e187cacfdc15cf4dab86d9a39f41b6fa0e3dc1fbb",
+      "compressed_file": "authentic-19fab8e8ace09f70-checkpoint.json.gz",
+      "compressed_sha256": "09a9178b30d025898351c09de107b9aa54edeeac6cf28c0e639cc546b8ef8bf0",
+      "bytes": 4148272
+    },
+    {
+      "context_id": "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01",
+      "commission_id": "a30b3e66c82e22fc962360e1ff4d991d234854fb4b072c423bca6d0a3bef3421",
+      "name": "result",
+      "original_sha256": "f6dff1fe55b4b24c30977df8e766dbb373ec07ff16e2c052124ffc9519de31c6",
+      "compressed_file": "authentic-19fab8e8ace09f70-result.json.gz",
+      "compressed_sha256": "4082887640739013c71d182496d0c3267a5a5be62107e11f4d0171bd6e925ef1",
+      "bytes": 4149637
+    },
+    {
+      "context_id": "1f448239f69240b7aca67992c1b7c5b08eec484647dea45c63930415de115dd5",
+      "commission_id": "d08ade2579283a4d8cdcb735c7b14dfd7163b57f6bdbbeb6abf5811ecdc69ce4",
+      "name": "checkpoint",
+      "original_sha256": "b55a619aba425246b69f3b9e30b8151a8ca8de918da4a4af2e2099eaa7573590",
+      "compressed_file": "authentic-1f448239f69240b7-checkpoint.json.gz",
+      "compressed_sha256": "43498b13ed278f16bd2501864c587c0c4b837dc2135bf9cde476ece3e5e40657",
+      "bytes": 1670826
+    },
+    {
+      "context_id": "1f448239f69240b7aca67992c1b7c5b08eec484647dea45c63930415de115dd5",
+      "commission_id": "d08ade2579283a4d8cdcb735c7b14dfd7163b57f6bdbbeb6abf5811ecdc69ce4",
+      "name": "result",
+      "original_sha256": "926bf29cae4cc20179de799eda307eca6a10fd55ef1b2c793ff1797fe864aa1e",
+      "compressed_file": "authentic-1f448239f69240b7-result.json.gz",
+      "compressed_sha256": "cc391f3b58ae18eba0b81cc717dfe6768b46f21073ff31a4706e929f9513206a",
+      "bytes": 1672140
+    },
+    {
+      "context_id": "9b1e65c9d5c50f5d33a95d747b56a89be69f142fa6117908bf8aaf38f178fc5e",
+      "commission_id": "3856173c1945006e714a8661c527b68b7182254c70c8229e9bf4b345b07eef4e",
+      "name": "checkpoint",
+      "original_sha256": "c8e6d71b10250a3532251abfececa9182b7be78eca1f1dcb4c0d4ae7e77374cf",
+      "compressed_file": "authentic-9b1e65c9d5c50f5d-checkpoint.json.gz",
+      "compressed_sha256": "1d82c00d11029be03934187a5280129de1736dbc5baad1aefb3fc935486945b9",
+      "bytes": 1704
+    },
+    {
+      "context_id": "9b1e65c9d5c50f5d33a95d747b56a89be69f142fa6117908bf8aaf38f178fc5e",
+      "commission_id": "3856173c1945006e714a8661c527b68b7182254c70c8229e9bf4b345b07eef4e",
+      "name": "result",
+      "original_sha256": "a7c79d72febd6e99200cc013846366e0203ac2b640f0c02642a9dbe2992ea154",
+      "compressed_file": "authentic-9b1e65c9d5c50f5d-result.json.gz",
+      "compressed_sha256": "46571b7be638befe8d28681b6ad003678f00ba5975b86ede53e24292bb0bfbe1",
+      "bytes": 2671
+    }
+  ],
+  "source_checkpoint_hashes": {
+    "04f4a1c62c4646e56493454de0072e98e380b415554108a77e10cabd53eafcfd": "611a5c02c162fb51aaa791020429b6aa52991bf48c4bbfed11ee816a6716622f",
+    "19fab8e8ace09f700ea018b92e0fbf185c5592f3b60839b790ac64f919437e01": "7ae51f511a6f643ce7c1a42f28f0287c4930a356b3fd93045fe5573762a06915",
+    "3e017cbdcf6e81fc0a1cb17904074e320fd2d0dd7ffa4a8fdba4efd44d7d1ea3": "d8da8da56fcf0c795b08511f500be05e0cf9a732b72a60b0a32ad3a79f985800",
+    "4b12283ea4a1e5b0e2c59a31b9a59db69b384661b95aafc6040ab46ec9e6c212": "147e710ddc845dbc27c6958a8819efbff03d80a2f1662fbcd7b59168af58b9d1",
+    "7ecc8949293ee480b1685ad6f78606cd18a464d22389bae4a4b6507355cafdc5": "9267fa2d05f1241f9ae5d841eab799e168c2bf2487a4ca1f9f377f5e957b0285",
+    "d7ba0af50f9fa1301efb05534236296c63884abdd3722f36be32731e5d00393c": "8bb8fb73541f1b37fbaff96602ed08aae2faa3081fc2d5bc17a78d623c828624",
+    "e8e1028f0c6cda025f86f96ea3bed0527c3c087ddf1cce8e5a6aeef2fed1e722": "68b5e5a03d209485a11e8dd07af6296c6d34b8fcd76126c198f0eb5489654005"
+  },
+  "code_parent": "c2afb792f52f5dc9121eac9676ebbd4b608f9de1",
+  "runtime_provenance": {
+    "code_revision": "c2afb792f52f5dc9121eac9676ebbd4b608f9de1",
+    "dirty_worktree": true,
+    "test_environment": "offline process; no hardware capability initialized"
+  },
+  "physical_authorization": false,
+  "qualification": "Authentic preserved native evidence resumed on host; retrospective associations remain unverified",
+  "selective_memory_and_evaluator": "Absent original databases were not inferred; host initialized its own",
+  "restore": "Separate copy only. Verify gzip raw hashes; preserve original ordered documents/commitment times, then append recovery records. Do not replace Pi notebook or create independent experience."
+}

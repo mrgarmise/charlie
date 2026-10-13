@@ -1,0 +1,762 @@
+{
+  "records": 638,
+  "proposal_ids": [
+    "8457511a2a6766c3c175610e28e2caca94b99159d271694d801c2d6f2b02753d"
+  ],
+  "activations": [],
+  "status": {
+    "schema": "charlie-development-status-v1",
+    "phase": "stopped",
+    "last_activity": "waiting for evidence",
+    "current_project": null,
+    "current_question": null,
+    "activity_description": null,
+    "projects": {
+      "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c": {
+        "goal": "Can temporal estimation improve without promoting uncertain track links?",
+        "status": "paused",
+        "progress": {
+          "attempts": 1,
+          "conditions": 0,
+          "episodes": 0,
+          "independent_offline_evidence_units": 0,
+          "independent_physical_episodes": 0,
+          "offline_trials": 0,
+          "resolved": 0,
+          "results": {
+            "unresolved": 1
+          },
+          "support_fraction": null
+        },
+        "next_direction": "Request specific authorization and environment preflight; continue other eligible offline work"
+      },
+      "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343": {
+        "goal": "Can temporal estimation improve without promoting uncertain track links?",
+        "status": "paused",
+        "progress": {
+          "attempts": 1,
+          "conditions": 0,
+          "episodes": 0,
+          "independent_offline_evidence_units": 0,
+          "independent_physical_episodes": 0,
+          "offline_trials": 0,
+          "resolved": 0,
+          "results": {
+            "unresolved": 1
+          },
+          "support_fraction": null
+        },
+        "next_direction": "continue scoped evidence collection"
+      },
+      "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0": {
+        "goal": "The unresolved question may recur in independent experience: action_execution",
+        "status": "paused",
+        "progress": {
+          "attempts": 2,
+          "conditions": 1,
+          "episodes": 1,
+          "independent_offline_evidence_units": 1,
+          "independent_physical_episodes": 0,
+          "offline_trials": 2,
+          "resolved": 2,
+          "results": {
+            "supported": 2
+          },
+          "support_fraction": 1.0
+        },
+        "next_direction": "continue scoped evidence collection"
+      },
+      "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a": {
+        "goal": "The unresolved question may recur in independent experience: death_observability",
+        "status": "paused",
+        "progress": {
+          "attempts": 3,
+          "conditions": 1,
+          "episodes": 1,
+          "independent_offline_evidence_units": 1,
+          "independent_physical_episodes": 0,
+          "offline_trials": 3,
+          "resolved": 3,
+          "results": {
+            "supported": 3
+          },
+          "support_fraction": 1.0
+        },
+        "next_direction": "continue scoped evidence collection"
+      },
+      "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345": {
+        "goal": "The unresolved question may recur in independent experience: ownership_continuity",
+        "status": "paused",
+        "progress": {
+          "attempts": 2,
+          "conditions": 1,
+          "episodes": 1,
+          "independent_offline_evidence_units": 1,
+          "independent_physical_episodes": 0,
+          "offline_trials": 2,
+          "resolved": 2,
+          "results": {
+            "supported": 2
+          },
+          "support_fraction": 1.0
+        },
+        "next_direction": "continue scoped evidence collection"
+      },
+      "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf": {
+        "goal": "The unresolved question may recur in independent experience: score_attribution",
+        "status": "paused",
+        "progress": {
+          "attempts": 3,
+          "conditions": 1,
+          "episodes": 1,
+          "independent_offline_evidence_units": 1,
+          "independent_physical_episodes": 0,
+          "offline_trials": 3,
+          "resolved": 3,
+          "results": {
+            "supported": 3
+          },
+          "support_fraction": 1.0
+        },
+        "next_direction": "continue scoped evidence collection"
+      },
+      "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2": {
+        "goal": "The unresolved question may recur in independent experience: self_uncertainty",
+        "status": "paused",
+        "progress": {
+          "attempts": 2,
+          "conditions": 1,
+          "episodes": 1,
+          "independent_offline_evidence_units": 1,
+          "independent_physical_episodes": 0,
+          "offline_trials": 2,
+          "resolved": 2,
+          "results": {
+            "supported": 2
+          },
+          "support_fraction": 1.0
+        },
+        "next_direction": "continue scoped evidence collection"
+      },
+      "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f": {
+        "goal": "The unresolved question may recur in independent experience: semantic_coverage",
+        "status": "paused",
+        "progress": {
+          "attempts": 2,
+          "conditions": 1,
+          "episodes": 1,
+          "independent_offline_evidence_units": 1,
+          "independent_physical_episodes": 0,
+          "offline_trials": 2,
+          "resolved": 2,
+          "results": {
+            "supported": 2
+          },
+          "support_fraction": 1.0
+        },
+        "next_direction": "continue scoped evidence collection"
+      },
+      "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a": {
+        "goal": "The unresolved question may recur in independent experience: startup_latency",
+        "status": "paused",
+        "progress": {
+          "attempts": 1,
+          "conditions": 1,
+          "episodes": 1,
+          "independent_offline_evidence_units": 1,
+          "independent_physical_episodes": 0,
+          "offline_trials": 1,
+          "resolved": 1,
+          "results": {
+            "supported": 1
+          },
+          "support_fraction": 1.0
+        },
+        "next_direction": "continue scoped evidence collection"
+      },
+      "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df": {
+        "goal": "Can temporal estimation improve without promoting uncertain track links?",
+        "status": "paused",
+        "progress": {
+          "attempts": 1,
+          "conditions": 0,
+          "episodes": 0,
+          "independent_offline_evidence_units": 0,
+          "independent_physical_episodes": 0,
+          "offline_trials": 0,
+          "resolved": 0,
+          "results": {
+            "unresolved": 1
+          },
+          "support_fraction": null
+        },
+        "next_direction": "continue scoped evidence collection"
+      },
+      "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d": {
+        "goal": "Can preserved observations support the existing motion candidates?",
+        "status": "paused",
+        "progress": {
+          "attempts": 2,
+          "conditions": 1,
+          "episodes": 1,
+          "independent_offline_evidence_units": 1,
+          "independent_physical_episodes": 0,
+          "offline_trials": 2,
+          "resolved": 2,
+          "results": {
+            "contradicted": 2
+          },
+          "support_fraction": 0.0
+        },
+        "next_direction": "continue scoped evidence collection"
+      }
+    },
+    "latest_findings": [
+      {
+        "id": "20b311ac80bdddd31e157692a8c5ed24092aa69ae4e466b6f2f35823e59b9703",
+        "error": null,
+        "prediction_id": "ac7dc0d0671021b46448f820578ef1ebe69d1141f8a5e699dbe0731dcc958741",
+        "reason": "Reconstructed hash-bound capture timing; frozen-horizon availability only, identities and performance remain unqualified",
+        "result": "contradicted"
+      },
+      {
+        "id": "23724cc72dcedc3006c7a840608c01c0a584bf5dfb928793d57ad9aa7e687b54",
+        "error": null,
+        "prediction_id": "2930fa10a0e9ff3540d4234a259e785211dc7c0da483ad4cea861a5ea67b89de",
+        "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+        "result": "supported"
+      },
+      {
+        "id": "9ede54c3ccb943a405190537454a3cea39fedbf4562ec06698020f005944a9f1",
+        "error": null,
+        "prediction_id": "ac5710233a8fb02e29f9e57e01b4605920e92ed136e82eaa65bb890da5a53ea5",
+        "reason": "Retrieved frozen experience references; question recurrence only, causal explanation remains tentative",
+        "result": "supported"
+      }
+    ],
+    "rejected_preserved_findings": [],
+    "latest_operational_outcome": null,
+    "developmental_work": {},
+    "turn_outcome": {
+      "progress_occurred": false,
+      "runnable_work_remaining": false,
+      "reason": "No eligible work; retained dependencies unchanged",
+      "next_direction": "Await qualified evidence or capability/dependency change",
+      "meditation": null
+    },
+    "current_activity": {
+      "kind": "waiting",
+      "reason": "No eligible work; retained dependencies unchanged"
+    },
+    "evidence_requests": [
+      {
+        "acceptance_criteria": {
+          "duplicate_capture_overlap": "reject",
+          "identity_status": "independently_verified",
+          "interface": "existing independent_motion_corpus acquisition inbox",
+          "minimum_fresh_final": 3,
+          "minimum_validation": 1,
+          "physical_score_improvement": "UNKNOWN",
+          "source_kinds": [
+            "independent_measurement",
+            "external_annotation"
+          ]
+        },
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Acquisition verifies incoming evidence; existing Reflection selects new comparison and resumes this agenda",
+        "op": "evidence_continuation",
+        "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+        "physical_authorization": false,
+        "prediction_id": "3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019",
+        "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Hash-bound independently verified persistent identities and measured board trajectories",
+          "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+          "One validation and at least three distinct unconsulted final experience groups",
+          "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+        ],
+        "resolution_id": "20e7a3dee0e02357dcc2912b994244892077343f6c6e6a24fbe7f277c91c73d5",
+        "rollback": "Retain baseline and every prior attempt; no physical activation",
+        "servo_authorization": false,
+        "status": "AWAITING_QUALIFIED_EVIDENCE",
+        "uncertainty": "Retrospective track links remain unverified; temporal or association error unresolved",
+        "evidence_id": "edeab8047bd3c20bebce278db7c5c9dce919c6838140532caec7b0a89e297381"
+      },
+      {
+        "acceptance_criteria": {
+          "duplicate_capture_overlap": "reject",
+          "identity_status": "independently_verified",
+          "interface": "existing independent_motion_corpus acquisition inbox",
+          "minimum_fresh_final": 3,
+          "minimum_validation": 1,
+          "physical_score_improvement": "UNKNOWN",
+          "source_kinds": [
+            "independent_measurement",
+            "external_annotation"
+          ]
+        },
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Acquisition verifies incoming evidence; existing Reflection selects new comparison and resumes this agenda",
+        "op": "evidence_continuation",
+        "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+        "physical_authorization": false,
+        "prediction_id": "ab443d5418272e3cb765532f2a2549e581f9c329aab789355da52075bf10aef3",
+        "project_id": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Hash-bound independently verified persistent identities and measured board trajectories",
+          "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+          "One validation and at least three distinct unconsulted final experience groups",
+          "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+        ],
+        "resolution_id": "ee787ba1c4a37696ab77d2358559f2fccd7d7b81a8f4f322adb0b2bfab582efd",
+        "rollback": "Retain baseline and every prior attempt; no physical activation",
+        "servo_authorization": false,
+        "status": "AWAITING_QUALIFIED_EVIDENCE",
+        "uncertainty": "Retrospective track links remain unverified; temporal or association error unresolved",
+        "evidence_id": "4a217010ff4ede372fef4273e984f3cb3d008c06cdb0d4f09c9bbf48346be123"
+      },
+      {
+        "acceptance_criteria": {
+          "duplicate_capture_overlap": "reject",
+          "identity_status": "independently_verified",
+          "interface": "existing independent_motion_corpus acquisition inbox",
+          "minimum_fresh_final": 3,
+          "minimum_validation": 1,
+          "physical_score_improvement": "UNKNOWN",
+          "source_kinds": [
+            "independent_measurement",
+            "external_annotation"
+          ]
+        },
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Acquisition verifies incoming evidence; existing Reflection selects new comparison and resumes this agenda",
+        "op": "evidence_continuation",
+        "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+        "physical_authorization": false,
+        "prediction_id": "81ac3dbee03e461066de5aa4396685f6cbd74b793dfb11dd5d1b9cfa33a58e91",
+        "project_id": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Hash-bound independently verified persistent identities and measured board trajectories",
+          "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+          "One validation and at least three distinct unconsulted final experience groups",
+          "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+        ],
+        "resolution_id": "27a53fd2f0cf98f1db8429d9d5b16f66fe1216a9b78fecada158eb034d1f2cdf",
+        "rollback": "Retain baseline and every prior attempt; no physical activation",
+        "servo_authorization": false,
+        "status": "AWAITING_QUALIFIED_EVIDENCE",
+        "uncertainty": "Retrospective track links remain unverified; temporal or association error unresolved",
+        "evidence_id": "ce56f59bdbfe02ec44dda3fd7298320b6f5d1f3326bc792c660a066e8e07517b"
+      },
+      {
+        "candidate_admitted": false,
+        "firmware_authorization": false,
+        "next_direction": "Await separately authorized acquisition; resume this project only after new qualified evidence",
+        "op": "evidence_continuation",
+        "original_question": "Can preserved observations support the existing motion candidates?",
+        "physical_authorization": false,
+        "prediction_id": "ac7dc0d0671021b46448f820578ef1ebe69d1141f8a5e699dbe0731dcc958741",
+        "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+        "qualification_keys": [
+          "3a755dc5bc9b3f72bfdf051e153cae452d88b4d2c5f867bd044b56ff16c93df4",
+          "43d75ac9ef8e014cdc5d1257e4c65ce5c46fc93f77d1fb94473c8f78e055dfdf",
+          "5518b79b76bef23eee16a345c846a1e5ee25650049dc960dfcbf5b7dac6fe06d",
+          "ee8e13fdd01e2c504d914421e58258460f28f19f9fe568d0f923807c72ff84cd"
+        ],
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+          "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+          "Independent persistent player/object identities and board coordinates",
+          "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+        ],
+        "resolution_id": "20b311ac80bdddd31e157692a8c5ed24092aa69ae4e466b6f2f35823e59b9703",
+        "rollback": "Keep baseline; no candidate activation or final-test reuse",
+        "servo_authorization": false,
+        "status": "READY_FOR_PLAY",
+        "evidence_id": "d54c86b59382b826f7fe3293b9a07ae0113367416796c7d863a8f8c97c089294"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "8433de0705a0c7eab914f60fbbf098caca6eb15c9b812b1da96c5d1f96fa7205",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Investigate the retained Executive evidence dependency",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "At least one validation and three distinct unconsulted final motion episodes with observed 150ms +/-25ms pairs",
+          "Candidate-specific native Pi cadence/ownership/reacquisition/recovery/rollback qualification",
+          "Independent persistent player/object identities and board coordinates",
+          "Synchronized start/terminal/HUD captures with independently qualified score channel and score reader"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "6064e90d18400bdb450fecc63c47b65d1e0f1e74be23da15bcc754f00ba9a1f5",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Investigate the retained Executive evidence dependency",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Hash-bound independently verified persistent identities and measured board trajectories",
+          "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+          "One validation and at least three distinct unconsulted final experience groups",
+          "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "f786e33e405bc8c1dfadca878d990bfb889f7adf7377b778d7e48d50b63ba5f2",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Investigate the retained Executive evidence dependency",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Hash-bound independently verified persistent identities and measured board trajectories",
+          "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+          "One validation and at least three distinct unconsulted final experience groups",
+          "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "63d2f97ab361cf8e17b703c72793ae96c8cca74330b38c9d9a1e4d50bdd79343"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "09461702bd27ea97dfb5c7be8b819f947e91f43a6a8a4c4926fad7083a5d13b8",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Investigate the retained Executive evidence dependency",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Hash-bound independently verified persistent identities and measured board trajectories",
+          "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+          "One validation and at least three distinct unconsulted final experience groups",
+          "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "75481e2f0435e7c80dd3d8156aa717422cc05411c30156890807c4f01c3969df"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "5ed2bb07d4249d99b489ad328c39645136af102e2d48b29f95818bfce8ac6d6f",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Existing portfolio prerequisites are unavailable",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Offline result awaits independent new evidence; preserve questions"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "25539765ff7bae08ad4a5b67579dd32e625957751dadd0a6c4192eb349421ec0",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Existing portfolio prerequisites are unavailable",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Offline result awaits independent new evidence; preserve questions"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "f988c0d9e395ee910f9c95ca4161c8ce38089b8fde427e1a9078adeb131abb3d",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Existing portfolio prerequisites are unavailable",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Offline result awaits independent new evidence; preserve questions"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "300bc23773e486068c142673243e020ee56800399d9861054639aedb27bf6157",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Existing portfolio prerequisites are unavailable",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Offline result awaits independent new evidence; preserve questions"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "5c973a2a52e72b729e04668b8c2d629dbcc7aa492876c981825bc1dc646b24d6",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Existing portfolio prerequisites are unavailable",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Offline result awaits independent new evidence; preserve questions"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "ddd610b79e4222ef74eb2aff0fc5124ad61bad71095c31874223e4271396847d",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Existing portfolio prerequisites are unavailable",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Offline result awaits independent new evidence; preserve questions"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f"
+      },
+      {
+        "category": "learning_evidence_request",
+        "dependency_key": "407fd69b26ee708d12b639a408d4cfe0f8ea28287b5ed85aab709847227ce94a",
+        "firmware_authorization": false,
+        "fulfillment": "Independently qualified acquisition delivery or recorded resource/capability change; Executive checks eligibility",
+        "method": "developmental-dependency",
+        "physical_authorization": false,
+        "reason": "Existing portfolio prerequisites are unavailable",
+        "request_kind": "evidence_acquisition_only",
+        "required_evidence": [
+          "Offline result awaits independent new evidence; preserve questions"
+        ],
+        "servo_authorization": false,
+        "status": "AWAITING_DEPENDENCY",
+        "work_id": "a462c4c277d38d0f7f7457ff08f65709e240065936d37c07b87a850c95882a8a"
+      }
+    ],
+    "identity_conflicts": [],
+    "activation": null,
+    "physical_authorization": false,
+    "physical_score_improvement": "UNKNOWN",
+    "error": null,
+    "provenance": {
+      "code_revision": "12c155d95afd0ec9daf95d9d1127d5cbcc8e1b6a",
+      "dirty_worktree": true,
+      "test_environment": "offline process; no hardware capability initialized"
+    },
+    "resources": {
+      "cpu_cores": 2,
+      "memory_budget_mb": 768,
+      "temperature_limit_c": 75.0,
+      "ownership_poll_seconds": 0.05,
+      "resident_bytes": 85868544,
+      "owned_worker_count": 0,
+      "peak_rss_bytes": 92798976,
+      "peak_owned_resident_bytes": 86777856,
+      "cpu_seconds": 2.2264280000000003,
+      "temperature_c": null,
+      "thermal_sensor_available": false,
+      "ownership_checks": 4
+    },
+    "analytical_progress": [
+      {
+        "context_id": "3e2df517ee10da6d0b4ff4cf0f88c53c039ff059224916b6b780c33ff70b81e1",
+        "checkpoint_available": true,
+        "completed_iterations": 5,
+        "completed_left_tracks": 0,
+        "neighbor_cursor": 0,
+        "retained_plausible_links": 0,
+        "reconstructed_links": 102,
+        "interpretation": "Computational progress only; reconstructed identities remain unverified"
+      },
+      {
+        "context_id": "e9a4b8ac1925c7be7c372a640a2b24083a701bf8d6382489b58d7c9a87cbd54e",
+        "checkpoint_available": true,
+        "completed_iterations": 1,
+        "completed_left_tracks": 0,
+        "neighbor_cursor": 0,
+        "retained_plausible_links": 0,
+        "reconstructed_links": 0,
+        "interpretation": "Computational progress only; reconstructed identities remain unverified"
+      }
+    ],
+    "authorization_requests": [
+      {
+        "alternatives": [
+          {
+            "checkpoint": "/workspace/scratch/ef0174068eca/meditation-admission-final-20261003/models/3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019/ff934a962b96d937ebaa1dc5c9830b234dcf31cdb6f6d9215ced223be5228e7c.json",
+            "checkpoint_sha256": "8de707093fe770a4aa2306478fb9d6e6c3dab87f5d07ee89aefc652b3651a7de",
+            "identifier": "ff934a962b96d937ebaa1dc5c9830b234dcf31cdb6f6d9215ced223be5228e7c",
+            "originator": "Reflection",
+            "source_evidence": [
+              "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5"
+            ],
+            "spec": {
+              "adapter": "meditation-motion-v1",
+              "horizon_seconds": 0.15,
+              "max_speed": 100.0,
+              "velocity_alpha": 0.35
+            }
+          },
+          {
+            "checkpoint": "/workspace/scratch/ef0174068eca/meditation-admission-final-20261003/models/3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019/531d952746dde4f0fbbce325ea9061efc5d9ff13efa25fcfb6b490c665b06bad.json",
+            "checkpoint_sha256": "e479616930c0db271f756361ef453423decf2217063d97a35aafc2fa98531239",
+            "identifier": "531d952746dde4f0fbbce325ea9061efc5d9ff13efa25fcfb6b490c665b06bad",
+            "originator": "Reflection",
+            "source_evidence": [
+              "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5"
+            ],
+            "spec": {
+              "adapter": "meditation-motion-v1",
+              "horizon_seconds": 0.15,
+              "max_speed": 100.0,
+              "velocity_alpha": 0.65
+            }
+          },
+          {
+            "checkpoint": "/workspace/scratch/ef0174068eca/meditation-admission-final-20261003/models/3aab257e20a991830e43b456652bc00b6ae9c511dbf3e01fe402413032719019/b575a671d64812a6993329902d783eb3db88fdac64f9c5459f0b65d4054f4d5c.json",
+            "checkpoint_sha256": "e4a9fa75a07b1bcafc7865074480a7ec76eb63c83651ad6381df9be3ae18964c",
+            "identifier": "b575a671d64812a6993329902d783eb3db88fdac64f9c5459f0b65d4054f4d5c",
+            "originator": "Reflection",
+            "source_evidence": [
+              "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5"
+            ],
+            "spec": {
+              "adapter": "meditation-motion-v1",
+              "horizon_seconds": 0.15,
+              "max_speed": 100.0,
+              "velocity_alpha": 0.85
+            }
+          }
+        ],
+        "authorization": {
+          "firmware": false,
+          "gameplay": false,
+          "offline_investigation": false,
+          "offline_shadow": false,
+          "persistent_policy": false,
+          "servo": false
+        },
+        "bookmark_id": "edeab8047bd3c20bebce278db7c5c9dce919c6838140532caec7b0a89e297381",
+        "candidate_qualified": false,
+        "category": "gameplay_experiment_proposal",
+        "constraints": [
+          "Existing resource, thermal and independent physical authorization gates",
+          "No Guide/Home; no game switching; no servo movement or firmware changes",
+          "A live game is not stopped merely because an offline analysis budget expires"
+        ],
+        "environment": {
+          "hardware": "Raspberry Pi 5",
+          "host": "charlie",
+          "preflight_required": [
+            "Bind current code revision, frozen baseline hash, camera/calibration and controller configuration before specific approval"
+          ]
+        },
+        "evaluation_id": "6aa5ee3cd0e1b1554dd23f0180faadd5288a8cca6e40bc0669cf1da10b9d5cf8",
+        "execution": "staged only; existing physical gates must receive separate experiment-specific authorization",
+        "expected_observation": "New camera sequences and recorded actions may separate temporal-estimation error from incorrect historical associations",
+        "hypothesis": "An independently qualified temporal candidate improves held-out motion error",
+        "interpretation": {
+          "contradiction": "Independently measured error fails to improve against baseline",
+          "inconclusive": "Missing/ambiguous identities, calibration, timings, boundaries or independent measurements; preserve alternatives",
+          "support": "Independently measured held-out motion error below the frozen baseline"
+        },
+        "measurements": [
+          "Original hash-bound camera frames with capture clock and acknowledged command timing",
+          "Verified game start and terminal boundaries, independent complete-game SCORE annotation",
+          "Independently reviewed identities, calibration and measured trajectories; ambiguous outcomes remain unresolved"
+        ],
+        "meditation_id": "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5",
+        "op": "experiment_staged",
+        "original_question": "Can temporal estimation improve without promoting uncertain track links?",
+        "original_requirements": [
+          "Hash-bound independently verified persistent identities and measured board trajectories",
+          "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+          "One validation and at least three distinct unconsulted final experience groups",
+          "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+        ],
+        "physical_authorization": false,
+        "portfolio_selection": [
+          {
+            "authorized": true,
+            "blocked": false,
+            "method_available": true,
+            "missing_resources": [],
+            "opportunity_cost": "foregone eligible alternatives shown in this selection",
+            "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+            "score": 2.0999999999999996,
+            "status": "paused",
+            "terms": {
+              "cost": 0.1,
+              "learning_value": 0.8,
+              "objective_contribution": 0.5,
+              "remaining_uncertainty": 1.0,
+              "risk": 0.1
+            },
+            "unmet_dependencies": [],
+            "urgent": false
+          }
+        ],
+        "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+        "proposal_id": "69a07dcf7f557c136da9b7f544b0c90a0e7ebcde7e658c9e2b9e821b657991d4",
+        "requested_permissions": [
+          "robotron-gameplay:one-baseline-game",
+          "offline-shadow:listed-temporal-candidates"
+        ],
+        "rollback": "Candidates remain unactivated; restore neutral controller through existing shutdown and preserve the frozen baseline and all attempts",
+        "score_improvement": "UNKNOWN",
+        "search_id": "6de2c81f9c579a956ae0e6f8c12b42ac28133a8c085c834a7f029e73796f779b",
+        "status": "AWAITING_SPECIFIC_AUTHORIZATION_AND_ENVIRONMENT_PREFLIGHT",
+        "stopping": [
+          "Verified terminal state after one game",
+          "Operator cancellation",
+          "Existing safety/resource/controller interruption"
+        ],
+        "trial_scope": {
+          "candidate_activation": false,
+          "game": "robotron",
+          "maximum_candidate_shadows": 3,
+          "maximum_games": 1
+        },
+        "variation": "Collect one game using the frozen existing baseline; compare all retained Reflection temporal alternatives offline without controller output"
+      }
+    ]
+  }
+}

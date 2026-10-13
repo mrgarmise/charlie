@@ -1,0 +1,157 @@
+{
+  "original_records": 1144,
+  "source_export_sha256": "be2754892cdf86af401eae8db37833985e79566906ed59c6e126b5ed292fcc0d",
+  "recovered_pixels": [
+    {
+      "example": "98401c04498e4307a9ff876b5aff1ec4944d9a14990be74c59e9266acfcf1a6c",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-003511/development-20261002-003511/game-01/review-000-0-gameplay.jpg",
+      "sha256": "bf52abb6f741e8d3e042cf1944adadc6ed7450eb7104e8b2fc068d04741c6c32",
+      "pixel_sha256": "fc125230c7a407e9a2add3360dfe30600bb03da0285ad6f63412c1c1c13e04bc"
+    },
+    {
+      "example": "bea6676d085b21c5ddc5a1e1d50e44f4c8b236db629fcd9725bdff74d6714912",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-003511/development-20261002-003511/game-01/review-001-10-identity-loss.jpg",
+      "sha256": "710bc5af5288f9c6112b7e0d6c069e7fe8cf6acc71469f898f38e0783a51f67e",
+      "pixel_sha256": "9ba7a06969c643defc9b53bf3974a9a624bcd7beb027acfd1f4b214be1c5ed5e"
+    },
+    {
+      "example": "ebf3e328d38dec62c863a404d36d3fd377bed21e2ce1e55a3f102c1e31f6fe27",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-003511/development-20261002-003511/game-01/review-003-22-final-view.jpg",
+      "sha256": "0c15effa825ce8d643a401efa9c48f370f62f4544cf7ef2188a7da1c3353cfc3",
+      "pixel_sha256": "fd46b194f13ef6a081976d28d14698d10e06f4fe8cee390b7c2db62cc78533e9"
+    },
+    {
+      "example": "5115cde36762fe2c5c0984be44e6c3a9fa66a32efdce5209cb18a7e30d365eb6",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-003511/development-20261002-003511/game-01/review-003-22-final-view.jpg",
+      "sha256": "0c15effa825ce8d643a401efa9c48f370f62f4544cf7ef2188a7da1c3353cfc3",
+      "pixel_sha256": "fd46b194f13ef6a081976d28d14698d10e06f4fe8cee390b7c2db62cc78533e9"
+    },
+    {
+      "example": "0161fb3c8bdab5f3281140d46f644561c4dd34641d4bae07ffb0a16181df27de",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-005944/development-20261002-005944/game-01/review-000-0-gameplay.jpg",
+      "sha256": "25ce0a62b36c00bc96c65e6ae412cf47dcfa813e77583e9dd980b654a8851c9e",
+      "pixel_sha256": "174c66cc32c949f9f8bae371b12c92e65019c4f13d017de3c0d072f8c96181ec"
+    },
+    {
+      "example": "30a1cdfd12de2a0cd9a6630d61dd4fb9756523ce84aec5e8222eb138a8295e49",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-005944/development-20261002-005944/game-01/review-001-3-identity-loss.jpg",
+      "sha256": "747b4ce5fe240ec3c19acab8821250241165631e9fab31ff8db33817e98657ae",
+      "pixel_sha256": "fbb8588464e17833750b6461ae58ec5cacca318ec9a9d8b406ef2c990f6408b3"
+    },
+    {
+      "example": "b00b41872344a36906cdfea102f621b25f5a20cea9f195d7635c6e1fde297473",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-005944/development-20261002-005944/game-01/review-002-38-identity-loss.jpg",
+      "sha256": "06f0f032271b3ff5ee5a9ae493c597476bf3f2157c031fae46ff5370f0a04664",
+      "pixel_sha256": "a11ba210229eaa539e33836b460edefc734697c5fc5480ee61c2e4b3a9cb84ad"
+    },
+    {
+      "example": "56864f85dec3b28f34ffe97bf1451e223ac5c577e874a6b0161c4a1494b94dea",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-005944/development-20261002-005944/game-01/review-003-50-gameplay.jpg",
+      "sha256": "39ace95111848ed5cfcea849a1eff51e3952c3b628999b63156192a458812f47",
+      "pixel_sha256": "8ab973bc585ea41c0a3ddd4a0cf8a0f1e2c442312ac1c4bf116fb4208676474a"
+    },
+    {
+      "example": "f3ea38bca82677be87e9331debe4bc65b8ff75534be9ed840366bd20fec9916b",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-005944/development-20261002-005944/game-01/review-004-67-identity-loss.jpg",
+      "sha256": "253a8e83cca7388ef46b4e04cfe8d2ead8636e1202068b5256b9316c42a24e62",
+      "pixel_sha256": "3e8df7c6e0ea2e3c652e87a8cb190b7d7c00fb332f4831289eadc99e7cbee470"
+    },
+    {
+      "example": "bcbc3a5bd5c3e6e696cd18bb51d9347d0010637c75a0d1fa78e27bf0d626a873",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-005944/development-20261002-005944/game-01/review-005-69-identity-loss.jpg",
+      "sha256": "faedd73bc51524307d10b4bd2d9ea7c463a024c35482c5c8dc52187ebecf59a9",
+      "pixel_sha256": "8511e454a0c87eba1606aefd663a69aed33add7892a871843fd2ef0e13f5e6fb"
+    },
+    {
+      "example": "f156ed79cb5d488fcb801ff95489a65f5b229a97359e911b61a7a92bf56660ab",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-005944/development-20261002-005944/game-01/review-006-94-final-view.jpg",
+      "sha256": "87a7107ebb9074bbcc84cb01cf1375567b15d2e4ee71e1c57ad77c294190451d",
+      "pixel_sha256": "2dbb06e7af17a592faf7fda0a33354edeed5ee0491d4358191a48bc9d494558e"
+    },
+    {
+      "example": "439788af351fbcdb29a252f7acd3fcfbeb5c0fbb91c05e9768a80423a05c0e37",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-012801/development-20261002-012801/game-01/review-000-0-gameplay.jpg",
+      "sha256": "b4d0b28cc54287e66ccb40e179818d2777140f52154167cedc8a66b8b4b4b451",
+      "pixel_sha256": "294d1de9a20b0c3d99daa4c4c8589ed7c4990bba0249f08506884117fc30616c"
+    },
+    {
+      "example": "a54782751f593f167e55ac244183e77ed695bece700354342391995fd02d59e0",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-012801/development-20261002-012801/game-01/review-001-8-identity-loss.jpg",
+      "sha256": "17d6e0fb03857c3c30fd34ca973331c9cb98e4eb2866f982a652848fbe1b4f3b",
+      "pixel_sha256": "392966f153532a86f7b93398c460a356576e239213ea7a67d8af682970ecc836"
+    },
+    {
+      "example": "3aadc111e3c8ac59e6d43b6a8995de8b5bd85126b1c7308ec1aa954a5c43f193",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-012801/development-20261002-012801/game-01/review-002-27-identity-loss.jpg",
+      "sha256": "f94950776ed97079cbe196ea4a1789e276b2d43877ad3bc41f9692c53019d083",
+      "pixel_sha256": "1ae01deb0e3ac16ecbd92328f35d1d2c3115cdcd63a2d377d9d4b68326e21e9c"
+    },
+    {
+      "example": "bf35ca7002f72e8383fa583b4666f00f0032bc078367718c4342a0e1ed731fa0",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-012801/development-20261002-012801/game-01/review-003-32-identity-loss.jpg",
+      "sha256": "58e37f92d7762d408bc7b7a8a14205ca3c23d4c7cab9f361c05d271656ce7d33",
+      "pixel_sha256": "8f83f18fb8c4cc6dec7def64a11668d4f8be8add17738fdf30bb3cea00a89004"
+    },
+    {
+      "example": "bebbe248d6c6e6f02a01a924fb84b2f374751e411aeceb535acb71c4f1ed8fe2",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-012801/development-20261002-012801/game-01/review-004-43-identity-loss.jpg",
+      "sha256": "a2b6aa0687bd0fcb41dc1e6955f6b692d495a7e77fca16792f919f235d7673c2",
+      "pixel_sha256": "b73b82f765e56ff2c0f5f5743647807b409f673a51c34be012c6c6fbb41f1480"
+    },
+    {
+      "example": "743548b6d771a5dbecfe056314225a33f01d149478f5992be4c511d9a0302e42",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-012801/development-20261002-012801/game-01/review-005-45-identity-loss.jpg",
+      "sha256": "b6c30f022eb8391bf3a8ace7a9f14f7cdbc587aa6b7dcd9bae13dfd24fe5b892",
+      "pixel_sha256": "dce36fc1238efd830479a93892e30fad95a7ac4b416f87cff8466f4835e27246"
+    },
+    {
+      "example": "1cbbd15cee115341a67e4cf5d9e804b092d9e6f1808a91a0969e04e3eb880244",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/development-20261002-012801/development-20261002-012801/game-01/review-006-69-final-view.jpg",
+      "sha256": "fe1e2e8e3fa8800bb5eeae6c8dcece456dba26ba165fd9857f4fdd44166cc560",
+      "pixel_sha256": "9979ad34c026a7cbb66e90e61d0151b6448e2c3bcb94f7f122f65979441f799c"
+    },
+    {
+      "example": "5aa5753de044bc2857f1d5ab4849a2847c05067be9471e399b11e83fb5777add",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/charlie-game-20261004/robotron-runs/play-20261004-205356/review-000-0-gameplay.jpg",
+      "sha256": "f703f6859a298c8a10038ec64a23a5e897f016a389735c5c132e4fa46e9baa3b",
+      "pixel_sha256": "6d4ab7bbae82c50b259cef2915addacc10e18b204cbf8b222ee2f27b0517000f"
+    },
+    {
+      "example": "7f5fc18fda8fe92b3fb04337e5f19234b1c1cafa7598cca1efc22f0a9e4e781a",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/charlie-game-20261004/robotron-runs/play-20261004-205356/review-001-7-identity-loss.jpg",
+      "sha256": "2630b48b250c359f6c2780f9ed651996b83cf1077de792d466bc1422a23f5f20",
+      "pixel_sha256": "2d43a0a27ee5de4121b733378d6cdac51fae1f1a5bb49a935c38ba4e5c3fd936"
+    },
+    {
+      "example": "66e109ca65f27565bbfcd7e2c69dff31c90963c9262ac724507f2171cce494f3",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/charlie-game-20261004/robotron-runs/play-20261004-205356/review-002-9-identity-loss.jpg",
+      "sha256": "e51b285286f497db7e6dc1c473e45a28f161745584586df60ee9303cba2e1f3b",
+      "pixel_sha256": "9116264670f4d11c2852a55cf9be00383d16c82478cbf6e974f6298f8e20582b"
+    },
+    {
+      "example": "5f7c4fdc107ebc157a3d6834b0d88ceea688335e2d6958a339101c0265c7653f",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/charlie-game-20261004/robotron-runs/play-20261004-205356/review-003-27-identity-loss.jpg",
+      "sha256": "22babb97ade433d28bac5b39b4de02a626543325f2930739ce6394f89fa2befd",
+      "pixel_sha256": "a1249a24363400143bed8c3c1a5134e0800aeba5154ec7360a3adf82d578a41a"
+    },
+    {
+      "example": "8af75aefac05c6f6c2945ed700a4d812799bc6b0708d911b215fec4f3d4bfee6",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/charlie-game-20261004/robotron-runs/play-20261004-205356/review-004-29-identity-loss.jpg",
+      "sha256": "822f50ae81a5fe6385d7ab68a6a96a53942070576d0d9a9adf266df299a63389",
+      "pixel_sha256": "d589cd7c038ec5034e9d3d04cf5600ee5a604f253704f64e9a7d43aa06053b2c"
+    },
+    {
+      "example": "52e87df377a2fad1a04b98c4f04acd67c1a311d7c427c94e65ae06d6c82c1d0c",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/charlie-game-20261004/robotron-runs/play-20261004-205356/review-006-33-final-view.jpg",
+      "sha256": "63f101d0e5552f26256378d3645dfcbae1abb580848585547e37512609ba4a6c",
+      "pixel_sha256": "77b3deb23c242419f09e13c82004db4ec68680803abd7fded9c3d18a35fcd67e"
+    },
+    {
+      "example": "d968f5e76682e03aefa11d1cf95c27b920f779aec2ba06ce804d8daec0032dc0",
+      "original": "/workspace/scratch/c81a2d35e2bc/authentic-evidence/original-archives/charlie-game-20261004/robotron-runs/play-20261004-205356/review-006-33-final-view.jpg",
+      "sha256": "63f101d0e5552f26256378d3645dfcbae1abb580848585547e37512609ba4a6c",
+      "pixel_sha256": "77b3deb23c242419f09e13c82004db4ec68680803abd7fded9c3d18a35fcd67e"
+    }
+  ],
+  "physical_authorization": false
+}

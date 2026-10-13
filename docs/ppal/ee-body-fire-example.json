@@ -1,0 +1,99 @@
+{
+  "episode": "episode:71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+  "source_run": "body-fire-bootstrap-20261001-020552",
+  "source_revision": "dfdccdefe6d875253e5b0ef32ae53accc1d5286e",
+  "source_dirty_worktree": true,
+  "observation_count": 214,
+  "replay_models": {
+    "cv-window-3-tolerance-2-v1": {
+      "supported": 1370,
+      "unresolved": 245,
+      "contradicted": 186
+    },
+    "cv-window-5-tolerance-4-v1": {
+      "supported": 1508,
+      "unresolved": 245,
+      "contradicted": 48
+    }
+  },
+  "reflection": {
+    "episode": "episode:71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+    "findings": [
+      {
+        "version": "cv-window-3-tolerance-2-v1",
+        "results": {
+          "supported": 1370,
+          "unresolved": 245,
+          "contradicted": 186
+        },
+        "promoted": true,
+        "evidence_ids": [
+          "183476e257440c97c510d5e1c6c540a49f268ed83b44601586805e7ed0d7997d",
+          "528b313fa1f46f58580070fa98a06621c8df454feebcb27688ca7057605a9872"
+        ]
+      },
+      {
+        "version": "cv-window-5-tolerance-4-v1",
+        "results": {
+          "supported": 1508,
+          "unresolved": 245,
+          "contradicted": 48
+        },
+        "promoted": true,
+        "evidence_ids": [
+          "faa873b31e7972347a767bde494548ccb6ed0244e7216c8eb360bb3460e784da",
+          "9adc251058058449b5168c7c1d1f2306ae473cae4f725bb8473b84fc4b456549"
+        ]
+      }
+    ],
+    "policy_updated": false,
+    "memory_path": "Experience -> MemoryGateway -> MemoryEvaluator -> existing JsonlStore (demo); MARM outbox in normal CLI"
+  },
+  "annotation": {
+    "at": null,
+    "episode": "episode:71e631d74e1d5f86dedac8efc8c88e7f4ee4b286e81e3b789f3a5dd05f801123",
+    "kind": "observation",
+    "payload": {
+      "category": "human_report",
+      "quotation": "He scored 400! All him!",
+      "score": 400,
+      "semantic_status": "human annotation; not sensor output",
+      "source": "user:Alex"
+    },
+    "producer": "user:Alex",
+    "provenance": {},
+    "schema": "charlie-evidence-v1",
+    "sources": [],
+    "version": "1"
+  },
+  "superseded_memory_id": "be1c875a64da5fe3547708b10a41a38f369882457171114afee9f219638602a1",
+  "memory_history": [
+    {
+      "id": "8135e3c7802e085915d35820e4b5b883a418edb47eda1e009912b5dd7d86c729",
+      "status": "promoted",
+      "priority": 0.65,
+      "text": "Alex reports the game score was 400; observer baseline 888 conflicts and remains preserved."
+    },
+    {
+      "id": "be1c875a64da5fe3547708b10a41a38f369882457171114afee9f219638602a1",
+      "status": "superseded",
+      "priority": 0.52,
+      "text": "Working score interpretation: observer accepted 888; environmental score remains unverified."
+    },
+    {
+      "id": "ca9cee88fd6ea358e40c102cced84e99e6a3603a9603fb0ff0d6119166e6e537",
+      "status": "promoted",
+      "priority": 0.52,
+      "text": "Replay model cv-window-5-tolerance-4-v1: {'supported': 1508, 'unresolved': 245, 'contradicted': 48}. These are diagnostic replay tests, not live commitments or causal game rules."
+    },
+    {
+      "id": "47b1ef50764c73e87f0efc93cf8ebcd14691de59fd1b4d19e648ec415523ba94",
+      "status": "promoted",
+      "priority": 0.52,
+      "text": "Replay model cv-window-3-tolerance-2-v1: {'supported': 1370, 'unresolved': 245, 'contradicted': 186}. These are diagnostic replay tests, not live commitments or causal game rules."
+    }
+  ],
+  "source_unchanged": true,
+  "live_prediction_claim": false,
+  "live_policy_changed": false
+}

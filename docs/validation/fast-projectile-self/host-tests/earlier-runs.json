@@ -1,0 +1,30 @@
+{
+  "focused.log.gz": {
+    "sha256": "11473050d330ccb0e61129d05a2fef5f1807a573873e5f81d174c5a596ed483d",
+    "description": "First focused run: 4 failures (three provisional expectation updates plus floating-point boundary fix)."
+  },
+  "collection.log.gz": {
+    "sha256": "3318781535652d48dece4657b6d89f9159ce5042be947f8ab70c2c54fc758d3a",
+    "description": "Mistaken repository-root collection: 4 legacy hardware import errors; absent serial port attempt failed."
+  },
+  "collection.xml.gz": {
+    "sha256": "f4fafe7fa48549fe54a1e313d147ea441ff4607297c7570f0198af4a9f530176",
+    "description": "Mistaken repository-root collection: 4 legacy hardware import errors; absent serial port attempt failed."
+  },
+  "pre-final.log.gz": {
+    "sha256": "37d3af62ce20d7dbb7c464bf9b994161f3e202729c90d7e807d58fdd1107434d",
+    "description": "First complete tests/ suite: 1287 passed, 9 failed, 21 skipped; legacy protocol/ID/provisional assumptions then updated."
+  },
+  "pre-final.xml.gz": {
+    "sha256": "79e4ba5bea215b2c9d4b49f631c110bc91939e89c1cd6ea85c808f2b6617098c",
+    "description": "First complete tests/ suite: 1287 passed, 9 failed, 21 skipped; legacy protocol/ID/provisional assumptions then updated."
+  },
+  "interrupted.log.gz": {
+    "sha256": "8924c2ed27732cc4980de75a54a0383d2f0bbf6bacf1e565c0b05150638aef4f",
+    "description": "Run interrupted before finalization to retain the original three-second recovery action budget."
+  },
+  "targeted.log.gz": {
+    "sha256": "eb232bb28db28c290a460e5b8dde7ca13c47b051baf8cd29eaaa14b27a880610",
+    "description": "90 focused tests passed before final full suite."
+  }
+}

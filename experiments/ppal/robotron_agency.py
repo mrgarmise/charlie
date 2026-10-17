@@ -3,6 +3,7 @@ import time
 import math
 
 from .agency import AgencyTracker
+from .projectile_agency import ShotOrigins
 from .eyes.tracking import SpriteTracker
 from .models import Action
 
@@ -13,8 +14,11 @@ VECTORS = {'E': (1, 0), 'W': (-1, 0), 'S': (0, 1), 'N': (0, -1),
 
 class VisualAgency:
     """Track every visible region, independent of its taught identity."""
-    def __init__(self, *, bootstrap_body_fire=False):
+    def __init__(self, *, bootstrap_body_fire=False, projectile_confirmation=False):
         self.bootstrap_body_fire = bootstrap_body_fire
+        self.projectile_confirmation = projectile_confirmation
+        self.shots = ShotOrigins()
+        self.spawn_prior = True
         self.tracker = SpriteTracker()
         self.agency = AgencyTracker()
         self.tick = 0
@@ -44,10 +48,29 @@ class VisualAgency:
                 if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
                     lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
                                     "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
         snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
-                                   interval_seconds=interval_seconds, reference_positions=reference_positions)
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+        shot_id = self.shots.confirmed
+        contradicted=any(row['track_id']==shot_id and row['reason'] in
+            ('wrong_way','nonresponse_or_off_axis','continued_during_neutral') for row in snapshot['evidence'])
+        if (shot_id not in self.positions or snapshot.get('global_motion') or contradicted
+                or (shot_id in self.tracker.active and self.tracker.active[shot_id].identity_uncertain)):
+            self.shots.confirmed = None
+            if shot_id is not None or snapshot.get('global_motion'):self.shots.votes.clear()
+        if self.projectile_confirmation and self.shots.confirmed is not None:
+            self.agency.self_id = self.shots.confirmed
+            self.agency.last_confirmed_id = self.shots.confirmed
+            snapshot['self_track_id'] = self.shots.confirmed
+            snapshot['confirmation_route'] = 'two_nonparallel_command_aligned_shot_origins'
+            snapshot['event'] = 'acquired' if previous_self != self.shots.confirmed else None
+            snapshot['projectile_support'] = self.shots.votes.get(self.shots.confirmed,[])
         for row in self.tracker.last_update["detections"]:
             row["class_scores"] = dict(pairs[row["index"]][1].get("class_scores", {}))
+        snapshot["spawn_prior"] = dict(weights=prior, interpretation="candidate ranking only; no causal confidence")
         snapshot["tracking"] = self.tracker.last_update
         snapshot["lineage_proposals"] = lineage
         snapshot["controlled_track_id"] = self.controlled_track_id
@@ -61,8 +84,18 @@ class VisualAgency:
         self.tracker.finished.extend(self.tracker.active.values())
         self.tracker.active.clear()
         self.agency=AgencyTracker()
+        self.shots.reset()
+        self.spawn_prior=False
         self.positions={};self.assignments={};self.pairs=[]
         return retired
+
+    def confirmed_respawn(self, *, death_confirmed, respawn_confirmed, game_over=False):
+        """Accept independently established life evidence, never infer it from SELF loss."""
+        if not death_confirmed or not respawn_confirmed or game_over:
+            return False
+        self.reframe()
+        self.spawn_prior=True
+        return True
 
     @property
     def controlled_track_id(self):
@@ -83,46 +116,65 @@ class VisualAgency:
     def player(self):
         return self.positions.get(self.controlled_track_id)
 
-    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None, response_frames=2, should_stop=None, center_spawn=False):
-        """Bounded reversal/orthogonal taps interleaved with measured neutral.
+    def discover(self, read_pairs, controller, *, pulse_ms=60, deadline=None, record=None, observation_time=None, response_frames=2, should_stop=None, center_spawn=None, fire_first=True):
+        """Fire-first shot evidence, then bounded movement/neutral fallback.
+
+        fire_first=False and center_spawn=False permit exact replay of historic
+        movement-only recordings; they never create new observations or controls.
 
         Controller.execute centers both sticks at each pulse's end. Read the
         two fresh post-pulse exposures, measuring displacement from the pre-pulse
         reference to the second endpoint, then an independent neutral interval.
         The intermediate exposure is retained without scoring an early response.
         """
+        if center_spawn is not None:self.spawn_prior=bool(center_spawn)
         self.last_discovery = dict(schema='causal-discovery-result-v1', commands=[], capture_timestamps=[],
                                    confirmed_self=False, complete=False,
-                                   spawn_prior='center candidate ordering only; causal evidence required' if center_spawn else None)
-        if center_spawn:
+                                   spawn_prior='center candidate ordering only; causal evidence required' if center_spawn or self.spawn_prior else None)
+        if self.spawn_prior:
             original_read=read_pairs
             def read_pairs():
-                return sorted(original_read(),key=lambda pair:sum((float(v)-50.)**2 for v in pair[0].center))
+                pairs=original_read()
+                read_pairs.projectiles=getattr(original_read,'projectiles',[])
+                return sorted(pairs,key=lambda pair:sum((float(v)-50.)**2 for v in pair[0].center))
         if response_frames not in (2, 3):
             raise ValueError('agency response window must contain two or three fresh frames')
         def stopped():
             return ((deadline is not None and time.monotonic() >= deadline)
                     or (should_stop is not None and should_stop()))
         if stopped():return self.player
+        if self.agency.self_id is None:self.shots.reset()
         pairs = read_pairs()
         initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
         self.last_discovery['capture_timestamps'].append(self.tracker.last_update['observed_at'])
         if record:
             record(initial)  # pre-command detections are essential for exact replay
         if stopped():return self.player
-        if self.bootstrap_body_fire:
-            if deadline is not None and time.monotonic()+pulse_ms/1000 >= deadline:
-                return self.player
-            controller.execute(Action('STAY', 'E', 'FIRE actuator exploration'), pulse_ms)
-            for endpoint in (1,2):
-                pairs = read_pairs()
-                snapshot = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
-                snapshot['phase'] = 'fire_exploration_unmeasured_body'
-                snapshot['actuators'] = {'body':'STAY', 'fire':'E', 'endpoint':endpoint,
-                                         'interpretation':'effects unknown; no projectile labels inferred'}
-                if record:
-                    record(snapshot)
+        # Fire first in two nonparallel directions. Missing acknowledged timing
+        # or missing projectile observations supplies no causal evidence.
+        for fire in (('E','N') if fire_first else ()):
+            if stopped():return self.player
+            if deadline is not None and time.monotonic()+pulse_ms/1000 >= deadline:return self.player
+            baseline=list(getattr(read_pairs,'projectiles',[]))
+            bodies=dict(self.positions)
+            controller.execute(Action('STAY',fire,'shot-origin acquisition'),pulse_ms)
+            execution=getattr(controller,'last_execution',None) or {}
+            self.shots.begin(VECTORS[fire],execution,bodies,baseline)
+            for endpoint in range(3):
                 if stopped():return self.player
+                pairs=read_pairs()
+                at=observation_time() if observation_time else time.monotonic()
+                evidence=self.shots.observe(getattr(read_pairs,'projectiles',[]),at)
+                snapshot=self.observe(pairs,observed_at=at)
+                snapshot.update(phase='shot_origin_experiment',shot_evidence=evidence,
+                    projectile_candidate=getattr(self.shots,'confirmed',None),
+                    projectile_confirmation_enabled=self.projectile_confirmation,
+                    actuators=dict(body='STAY',fire=fire,endpoint=endpoint+1))
+                self.last_discovery['capture_timestamps'].append(at)
+                if record:record(snapshot)
+                if self.agency.self_id is not None:
+                    self.last_discovery['confirmed_self']=True
+                    return self.player
         for probe, move in enumerate(('E', 'W', 'S', 'N', 'E', 'W')):
             if stopped():break
             if deadline is not None and time.monotonic() + 2*pulse_ms/1000 >= deadline:
@@ -169,7 +221,7 @@ class VisualAgency:
                                                     'duration_seconds': at-origin_at}
                 if record:
                     record(snapshot)
-            if self.player is not None:
+            if self.agency.self_id is not None:
                 break
         self.last_discovery['confirmed_self'] = self.agency.self_id is not None
         times = self.last_discovery['capture_timestamps']

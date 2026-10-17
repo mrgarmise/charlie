@@ -52,6 +52,12 @@ class TaughtRecognizer:
             identity = "unknown"
         return identity, score, runner_up, by_class
 
+    def detect_acquisition(self, frame: Image.Image):
+        """Class-free low-latency path; tactical recognition is unchanged."""
+        from ..projectile_agency import candidates
+        pairs, self.projectile_candidates = candidates(frame)
+        return pairs
+
     def detect(self, frame: Image.Image):
         """Return (Detection, evidence) pairs in corrected playfield coordinates."""
         width, height = frame.size

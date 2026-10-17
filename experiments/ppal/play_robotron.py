@@ -505,6 +505,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
     parser.add_argument("--output", type=Path)
     parser.add_argument("--arm", action="store_true",
                         help="actually send movement/fire commands")
+    parser.add_argument("--projectile-self", action="store_true",
+                        help="experimental shot-origin confirmation; requires independent native qualification")
     parser.add_argument("--bootstrap-body-fire", action="store_true",
                         help="experimental provisional BODY identity with independent and simultaneous FIRE exploration")
     parser.add_argument('--experiment-plan', type=Path,
@@ -592,7 +594,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
     shadow_forebrain = Forebrain()
     shadow_hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
     shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
-    visual_agency = VisualAgency(bootstrap_body_fire=args.bootstrap_body_fire)
+    visual_agency = VisualAgency(bootstrap_body_fire=args.bootstrap_body_fire,
+                                 projectile_confirmation=args.projectile_self)
     self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3,
                                          tracker=visual_agency.tracker if args.arm else None)
     session = RobotronSessionManager(clock=time.monotonic)
@@ -677,7 +680,9 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                  track_id=snapshot.get('controlled_track_id'), identity_status=status)
         row = {"sample": visual_agency.tick, "capture_timestamp": source.timestamp, "capture": source.capture,
                "viewer_state":source.viewer_state,
-               "control_execution": getattr(controller, "last_execution", None), "session_phase":session.state.value, **snapshot}
+               "control_execution": getattr(controller, "last_execution", None), "session_phase":session.state.value,
+               "acquisition_processing_seconds":(getattr(read_agency_pairs,"processing_seconds",None)
+                   if getattr(read_agency_pairs,"processing_at",None)==source.timestamp else None), **snapshot}
         if publisher is not None and source.raw is not None:
             publisher.submit(source.raw, timestamp=source.timestamp, playfield=latest_agency_frame,
                 metadata={'phase':session.state.value, 'agency':snapshot,
@@ -773,7 +778,15 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         nonlocal latest_agency_frame
         latest_agency_frame = calibration.apply(source.read())
         observe_episode(latest_agency_frame)
-        return [] if episode_observer is not None and not episode_observer.agency_allowed else recognizer.detect(latest_agency_frame)
+        if episode_observer is not None and not episode_observer.agency_allowed:
+            read_agency_pairs.projectiles=[]
+            return []
+        started=time.perf_counter()
+        pairs=getattr(recognizer,'detect_acquisition',recognizer.detect)(latest_agency_frame)
+        read_agency_pairs.projectiles=getattr(recognizer,'projectile_candidates',[])
+        read_agency_pairs.processing_seconds=time.perf_counter()-started
+        read_agency_pairs.processing_at=source.timestamp
+        return pairs
     def save_review(raw, tick, reason):
         if len(review_frames) >= (40 if reason == 'final-view' else 39):
             return
@@ -1105,7 +1118,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                     tick+=1;time.sleep(.025)
                     continue
                 recovery_frames = _quick_frames(
-                    source, calibration, recognizer, count=4, interval=0.025,
+                    source, calibration, recognizer, count=1, interval=0.,
                     on_observation=observe_unmeasured, deadline=min(deadline,recovery_since+20.))
                 if episode_observer.confirmed:
                     result='GAME OVER'

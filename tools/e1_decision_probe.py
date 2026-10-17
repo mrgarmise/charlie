@@ -50,24 +50,24 @@ def decision_input(row):
 
 
 def differences(left, right):
-    """Compare what the chooser actually consumes, keeping identity fixed."""
-    ids = set(left["alternatives"]) | set(right["alternatives"])
-    changed = sorted(pid for pid in ids if
-                     decision_input(left["alternatives"][pid]) !=
-                     decision_input(right["alternatives"][pid]))
+    """Compare chooser inputs, distinguishing metadata changes from decisions."""
+    old = left["alternatives"]
+    new = right["alternatives"]
+    common = set(old) & set(new)
+    presence_changes = sorted(set(old) ^ set(new))
+    changed = sorted(pid for pid in common
+                     if decision_input(old[pid]) != decision_input(new[pid]))
     return dict(
         choice_changed=left["chosen"] != right["chosen"],
         eligibility_changed=left["eligible"] != right["eligible"],
-        decision_evaluations_changed=changed,
+        alternative_presence_changed=presence_changes,
+        decision_evaluations_changed=sorted(set(changed) | set(presence_changes)),
         numerical_scores_changed=sorted(
-            pid for pid in ids if
-            left["alternatives"][pid]["score"] !=
-            right["alternatives"][pid]["score"]),
+            pid for pid in common if old[pid]["score"] != new[pid]["score"]),
         metadata_only_changed=sorted(
-            pid for pid in ids
-            if decision_input(left["alternatives"][pid]) ==
-               decision_input(right["alternatives"][pid])
-            and left["alternatives"][pid] != right["alternatives"][pid]
+            pid for pid in common
+            if decision_input(old[pid]) == decision_input(new[pid])
+            and old[pid] != new[pid]
         )
     )
 

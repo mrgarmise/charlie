@@ -2,7 +2,7 @@
 
 Does not instantiate DevelopmentLifecycle, write notebooks, or authorize activity.
 The ablation changes only the *evaluation input* in memory and never rewrites evidence.
-A difference is a candidate causal signal, not E1 acceptance.
+Only decision-relevant score/eligibility/choice differences are candidate signals;\nchanges to resolution-ID listings are provenance changes, not decision adaptation.
 """
 from __future__ import annotations
 
@@ -34,6 +34,42 @@ def decision(projects):
     return dict(chosen=chosen["id"] if chosen else None,
                 alternatives=alternatives,
                 eligible=sorted(k for k, v in alternatives.items() if not v["blocked"]))
+
+
+def decision_input(row):
+    """Fields used by the inspect-only selection path, excluding evidence metadata.
+
+    Resolution IDs are traceability information. They are not used to score,
+    block, rank or choose a project in LearningExecutive.select().
+    """
+    return {key: row[key] for key in (
+        "score", "terms", "blocked", "status", "urgent",
+        "missing_resources", "unmet_dependencies",
+        "method_available", "authorized"
+    )}
+
+
+def differences(left, right):
+    """Compare what the chooser actually consumes, keeping identity fixed."""
+    ids = set(left["alternatives"]) | set(right["alternatives"])
+    changed = sorted(pid for pid in ids if
+                     decision_input(left["alternatives"][pid]) !=
+                     decision_input(right["alternatives"][pid]))
+    return dict(
+        choice_changed=left["chosen"] != right["chosen"],
+        eligibility_changed=left["eligible"] != right["eligible"],
+        decision_evaluations_changed=changed,
+        numerical_scores_changed=sorted(
+            pid for pid in ids if
+            left["alternatives"][pid]["score"] !=
+            right["alternatives"][pid]["score"]),
+        metadata_only_changed=sorted(
+            pid for pid in ids
+            if decision_input(left["alternatives"][pid]) ==
+               decision_input(right["alternatives"][pid])
+            and left["alternatives"][pid] != right["alternatives"][pid]
+        )
+    )
 
 
 def load_projects(path):
@@ -76,12 +112,15 @@ def analyze(before, after):
         if a != b or b != c:
             changes.append(dict(id=pid, goal=new[pid].get("goal"),
                                 baseline=a, learned=b, outcome_ablated=c))
-    outcome_influence = any(
-        post["alternatives"].get(k) != control["alternatives"].get(k)
-        for k in shared
+    history_change = differences(pre, post)
+    ablation_effect = differences(control, post)
+    outcome_influence = bool(
+        ablation_effect["decision_evaluations_changed"]
+        or ablation_effect["choice_changed"]
+        or ablation_effect["eligibility_changed"]
     )
     return dict(
-        schema="charlie-e1-decision-probe-v1",
+        schema="charlie-e1-decision-probe-v2",
         source=dict(before=str(Path(before).resolve()),
                     after=str(Path(after).resolve()),
                     original_records=len(before_ids),
@@ -92,8 +131,8 @@ def analyze(before, after):
                "Post-session outcome-derived fields restored from pre-session state "
                "in memory, with post-session lifecycle and eligibility unchanged.",
         baseline=pre, learned=post, outcome_ablated=control,
-        changed_shared_projects=changes,
-        outcome_evaluation_influence_observed=outcome_influence,
+        changed_shared_projects=changes,\n        baseline_to_learned=history_change,\n        outcome_ablation_effect=ablation_effect,
+        outcome_evaluation_influence_observed=outcome_influence,\n        retained_outcome_metadata_changed=bool(ablation_effect["metadata_only_changed"]),
         selection_changed_baseline_to_learned=pre["chosen"] != post["chosen"],
         selection_changed_learned_to_ablation=post["chosen"] != control["chosen"],
         acceptance="NOT YET DEMONSTRATED",
@@ -102,7 +141,7 @@ def analyze(before, after):
             "The fixed inspect-only chooser is not a prospective autonomous decision.",
             "Ablation substitutes entire historical outcome-derived fields, not individual authenticated resolution records.",
             "Other overnight changes, project holds, and evidence availability are not counterfactually reconstructed.",
-            "Score differences under fixed rules alone do not demonstrate a learned investigation strategy.",
+            "Provenance-only changes (resolution IDs) are not decision influence.",\n            "Score differences under fixed rules alone do not demonstrate a learned investigation strategy.",
             "Physical authorization remains absent; no PPAL/I1 or performance claim."
         ])
 
@@ -127,7 +166,7 @@ def main(argv=None):
         baseline_choice=report["baseline"]["chosen"],
         learned_choice=report["learned"]["chosen"],
         ablated_choice=report["outcome_ablated"]["chosen"],
-        outcome_evaluation_influence_observed=report["outcome_evaluation_influence_observed"],
+        outcome_evaluation_influence_observed=report["outcome_evaluation_influence_observed"],\n        baseline_to_learned_decision_changes=len(report["baseline_to_learned"]["decision_evaluations_changed"]),\n        ablation_decision_changes=len(report["outcome_ablation_effect"]["decision_evaluations_changed"]),\n        ablation_score_changes=len(report["outcome_ablation_effect"]["numerical_scores_changed"]),\n        ablation_metadata_only_changes=len(report["outcome_ablation_effect"]["metadata_only_changed"]),
         changed_project_evaluations=len(report["changed_shared_projects"]),
         acceptance=report["acceptance"],
         report=str(destination)), indent=2))

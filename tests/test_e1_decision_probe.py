@@ -42,7 +42,8 @@ def test_read_only_ablation_is_not_automatic_acceptance(monkeypatch):
     assert result["learned"]["chosen"] == "b"
     assert result["outcome_ablated"]["chosen"] == "a"
     assert result["acceptance"] == "NOT YET DEMONSTRATED"
-    assert result["outcome_evaluation_influence_observed"]\n    assert result["outcome_ablation_effect"]["numerical_scores_changed"] == ["a"]
+    assert result["outcome_evaluation_influence_observed"]
+    assert result["outcome_ablation_effect"]["numerical_scores_changed"] == ["a"]
 
 
 def test_append_only_identity_control(monkeypatch):

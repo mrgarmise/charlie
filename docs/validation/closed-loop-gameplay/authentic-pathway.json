@@ -1,0 +1,24 @@
+{
+  "schema": "authentic-executable-pathway-check-v1",
+  "originator": "LearningExecutive",
+  "original_proposal": "97f90b0167670c30404e4cb8fdc16e6daacead326ae50105125c6fc7f5b64c65",
+  "original_project": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+  "hypothesis": "An independently qualified temporal candidate improves held-out motion error",
+  "measurements": [
+    "Original hash-bound camera frames with capture clock and acknowledged command timing",
+    "Verified game start and terminal boundaries, independent complete-game SCORE annotation",
+    "Independently reviewed identities, calibration and measured trajectories; ambiguous outcomes remain unresolved"
+  ],
+  "games": 1,
+  "offline_validation": "original Executive request resolves to supported bounded one-game marathon adapter",
+  "authority_created": false,
+  "gameplay_executed": false,
+  "candidate_activation": false,
+  "decision_learning": "NOT YET DEMONSTRATED",
+  "remaining": [
+    "Hash-bound independently verified persistent identities and measured board trajectories",
+    "Observed 150ms +/-25ms adjacent horizons, at least three frames per episode",
+    "One validation and at least three distinct unconsulted final experience groups",
+    "Independent qualification provenance and start/terminal occurrence evidence; transfers are correlated copies"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "closed-loop-validation-v1",
+  "status": "published checkpoint; final full suite pending",
+  "baseline": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+  "read_only_probe_lineage": "9152ee0",
+  "runtime_file_sha256": {
+    "learning/campaign.py": "6f5d57caee2f00f8aca653445e6a64a47a754a63a997482ac68c64167292202d",
+    "learning/cycle.py": "233c8280d21acdfedd809aaf5d78ebfa89d0b96727690a2fac479f1b0e568add",
+    "experiments/ppal/marathon_robotron.py": "44faa7d92976b0ccc6db76a39924bab32f2926a3204549feb1a16d299503eeea",
+    "memory/investigation_learning.py": "fae67fb552e38ecb118c4d236965364d16d0ec0355ef439a6e386c55691ea9ba",
+    "tools/e1_decision_probe.py": "2d4178681ccaff0649f21ffe02344353d0e42103ccab29215311b6e7f91a8f8d",
+    "tools/e1_information_yield_probe.py": "838799f18387c1aa8a6649fab3fd2f645477aa24f0d06c82f930fc822ca24b7d",
+    "tests/test_gameplay_campaign.py": "37c4d9a2b1ab7f2e4209e47158aa8697d28526ced46cb5c45b0d9fd1aa4b30be",
+    "tests/test_ala_diagnostics.py": "c3ecbe2a02bda919ff6cd7bd46150f3ef3544a943780162f010614b51fd07e38"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "dependencies": {
+      "pytest": "9.1.1",
+      "numpy": "2.3.5",
+      "pillow": "12.3.0",
+      "opencv-python-headless": "5.0.0.93",
+      "pyserial": "3.5"
+    }
+  },
+  "focused": {
+    "tests": 102,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 38.168
+  },
+  "earlier_full": {
+    "tests": 1298,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 21,
+    "seconds": 331.356
+  },
+  "loaded_stop_early": {
+    "tests": 505,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 20,
+    "seconds": 122.348
+  },
+  "failed_case": "test_developmental_stall.py::test_waiting_investigation_resumes_on_qualified_delivery",
+  "isolated_case": "passed; full focused file also passed; full-suite failure retained without claiming baseline equivalence",
+  "synthetic_evidence": "software controls only; no native acceptance or learning qualification",
+  "native_gameplay": false,
+  "native_deployment": false,
+  "servo_movement": false,
+  "candidate_activation": false,
+  "gates": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED",
+    "native reliability": "NOT YET DEMONSTRATED",
+    "performance": "NOT YET DEMONSTRATED"
+  }
+}

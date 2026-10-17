@@ -203,13 +203,27 @@ def process_completed_episode(game, output, gateway, commitments, plan=None, exe
         journal.close()
 
 
+def campaign_gateway(args):
+    """Use the original notebook's existing memory interfaces when explicit."""
+    from memory.gateway import MemoryGateway
+    notebook=getattr(args,'campaign_notebook',None)
+    if notebook is None:return MemoryGateway()
+    from memory.evaluator import MemoryEvaluator
+    from memory.store import JsonlStore
+    notebook=Path(notebook).resolve()
+    if notebook!=Path(args.learning_root).resolve() or not (notebook/'learning-evidence.sqlite3').is_file():
+        raise ValueError('campaign must retain its existing learning notebook')
+    return MemoryGateway(store=JsonlStore(notebook/'memory.jsonl'),
+        evaluator=MemoryEvaluator(notebook/'evaluator.sqlite3'))
+
+
 def developmental_marathon(args, *, driver=run_bounded, gateway=None):
     """Bounded runner with optional project continuity, between games only."""
     from collections import Counter
     from memory.evidence import EvidenceJournal
     from memory.gateway import MemoryGateway
     from .experiment_return import select_experiment
-    gateway=gateway or MemoryGateway()
+    gateway=gateway or campaign_gateway(args)
     authority_path=getattr(args,'ala_deployment_authority',None)
     authority=json.loads(Path(authority_path).read_text()) if authority_path else None
     developmental = getattr(args,'developmental',True)
@@ -293,12 +307,12 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             game=session/f'game-{index:02d}'
             selection = None
             context = None
-            if executive:
+            if executive and not getattr(args,'baseline_only',False):
                 selection = executive.select(methods={'actuator-response'},
                     resources={'camera-evidence', 'actuator-experiment-slot'}, authorized_methods={'actuator-response'})
                 if selection['project']:
                     context = executive.chooser_context(selection['project']['id'])
-            plan = None if not developmental or (executive and context is None) else select_experiment(
+            plan = None if getattr(args,'baseline_only',False) or not developmental or (executive and context is None) else select_experiment(
                 gateway,commitments,game,horizon_seconds=(args.game_seconds or 120.)+120.,project_context=context)
             plan_path=session/f'game-{index:02d}-experiment.json'
             if plan:write_session(plan_path,plan)
@@ -318,9 +332,16 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 candidate_manifest=Path(candidate_root)/'semantic-activation.json'
                 if candidate_manifest.exists():semantic_manifest=candidate_manifest
             if semantic_manifest:cmd.extend(['--learned-semantics',str(semantic_manifest)])
+            policy_manifest=getattr(args,'learned_policy',None)
+            if policy_manifest:
+                # Gameplay authority cannot turn an offline candidate into a
+                # physical policy. Recheck activation/rollback at every episode.
+                from .qualified_policy import load_policy
+                load_policy(policy_manifest,physical=True)
+                cmd.extend(['--learned-policy',str(policy_manifest)])
             if executive:
                 viewer_context = session/f'game-{index:02d}-observer-context.json'
-                write_session(viewer_context, {'episode':str(game.resolve()), 'project':selection['project']})
+                write_session(viewer_context, {'episode':str(game.resolve()), 'project':selection['project'] if selection else None})
                 cmd.extend(['--observer-context', str(viewer_context)])
             if play_first:
                 # Bookmark before the child: interrupted captures remain discoverable.
@@ -388,7 +409,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                 project_state = executive.projects().get(context['project_id'], {}) if context else {}
                 print(f"PROJECT: {context['project_id'][:12] if context else 'NONE'}; "
                       f"goal={project_state.get('goal','UNKNOWN')}; status={project_state.get('status','UNKNOWN')}; "
-                      f"selection={selection['reason']}; progress={project_state.get('progress','UNKNOWN')}; "
+                      f"selection={selection['reason'] if selection else 'frozen baseline'}; progress={project_state.get('progress','UNKNOWN')}; "
                       f"next={project_state.get('next_direction','no justified experiment yet')}", flush=True)
             handoff('session_state_update',write_session,session/'session.json',doc)
             if rc==124:
@@ -508,7 +529,7 @@ def reflect_marathon(session, args, *, gateway=None, processor=None, development
     doc=load_report(session/'session.json')
     if not doc:raise ValueError('existing marathon session.json required')
     if gameplay_active():raise RuntimeError('reflection unavailable during active gameplay')
-    gateway=gateway or MemoryGateway()
+    gateway=gateway or campaign_gateway(args)
     processor=processor or process_supervised
     development=development or develop
     path=session/'reflection-progress.json'
@@ -803,6 +824,10 @@ def main():
     ap.add_argument('--developmental',action='store_true',help='automatic between-game evidence-backed experiments; 3..5 attempts')
     ap.add_argument('--seed-episode',type=Path,help='optional prior episode to process before developmental game 1')
     ap.add_argument('--learning-projects',action='store_true',help='opt-in durable diagnostic project continuity between developmental games')
+    ap.add_argument('--baseline-only',action='store_true',help='freeze existing policy; no actuator experiment selection')
+    ap.add_argument('--single-observation','--observation-block',dest='single_observation',action='store_true',help='one or two explicit baseline observations; offline handoff is separate from three-game reliability')
+    ap.add_argument('--learned-policy',type=Path,help='explicit separately qualified physical PPAL policy; never auto-activated')
+    ap.add_argument('--campaign-notebook',type=Path,help=argparse.SUPPRESS)
     ap.add_argument('--ala-learning',action='store_true',help='opt-in bounded offline model investigations after completed episodes; requires learning projects')
     ap.add_argument('--learning-root',type=Path,help='durable experience artifacts and evidence; no live training')
     ap.add_argument('--ala-budget',type=float,default=60.,help='offline foundry budget 1..3600 seconds')
@@ -839,7 +864,10 @@ def main():
         ap.error('ALA options require --developmental --learning-projects')
     if a.project_evidence and not a.learning_projects:
         ap.error('--project-evidence requires --learning-projects')
-    if a.developmental and not 3<=a.max_games<=5:
+    single=a.single_observation and a.baseline_only and a.play_first and 1<=a.max_games<=2 and a.qualified_games==a.max_games
+    if a.single_observation and not single:
+        ap.error('--observation-block requires --baseline-only --play-first and matching max/qualified games in 1..2')
+    if a.developmental and not (3<=a.max_games<=5 or single):
         ap.error('developmental mode requires 3..5 bounded attempts')
     if not a.supervised_marathon:
         from .progress_supervision import supervise
@@ -851,16 +879,20 @@ def main():
         if rc==0 and a.play_first and final.get('gameplay_finished'):
             session=Path(final['session'])
             state=load_report(session/'session.json') or {}
-            if scheduled_learning(state)['eligible']:
+            if single:
+                # Explicit small acquisition blocks are not three-game
+                # reliability and never schedule reflection implicitly.
+                if not state.get('target_met'):rc=2
+            elif scheduled_learning(state)['eligible']:
                 reflect_marathon(session,a)
             else:
                 print('SCHEDULED LEARNING DEFERRED: '+scheduled_learning(state)['reason'],flush=True)
                 rc=2
         raise SystemExit(rc)
     if a.developmental:
-        if not 3<=a.max_games<=5:ap.error('developmental mode requires 3..5 bounded attempts')
+        if not (3<=a.max_games<=5 or single):ap.error('developmental mode requires 3..5 bounded attempts')
         doc=developmental_marathon(a)
-        if a.play_first and not scheduled_learning(doc)['eligible']:raise SystemExit(2)
+        if a.play_first and not single and not scheduled_learning(doc)['eligible']:raise SystemExit(2)
         return
     if a.seed_episode:ap.error('--seed-episode requires --developmental')
     # Normal and developmental episodes share the same safe orchestration and

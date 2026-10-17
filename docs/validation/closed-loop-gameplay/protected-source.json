@@ -1,0 +1,22 @@
+{
+  "experiments/ppal/preflight.py": {
+    "unchanged_from_master": true,
+    "sha256": "8cd902f89603394fe3e492370e37f88854ee8d2e0904b49bdc2ee03aca665bb8"
+  },
+  "experiments/ppal/camera_session.py": {
+    "unchanged_from_master": true,
+    "sha256": "ef83471ae915a623be5cbe7a6789da1387bf7d008598e37725415a207cc8cdcd"
+  },
+  "experiments/ppal/progress_supervision.py": {
+    "unchanged_from_master": true,
+    "sha256": "d571c2f2dd3f63c7ec3f10c27eb2a0ffbf4ad04328d2862a0bcfbeaa1265d8af"
+  },
+  "experiments/ppal/robotron_screen_state.py": {
+    "unchanged_from_master": true,
+    "sha256": "aab1cbd928ea1a4d61cab884260d152929d4dcd4ed81f95d5cb0065432da7100"
+  },
+  "rp2040/servos.py": {
+    "unchanged_from_master": true,
+    "sha256": "dd60cb43ee57d61333d33004f065b344d93dbd20e7fa5a44982866109ad8170e"
+  }
+}

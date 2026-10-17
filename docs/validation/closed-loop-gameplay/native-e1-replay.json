@@ -1,0 +1,2225 @@
+{
+  "schema": "charlie-e1-decision-probe-v2",
+  "source": {
+    "before": "/workspace/scratch/a5d7375d8e4e/authentic/reconstructed/baseline-frozen",
+    "after": "/workspace/scratch/a5d7375d8e4e/authentic/reconstructed/after",
+    "original_records": 3247,
+    "retained_records": 585,
+    "shared_projects": 19,
+    "new_project_ids": []
+  },
+  "method": "Same code and available methods. Shared project identities. Post-session outcome-derived fields restored from pre-session state in memory, with post-session lifecycle and eligibility unchanged.",
+  "baseline": {
+    "chosen": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+    "alternatives": {
+      "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a": {
+        "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+        "score": 1.5,
+        "blocked": false,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "0096e1116a5d60530f65bb1a07cdea1a6d1462bfad858983cfb9dda485fe2965",
+            "67ebfe8cbc45db661a78adbb987a9678c5e7b5f21dec04663cfc42eec3b25e43"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "candidate"
+      },
+      "03977f64fb67f7279856ff5e234f227fdc0d36db39d13b0dee1638b6f5df9c7d": {
+        "project_id": "03977f64fb67f7279856ff5e234f227fdc0d36db39d13b0dee1638b6f5df9c7d",
+        "score": 0.16666666666666674,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.33333333333333337,
+          "remaining_uncertainty": 0.33333333333333337,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "0ba5ec785dc3c8d589f5ffbc9477c392c6c1df2815116789ea7917d7eda70595": {
+        "project_id": "0ba5ec785dc3c8d589f5ffbc9477c392c6c1df2815116789ea7917d7eda70595",
+        "score": 0.38888888888888884,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.4444444444444444,
+          "remaining_uncertainty": 0.4444444444444444,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071": {
+        "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+        "score": 1.0555555555555554,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.7777777777777778,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345": {
+        "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "938039fb7ff20c7e103b99fe7a71ace04c7f592661c88979a17cc2bc3e3e6653",
+            "d30c55f90f5f13da726dbfa0b7e8445f860aa70d34b757cf56de5d99f1ab985f"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252": {
+        "project_id": "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252",
+        "score": 1.1500000000000001,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.65,
+          "remaining_uncertainty": 0.8,
+          "cost": 0.6,
+          "risk": 0.2
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2": {
+        "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+            "0dcc9e1d9457e4ce7b61eba95eab3f90ec0d203482f36cd716bac0dfa4fd5c9f"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "78f34cca17011649445b4caaa71dc8e750d9f66d492c0422c01da528b6b3a5f3": {
+        "project_id": "78f34cca17011649445b4caaa71dc8e750d9f66d492c0422c01da528b6b3a5f3",
+        "score": 0.8333333333333335,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6666666666666667,
+          "remaining_uncertainty": 0.6666666666666667,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "7b426d1a1c3d66e45691ef8151b2359d03d5bb923a0c7ba7847ada5d751cd3b3": {
+        "project_id": "7b426d1a1c3d66e45691ef8151b2359d03d5bb923a0c7ba7847ada5d751cd3b3",
+        "score": 0.6111111111111112,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.5555555555555556,
+          "remaining_uncertainty": 0.5555555555555556,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533": {
+        "project_id": "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533",
+        "score": 0.6666666666666665,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.3888888888888889,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "c3820277ad8203e73d60a1897b6c623c1ae85f97e894ac0b42e6552abdf008e4"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "active"
+      },
+      "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d": {
+        "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+        "score": 2.0000000000000004,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 1.0,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f": {
+        "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+            "51c8d42305d06437e719260c27dbf4318b5c7a8b81b7056f2f75e09bae3efa51"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c": {
+        "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+        "score": 2.0999999999999996,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.8,
+          "remaining_uncertainty": 1.0,
+          "cost": 0.1,
+          "risk": 0.1
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0": {
+        "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+            "acd28ee566e46b6934e58bcecebef5f64f04bb7bb8ead54f41acff8130bc9693"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf": {
+        "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+            "90c8167f4e8f847363649d47d47e0b0a6dbd611e200cbb44d88a8a3028d4314b",
+            "c4b48e16f1c736b09e117ab7c6f2cc919c6ddc12cd49cea1c1f7f451679ea819"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "d838af954e2eda9abc646b8da48e6c5adb6d17ddfe0ee9c95f6b4354bc1ae60d": {
+        "project_id": "d838af954e2eda9abc646b8da48e6c5adb6d17ddfe0ee9c95f6b4354bc1ae60d",
+        "score": 1.0555555555555554,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.7777777777777778,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [
+            "55dae309fc1e82a883fbb911379ae403e69ad696ac84e500ddf1cbe0bec81fdb",
+            "ae7ae0e6fdc606c8d956e7ff164efaf302a32a1ea40ec1cb110b3eb928501b5a"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "f7c975fc2e3189ae896726901f43f0732ec5355de6c50f2283c37cbebbce5d78": {
+        "project_id": "f7c975fc2e3189ae896726901f43f0732ec5355de6c50f2283c37cbebbce5d78",
+        "score": 0.6111111111111112,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.5555555555555556,
+          "remaining_uncertainty": 0.5555555555555556,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0": {
+        "project_id": "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "b8c7154feb597abb61a0bacd1f4d1abc5ada8305d06d00e095008e0cf55515c9"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    },
+    "eligible": [
+      "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a"
+    ]
+  },
+  "learned": {
+    "chosen": null,
+    "alternatives": {
+      "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a": {
+        "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "0096e1116a5d60530f65bb1a07cdea1a6d1462bfad858983cfb9dda485fe2965",
+            "67ebfe8cbc45db661a78adbb987a9678c5e7b5f21dec04663cfc42eec3b25e43"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "03977f64fb67f7279856ff5e234f227fdc0d36db39d13b0dee1638b6f5df9c7d": {
+        "project_id": "03977f64fb67f7279856ff5e234f227fdc0d36db39d13b0dee1638b6f5df9c7d",
+        "score": 0.16666666666666674,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.33333333333333337,
+          "remaining_uncertainty": 0.33333333333333337,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "0ba5ec785dc3c8d589f5ffbc9477c392c6c1df2815116789ea7917d7eda70595": {
+        "project_id": "0ba5ec785dc3c8d589f5ffbc9477c392c6c1df2815116789ea7917d7eda70595",
+        "score": 0.38888888888888884,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.4444444444444444,
+          "remaining_uncertainty": 0.4444444444444444,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071": {
+        "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+        "score": 1.0555555555555554,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.7777777777777778,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345": {
+        "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "938039fb7ff20c7e103b99fe7a71ace04c7f592661c88979a17cc2bc3e3e6653",
+            "d30c55f90f5f13da726dbfa0b7e8445f860aa70d34b757cf56de5d99f1ab985f",
+            "f5364b0bbfc5a14ba3d368743b002661219bd6d627eaeb085ac8d8f702726b13"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252": {
+        "project_id": "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252",
+        "score": 1.1500000000000001,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.65,
+          "remaining_uncertainty": 0.8,
+          "cost": 0.6,
+          "risk": 0.2
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2": {
+        "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+            "0dcc9e1d9457e4ce7b61eba95eab3f90ec0d203482f36cd716bac0dfa4fd5c9f",
+            "ffe895ce4a4357323c7bb4690feff01926960d14e06637a478e9f427d3a1e583"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "78f34cca17011649445b4caaa71dc8e750d9f66d492c0422c01da528b6b3a5f3": {
+        "project_id": "78f34cca17011649445b4caaa71dc8e750d9f66d492c0422c01da528b6b3a5f3",
+        "score": 0.8333333333333335,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6666666666666667,
+          "remaining_uncertainty": 0.6666666666666667,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "7b426d1a1c3d66e45691ef8151b2359d03d5bb923a0c7ba7847ada5d751cd3b3": {
+        "project_id": "7b426d1a1c3d66e45691ef8151b2359d03d5bb923a0c7ba7847ada5d751cd3b3",
+        "score": 0.6111111111111112,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.5555555555555556,
+          "remaining_uncertainty": 0.5555555555555556,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533": {
+        "project_id": "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533",
+        "score": 0.6666666666666665,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.3888888888888889,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "c3820277ad8203e73d60a1897b6c623c1ae85f97e894ac0b42e6552abdf008e4"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d": {
+        "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+        "score": 2.0000000000000004,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 1.0,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f": {
+        "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+            "51c8d42305d06437e719260c27dbf4318b5c7a8b81b7056f2f75e09bae3efa51",
+            "f3a65b292434d3ae965309a167ac7349b60edfa63d7d84c4482fab1a1618113d"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c": {
+        "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+        "score": 2.0999999999999996,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.8,
+          "remaining_uncertainty": 1.0,
+          "cost": 0.1,
+          "risk": 0.1
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0": {
+        "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+            "acd28ee566e46b6934e58bcecebef5f64f04bb7bb8ead54f41acff8130bc9693",
+            "1225efaf29c0488e7462145d15cba392c53c55225502e1f816a0c3d8d1782c9b"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf": {
+        "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+            "90c8167f4e8f847363649d47d47e0b0a6dbd611e200cbb44d88a8a3028d4314b",
+            "c4b48e16f1c736b09e117ab7c6f2cc919c6ddc12cd49cea1c1f7f451679ea819",
+            "d1bf8051b4676349e20ecb13fc2d36e8daee38b379cb8325684a356facf0a06a"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "d838af954e2eda9abc646b8da48e6c5adb6d17ddfe0ee9c95f6b4354bc1ae60d": {
+        "project_id": "d838af954e2eda9abc646b8da48e6c5adb6d17ddfe0ee9c95f6b4354bc1ae60d",
+        "score": 1.0555555555555554,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.7777777777777778,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [
+            "55dae309fc1e82a883fbb911379ae403e69ad696ac84e500ddf1cbe0bec81fdb",
+            "ae7ae0e6fdc606c8d956e7ff164efaf302a32a1ea40ec1cb110b3eb928501b5a"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "f7c975fc2e3189ae896726901f43f0732ec5355de6c50f2283c37cbebbce5d78": {
+        "project_id": "f7c975fc2e3189ae896726901f43f0732ec5355de6c50f2283c37cbebbce5d78",
+        "score": 0.6111111111111112,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.5555555555555556,
+          "remaining_uncertainty": 0.5555555555555556,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0": {
+        "project_id": "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "b8c7154feb597abb61a0bacd1f4d1abc5ada8305d06d00e095008e0cf55515c9",
+            "1240dce4d1108a0663f2e212864adca0daf06f862e43c375542d3e235612d275"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    },
+    "eligible": []
+  },
+  "outcome_ablated": {
+    "chosen": null,
+    "alternatives": {
+      "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a": {
+        "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "0096e1116a5d60530f65bb1a07cdea1a6d1462bfad858983cfb9dda485fe2965",
+            "67ebfe8cbc45db661a78adbb987a9678c5e7b5f21dec04663cfc42eec3b25e43"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "03977f64fb67f7279856ff5e234f227fdc0d36db39d13b0dee1638b6f5df9c7d": {
+        "project_id": "03977f64fb67f7279856ff5e234f227fdc0d36db39d13b0dee1638b6f5df9c7d",
+        "score": 0.16666666666666674,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.33333333333333337,
+          "remaining_uncertainty": 0.33333333333333337,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "0ba5ec785dc3c8d589f5ffbc9477c392c6c1df2815116789ea7917d7eda70595": {
+        "project_id": "0ba5ec785dc3c8d589f5ffbc9477c392c6c1df2815116789ea7917d7eda70595",
+        "score": 0.38888888888888884,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.4444444444444444,
+          "remaining_uncertainty": 0.4444444444444444,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071": {
+        "project_id": "3121f3614b3b7a3d483a3bf17890f78049b8306f57b0bbeb9690523e8f1be071",
+        "score": 1.0555555555555554,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.7777777777777778,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345": {
+        "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "938039fb7ff20c7e103b99fe7a71ace04c7f592661c88979a17cc2bc3e3e6653",
+            "d30c55f90f5f13da726dbfa0b7e8445f860aa70d34b757cf56de5d99f1ab985f"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252": {
+        "project_id": "414463f5d37e1680fc832cc0f50ac281ec5eb068383ac4681e401853e0373252",
+        "score": 1.1500000000000001,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.65,
+          "remaining_uncertainty": 0.8,
+          "cost": 0.6,
+          "risk": 0.2
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2": {
+        "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+            "0dcc9e1d9457e4ce7b61eba95eab3f90ec0d203482f36cd716bac0dfa4fd5c9f"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "78f34cca17011649445b4caaa71dc8e750d9f66d492c0422c01da528b6b3a5f3": {
+        "project_id": "78f34cca17011649445b4caaa71dc8e750d9f66d492c0422c01da528b6b3a5f3",
+        "score": 0.8333333333333335,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6666666666666667,
+          "remaining_uncertainty": 0.6666666666666667,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "7b426d1a1c3d66e45691ef8151b2359d03d5bb923a0c7ba7847ada5d751cd3b3": {
+        "project_id": "7b426d1a1c3d66e45691ef8151b2359d03d5bb923a0c7ba7847ada5d751cd3b3",
+        "score": 0.6111111111111112,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.5555555555555556,
+          "remaining_uncertainty": 0.5555555555555556,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533": {
+        "project_id": "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533",
+        "score": 0.6666666666666665,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.3888888888888889,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "c3820277ad8203e73d60a1897b6c623c1ae85f97e894ac0b42e6552abdf008e4"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d": {
+        "project_id": "8dc02d21dff02d950f35758423db5fdfedd2ef8cef448a2f4f277a1b92deb91d",
+        "score": 2.0000000000000004,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 1.0,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f": {
+        "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+            "51c8d42305d06437e719260c27dbf4318b5c7a8b81b7056f2f75e09bae3efa51"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c": {
+        "project_id": "aef1dd40685d65655699145b7e6105b2af15b5db18589de7aa58c7c713ac3a9c",
+        "score": 2.0999999999999996,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.8,
+          "remaining_uncertainty": 1.0,
+          "cost": 0.1,
+          "risk": 0.1
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0": {
+        "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+            "acd28ee566e46b6934e58bcecebef5f64f04bb7bb8ead54f41acff8130bc9693"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf": {
+        "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+            "90c8167f4e8f847363649d47d47e0b0a6dbd611e200cbb44d88a8a3028d4314b",
+            "c4b48e16f1c736b09e117ab7c6f2cc919c6ddc12cd49cea1c1f7f451679ea819"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "d838af954e2eda9abc646b8da48e6c5adb6d17ddfe0ee9c95f6b4354bc1ae60d": {
+        "project_id": "d838af954e2eda9abc646b8da48e6c5adb6d17ddfe0ee9c95f6b4354bc1ae60d",
+        "score": 1.0555555555555554,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.7777777777777778,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [
+            "55dae309fc1e82a883fbb911379ae403e69ad696ac84e500ddf1cbe0bec81fdb",
+            "ae7ae0e6fdc606c8d956e7ff164efaf302a32a1ea40ec1cb110b3eb928501b5a"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "f7c975fc2e3189ae896726901f43f0732ec5355de6c50f2283c37cbebbce5d78": {
+        "project_id": "f7c975fc2e3189ae896726901f43f0732ec5355de6c50f2283c37cbebbce5d78",
+        "score": 0.6111111111111112,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.5555555555555556,
+          "remaining_uncertainty": 0.5555555555555556,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0": {
+        "project_id": "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "b8c7154feb597abb61a0bacd1f4d1abc5ada8305d06d00e095008e0cf55515c9"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    },
+    "eligible": []
+  },
+  "changed_shared_projects": [
+    {
+      "id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "goal": "The unresolved question may recur in independent experience: death_observability",
+      "baseline": {
+        "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+        "score": 1.5,
+        "blocked": false,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "0096e1116a5d60530f65bb1a07cdea1a6d1462bfad858983cfb9dda485fe2965",
+            "67ebfe8cbc45db661a78adbb987a9678c5e7b5f21dec04663cfc42eec3b25e43"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "candidate"
+      },
+      "learned": {
+        "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "0096e1116a5d60530f65bb1a07cdea1a6d1462bfad858983cfb9dda485fe2965",
+            "67ebfe8cbc45db661a78adbb987a9678c5e7b5f21dec04663cfc42eec3b25e43"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "outcome_ablated": {
+        "project_id": "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "0096e1116a5d60530f65bb1a07cdea1a6d1462bfad858983cfb9dda485fe2965",
+            "67ebfe8cbc45db661a78adbb987a9678c5e7b5f21dec04663cfc42eec3b25e43"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    },
+    {
+      "id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "goal": "The unresolved question may recur in independent experience: ownership_continuity",
+      "baseline": {
+        "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "938039fb7ff20c7e103b99fe7a71ace04c7f592661c88979a17cc2bc3e3e6653",
+            "d30c55f90f5f13da726dbfa0b7e8445f860aa70d34b757cf56de5d99f1ab985f"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "learned": {
+        "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "938039fb7ff20c7e103b99fe7a71ace04c7f592661c88979a17cc2bc3e3e6653",
+            "d30c55f90f5f13da726dbfa0b7e8445f860aa70d34b757cf56de5d99f1ab985f",
+            "f5364b0bbfc5a14ba3d368743b002661219bd6d627eaeb085ac8d8f702726b13"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "outcome_ablated": {
+        "project_id": "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "938039fb7ff20c7e103b99fe7a71ace04c7f592661c88979a17cc2bc3e3e6653",
+            "d30c55f90f5f13da726dbfa0b7e8445f860aa70d34b757cf56de5d99f1ab985f"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    },
+    {
+      "id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "goal": "The unresolved question may recur in independent experience: self_uncertainty",
+      "baseline": {
+        "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+            "0dcc9e1d9457e4ce7b61eba95eab3f90ec0d203482f36cd716bac0dfa4fd5c9f"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "learned": {
+        "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+            "0dcc9e1d9457e4ce7b61eba95eab3f90ec0d203482f36cd716bac0dfa4fd5c9f",
+            "ffe895ce4a4357323c7bb4690feff01926960d14e06637a478e9f427d3a1e583"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "outcome_ablated": {
+        "project_id": "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "4c0f042f20b62bcb7bac6b03bb1b8780deaf9cdc7bc87748ba3bd7cf102078c4",
+            "0dcc9e1d9457e4ce7b61eba95eab3f90ec0d203482f36cd716bac0dfa4fd5c9f"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    },
+    {
+      "id": "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533",
+      "goal": "Measure whether signed_command_response repeats across conditions for {'body': 'SW'}",
+      "baseline": {
+        "project_id": "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533",
+        "score": 0.6666666666666665,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.3888888888888889,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "c3820277ad8203e73d60a1897b6c623c1ae85f97e894ac0b42e6552abdf008e4"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "active"
+      },
+      "learned": {
+        "project_id": "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533",
+        "score": 0.6666666666666665,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.3888888888888889,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "c3820277ad8203e73d60a1897b6c623c1ae85f97e894ac0b42e6552abdf008e4"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      },
+      "outcome_ablated": {
+        "project_id": "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533",
+        "score": 0.6666666666666665,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.7777777777777778,
+          "remaining_uncertainty": 0.3888888888888889,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "c3820277ad8203e73d60a1897b6c623c1ae85f97e894ac0b42e6552abdf008e4"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [
+          "actuator-experiment-slot",
+          "camera-evidence"
+        ],
+        "unmet_dependencies": [],
+        "method_available": false,
+        "authorized": false,
+        "urgent": false,
+        "status": "blocked"
+      }
+    },
+    {
+      "id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "goal": "The unresolved question may recur in independent experience: semantic_coverage",
+      "baseline": {
+        "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+            "51c8d42305d06437e719260c27dbf4318b5c7a8b81b7056f2f75e09bae3efa51"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "learned": {
+        "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+            "51c8d42305d06437e719260c27dbf4318b5c7a8b81b7056f2f75e09bae3efa51",
+            "f3a65b292434d3ae965309a167ac7349b60edfa63d7d84c4482fab1a1618113d"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "outcome_ablated": {
+        "project_id": "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "574b454c94d11de6369b0cae9280c41e655947d1f731a98355bed354aa4d460d",
+            "51c8d42305d06437e719260c27dbf4318b5c7a8b81b7056f2f75e09bae3efa51"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    },
+    {
+      "id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "goal": "The unresolved question may recur in independent experience: action_execution",
+      "baseline": {
+        "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+            "acd28ee566e46b6934e58bcecebef5f64f04bb7bb8ead54f41acff8130bc9693"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "learned": {
+        "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+            "acd28ee566e46b6934e58bcecebef5f64f04bb7bb8ead54f41acff8130bc9693",
+            "1225efaf29c0488e7462145d15cba392c53c55225502e1f816a0c3d8d1782c9b"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "outcome_ablated": {
+        "project_id": "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "aa79cd09dabc9fa20f58cde506b03e250c01c3468c88c10575407a8348dd50dc",
+            "acd28ee566e46b6934e58bcecebef5f64f04bb7bb8ead54f41acff8130bc9693"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    },
+    {
+      "id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "goal": "The unresolved question may recur in independent experience: score_attribution",
+      "baseline": {
+        "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+            "90c8167f4e8f847363649d47d47e0b0a6dbd611e200cbb44d88a8a3028d4314b",
+            "c4b48e16f1c736b09e117ab7c6f2cc919c6ddc12cd49cea1c1f7f451679ea819"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "learned": {
+        "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+            "90c8167f4e8f847363649d47d47e0b0a6dbd611e200cbb44d88a8a3028d4314b",
+            "c4b48e16f1c736b09e117ab7c6f2cc919c6ddc12cd49cea1c1f7f451679ea819",
+            "d1bf8051b4676349e20ecb13fc2d36e8daee38b379cb8325684a356facf0a06a"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "outcome_ablated": {
+        "project_id": "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "cbfa8c6c260b13b134066f31b54276fb8306113c09beb13707d045b3a0131e75",
+            "90c8167f4e8f847363649d47d47e0b0a6dbd611e200cbb44d88a8a3028d4314b",
+            "c4b48e16f1c736b09e117ab7c6f2cc919c6ddc12cd49cea1c1f7f451679ea819"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    },
+    {
+      "id": "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0",
+      "goal": "The unresolved question may recur in independent experience: perception_reconciliation",
+      "baseline": {
+        "project_id": "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "b8c7154feb597abb61a0bacd1f4d1abc5ada8305d06d00e095008e0cf55515c9"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "learned": {
+        "project_id": "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "b8c7154feb597abb61a0bacd1f4d1abc5ada8305d06d00e095008e0cf55515c9",
+            "1240dce4d1108a0663f2e212864adca0daf06f862e43c375542d3e235612d275"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      },
+      "outcome_ablated": {
+        "project_id": "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0",
+        "score": 1.5,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.6,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.05,
+          "risk": 0.05
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "b8c7154feb597abb61a0bacd1f4d1abc5ada8305d06d00e095008e0cf55515c9"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    }
+  ],
+  "baseline_to_learned": {
+    "choice_changed": true,
+    "eligibility_changed": true,
+    "alternative_presence_changed": [],
+    "decision_evaluations_changed": [
+      "0381ecb4a1b81fc63470325c5e07be73946fe36f6924b4b88881cb812e502e7a",
+      "7e24ad9a9ba9c5456cf7b3d3e2fd54d32650d17851bd7990b596e3e60e7ef533"
+    ],
+    "numerical_scores_changed": [],
+    "metadata_only_changed": [
+      "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0"
+    ]
+  },
+  "outcome_ablation_effect": {
+    "choice_changed": false,
+    "eligibility_changed": false,
+    "alternative_presence_changed": [],
+    "decision_evaluations_changed": [],
+    "numerical_scores_changed": [],
+    "metadata_only_changed": [
+      "4091f93879a8c90ab526413aff2c28d1fb136d439d70581cdb648266a78d1345",
+      "65afb9352baf1e8d9aec1bd323e3a016663fe2986b2833915df1ce16ffb0b7a2",
+      "9470fa146d0463c6772118016e23d98bfc731496529334a4ba54dc91c774a84f",
+      "b1e471d2fa3e3ce42594ae3c31bda64bf82c3c671376c7122d6749a0bc11a9d0",
+      "b52825e1bca63b585dd80a3e0484253d9d66c371230b8d635bbfdf3d4bace9cf",
+      "fb3fba68898c4352631f1d6f1ebe01d6451305b690f063fdaff4303a9a3c22c0"
+    ]
+  },
+  "outcome_evaluation_influence_observed": false,
+  "retained_outcome_metadata_changed": true,
+  "selection_changed_baseline_to_learned": true,
+  "selection_changed_learned_to_ablation": false,
+  "acceptance": "NOT YET DEMONSTRATED",
+  "limitations": [
+    "This is a retrospective, read-only causal screening test, not a full E1 acceptance.",
+    "The fixed inspect-only chooser is not a prospective autonomous decision.",
+    "Ablation substitutes entire historical outcome-derived fields, not individual authenticated resolution records.",
+    "Other overnight changes, project holds, and evidence availability are not counterfactually reconstructed.",
+    "Provenance-only changes (resolution IDs) are not decision influence.",
+    "Score differences under fixed rules alone do not demonstrate a learned investigation strategy.",
+    "Physical authorization remains absent; no PPAL/I1 or performance claim."
+  ]
+}

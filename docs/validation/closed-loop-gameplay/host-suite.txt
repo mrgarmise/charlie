@@ -1,0 +1,47 @@
+........................................................................ [  5%]
+.........................ss.ss.ss.................s..sssss.ss..ssss..... [ 11%]
+........................................................................ [ 16%]
+........................................................................ [ 22%]
+........................................................................ [ 27%]
+....................F...........................................s....... [ 33%]
+........................................................................ [ 38%]
+........................................................................ [ 44%]
+........................................................................ [ 49%]
+........................................................................ [ 55%]
+........................................................................ [ 61%]
+........................................................................ [ 66%]
+........................................................................ [ 72%]
+........................................................................ [ 77%]
+........................................................................ [ 83%]
+............................s........................................... [ 88%]
+........................................................................ [ 94%]
+........................................................................ [ 99%]
+.                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_waiting_investigation_resumes_on_qualified_delivery ___________
+
+tmp_path = PosixPath('/workspace/scratch/a5d7375d8e4e/test-temp/pytest-of-root/pytest-1/test_waiting_investigation_res0')
+
+    def test_waiting_investigation_resumes_on_qualified_delivery(tmp_path):
+        root=experience(tmp_path);state=tmp_path/'state'
+        p=startup(state,[root],authorize=False,turns=12);assert p.returncode==0,p.stderr
+        status=json.loads((state/'development-status.json').read_text())
+        assert status['phase']=='stopped' and status['last_activity']=='waiting for evidence'
+        before=rows(state)
+        p=startup(state,[root],authorize=False,turns=12);assert p.returncode==0,p.stderr
+>       assert [r.id for r in rows(state)]==[r.id for r in before]
+E       AssertionError: assert ['145ea99fa72...56d0ac0', ...] == ['145ea99fa72...56d0ac0', ...]
+E         
+E         Left contains 48 more items, first extra item: 'da15b6d72142376da3c33555ead0ca672882a58d151cadbf00b1379d8600de0b'
+E         Use -v to get more diff
+
+tests/test_developmental_stall.py:95: AssertionError
+=============================== warnings summary ===============================
+tests/test_thermal_recovery.py::test_restart_retains_same_investigation_checkpoint_and_no_duplicates
+  tests/test_thermal_recovery.py:127: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_restart_retains_same_investigation_checkpoint_and_no_duplicates(tmp_path,monkeypatch,record_property):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_developmental_stall.py::test_waiting_investigation_resumes_on_qualified_delivery
+1 failed, 1276 passed, 21 skipped, 1 warning in 331.38s (0:05:31)

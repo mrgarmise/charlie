@@ -319,8 +319,11 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
             if result['status']=='already_resolved':
                 payload=result['resolution']; result.update(result=payload['result'],reason=payload['reason'])
             executive.record_result(project['id'],plan,result,dataset.journal,episode=SCOPE)
-            gateway.assess_decision('offline:'+plan['prediction_id'],'helpful' if result['result']=='supported' else 'harmful',
-                result['resolution_id'],'diagnostic prediction usefulness only; no score reward attribution')
+            # An unanswered prediction is not a false prediction. Retain its
+            # resolution and dependency without teaching negative usefulness.
+            if result['result'] in ('supported','contradicted'):
+                gateway.assess_decision('offline:'+plan['prediction_id'],'helpful' if result['result']=='supported' else 'harmful',
+                    result['resolution_id'],'diagnostic prediction usefulness only; no score reward attribution')
             gateway.remember(Experience(kind='outcome',summary='Offline '+project['method']+' experiment: '+result['result'],
                 source='learning:foundry-resolution',subject=project['id'],goal=project['goal'],
                 outcome=json.dumps(result.get('metrics',{})),significant=True,

@@ -1,0 +1,18 @@
+{
+  "experiments/ppal/acquisition_profile.py": "ad9447346a554eeddce116103a23005894326b04396d053fd38c0e76ab190122",
+  "experiments/ppal/arcade_transport.py": "d44770baff7179a663ed0a1d53fe95310d639b3dd3a3cff31bddc5517ff60294",
+  "experiments/ppal/benchmark_agency_engine.py": "84878ee0967b20f2987c5f54d33e33b6b2ad2b82752502ca885b7e6d478e2c48",
+  "experiments/ppal/controller_overlap.py": "1e9aa5cfaf4a6682aa67c94cff9c3f6e2c4329430ec86a6483328298e9c4c430",
+  "experiments/ppal/eyes/sources.py": "0b4ded53247472a33425718b71457f89baf8c7e07a7e6f5824625fa6fa8df569",
+  "experiments/ppal/eyes/taught_recognizer.py": "7d66f85b5fd42e64e7a0fd358bed5f6367b123f9ccba75bacc00653da10f8876",
+  "experiments/ppal/gameplay_engine.py": "ab69f8a672227c8cfa929d2a6ebd8fa53f9b1f01f77fd11d682d5f7f70383a06",
+  "experiments/ppal/observation_camera.py": "1c9ac14d55d2caac58f8d3169c7e4d5dbaa31501d1b406c0a2d931f5911ab04d",
+  "experiments/ppal/observation_stream.py": "ba74c870d384f9dc18e81dbbcc4401e9c3f1bf0103f10a258861601502121b5c",
+  "experiments/ppal/play_robotron.py": "06027ccba7760982ce56354c20845ce01fa9cc03c18b914056b3638c5acdab03",
+  "experiments/ppal/projectile_agency.py": "7d1d9d3efc8e133a847faf5ed0bd0fdee4dc2ff1a001bb378ee9b63c467e3be4",
+  "experiments/ppal/robotron_agency.py": "613d8ffff658a78446302c1f383a4f461744849db5032420dcd433439a7083ab",
+  "experiments/ppal/shot_capture.py": "e95259c9041ec5ef160e302912094eb0ca75cc7c081b2c72c4a864e7adc16a28",
+  "tests/test_agency_stream_engine.py": "b0e97569f513f8f00b7951068a36cc780a505594cfa2a0310254eceb86fe55ee",
+  "tests/test_projectile_agency.py": "8c6b93cc8bdefc850a5a26fa6c2a1284806658194b4bc436e1008674156d8469",
+  "vision/camera.py": "1dd631ff149fe03a5d2608ffc716986c6a50e9e0ae628c742ce4528c51465b0b"
+}

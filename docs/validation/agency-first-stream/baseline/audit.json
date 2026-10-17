@@ -1,0 +1,24 @@
+{
+  "session": "development-20261017-200109",
+  "source_revision": "73169db9ad2648ca7e4088979d22905900052c6a",
+  "agency_observations": 37,
+  "shot_observations": 6,
+  "accepted_votes": 0,
+  "confirmed_self": false,
+  "tactical_ticks": 0,
+  "automated_score_retained": 100,
+  "operator_reported_score": 1500,
+  "complete_game_verified": false,
+  "timing": {
+    "independent_observation_hz": 1.6559773329822074,
+    "sensor_frame_duration_us": 67106,
+    "sensor_cadence_hz": 14.901797156737102,
+    "exposure_us": 66655,
+    "capture_seconds": 0.11164441599976271,
+    "controller_ready_seconds": 0.00945427900114737,
+    "controller_command_ack_seconds": 0.011003877500115777,
+    "unique_controller_executions": 14,
+    "processing_seconds": 0.03217064899945399,
+    "caveat": "delivered observations may skip sensor frames; no projectile rate inferred"
+  }
+}

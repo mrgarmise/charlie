@@ -1,0 +1,17 @@
+{
+  "experiments/ppal/acquisition_profile.py": "dc32c84a40f826902a6efe8ed0647cec95c98f8e5ff5e8846100d0bbcee3a59d",
+  "experiments/ppal/agency.py": "0ec18236471d21782737d09d4a22d04bbb743edb8d0b1fee40f7fb85bcc73a65",
+  "experiments/ppal/eyes/taught_recognizer.py": "9c4dbcc516d65d5cd2087b52cd68cf7168b16796971cb68343b295b8e87610d2",
+  "experiments/ppal/marathon_robotron.py": "b54830dcbc3b7bf28b4bca488c30cdfc74c501360ea82b0e4a077ffc80f186a3",
+  "experiments/ppal/play_robotron.py": "ba4e443faf5ba4d0b01fc31ae61916fb84fcc985c1c27e5d622ad8d2a8b6705a",
+  "experiments/ppal/projectile_agency.py": "d910553affee7f829f6157d270ab12fdb30d7ca72498c71a55225f00ff0a493c",
+  "experiments/ppal/robotron_agency.py": "36d370d92fd7e236dce27afeee4c97e20578cff3d2283e3fdf103d8e7fcd7666",
+  "tests/test_ppal_agency.py": "5e6765eec189d12ea4a9b6ec2b3383cbb8cc096182982138e882984323a1a8d9",
+  "tests/test_projectile_agency.py": "20d28250cdf533702f89fc1c611131651ebc3bffe4cd93e801efc1a7f5d6fc62",
+  "tests/test_restart_discovery_evidence.py": "a68fceb8d076d6e082d678e8390cb72f504db582aa77752d4a5de4443a6f3789",
+  "tests/test_robotron_actuator_bootstrap.py": "37ba43de39c869d01c18bffaa7b10edae33f63c1a055474579536135ed412740",
+  "tests/test_robotron_agency_integration.py": "6f939c3c346882a78791e071d9bce90a31cdab4e04f35994068ec8add4975b1e",
+  "tests/test_robotron_capture_timing.py": "e247e06ac3e5b0f1a56c59f6631f74f808728cd05fb9d213d931f16be8db086a",
+  "tests/test_robotron_new_run_regressions.py": "e0c16b620381eaa6b69aedf6766402f7ef26c544668a1fba804b50aff075b464",
+  "tests/test_robotron_response_window.py": "066dd189de83a3df5a370d8fa82ce190d73a1d22edf9dedad50774eaea7206a7"
+}

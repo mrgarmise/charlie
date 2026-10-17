@@ -107,7 +107,7 @@ class ArcadeController:
         try:self._command('NEUTRAL')
         except (OSError, ValueError):self.connection.close()
 
-    def execute(self, action: Action, duration_ms: int = 100) -> None:
+    def execute(self, action: Action, duration_ms: int = 100, *, cancel_event=None, deadline=None) -> None:
         if self.closed:
             raise RuntimeError("controller closed")
         # Validate the entire action before modifying any held controls.
@@ -119,12 +119,28 @@ class ArcadeController:
         timing = {"started_at":time.monotonic(), "move":action.move,
                   "fire":action.fire, "duration_ms":duration_ms, "commands":[]}
         self.last_execution = timing
+        def check_cancel():
+            if (cancel_event is not None and cancel_event.is_set()) or (deadline is not None and time.monotonic()>=deadline):
+                timing['cancelled_at']=time.monotonic()
+                raise InterruptedError('bounded controller operation cancelled')
         def send(command):
+            check_cancel()
             began = time.monotonic()
             self._command(command)
+            acknowledged=time.monotonic()
+            wire=getattr(self,'last_command',None) or {}
             timing["commands"].append({"command":command, "sent_at":began,
-                                       "ack_at":time.monotonic()})
+                "write_completed_at":wire.get('write_completed_at') if wire.get('command')==command else None,
+                "ack_at":acknowledged})
+            if command.startswith('RS_'):
+                if command=='RS_CENTER' or command.endswith('_UP') and self.protocol=='legacy':
+                    timing['fire_off_submitted_at']=began
+                    timing['fire_off_ack_at']=acknowledged
+                else:
+                    timing.setdefault('fire_on_submitted_at',began)
+                    timing['fire_on_ack_at']=acknowledged
         try:
+            check_cancel()
             for button in buttons:
                 send(button+'_DOWN')
             if self.protocol == "positions":
@@ -139,9 +155,15 @@ class ArcadeController:
                     send(control + "_DOWN")
                 self.held = desired
             timing["controls_ready_at"] = time.monotonic()
-            self.sleep(duration_ms / 1000)
+            if cancel_event is None and deadline is None:self.sleep(duration_ms / 1000)
+            else:
+                wait=duration_ms/1000
+                if deadline is not None:wait=min(wait,max(0.,deadline-time.monotonic()))
+                (cancel_event or threading.Event()).wait(wait)
+                check_cancel()
             timing["pulse_finished_at"] = time.monotonic()
             if self.pulse:
+                timing['release_started_at']=time.monotonic()
                 for button in buttons:
                     send(button+'_UP')
                 if self.protocol == "positions":
@@ -152,6 +174,7 @@ class ArcadeController:
                     for control in sorted(self.held):
                         send(control + "_UP")
                     self.held = frozenset()
+            timing['release_completed_at']=time.monotonic() if self.pulse else None
             timing["returned_at"] = time.monotonic()
         except BaseException:
             # A dropped connection makes the Zero-side launcher neutralize too.

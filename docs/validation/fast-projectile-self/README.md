@@ -1,3 +1,6 @@
+Latest continuation: [agency-first streaming repair](../agency-first-stream/README.md).
+The results below describe the original PR #5 checkpoint.
+
 # Fast SELF acquisition — implementation and open native validation
 
 Baseline: `d74d7a620c39104ce58fb2c9551381543a66b5f2`.

@@ -163,7 +163,9 @@ def test_fire_first_discovery_handoff_requires_explicit_confirmation_route(enabl
         assert rows[-1]['identity_status']=='confirmed'
         # Loss clears the alternative route; no inherited confirmation on respawn.
         v.observe([],observed_at=clock[0]+.1)
-        assert v.agency.self_id is None and v.player is None
+        assert v.player is None  # brief occlusion retains identity, never a guessed control position
+        v.observe([],observed_at=clock[0]+.5)
+        assert v.agency.self_id is None
     else:
         assert len(commands)>2 and v.agency.self_id is None
 
@@ -215,10 +217,12 @@ def test_camera_only_profiler_closes_before_writing(monkeypatch,tmp_path):
     clock=[0.];closed=[];focus=[];out=tmp_path/'profile.json'
     class Camera:
         def manual_focus(self,p):focus.append(p)
+        set_manual_focus=manual_focus
+        def focus_limits(self):return (0.,10.)
         def read_fresh(self):
             assert not out.exists()
             clock[0]+=.5
-            self.last_capture=dict(lens_position=2.,af_state=0,first_pixel_exposure_at=clock[0],
+            self.last_capture=dict(lens_position=2.,af_state=0,sensor_timestamp_ns=int(clock[0]*1e9),first_pixel_exposure_at=clock[0],
                 frame_duration_us=66667,exposure_time_us=60000)
             return Image.new('RGB',(100,100))
         def close(self):closed.append(True)

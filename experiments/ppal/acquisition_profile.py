@@ -17,13 +17,18 @@ def main(argv=None):
     source=PiCameraSource()
     rows=[]
     try:
-        source.manual_focus(2.0)
+        from .eyes.autofocus import verify_focus_lock
+        lock_report={}
+        verify_focus_lock(source,2.0,report=lock_report)
+        from .observation_camera import ObservedCamera
+        observed=ObservedCamera(source,require_fresh=True)
+        observed.start_stream()
         deadline=time.monotonic()+args.seconds
         while time.monotonic()<deadline:
-            frame=source.read_fresh()
-            capture=dict(source.last_capture)
+            frame=observed.read()
+            capture=dict(observed.capture)
             if (capture.get('lens_position') is None or abs(capture['lens_position']-2.)>.05
-                    or capture.get('af_state')!=0):
+                    or isinstance(capture.get('af_state'),bool) or capture.get('af_state')!=0):
                 raise ValueError('manual focus 2.0 not verified; profile aborted')
             started=time.perf_counter()
             bodies,points=candidates(frame)
@@ -36,7 +41,8 @@ def main(argv=None):
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(dict(schema='acquisition-camera-profile-v1',
         native=True,controller_opened=False,gameplay_evidence=False,focus=2.0,
-        qualification='timing only; no SELF or policy qualification',
+        focus_lock=lock_report,qualification='timing only; no SELF or policy qualification',
+        stream=observed.stream.stats() if observed.stream is not None else None,
         summary=timing_summary(rows),observations=rows),indent=2)+'\n')
 
 

@@ -35,6 +35,7 @@ class ShotOrigins:
 
     def reset(self):
         self.window=None
+        self.last_at=None
         self.previous=[]
         self.paths=[]
         self.votes={}
@@ -42,27 +43,33 @@ class ShotOrigins:
 
     def begin(self, direction, execution, bodies, baseline):
         """Only acknowledged command timing may open an evidence window."""
-        self.window=None; self.paths=[]; self.previous=list(baseline)
+        self.window=None; self.last_at=None; self.paths=[]; self.previous=list(baseline)
         if not isinstance(execution,dict) or execution.get('move')!='STAY':return False
         vectors={'E':(1,0),'W':(-1,0),'N':(0,-1),'S':(0,1),
                  'NE':(1,-1),'NW':(-1,-1),'SE':(1,1),'SW':(-1,1)}
         if vectors.get(execution.get('fire'))!=tuple(direction):return False
-        ready=execution.get('controls_ready_at'); end=execution.get('pulse_finished_at')
-        if ready is None or end is None or not math.isfinite(ready+end) or end<ready:
+        ready=execution.get('controls_ready_at'); end=execution.get('fire_off_ack_at',execution.get('pulse_finished_at'))
+        submitted=execution.get('fire_on_submitted_at',ready)
+        if ready is None or end is None or submitted is None or not math.isfinite(ready+end+submitted) or end<ready or submitted>ready:
             return False
         n=math.hypot(*direction)
         if not n:return False
         if any(ready-vote['start']>3. for votes in self.votes.values() for vote in votes):
             self.votes.clear();self.confirmed=None
-        self.window=dict(direction=tuple(v/n for v in direction),start=ready,end=end,
+        self.window=dict(direction=tuple(v/n for v in direction),start=submitted,end=end,
+                         ready_at=ready,latency='wire acknowledgment brackets are not display onset',
                          bodies=dict(bodies),command=len(self.votes))
         return True
 
     def observe(self, points, at):
         evidence=[]; w=self.window
         if w is None:return evidence
-        if not math.isfinite(at) or at<=w['start'] or at>w['end']+.75:
+        if not math.isfinite(at) or (self.last_at is not None and at<=self.last_at) or at>w['end']+.75:
             self.window=None; return evidence
+        self.last_at=at
+        if at<=w['start']:
+            self.previous=list(points);self.paths=[]
+            return evidence
         if len(points)>64: # merged transition/effect field, no identity inference
             self.window=None; return evidence
         # Unique bidirectional nearest association. Ambiguous crossings are dropped.

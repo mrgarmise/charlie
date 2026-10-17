@@ -62,8 +62,16 @@ class TaughtRecognizer:
         """Return (Detection, evidence) pairs in corrected playfield coordinates."""
         width, height = frame.size
         output = []
-        for box, area, patch in regions(frame):
-            identity, score, runner_up, by_class = self.classify_patch(patch)
+        components=regions(frame)
+        if not components:return output
+        queries=np.stack([feature(patch) for _,_,patch in components])
+        scores={identity:np.median(np.sort(matrix@queries.T,axis=0)[-3:],axis=0)
+                for identity,matrix in self.references.items()}
+        for index,(box,area,patch) in enumerate(components):
+            by_class={identity:float(values[index]) for identity,values in scores.items()}
+            ranked=sorted(by_class.items(),key=lambda item:item[1],reverse=True)
+            identity,score=ranked[0];runner_up=ranked[1][1] if len(ranked)>1 else -1.
+            if score<self.threshold or score-runner_up<self.margin:identity='unknown'
             detection = Detection(
                 identity,
                 ((box[0] + box[2]) / 2 / width * 100,

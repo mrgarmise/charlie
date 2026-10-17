@@ -42,7 +42,7 @@ def test_read_only_ablation_is_not_automatic_acceptance(monkeypatch):
     assert result["learned"]["chosen"] == "b"
     assert result["outcome_ablated"]["chosen"] == "a"
     assert result["acceptance"] == "NOT YET DEMONSTRATED"
-    assert result["outcome_evaluation_influence_observed"]
+    assert result["outcome_evaluation_influence_observed"]\n    assert result["outcome_ablation_effect"]["numerical_scores_changed"] == ["a"]
 
 
 def test_append_only_identity_control(monkeypatch):
@@ -52,3 +52,38 @@ def test_append_only_identity_control(monkeypatch):
                         else (state, ["different", "new"]))
     with pytest.raises(ValueError, match="append-only"):
         probe.analyze("before", "after")
+
+
+def test_resolution_ids_alone_are_not_learning_decision_influence(monkeypatch):
+    """Regression for authentic overnight: extra resolutions but unchanged scores."""
+    old = {"a": project("a", uncertainty=1.0)}
+    new = copy.deepcopy(old)
+    new["a"]["experiment_history"] = [
+        {"resolution_id": "prior", "result": "supported"},
+        {"resolution_id": "overnight", "result": "unresolved"},
+    ]
+    monkeypatch.setattr(probe, "load_projects",
+                        lambda p: (old, ["prior"]) if p == "before"
+                        else (new, ["prior", "overnight"]))
+    result = probe.analyze("before", "after")
+    assert not result["outcome_evaluation_influence_observed"]
+    assert result["retained_outcome_metadata_changed"]
+    assert result["outcome_ablation_effect"]["decision_evaluations_changed"] == []
+    assert result["outcome_ablation_effect"]["metadata_only_changed"] == ["a"]
+    assert result["baseline"]["chosen"] == result["learned"]["chosen"]
+
+
+def test_lifecycle_hold_not_misread_as_outcome_ablation(monkeypatch):
+    old = {"a": project("a", uncertainty=1.0)}
+    new = copy.deepcopy(old)
+    new["a"].update(status="paused", hold=True)
+    monkeypatch.setattr(probe, "load_projects",
+                        lambda p: (old, ["prior"]) if p == "before"
+                        else (new, ["prior", "hold"]))
+    result = probe.analyze("before", "after")
+    assert result["baseline"]["chosen"] == "a"
+    assert result["learned"]["chosen"] is None
+    assert result["outcome_ablated"]["chosen"] is None
+    assert not result["outcome_evaluation_influence_observed"]
+    assert result["baseline_to_learned"]["eligibility_changed"]
+    assert not result["outcome_ablation_effect"]["eligibility_changed"]

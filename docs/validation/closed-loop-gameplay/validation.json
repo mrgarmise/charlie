@@ -1,6 +1,6 @@
 {
   "schema": "closed-loop-validation-v1",
-  "status": "published checkpoint; final full suite pending",
+  "status": "software controls passed; native and learning acceptance remain pending",
   "baseline": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
   "read_only_probe_lineage": "9152ee0",
   "runtime_file_sha256": {
@@ -11,7 +11,8 @@
     "tools/e1_decision_probe.py": "2d4178681ccaff0649f21ffe02344353d0e42103ccab29215311b6e7f91a8f8d",
     "tools/e1_information_yield_probe.py": "838799f18387c1aa8a6649fab3fd2f645477aa24f0d06c82f930fc822ca24b7d",
     "tests/test_gameplay_campaign.py": "37c4d9a2b1ab7f2e4209e47158aa8697d28526ced46cb5c45b0d9fd1aa4b30be",
-    "tests/test_ala_diagnostics.py": "c3ecbe2a02bda919ff6cd7bd46150f3ef3544a943780162f010614b51fd07e38"
+    "tests/test_ala_diagnostics.py": "c3ecbe2a02bda919ff6cd7bd46150f3ef3544a943780162f010614b51fd07e38",
+    "tests/test_marathon_camera_session.py": "722c091ed1872d324273eb4f648baba4c4fe93ff9babea548bc462b0e5c5dd53"
   },
   "environment": {
     "python": "3.12.14",
@@ -24,22 +25,19 @@
       "pyserial": "3.5"
     }
   },
-  "focused": {
-    "tests": 102,
-    "failures": 0,
-    "errors": 0,
-    "skipped": 0,
-    "seconds": 38.168
-  },
   "earlier_full": {
+    "artifact": "host-suite.xml.gz",
     "tests": 1298,
+    "passed": 1276,
     "failures": 1,
     "errors": 0,
     "skipped": 21,
     "seconds": 331.356
   },
   "loaded_stop_early": {
+    "artifact": "host-loaded-run.xml.gz",
     "tests": 505,
+    "passed": 484,
     "failures": 1,
     "errors": 0,
     "skipped": 20,
@@ -58,5 +56,69 @@
     "I1": "NOT YET DEMONSTRATED",
     "native reliability": "NOT YET DEMONSTRATED",
     "performance": "NOT YET DEMONSTRATED"
-  }
+  },
+  "focused_prior": {
+    "tests": 102,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 38.168
+  },
+  "focused": {
+    "artifact": "focused-final.xml",
+    "tests": 114,
+    "passed": 114,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 41.564
+  },
+  "final_full": {
+    "artifact": "final-host-suite.xml",
+    "tests": 1299,
+    "passed": 1278,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 21,
+    "seconds": 344.419
+  },
+  "pre_fixture_full": {
+    "artifact": "host-before-fixture-pacing.xml.gz",
+    "tests": 1299,
+    "passed": 1277,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 21,
+    "seconds": 330.384
+  },
+  "published_implementation": "15631b72c4992e188af117aab05550d7ded045e6",
+  "published_test_checkpoint": "2a505ad7715c2a337c08edabab6a294a473f3f29",
+  "tested_local_commit": "92a856b41a939ec4a5ec96a184771349e9602123",
+  "tested_tree": "7e3e04ce7d198d34f330057d89ba39a9e6c4cbdb",
+  "earlier_failures": [
+    "Shared ownership lock interrupted initial broad run; not an acceptance result",
+    "A restart-stability case appended 48 additional investigation records under full-suite execution; passed isolated, focused and final full runs. No unverified claim of baseline equivalence.",
+    "Default production recording protection invalidated accelerated synthetic camera episodes under host scheduling variability. The transition fixture now waits for real durable writer completion before advancing synthetic exposures; production limits and overflow safety unchanged."
+  ],
+  "warnings": [
+    "One pytest JUnit record_property format warning; no test failure"
+  ],
+  "skips": {
+    "torch_unavailable": 18,
+    "collection_skip": 1,
+    "original_archive_inputs_unavailable": 2
+  },
+  "changed_source_files": [
+    "experiments/ppal/marathon_robotron.py",
+    "learning/campaign.py",
+    "learning/cycle.py",
+    "memory/investigation_learning.py",
+    "tests/test_ala_diagnostics.py",
+    "tests/test_e1_decision_probe.py",
+    "tests/test_e1_information_yield_shadow.py",
+    "tests/test_gameplay_campaign.py",
+    "tests/test_marathon_camera_session.py",
+    "tools/e1_decision_probe.py",
+    "tools/e1_information_yield_probe.py"
+  ]
 }

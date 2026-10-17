@@ -1,0 +1,37 @@
+{
+  "host-loaded-run.xml": {
+    "preserved_as": "host-loaded-run.xml.gz",
+    "original_sha256": "d7346eeba07e751eced48a2655e4cf95591248c4a53e9c06b8ee82a6c0b36740",
+    "gzip_sha256": "82c026033df9c1822f7f5f2f4909f00a3c42a3297886d16b38cd9e9c797f0a99"
+  },
+  "host-loaded-run.txt": {
+    "preserved_as": "host-loaded-run.txt.gz",
+    "original_sha256": "de5d406985efba7f6ebf666467dfe2d3c46918d252e42eca38294114d9412240",
+    "gzip_sha256": "c1965e26ee5e4a0296e52a1ec9234560e35f00b20c45905a81d554c270ff32fa"
+  },
+  "host-suite.xml": {
+    "preserved_as": "host-suite.xml.gz",
+    "original_sha256": "35c719030839c34321072a4dc6ab8397ad3c0e2c00b650d06809ede8c06f0334",
+    "gzip_sha256": "46611e10a4e705c0186e7ba7f4a538d7a938d8448182e1b084c130e92aac3a46"
+  },
+  "host-suite.txt": {
+    "preserved_as": "host-suite.txt.gz",
+    "original_sha256": "73e99036c5eb62825c63ff9d55a9dde1366e77d782cc7c67696fbdc8b557d334",
+    "gzip_sha256": "66a4f347064a075eabac5e23a3b2ee7bb06beb2d75969f7bdeb19ccbd600b527"
+  },
+  "host-initial-interrupted.txt": {
+    "preserved_as": "host-initial-interrupted.txt.gz",
+    "original_sha256": "bdf10ee4ac693d278270fe8e5812c41545bce7061cd7fb22c3e7dd35eb26be5e",
+    "gzip_sha256": "44d11d2905e42a023228b31867e3d4ece7ef319bccbc7fd6243ca36046d7f51b"
+  },
+  "host-before-fixture-pacing.xml": {
+    "preserved_as": "host-before-fixture-pacing.xml.gz",
+    "original_sha256": "cefcb84a6200c750d3ad5462cc1d862354ddab3d200f00525ce3af810c0fe4ff",
+    "gzip_sha256": "e05f9830c5b6683c17d8e393fb7495164aed8828808a8672bde15d5afaedb125"
+  },
+  "host-before-fixture-pacing.txt": {
+    "preserved_as": "host-before-fixture-pacing.txt.gz",
+    "original_sha256": "f19108b049bd4e20a81b319bbd5947aa177d0d388b50027f47cc5bb3aa5a9051",
+    "gzip_sha256": "05f3c3af34afa53ec250a06a15aecfe5a8fc8526d7b5434bef04e4ba74d60f0f"
+  }
+}

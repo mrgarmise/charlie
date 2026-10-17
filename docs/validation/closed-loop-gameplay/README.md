@@ -135,3 +135,7 @@ Disarm first and wait for confirmed worker/controller/camera cleanup. Keep the c
 ## Validation
 
 Final counts and exact runtime file hashes are in `validation.json`. The initial broad test attempt was interrupted after encountering a shared gameplay ownership lock; its incomplete output is retained separately and is not a successful test receipt. Subsequent scoped/full runs use isolated test temporary directories with all ownership guards intact. Software fixtures are explicitly labeled and never qualify native gameplay, learning or scores.
+
+Final host verification: **1,278 passed, 21 skipped, zero failures** in 344.45 seconds; **114 focused tests passed**. Eighteen skips require optional Torch, one is a collection skip, and two require unavailable original archive inputs. One JUnit property-format warning remains. The final source/test checkpoint is `2a505ad7715c2a337c08edabab6a294a473f3f29`, whose tree matches tested local commit `92a856b41a939ec4a5ec96a184771349e9602123`. Subsequent receipt changes do not alter application or test code.
+
+Earlier failing runs remain byte-for-byte recoverable from the gzip artifacts listed in `historical-test-receipts.json`. The synthetic transition fixture now waits for actual durable writer work before advancing its artificial camera clock. This is not a production throughput improvement or a relaxed recording limit. Both overflow safety and the final two-game transition passed.

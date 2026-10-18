@@ -59,9 +59,11 @@ def qualified_motion_outcomes(journal):
         if len(linked) != 1:
             continue
         action = linked[0].data["payload"]["action"]
-        if (p.get("actual_action") is not None
-                and any(p["actual_action"].get(k) != action.get(k)
-                        for k in ("move", "fire"))):
+        reported_action = p.get("actual_action")
+        if (reported_action is not None
+                and (not isinstance(reported_action, dict)
+                     or any(reported_action.get(k) != action.get(k)
+                            for k in ("move", "fire")))):
             continue
         resolution = journal.resolution_for(prediction_id)
         if (resolution is None or resolution.data["payload"].get("result") != p["result"]):

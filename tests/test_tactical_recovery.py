@@ -44,6 +44,15 @@ class TestTacticalRecovery(unittest.TestCase):
         self.assertEqual(rows[0][1], "outcome-1")
         self.assertEqual(rows[0][2]["actual_action"], dict(move="N", fire="NONE"))
 
+    def test_real_capture_prediction_wrapper_is_supported(self):
+        journal = FakeJournal()
+        original = journal.pred.data["payload"]
+        journal.pred.data["payload"] = dict(
+            mode="buffered_live_prospective", deadline=15.0, expected=original)
+        recovered = list(qualified_motion_outcomes(journal))
+        self.assertEqual(len(recovered), 1)
+        self.assertEqual(recovered[0][2]["actual_action"]["move"], "N")
+
     def test_missing_identity_or_execution_is_excluded(self):
         self.assertEqual(list(qualified_motion_outcomes(FakeJournal(identity="provisional"))), [])
         self.assertEqual(list(qualified_motion_outcomes(FakeJournal(execution_move="S"))), [])

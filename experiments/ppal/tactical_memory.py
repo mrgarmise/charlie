@@ -85,8 +85,15 @@ class TacticalDiagnosticMemory:
                 if old != row:
                     raise ValueError("conflicting tactical observation identity")
                 return False
-        self.rows = (self.rows + [row])[-MAX_ROWS:]
-        self._save()
+        if len(self.rows) >= MAX_ROWS:
+            raise RuntimeError("tactical diagnostic ledger full; preserve existing evidence and rotate under review")
+        previous = self.rows
+        self.rows = previous + [row]
+        try:
+            self._save()
+        except BaseException:
+            self.rows = previous
+            raise
         return True
 
     def _save(self):

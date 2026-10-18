@@ -1,0 +1,236 @@
+{
+  "native": false,
+  "new_gameplay": false,
+  "scope": "host archived pixels; no recognition-quality or native FPS claim",
+  "python": "3.12.14",
+  "summary": {
+    "existing_cpu_regions": {
+      "samples": 18,
+      "median_seconds": 0.03352984750000587,
+      "p95_seconds": 0.04080308899995089
+    },
+    "existing_projectile_candidates": {
+      "samples": 18,
+      "median_seconds": 0.017605720000062774,
+      "p95_seconds": 0.019110052000087308
+    }
+  },
+  "samples": [
+    {
+      "image": "raw-0003.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.04080308899995089,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0003.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03436135499998727,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0003.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.036112211000045136,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0003.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017636575999972592,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0003.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017548065000028146,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0003.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017482549000078507,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0004.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.033270414999947207,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0004.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.033317262999958075,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0004.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03350173599994832,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0004.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017644457999949736,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0004.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017936539000061202,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0004.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017385525000008784,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0005.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.033692017000021224,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0005.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03332456399994044,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0005.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03333327600000757,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0005.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.01750294800001484,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0005.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017632299000069906,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0005.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017907356000023356,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0006.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03288823900004445,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0006.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03322749100004785,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0006.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03355795900006342,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0006.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.019110052000087308,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0006.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.016985254000019268,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0006.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017530299000100058,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0007.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03313212900002327,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0007.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03371440000000803,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0007.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03356262600004811,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0007.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017787449000024935,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0007.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.018248529000061353,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0007.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.01727087599999777,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0008.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.033384221999995134,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0008.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.033604007000008096,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0008.png",
+      "stage": "existing_cpu_regions",
+      "seconds": 0.03358889399999043,
+      "repeat": 2
+    },
+    {
+      "image": "raw-0008.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017579141000055643,
+      "repeat": 0
+    },
+    {
+      "image": "raw-0008.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017737885000087772,
+      "repeat": 1
+    },
+    {
+      "image": "raw-0008.png",
+      "stage": "existing_projectile_candidates",
+      "seconds": 0.017545141000027797,
+      "repeat": 2
+    }
+  ]
+}

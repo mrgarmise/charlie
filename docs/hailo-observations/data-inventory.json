@@ -1,0 +1,91 @@
+{
+  "schema": "charlie-labeling-backlog-v1",
+  "root": "docs/validation/agency-first-stream/baseline",
+  "session": "development-20261017-200109",
+  "images": 6,
+  "unique_pixels": 6,
+  "verified_images": 0,
+  "required_review": 6,
+  "eligible_training_images": 0,
+  "frames": [
+    {
+      "path": "raw-0003.png",
+      "session": "development-20261017-200109",
+      "geometry": [
+        640,
+        480
+      ],
+      "sha256": "f8615655664f2ba19d1aaa8c41df984fb5617f9a45eca06436cd54353f742e5b",
+      "pixel_sha256": "0ed27d5ded673ef3c010c3d36fb3a43b9809f08a80abe970678f9fd1621b70d7",
+      "human_verified": false,
+      "labels": null,
+      "timestamp_basis": null
+    },
+    {
+      "path": "raw-0004.png",
+      "session": "development-20261017-200109",
+      "geometry": [
+        640,
+        480
+      ],
+      "sha256": "06e1ba9271397166524cb2d6cb9590621d203f6674d1c5ea43661b614a5cf417",
+      "pixel_sha256": "a2a33b6638bead3d9fd61b45502261f88e7e3e8688361be7e0e722a1e57be6b4",
+      "human_verified": false,
+      "labels": null,
+      "timestamp_basis": null
+    },
+    {
+      "path": "raw-0005.png",
+      "session": "development-20261017-200109",
+      "geometry": [
+        640,
+        480
+      ],
+      "sha256": "a064122a37537b73fcc9f64af3f4a1c39d542ae3feb1989c4c8a755058d51cbd",
+      "pixel_sha256": "962cf7499afca93b577fc6bb1b899d0d9bc7c8b5834d2485b86bdbef1957e689",
+      "human_verified": false,
+      "labels": null,
+      "timestamp_basis": null
+    },
+    {
+      "path": "raw-0006.png",
+      "session": "development-20261017-200109",
+      "geometry": [
+        640,
+        480
+      ],
+      "sha256": "abc3f23fd545b2482ee806daa37210c3ea67df9ac6d9485147960c6a71abf5a7",
+      "pixel_sha256": "7555177deb5de0871182e9f28f3002308846812c53ab821aa053712401ae1b25",
+      "human_verified": false,
+      "labels": null,
+      "timestamp_basis": null
+    },
+    {
+      "path": "raw-0007.png",
+      "session": "development-20261017-200109",
+      "geometry": [
+        640,
+        480
+      ],
+      "sha256": "7d3051e85f2f2a0e6914a3e5d1955005b062e7f663afeed3213f83d9152d15e9",
+      "pixel_sha256": "0bb670d7f6d57f19029d9e6f6d7636abab9d53ed41c770e36f18d1fa05dc863a",
+      "human_verified": false,
+      "labels": null,
+      "timestamp_basis": null
+    },
+    {
+      "path": "raw-0008.png",
+      "session": "development-20261017-200109",
+      "geometry": [
+        640,
+        480
+      ],
+      "sha256": "ef22797777c3bb54f25d0d6909699546d3f9003b8b87eb0e8f5346dcec01880a",
+      "pixel_sha256": "46ed2c8d073eecccf4cf0667e1bcc144430b62799b0dce2340751f9c5b7c677b",
+      "human_verified": false,
+      "labels": null,
+      "timestamp_basis": null
+    }
+  ],
+  "qualification": "inventory only; source authenticity requires provenance review"
+}

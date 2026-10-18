@@ -56,6 +56,28 @@ remains required; the two SSD copies alone do not prove complete migration.
    physical action remains unchanged. The game runner does not instantiate
    the ledger or activate a learned policy; separate native integration and
    authorization are required.
+4. Every actual Executive selection now carries a same-opportunity-set,
+   contemporaneous diagnostic-unit score ablation and possible alternate
+   winner. This is mechanistic traceability, **not** authenticated scientific
+   resolution or completed E1 acceptance.
+5. `learning/tactical_recovery.py` and `tools/recover_tactical_feedback.py`
+   reconcile immutable prediction/execution/outcome/resolution links from
+   preserved per-game SQLite journals. Default operation previews evidence;
+   writing requires an explicit *separate* ledger and never activates motion.
+
+Example preview (native Pi, no physical commands):
+
+```bash
+python3 tools/recover_tactical_feedback.py \
+  --journal /path/to/preserved/game-01/session-evidence.sqlite3 \
+  --report /path/to/new-audit-output/tactical-recovery-preview.json
+```
+
+After source identity, consent and source-copy qualification have been
+reviewed, an **offline diagnostic ledger only** may be written with
+`--write-ledger /path/to/isolated-state/tactical-diagnostics.json`.
+Do not point the ledger at original observations. The ledger's bounded capacity
+stops on exhaustion; it never silently evicts historical evidence.
 
 These are implementation claims, not authentic acceptance. Synthetic tests
 must be reported as tests, never as new gameplay or E1/P1/I1 success.

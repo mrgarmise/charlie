@@ -1,0 +1,69 @@
+{
+  "schema": "charlie-audit-capability-reconciliation-v1",
+  "branch": "feature/hailo-score-reader",
+  "base_source": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+  "report": "docs/neural-score/README.md",
+  "related_issue": {
+    "id": "CHA-9",
+    "url": "https://linear.app/charlie-monoraton/issue/CHA-9/qualify-independent-robotron-observation-and-complete-game-score",
+    "status": "OPEN; not mutated"
+  },
+  "phase1_audit": {
+    "library_file_id": "libfile_c76f39e7f6d88191b0ed9e0d958f096f",
+    "history": "PENDING EXPORT",
+    "exhaustive": false
+  },
+  "capabilities": [
+    {
+      "id": "ROB-SCORE",
+      "new_or_preserved": "new optional sequence visual reader; original temporal/official-score rules preserved",
+      "acceptance": "host-tested code, synthetic model only"
+    },
+    {
+      "id": "ROB-FEEDBACK",
+      "new_or_preserved": "existing integrated original review/recovery reused read-only; no new portal/store",
+      "acceptance": "original October 10 database/photos still missing"
+    },
+    {
+      "id": "VIS-CORPUS",
+      "new_or_preserved": "new immutable score-string crop manifests, review adapter and consultation ledger",
+      "acceptance": "zero new authentic eligible training labels; prior external commitments pending"
+    },
+    {
+      "id": "VIS-LAB",
+      "new_or_preserved": "separate 9156940 Vision Lab preserved; sequence-specific tools reuse review/session principles",
+      "acceptance": "no YOLO duplication or activation"
+    },
+    {
+      "id": "VIS-HAILO",
+      "new_or_preserved": "new actual optional HailoRT adapter, resource admission contract and fixed graph compiler script",
+      "acceptance": "no DFC, HEF or device run; joint sprite integration not qualified"
+    },
+    {
+      "id": "SYS-NATIVE",
+      "new_or_preserved": "read-only operator inventory/acceptance instructions",
+      "acceptance": "installed/running/OS ABI and native latency UNKNOWN"
+    },
+    {
+      "id": "SYS-MIGRATION",
+      "new_or_preserved": "no migration work performed",
+      "acceptance": "historical proposal unverified; outside authorization"
+    }
+  ],
+  "actual_original_reviews_admitted": 0,
+  "original_notebook_mutated": false,
+  "physical_operations": false,
+  "original_discrepancy": {
+    "session": "development-20261011-192041",
+    "operator_report": 2200,
+    "reader_report": 1100,
+    "status": "UNRESOLVED HISTORICAL CASE",
+    "truth_label": null
+  },
+  "gates": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  },
+  "publication": "Draft PR on this branch; exact published head and receipt recorded in PR metadata. No merge requested."
+}

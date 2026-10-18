@@ -1,0 +1,47 @@
+{
+  "schema": "charlie-neural-score-integration-ledger-v1",
+  "base": "origin/master",
+  "refs": {
+    "master": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+    "feature/score-feedback-master-integration": "b1d1ef14fd9100a34a94519305db802c2b75d66e",
+    "feature/fast-projectile-self": "8c96db003b87246ee6b0f9dc9918cb42af726370",
+    "feature/hailo-observation-bridge": "ab58a3d3d3f83a44e77184d329f0e28c1f9cbda8",
+    "feature/charlie-vision-lab": "9156940a89651ec0b16d8972f8fed1261ae8f3da"
+  },
+  "source_hashes": {
+    "experiments/ppal/robotron_hud.py": "ec8a77a4c79e7405ed2605efad6aacf6aace9a5e4d85a35e392da196f5aa8135",
+    "experiments/ppal/score_feedback.py": "c20d60389ffa40daee03524058119b386fc28760f4f2bf3afbc62e718d01f6fa",
+    "tools/recover_score_reviews.py": "a02df3c259c5ce6534d88a9f1992d2e3eee2c53670506bf941359f46ba945e59",
+    "tools/score_feedback_candidate.py": "d467fb8de6883bb0675fbebb5177e6cc6f3346f09ad2317709ec1bac86c5f0d1",
+    "experiments/ppal/score_tracker.py": "98694cc60807273245182bf0c758359b861c9b1c9edfdccddf1eaa69f9ae2d36",
+    "experiments/ppal/score_events.py": "e8bdce36eb9993a4909d4616ccf391a9481961becf65bc759a10d37f6c9613d1"
+  },
+  "feedback_already_integrated": [
+    "experiments/ppal/robotron_hud.py",
+    "experiments/ppal/score_feedback.py",
+    "tools/recover_score_reviews.py",
+    "tools/score_feedback_candidate.py",
+    "experiments/ppal/score_tracker.py",
+    "experiments/ppal/score_events.py"
+  ],
+  "excluded": [
+    "gameplay activation",
+    "controller/camera/servo ownership",
+    "firmware",
+    "master merge",
+    "notebook writes",
+    "SYS-MIGRATION",
+    "historical branch consolidation"
+  ],
+  "new_scope": [
+    "fixed convolutional whole-string CTC reader",
+    "optional CPU/Hailo inference",
+    "explicit opt-in existing score pipeline adapter",
+    "immutable reviewed crop corpus",
+    "training/export/replay/metrics"
+  ],
+  "installed": "UNKNOWN: Pi inaccessible",
+  "running": "UNKNOWN: Pi inaccessible",
+  "native_hailo": "NOT EXECUTED",
+  "history": "PENDING EXPORT; Phase 1 not exhaustive"
+}

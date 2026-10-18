@@ -9,8 +9,11 @@ from .score_events import ScoreEventLog
 
 
 class ScoreObserver:
-    def __init__(self, calibration, path):
-        self.system = RobotronScoreSystem(calibration, self_channel=1, confirm_baseline=True)
+    def __init__(self, calibration, path, *, reader_factory=None):
+        self.closed = False
+        self.neural_enabled = reader_factory is not None
+        self.system = RobotronScoreSystem(calibration, self_channel=1, confirm_baseline=True,
+            reader=reader_factory(calibration) if reader_factory else None)
         self.log = ScoreEventLog(path)
         self.queue = queue.Queue(maxsize=2)
         self.dropped = 0
@@ -23,7 +26,8 @@ class ScoreObserver:
         self.gameplay_report=None
         self.gameplay_observations=[]
         self.frozen_at=None
-        self.non_gameplay_system=RobotronScoreSystem(calibration,self_channel=1,confirm_baseline=True)
+        self.non_gameplay_system=RobotronScoreSystem(calibration,self_channel=1,confirm_baseline=True,
+            reader=reader_factory(calibration) if reader_factory else None)
         self.late_change_frames = 0
         self.omitted_change_frames = 0
         self.accepted_confidence = {1:None, 2:None}
@@ -35,16 +39,17 @@ class ScoreObserver:
         # game score history; a viewpoint change is not a new game/reset.
         self.queue.put(('geometry',calibration),timeout=1.)
 
-    def submit(self, frame, *, timestamp, sample, preceding_action,observation_id=None,screen=None):
+    def submit(self, frame, *, timestamp, sample, preceding_action,observation_id=None,screen=None,capture_metadata=None):
         begin = time.monotonic()
-        if self.queue.full():
+        if self.closed or self.queue.full():
             self.dropped += 1
             return
         # Independent pixels: camera buffers may be reused by the next capture.
         try:
             copied = frame.copy()
             self.queue.put_nowait((copied, timestamp, sample, preceding_action,
-                                  time.monotonic()-begin,observation_id,screen))
+                                  time.monotonic()-begin,observation_id,screen,
+                                  dict(capture_metadata or {},enqueued_at=time.monotonic())))
         except Exception:
             self.errors += 1
 
@@ -58,14 +63,19 @@ class ScoreObserver:
                     self.system.reader.calibration=item[1]
                     self.non_gameplay_system.reader.calibration=item[1]
                     continue
-                frame, timestamp, sample, action, copy_seconds, observation_id, screen = item
-                eligible=(screen is None or (screen.get('phase')=='gameplay' and not screen.get('episode_retired')))
+                frame, timestamp, sample, action, copy_seconds, observation_id, screen, capture_metadata = item
+                eligible=((screen is None and not self.neural_enabled) or (screen is not None and screen.get('phase')=='gameplay' and not screen.get('episode_retired')))
                 if self.frozen_at is not None and timestamp>self.frozen_at:eligible=False
                 system=self.system if eligible else self.non_gameplay_system
                 begin = time.monotonic()
                 error = None
                 try:
-                    channels = system.observe(frame, t=timestamp)
+                    source=dict(capture_metadata,observation_id=observation_id,
+                        queue_wait_seconds=time.monotonic()-capture_metadata["enqueued_at"])
+                    if hasattr(system.reader,"bind_source"):
+                        channels = system.observe(frame, t=timestamp, source=source)
+                    else:
+                        channels = system.observe(frame, t=timestamp)
                 except Exception as exc:
                     self.errors += 1
                     error = f'{type(exc).__name__}: {exc}'
@@ -94,7 +104,7 @@ class ScoreObserver:
                     self.omitted_change_frames += 1
                 row.update(sample=sample, timestamp=timestamp, preceding_action=action,observation_id=observation_id,
                            processing_seconds=elapsed, enqueue_copy_seconds=copy_seconds,
-                           error=error, reward_evidence=channels.self_delta,
+                           error=error, neural_score=getattr(system.reader,"last_packet",None), reward_evidence=channels.self_delta,
                            attribution='temporal_association_only',score_partition='gameplay' if eligible else 'non_gameplay',
                            screen=screen)
                 # The final image is retained at close even when this row did
@@ -129,11 +139,17 @@ class ScoreObserver:
 
     def close(self):
         # Called only after camera and controls have closed.
+        if self.closed: return
+        self.closed = True
         try:
             self.queue.put(None, timeout=.1)
         except queue.Full:
-            return
+            try:
+                self.queue.get_nowait(); self.queue.task_done(); self.dropped += 1
+                self.queue.put_nowait(None)
+            except queue.Empty: self.queue.put_nowait(None)
         self.thread.join(timeout=5.)
+        if self.thread.is_alive(): self.errors += 1
         if not self.thread.is_alive() and self.latest_frame is not None:
             if all(name != self.latest_frame[0] for name, _ in self.frames):
                 self.frames.append(self.latest_frame)

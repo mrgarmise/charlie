@@ -434,6 +434,14 @@ class LearningExecutive:
                 experience_basis=dict(independent_units=resolved,
                     resolution_ids=[h['resolution_id'] for h in p.get('experiment_history', [])
                                     if h['result'] != 'unresolved'],
+                    contemporaneous_ablation=dict(
+                        # Freeze the exact opportunity, eligibility, declared
+                        # costs and other terms of this actual decision.
+                        without_diagnostic_units_score=score + p.get('uncertainty', .5)
+                            - terms['remaining_uncertainty'],
+                        retained_unit_score_effect=terms['remaining_uncertainty']
+                            - p.get('uncertainty', .5),
+                        scope='diagnostic recurrence only; causal truth and method utility unqualified'),
                     interpretation='retained diagnostic outcomes; independence accounting is not authenticity or score qualification'),
                 missing_resources=missing, unmet_dependencies=unmet,
                 method_available=p['method'] in methods, authorized=p['method'] in authorized_methods,
@@ -453,16 +461,28 @@ class LearningExecutive:
         # Resuming an interrupted undertaking precedes starting a fresh one.
         resume = [a for a in eligible if projects[a['project_id']].get('interrupted_by')
                   and projects.get(projects[a['project_id']]['interrupted_by'], {}).get('status') in FINAL]
-        chosen = max(urgent or active or resume or eligible, key=lambda a: (a['score'], a['project_id']))
+        eligible_tier = urgent or active or resume or eligible
+        chosen = max(eligible_tier, key=lambda a: (a['score'], a['project_id']))
+        ablated = max(eligible_tier, key=lambda a: (
+            a['experience_basis']['contemporaneous_ablation']['without_diagnostic_units_score'],
+            a['project_id']))
+        ablation = dict(
+            baseline_project_id=ablated['project_id'],
+            retained_project_id=chosen['project_id'],
+            changed_winner=ablated['project_id'] != chosen['project_id'],
+            opportunity_tier=[a['project_id'] for a in eligible_tier],
+            attribution='same-decision heuristic counterfactual; not an authentic second decision or E1 proof')
         reason = ('evidenced interruption' if urgent else 'continue active project' if active
                   else 'resume interrupted project' if resume else 'generic value/uncertainty minus cost/risk policy')
-        if inspect:return dict(project=projects[chosen['project_id']],alternatives=alternatives)
+        if inspect:return dict(project=projects[chosen['project_id']],alternatives=alternatives,
+                              ablation=ablation)
         interrupted = [p['id'] for p in projects.values()
                        if p['status'] == 'active' and p['id'] != chosen['project_id']]
         resume_from=next((r.id for r in reversed(self.journal.records('event'))
             if r.data['payload'].get('project_id')==chosen['project_id']
             and r.data['payload'].get('op') in ('lifecycle','assessment')),None)
         self._event(dict(op='selected', project_id=chosen['project_id'], resume_from=resume_from, alternatives=alternatives,
+                         contemporaneous_ablation=ablation,
                          interrupted_projects=interrupted, reason=reason))
         return dict(project=self.projects()[chosen['project_id']], alternatives=alternatives, reason=reason)
 

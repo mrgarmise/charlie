@@ -17,9 +17,16 @@ def qualified_motion_outcomes(journal):
     response window was structurally linked, NOT that it is independent final
     gameplay evidence or a valid causal/score claim.
     """
+    # CaptureEvidence.prepare_buffered_prediction nests the frozen plan
+    # under payload.expected (unlike ordinary observation payloads).
+    def frozen_plan(record):
+        payload = record.data["payload"]
+        embedded = payload.get("expected")
+        return embedded if isinstance(embedded, dict) else payload
+
     predictions = {
         r.id: r for r in journal.records("prediction")
-        if r.data["payload"].get("category") == "tactical_prediction"
+        if frozen_plan(r).get("category") == "tactical_prediction"
     }
     executions = {}
     for r in journal.records("observation"):
@@ -48,7 +55,8 @@ def qualified_motion_outcomes(journal):
                 or not 0 < observed_at - origin_at <= 2):
             continue
 
-        predicted = pred.data["payload"].get("actual_action") or pred.data["payload"].get("selected")
+        expected = frozen_plan(pred)
+        predicted = expected.get("actual_action") or expected.get("selected")
         if not isinstance(predicted, dict):
             continue
         linked = [e for e in executions.get(prediction_id, [])

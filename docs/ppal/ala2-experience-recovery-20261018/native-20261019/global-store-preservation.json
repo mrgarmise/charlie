@@ -1,0 +1,23 @@
+[
+  {
+    "source": "/home/five/.local/share/charlie/memory-evaluation.sqlite3",
+    "copy": "/home/five/ala2-recovery-20261019/preserved/global-memory/memory-evaluation.sqlite3",
+    "sha256": "8e3fc59c55456875f09b7b35fe2fa73ba318aee877e2b4bb697de2bfb1343da6",
+    "merged": false,
+    "source_unchanged_at_final_check": true
+  },
+  {
+    "source": "/home/five/.local/share/charlie/memory-outbox.sqlite3",
+    "copy": "/home/five/ala2-recovery-20261019/preserved/global-memory/memory-outbox.sqlite3",
+    "sha256": "22e4e19add8785ac31bbf82bced38b839ede2026f27ddc72458e2811432ca935",
+    "merged": false,
+    "source_unchanged_at_final_check": true
+  },
+  {
+    "source": "/home/five/.local/share/charlie/learning-project-evidence.sqlite3",
+    "copy": "/home/five/ala2-recovery-20261019/preserved/global-memory/learning-project-evidence.sqlite3",
+    "sha256": "139f0d393e8adc4a15950abca1c0fd6aaf00bcac807cfeb2f7ee2a4bffa66e0e",
+    "merged": false,
+    "source_unchanged_at_final_check": true
+  }
+]

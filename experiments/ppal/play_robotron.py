@@ -505,6 +505,10 @@ def main(argv=None, *, camera_session=None, progress_path=None):
     parser.add_argument("--output", type=Path)
     parser.add_argument("--arm", action="store_true",
                         help="actually send movement/fire commands")
+    parser.add_argument("--acquisition-fire-ms", type=int, default=60, choices=range(30,401),
+                        help="explicit bounded shot acquisition hold; existing budgets and 500ms lease unchanged")
+    parser.add_argument("--projectile-self", action="store_true",
+                        help="experimental shot-origin confirmation; requires independent native qualification")
     parser.add_argument("--bootstrap-body-fire", action="store_true",
                         help="experimental provisional BODY identity with independent and simultaneous FIRE exploration")
     parser.add_argument('--experiment-plan', type=Path,
@@ -592,7 +596,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
     shadow_forebrain = Forebrain()
     shadow_hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
     shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
-    visual_agency = VisualAgency(bootstrap_body_fire=args.bootstrap_body_fire)
+    visual_agency = VisualAgency(bootstrap_body_fire=args.bootstrap_body_fire,
+                                 projectile_confirmation=args.projectile_self)
     self_tracker = PersistentSelfTracker(max_distance=7.0, max_missed=3,
                                          tracker=visual_agency.tracker if args.arm else None)
     session = RobotronSessionManager(clock=time.monotonic)
@@ -659,6 +664,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
     recorder=None
     recent_observation_ids=[]
     def record_agency(snapshot):
+        evidence_began=time.perf_counter()
         if recorder is not None and recorder.latest_observation is not None:
             recorder.event('perception_trace',dict(schema='first-person-trace-v1',
                 agency=snapshot,interpretation='Charlie-authored provisional beliefs; not independent visual truth'),
@@ -677,7 +683,9 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                  track_id=snapshot.get('controlled_track_id'), identity_status=status)
         row = {"sample": visual_agency.tick, "capture_timestamp": source.timestamp, "capture": source.capture,
                "viewer_state":source.viewer_state,
-               "control_execution": getattr(controller, "last_execution", None), "session_phase":session.state.value, **snapshot}
+               "control_execution": getattr(controller, "last_execution", None), "session_phase":session.state.value,
+               "acquisition_processing_seconds":(getattr(read_agency_pairs,"processing_seconds",None)
+                   if getattr(read_agency_pairs,"processing_at",None)==source.timestamp else None), **snapshot}
         if publisher is not None and source.raw is not None:
             publisher.submit(source.raw, timestamp=source.timestamp, playfield=latest_agency_frame,
                 metadata={'phase':session.state.value, 'agency':snapshot,
@@ -726,11 +734,17 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                                       "response_window":snapshot.get("response_window"),
                                       "identity_status":snapshot.get("identity_status"),
                                       "actuators":snapshot.get("actuators")} if preceding_action or snapshot.get("command") is not None or getattr(controller, "last_execution", None) is not None else None)
+        performance.stages['evidence_preparation'].append(time.perf_counter()-evidence_began)
     def current_observation_key():
         at=getattr(source,'timestamp',None)
         if type(at) not in (int,float) or not math.isfinite(at):return None
         return (getattr(source,'observation_id',None),at,id(calibration))
-    screen_classifier=CurrentScreenClassifier(screen_classifier,current_observation_key)
+    from .gameplay_engine import AgencyScreen, CycleMetrics
+    performance=CycleMetrics()
+    agency_screen=AgencyScreen(screen_classifier,lambda:visual_agency.agency.self_id is not None
+        and (visual_agency.player is not None or visual_agency.brief_occlusion(source.timestamp)))
+    screen_classifier=CurrentScreenClassifier(agency_screen,lambda:(current_observation_key(),
+        visual_agency.agency.self_id,visual_agency.player is not None or visual_agency.brief_occlusion(source.timestamp)))
     recovery_since=None
     current_screen={}
     last_terminal_diagnostic=None
@@ -769,11 +783,30 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         latest_agency_frame = frame
         observe_episode(frame)
         record_agency(visual_agency.observe(pairs, observed_at=source.timestamp))
-    def read_agency_pairs():
+    def analyze_agency_frame(raw):
         nonlocal latest_agency_frame
-        latest_agency_frame = calibration.apply(source.read())
+        latest_agency_frame = calibration.apply(raw)
         observe_episode(latest_agency_frame)
-        return [] if episode_observer is not None and not episode_observer.agency_allowed else recognizer.detect(latest_agency_frame)
+        if episode_observer is not None and not episode_observer.agency_allowed:
+            read_agency_pairs.projectiles=[]
+            return []
+        started=time.perf_counter()
+        pairs=getattr(recognizer,'detect_acquisition',recognizer.detect)(latest_agency_frame)
+        read_agency_pairs.projectiles=getattr(recognizer,'projectile_candidates',[])
+        read_agency_pairs.processing_seconds=time.perf_counter()-started
+        read_agency_pairs.processing_at=source.timestamp
+        return pairs
+    def read_agency_pairs():
+        return analyze_agency_frame(source.read())
+    def accept_agency_exposure(packet):
+        if packet.sequence<=source.stream_sequence:return None
+        pairs=analyze_agency_frame(source.accept_exposure(packet))
+        accept_agency_exposure.projectiles=getattr(read_agency_pairs,'projectiles',[])
+        return pairs
+    read_agency_pairs.accept_exposure=accept_agency_exposure
+    def capture_agency_shots(controller,action,duration,deadline,stop):
+        from .shot_capture import capture_window
+        return capture_window(source,controller,action,duration,deadline,stop)
     def save_review(raw, tick, reason):
         if len(review_frames) >= (40 if reason == 'final-view' else 39):
             return
@@ -837,20 +870,22 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         else:
             calibration,sensory_report=camera_session.establish(source,args.output,sensory_preflight,seed_position=args.focus)
         original_detect=recognizer.detect
-        def trace_detect(frame):
-            pairs=original_detect(frame)
+        def trace_pairs(pairs):
             recorder.event('detector_trace',dict(schema='first-person-trace-v1',
                 detections=[dict(kind=d.kind,center=list(d.center),box=list(d.box),pixels=d.pixels,
                                  detector_output=e) for d,e in pairs],
                 geometry=dict(corners=getattr(calibration,'corners',None),output_size=getattr(calibration,'output_size',None)),
                 interpretation='Charlie detector outputs; no independent identity/semantic truth'),at=source.timestamp)
             return pairs
+        def trace_detect(frame):
+            return trace_pairs(original_detect(frame))
         recognizer.detect=trace_detect
         exposure_preflight=sensory_report.get('exposure')
         calibration_mode='live_session_reuse' if (sensory_report.get('camera_session') or {}).get('reused') else 'fresh_session'
         mark('calibration_finished', mode=calibration_mode)
         recorder.ready()
         mark('evidence_ready',raw_frames=recorder.count)
+        source.start_stream()
         phase(SessionState.CAMERA_READY, 'optics and geometric calibration complete')
         mark('camera_ready')
         from .live_view import LiveViewMonitor
@@ -926,6 +961,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             if r['screen_state']['state']=='gameplay'), None)
         timing['gameplay_confirmed_at'] = next((startup_watch[i]['capture_timestamp'] for i in range(2,len(startup_watch))
             if all(r['screen_state'].get('phase')=='gameplay' for r in startup_watch[i-2:i+1])), None)
+        agency_screen.active=source.stream is not None
+        visual_agency.seed_new_game(timing.get('start_transport'),startup_watch)
         phase(SessionState.ACQUIRING, 'candidate watch complete; direct actuator evidence follows')
 
         episode_observer = EpisodeEndObserver(required_not_gameplay=8)
@@ -945,6 +982,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             mark('self_discovery_started')
             initial_recovery_started=time.monotonic()
             player = visual_agency.discover(read_agency_pairs, controller, record=record_agency, center_spawn=True,
+                capture_shots=capture_agency_shots if source.stream is not None else None,
+                fire_ms=args.acquisition_fire_ms,
                                            observation_time=lambda: source.timestamp,deadline=initial_recovery_started+20.,
                                            should_stop=lambda: episode_observer.confirmed or not episode_observer.agency_allowed)
             mark('self_discovery_finished', identity_status='confirmed' if visual_agency.agency.self_id is not None else 'provisional' if player is not None else 'unknown')
@@ -1000,11 +1039,24 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         pending_origin_at = None
         print(f"CHARLIE LOOSE: diagnostic limit {args.seconds:.1f}s" if args.seconds else "CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state")
 
+        prepared_next=None
+        def prepare_next(packet):
+            with performance.measure('overlapped_perspective_and_detection'):
+                frame=calibration.apply(packet.image)
+                pairs=original_detect(frame)
+            return packet,frame,pairs
         while time.monotonic() < deadline:
-            raw = source.read()
+            cached=prepared_next;prepared_next=None
+            continuity_only=bool(cached is not None and tick%4!=0
+                and cached[0].sequence>source.stream_sequence and time.monotonic()-cached[0].at<=.25
+                and cached[0].at>=(getattr(controller,'last_execution',None) or {}).get('controls_ready_at',float('inf')))
+            with performance.measure("camera_delivery"):
+                raw=source.accept_exposure(cached[0]) if continuity_only else source.read()
             observed_at = time.monotonic()-started
-            playfield = calibration.apply(raw)
-            observe_episode(playfield)
+            with performance.measure("perspective"):
+                playfield = cached[1] if continuity_only else calibration.apply(raw)
+            with performance.measure("screen"):
+                observe_episode(playfield)
             if episode_observer.confirmed:
                 result='GAME OVER';controller._command('NEUTRAL')
                 retired=visual_agency.reframe();self_tracker.player_track_id=None
@@ -1013,12 +1065,14 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 diary.event('episode_boundary_confirmed',evidence=episode_end['evidence'],retired_tracks=retired)
                 save_review(raw,tick,'game-over')
                 break
-            pairs = recognizer.detect(playfield)
+            with performance.measure("detection_and_classification"):
+                pairs=trace_pairs(cached[2]) if continuity_only else recognizer.detect(playfield)
             detections = [d for d, _ in pairs]
 
             # Normal movement is another causal experiment; right-stick firing
             # never enters the BODY evidence model. Track continuity supplies WHERE.
-            response_window = episode_observer.agency_allowed and pending_move not in (None, 'STAY')
+            response_window = (episode_observer.agency_allowed and pending_move not in (None, 'STAY')
+                               and (source.stream is None or visual_agency.agency.self_id is None or tick%4==0))
             if response_window:
                 early = visual_agency.observe(pairs, observed_at=source.timestamp)
                 early['phase'] = 'response_window_early_unmeasured'
@@ -1035,11 +1089,13 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 observe_episode(playfield)
                 pairs = recognizer.detect(playfield)
                 detections = [d for d, _ in pairs]
+            tracking_began=time.perf_counter()
             agency_snapshot = visual_agency.observe(
-                pairs, pending_move if episode_observer.agency_allowed else None,
+                pairs, pending_move if episode_observer.agency_allowed and not continuity_only else None,
                 time.monotonic()-pending_at if pending_at is not None else None,
                 observed_at=source.timestamp,
                 reference_positions=pending_origin if response_window else None)
+            performance.stages["tracking_and_SELF"].append(time.perf_counter()-tracking_began)
             if response_window:
                 agency_snapshot['phase'] = 'action_response_window'
                 agency_snapshot['response_window'] = {
@@ -1047,6 +1103,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                     'move': pending_move, 'endpoint': 2, 'endpoints': 2,
                     'duration_seconds': source.timestamp-pending_origin_at}
 
+            if continuity_only:agency_snapshot['phase']='buffered_continuity_not_causal_BODY_window'
             latest_agency_frame = playfield
             record_agency(agency_snapshot)
             pending_move = None
@@ -1075,6 +1132,13 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                     self_obs = self_tracker.bind_track(tick + 1, visual_agency.controlled_track_id, visual_agency.positions)
                     new_player = self_obs.center
 
+            if (new_player is None and source.stream is not None and episode_observer.agency_allowed
+                    and visual_agency.brief_occlusion(source.timestamp)):
+                controller._command('NEUTRAL')
+                recorder.event('brief_SELF_occlusion',dict(track_id=visual_agency.agency.last_confirmed_id,
+                    status='identity retained; controls neutral',capture_timestamp=source.timestamp),at=source.timestamp)
+                tick+=1
+                continue
             if new_player is None or not episode_observer.agency_allowed:
                 lost += 1
                 phase(SessionState.REACQUIRING, 'SELF unavailable; life boundary UNKNOWN')
@@ -1105,7 +1169,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                     tick+=1;time.sleep(.025)
                     continue
                 recovery_frames = _quick_frames(
-                    source, calibration, recognizer, count=4, interval=0.025,
+                    source, calibration, recognizer, count=1, interval=0.,
                     on_observation=observe_unmeasured, deadline=min(deadline,recovery_since+20.))
                 if episode_observer.confirmed:
                     result='GAME OVER'
@@ -1151,6 +1215,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 recovered = visual_agency.discover(
                     read_agency_pairs, controller, pulse_ms=pulse_ms,
                     response_frames=response_frames,deadline=probe_deadline,record=record_agency,
+                    capture_shots=capture_agency_shots if source.stream is not None else None,fire_ms=args.acquisition_fire_ms,
                     observation_time=lambda: source.timestamp,
                     should_stop=lambda: episode_observer.confirmed or not episode_observer.agency_allowed)
                 if not episode_observer.agency_allowed:recovered=None
@@ -1350,6 +1415,9 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             goal = forebrain.update(world)
             intent, action = hindbrain.decide(world, goal, timestamp=source.timestamp)
             decision_ns=time.perf_counter_ns()-decision_started
+            performance.stages['forebrain_hindbrain'].append(decision_ns/1e9)
+            performance.decision(source.observation_id,source.timestamp,
+                supported=agency_snapshot.get('identity_status')=='confirmed',track_id=visual_agency.controlled_track_id)
             feedback_persistence_ns=0
             if tactical_outcome is not None:
                 began=time.perf_counter_ns()
@@ -1396,6 +1464,11 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             if pulse_ms < 30:
                 result = "DIAGNOSTIC LIMIT"
                 break
+            if source.stream is not None and time.monotonic()-source.timestamp>.25:
+                recorder.event('stale_decision_discarded',dict(capture_timestamp=source.timestamp,
+                    age_seconds=time.monotonic()-source.timestamp,reason='no controller action from stale prepared pixels'),at=time.monotonic())
+                controller._command('NEUTRAL');tick+=1
+                continue
             if uncertainty is not None:uncertainty.observe(True, time.monotonic())
             pending_origin = dict(visual_agency.positions)
             pending_origin_at = source.timestamp
@@ -1415,7 +1488,12 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 policy=hindbrain.last_decision.get('policy'),goal=vars(goal),
                 intent=dict(kind=intent.kind,target_id=intent.target_id)),at=time.monotonic(),sources=recent_observation_ids)
             prediction_persistence_ns=time.perf_counter_ns()-began
-            controller.execute(action, pulse_ms)
+            with performance.measure("controller"):
+                if source.stream is None:controller.execute(action,pulse_ms)
+                else:
+                    from .controller_overlap import execute_with_lookahead
+                    prepared_next=execute_with_lookahead(controller,action,pulse_ms,source.stream,
+                        source.stream_sequence,prepare_next,deadline=deadline)
             hindbrain.executed_tactic(world,action,timestamp=source.timestamp,
                 track_id=visual_agency.controlled_track_id,prediction_id=tactical_prediction_id)
             recorder.event('tactical_execution',dict(prediction_id=tactical_prediction_id,
@@ -1433,6 +1511,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                     metadata={'phase':'ordinary_action_completed', 'agency':agency_snapshot,
                               'action':action_dict(action), 'intent':{'kind':intent.kind,'target_id':intent.target_id},
                               'control_execution':getattr(controller,'last_execution',None), 'experiment':experiment_plan})
+            if source.stream is not None:
+                source.not_before=(getattr(controller,'last_execution',None) or {}).get('pulse_finished_at')
             pending_move = action.move
             rows.append({
                 "tick": tick, "observed_at": observed_at, "t": time.monotonic()-started,
@@ -1527,6 +1607,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         if controller is not None:
             try:controller.close()
             except (OSError,ConnectionError):pass
+        performance_report=(performance.report(stream=source.stream,screen=agency_screen)
+                            if 'performance' in locals() else None)
         try:source.close()
         except Exception as exc:recording_error=f'camera close: {type(exc).__name__}: {exc}'
         if progress:
@@ -1581,7 +1663,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             if progress:progress.operation_completed()
         tracks = self_tracker.tracks() if args.arm else []
         (args.output / "tracks.json").write_text(json.dumps({"tracks":tracks}, indent=2)+"\n")
-        report = {"session_timing":timing, "session_transitions":[vars(r) for r in session.transitions], "session_events":"events.jsonl", "provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
+        report = {"performance":performance_report,"session_timing":timing, "session_transitions":[vars(r) for r in session.transitions], "session_events":"events.jsonl", "provenance": provenance, "review_frames": review_frames, "result": result, "armed": args.arm, "seconds": args.seconds,
                   "failure_kind": locals().get("failure_kind"),
                   "cal_recovery":locals().get("cal_recovery"),
                   "progress": dict(progress.data, publication_seconds=progress.cost_seconds) if progress else None,

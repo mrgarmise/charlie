@@ -1,0 +1,13 @@
+{
+  "status": "preserved",
+  "original_records": 3832,
+  "added_records": 585,
+  "source": "/home/five/ala2-recovery-20261019/overnight-operational-history",
+  "snapshot": "/home/five/ala2-recovery-20261019/runtime-state/recovered-history/8f3e655639e3568407b3215a60fd7163090e844ee55113a130a807459fbe9281",
+  "inventory_digest": "8f3e655639e3568407b3215a60fd7163090e844ee55113a130a807459fbe9281",
+  "history_import": true,
+  "new_physical_experience": false,
+  "semantic_memory_delivery": "not inferred from journal import",
+  "ordered_original_ids_sha256": "d6e254588ba46f86607f69a3d45f0640c4177ad233685128f5bb54851d2ee75a",
+  "full_local_receipt_sha256": "20ce9298aff7600bb893a569cd65ed80434df7d333c91fec512bfe66dd6278e3"
+}

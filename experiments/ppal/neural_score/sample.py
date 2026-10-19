@@ -73,6 +73,82 @@ def _reader_crop(image, reader):
     return digest([int(x) for x in gray.flatten() // 24]), float(np.std(gray))
 
 
+def _saved_camera_sources(root, reader, game_id, group, role, geometry_digest, diagnostics):
+    """Yield verified original camera captures from immutable preserved journals.
+
+    This fills gaps for early games without score.jsonl. The snapshot is
+    byte-verified and opened read-only; any WAL/SHM means stop rather than
+    inspecting an inconsistent single-file copy. It never treats a playfield
+    crop or a report screenshot as the raw camera exposure.
+    """
+    import sqlite3
+    import shutil
+    from tempfile import TemporaryDirectory
+
+    source = root / "session-evidence.sqlite3"
+    if not source.is_file():
+        diagnostics["no_camera_evidence_journal"] += 1
+        return
+    if any(Path(str(source) + suffix).exists() for suffix in ("-wal", "-shm", "-journal")):
+        diagnostics["live_sqlite_sidecars_snapshot_required"] += 1
+        return
+    original_sha = file_sha(source)
+    with TemporaryDirectory() as temp:
+        snapshot = Path(temp) / "journal.sqlite3"
+        shutil.copyfile(source, snapshot)
+        if file_sha(snapshot) != original_sha or file_sha(source) != original_sha:
+            raise RuntimeError("camera journal changed during snapshot")
+        connection = sqlite3.connect(snapshot.as_uri() + "?mode=ro&immutable=1", uri=True)
+        try:
+            records = list(connection.execute("SELECT id, document FROM records"))
+        finally:
+            connection.close()
+    for rid, raw in records:
+        try:
+            doc = json.loads(raw)
+            payload = doc.get("payload", {})
+            if doc.get("kind") != "observation" or payload.get("category") != "camera_capture":
+                continue
+            artifact = payload.get("artifact") or {}
+            name = artifact.get("path")
+            if not isinstance(name, str) or not name.startswith("observations/camera-") or not name.endswith(".png"):
+                diagnostics["unsafe_or_unlinked_original_capture"] += 1
+                continue
+            frame = (root / name).resolve()
+            if not frame.is_relative_to(root) or not frame.is_file():
+                diagnostics["missing_or_unsafe_frame"] += 1
+                continue
+            actual_sha = file_sha(frame)
+            if actual_sha != artifact.get("sha256"):
+                diagnostics["original_camera_hash_mismatch"] += 1
+                continue
+            timestamp = doc.get("at")
+            if type(timestamp) not in (int,float) or not math.isfinite(timestamp) or timestamp < 0:
+                diagnostics["no_authentic_capture_time"] += 1
+                continue
+            with Image.open(frame) as img:
+                img.verify()
+            with Image.open(frame) as img:
+                feature, contrast = _reader_crop(img.convert("RGB"), reader)
+            diagnostics["scanned_frames"] += 1
+            yield dict(canonical_game_id=game_id, source_directory=str(root),
+                source_image=str(frame), source_image_sha256=actual_sha,
+                source_reference_file=str(source), source_reference_sha256=original_sha,
+                source_reference_record_id=rid,
+                source_log_sha256=None, source_log_line=None,
+                source_timestamp=timestamp, source_observation_id=payload.get("observation_id"),
+                role=role,split_group=group,source_session=group,
+                calibration_geometry_digest=geometry_digest,
+                proposed_score=None, proposed_confidence=0.0,
+                score_status="retained-camera-original; score unreviewed",
+                score_strip_fingerprint=feature, contrast=contrast,
+                selection_origin="hash-bound original camera capture; no machine score or human label")
+        except (OSError, ValueError, TypeError, KeyError):
+            diagnostics["invalid_or_unusable_original_camera"] += 1
+    if file_sha(source) != original_sha:
+        raise RuntimeError("original camera journal changed during inspection")
+
+
 def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=()):
     entries = json.loads(Path(inventory).read_text())
     if not isinstance(entries, list):
@@ -109,6 +185,17 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=()):
         logfile = root / "score.jsonl"
         if not logfile.is_file():
             diagnostics["no_score_source_log"] += 1
+            # Early games retain camera captures in the session journal even
+            # when the later ScoreObserver protocol did not exist.
+            for candidate in _saved_camera_sources(root, reader, game_id, group, role, geometry_digest, diagnostics):
+                if len(candidates) >= scan_limit:
+                    diagnostics["scan_cap_reached"] += 1
+                    break
+                if candidate["source_image_sha256"] in already_seen:
+                    diagnostics["duplicate_original_bytes"] += 1
+                    continue
+                already_seen.add(candidate["source_image_sha256"])
+                candidates.append(candidate)
             continue
         before = file_sha(logfile)
         with logfile.open() as stream:
@@ -154,7 +241,9 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=()):
                     already_seen.add(raw_sha)
                     candidates.append(dict(canonical_game_id=game_id, source_directory=str(root),
                         source_image=str(path), source_image_sha256=raw_sha, source_log_sha256=before,
-                        source_log_line=number, source_timestamp=timestamp,
+                        source_log_line=number,source_reference_file=str(logfile),
+                        source_reference_sha256=before,source_reference_record_id="jsonl-line-"+str(number),
+                        source_timestamp=timestamp,
                         source_observation_id=row.get("observation_id"), role=role,
                         split_group=group, source_session=group,
                         calibration_geometry_digest=geometry_digest,
@@ -260,9 +349,9 @@ def queue_for_review(manifest, journal_path):
             src = Path(item["source_image"])
             if file_sha(src) != item["source_image_sha256"]:
                 raise ValueError("original source image changed")
-            scorelog = Path(item["source_directory"]) / "score.jsonl"
-            if file_sha(scorelog) != item["source_log_sha256"]:
-                raise ValueError("original score log changed")
+            reference = Path(item["source_reference_file"])
+            if file_sha(reference) != item["source_reference_sha256"]:
+                raise ValueError("original camera/score journal changed")
             if item["source_image_sha256"] in present:
                 if present[item["source_image_sha256"]].data["payload"].get("role") != item["role"]:
                     raise ValueError("existing score review sample split conflict")
@@ -276,7 +365,8 @@ def queue_for_review(manifest, journal_path):
             source = journal.append("observation", dict(
                 category="score_review_source", artifact=dict(path=str(src),sha256=item["source_image_sha256"]),
                 original_observation_id=item["source_observation_id"], score_log_sha256=item["source_log_sha256"],
-                score_log_line=item["source_log_line"], source_session=item["source_session"],
+                score_log_line=item["source_log_line"], source_reference_sha256=item["source_reference_sha256"],
+                source_reference_id=item["source_reference_record_id"],source_session=item["source_session"],
                 note="archived source row, not fresh independent camera capture or human truth"),
                 episode=source_episode, at=at, producer="score-frame-sampler", version="1")
             # The frozen calibration digest is checked again by the corpus

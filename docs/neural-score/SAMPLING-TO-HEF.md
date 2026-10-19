@@ -83,6 +83,52 @@ Never reassign a reserved final session to training. For later batches pass
 `--prior-review-journal` for the old and newly labeled journals. Do not
 select on knowledge of held-out labels.
 
+### Continue labeling in additional frozen batches
+
+The first October 18 pilot selected 25 original images out of 1,507
+screened, source-linked candidates. Additional rounds may use *new* images
+from recording groups already included in a prior sampler manifest, but
+only under that group's original committed train/validation/final role.
+Previous-image SHA-256s are excluded. Historically reviewed sessions without
+a frozen split remain ineligible for fresh independent holdout selection.
+Passing the frozen manifest and **both** previous score-review sources is
+necessary for this safeguard.
+
+After reviewing the previous batch, stop the review server (`Ctrl+C`) and
+run from the isolated checkout:
+
+```bash
+python -m experiments.ppal.neural_score.sample \\
+  --inventory ~/charlie-e1-probe/audit/2026-10-18-ala2/canonical-game-manifest.json \\
+  --calibration ~/Projects/charlie/config/robotron/playfield-latest.json \\
+  --prior-review-journal ~/.local/share/charlie/score-review/learning-evidence.sqlite3 \\
+  --prior-review-journal ~/charlie-score-sampling/review-copy/working.sqlite3 \\
+  --prior-manifest ~/charlie-score-sampling/pilot-002.json \\
+  --output ~/charlie-score-sampling/pilot-003.json \\
+  --limit 75 --per-game 12 \\
+  --queue-to-working-journal ~/charlie-score-sampling/review-copy/working.sqlite3
+```
+
+This keeps the original 25 reviews and appends only newly chosen,
+hash-verified review requests. Do not overwrite `pilot-002.json`, delete the
+working journal or move samples between roles. For `pilot-004`, include
+both earlier manifests with repeated `--prior-manifest`; continue to pass
+the prior review journals. Restart the existing browser server against
+the **same** working review database.
+
+There is no fixed count of labeled frames that guarantees accurate
+whole-string recognition. A working plan is a **100–200 readable-score
+prototype** to inspect network failure modes; **300–500 genuinely different
+human-reviewed frames** for a serious training trial; and **500–1,000+
+varied train/validation/test examples** if coverage and accuracy remain
+poor, with the bulk reserved for training. Avoid adjacent near-duplicate
+frames and repeated identical scores. Track digit coverage, lengths,
+all-zero displays, camera calibration, blur/lighting, P1/P2 identity,
+and independent recording-session splits. Model usefulness must be
+established by unseen-game exact-string accuracy, coverage/abstention,
+high-confidence false reads and eventual CPU/Hailo device parity, not
+by meeting any sample-count target alone.
+
 ## 2. Label in the existing score-review interface
 
 From the same checkout on Charlie:

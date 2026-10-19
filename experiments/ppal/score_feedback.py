@@ -57,6 +57,9 @@ def reviewed_labels(journal, *, partition='training', allow_fixture=False):
             reason='photo reading not attested (original submission or later linked confirmation required)'
         elif any(r.data['payload'].get('artifact_sha256')!=sha or r.data['payload'].get('source_episode')!=journal.get(r.data['payload']['proposal_id']).data['payload']['source_episode'] for r in peers):reason='annotation provenance mismatch'
         elif len({r.data['payload']['value'] for r in peers})!=1:reason='conflicting reviewer labels'
+        elif len({r.data['payload'].get('visible_digits') for r in peers
+                  if r.data['payload'].get('visible_digits') is not None})>1:
+            reason='conflicting exact visible digit strings'
         elif next(iter({r.data['payload']['value'] for r in peers})) is None:reason='unreadable review'
         if not reason:
             try:path=ScoreObserver.review_artifact(journal,p)
@@ -65,7 +68,21 @@ def reviewed_labels(journal, *, partition='training', allow_fixture=False):
         value=peers[0].data['payload']['value']
         if type(value) is not int or not 0<=value<=9999999:
             excluded.append(dict(proposal_id=key,reason='bounded nonnegative seven-digit label required'));continue
-        rows.append(dict(proposal_id=key,proposal=p,label=value,path=path,annotation_ids=[r.id for r in peers]))
+        explicit={r.data['payload'].get('visible_digits') for r in peers
+                  if r.data['payload'].get('visible_digits') is not None}
+        if explicit:
+            digits=next(iter(explicit))
+            if (not isinstance(digits,str) or not digits.isascii() or not digits.isdigit()
+                    or not 1<=len(digits)<=7 or int(digits)!=value):
+                excluded.append(dict(proposal_id=key,reason='visible digit string conflicts with numeric score'));continue
+        elif value==0:
+            # Historic numeric zero cannot tell whether one or two zero
+            # glyphs appeared. Never invent visual text for a CTC target.
+            excluded.append(dict(proposal_id=key,reason='visible zero count unverified (0 versus 00)'));continue
+        else:
+            digits=str(value)
+        rows.append(dict(proposal_id=key,proposal=p,label=value,display_digits=digits,
+                         path=path,annotation_ids=[r.id for r in peers]))
         seen.add(sha)
     return rows,excluded
 

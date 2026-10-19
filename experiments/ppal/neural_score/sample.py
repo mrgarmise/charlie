@@ -50,8 +50,10 @@ def _source_directory(entry):
 
 
 def _group(path):
-    # Multiple game-XX recordings in the same marathon belong to one split.
-    return str(path.parent if path.name.startswith("game-") else path)
+    # Stable across original-home -> SSD relocation. All game-XX recordings
+    # under one named marathon share a split, including resumed/partial games.
+    logical = path.parent.name if path.name.startswith("game-") else path.name
+    return "recording-session:" + logical
 
 
 def _reader_crop(image, reader):

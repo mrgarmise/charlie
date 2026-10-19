@@ -250,8 +250,9 @@ def import_queue(journal, root):
 def queue_rows(journal):
     """Project immutable history; changing a review never rewrites a prediction."""
     games={}
-    for r in journal.category_records('observation','score_game_record'):
-        p=r.data['payload'];games[p['attempt_id']]=dict(p,id=r.id)
+    for category in ('score_game_record', 'score_review_sample'):
+        for r in journal.category_records('observation',category):
+            p=r.data['payload'];games[p['attempt_id']]=dict(p,id=r.id)
     unique={}
     for p in games.values():
         key=p['capture_key']
@@ -291,7 +292,7 @@ def _review_game(journal, identifier, *, annotator, verdict, value=None, reason=
     if type(not_final_score) is not bool or type(finality_unknown) is not bool:raise ValueError('finality controls must be explicit booleans')
     if type(independent) is not bool:raise ValueError('independence attestation must be explicit boolean')
     row=journal.get(identifier);p=row.data['payload']
-    if p.get('category')!='score_game_record' or not isinstance(annotator,str) or not annotator.strip():raise ValueError('game and reviewer identity required')
+    if p.get('category') not in ('score_game_record','score_review_sample') or not isinstance(annotator,str) or not annotator.strip():raise ValueError('game/sample and reviewer identity required')
     statuses={'confirm':'confirmed','correct':'corrected','unreadable':'unreadable',
               'insufficient':'insufficient','defer':'pending','disagree':'disputed'}
     if verdict not in statuses:raise ValueError('unsupported review verdict')

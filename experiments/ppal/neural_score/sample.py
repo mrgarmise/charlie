@@ -232,6 +232,7 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prio
         if group in groups and groups[group] != role:
             raise ValueError("one recording group would cross partitions")
         groups[group] = role
+        before_group_candidates = len(candidates)
         logfile = root / "score.jsonl"
         if not logfile.is_file():
             diagnostics["no_score_source_log"] += 1
@@ -310,6 +311,22 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prio
                 break
         if file_sha(logfile) != before:
             raise RuntimeError("source score log changed during sampling")
+        if len(candidates) == before_group_candidates and not diagnostics["scan_cap_reached"]:
+            # Some historic score logs have no retained score-raw filenames.
+            # Fall back to verified camera-observation originals, never to
+            # unproven playfield crops or invented score timestamps.
+            for candidate in _saved_camera_sources(root,reader,game_id,group,role,geometry_digest,diagnostics):
+                if len(candidates) >= scan_limit:
+                    diagnostics["scan_cap_reached"] += 1
+                    break
+                if prior_reviews is not None and candidate["source_image_sha256"] in prior_reviews["images"]:
+                    diagnostics["preconsulted_image_excluded"] += 1
+                    continue
+                if candidate["source_image_sha256"] in already_seen:
+                    diagnostics["duplicate_original_bytes"] += 1
+                    continue
+                already_seen.add(candidate["source_image_sha256"])
+                candidates.append(candidate)
     return candidates, diagnostics, groups
 
 

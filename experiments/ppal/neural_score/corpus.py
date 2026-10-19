@@ -71,7 +71,12 @@ def from_reviews(journal,calibration,output,*,partition='training',previous=()):
     """Adapter to existing immutable whole-number review protocol; no glyph boxes."""
     from ..score_feedback import reviewed_labels
     from ..robotron_hud import RobotronHUDReader
-    rows,excluded=reviewed_labels(journal,partition=partition)
+    parts=('training','validation','final') if partition=='all' else (partition,)
+    rows=[];excluded=[]
+    for part in parts:
+        accepted, rejected=reviewed_labels(journal,partition=part)
+        rows.extend(dict(item,review_partition=part) for item in accepted)
+        excluded.extend(dict(item,review_partition=part) for item in rejected)
     output=Path(output);output.mkdir(exist_ok=False)
     reader=RobotronHUDReader(calibration);result=[]
     for row in rows:
@@ -85,9 +90,11 @@ def from_reviews(journal,calibration,output,*,partition='training',previous=()):
         fraction=reader.P1_X if channel==1 else reader.P2_X
         box=(int(640*fraction[0]),0,int(640*fraction[1]),96)
         path=output/(row['proposal_id']+'.png');hud.crop(box).save(path)
+        review_partition=row['review_partition']
+        role={'training':'train','validation':'val','final':'test','diagnostic':'val'}[review_partition]
         result.append(dict(image=str(path),sha256=sha(path),label=str(row['label']),channel=channel,
             verified=True,reviewer=','.join(sorted({str(journal.get(key).data['payload'].get('annotator','unrecorded reviewer')) for key in row['annotation_ids']})),annotation_ids=row['annotation_ids'],
-            proposal_id=row['proposal_id'],review_partition=partition,role='train' if partition=='training' else 'val',
+            proposal_id=row['proposal_id'],review_partition=review_partition,role=role,
             session=context['source_session'],source_image_sha256=p['artifact']['sha256'],source_proposal=p,
             synthetic=False))
     (output/'review-exclusions.json').write_text(json.dumps(excluded,indent=2))
@@ -144,7 +151,7 @@ def main():
     from ..eyes.calibration import Calibration
     p=argparse.ArgumentParser(description='Read-only existing review journal -> frozen whole-score crops; no new review store')
     p.add_argument('--journal',type=Path,required=True);p.add_argument('--calibration',type=Path,required=True)
-    p.add_argument('--prior-manifest',type=Path,action='append',default=[]);p.add_argument('--output',type=Path,required=True);p.add_argument('--partition',choices=['training','diagnostic'],default='training')
+    p.add_argument('--prior-manifest',type=Path,action='append',default=[]);p.add_argument('--output',type=Path,required=True);p.add_argument('--partition',choices=['training','validation','final','diagnostic','all'],default='training')
     a=p.parse_args();journal=EvidenceJournal(a.journal,read_only=True)
     try:record=from_reviews(journal,Calibration.load(a.calibration),a.output,partition=a.partition,previous=a.prior_manifest)
     finally:journal.close()

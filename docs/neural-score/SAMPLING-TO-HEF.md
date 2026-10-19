@@ -114,6 +114,45 @@ The original image, original score-log/camera source, prior predictions,
 immutable human review IDs and validation/final partition are retained.
 Human review records are written only into the isolated working notebook.
 
+**Mid-game screenshot labeling recovery.** Do not use `Not a final-score
+image` as a substitute for a readable-score label. The first Oct 18
+25-frame pilot contained 17 original reviews marked `insufficient` because
+the operator thought the photo needed to be from the end of a game. The old
+UI silently ignored numbers typed before that button was clicked, so no
+authentic digit transcription for those 17 was persisted. Never
+reconstruct those lost digits from the proposed numeric score, an
+empty input, or a guessed `00`.
+
+The updated **score-sample** interface hides the irrelevant final-score
+exclusion and confirmation shortcuts. It requires typing the **exact visible
+digit string** (including `00` when two zero glyphs actually appear) and
+choosing `Save visible score`, or marking the photograph Unreadable.
+Legacy samples can be revisited using **Needs visible-score label (legacy
+reviews)** in the filter dropdown. The form defaults those samples to
+`Not a verified final score`. The earlier `insufficient` event is
+preserved in append-only review history; a genuine new correction changes
+the effective current status and stores both the numeric score and the
+exact visible string. We do not create artificial score evidence for
+screenshots the reviewer cannot read.
+
+A numeric score of zero does **not** establish that the visible display
+contains `0` instead of `00`. The updated CTC corpus/decoder permits
+exactly human-verified all-zero visual sequences; arbitrary mixed
+leading-zero strings continue to abstain. Earlier numeric-only zero
+reviews without explicit visible-width verification remain excluded
+rather than becoming invented visual targets. This is a recognition
+labeling correction, not independent complete-game qualification.
+
+To recover the existing pilot, stop the local review server with Ctrl-C,
+`git pull --ff-only` inside the isolated
+`~/charlie-score-sampler` checkout, restart the same score review
+server against the **same**
+`~/charlie-score-sampling/review-copy/working.sqlite3`, refresh the
+browser, choose the **Needs visible-score label** filter and re-read the
+17 original photographs. No re-sampling or review-database reset is
+needed. Afterward inspect `reviewed_labels()` per partition and
+preserve the original train/validation/final assignments.
+
 **Checkbox removal and October 18 pilot recovery.** The updated browser
 interface treats submitting Confirm, Save correction, or Unreadable while the
 verified primary photograph is displayed as the operator's attestation that

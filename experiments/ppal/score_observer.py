@@ -391,6 +391,8 @@ class ScoreObserver:
                    if r.data['payload']['partition']==partition and not r.data['payload']['synthetic']}
         annotations={}
         all_annotations=journal.category_records('observation','score_human_annotation')
+        from .score_review_attestation import attested_photo_annotation_ids
+        retrospectively_attested=attested_photo_annotation_ids(journal)
         superseded={r.data['payload'].get('supersedes') for r in all_annotations}
         latest_status={r.data['payload'].get('proposal_id'):r.data['payload'] for r in
             journal.category_records('observation','score_review_status')}
@@ -398,7 +400,8 @@ class ScoreObserver:
             if r.id in superseded:continue
             p=r.data['payload']
             if latest_status.get(p['proposal_id'],{}).get('status') in ('pending','insufficient','disputed'):continue
-            if p['proposal_id'] in proposals and p['independence_attested']:
+            if p['proposal_id'] in proposals and (
+                    p['independence_attested'] or r.id in retrospectively_attested):
                 annotations.setdefault(p['proposal_id'],[]).append(p)
         eligible=correct=accepted=false_confident=abstained=disagreement=unreadable=0
         seen_pixels=set();bins={}

@@ -76,7 +76,7 @@ class ScoreSamplerTest(unittest.TestCase):
             next_batch=freeze(inventory,calibration,second_file,limit=2,
                               per_game=2,prior=[first_file],
                               prior_review_journal=working)
-            self.assertEqual(len(next_batch["selected"]),1)
+            self.assertEqual(len(next_batch["selected"]),1, str(next_batch["exclusions"]))
             self.assertEqual(next_batch["selected"][0]["role"],role)
             self.assertNotEqual(next_batch["selected"][0]["source_image_sha256"],
                                 first["selected"][0]["source_image_sha256"])

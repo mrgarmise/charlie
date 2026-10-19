@@ -184,7 +184,7 @@ def _existing_review_sources(path):
         if isinstance(context,dict):
             session = context.get("source_session")
             if isinstance(session,str):
-                sessions.add(_group(Path(session)))
+                sessions.add(session if session.startswith("recording-session:") else _group(Path(session)))
         artifact = p.get("artifact") or {}
         fingerprint = artifact.get("sha256",p.get("artifact_sha256"))
         if isinstance(fingerprint,str):

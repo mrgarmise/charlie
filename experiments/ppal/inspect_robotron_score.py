@@ -278,15 +278,15 @@ def queue_rows(journal):
     return sorted(result,key=lambda p:(p['session'],str(p['number']).zfill(5)))
 
 
-def review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
+def review_game(journal, identifier, *, annotator, verdict, value=None, visible_digits=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
     if (journal.path.parent/'capture-manifest.json').is_file():
         raise ValueError('review must use consolidated notebook; sealed original diary is immutable')
     with journal.batch():
         return _review_game(journal,identifier,annotator=annotator,verdict=verdict,
-            value=value,reason=reason,independent=independent,not_final_score=not_final_score,finality_unknown=finality_unknown)
+            value=value,visible_digits=visible_digits,reason=reason,independent=independent,not_final_score=not_final_score,finality_unknown=finality_unknown)
 
 
-def _review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
+def _review_game(journal, identifier, *, annotator, verdict, value=None, visible_digits=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
     from .score_observer import ScoreObserver
     from datetime import datetime,timezone
     if type(not_final_score) is not bool or type(finality_unknown) is not bool:raise ValueError('finality controls must be explicit booleans')
@@ -296,12 +296,22 @@ def _review_game(journal, identifier, *, annotator, verdict, value=None, reason=
     statuses={'confirm':'confirmed','correct':'corrected','unreadable':'unreadable',
               'insufficient':'insufficient','defer':'pending','disagree':'disputed'}
     if verdict not in statuses:raise ValueError('unsupported review verdict')
+    if p.get('category')=='score_review_sample':
+        if verdict=='insufficient':
+            raise ValueError('mid-game score is not insufficient; enter exact visible digits or mark unreadable')
+        if verdict=='correct':
+            if (not isinstance(visible_digits,str) or not visible_digits.isascii() or
+                    not visible_digits.isdigit() or not 1<=len(visible_digits)<=7 or
+                    type(value) is not int or int(visible_digits)!=value):
+                raise ValueError('sample correction requires exact 1–7 visible digits matching numeric score')
+        if verdict=='confirm':
+            raise ValueError('score-training samples require explicit visible-digit transcription, not inferred score confirmation')
     annotation=None
     if verdict in ('confirm','correct','unreadable') and p.get('proposal_id'):
         previous=next((r for r in reversed(journal.category_records('observation','score_human_annotation'))
             if r.data['payload']['proposal_id']==p['proposal_id'] and r.data['payload']['annotator']==annotator),None)
         annotation=ScoreObserver.annotate_review(journal,p['proposal_id'],annotator=annotator,verdict=verdict,
-            value=value,reason=reason or 'Reviewer inspected the original photograph',independent=independent,
+            value=value,visible_digits=visible_digits,reason=reason or 'Reviewer inspected the original photograph',independent=independent,
             supersedes=previous.id if previous else None)
     elif verdict in ('confirm','correct'):raise ValueError('original score photograph unavailable')
     return journal.append('observation',dict(category='score_review_status',attempt_id=p['attempt_id'],

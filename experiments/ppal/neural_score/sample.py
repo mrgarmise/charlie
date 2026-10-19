@@ -210,7 +210,15 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prio
                 raise ValueError("prior session split collision")
             commitments[group] = role
 
-    prior_reviews = _existing_review_sources(prior_review_journal) if prior_review_journal is not None else None
+    sources = ([prior_review_journal] if isinstance(prior_review_journal,(str,Path))
+               else list(prior_review_journal or ()))
+    prior_reviews = None
+    if sources:
+        prior_reviews = dict(episodes=set(),sessions=set(),images=set())
+        for source in sources:
+            prior = _existing_review_sources(source)
+            for key in ("episodes","sessions","images"):
+                prior_reviews[key].update(prior[key])
     diagnostics = Counter()
     candidates = []
     already_seen = set()
@@ -386,8 +394,9 @@ def freeze(inventory, calibration_path, output, *, seed=17, limit=300, per_game=
         source_candidates=len(candidates), selected=chosen, exclusions=dict(diagnostics),
         meaning="source-linked screenshot review proposals, not score truth or complete games",
         prior_manifests=[file_sha(p) for p in prior],
-        prior_review_journal=str(Path(prior_review_journal).resolve()) if prior_review_journal else None,
-        prior_review_main_sha256=file_sha(prior_review_journal) if prior_review_journal else None)
+        prior_review_journals=[dict(path=str(Path(path).resolve()),main_sha256=file_sha(path))
+                               for path in ([prior_review_journal] if isinstance(prior_review_journal,(str,Path))
+                                            else list(prior_review_journal or ()))])
     record["digest"] = digest(record)
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("x") as stream:
@@ -492,8 +501,8 @@ def main():
     p.add_argument("--per-game", type=int, default=18)
     p.add_argument("--prior-manifest", type=Path, action="append", default=[])
     reviews = p.add_mutually_exclusive_group(required=True)
-    reviews.add_argument("--prior-review-journal", type=Path,
-        help="existing original score-review notebook: exclude previously consulted games/images")
+    reviews.add_argument("--prior-review-journal", type=Path,action="append",
+        help="prior score-review notebook; repeat for all old/working consulted sources")
     reviews.add_argument("--attest-no-prior-reviews", action="store_true",
         help="explicit operator attestation ONLY when no earlier score images/reviews exist")
     p.add_argument("--queue-to-working-journal", type=Path,

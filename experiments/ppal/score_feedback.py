@@ -27,7 +27,8 @@ def reviewed_labels(journal, *, partition='training', allow_fixture=False):
     Diagnostic use must be requested explicitly. Final/validation labels cannot
     become development data. Returns exclusions instead of guessing labels.
     """
-    if partition not in ('training','diagnostic'):raise ValueError('training or explicit diagnostic consultation required')
+    if partition not in ('training','validation','final','diagnostic'):
+        raise ValueError('explicit training, validation, final or diagnostic review partition required')
     proposals=journal.category_records('observation','score_review_proposal')
     if len(proposals)>4096:raise ValueError('bounded feedback requires <=4096 proposals')
     annotations=journal.category_records('observation','score_human_annotation')

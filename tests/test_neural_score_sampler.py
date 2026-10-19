@@ -39,6 +39,52 @@ class ScoreSamplerTest(unittest.TestCase):
                                         p1=dict(observed_score=value, confidence=.51,status="changed"))) + "\n")
         return root
 
+    def test_second_batch_same_session_preserves_split_and_excludes_first_photo(self):
+        with TemporaryDirectory() as folder:
+            base=Path(folder)
+            game=self.make_fixture(base)
+            # The next real camera frame has different original pixels and
+            # its own source timestamp and log-line identity.
+            img=Image.new("RGB",(640,480),(9,9,9))
+            dr=ImageDraw.Draw(img)
+            dr.rectangle((80,65,190,95),fill=(175,210,200))
+            second=game/"score-raw-0002.png"
+            img.save(second)
+            with (game/"score.jsonl").open("a") as stream:
+                stream.write(json.dumps(dict(raw_frame=second.name,
+                    timestamp=11.25,score_partition="gameplay",
+                    observation_id="observation-b",
+                    p1=dict(observed_score=2600,confidence=.72,status="changed")))+"\\n")
+            inventory=base/"inventory.json"
+            inventory.write_text(json.dumps([
+                dict(canonical_game_id="recorded-game",paths=[str(game)])]))
+            calibration=base/"calibration.json"
+            Calibration(((.10,.20),(.90,.20),(.90,.90),(.10,.90))).save(calibration)
+            first_file=base/"pilot-1.json"
+            first=freeze(inventory,calibration,first_file,limit=1,per_game=1)
+            self.assertEqual(len(first["selected"]),1)
+            working=base/"isolated"/"working.sqlite3"
+            self.assertEqual(queue_for_review(first_file,working)["queued"],1)
+            role=first["selected"][0]["role"]
+            # Prior review without a frozen split blocks fresh holdout claims.
+            blocked=freeze(inventory,calibration,base/"blocked.json",
+                           prior_review_journal=working,limit=2,per_game=2)
+            self.assertFalse(blocked["selected"])
+            # Explicit frozen role allows additional original images from the
+            # same session without reusing the old picture.
+            second_file=base/"pilot-2.json"
+            next_batch=freeze(inventory,calibration,second_file,limit=2,
+                              per_game=2,prior=[first_file],
+                              prior_review_journal=working)
+            self.assertEqual(len(next_batch["selected"]),1)
+            self.assertEqual(next_batch["selected"][0]["role"],role)
+            self.assertNotEqual(next_batch["selected"][0]["source_image_sha256"],
+                                first["selected"][0]["source_image_sha256"])
+            self.assertEqual(next_batch["exclusions"]["previously_selected_image_excluded"],1)
+            self.assertEqual(queue_for_review(second_file,working)["queued"],1)
+            self.assertEqual(len([r for r in queue_rows(EvidenceJournal(working,read_only=True))
+                                  if r.get("sample")]),2)
+
     def test_split_group_is_precommitted_without_label_knowledge(self):
         group = "/game/experiment-run"
         a = role_for_group(group, 17)

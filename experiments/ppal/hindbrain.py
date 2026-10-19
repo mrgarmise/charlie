@@ -128,7 +128,9 @@ class Hindbrain:
             self.tactical_plan['retained_diagnostic']=dict(
                 baseline=self.tactical_memory.summary(baseline.move,baseline.fire),
                 shadow_preference=dict(move=best[0].move,fire=best[0].fire) if best else None,
-                alternatives=[dict(move=a.move,fire=a.fire,**e) for a,e in remembered],
+                alternatives=[dict(move=a.move,fire=a.fire,**e,
+                    valuation=dict(signed_support=preference((a,e))[0],
+                                   samples_used=preference((a,e))[1])) for a,e in remembered],
                 applied_to_physical_action=False,
                 interpretation='retained response valuation, not a qualified tactical or score policy')
         return intent,selected

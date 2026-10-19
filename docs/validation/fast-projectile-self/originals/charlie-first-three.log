@@ -1,0 +1,62 @@
+DEVELOPMENT GAME 1/3: no justified experiment yet; existing policy only
+[2:36:17.985896228] [2716]  INFO Camera camera_manager.cpp:340 libcamera v0.7.1+rpt20260609
+[2:36:17.997187388] [2719]  INFO RPI pisp.cpp:720 libpisp version v1.6.0 29-06-2026 (16:17:40)
+[2:36:18.012066428] [2719]  INFO IPAProxy ipa_proxy.cpp:184 Using tuning file /usr/share/libcamera/ipa/rpi/pisp/imx708.json
+[2:36:18.022129565] [2719]  INFO Camera camera_manager.cpp:223 Adding camera '/base/axi/pcie@1000120000/rp1/i2c@80000/imx708@1a' for pipeline handler rpi/pisp
+[2:36:18.022165158] [2719]  INFO RPI pisp.cpp:1181 Registered camera /base/axi/pcie@1000120000/rp1/i2c@80000/imx708@1a to CFE device /dev/media3 and ISP device /dev/media0 using PiSP variant BCM2712_C0
+[2:36:18.025201962] [2719]  WARN V4L2 v4l2_pixelformat.cpp:346 Unsupported V4L2 pixel format Nc30
+[2:36:18.025225925] [2719]  WARN V4L2 v4l2_pixelformat.cpp:346 Unsupported V4L2 pixel format Nc12
+[2:36:18.025880038] [2716]  INFO Camera camera.cpp:1216 configuring streams: (0) 1280x720-RGB888/sRGB (1) 1536x864-BGGR_PISP_COMP1/RAW
+[2:36:18.025983020] [2719]  INFO RPI pisp.cpp:1485 Sensor: /base/axi/pcie@1000120000/rp1/i2c@80000/imx708@1a - Selected sensor format: 1536x864-SBGGR10_1X10/RAW - Selected CFE format: 1536x864-PC1B/RAW
+Camera: continuous autofocus enabled
+EXPOSURE: EV=+0 locked=True; RGB evidence saved
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+SELF PROVISIONAL: hypothesis=14; FIRE outcomes unconfirmed
+PLAYER HYPOTHESIS (provisional_body_agency) x=50.31 y=49.58
+SELF TRACK SEEDED: track=14
+CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state
+RUN COMPLETE: OBSERVATION UNCERTAIN; ticks=20
+Evidence: /home/five/charlie-campaigns/first-three/runs/development-20261017-182719/game-01/report.json
+GAME 1: score evidence=None; SELF={}; experiment attempted=False; prediction=NONE; resolution=no prediction; memory=UNKNOWN->UNKNOWN (UNKNOWN); belief=none
+PROJECT: NONE; goal=UNKNOWN; status=UNKNOWN; selection=frozen baseline; progress=UNKNOWN; next=no justified experiment yet
+DEVELOPMENT STOP: no confirmed game-over evidence; no further START
+DEVELOPMENT COMPLETE: unverified_episode_boundary; attempts=1; qualified=0; invalid=0; unverified=1; target_met=False; /home/five/charlie-campaigns/first-three/runs/development-20261017-182719
+{
+  "schema": "charlie-gameplay-campaign-v1",
+  "source": {
+    "revision": "d74d7a620c39104ce58fb2c9551381543a66b5f2",
+    "runtime_sha256": "1d7cf188a7545146e2f99fc67abe810dcfe8b85e5df8b8b50b0b9a98a2e29807"
+  },
+  "notebook": "/home/five/.local/share/charlie/development",
+  "blocks": 1,
+  "games": 3,
+  "proposal_id": null,
+  "policy": null,
+  "phase": "blocked",
+  "attempts": [
+    {
+      "index": 1,
+      "progress": "/home/five/charlie-campaigns/first-three/block-001-progress.json",
+      "source": {
+        "revision": "d74d7a620c39104ce58fb2c9551381543a66b5f2",
+        "runtime_sha256": "1d7cf188a7545146e2f99fc67abe810dcfe8b85e5df8b8b50b0b9a98a2e29807"
+      },
+      "proposal_id": null,
+      "policy_sha256": null,
+      "retained_executive_handoff": {
+        "added_records": 3247,
+        "source_record_ids_digest": "3dba08a7e03bc16395510a5df8d4e8a82b3c4e2d8b63531f12b404de21a1ba0d",
+        "independent_new_experience": false
+      },
+      "returncode": 2
+    }
+  ],
+  "gates": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  },
+  "physical_authorization": false,
+  "reason": "ValueError: gameplay block interrupted or camera release unconfirmed"
+}

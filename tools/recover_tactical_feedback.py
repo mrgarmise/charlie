@@ -11,7 +11,10 @@ from hashlib import sha256
 from pathlib import Path
 import json
 import shutil
+import sys
 from tempfile import TemporaryDirectory
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from experiments.ppal.tactical_memory import TacticalDiagnosticMemory
 from learning.tactical_recovery import qualified_motion_summary
@@ -52,6 +55,8 @@ def main(argv=None):
             p.error("report may not overwrite original recording files")
     else:
         report_path = None
+    if destination is not None and report_path == destination:
+        p.error("report and diagnostic ledger must be separate files")
 
     class NoWrite:
         def record(self, *unused, **kwargs):

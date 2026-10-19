@@ -45,6 +45,7 @@ def qualified_motion_outcomes(journal):
         if (p.get("eligible") is not True or p.get("identity_status") != "confirmed"
                 or p.get("result") not in ("supported", "contradicted")
                 or not isinstance(p.get("track_id"), (str, int))
+                or isinstance(p["track_id"], bool)
                 or not isinstance(p.get("along"), (float, int))
                 or isinstance(p["along"], bool)
                 or not math.isfinite(p["along"])):
@@ -56,8 +57,14 @@ def qualified_motion_outcomes(journal):
             continue
 
         expected = frozen_plan(pred)
+        if expected.get("self_track_id") != p["track_id"]:
+            continue
         predicted = expected.get("actual_action") or expected.get("selected")
         if not isinstance(predicted, dict):
+            continue
+        # A second execution is ambiguous even if only one matches the frozen
+        # plan. Filtering first must not hide a conflicting actual command.
+        if len(executions.get(prediction_id, [])) != 1:
             continue
         linked = [e for e in executions.get(prediction_id, [])
                   if e.data["episode"] == r.data["episode"]
@@ -74,7 +81,8 @@ def qualified_motion_outcomes(journal):
                             for k in ("move", "fire")))):
             continue
         resolution = journal.resolution_for(prediction_id)
-        if (resolution is None or resolution.data["payload"].get("result") != p["result"]):
+        if (resolution is None or resolution.data.get("episode") != r.data["episode"]
+                or resolution.data["payload"].get("result") != p["result"]):
             continue
 
         # The source episode is an observed recording origin, not a guarantee

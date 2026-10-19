@@ -202,7 +202,10 @@ def test_score_worker_integration_partition_and_shutdown(tmp_path):
     assert observer.dropped==before+1
 
 
-def test_hailo_sdk_stream_contract(monkeypatch,tmp_path):
+@pytest.mark.parametrize('output_order',['FormatOrder.FCR','FormatOrder.NHWC'])
+@pytest.mark.parametrize('defect',[None,'input-order','output-order','input-name','output-name',
+    'input-shape','output-shape','returned-shape','returned-dtype','nonfinite'])
+def test_hailo_sdk_stream_contract(monkeypatch,tmp_path,output_order,defect):
     import sys,subprocess
     from experiments.ppal.neural_score.backends import Hailo
     path=tmp_path/'model.hef';path.write_bytes(b'FAKE engineering HEF')
@@ -212,8 +215,14 @@ def test_hailo_sdk_stream_contract(monkeypatch,tmp_path):
         def __exit__(self,*a):calls.append('closed')
     class HEF:
         def __init__(self,path):pass
-        def get_input_vstream_infos(self):return [types.SimpleNamespace(shape=(32,256,3),name='images',format=types.SimpleNamespace(order='NHWC'))]
-        def get_output_vstream_infos(self):return [types.SimpleNamespace(shape=(1,64,11),name='logits',format=types.SimpleNamespace(order='NHWC'))]
+        def get_input_vstream_infos(self):return [types.SimpleNamespace(
+            shape=(32,256,4) if defect=='input-shape' else (32,256,3),
+            name='wrong' if defect=='input-name' else 'charlie_score/input_layer1',
+            format=types.SimpleNamespace(order='NCHW' if defect=='input-order' else 'FormatOrder.NHWC'))]
+        def get_output_vstream_infos(self):return [types.SimpleNamespace(
+            shape=(1,63,11) if defect=='output-shape' else (1,64,11),
+            name='wrong' if defect=='output-name' else 'charlie_score/conv4',
+            format=types.SimpleNamespace(order='NOT_NHWC' if defect=='output-order' else output_order))]
     class Group:
         def create_params(self):return {}
         def activate(self,*a):return Context()
@@ -228,22 +237,37 @@ def test_hailo_sdk_stream_contract(monkeypatch,tmp_path):
     class Pipeline(Context):
         def __init__(self,*a):pass
         def infer(self,inputs):
-            assert inputs['images'].shape==(1,32,256,3)
-            assert inputs['images'].max()<=1
-            return {'logits':logits('2200').transpose(0,2,3,1)}
+            assert inputs['charlie_score/input_layer1'].shape==(1,32,256,3)
+            assert inputs['charlie_score/input_layer1'].max()<=1
+            value=logits('2200').transpose(0,2,3,1)
+            if defect=='returned-shape':value=value.transpose(0,3,1,2)
+            if defect=='returned-dtype':value=value.astype(np.uint8)
+            if defect=='nonfinite':value[0,0,0,0]=np.nan
+            return {'charlie_score/conv4':value}
     sdk=types.SimpleNamespace(HEF=HEF,Device=types.SimpleNamespace(scan=lambda:['fake']),VDevice=Device,
         ConfigureParams=types.SimpleNamespace(create_from_hef=lambda *a,**k:{}),HailoStreamInterface=types.SimpleNamespace(PCIe=1),
         InputVStreamParams=Params,OutputVStreamParams=Params,FormatType=types.SimpleNamespace(FLOAT32='FLOAT32'),InferVStreams=Pipeline)
     monkeypatch.setitem(sys.modules,'hailo_platform',sdk)
     monkeypatch.setattr(subprocess,'run',lambda *a,**kw:types.SimpleNamespace(stdout='Architecture HAILO8L'))
     contract=dict(architecture='hailo8l',hef_sha256=sha(path),normalization='host /255; no embedded normalization')
+    if defect:
+        with pytest.raises(ValueError):
+            Hailo(path,contract,timeout_ms=200).infer(np.zeros((1,3,32,256),dtype=np.float32))
+        return
     h=Hailo(path,contract,timeout_ms=200)
     result,timing=h.infer(np.zeros((1,3,32,256),dtype=np.float32))
+    np.testing.assert_array_equal(result,logits('2200'))
+    assert result.shape==OUTPUT and result.dtype==np.float32
+    assert timing['hef_output_order']==output_order.split('.')[-1]
     assert decode(result)['score']==2200 and len(calls)==3
     monkeypatch.setattr(subprocess,'run',lambda *a,**kw:types.SimpleNamespace(stdout='Architecture HAILO8'))
     with pytest.raises(ValueError,match='hailo8l'):Hailo(path,contract)
     with pytest.raises(ValueError):Hailo(path,dict(contract,hef_sha256='wrong'))
     with pytest.raises(ValueError):Hailo(path,dict(contract,normalization='unknown'))
+    for bad in (dict(contract,input_shape=[1,3,64,256]),
+                dict(contract,hef_output_order='NCHW'),dict(contract,output_name='other')):
+        monkeypatch.setattr(subprocess,'run',lambda *a,**kw:types.SimpleNamespace(stdout='Architecture HAILO8L'))
+        with pytest.raises(ValueError):Hailo(path,bad)
 
 
 def test_busy_hailo_does_not_move_contention_to_cpu():
@@ -284,6 +308,31 @@ def test_quantization_drift_does_not_disappear_in_tracker():
     assert quantization_comparison(a,a)['maximum_absolute_logit_error']==0
     report=quantization_comparison(a,b);assert not report['accepted_digits_match'] and report['maximum_absolute_logit_error']>0
     with pytest.raises(ValueError):quantization_comparison(a,b[:,:,:,:4])
+
+
+def test_confidence_crossing_is_valid_inference_not_permission_to_accept():
+    """Controlled logits, NOT reconstructed native arrays or accuracy evidence."""
+    from experiments.ppal.neural_score.evaluate import quantization_comparison
+    def with_confidence(confidence):
+        a=logits('67846')
+        # One uncertain blank; margin still exceeds .25. Proposal is unchanged.
+        a[0,:,0,1]=0
+        a[0,10,0,1]=np.log(10*confidence/(1-confidence))
+        return a
+    cpu=with_confidence(.8189502364575215)
+    hailo=with_confidence(.8902723898299889)
+    report=quantization_comparison(cpu,hailo)
+    assert report['proposed_digits_match'] and not report['accepted_digits_match']
+    a,b=decode(cpu),decode(hailo)
+    assert a['proposed_digits']==b['proposed_digits']=='67846'
+    assert a['score'] is None and a['digits'] is None
+    assert a['reason']=='ambiguous digit or blank' and b['score']==67846
+    assert min(r['margin'] for r in a['alignment_runs'])>.25
+    backend=Backend('hailo-required',lambda:pytest.fail('no CPU fallback'),
+                    lambda:types.SimpleNamespace(infer=lambda x:(cpu,{})))
+    values,timing=backend.infer(None)
+    assert timing['backend']=='hailo-required' and timing['health_event'] is None
+    assert decode(values)['digits'] is None
 
 
 def test_channels_cannot_split_same_original_across_roles(tmp_path):

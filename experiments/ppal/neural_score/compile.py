@@ -50,7 +50,12 @@ def main():
     hef=runner.compile();path=a.output/'score.hef';path.write_bytes(hef)
     record=dict(architecture='hailo8l',hef_sha256=sha(path),onnx_sha256=sha(a.onnx),dfc=version,
         normalization='host /255; no embedded normalization',input_shape=list(INPUT),output_shape=list(OUTPUT),
-        input_layout='NHWC virtual streams, NCHW CPU',output_layout='NHWC [1,1,64,11] virtual streams',
+        input_layout='NHWC virtual streams, NCHW CPU',
+        input_name='charlie_score/input_layer1',output_name='charlie_score/conv4',
+        hef_input_order='NHWC',hef_output_order='FCR',
+        hef_input_dimensions=[32,256,3],hef_output_dimensions=[1,64,11],
+        vstream_output_shape=[1,1,64,11],vstream_dtype='float32',
+        output_layout='Python FLOAT32 [batch,height,width,classes]; transpose(0,3,1,2) to decoder NCHW; HEF metadata FCR is separate',
         decoder='ctc-greedy-abstain-v1',calibration_manifest_sha256=sha(a.manifest),
         calibration_images=[r['sha256'] for r in rows],calibration_count=len(rows),
         qualification=corpus['authenticity'],native_validated=False,end_node=end)

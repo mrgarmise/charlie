@@ -26,7 +26,8 @@ const context={document:{getElementById(id){return elements[id]??=element()},cre
 vm.createContext(context);vm.runInContext(fs.readFileSync(process.argv[2],'utf8'),context);
 const tick=()=>new Promise(r=>setImmediate(r));
 (async()=>{elements.filter.value='all';await vm.runInContext('load()',context);
- assert.equal(elements.value.value,1300);assert.equal(elements.note.value,'Saved correction');assert.equal(elements.not_final.checked,true);
+ // HTMLInputElement.value is a string; exact visible digits preserve "00".
+ assert.equal(elements.value.value,'1300');assert.equal(elements.note.value,'Saved correction');assert.equal(elements.not_final.checked,true);
  assert.equal(elements.image.hidden,true);assert.equal(elements.confirm.disabled,true);
  const old=pending.splice(0);elements.next.click();assert.equal(elements.image.hidden,true);assert.equal(elements.image.src,undefined);assert.match(elements.game.textContent,/Game 2/);
  for(const p of old)p.resolve({ok:true,blob:async()=>({id:'old-photo'})});await tick();assert.equal(elements.image.hidden,true);

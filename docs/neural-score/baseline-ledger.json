@@ -42,6 +42,9 @@
   ],
   "installed": "UNKNOWN: Pi inaccessible",
   "running": "UNKNOWN: Pi inaccessible",
-  "native_hailo": "NOT EXECUTED",
+  "native_hailo": "OPERATOR-REPORTED synthetic HEF execution and five-image parity; repaired adapter not yet native-tested; authentic qualification OPEN",
+  "continuation_parent": "207c3f053b86d4b75078badef574535d8853dd91",
+  "continuation_report": "NATIVE-FINDINGS-20261018.md",
+  "prior_native_hailo_status": "NOT EXECUTED at original Work implementation; superseded only by operator-reported synthetic hardware results",
   "history": "PENDING EXPORT; Phase 1 not exhaustive"
 }

@@ -1,0 +1,50 @@
+{
+  "schema": "charlie-operator-reported-synthetic-parity-v1",
+  "source": "Operator mission supplied October 19, reporting October 18 hardware observations; no direct Work access or raw native arrays/logs supplied",
+  "qualification": "SYNTHETIC / NOT ROBOTRON-QUALIFIED",
+  "evidence_use": "consulted engineering validation; NOT untouched independent final-test evidence",
+  "hef_sha256": "d0e977e11eb4d1c4bb6d8338da79ce4cb503fae0cbcd22d28ad6fd963492d0f3",
+  "dfc": "3.33.0",
+  "calibration_images": 66,
+  "native": {
+    "os": "Debian 13 aarch64",
+    "architecture": "HAILO8L",
+    "hailort_driver_firmware": "4.23.0",
+    "device": "/dev/hailo0",
+    "parse_hef": "successful",
+    "benchmark_frames": 10,
+    "benchmark_exit_code": 0,
+    "benchmark_streaming_fps_approximate": 7078,
+    "benchmark_scope": "short accelerator benchmark; NOT camera-to-score or gameplay throughput",
+    "input_name": "charlie_score/input_layer1",
+    "input_metadata": "UINT8 NHWC(32x256x3)",
+    "output_name": "charlie_score/conv4",
+    "output_metadata": "UINT8 FCR(1x64x11)",
+    "python_output_dtype": "float32",
+    "python_output_shape": [1, 1, 64, 11],
+    "all_finite": true,
+    "transpose": [0, 3, 1, 2],
+    "canonical_shape": [1, 11, 1, 64]
+  },
+  "samples": [
+    {"label": "44216", "cpu_proposed": "44216", "cpu_accepted": null, "hailo_proposed": "44216", "hailo_accepted": null, "mean_absolute_logit_error": 0.17241},
+    {"label": "6789", "cpu_proposed": "6789", "cpu_accepted": "6789", "hailo_proposed": "6789", "hailo_accepted": "6789", "mean_absolute_logit_error": 0.20979},
+    {"label": "67846", "cpu_proposed": "67846", "cpu_accepted": null, "hailo_proposed": "67846", "hailo_accepted": "67846", "mean_absolute_logit_error": 0.18577},
+    {"label": "14786", "cpu_proposed": "14786", "cpu_accepted": null, "hailo_proposed": "14786", "hailo_accepted": null, "mean_absolute_logit_error": 0.18676},
+    {"label": "80249", "cpu_proposed": "80249", "cpu_accepted": "80249", "hailo_proposed": "80249", "hailo_accepted": "80249", "mean_absolute_logit_error": 0.17812}
+  ],
+  "maximum_individual_logit_error": 0.842,
+  "sample_3": {
+    "cpu_confidence": 0.8189502364575215,
+    "cpu_minimum_alignment_margin": 0.6380025246305921,
+    "hailo_confidence": 0.8902723898299889,
+    "hailo_minimum_alignment_margin": 0.7806081142411844,
+    "explanation": "Valid inference, same proposed digits, unchanged 0.85 confidence threshold crossed; not evidence of Hailo superiority or justification for recalibration"
+  },
+  "authentic_accuracy": "NOT DEMONSTRATED",
+  "confidence_calibration": "NOT DEMONSTRATED",
+  "extended_native_reliability": "NOT DEMONSTRATED",
+  "live_camera_latency": "NOT DEMONSTRATED",
+  "multi_client_concurrency": "NOT DEMONSTRATED",
+  "gameplay_improvement": "NOT DEMONSTRATED"
+}

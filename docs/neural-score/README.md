@@ -1,5 +1,11 @@
 # Neural Robotron score reader — unqualified draft
 
+**October 19 native findings:** [FCR repair, authentic recovery, exact blockers
+and isolated native acceptance](NATIVE-FINDINGS-20261018.md). Operator-reported
+synthetic HEF execution supersedes the earlier infrastructure-unknown status
+below; authentic-trained HEF and recognition qualification remain blocked.
+Historical receipts are retained.
+
 **October 18 continuation — archival screenshot training path:** [Sampling to authentic
 HEF](SAMPLING-TO-HEF.md) documents the newly implemented preserved-game
 source sampler, existing human review UI queue, strict game-level

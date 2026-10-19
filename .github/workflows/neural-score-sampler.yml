@@ -12,6 +12,9 @@ on:
       - "tests/test_neural_score_sampler.py"
       - "tests/test_score_feedback_recovery.py"
       - "tools/train_score_to_hef.py"
+      - "tools/recover_score_review_evidence.py"
+      - "tests/test_score_archive_recovery.py"
+      - "tests/test_score_review_navigation.py"
 permissions:
   contents: read
 jobs:
@@ -23,4 +26,4 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements.txt pytest
-      - run: python -m pytest tests/test_neural_score_sampler.py tests/test_neural_score.py tests/test_score_feedback_recovery.py tests/test_score_feedback_learning.py tests/test_score_human_review.py tests/test_score_review_frontend.py tests/test_score_tracker.py -q
+      - run: python -m pytest tests/test_neural_score_sampler.py tests/test_neural_score.py tests/test_score_archive_recovery.py tests/test_score_feedback_recovery.py tests/test_score_feedback_learning.py tests/test_score_human_review.py tests/test_score_review_frontend.py tests/test_score_review_navigation.py tests/test_score_tracker.py -q

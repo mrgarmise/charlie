@@ -1,0 +1,428 @@
+{
+  "schema": "charlie-score-archive-recovery-v1",
+  "audit_archive_sha256": "752c957b1b4ea35677c4d26f5efc572653d20b8fe9eaa55b13a052d92241e63f",
+  "review_snapshot_sha256": "ee612110302b40d89b977fc7dbb57ae2dc3a2ac09f7482bd78aa83d682464d21",
+  "annotation_records": 8,
+  "distinct_annotation_photos": 6,
+  "recovered_annotation_photos": 6,
+  "missing_annotation_photos": [],
+  "partitions": {
+    "training": {
+      "eligible": 0,
+      "proposal_ids": [],
+      "exclusions": []
+    },
+    "validation": {
+      "eligible": 0,
+      "proposal_ids": [],
+      "exclusions": []
+    },
+    "final": {
+      "eligible": 0,
+      "proposal_ids": [],
+      "exclusions": []
+    },
+    "diagnostic": {
+      "eligible": 6,
+      "proposal_ids": [
+        "96caef434658f9142ea9aeb319d7444d61067846cff13f87027aaf1296e4bb9f",
+        "ef62991e016c702183cde5d991a91721054027df8d451c3bc3f080ae3aa7db89",
+        "a5e58d3e2447fd6429b6932f7edeb06da94f9a6e4ccb0a212c8fb17503c7c619",
+        "8db56dc1d3a2be37ddd41061b0fdb3d5758b647db58f9945d3faa75ae936e50f",
+        "70ef7d82bd82fc477fa10e1bc534032b0137dedefc2afb6fe2ecab207dcfb18a",
+        "ce897790cc485ae9b1bbde6ae9370d75e199e544a2568af6bacfdd69989e661d"
+      ],
+      "exclusions": [
+        {
+          "proposal_id": "c99c103634b4c618707e440bfa2882aea98d8dc60d89a809e2acd26899c51a7b",
+          "reason": "unresolved review status"
+        },
+        {
+          "proposal_id": "916985ee79bfa247b144880713aa99de7946abcb76d2d202edcafd932b8a3803",
+          "reason": "photo reading not attested (original submission or later linked confirmation required)"
+        },
+        {
+          "proposal_id": "07dfcd10a2b962cb6f35572bb0618fc19adc7da2c047e3b48fbe3bdb9acd16ec",
+          "reason": "unresolved review status"
+        },
+        {
+          "proposal_id": "3c6977826aa4caf172b4dea89a5c841b4d2fb0bc729507698f001daa55fff07e",
+          "reason": "photo reading not attested (original submission or later linked confirmation required)"
+        },
+        {
+          "proposal_id": "63b9ffebb2ba900df8f05453824237f4ba8faea9c1793c3c102b75a489065326",
+          "reason": "unresolved review status"
+        },
+        {
+          "proposal_id": "6dae851c2bd61e350d15f5d450fa1a0ea99d9a7384f625e441db3280e1b19408",
+          "reason": "photo reading not attested (original submission or later linked confirmation required)"
+        },
+        {
+          "proposal_id": "af8083b50a9ba791c8a776100e47c58325efb114b3da854e27571d0f72234603",
+          "reason": "photo reading not attested (original submission or later linked confirmation required)"
+        }
+      ]
+    }
+  },
+  "image_archives": [
+    {
+      "path": "charlie-executive-diagnostics-20261016.tar.gz",
+      "sha256": "dd5ebba5f396a3b528a5f4257bd85cecb1d931e5013d60f915e278d40a30666d",
+      "members": 4
+    },
+    {
+      "path": "charlie-overnight-results-20261016.tar.gz",
+      "sha256": "ec3e121b8eb6257fa3e52453500d3044b96cb79d5e5eabb90fe3c815883481a4",
+      "members": 6
+    },
+    {
+      "path": "charlie-first-game-diagnostics.tar.gz",
+      "sha256": "428378af0049dbdf63a67c1693fb523f472a6d1cb9376ff621e79a3a415142d6",
+      "members": 17,
+      "image_members": 5
+    },
+    {
+      "path": "charlie-pr5-game01.tar.gz",
+      "sha256": "c02b9ec790a028f54bc143fb1c54d06aad8542c83122bf62e75f5a96c0b21780",
+      "members": 230,
+      "image_members": 204
+    },
+    {
+      "path": "Charlie-ALA2-normal-operation-history-20261004.tar.gz",
+      "sha256": "8b4c53f7ad8f0e3f656ab4aa25a7b40b208459e89f56a24f90b2950749278444",
+      "members": 48,
+      "image_members": 6
+    },
+    {
+      "path": "charlie-game-20261004.tar.gz",
+      "sha256": "6c5ee17f6d9aa968c326fbbc51b51de20797517f3415b91fadf7696ca2a3d36e",
+      "members": 183,
+      "image_members": 172,
+      "annotation_hash_matches": 1
+    },
+    {
+      "path": "Charlie-ALA2-qualified-continuation-20261004.tar.gz",
+      "sha256": "f97e63c34ef99eb3d34e66c1d89d751b5b8995fe7d0c85d8abcdefc61bd7057e",
+      "members": 55
+    },
+    {
+      "path": "Charlie-ALA2-recovery-20261004.tar.gz",
+      "sha256": "1d40d08b2665ff4113d8398438c6e47487c8541ffc57af6a364548c99ebc1ea5",
+      "members": 62
+    },
+    {
+      "path": "Charlie-ALA2-retrospective-20261003.tar.gz",
+      "sha256": "33c823d95fed394f0ed2a2e6d3f56e775ad27390d94198e2712d1c87ede8aa70",
+      "members": 26
+    },
+    {
+      "path": "charlie-terminal-restart.tar.gz",
+      "sha256": "5e95637c06ace5faa826d97a22b38c6d6e2aa8b9f84b7d23ebdd050f5076f33f",
+      "members": 1560,
+      "image_members": 337,
+      "annotation_hash_matches": 2
+    },
+    {
+      "path": "ALA-2-evidence-followup.tar.gz",
+      "sha256": "e0f04ab7fd114cdc6dc93d11f6ceb45118c98cb47b717c8e9abc5a0004992a00",
+      "members": 12
+    },
+    {
+      "path": "ALA-1-offline-demonstration.tar.gz",
+      "sha256": "eb3d922881db2e0834675dc90dfeec99924160580b78fe6ab82ceae59421dce8",
+      "members": 297,
+      "image_members": 25
+    },
+    {
+      "path": "ALA-2-continuation-evidence.tar.gz",
+      "sha256": "e650c32a38c8f77aa3643c88e39958e5fd189fdeef4b6fc8b1e713b2deb35dbd",
+      "members": 433,
+      "image_members": 89
+    },
+    {
+      "path": "body-fire-bootstrap-20261001-020552.tar.gz",
+      "sha256": "869bd605a25b1cc8b02c8ad0aa8420cf1d7c314fd1affaaf43fd4f9ef401e8a5",
+      "members": 155,
+      "image_members": 144
+    },
+    {
+      "path": "development-20261002-003511.tar.gz",
+      "sha256": "0ec32e4ab56c9fe2a4f73c31fc0822d48e816e94965f64c36bf137cb06a831ec",
+      "members": 178,
+      "image_members": 159
+    },
+    {
+      "path": "development-20261002-005944.tar.gz",
+      "sha256": "68ba09254926ee13d7cbc7813d82f52f139e79f8279505f3f888fddab9d49137",
+      "members": 196,
+      "image_members": 176,
+      "annotation_hash_matches": 1
+    },
+    {
+      "path": "development-20261002-012801.tar.gz",
+      "sha256": "43059f380110ea979fe7a570bd04f1ee512f5d429ca82091078c9102b1fb325f",
+      "members": 197,
+      "image_members": 176,
+      "annotation_hash_matches": 1
+    },
+    {
+      "path": "development-20261002-015817.tar.gz",
+      "sha256": "7e348d98e89526cfe72f979ed0801599b51969490a25de4116ad551679bfa85f",
+      "members": 208,
+      "image_members": 184,
+      "annotation_hash_matches": 1
+    },
+    {
+      "path": "exposure-calibration-20261001-010300.tar.gz",
+      "sha256": "ace246e7b9f0204904515563917455cd3c29976e0b6e90ebb7d227b8af6efa56",
+      "members": 96,
+      "image_members": 85,
+      "annotation_hash_matches": 1
+    },
+    {
+      "path": "marathon-20261008-031501.tar.gz",
+      "sha256": "c6894512e8a79898bbd158f957d22113f1580138bc9d373f67a92209e2208635",
+      "members": 29,
+      "image_members": 6
+    },
+    {
+      "path": "marathon-20261009-004249.tar.gz",
+      "sha256": "277769a3e4d2d106fdab98a80be7c6a8532be75415875314949ed6130cc71a04",
+      "members": 151,
+      "image_members": 123
+    },
+    {
+      "path": "meditation-history.tar.gz",
+      "sha256": "5764ca96d7c725c821997d3bf7dbb42841c7785364e40ddc2702282ba02d708a",
+      "members": 26
+    },
+    {
+      "path": "play-20260930-024128.tar.gz",
+      "sha256": "e06c4880802c15559d44b91baa1e5b64b85842db7d15ba01bad2155a4a8badfb",
+      "members": 20,
+      "image_members": 17
+    },
+    {
+      "path": "response-window-20261001-012341.tar.gz",
+      "sha256": "ce31b3eb34fdaec1ff39559a1fa87cd78961f1b2c10bdf3e33562f7c2108238c",
+      "members": 150,
+      "image_members": 139,
+      "annotation_hash_matches": 1
+    },
+    {
+      "path": "tracking-hud-fix-20261001-002127.tar.gz",
+      "sha256": "480b329dfeaeab498107ba37a5ec1267fb020962ac3904052d4f341a88ad6c36",
+      "members": 6,
+      "image_members": 1
+    },
+    {
+      "path": "tracking-hud-fix-goodview-20261001-002659.tar.gz",
+      "sha256": "93eba0850a8f78b18369c40c842745f63404a06a452832b4f432a697aabc875d",
+      "members": 6,
+      "image_members": 1
+    },
+    {
+      "path": "tracking-repair-20260930-034659.tar.gz",
+      "sha256": "71fc4e8b11cc92eb11b10ba8a36e60e68252846dced9c8ff7b755bc236620d9b",
+      "members": 50,
+      "image_members": 44
+    },
+    {
+      "path": "original-camera-check-2.tar.gz",
+      "sha256": "e315469c457107e73390d1ef9006962622aa3f74f53a66dfe2844987bdfa1ac2",
+      "members": 8,
+      "image_members": 5
+    },
+    {
+      "path": "audit-03.tar.gz",
+      "sha256": "c78ed5c507c447e95bee5c02660dfb08474e60eeb11f989b384656f5362fbada",
+      "members": 23,
+      "image_members": 22
+    },
+    {
+      "path": "visual-probe-failure.tar.gz",
+      "sha256": "2976cdd657dfc667320fae3d7c401b5e76a56e61ff00ed34b703ea1dab3195f9",
+      "members": 13,
+      "image_members": 9
+    },
+    {
+      "path": "charlie-arcade-intake-snapshot.tar.gz",
+      "sha256": "0377dd60bd820c9ebb30fbe7ff044ee56dc23db7685abd69a8769f16fc342256",
+      "members": 17
+    },
+    {
+      "path": "camera-T7g7DsKz.tar.gz",
+      "sha256": "536d0a9d7d7c792ea696725fb9b15f16f12390bb4db1853da615983daf4cfcac",
+      "members": 38,
+      "image_members": 24
+    },
+    {
+      "path": "camera-mBPTGSQy.tar.gz",
+      "sha256": "7938b2237a809ac423fdcaef3bc608fc808111d1fa004510efbef47476bd4678",
+      "members": 38,
+      "image_members": 24
+    },
+    {
+      "path": "camera-sqrdgs7L.tar.gz",
+      "sha256": "37487b54082a73bbd926e2fe7eb4b0275e50ce5e425b2adb7e94a46872a470e3",
+      "members": 38,
+      "image_members": 24
+    },
+    {
+      "path": "charlie-causal-self-id-update.tar.gz",
+      "sha256": "379bcbea3abe4984343f7918d9dd87ca17f3a30e4e6e90f1ab0a6800105a914a",
+      "members": 6
+    },
+    {
+      "path": "charlie-center-bootstrap-update.tar.gz",
+      "sha256": "1b3381f890c5a98aa03f1cc44a0ed243147ccc1bb126a131eee88e0e2bcacf3b",
+      "members": 6
+    },
+    {
+      "path": "charlie-robotron-20s-runner-fix1.tar.gz",
+      "sha256": "a68706c836ebe8d0f5a4e674f49d9c995816f346ea80ffc8c98a2b52b5afbbc5",
+      "members": 1
+    },
+    {
+      "path": "charlie-robotron-20s-runner.tar.gz",
+      "sha256": "392f7f9e150430de445f72242833435dd6190d115b033418dff21450f87673e5",
+      "members": 1
+    },
+    {
+      "path": "charlie-robotron-auto-start-fix3.tar.gz",
+      "sha256": "b8ae528e64c096972077f615b6e9ecca344071a640c1a3fa112f988a3a62f5da",
+      "members": 1
+    },
+    {
+      "path": "charlie-robotron-fast-start-fix2.tar.gz",
+      "sha256": "5a6ea4574faa7bf215f541791bcc0ccd5fb76380512b34e2639758900e75e417",
+      "members": 1
+    },
+    {
+      "path": "charlie-robotron-post-start-watch-fix4.tar.gz",
+      "sha256": "4be7c556b85602c9ce2306aa2c8960cc554288009c7bf88c6b02361dd9d283f6",
+      "members": 1
+    },
+    {
+      "path": "charlie-robotron-session-foundation-v1.tar.gz",
+      "sha256": "6ff981b9a6f83f4c878d5459a600a5bcbba866987a666690512a8dbda0b5408e",
+      "members": 2
+    },
+    {
+      "path": "charlie-visual-probe-source.tar.gz",
+      "sha256": "117f80ce804bd9b49af394742469be5b1ed574136ddad4e3f35095ae9c78f64e",
+      "members": 163
+    },
+    {
+      "path": "charlie-visual-probe-update.tar.gz",
+      "sha256": "ab0b14da7f08c6bc514063aed37e50e44bd612ba212071eb0a90799d3dc93238",
+      "members": 11
+    },
+    {
+      "path": "detection-9iYXAHNo.tar.gz",
+      "sha256": "edd8ddb89aed80a2e3cedd8d295f51456d05dbba1076005001088bceb5b09707",
+      "members": 146,
+      "image_members": 141
+    },
+    {
+      "path": "detection-DsFahuba.tar.gz",
+      "sha256": "4c3a3ac9471f10fa187208c15c13d8f29a37ce709477732ed249d427dced2df5",
+      "members": 148,
+      "image_members": 143
+    },
+    {
+      "path": "detection-FKVZ0qEZ.tar.gz",
+      "sha256": "0d6e2657912c3492bfc292b6323ddb641b595f6f1d27db77ae1a25e3ea80c1bf",
+      "members": 128,
+      "image_members": 123
+    },
+    {
+      "path": "detection-HDdQVxls.tar.gz",
+      "sha256": "33e2960a71cb101beab8e6cac16e298667b2ec5424b6ff8373c45ace507804a7",
+      "members": 294,
+      "image_members": 289
+    },
+    {
+      "path": "detection-lPC7dT3m.tar.gz",
+      "sha256": "1adaf6c0db0744b554f7606f6f89641336c03a805e27ab9f317ae8bd6fdc53c3",
+      "members": 136,
+      "image_members": 131
+    },
+    {
+      "path": "detection-voc6Fiar.tar.gz",
+      "sha256": "792a18ded0ca7edbb386ca10423616749b5fd19a12563a6909a906b2855934f5",
+      "members": 144,
+      "image_members": 139
+    },
+    {
+      "path": "timing-5kY3h0NP.tar.gz",
+      "sha256": "d6a740008e97f96e5486e88418bc3f78d16dcfa3096b103f4be13653abaaa49f",
+      "members": 5,
+      "image_members": 2
+    },
+    {
+      "path": "timing-QSsAxcb8.tar.gz",
+      "sha256": "622b50341be637c27fc3e8878ff10ae258452c5fc075d7bbca2a773f11851a2c",
+      "members": 5,
+      "image_members": 2
+    },
+    {
+      "path": "tracking-score-20260930-231757.tar.gz",
+      "sha256": "8172c46c62be2fafe18ac57fe0fc144d51b2b09bcb18e4872125f52aadfd15b7",
+      "members": 6,
+      "image_members": 1
+    },
+    {
+      "path": "tracking-score-20260930-232827.tar.gz",
+      "sha256": "88f950c324496aa0c43980d7824702a968e56cab9d2d61d3ee32dc2856e1aec5",
+      "members": 63,
+      "image_members": 56
+    }
+  ],
+  "matches": [
+    {
+      "archive_sha256": "6c5ee17f6d9aa968c326fbbc51b51de20797517f3415b91fadf7696ca2a3d36e",
+      "member": "robotron-runs/play-20261004-205356/score-raw-0085.png",
+      "sha256": "160b5d12b7f4051e6fafb4b09618b8112be9ecc448efe5dcbe8bdcb57375bff2"
+    },
+    {
+      "archive_sha256": "5e95637c06ace5faa826d97a22b38c6d6e2aa8b9f84b7d23ebdd050f5076f33f",
+      "member": "charlie-terminal-restart/tests/fixtures/robotron-developmental/012801-score-raw-0097.png",
+      "sha256": "4de1bb7249cc9208fff051cfa1c2465a824cd385c0f1f904b43658339b9101a9"
+    },
+    {
+      "archive_sha256": "5e95637c06ace5faa826d97a22b38c6d6e2aa8b9f84b7d23ebdd050f5076f33f",
+      "member": "charlie-terminal-restart/tests/fixtures/robotron-developmental/015817-score-raw-0175.png",
+      "sha256": "2ca8fb8ae67b415f7bd2dfe1d77e48daaefb295aad2719bf0d1693a8bd55ffc8"
+    },
+    {
+      "archive_sha256": "68ba09254926ee13d7cbc7813d82f52f139e79f8279505f3f888fddab9d49137",
+      "member": "development-20261002-005944/game-01/score-raw-0181.png",
+      "sha256": "6e2f3902373e2a18798f36425495d6716c3d8a1aba68f99d12d79b0acc0a9dbe"
+    },
+    {
+      "archive_sha256": "43059f380110ea979fe7a570bd04f1ee512f5d429ca82091078c9102b1fb325f",
+      "member": "development-20261002-012801/game-01/score-raw-0097.png",
+      "sha256": "4de1bb7249cc9208fff051cfa1c2465a824cd385c0f1f904b43658339b9101a9"
+    },
+    {
+      "archive_sha256": "7e348d98e89526cfe72f979ed0801599b51969490a25de4116ad551679bfa85f",
+      "member": "development-20261002-015817/game-01/score-raw-0175.png",
+      "sha256": "2ca8fb8ae67b415f7bd2dfe1d77e48daaefb295aad2719bf0d1693a8bd55ffc8"
+    },
+    {
+      "archive_sha256": "ace246e7b9f0204904515563917455cd3c29976e0b6e90ebb7d227b8af6efa56",
+      "member": "robotron-runs/exposure-calibration-20261001-010300/score-raw-0016.png",
+      "sha256": "12b6139cea27a3f81549b49f3b1702ffeff3c56efe2fee0516304717e994a0e0"
+    },
+    {
+      "archive_sha256": "ce31b3eb34fdaec1ff39559a1fa87cd78961f1b2c10bdf3e33562f7c2108238c",
+      "member": "robotron-runs/response-window-20261001-012341/score-raw-0016.png",
+      "sha256": "ce5bc3d6cd887b27986988f53cb4c19c25187571238d4f5023505b63784ca558"
+    }
+  ],
+  "qualification": "existing consulted reviews; original partitions unchanged; no invented labels",
+  "original_journal_modified": false,
+  "model_trained": false,
+  "hef_generated": false
+}

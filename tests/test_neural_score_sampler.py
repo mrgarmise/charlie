@@ -13,7 +13,8 @@ from PIL import Image, ImageDraw
 
 from experiments.ppal.eyes.calibration import Calibration
 from experiments.ppal.inspect_robotron_score import queue_rows, review_game
-from experiments.ppal.neural_score.sample import freeze, queue_for_review, role_for_group
+from experiments.ppal.neural_score.sample import (freeze, queue_for_review,
+    role_for_group, _score_channel_camera_coverage)
 from experiments.ppal.neural_score.export_reviews import export
 from experiments.ppal.score_observer import ScoreObserver
 from experiments.ppal.score_feedback import reviewed_labels
@@ -141,6 +142,24 @@ class ScoreSamplerTest(unittest.TestCase):
             self.assertEqual(selection["selected"][0]["source_reference_record_id"],"capture-001")
             self.assertIsNone(selection["selected"][0]["proposed_score"])
             self.assertEqual(queue_for_review(manifest_path,base/"isolated"/"reviews.sqlite3")["queued"],1)
+
+    def test_real_camera_geometry_keeps_visible_score_channel(self):
+        # The released calibration's extended upper-left HUD corner lies just
+        # outside the photograph, but *both score channels* are inside it.
+        corners=((.24609375,.06527777777777778),
+                 (.8125,.11805555555555555),
+                 (.8234375,.8263888888888888),
+                 (.19375,.7694444444444445))
+        self.assertLess(
+            corners[0][1] - .10 * (corners[3][1]-corners[0][1]), 0)
+        for channel in ((.10,.28),(.72,.90)):
+            self.assertGreaterEqual(
+                _score_channel_camera_coverage(1280,720,corners,channel),.995)
+
+    def test_clipped_score_channel_stays_ineligible(self):
+        corners=((.1,.03),(.9,.03),(.9,.9),(.1,.9))
+        self.assertLess(
+            _score_channel_camera_coverage(640,480,corners,(.10,.28)),.995)
 
     def test_reject_geometry_without_original_hud(self):
         with TemporaryDirectory() as folder:

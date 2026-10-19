@@ -79,7 +79,7 @@ class ScoreSamplerTest(unittest.TestCase):
                 part = {"train":"training","val":"validation","test":"final"}[role]
                 self.assertEqual(len(reviewed_labels(journal,partition=part)[0]),0)
                 review_game(journal,samples[0]["id"],annotator="test-human",
-                            verdict="correct",value=2200,reason="Visible whole score",
+                            verdict="correct",value=2200,visible_digits="2200",reason="Visible whole score",
                             independent=True,not_final_score=True)
                 rows,_ = reviewed_labels(journal,partition=part)
                 self.assertEqual(len(rows),1)
@@ -133,7 +133,7 @@ class ScoreSamplerTest(unittest.TestCase):
             try:
                 sample=next(row for row in queue_rows(journal) if row.get("sample"))
                 review_game(journal,sample["id"],annotator="operator",
-                    verdict="correct",value=2200,reason="I read the picture",
+                    verdict="correct",value=2200,visible_digits="2200",reason="I read the picture",
                     independent=False,not_final_score=True)
                 original=journal.category_records("observation","score_human_annotation")[0]
                 original_document=original.document
@@ -178,7 +178,7 @@ class ScoreSamplerTest(unittest.TestCase):
             try:
                 sample=next(row for row in queue_rows(journal) if row.get("sample"))
                 review_game(journal,sample["id"],annotator="operator",
-                    verdict="correct",value=2200,independent=False)
+                    verdict="correct",value=2200,visible_digits="2200",independent=False)
                 photo=root/"score-raw-0001.png"
                 photo.rename(root/"score-raw-0001.png.missing")
                 result=attest(journal,manifest_path,apply=True)
@@ -186,6 +186,43 @@ class ScoreSamplerTest(unittest.TestCase):
                 self.assertEqual(result["skipped"]["original_photo_missing_or_modified"],1)
             finally:
                 journal.close()
+
+    def test_legacy_midgame_insufficient_recovered_by_explicit_zero_transcription(self):
+        # A previous mid-game "not final" click threw away a filled field.
+        # We must not create score truth from that lost input. A new
+        # photograph-based exact-text correction can preserve visible '00'.
+        with TemporaryDirectory() as folder:
+            base=Path(folder)
+            root=self.make_fixture(base,value=0)
+            inventory=base/"inventory.json"
+            inventory.write_text(json.dumps([
+                dict(canonical_game_id="legacy-midgame-sample",paths=[str(root)])]))
+            calibration=base/"calibration.json"
+            Calibration(((.10,.20),(.90,.20),(.90,.90),(.10,.90))).save(calibration)
+            selection=base/"selection.json"
+            plan=freeze(inventory,calibration,selection,limit=1)
+            location=base/"isolated"/"working.sqlite3"
+            queue_for_review(selection,location)
+            j=EvidenceJournal(location)
+            try:
+                sample=next(row for row in queue_rows(j) if row.get("sample"))
+                with self.assertRaisesRegex(ValueError,"mid-game"):
+                    review_game(j,sample["id"],annotator="operator",verdict="insufficient")
+                with self.assertRaisesRegex(ValueError,"exact"):
+                    review_game(j,sample["id"],annotator="operator",verdict="correct",
+                                value=0,reason="just numeric zero",independent=True)
+                review_game(j,sample["id"],annotator="operator",verdict="correct",
+                    value=0,visible_digits="00",reason="read both zero glyphs",
+                    independent=True,not_final_score=True)
+                part={"train":"training","val":"validation","test":"final"}[plan["selected"][0]["role"]]
+                rows,_=reviewed_labels(j,partition=part)
+                self.assertEqual(len(rows),1)
+                self.assertEqual(rows[0]["label"],0)
+                self.assertEqual(rows[0]["display_digits"],"00")
+                annotated=j.category_records("observation","score_human_annotation")[-1]
+                self.assertEqual(annotated.data["payload"]["visible_digits"],"00")
+            finally:
+                j.close()
 
     def test_pre_score_game_uses_hash_bound_original_camera_journal(self):
         with TemporaryDirectory() as folder:

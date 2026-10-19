@@ -361,7 +361,7 @@ class ScoreObserver:
         raise ValueError('original score image missing or changed')
 
     @staticmethod
-    def annotate_review(journal,proposal_id,*,annotator,verdict,value=None,reason,independent=False,supersedes=None):
+    def annotate_review(journal,proposal_id,*,annotator,verdict,value=None,visible_digits=None,reason,independent=False,supersedes=None):
         import hashlib
         from datetime import datetime,timezone
         from pathlib import Path
@@ -373,12 +373,17 @@ class ScoreObserver:
         elif verdict=='unreadable':value=None
         elif verdict!='correct':raise ValueError('confirm, correct or unreadable required')
         if verdict!='unreadable' and (type(value) is not int or value<0):raise ValueError('readable annotation requires exact nonnegative digits')
+        if visible_digits is not None:
+            if (verdict=='unreadable' or not isinstance(visible_digits,str) or
+                    not visible_digits.isascii() or not visible_digits.isdigit() or
+                    not 1<=len(visible_digits)<=7 or int(visible_digits)!=value):
+                raise ValueError('visible digits must be 1–7 exact ASCII digits matching reviewed numeric value')
         if supersedes:
             prior=journal.get(supersedes).data['payload']
             if prior.get('category')!='score_human_annotation' or prior.get('proposal_id')!=proposal_id or prior.get('annotator')!=annotator:
                 raise ValueError('correction must supersede this reviewer and proposal')
         return journal.append('observation',dict(category='score_human_annotation',proposal_id=proposal_id,
-            annotator=annotator,verdict=verdict,value=value,reason=reason,independence_attested=bool(independent),
+            annotator=annotator,verdict=verdict,value=value,visible_digits=visible_digits,reason=reason,independence_attested=bool(independent),
             reviewed_at=datetime.now(timezone.utc).isoformat(),artifact_sha256=p['artifact']['sha256'],
             source_episode=p['source_episode'],timestamp=p['timestamp'],partition=p['partition'],synthetic=p['synthetic'],
             supersedes=supersedes,qualification='human annotation; complete-game boundary and independent qualification still required'),

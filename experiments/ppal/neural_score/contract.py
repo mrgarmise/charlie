@@ -53,7 +53,7 @@ def decode(logits, *, min_score=.85, min_margin=.25, max_digits=7):
     if not digits:reason='blank/no score'
     elif len(text)>max_digits:reason='length exceeds contract'
     elif path[0]!=BLANK or path[-1]!=BLANK:reason='edge/truncated sequence'
-    elif len(text)>1 and text[0]=='0':reason='noncanonical leading zero; no coercion'
+    elif len(text)>1 and text[0]=='0' and set(text)!={'0'}:reason='noncanonical leading zero; no coercion'
     elif float(conf.min())<min_score or float(margins.min())<min_margin:reason='ambiguous digit or blank'
     score=float(conf.min())
     return dict(score=int(text) if reason is None else None,digits=text if reason is None else None,

@@ -44,7 +44,20 @@ async function run(){await vm.runInContext('load()',context);await tick();assert
  elements.filter.value='all';elements.filter.onchange();elements.zoom.value='3';elements.zoom.oninput();
  assert.equal(elements.image.style.width,'300%');
  context.document.onkeydown({key:'ArrowRight',target:{tagName:'BODY'}});assert.match(elements.game.textContent,/Game 2/);
- console.log('30-game JavaScript batch, correction, filter, missing-photo and navigation checks passed; DOM double only');}
+ // The screenshot-labeling mode is distinct from final-game review. Never
+ // offer the legacy "not final score" exclusion on a training sample.
+ games[11].sample=true;games[11].role='train';
+ elements.filter.value='all';elements.filter.onchange();
+ elements.list.children[11].click();await tick();
+ assert.equal(elements.insufficient.hidden,true);
+ assert.equal(elements.confirm.hidden,true);
+ assert.equal(elements.not_final.checked,true);
+ assert.equal(elements.value.value,'');
+ elements.value.value='00';await vm.runInContext("save('correct')",context);
+ assert.equal(games[11].annotations[0].visible_digits,'00');
+ assert.equal(games[11].annotations[0].value,0);
+ assert.equal(games[11].annotations[0].not_final_score,true);
+ console.log('Score review DOM: 30 games, sample midgame guard, exact 00 label, filters and navigation passed');}
 run().catch(e=>{console.error(e);process.exitCode=1});
 ''')
     subprocess.run([node,str(harness),str(script)],check=True,capture_output=True,text=True)

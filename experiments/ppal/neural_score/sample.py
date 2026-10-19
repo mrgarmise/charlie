@@ -78,6 +78,8 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=()):
     if not isinstance(entries, list):
         raise ValueError("canonical recording inventory must be an array")
     reader = RobotronHUDReader(calibration)
+    from memory.evidence import digest as evidence_digest
+    geometry_digest = evidence_digest(dict(corners=calibration.corners, output_size=calibration.output_size))
     commitments = {}
     for file in prior:
         old = json.loads(Path(file).read_text())
@@ -155,6 +157,7 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=()):
                         source_log_line=number, source_timestamp=timestamp,
                         source_observation_id=row.get("observation_id"), role=role,
                         split_group=group, source_session=group,
+                        calibration_geometry_digest=geometry_digest,
                         proposed_score=proposed, proposed_confidence=float(conf),
                         score_status=ch.get("status", "unknown"), score_strip_fingerprint=feature,
                         contrast=contrast, selection_origin="recorded original score camera image; not a verified human label"))
@@ -232,7 +235,7 @@ def freeze(inventory, calibration_path, output, *, seed=17, limit=300, per_game=
 def queue_for_review(manifest, journal_path):
     # An operator must explicitly give a NEW isolated working-state location.
     # Never write into the game's preserved evidence or the default Pi notebook.
-    from memory.evidence import EvidenceJournal, digest as evidence_digest
+    from memory.evidence import EvidenceJournal
     from ..score_observer import ScoreObserver
     manifest = Path(manifest).resolve()
     record = json.loads(manifest.read_text())
@@ -245,6 +248,7 @@ def queue_for_review(manifest, journal_path):
         raise ValueError("review journal must be outside all original recording trees")
     if "score-review" in journal_path.parts or "development" in journal_path.parts:
         raise ValueError("review journal must be a dedicated isolated working copy")
+    journal_path.parent.mkdir(parents=True, exist_ok=True)
     journal = EvidenceJournal(journal_path)
     try:
         present = {
@@ -275,9 +279,8 @@ def queue_for_review(manifest, journal_path):
                 score_log_line=item["source_log_line"], source_session=item["source_session"],
                 note="archived source row, not fresh independent camera capture or human truth"),
                 episode=source_episode, at=at, producer="score-frame-sampler", version="1")
-            calibration = Calibration.load_by_digest if False else None
-            # Compare the exact calibration identity from the frozen manifest;
-            # the corpus adapter also enforces its geometric digest.
+            # The frozen calibration digest is checked again by the corpus
+            # adapter; neither sampler nor review supplies truth labels.
             proposal = ScoreObserver.review_proposal(journal,src,
                 source_episode=source_episode,timestamp=at,clock="preserved score.jsonl exposure basis",
                 source_id=source.id,proposed=item["proposed_score"],

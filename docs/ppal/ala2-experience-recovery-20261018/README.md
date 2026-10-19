@@ -1,6 +1,11 @@
 # ALA-2 experience-to-decision recovery — implementation checkpoint
 
-**Status: software integration in progress; E1/P1/I1 NOT YET DEMONSTRATED.**
+Native continuation and controlled offline evidence are recorded in
+[the October 19 report](native-20261019/README.md). Its diagnostic learning
+results do not waive the original mission, qualification or authorization gates.
+
+**Status: scoped native offline E1/P1 diagnostic controls demonstrated;
+I1 and original ALA-2 acceptance remain open.**
 This work implements only scoped mechanisms. No original notebook, recorded
 game, physical policy or controller has been modified or activated.
 
@@ -134,7 +139,7 @@ permission before gameplay, policy activation or firmware/servo operations.
 
 - Historical copy parity: audit-reported, original SD image not compared.
 - Native copied-state continuation: historical result only.
-- E1: NOT YET DEMONSTRATED.
-- P1: NOT YET DEMONSTRATED.
+- E1: scoped authentic recurrence investigation/later evaluation control demonstrated; see native report.
+- P1: scoped offline retained valuation/reload/ablation demonstrated; physical policy qualification remains open.
 - I1: NOT YET DEMONSTRATED.
 - Complete-game SCORE comparison: NOT YET DEMONSTRATED.

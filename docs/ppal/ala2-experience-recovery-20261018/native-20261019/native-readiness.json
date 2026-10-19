@@ -1,0 +1,18 @@
+{
+  "schema": "ala-2-offline-readiness-v1",
+  "system": {
+    "python": "3.13.5",
+    "machine": "aarch64",
+    "platform": "Linux-6.18.50+rpt-rpi-2712-aarch64-with-glibc2.41",
+    "torch_available": false,
+    "numpy": "2.2.4"
+  },
+  "physical_authorization": false,
+  "score_improvement": "not demonstrated",
+  "gaps": [
+    "no authorized operational candidate supplied",
+    "physical camera/controller/recovery/cadence evidence must be independently qualified",
+    "official-score reader and complete-game boundaries need independent qualification",
+    "preregistered frozen baseline/candidate score comparison and explicit armed authorization required"
+  ]
+}

@@ -843,10 +843,9 @@ class LearningExecutive:
         self.reconcile_agenda()
         # The Executive chooses eligible new experience for bounded reflection.
         # A completed result is a durable checkpoint, not another experience.
-        contexts=[r for r in self.journal.records('observation') if
-            r.data['payload'].get('category')=='learning_context_reference' and r.data['payload'].get('source_episode') and lifecycle.evidence_eligible(r.data['payload'])]
-        results=[r.data['payload'] for r in self.journal.records('observation') if
-            r.data['payload'].get('category')=='normal_meditation_result']
+        contexts=[r for r in self.journal.category_records('observation','learning_context_reference') if
+            r.data['payload'].get('source_episode') and lifecycle.evidence_eligible(r.data['payload'])]
+        results=[r.data['payload'] for r in self.journal.category_records('observation','normal_meditation_result')]
         completed_episodes={r['source_episode'] for r in results if r['status']=='completed'}
         unavailable={r['context_id'] for r in results if r['status']=='unavailable'}
         meditation_advanced=False

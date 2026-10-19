@@ -1,0 +1,83 @@
+{
+  "schema": "ala2-scoped-native-acceptance-20261019",
+  "E1": {
+    "result": "PASS",
+    "scope": "authentic score-review uncertainty recurrence investigation affects actual later evaluation",
+    "resolution_id": "99697ab53914ee39fdb8f1cbb557cd7131cdfc781a803babf465d69949da31d5",
+    "project_id": "08b0e92fa61c9db86e50557e04a092748d1bdd5664adf8d634f6926c5cf1e696",
+    "alternatives": 19,
+    "before": 2.0000000000000004,
+    "after_actual_fresh_process": 1.5,
+    "scoped_ablation": 2.0000000000000004,
+    "causal_gameplay_explanation_qualified": false
+  },
+  "P1": {
+    "result": "PASS",
+    "scope": "retrospective retained diagnostic action valuation in offline Hindbrain",
+    "windows": 99,
+    "capture_origins": 6,
+    "numeric_valuation_changes": 96,
+    "shadow_preference_changes": 84,
+    "physical_actions_changed": 0,
+    "independent_physical_policy_qualification": false
+  },
+  "I1": {
+    "result": "NOT YET DEMONSTRATED",
+    "reason": "No independently qualified improvement advanced through operational integration/authorization/rollback"
+  },
+  "original_mission": {
+    "result": "OPEN",
+    "requirements": [
+      "Independent Mint SD-image migration comparison",
+      "Exact October 9 invalid-meditation/native original-notebook acceptance",
+      "Independent identity/role/trajectory and candidate-specific native readiness",
+      "Independent held-out score-reader and complete-game SCORE comparison",
+      "Guarded qualified integration and rollback; separate physical authorization"
+    ]
+  },
+  "independent_performance_comparison": "NOT YET DEMONSTRATED",
+  "autonomous_operation": "Controlled bounded offline continuation only; no operational closure claimed",
+  "safety": {
+    "physical_gameplay": false,
+    "controller_transport": false,
+    "servos": false,
+    "firmware": false,
+    "learned_physical_policy_activation": false
+  },
+  "retained": {
+    "original_records": 3247,
+    "overnight_records": 3832,
+    "overnight_added_records": 585,
+    "overnight_completed_meditations_recovered": 7,
+    "final_records": 4492,
+    "new_native_completed_meditations": 8,
+    "original_notebook_sha256": "7c942b2a5977142ba093bfe2b2238d8d37573438e55b9c8cab5f566bb44ae6ae",
+    "all_original_and_overnight_ids_preserved": true
+  },
+  "source_gates": {
+    "eligible_report_contexts": 8,
+    "reportless_partial_recordings": 2,
+    "incomplete_writer_quarantined_recordings": 1,
+    "diagnostic_tactical_outcomes_excluded": 16,
+    "preliminary_prediction_identities": {
+      "confirmed": 88,
+      "provisional": 11
+    },
+    "reported_game_over_is_independent_complete_game_certification": false
+  },
+  "score_feedback": {
+    "annotations_imported": 8,
+    "status_records_imported": 16,
+    "usable_diagnostic_labels": 6,
+    "held_out_reader_evaluation": "BLOCKED: no training/held-out partition supplied; diagnostic reviews not reclassified"
+  },
+  "tests": {
+    "full_native_passed": 1281,
+    "full_native_skipped": 24,
+    "full_native_failed": 34,
+    "failure_reason": "sandbox denies socket creation in loopback TCP/HTTP fixtures",
+    "clean_full_suite_pass": false
+  },
+  "ala2_closed": false,
+  "ready_for_merge_or_pi_deployment": false
+}

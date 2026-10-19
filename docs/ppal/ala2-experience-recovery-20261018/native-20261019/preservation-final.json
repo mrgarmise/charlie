@@ -1,0 +1,20 @@
+[
+  {
+    "source": "/home/five/.local/share/charlie/development",
+    "files_checked": 364,
+    "unchanged": true,
+    "changed": []
+  },
+  {
+    "source": "/home/five/charlie-overnight-20261016T015459Z/validation-state",
+    "files_checked": 386,
+    "unchanged": true,
+    "changed": []
+  },
+  {
+    "source": "/home/five/.local/share/charlie/score-review",
+    "files_checked": 1,
+    "unchanged": true,
+    "changed": []
+  }
+]

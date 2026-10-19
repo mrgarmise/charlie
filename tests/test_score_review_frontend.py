@@ -8,6 +8,8 @@ def test_batch_navigation_correction_filters_and_keyboard(tmp_path):
     node=shutil.which('node') or os.environ.get('CODEX_PRIMARY_RUNTIME_NODE')
     if not node:pytest.skip('Node unavailable; browser logic test requires JavaScript runtime')
     page=(Path(__file__).parents[1]/'experiments/ppal/score-review.html').read_text()
+    assert 'id="independent"' not in page
+    assert 'automatically' not in page or 'original photograph' in page
     source=page.split('<script>')[1].split('</script>')[0]
     script=tmp_path/'review.js';script.write_text(source)
     subprocess.run([node,'--check',str(script)],check=True,capture_output=True,text=True)
@@ -35,7 +37,7 @@ async function run(){await vm.runInContext('load()',context);await tick();assert
  assert.equal(elements.progress.textContent,'1 of 30 reviewed');
  elements.list.children[4].click();await tick();assert.match(elements.game.textContent,/Game 5/);
  elements.value.value='1234';await vm.runInContext("save('correct')",context);
- assert.equal(games[4].annotations[0].value,1234);assert.equal(games[4].proposed_score,400);
+ assert.equal(games[4].annotations[0].value,1234);assert.equal(games[4].annotations[0].independent,true);assert.equal(games[4].proposed_score,400);
  elements.filter.value='pending';elements.filter.onchange();assert.equal(elements.list.children.length,28);
  elements.filter.value='incomplete';elements.filter.onchange();assert.equal(elements.list.children.length,1);
  assert.equal(elements.confirm.disabled,true);assert.equal(elements.missing.hidden,false);

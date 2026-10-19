@@ -151,7 +151,48 @@ def _saved_camera_sources(root, reader, game_id, group, role, geometry_digest, d
         raise RuntimeError("original camera journal changed during inspection")
 
 
-def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=()):
+def _existing_review_sources(path):
+    """Read previous score-review commitments using SQLite WAL-safe backup."""
+    import sqlite3
+    from tempfile import TemporaryDirectory
+    path = Path(path).resolve(strict=True)
+    source = sqlite3.connect(path.as_uri() + "?mode=ro", uri=True)
+    with TemporaryDirectory() as temp:
+        copy = sqlite3.connect(Path(temp) / "review.sqlite3")
+        try:
+            source.backup(copy)
+        finally:
+            copy.close()
+            source.close()
+        inspected = sqlite3.connect(
+            (Path(temp) / "review.sqlite3").as_uri() + "?mode=ro&immutable=1",uri=True)
+        try:
+            documents = [json.loads(doc) for (doc,) in
+                         inspected.execute("SELECT document FROM records")]
+        finally:
+            inspected.close()
+    episodes = set()
+    sessions = set()
+    images = set()
+    for doc in documents:
+        p = doc.get("payload", {})
+        if p.get("category") not in ("score_review_proposal","score_human_annotation"):
+            continue
+        if isinstance(p.get("source_episode"), str):
+            episodes.add(p["source_episode"])
+        context = p.get("context") or {}
+        if isinstance(context,dict):
+            session = context.get("source_session")
+            if isinstance(session,str):
+                sessions.add(_group(Path(session)))
+        artifact = p.get("artifact") or {}
+        fingerprint = artifact.get("sha256",p.get("artifact_sha256"))
+        if isinstance(fingerprint,str):
+            images.add(fingerprint)
+    return dict(episodes=episodes,sessions=sessions,images=images,origin=str(path))
+
+
+def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prior_review_journal=None):
     entries = json.loads(Path(inventory).read_text())
     if not isinstance(entries, list):
         raise ValueError("canonical recording inventory must be an array")
@@ -169,6 +210,7 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=()):
                 raise ValueError("prior session split collision")
             commitments[group] = role
 
+    prior_reviews = _existing_review_sources(prior_review_journal) if prior_review_journal is not None else None
     diagnostics = Counter()
     candidates = []
     already_seen = set()
@@ -180,6 +222,12 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=()):
             diagnostics["missing_recording_directory"] += 1
             continue
         group = _group(root)
+        if prior_reviews is not None and (
+            game_id in prior_reviews["episodes"]
+            or any(alias in prior_reviews["episodes"] for alias in entry.get("source_aliases",()))
+            or group in prior_reviews["sessions"]):
+            diagnostics["preconsulted_session_excluded"] += 1
+            continue
         role = commitments.get(group, role_for_group(group, seed))
         if group in groups and groups[group] != role:
             raise ValueError("one recording group would cross partitions")
@@ -223,6 +271,9 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=()):
                         diagnostics["no_authentic_capture_time"] += 1
                         continue
                     raw_sha = file_sha(path)
+                    if prior_reviews is not None and raw_sha in prior_reviews["images"]:
+                        diagnostics["preconsulted_image_excluded"] += 1
+                        continue
                     if raw_sha in already_seen:
                         diagnostics["duplicate_original_bytes"] += 1
                         continue
@@ -303,19 +354,23 @@ def select(candidates, *, seed=17, limit=300, per_game=18):
     return chosen
 
 
-def freeze(inventory, calibration_path, output, *, seed=17, limit=300, per_game=18, prior=()):
+def freeze(inventory, calibration_path, output, *, seed=17, limit=300, per_game=18,
+           prior=(), prior_review_journal=None):
     output = Path(output)
     if output.exists():
         raise FileExistsError("sampler output must be a new immutable file")
     calibration = Calibration.load(Path(calibration_path))
-    candidates, diagnostics, groups = discover(inventory, calibration, seed=seed, prior=prior)
+    candidates, diagnostics, groups = discover(inventory, calibration, seed=seed,
+                                                prior=prior, prior_review_journal=prior_review_journal)
     chosen = select(candidates, seed=seed, limit=limit, per_game=per_game)
     record = dict(schema=SCHEMA, inventory_sha256=file_sha(inventory),
         calibration_sha256=file_sha(calibration_path), seed=seed, selection_limit=limit,
         per_game_limit=per_game, split_groups=groups,
         source_candidates=len(candidates), selected=chosen, exclusions=dict(diagnostics),
         meaning="source-linked screenshot review proposals, not score truth or complete games",
-        prior_manifests=[file_sha(p) for p in prior])
+        prior_manifests=[file_sha(p) for p in prior],
+        prior_review_journal=str(Path(prior_review_journal).resolve()) if prior_review_journal else None,
+        prior_review_main_sha256=file_sha(prior_review_journal) if prior_review_journal else None)
     record["digest"] = digest(record)
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("x") as stream:
@@ -419,13 +474,19 @@ def main():
     p.add_argument("--limit", type=int, default=300)
     p.add_argument("--per-game", type=int, default=18)
     p.add_argument("--prior-manifest", type=Path, action="append", default=[])
+    reviews = p.add_mutually_exclusive_group(required=True)
+    reviews.add_argument("--prior-review-journal", type=Path,
+        help="existing original score-review notebook: exclude previously consulted games/images")
+    reviews.add_argument("--attest-no-prior-reviews", action="store_true",
+        help="explicit operator attestation ONLY when no earlier score images/reviews exist")
     p.add_argument("--queue-to-working-journal", type=Path,
                    help="EXPLICIT opt-in isolated journal; no original score/learning journal")
     a = p.parse_args()
     if not 1 <= a.limit <= 2000 or not 1 <= a.per_game <= 64:
         p.error("sampler limits 1..2000 frames and 1..64 per game")
     record = freeze(a.inventory, a.calibration, a.output, seed=a.seed, limit=a.limit,
-                    per_game=a.per_game, prior=a.prior_manifest)
+                    per_game=a.per_game, prior=a.prior_manifest,
+                    prior_review_journal=a.prior_review_journal)
     result = dict(selection_id=record["digest"], selected=len(record["selected"]),
                   candidates=record["source_candidates"], roles=dict(Counter(r["role"] for r in record["selected"])),
                   exclusions=record["exclusions"], original_state_modified=False,

@@ -54,7 +54,7 @@ class ScoreSamplerTest(unittest.TestCase):
                 stream.write(json.dumps(dict(raw_frame=second.name,
                     timestamp=11.25,score_partition="gameplay",
                     observation_id="observation-b",
-                    p1=dict(observed_score=2600,confidence=.72,status="changed")))+"\\n")
+                    p1=dict(observed_score=2600,confidence=.72,status="changed")))+"\n")
             inventory=base/"inventory.json"
             inventory.write_text(json.dumps([
                 dict(canonical_game_id="recorded-game",paths=[str(game)])]))

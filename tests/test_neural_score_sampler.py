@@ -172,7 +172,7 @@ class ScoreSamplerTest(unittest.TestCase):
             Calibration(((.1,.03),(.9,.03),(.9,.9),(.1,.9))).save(calibration)
             m = freeze(inv,calibration,base/"selection.json")
             self.assertEqual(len(m["selected"]),0)
-            self.assertGreater(m["exclusions"].get("invalid_or_unusable_frame",0),0)
+            self.assertGreater(m["exclusions"].get("score_channel_outside_original_camera",0),0)
 
 
 if __name__ == "__main__":

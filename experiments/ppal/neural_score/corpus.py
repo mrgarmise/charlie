@@ -27,8 +27,10 @@ def _freeze(rows,output,*,previous=(),commitments=()):
         r=dict(row);path=Path(r['image'])
         if r.get('verified') is not True or not r.get('reviewer') or not r.get('annotation_ids'):raise ValueError('explicit verified original human review required')
         label=r['label']
-        if label is not None and (not isinstance(label,str) or (label!='' and (not label.isascii() or not label.isdigit() or len(label)>7 or (len(label)>1 and label[0]=='0')))):
-            raise ValueError('canonical whole score, empty negative or unreadable null required')
+        if label is not None and (not isinstance(label,str) or (label!='' and
+                (not label.isascii() or not label.isdigit() or len(label)>7
+                 or (len(label)>1 and label[0]=='0' and set(label)!={'0'})))):
+            raise ValueError('whole visible score digits required; only zero-padding of zero is supported')
         if r['role'] not in ('train','val','test') or not r.get('session'):raise ValueError('session split required')
         if r.get('consulted_test') and r['role']!='test':raise ValueError('consulted test cannot migrate')
         if r.get('review_partition')=='training' and r['role']!='train':raise ValueError('training review is not independent evaluation')
@@ -92,7 +94,7 @@ def from_reviews(journal,calibration,output,*,partition='training',previous=()):
         path=output/(row['proposal_id']+'.png');hud.crop(box).save(path)
         review_partition=row['review_partition']
         role={'training':'train','validation':'val','final':'test','diagnostic':'val'}[review_partition]
-        result.append(dict(image=str(path),sha256=sha(path),label=str(row['label']),channel=channel,
+        result.append(dict(image=str(path),sha256=sha(path),label=row['display_digits'],channel=channel,
             verified=True,reviewer=','.join(sorted({str(journal.get(key).data['payload'].get('annotator','unrecorded reviewer')) for key in row['annotation_ids']})),annotation_ids=row['annotation_ids'],
             proposal_id=row['proposal_id'],review_partition=review_partition,role=role,
             session=context['source_session'],source_image_sha256=p['artifact']['sha256'],source_proposal=p,

@@ -114,6 +114,48 @@ The original image, original score-log/camera source, prior predictions,
 immutable human review IDs and validation/final partition are retained.
 Human review records are written only into the isolated working notebook.
 
+**Checkbox removal and October 18 pilot recovery.** The updated browser
+interface treats submitting Confirm, Save correction, or Unreadable while the
+verified primary photograph is displayed as the operator's attestation that
+they actually read it. There is no extra checkbox. This attests to a
+photograph-based human score judgment; it is not a complete-game certificate,
+a second independent reviewer, or automatic model accuracy acceptance.
+
+If you labeled the existing `pilot-002.json` batch using the older version
+without checking the redundant photo-reading box, do **not** re-enter your
+scores. The original annotations are immutable and remain saved. Stop the
+review server (`Ctrl+C`) before updating the checkout and processing the
+retrospective confirmation. Then, from the updated PR #8 checkout:
+
+```bash
+~/Projects/charlie/.venv/bin/python -m experiments.ppal.neural_score.attest_reviews \\
+  --journal ~/charlie-score-sampling/review-copy/working.sqlite3 \\
+  --manifest ~/charlie-score-sampling/pilot-002.json
+```
+
+This first command is a **read-only preview**; inspect its number of
+unattested completed labels, split counts and reviewer name(s). Then only
+after confirming that these were **your** original photo reviews, append
+a separately dated attestation for the identified frozen batch:
+
+```bash
+~/Projects/charlie/.venv/bin/python -m experiments.ppal.neural_score.attest_reviews \\
+  --journal ~/charlie-score-sampling/review-copy/working.sqlite3 \\
+  --manifest ~/charlie-score-sampling/pilot-002.json \\
+  --attest-photo-reading
+```
+
+If multiple different reviewers are present in the batch, the write
+command refuses a blanket attestation and requires
+`--reviewer "exact name entered in the form"`. The write is idempotent,
+checks every original photograph SHA and source identity, retains the
+original unchecked-box state and timestamp, and appends one new
+`score_photo_read_attestation` linked to each eligible existing
+annotation. It never modifies the original Pi score-review notebook,
+original photographs, prior reviewed digits, game identities or frozen
+training/validation/final partitions. Unreadable submissions remain
+unreadable and are **not** valid digit labels.
+
 ## 3. Transfer a labeled corpus to Mint
 
 No Torch, ONNX training or Hailo DFC is needed for the Pi labeling stage.

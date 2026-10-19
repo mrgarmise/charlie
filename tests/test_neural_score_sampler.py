@@ -3,6 +3,8 @@
 Passing these tests is not authentic score-reader accuracy or a Hailo HEF.
 """
 import json
+import hashlib
+import sqlite3
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -81,6 +83,39 @@ class ScoreSamplerTest(unittest.TestCase):
                 journal.close()
             with self.assertRaises(FileExistsError):
                 freeze(inventory,calibration,manifest_path,limit=10)
+
+    def test_pre_score_game_uses_hash_bound_original_camera_journal(self):
+        with TemporaryDirectory() as folder:
+            base = Path(folder)
+            root = base / "sessions" / "early-legacy"
+            camera_dir = root / "observations"
+            camera_dir.mkdir(parents=True)
+            frame = camera_dir / "camera-000001.png"
+            image = Image.new("RGB",(640,480),(9,9,9))
+            draw = ImageDraw.Draw(image)
+            draw.rectangle((80,65,160,95),fill=(200,200,200))
+            image.save(frame)
+            image_sha = hashlib.sha256(frame.read_bytes()).hexdigest()
+            journal_file = root / "session-evidence.sqlite3"
+            conn = sqlite3.connect(journal_file)
+            conn.execute("CREATE TABLE records (id TEXT PRIMARY KEY, document TEXT NOT NULL)")
+            doc = dict(kind="observation", episode="original-recorded-episode",
+                       at=10.25, payload=dict(category="camera_capture",
+                           artifact=dict(path="observations/camera-000001.png",sha256=image_sha),
+                           observation_id="camera-observation-001"))
+            conn.execute("INSERT INTO records VALUES (?, ?)",("capture-001",json.dumps(doc)))
+            conn.commit()
+            conn.close()
+            calibration = base / "calibration.json"
+            Calibration(((.10,.20),(.90,.20),(.90,.90),(.10,.90))).save(calibration)
+            inventory = base / "inventory.json"
+            inventory.write_text(json.dumps([dict(canonical_game_id="early-original",paths=[str(root)])]))
+            manifest_path = base / "selection.json"
+            selection = freeze(inventory,calibration,manifest_path)
+            self.assertEqual(len(selection["selected"]),1)
+            self.assertEqual(selection["selected"][0]["source_reference_record_id"],"capture-001")
+            self.assertIsNone(selection["selected"][0]["proposed_score"])
+            self.assertEqual(queue_for_review(manifest_path,base/"isolated"/"reviews.sqlite3")["queued"],1)
 
     def test_reject_geometry_without_original_hud(self):
         with TemporaryDirectory() as folder:

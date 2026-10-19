@@ -32,6 +32,8 @@ def reviewed_labels(journal, *, partition='training', allow_fixture=False):
     proposals=journal.category_records('observation','score_review_proposal')
     if len(proposals)>4096:raise ValueError('bounded feedback requires <=4096 proposals')
     annotations=journal.category_records('observation','score_human_annotation')
+    from .score_review_attestation import attested_photo_annotation_ids
+    retrospectively_attested=attested_photo_annotation_ids(journal)
     superseded={r.data['payload'].get('supersedes') for r in annotations}
     statuses={r.data['payload'].get('proposal_id'):r.data['payload'].get('status') for r in
         journal.category_records('observation','score_review_status')}
@@ -50,7 +52,9 @@ def reviewed_labels(journal, *, partition='training', allow_fixture=False):
         if any(a.data['payload']['partition']!=partition and same_source(a.data['payload']) for a in proposals):reason='source partition conflict'
         elif any(a.data['payload']['synthetic'] for a in aliases) and not allow_fixture:reason='fixture evidence excluded'
         elif any(statuses.get(a.id) in ('pending','insufficient','disputed') for a in aliases):reason='unresolved review status'
-        elif not peers or any(r.data['payload'].get('independence_attested') is not True for r in peers):reason='independent readable review required'
+        elif not peers or any(r.data['payload'].get('independence_attested') is not True
+                               and r.id not in retrospectively_attested for r in peers):
+            reason='photo reading not attested (original submission or later linked confirmation required)'
         elif any(r.data['payload'].get('artifact_sha256')!=sha or r.data['payload'].get('source_episode')!=journal.get(r.data['payload']['proposal_id']).data['payload']['source_episode'] for r in peers):reason='annotation provenance mismatch'
         elif len({r.data['payload']['value'] for r in peers})!=1:reason='conflicting reviewer labels'
         elif next(iter({r.data['payload']['value'] for r in peers})) is None:reason='unreadable review'

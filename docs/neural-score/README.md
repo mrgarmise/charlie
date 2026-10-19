@@ -1,5 +1,13 @@
 # Neural Robotron score reader — unqualified draft
 
+**October 18 continuation — archival screenshot training path:** [Sampling to authentic
+HEF](SAMPLING-TO-HEF.md) documents the newly implemented preserved-game
+source sampler, existing human review UI queue, strict game-level
+train/validation/test commitments, portable Mint labeling export, and an
+explicit `score.hef` compiler-required pipeline. The compiler is still
+not available in this workspace, no authentic model or HEF has been
+produced, and native/activation acceptance remains open.
+
 Revision 2 mission, October 18, 2026. Workstreams: **ROB-SCORE, ROB-FEEDBACK,
 VIS-CORPUS, VIS-LAB, VIS-HAILO, SYS-NATIVE, SYS-MIGRATION; CHA-9**.
 

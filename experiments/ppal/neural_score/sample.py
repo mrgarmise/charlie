@@ -56,23 +56,57 @@ def _group(path):
     return "recording-session:" + logical
 
 
+from functools import lru_cache
+
+
+@lru_cache(maxsize=32)
+def _score_channel_camera_coverage(width, height, corners, channel):
+    """Percent of score pixels genuinely inside the original camera exposure.
+
+    The full extended HUD quadrilateral can cross an image edge even when both
+    actual score regions are entirely inside the camera. Replicate the reader's
+    exact homography on a validity mask rather than rejecting all such images.
+    Cached by source dimensions and calibration: this is constant-time per
+    archived screenshot after the first mask.
+    """
+    import cv2
+
+    tl, tr, br, bl = np.float32(
+        [(x * width, y * height) for x, y in corners])
+    frac = .10  # Exactly RobotronHUDReader.rectify's HUD extension.
+    src = np.float32((tl - (bl - tl) * frac,
+                      tr - (br - tr) * frac, tr, tl))
+    dst = np.float32(((0, 0), (639, 0), (639, 95), (0, 95)))
+    homography = cv2.getPerspectiveTransform(src, dst)
+    original_camera_valid = np.full((height, width), 255, dtype=np.uint8)
+    hud_valid = cv2.warpPerspective(
+        original_camera_valid, homography, (640, 96),
+        flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT,
+        borderValue=0)
+    x0, x1 = (int(640 * channel[0]), int(640 * channel[1]))
+    pixels = hud_valid[:, x0:x1]
+    return float(np.count_nonzero(pixels == 255) / pixels.size)
+
+
 def _reader_crop(image, reader):
-    # Source-calibration must leave the entire extended score strip inside the
-    # camera exposure; otherwise perspective extrapolation fabricates pixels.
-    w, h = image.size
-    tl, tr, br, bl = reader.calibration.corners
-    ext_left = (tl[0] - .10 * (bl[0] - tl[0]), tl[1] - .10 * (bl[1] - tl[1]))
-    ext_right = (tr[0] - .10 * (br[0] - tr[0]), tr[1] - .10 * (br[1] - tr[1]))
-    if w < 320 or h < 180 or not all(0 <= x <= 1 and 0 <= y <= 1 for x, y in (ext_left, ext_right)):
-        raise ValueError("missing full original camera HUD geometry")
+    width, height = image.size
+    if width < 320 or height < 180:
+        raise ValueError("original_camera_too_small")
+    # Require nearly all score-channel pixels to come from real camera data.
+    # Never accept a broad extrapolated black band as a valid score crop.
+    coverage = _score_channel_camera_coverage(
+        width, height, tuple(tuple(x) for x in reader.calibration.corners),
+        tuple(reader.P1_X))
+    if coverage < .995:
+        raise ValueError("score_channel_outside_original_camera")
     hud = reader.rectify(image)
-    # Bright, textured score strips are useful candidates, but this is NOT
-    # recognition truth. Empty HUDs remain recorded as exclusions for review.
-    crop = hud.crop((int(640 * reader.P1_X[0]), 0, int(640 * reader.P1_X[1]), 96))
+    crop = hud.crop((int(640 * reader.P1_X[0]), 0,
+                     int(640 * reader.P1_X[1]), 96))
     gray = np.asarray(crop.convert("L").resize((32, 8)), dtype=np.float32)
     if float(np.percentile(gray, 99)) < 12:
-        raise ValueError("score strip unilluminated or missing")
+        raise ValueError("score_strip_unilluminated")
     return digest([int(x) for x in gray.flatten() // 24]), float(np.std(gray))
+
 
 
 def _saved_camera_sources(root, reader, game_id, group, role, geometry_digest, diagnostics):
@@ -145,7 +179,17 @@ def _saved_camera_sources(root, reader, game_id, group, role, geometry_digest, d
                 score_status="retained-camera-original; score unreviewed",
                 score_strip_fingerprint=feature, contrast=contrast,
                 selection_origin="hash-bound original camera capture; no machine score or human label")
-        except (OSError, ValueError, TypeError, KeyError):
+        except ValueError as exc:
+            # Preserve exact failure reasons in the audit output. In
+            # particular, "score_strip_unilluminated" is distinct from
+            # a calibration/geometry or corrupted-file failure.
+            reason = str(exc)
+            diagnostics[reason if reason in (
+                "score_channel_outside_original_camera",
+                "original_camera_too_small",
+                "score_strip_unilluminated") else
+                "invalid_or_unusable_original_camera"] += 1
+        except (OSError, TypeError, KeyError):
             diagnostics["invalid_or_unusable_original_camera"] += 1
     if file_sha(source) != original_sha:
         raise RuntimeError("original camera journal changed during inspection")
@@ -312,7 +356,13 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prio
                         proposed_score=proposed, proposed_confidence=float(conf),
                         score_status=ch.get("status", "unknown"), score_strip_fingerprint=feature,
                         contrast=contrast, selection_origin="recorded original score camera image; not a verified human label"))
-                except (OSError, ValueError, TypeError, KeyError) as exc:
+                except ValueError as exc:
+                    reason = str(exc)
+                    diagnostics[reason if reason in (
+                        "score_channel_outside_original_camera",
+                        "original_camera_too_small",
+                        "score_strip_unilluminated") else "invalid_or_unusable_frame"] += 1
+                except (OSError, TypeError, KeyError):
                     diagnostics["invalid_or_unusable_frame"] += 1
                     continue
             if diagnostics["scan_cap_reached"]:

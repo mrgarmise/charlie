@@ -14,6 +14,8 @@ from PIL import Image, ImageDraw
 from experiments.ppal.eyes.calibration import Calibration
 from experiments.ppal.inspect_robotron_score import queue_rows, review_game
 from experiments.ppal.neural_score.sample import freeze, queue_for_review, role_for_group
+from experiments.ppal.neural_score.export_reviews import export
+from experiments.ppal.score_observer import ScoreObserver
 from experiments.ppal.score_feedback import reviewed_labels
 from memory.evidence import EvidenceJournal
 
@@ -81,6 +83,24 @@ class ScoreSamplerTest(unittest.TestCase):
                 self.assertEqual(rows[0]["label"],2200)
             finally:
                 journal.close()
+            # Already-reviewed/consulted games are excluded from a new
+            # independent holdout sampler on the next version.
+            later = freeze(inventory,calibration,base/"fresh-selection.json",
+                           prior_review_journal=working,limit=10)
+            self.assertFalse(later["selected"])
+            self.assertEqual(later["exclusions"]["preconsulted_session_excluded"],2)
+            exported=export(working,base/"portable")
+            self.assertEqual(exported["photographs"],1)
+            # A copied journal on a separate host resolves the relocated
+            # hash-addressed photograph without rewriting original IDs.
+            saved=EvidenceJournal(base/"portable"/"learning-evidence.sqlite3",read_only=True)
+            try:
+                proposal=saved.category_records("observation","score_review_proposal")[0]
+                recovered=ScoreObserver.review_artifact(saved,proposal.data["payload"])
+                self.assertTrue(recovered.is_file())
+                self.assertEqual(recovered.parent.name,"images")
+            finally:
+                saved.close()
             with self.assertRaises(FileExistsError):
                 freeze(inventory,calibration,manifest_path,limit=10)
 

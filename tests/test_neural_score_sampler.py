@@ -93,6 +93,11 @@ class ScoreSamplerTest(unittest.TestCase):
             self.assertEqual(exported["photographs"],1)
             # A copied journal on a separate host resolves the relocated
             # hash-addressed photograph without rewriting original IDs.
+            # Simulate transfer to Mint: the original Pi paths no longer
+            # exist, so only exported hash-addressed images can resolve.
+            for game in (one,two):
+                original=game/"score-raw-0001.png"
+                original.rename(game/"score-raw-0001.png.unavailable")
             saved=EvidenceJournal(base/"portable"/"learning-evidence.sqlite3",read_only=True)
             try:
                 proposal=saved.category_records("observation","score_review_proposal")[0]

@@ -244,6 +244,8 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prio
     from memory.evidence import digest as evidence_digest
     geometry_digest = evidence_digest(dict(corners=calibration.corners, output_size=calibration.output_size))
     commitments = {}
+    previously_selected_images = set()
+    previously_selected_groups = set()
     for file in prior:
         old = json.loads(Path(file).read_text())
         if old.get("schema") != SCHEMA or digest({k: v for k, v in old.items() if k != "digest"}) != old.get("digest"):
@@ -253,6 +255,8 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prio
             if group in commitments and commitments[group] != role:
                 raise ValueError("prior session split collision")
             commitments[group] = role
+            previously_selected_groups.add(group)
+            previously_selected_images.add(row["source_image_sha256"])
 
     sources = ([prior_review_journal] if isinstance(prior_review_journal,(str,Path))
                else list(prior_review_journal or ()))
@@ -274,10 +278,13 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prio
             diagnostics["missing_recording_directory"] += 1
             continue
         group = _group(root)
-        if prior_reviews is not None and (
+        if prior_reviews is not None and group not in previously_selected_groups and (
             game_id in prior_reviews["episodes"]
             or any(alias in prior_reviews["episodes"] for alias in entry.get("source_aliases",()))
             or group in prior_reviews["sessions"]):
+            # A historically reviewed *new* session is not a fresh holdout.
+            # A previously frozen group may contribute additional, distinct
+            # photos only in its original committed role.
             diagnostics["preconsulted_session_excluded"] += 1
             continue
         role = commitments.get(group, role_for_group(group, seed))
@@ -294,6 +301,15 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prio
                 if len(candidates) >= scan_limit:
                     diagnostics["scan_cap_reached"] += 1
                     break
+                if candidate["source_image_sha256"] in previously_selected_images:
+                    diagnostics["previously_selected_image_excluded"] += 1
+                    continue
+                if candidate["source_image_sha256"] in previously_selected_images:
+                    diagnostics["previously_selected_image_excluded"] += 1
+                    continue
+                if prior_reviews is not None and candidate["source_image_sha256"] in prior_reviews["images"]:
+                    diagnostics["preconsulted_image_excluded"] += 1
+                    continue
                 if candidate["source_image_sha256"] in already_seen:
                     diagnostics["duplicate_original_bytes"] += 1
                     continue
@@ -324,6 +340,9 @@ def discover(inventory, calibration, *, seed=17, scan_limit=6000, prior=(), prio
                         diagnostics["no_authentic_capture_time"] += 1
                         continue
                     raw_sha = file_sha(path)
+                    if raw_sha in previously_selected_images:
+                        diagnostics["previously_selected_image_excluded"] += 1
+                        continue
                     if prior_reviews is not None and raw_sha in prior_reviews["images"]:
                         diagnostics["preconsulted_image_excluded"] += 1
                         continue

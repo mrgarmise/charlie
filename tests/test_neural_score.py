@@ -23,7 +23,7 @@ class Fake:
     def __init__(self,text='100'):self.text=text
     def infer(self,x):return logits(self.text),dict(backend='FAKE engineering adapter',device_seconds=None)
 
-@pytest.mark.parametrize('text',['0','11','100','2200','9999999','3500'])
+@pytest.mark.parametrize('text',['0','00','11','100','2200','9999999','3500'])
 def test_ctc_repeated_full_strings(text):
     r=decode(logits(text));assert r['digits']==text and r['score']==int(text)
 
@@ -147,6 +147,8 @@ def test_invalid_training_label(tmp_path,value):
 def test_corpus_preserves_unreadable_and_zero(tmp_path):
     record=freeze([row(tmp_path,0,label=None),row(tmp_path,1,label='0'),row(tmp_path,2,label='')],tmp_path/'data.json')
     assert [r['label'] for r in record['rows']]==[None,'0','']
+    other=freeze([row(tmp_path,3,label='00')],tmp_path/'visible-two-zeros.json')
+    assert verify(tmp_path/'visible-two-zeros.json')['rows'][0]['label']=='00'
 
 
 def test_raw_recognition_metrics_separate_abstention():

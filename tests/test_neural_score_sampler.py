@@ -16,6 +16,8 @@ from experiments.ppal.inspect_robotron_score import queue_rows, review_game
 from experiments.ppal.neural_score.sample import (freeze, queue_for_review,
     role_for_group, _score_channel_camera_coverage)
 from experiments.ppal.neural_score.export_reviews import export
+from experiments.ppal.neural_score.attest_reviews import attest
+from experiments.ppal.score_review_attestation import attested_photo_annotation_ids
 from experiments.ppal.score_observer import ScoreObserver
 from experiments.ppal.score_feedback import reviewed_labels
 from memory.evidence import EvidenceJournal
@@ -109,6 +111,81 @@ class ScoreSamplerTest(unittest.TestCase):
                 saved.close()
             with self.assertRaises(FileExistsError):
                 freeze(inventory,calibration,manifest_path,limit=10)
+
+    def test_later_operator_attestation_qualifies_existing_unchanged_labels(self):
+        # Regression for a real-world batch where the original photograph
+        # was read, but the old UI's redundant checkbox was left unchecked.
+        with TemporaryDirectory() as folder:
+            base=Path(folder)
+            root=self.make_fixture(base)
+            manifest_file=base/"pilot.json"
+            inventory=base/"inventory.json"
+            inventory.write_text(json.dumps([
+                dict(canonical_game_id="existing-session",paths=[str(root)])]))
+            calibration=base/"calibration.json"
+            Calibration(((.10,.20),(.90,.20),(.90,.90),(.10,.90))).save(calibration)
+            manifest=freeze(inventory,calibration,manifest_file,limit=1)
+            role=manifest["selected"][0]["role"]
+            partition={"train":"training","val":"validation","test":"final"}[role]
+            location=base/"isolated"/"working.sqlite3"
+            self.assertEqual(queue_for_review(manifest_file,location)["queued"],1)
+            journal=EvidenceJournal(location)
+            try:
+                sample=next(row for row in queue_rows(journal) if row.get("sample"))
+                review_game(journal,sample["id"],annotator="operator",
+                    verdict="correct",value=2200,reason="I read the picture",
+                    independent=False,not_final_score=True)
+                original=journal.category_records("observation","score_human_annotation")[0]
+                original_document=original.document
+                self.assertIs(original.data["payload"]["independence_attested"],False)
+                self.assertEqual(reviewed_labels(journal,partition=partition)[0],[])
+                inspected=attest(journal,manifest_file,apply=False)
+                self.assertEqual(inspected["eligible_for_retrospective_photo_attestation"],1)
+                self.assertEqual(inspected["appended_attestation_ids"],[])
+                result=attest(journal,manifest_file,apply=True)
+                self.assertEqual(len(result["appended_attestation_ids"]),1)
+                self.assertEqual(journal.get(original.id).document,original_document)
+                self.assertEqual(attested_photo_annotation_ids(journal),{original.id})
+                self.assertEqual(attest(journal,manifest_file,apply=True)["appended_attestation_ids"],[])
+                rows,excluded=reviewed_labels(journal,partition=partition)
+                self.assertEqual(len(rows),1)
+                self.assertEqual(rows[0]["label"],2200)
+                self.assertEqual(rows[0]["annotation_ids"],[original.id])
+                self.assertFalse(journal.category_records("event","capability_activation"))
+            finally:
+                journal.close()
+            reloaded=EvidenceJournal(location,read_only=True)
+            try:
+                self.assertEqual(len(reviewed_labels(reloaded,partition=partition)[0]),1)
+                self.assertEqual(len(reloaded.category_records("observation","score_photo_read_attestation")),1)
+            finally:
+                reloaded.close()
+
+    def test_attestation_refuses_modified_or_missing_original_and_other_batches(self):
+        with TemporaryDirectory() as folder:
+            base=Path(folder)
+            root=self.make_fixture(base)
+            inventory=base/"inventory.json"
+            inventory.write_text(json.dumps([
+                dict(canonical_game_id="g1",paths=[str(root)])]))
+            calibration=base/"calibration.json"
+            Calibration(((.10,.20),(.90,.20),(.90,.90),(.10,.90))).save(calibration)
+            manifest_path=base/"pilot.json"
+            freeze(inventory,calibration,manifest_path)
+            location=base/"isolated"/"working.sqlite3"
+            queue_for_review(manifest_path,location)
+            journal=EvidenceJournal(location)
+            try:
+                sample=next(row for row in queue_rows(journal) if row.get("sample"))
+                review_game(journal,sample["id"],annotator="operator",
+                    verdict="correct",value=2200,independent=False)
+                photo=root/"score-raw-0001.png"
+                photo.rename(root/"score-raw-0001.png.missing")
+                result=attest(journal,manifest_path,apply=True)
+                self.assertFalse(result["appended_attestation_ids"])
+                self.assertEqual(result["skipped"]["original_photo_missing_or_modified"],1)
+            finally:
+                journal.close()
 
     def test_pre_score_game_uses_hash_bound_original_camera_journal(self):
         with TemporaryDirectory() as folder:

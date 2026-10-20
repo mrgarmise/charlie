@@ -46,6 +46,7 @@ class CycleMetrics:
     def __init__(self,capacity=2048):
         self.stages=defaultdict(lambda:deque(maxlen=capacity));self.ages=deque(maxlen=capacity)
         self.first=None;self.last=None;self.count=0;self.last_observation=None
+        self.last_exposure_at=None
         self.feedback=deque(maxlen=capacity);self.feedback_unresolved=0
         self.previous_track=None;self.identity_changes=0;self.interruptions=deque(maxlen=capacity)
 
@@ -58,7 +59,10 @@ class CycleMetrics:
     def decision(self,observation,exposure_at,*,supported,track_id=None):
         now=time.monotonic()
         if not supported or observation is None or observation==self.last_observation:return False
-        if not isinstance(exposure_at,(int,float)) or not math.isfinite(exposure_at) or exposure_at>now or now-exposure_at>.25:return False
+        if type(exposure_at) not in (int,float) or not math.isfinite(exposure_at) or exposure_at>now or now-exposure_at>.25:return False
+        # An alias or reordered delivery is not another independent exposure.
+        if self.last_exposure_at is not None and exposure_at<=self.last_exposure_at:return False
+        self.last_exposure_at=exposure_at
         self.last_observation=observation;self.count+=1;self.ages.append(now-exposure_at)
         if self.first is None:self.first=now
         if self.last is not None:self.interruptions.append(now-self.last)

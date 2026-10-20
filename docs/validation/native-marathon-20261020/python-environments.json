@@ -1,0 +1,6 @@
+{
+  "/home/five/Projects/charlie/.venv/pyvenv.cfg": "home = /usr/bin\ninclude-system-site-packages = true\nversion = 3.13.5\nexecutable = /usr/bin/python3.13\ncommand = /usr/bin/python3 -m venv --system-site-packages /home/five/Projects/charlie/.venv\n",
+  "/home/five/charlie-active-vision/.venv/pyvenv.cfg": "home = /usr/bin\ninclude-system-site-packages = true\nversion = 3.13.5\nexecutable = /usr/bin/python3.13\ncommand = /usr/bin/python3 -m venv --system-site-packages /home/five/charlie-active-vision/.venv\n",
+  "/home/five/charlie-active-vision-safe-authority/.venv/pyvenv.cfg": "home = /usr/bin\ninclude-system-site-packages = true\nversion = 3.13.5\nexecutable = /usr/bin/python3.13\ncommand = /usr/bin/python3 -m venv --system-site-packages /home/five/charlie-active-vision-safe-authority/.venv\n",
+  "/home/five/charlie-play/.venv-robotron/pyvenv.cfg": "home = /usr/bin\ninclude-system-site-packages = true\nversion = 3.13.5\nexecutable = /usr/bin/python3.13\ncommand = /usr/bin/python3 -m venv --system-site-packages /home/five/charlie-play/.venv-robotron\n"
+}

@@ -1,0 +1,24 @@
+{
+  "inputs": "identical frozen historical interpreted worlds in every arm",
+  "ledger_digest": "5958d82228acdf7aeca44b15ab3f06d10c06b06ef191d1a0851e815002571da3",
+  "physical_actions": 0,
+  "policy_activated": false,
+  "preference_changes": 84,
+  "qualification": "retrospective diagnostic shadow only; no independent strategy or score qualification",
+  "schema": "ala2-retained-tactical-replay-v1",
+  "valuation_changes": 96,
+  "contexts": 99,
+  "two_process_bytes_equal": true,
+  "all_returned_actions_equal": true,
+  "E1_preserved_control": {
+    "project_id": "08b0e92fa61c9db86e50557e04a092748d1bdd5664adf8d634f6926c5cf1e696",
+    "resolution_id": "99697ab53914ee39fdb8f1cbb557cd7131cdfc781a803babf465d69949da31d5",
+    "alternatives": 19,
+    "before_score": 2.0000000000000004,
+    "actual_after_reload_score": 1.5,
+    "scoped_ablated_score": 2.0000000000000004,
+    "same_opportunity_set": true,
+    "independent_new_experiment": false,
+    "question_scope": "recurrence of score-reader review uncertainty; no explanation of reading errors"
+  }
+}

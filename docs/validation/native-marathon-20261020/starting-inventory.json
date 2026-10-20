@@ -1,0 +1,52 @@
+{
+  "Projects/charlie": {
+    "head": "bb40d02d3a128706e204cfd8e636fb1a9c5fd21b",
+    "status": "?? head2_sessions/\n?? robotron-evidence/\n",
+    "branch": "feature/agency-first-self"
+  },
+  "charlie-fast-self-validation": {
+    "head": "73169db9ad2648ca7e4088979d22905900052c6a",
+    "status": "",
+    "branch": "fix/pr5-spawn-prior-serialization"
+  },
+  "charlie-score-sampler": {
+    "head": "d45cce134e10d342f64a4d33f8baf9fcc1a41b01",
+    "status": "",
+    "branch": "feature/hailo-score-reader"
+  },
+  "charlie-ala2-recovery-20261019": {
+    "head": "365bc84ca7f2b02cde94a3f604b2f957bb66a6f9",
+    "status": "",
+    "branch": "recovery/ala2-20261019"
+  },
+  "charlie-marathon-camera-lifecycle": {
+    "head": "9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+    "status": "",
+    "branch": "native-camera-lifecycle-validation"
+  },
+  "charlie-restart-recovery": {
+    "head": "a785c9f745bd0645dd01ac70af3beb5a8d44d37b",
+    "status": "",
+    "branch": "feature/native-marathon-restart"
+  },
+  "charlie-progress-watchdog": {
+    "head": "3723132e0a7643d24b7670c202aba0f4a1acee12",
+    "status": "",
+    "branch": ""
+  },
+  "charlie-terminal-restart": {
+    "head": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+    "status": "",
+    "branch": ""
+  },
+  "charlie-active-vision": {
+    "head": "87779558b78aeb5b36d4c3bc1eceed7831201e95",
+    "status": "?? recovery/\n",
+    "branch": "feature/active-vision"
+  },
+  "notebook_sha256": "7c942b2a5977142ba093bfe2b2238d8d37573438e55b9c8cab5f566bb44ae6ae",
+  "platform": "Linux-6.18.50+rpt-rpi-2712-aarch64-with-glibc2.41",
+  "device_nodes": [],
+  "temperature_c": 54.0,
+  "process_visibility": "PID namespace only: /proc/1 is codex-linux-sandbox; host process ownership unverified"
+}

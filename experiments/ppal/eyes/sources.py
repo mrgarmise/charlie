@@ -1,6 +1,7 @@
 """Camera, saved-image, and synthetic frame sources; all return RGB PIL images."""
 
 from pathlib import Path
+import math
 import time
 
 from PIL import Image, ImageDraw
@@ -40,7 +41,8 @@ class PiCameraSource:
             image=self._capture(flush=False,timeout=1.)
             capture=dict(self.last_capture)
             lens=capture.get('lens_position')
-            if lens is None or abs(lens-2.)>.05 or isinstance(capture.get('af_state'),bool) or capture.get('af_state')!=0:
+            if (type(lens) not in (int, float) or not math.isfinite(lens) or abs(lens-2.)>.05
+                    or isinstance(capture.get('af_state'),bool) or capture.get('af_state')!=0):
                 raise ValueError('continuous gameplay focus lock 2.0 not verified')
             return image,capture
         except TimeoutError:

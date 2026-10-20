@@ -100,7 +100,7 @@ def main():
                   onnx_sha256=file_sha(onnx),training_json_sha256=file_sha(training))
 
     compile_command=["-m","experiments.ppal.neural_score.compile",str(onnx),
-                     "--manifest",str(a.manifest),"--output",str(target/"hef")]
+                     "--manifest",str(a.manifest),"--output",str(target/"hef"),"--model-record",str(training)]
     if a.engineering_feasibility:
         compile_command.append("--engineering-feasibility")
     run("compile",compile_command)

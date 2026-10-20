@@ -4,7 +4,7 @@ import hashlib
 import time
 import numpy as np
 from ..robotron_hud import RobotronHUDReader,RobotronHUDObservation
-from .contract import SCHEMA,PREPROCESS,DECODER,preprocess,decode,crop_quality,finite
+from .contract import SCHEMA,PREPROCESS,PREPROCESS_PROFILES,DECODER,preprocess,decode,crop_quality,finite
 
 
 class NeuralHUDReader:
@@ -13,6 +13,9 @@ class NeuralHUDReader:
         if not 0<max_age<=2:raise ValueError('bounded freshness required')
         self.calibration=calibration;self.backend=backend;self.model=model
         self.clock=clock;self.max_age=max_age;self.source=None;self.last_at=None;self.last_packet=None
+        self.preprocessing=(model.get('training_record') or {}).get('preprocessing',PREPROCESS)
+        if self.preprocessing not in PREPROCESS_PROFILES:raise ValueError('unknown model preprocessing')
+        if model.get('hef') and model['hef'].get('preprocessing',PREPROCESS)!=self.preprocessing:raise ValueError('HEF/model preprocessing mismatch')
 
     def bind_source(self,*,t,source):
         self.source=dict(source or {},exposure_at=t)
@@ -22,7 +25,7 @@ class NeuralHUDReader:
         started=self.clock();cpu=time.process_time()
         packet=dict(schema=SCHEMA,model=self.model,mode=self.backend.mode,channels=[],
             source=source,raw_size=list(raw.size),calibration=dict(corners=self.calibration.corners,
-            output_size=self.calibration.output_size),preprocessing_version=PREPROCESS,decoder_version=DECODER,
+            output_size=self.calibration.output_size),preprocessing_version=self.preprocessing,decoder_version=DECODER,
             source_pixel_sha256=hashlib.sha256(raw.convert('RGB').tobytes()).hexdigest(),
             observation_only=True,physical_authorization=False,official_game_score=False)
         reason=None
@@ -47,7 +50,7 @@ class NeuralHUDReader:
                 row['reason']=crop_quality(crop)
                 if row['reason'] is None:
                     try:
-                        begin=time.perf_counter();x,meta=preprocess(crop);pre=time.perf_counter()-begin
+                        begin=time.perf_counter();x,meta=preprocess(crop,profile=self.preprocessing);pre=time.perf_counter()-begin
                         logits,timing=self.backend.infer(x)
                         begin=time.perf_counter();result=decode(logits);decode_seconds=time.perf_counter()-begin
                         row.update(result);row['preprocessing']=meta

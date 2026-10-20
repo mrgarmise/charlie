@@ -1,6 +1,7 @@
 """Raw full-string recognition metrics, separate from temporal score acceptance."""
 import math
 import statistics
+from collections import Counter
 
 
 def edit(a,b):
@@ -25,7 +26,24 @@ def metrics(rows):
     correct=sum(r['prediction']['digits']==r['label'] for r in accepted)
     negative=[r for r in labeled if r['label']=='']
     durations=sorted(r['wall_seconds'] for r in rows)
+    per_score={}
+    for label in sorted({r['label'] for r in readable}):
+        group=[r for r in readable if r['label']==label]
+        per_score[label]=dict(samples=len(group),raw_exact=sum(r['prediction'].get('proposed_digits')==label for r in group),
+            accepted=sum(r['prediction']['score'] is not None for r in group),
+            accepted_correct=sum(r['prediction'].get('digits')==label for r in group),
+            proposed_counts=dict(Counter(r['prediction'].get('proposed_digits') for r in group)))
     return dict(samples=len(rows),readable=len(readable),accepted=len(accepted),correct=correct,
+        raw_exact=sum(r['prediction'].get('proposed_digits')==r['label'] for r in readable),
+        raw_exact_accuracy=sum(r['prediction'].get('proposed_digits')==r['label'] for r in readable)/len(readable) if readable else None,
+        always_00_raw_accuracy=sum(r['label']=='00' for r in readable)/len(readable) if readable else None,
+        raw_digit_edit_distance=sum(edit(r['prediction'].get('proposed_digits') or '',r['label']) for r in readable),
+        raw_high_confidence_wrong=sum(r['prediction']['confidence']>=.9 and r['prediction'].get('proposed_digits')!=r['label'] for r in readable),
+        confidence_calibration='NOT ESTABLISHED; empirical bins describe only the supplied rows',
+        confidence_bins=[dict(low=lo,high=hi,samples=sum(lo<=r['prediction']['confidence']<hi for r in readable),
+            raw_correct=sum(lo<=r['prediction']['confidence']<hi and r['prediction'].get('proposed_digits')==r['label'] for r in readable))
+            for lo,hi in ((0,.5),(.5,.85),(.85,.95),(.95,1.000001))],
+        per_score=per_score,rejection_reasons=dict(Counter(r['prediction'].get('reason') or 'accepted' for r in rows)),
         coverage=len(accepted)/len(readable) if readable else None,
         exact_accuracy_at_coverage=correct/len(accepted) if accepted else None,
         exact_over_all_readable=correct/len(readable) if readable else None,

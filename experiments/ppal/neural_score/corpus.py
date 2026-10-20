@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 from .contract import sha,PREPROCESS
+from ..score_digits import valid_display_digits
 
 
 def digest(value):return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':')).encode()).hexdigest()
@@ -23,13 +24,15 @@ def _freeze(rows,output,*,previous=(),commitments=()):
         for r in old['rows']:
             ownership[r['pixel_sha256']]=r['role'];sessions[r['session']]=r['role']
             if r.get('source_image_sha256'):raw_ownership[r['source_image_sha256']]=r['role']
+            # Prior frozen manifests must participate in the same near-pixel
+            # guard as rows in this batch. Exact hashes alone miss re-encodes.
+            with Image.open(image_path(path,r)) as image:
+                pixels.append((np.asarray(image.convert('RGB').resize((32,8)),dtype=np.int16),r['role'],None))
     for row in rows:
         r=dict(row);path=Path(r['image'])
         if r.get('verified') is not True or not r.get('reviewer') or not r.get('annotation_ids'):raise ValueError('explicit verified original human review required')
         label=r['label']
-        if label is not None and (not isinstance(label,str) or (label!='' and
-                (not label.isascii() or not label.isdigit() or len(label)>7
-                 or (len(label)>1 and label[0]=='0' and set(label)!={'0'})))):
+        if label is not None and label!='' and not valid_display_digits(label):
             raise ValueError('whole visible score digits required; only zero-padding of zero is supported')
         if r['role'] not in ('train','val','test') or not r.get('session'):raise ValueError('session split required')
         if r.get('consulted_test') and r['role']!='test':raise ValueError('consulted test cannot migrate')

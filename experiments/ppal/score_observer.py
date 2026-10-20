@@ -374,9 +374,10 @@ class ScoreObserver:
         elif verdict!='correct':raise ValueError('confirm, correct or unreadable required')
         if verdict!='unreadable' and (type(value) is not int or value<0):raise ValueError('readable annotation requires exact nonnegative digits')
         if visible_digits is not None:
+            from .score_digits import valid_display_digits
             if (verdict=='unreadable' or not isinstance(visible_digits,str) or
                     not visible_digits.isascii() or not visible_digits.isdigit() or
-                    not 1<=len(visible_digits)<=7 or int(visible_digits)!=value):
+                    not valid_display_digits(visible_digits) or int(visible_digits)!=value):
                 raise ValueError('visible digits must be 1–7 exact ASCII digits matching reviewed numeric value')
         if supersedes:
             prior=journal.get(supersedes).data['payload']

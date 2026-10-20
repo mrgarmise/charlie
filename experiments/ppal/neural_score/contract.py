@@ -3,9 +3,12 @@ import hashlib
 import math
 import numpy as np
 from PIL import Image
+from ..score_digits import valid_display_digits
 
 SCHEMA='charlie-neural-score-v1'
 PREPROCESS='score-rgb-channel-resize-256x32-v1'
+PADDED_PREPROCESS='score-rgb-channel-resize-224x28-pad16x2-v2'
+PREPROCESS_PROFILES=(PREPROCESS,PADDED_PREPROCESS)
 DECODER='ctc-greedy-abstain-v1'
 INPUT=(1,3,32,256)
 OUTPUT=(1,11,1,64)
@@ -19,16 +22,21 @@ def sha(path):
     return h.hexdigest()
 
 
-def preprocess(image):
+def preprocess(image, *, profile=PREPROCESS):
     """No glyph segmentation or inferred digits: retain complete channel aspect."""
     image=image.convert('RGB');w,h=image.size
     if not 1<=w<=4096 or not 1<=h<=2048:raise ValueError('bounded source crop required')
     # The calibrated fixed channel contains large vertical margins. Map the
     # complete channel to fixed dimensions instead of squeezing its word into
     # a few CTC timesteps. No content-dependent digit/glyph trimming.
-    canvas=image.resize((256,32),Image.Resampling.BILINEAR)
+    if profile not in PREPROCESS_PROFILES:raise ValueError('unknown score preprocessing profile')
+    # 224/256 == 28/32: preserve the legacy input aspect while adding fixed
+    # margins. This is not a content-dependent crop or an aspect correction.
+    size,padding=((256,32),(0,0)) if profile==PREPROCESS else ((224,28),(16,2))
+    canvas=Image.new('RGB',(256,32))
+    canvas.paste(image.resize(size,Image.Resampling.BILINEAR),padding)
     array=np.asarray(canvas,dtype=np.float32)/255.
-    return np.transpose(array,(2,0,1))[None],dict(version=PREPROCESS,scale_xy=[256/w,32/h],padding=[0,0],
+    return np.transpose(array,(2,0,1))[None],dict(version=profile,scale_xy=[size[0]/w,size[1]/h],padding=list(padding),
         input_shape=list(INPUT),color='RGB',range=[0,1],resize='bilinear full-channel fixed aspect transform',source_size=[w,h])
 
 
@@ -54,6 +62,7 @@ def decode(logits, *, min_score=.85, min_margin=.25, max_digits=7):
     elif len(text)>max_digits:reason='length exceeds contract'
     elif path[0]!=BLANK or path[-1]!=BLANK:reason='edge/truncated sequence'
     elif len(text)>1 and text[0]=='0' and set(text)!={'0'}:reason='noncanonical leading zero; no coercion'
+    elif not valid_display_digits(text):reason='unsupported Robotron visible digits; no coercion'
     elif float(conf.min())<min_score or float(margins.min())<min_margin:reason='ambiguous digit or blank'
     score=float(conf.min())
     return dict(score=int(text) if reason is None else None,digits=text if reason is None else None,

@@ -1,5 +1,11 @@
 # Neural Robotron score reader — unqualified draft
 
+**October 20 crop/CTC mission:** [findings, authentic historical contact sheet,
+exact-label/opset corrections, controlled experiments and operator commands](CROP-DIAGNOSTICS-20261020.md).
+The operator now reports an authentic 64-image training corpus/model-002 on Mint;
+those private artifacts were not accessible in this Work checkout. Their reported
+0/64 acceptance is not resolved or independently qualified by the synthetic controls.
+
 **October 19 native findings:** [FCR repair, authentic recovery, exact blockers
 and isolated native acceptance](NATIVE-FINDINGS-20261018.md). Operator-reported
 synthetic HEF execution supersedes the earlier infrastructure-unknown status

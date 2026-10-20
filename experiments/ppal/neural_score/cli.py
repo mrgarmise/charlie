@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import time
 from PIL import Image
-from .contract import preprocess,decode,sha
+from .contract import preprocess,decode,sha,PREPROCESS
 from .backends import CPU,Hailo,Backend
 from .reader import NeuralHUDReader
 from .corpus import image_path,verify,consult_test
@@ -24,7 +24,9 @@ def main():
     model_record=json.loads(a.model_record.read_text()) if a.model_record else None
     if model_record and model_record['onnx_sha256']!=model_sha:raise ValueError('model record/ONNX mismatch')
     if contract and model_sha and contract['onnx_sha256']!=model_sha:raise ValueError('HEF/CPU checkpoint mismatch')
-    backend=Backend(a.mode,lambda:CPU(a.onnx,model_sha),lambda:Hailo(a.hef,contract) if a.hef and contract else (_ for _ in ()).throw(RuntimeError('HEF absent')))
+    profile=(model_record or contract or {}).get('preprocessing',PREPROCESS)
+    if contract and contract.get('preprocessing',PREPROCESS)!=profile:raise ValueError('HEF/CPU preprocessing mismatch')
+    backend=Backend(a.mode,lambda:CPU(a.onnx,model_sha,preprocessing=profile),lambda:Hailo(a.hef,contract) if a.hef and contract else (_ for _ in ()).throw(RuntimeError('HEF absent')))
     with a.output.open('x') as out:
         if a.frame:
             from ..eyes.calibration import Calibration
@@ -40,13 +42,13 @@ def main():
             out.write(json.dumps(packet)+'\n')
             if a.mode=='hailo-required' and any(r.get('health_event') for r in packet['channels']):raise SystemExit(2)
         else:
-            reference=CPU(a.onnx,model_sha) if a.compare_reference else None
+            reference=CPU(a.onnx,model_sha,preprocessing=profile) if a.compare_reference else None
             corpus=verify(a.manifest);rows=[]
             if a.role=='test':consult_test(a.manifest)
             for row in corpus['rows']:
                 if row['role']!=a.role:continue
                 start=time.perf_counter()
-                with Image.open(image_path(a.manifest,row)) as image:x,pre=preprocess(image)
+                with Image.open(image_path(a.manifest,row)) as image:x,pre=preprocess(image,profile=profile)
                 try:values,timing=backend.infer(x);prediction=decode(values)
                 except Exception as exc:prediction=dict(score=None,digits=None,confidence=0.,reason=f'{type(exc).__name__}: {exc}');timing=None
                 parity=None

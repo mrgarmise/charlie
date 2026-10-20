@@ -5,7 +5,7 @@ import subprocess
 import threading
 import time
 import numpy as np
-from .contract import INPUT,OUTPUT,sha
+from .contract import INPUT,OUTPUT,PREPROCESS,PREPROCESS_PROFILES,sha
 
 
 class Busy(RuntimeError):
@@ -39,11 +39,13 @@ HAILO_ADMISSION=Admission()
 
 class CPU:
     name='cpu-reference'
-    def __init__(self,path,expected_sha):
+    def __init__(self,path,expected_sha,*,preprocessing=PREPROCESS):
         if sha(path)!=expected_sha:raise ValueError('ONNX hash mismatch')
         import onnxruntime as ort
         options=ort.SessionOptions();options.intra_op_num_threads=1;options.inter_op_num_threads=1
         self.session=ort.InferenceSession(str(path),sess_options=options,providers=['CPUExecutionProvider'])
+        recorded=self.session.get_modelmeta().custom_metadata_map.get('charlie.preprocessing',PREPROCESS)
+        if recorded not in PREPROCESS_PROFILES or recorded!=preprocessing:raise ValueError('ONNX preprocessing mismatch; matching model record required')
         if self.session.get_inputs()[0].shape!=list(INPUT) or self.session.get_outputs()[0].shape!=list(OUTPUT):
             raise ValueError('CPU model shape mismatch')
     def infer(self,x):

@@ -81,6 +81,9 @@ def reviewed_labels(journal, *, partition='training', allow_fixture=False):
             excluded.append(dict(proposal_id=key,reason='visible zero count unverified (0 versus 00)'));continue
         else:
             digits=str(value)
+        from .score_digits import valid_display_digits
+        if not valid_display_digits(digits):
+            excluded.append(dict(proposal_id=key,reason='unsupported Robotron visible digits (only 0 or 00 for zero)'));continue
         rows.append(dict(proposal_id=key,proposal=p,label=value,display_digits=digits,
                          path=path,annotation_ids=[r.id for r in peers]))
         seen.add(sha)

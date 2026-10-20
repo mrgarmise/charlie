@@ -323,6 +323,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                  '--output',str(game)]
             if index>1:cmd.extend(['--restart-from',str(previous_game)])
             if args.focus is not None:cmd.extend(['--focus',str(args.focus)])
+            if getattr(args,'projectile_self',False):cmd.append('--projectile-self')
             if developmental:cmd.extend(['--bootstrap-body-fire','--recalibrate'])
             if args.game_seconds is not None:cmd.extend(['--diagnostic-seconds',str(args.game_seconds)])
             if plan:cmd.extend(['--experiment-plan',str(plan_path)])
@@ -816,6 +817,8 @@ def main():
                     help="opt-in diagnostic duration, never normal game completion")
     ap.add_argument("--failed-starts",type=int,default=2)
     ap.add_argument("--retry-wait",type=float,default=5.0)
+    ap.add_argument("--projectile-self",action="store_true",
+                    help="experimental shot-origin confirmation; native qualification required")
     ap.add_argument("--focus",type=float,default=None,
                     help="optional diagnostic manual starting position; default is automatic calibration")
     ap.add_argument("--root",type=Path,default=Path("robotron-runs"))

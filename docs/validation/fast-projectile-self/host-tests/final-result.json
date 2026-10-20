@@ -1,0 +1,22 @@
+{
+  "command": "TMPDIR=<isolated host directory> python3 -m pytest -q tests --junitxml=<scratch>/fast-self-full.xml",
+  "passed": 1301,
+  "skipped": 21,
+  "failures": 0,
+  "errors": 0,
+  "warnings": 1,
+  "seconds": 337.06,
+  "native": false,
+  "physical_gameplay": false,
+  "projectile_native_qualified": false,
+  "life_sensor_native_qualified": false,
+  "gates": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  },
+  "artifacts": {
+    "final.log.gz": "9aa5e95ba6ddaffda7d551eaa424b331659f9018204a5dd63210eff891e7e9f4",
+    "final.xml.gz": "fc08410fb1be987b0032b88c15daaa8ccd5a6af05cef44b683427f381eb1f4d2"
+  }
+}

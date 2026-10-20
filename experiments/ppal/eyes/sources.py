@@ -1,6 +1,7 @@
 """Camera, saved-image, and synthetic frame sources; all return RGB PIL images."""
 
 from pathlib import Path
+import math
 import time
 
 from PIL import Image, ImageDraw
@@ -24,10 +25,35 @@ class PiCameraSource:
             raise
 
     def read(self) -> Image.Image:
+        if getattr(self,"stream",None) is not None:raise RuntimeError("use ObservedCamera; stream owns camera reads")
         # Camera uses Picamera2 RGB888: its array is BGR byte order.
         return Image.fromarray(self.camera.read()[..., ::-1].copy(), mode="RGB")
 
+    def start_stream(self):
+        from ..observation_stream import ObservationStream
+        if getattr(self,'stream',None) is None:
+            self.stream=ObservationStream(self._stream_capture)
+            self.stream.start()
+        return self.stream
+
+    def _stream_capture(self):
+        try:
+            image=self._capture(flush=False,timeout=1.)
+            capture=dict(self.last_capture)
+            lens=capture.get('lens_position')
+            if (type(lens) not in (int, float) or not math.isfinite(lens) or abs(lens-2.)>.05
+                    or isinstance(capture.get('af_state'),bool) or capture.get('af_state')!=0):
+                raise ValueError('continuous gameplay focus lock 2.0 not verified')
+            return image,capture
+        except TimeoutError:
+            self.camera.picam2.cancel_all_and_flush()
+            raise
+
     def read_fresh(self) -> Image.Image:
+        if getattr(self,"stream",None) is not None:raise RuntimeError("use ObservedCamera; stream owns camera reads")
+        return self._capture(flush=True)
+
+    def _capture(self, *, flush, timeout=None) -> Image.Image:
         """Use a new exposure, never Picamera2's cached pre-command frame.
 
         flush=True requires exposure to start after capture_request is called.
@@ -36,7 +62,8 @@ class PiCameraSource:
         fail explicitly rather than silently restoring stale agency evidence.
         """
         requested_at = time.monotonic()
-        request = self.camera.picam2.capture_request(flush=True)
+        request = (self.camera.picam2.capture_request(flush=flush) if timeout is None else
+                   self.camera.picam2.capture_request(flush=flush,wait=timeout))
         try:
             metadata = request.get_metadata()
             # Copy before release: CompletedRequest borrows camera buffers.
@@ -47,7 +74,7 @@ class PiCameraSource:
             exposure_start = (sensor_ns / 1e9 - exposure_us / 1e6
                               if sensor_ns is not None and exposure_us is not None else None)
             self.last_capture = {
-                "mode": "fresh_exposure", "requested_at": requested_at,
+                "mode": "fresh_exposure" if flush else "continuous_exposure", "requested_at": requested_at,
                 "completed_at": completed_at,
                 "capture_seconds": completed_at-requested_at,
                 "sensor_timestamp_ns": sensor_ns, "exposure_time_us": exposure_us,
@@ -99,16 +126,20 @@ class PiCameraSource:
         return True
 
     def autofocus(self) -> None:
+        if getattr(self,"stream",None) is not None:raise RuntimeError("autofocus prohibited during gameplay stream")
         self.camera.autofocus()
 
     def manual_focus(self, lens_position: float) -> None:
+        if getattr(self,"stream",None) is not None and lens_position!=2.:raise ValueError("gameplay focus remains 2.0")
         self.camera.manual_focus(lens_position)
 
     def lens_position(self) -> float | None:
+        if getattr(self,"stream",None) is not None:return self.last_capture.get("lens_position")
         return self.camera.lens_position()
 
     def capture_frame(self):
         """NumPy frame interface used by PPAL's FocusManager."""
+        if getattr(self,"stream",None) is not None:raise RuntimeError("stream owns camera reads")
         return self.camera.read()
 
     def set_autofocus(self) -> None:
@@ -118,7 +149,9 @@ class PiCameraSource:
         self.manual_focus(lens_position)
 
     def close(self) -> None:
-        self.camera.close()
+        try:
+            if getattr(self,"stream",None) is not None:self.stream.close()
+        finally:self.camera.close()
 
 
 class ImageSequenceSource:

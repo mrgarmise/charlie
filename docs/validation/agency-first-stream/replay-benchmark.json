@@ -1,0 +1,73 @@
+{
+  "schema": "agency-engine-replay-cost-v1",
+  "authentic_new_experience": false,
+  "native": false,
+  "caveat": "CPU costs on archived pixels; hypothetical SELF/policy inputs are benchmark fixtures, not recovered identity",
+  "images": [
+    "/workspace/scratch/a5d7375d8e4e/concurrent-evidence/extracted/pr5-fixed-three/runs/development-20261017-200109/game-01/raw-0003.png",
+    "/workspace/scratch/a5d7375d8e4e/concurrent-evidence/extracted/pr5-fixed-three/runs/development-20261017-200109/game-01/raw-0004.png",
+    "/workspace/scratch/a5d7375d8e4e/concurrent-evidence/extracted/pr5-fixed-three/runs/development-20261017-200109/game-01/raw-0005.png",
+    "/workspace/scratch/a5d7375d8e4e/concurrent-evidence/extracted/pr5-fixed-three/runs/development-20261017-200109/game-01/raw-0006.png",
+    "/workspace/scratch/a5d7375d8e4e/concurrent-evidence/extracted/pr5-fixed-three/runs/development-20261017-200109/game-01/raw-0007.png",
+    "/workspace/scratch/a5d7375d8e4e/concurrent-evidence/extracted/pr5-fixed-three/runs/development-20261017-200109/game-01/raw-0008.png"
+  ],
+  "repeats": 2,
+  "stages": {
+    "image_decode": {
+      "samples": 12,
+      "median": 0.008328442999982144,
+      "p95": 0.010057142999926327,
+      "worst": 0.010057142999926327
+    },
+    "full_terminal_classifier": {
+      "samples": 12,
+      "median": 0.08624668499999188,
+      "p95": 0.09296278800002256,
+      "worst": 0.09296278800002256
+    },
+    "hypothetical_supported_SELF_screen": {
+      "samples": 12,
+      "median": 0.0016289279999455175,
+      "p95": 0.0016832399999202607,
+      "worst": 0.0016832399999202607
+    },
+    "legacy_patch_classification": {
+      "samples": 12,
+      "median": 0.036555769999949916,
+      "p95": 0.04356296600008136,
+      "worst": 0.04356296600008136
+    },
+    "batched_detection_and_classification": {
+      "samples": 12,
+      "median": 0.033738355999958,
+      "p95": 0.036348040999996556,
+      "worst": 0.036348040999996556
+    },
+    "class_free_detection": {
+      "samples": 12,
+      "median": 0.019578143999979147,
+      "p95": 0.01984890300002462,
+      "worst": 0.01984890300002462
+    },
+    "tracking_and_belief": {
+      "samples": 12,
+      "median": 0.001875549000033061,
+      "p95": 0.0030365709999387036,
+      "worst": 0.0030365709999387036
+    },
+    "hypothetical_existing_tactical_policy": {
+      "samples": 12,
+      "median": 5.15880000193647e-05,
+      "p95": 8.076199992501643e-05,
+      "worst": 8.076199992501643e-05
+    }
+  },
+  "unmeasured": [
+    "native camera delivery",
+    "perspective correction on full raw pixels",
+    "controller response",
+    "complete-game performance",
+    "sustained native gameplay update rate"
+  ],
+  "original_trajectory_gates_unchanged": true
+}

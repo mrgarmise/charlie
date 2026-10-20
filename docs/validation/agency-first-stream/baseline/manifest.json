@@ -1,0 +1,17 @@
+{
+  "raw-0003.png": "f8615655664f2ba19d1aaa8c41df984fb5617f9a45eca06436cd54353f742e5b",
+  "raw-0007.png": "7d3051e85f2f2a0e6914a3e5d1955005b062e7f663afeed3213f83d9152d15e9",
+  "raw-0004.png": "06e1ba9271397166524cb2d6cb9590621d203f6674d1c5ea43661b614a5cf417",
+  "agency.jsonl.gz": "417f958b0837840bf5ab7068337dfbf17ca02011a2871c8bd8c3e45e0689d885",
+  "raw-0005.png": "a064122a37537b73fcc9f64af3f4a1c39d542ae3feb1989c4c8a755058d51cbd",
+  "report.json.gz": "5c34c6f77f96e41d8e3e7f2e7f0257ab1a95f447707e62a3a4bb491a13b041b2",
+  "raw-0008.png": "ef22797777c3bb54f25d0d6909699546d3f9003b8b87eb0e8f5346dcec01880a",
+  "raw-0006.png": "abc3f23fd545b2482ee806daa37210c3ea67df9ac6d9485147960c6a71abf5a7",
+  "original_archive": {
+    "filename": "charlie-pr5-game01.tar.gz",
+    "sha256": "c02b9ec790a028f54bc143fb1c54d06aad8542c83122bf62e75f5a96c0b21780",
+    "library_file_id": "libfile_dec964abb52c81919258d9dbd01f17ef",
+    "bytes": 156285077,
+    "unchanged": true
+  }
+}

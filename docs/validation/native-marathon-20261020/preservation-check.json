@@ -1,0 +1,77 @@
+{
+  "Projects/charlie": {
+    "unchanged": true,
+    "ending": {
+      "head": "bb40d02d3a128706e204cfd8e636fb1a9c5fd21b",
+      "status": "?? head2_sessions/\n?? robotron-evidence/\n",
+      "branch": "feature/agency-first-self"
+    }
+  },
+  "charlie-fast-self-validation": {
+    "unchanged": true,
+    "ending": {
+      "head": "73169db9ad2648ca7e4088979d22905900052c6a",
+      "status": "",
+      "branch": "fix/pr5-spawn-prior-serialization"
+    }
+  },
+  "charlie-score-sampler": {
+    "unchanged": true,
+    "ending": {
+      "head": "d45cce134e10d342f64a4d33f8baf9fcc1a41b01",
+      "status": "",
+      "branch": "feature/hailo-score-reader"
+    }
+  },
+  "charlie-ala2-recovery-20261019": {
+    "unchanged": true,
+    "ending": {
+      "head": "365bc84ca7f2b02cde94a3f604b2f957bb66a6f9",
+      "status": "",
+      "branch": "recovery/ala2-20261019"
+    }
+  },
+  "charlie-marathon-camera-lifecycle": {
+    "unchanged": true,
+    "ending": {
+      "head": "9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+      "status": "",
+      "branch": "native-camera-lifecycle-validation"
+    }
+  },
+  "charlie-restart-recovery": {
+    "unchanged": true,
+    "ending": {
+      "head": "a785c9f745bd0645dd01ac70af3beb5a8d44d37b",
+      "status": "",
+      "branch": "feature/native-marathon-restart"
+    }
+  },
+  "charlie-progress-watchdog": {
+    "unchanged": true,
+    "ending": {
+      "head": "3723132e0a7643d24b7670c202aba0f4a1acee12",
+      "status": "",
+      "branch": ""
+    }
+  },
+  "charlie-terminal-restart": {
+    "unchanged": true,
+    "ending": {
+      "head": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+      "status": "",
+      "branch": ""
+    }
+  },
+  "charlie-active-vision": {
+    "unchanged": true,
+    "ending": {
+      "head": "87779558b78aeb5b36d4c3bc1eceed7831201e95",
+      "status": "?? recovery/\n",
+      "branch": "feature/active-vision"
+    }
+  },
+  "notebook_sha256": "7c942b2a5977142ba093bfe2b2238d8d37573438e55b9c8cab5f566bb44ae6ae",
+  "original_pr5_archive_sha256": "c02b9ec790a028f54bc143fb1c54d06aad8542c83122bf62e75f5a96c0b21780",
+  "temperature_c": 57.85
+}

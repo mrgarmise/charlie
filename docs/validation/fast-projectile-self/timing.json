@@ -1,0 +1,57 @@
+{
+  "host_benchmark": {
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "frame": "authentic sensory-playfield.png",
+    "frame_size": [
+      640,
+      480
+    ],
+    "hardware_claim": false,
+    "results": {
+      "acquisition": {
+        "median_seconds": 0.020356829000036214,
+        "max_seconds": 0.02163147199996729,
+        "samples": [
+          0.020023845999958212,
+          0.020337149000056343,
+          0.020500285000025542,
+          0.020376509000016085,
+          0.020902812999906928,
+          0.020147181999959685,
+          0.02163147199996729,
+          0.02059373700001288,
+          0.020235335000052146,
+          0.019375764000074014
+        ]
+      },
+      "recognition": {
+        "median_seconds": 0.037128764500039324,
+        "max_seconds": 0.040954811000005975,
+        "samples": [
+          0.040954811000005975,
+          0.036903691000020444,
+          0.03752997399999458,
+          0.03639134800005195,
+          0.036839352000015424,
+          0.03709572000002481,
+          0.03984765099994547,
+          0.04025378300002558,
+          0.037161809000053836,
+          0.03548047899994344
+        ]
+      }
+    }
+  },
+  "authentic_failed_session": {
+    "independent_observation_hz": 1.4907884183636468,
+    "sensor_frame_duration_us": 67087,
+    "sensor_cadence_hz": 14.906017559288685,
+    "exposure_us": 66636,
+    "capture_seconds": 0.1161188249989209,
+    "controller_ready_seconds": 0.024191696998968837,
+    "controller_command_ack_seconds": 0.010564585001702653,
+    "unique_controller_executions": 5,
+    "processing_seconds": null,
+    "caveat": "delivered observations may skip sensor frames; no projectile rate inferred"
+  }
+}

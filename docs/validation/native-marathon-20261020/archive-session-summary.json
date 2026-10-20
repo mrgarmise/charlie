@@ -1,0 +1,251 @@
+{
+  "/home/five/charlie-campaigns/pr5-fixed-three/runs/development-20261017-200109/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": false,
+    "completion_counts": {
+      "incomplete_unverified": 1
+    },
+    "camera_cleanup_error": null,
+    "phase": "gameplay",
+    "games": [
+      {
+        "path": "/home/five/charlie-campaigns/pr5-fixed-three/runs/development-20261017-200109/game-01",
+        "returncode": 0,
+        "result": "OBSERVATION UNCERTAIN",
+        "durable_game_evidence": {
+          "record_id": "11c439913d2cf1a1e1829e1116af7b7a3abf3f05f8497e709d384a7c7120f38a",
+          "classification": "incomplete_unverified",
+          "duplicate": false
+        }
+      }
+    ]
+  },
+  "/home/five/charlie-campaigns/first-three/runs/development-20261017-182719/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": false,
+    "completion_counts": {
+      "incomplete_unverified": 1
+    },
+    "camera_cleanup_error": null,
+    "phase": "gameplay",
+    "games": [
+      {
+        "path": "/home/five/charlie-campaigns/first-three/runs/development-20261017-182719/game-01",
+        "returncode": 0,
+        "result": "OBSERVATION UNCERTAIN",
+        "durable_game_evidence": {
+          "record_id": "414fb599ac6b099d26d0fc4e2ab42cc604f74759d42f2d7ea2a714d6ef89d736",
+          "classification": "incomplete_unverified",
+          "duplicate": false
+        }
+      }
+    ]
+  },
+  "/home/five/Projects/charlie/robotron-runs/development-20261002-003511/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": null,
+    "games": [
+      {
+        "path": "robotron-runs/development-20261002-003511/game-01",
+        "returncode": 0,
+        "result": "TIME LIMIT",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/Projects/charlie/robotron-runs/development-20261002-015817/session.json": {
+    "status": "between_game_failure",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": null,
+    "games": [
+      {
+        "path": "robotron-runs/development-20261002-015817/game-01",
+        "returncode": 0,
+        "result": "OBSERVATION UNCERTAIN",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/Projects/charlie/robotron-runs/development-20261002-005944/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": null,
+    "games": [
+      {
+        "path": "robotron-runs/development-20261002-005944/game-01",
+        "returncode": 0,
+        "result": "TIME LIMIT",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/Projects/charlie/robotron-runs/development-20261002-012801/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": null,
+    "games": [
+      {
+        "path": "robotron-runs/development-20261002-012801/game-01",
+        "returncode": 0,
+        "result": "TIME LIMIT",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/charlie-marathon-camera-lifecycle/robotron-runs/development-20261011-203343/session.json": {
+    "status": "running",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": "gameplay",
+    "games": [
+      {
+        "path": "robotron-runs/development-20261011-203343/game-01",
+        "returncode": null,
+        "result": null,
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/charlie-restart-recovery/robotron-runs/development-20261011-192041/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": "gameplay",
+    "games": [
+      {
+        "path": "robotron-runs/development-20261011-192041/game-01",
+        "returncode": 0,
+        "result": "GAME OVER",
+        "durable_game_evidence": null
+      },
+      {
+        "path": "robotron-runs/development-20261011-192041/game-02",
+        "returncode": 1,
+        "result": "ERROR: ValueError: sensory preflight deadline; assistance required",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/charlie-terminal-restart/robotron-runs/development-20261011-221727/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": false,
+    "completion_counts": {
+      "incomplete_unverified": 1
+    },
+    "camera_cleanup_error": null,
+    "phase": "gameplay",
+    "games": [
+      {
+        "path": "robotron-runs/development-20261011-221727/game-01",
+        "returncode": 0,
+        "result": "OBSERVATION UNCERTAIN",
+        "durable_game_evidence": {
+          "record_id": "0f8ddeb6f724c9adb0ba5179464e53c2f475ab6400e886328a8200c7702290f7",
+          "classification": "incomplete_unverified",
+          "duplicate": false
+        }
+      }
+    ]
+  },
+  "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/development-20261009-024021/session.json": {
+    "status": "between_game_failure",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": null,
+    "games": [
+      {
+        "path": "robotron-runs/development-20261009-024021/game-01",
+        "returncode": 0,
+        "result": "GAME OVER",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/marathon-20261008-031501/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": null,
+    "games": [
+      {
+        "path": "robotron-runs/marathon-20261008-031501/game-01",
+        "returncode": 1,
+        "result": "ERROR: RuntimeError: initial START not authorized: no stable positive pregame or gameplay evidence",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/marathon-20261008-032614/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": null,
+    "games": [
+      {
+        "path": "robotron-runs/marathon-20261008-032614/game-01",
+        "returncode": 1,
+        "result": "ERROR: RuntimeError: initial START not authorized: no stable positive pregame or gameplay evidence",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/development-20261011-001506/session.json": {
+    "status": "unverified_episode_boundary",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": "gameplay",
+    "games": [
+      {
+        "path": "robotron-runs/development-20261011-001506/game-01",
+        "returncode": 1,
+        "result": "ERROR: ValueError: No complete game border found; include all corners and aim more squarely at TV; preflight could not establish stable Robotron geometry",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/marathon-20261009-004249/session.json": {
+    "status": "bounded_attempts_complete",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": null,
+    "games": [
+      {
+        "path": "robotron-runs/marathon-20261009-004249/game-01",
+        "returncode": 1,
+        "result": "ERROR: ValueError: No complete game border found; include all corners and aim more squarely at TV; preflight could not establish stable Robotron geometry",
+        "durable_game_evidence": null
+      }
+    ]
+  },
+  "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/marathon-20261009-021200/session.json": {
+    "status": "bounded_attempts_complete",
+    "target_met": null,
+    "completion_counts": null,
+    "camera_cleanup_error": null,
+    "phase": null,
+    "games": [
+      {
+        "path": "robotron-runs/marathon-20261009-021200/game-01",
+        "returncode": 0,
+        "result": "GAME OVER",
+        "durable_game_evidence": null
+      }
+    ]
+  }
+}

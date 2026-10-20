@@ -1,0 +1,28 @@
+{
+  "host_only": true,
+  "full_command": "TMPDIR=<isolated directory> python -m pytest -q tests --junitxml=<scratch>/agency-stream-full.xml",
+  "passed": 1324,
+  "skipped": 21,
+  "failures": 0,
+  "errors": 0,
+  "warnings": 1,
+  "seconds": 325.93,
+  "focused_passed": 109,
+  "artifacts": {
+    "focused-final.log.gz": "412b5e06a7544f247e1a4a8d41602eca160a190b128ab867a0a6f76c68449608",
+    "integration.log.gz": "3383098b3002a8f5ba1befe01be1a4c7ec01691ce2bfe920c00e1f779f616e28",
+    "respawn.log.gz": "1dd8cb5c970303f25f14a9461bff64869d3c1886d87fdfbcc6da80cd82040b0d",
+    "interrupted.log.gz": "a8891f9f8538a0994909eea69c9420f0b03e6dc3c0eabbd7f3205de69b75b88f",
+    "full.log.gz": "972daf47b6eb1c6f9679edba003c13aa6ad05559acbb22282ee604d3a3d9d2b3",
+    "full.xml.gz": "f15b75d0d21a839424186505c497139d6f4f4aab61cc09f3234c79494521d969"
+  },
+  "earlier_integration": "one respawn test failed before visible-position return guard was corrected; targeted rerun and final full run pass",
+  "interrupted": "early full run stopped to finalize bounded neutral-only shot-identity occlusion retention; no final failure hidden",
+  "physical_actions": false,
+  "native_target_demonstrated": false,
+  "gates": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  }
+}

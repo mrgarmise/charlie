@@ -101,10 +101,10 @@ def test_response_window_includes_delayed_motion_before_independent_stop():
     visual = VisualAgency()
     rows = []
     assert visual.discover(read,Controller(),record=rows.append) == points[0]
-    assert visual.agency.self_id == 1
-    assert visual.agency.beliefs[1].contradictions == 0
-    assert visual.agency.beliefs[1].hits == 3 and visual.agency.beliefs[1].stops == 3
-    assert visual.agency.beliefs[2].contradictions >= 3
+    assert visual.agency.self_id == 2
+    assert visual.agency.beliefs[visual.agency.self_id].contradictions == 0
+    assert visual.agency.beliefs[visual.agency.self_id].hits == 3 and visual.agency.beliefs[visual.agency.self_id].stops == 3
+    assert visual.agency.beliefs[1].contradictions >= 3
     early = [r for r in rows if r.get('phase')=='response_window_early_unmeasured']
     assert len(early)==3 and all(r['command'] is None for r in early)
     endpoints = [r for r in rows if r.get('phase')=='action_response_window']

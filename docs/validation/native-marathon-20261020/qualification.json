@@ -1,0 +1,327 @@
+{
+  "schema": "charlie-native-marathon-audit-v1",
+  "platform": "Raspberry Pi 5 ARM64, Python 3.13.5, OpenCV 4.10.0",
+  "remote_start": "8c96db003b87246ee6b0f9dc9918cb42af726370",
+  "local_reconstructed_baseline": "b197bb95b52ddbe71cc6706a45776dbf79599e41",
+  "full": {
+    "tests": 1352,
+    "passed": 1294,
+    "failed": 34,
+    "skipped": 24,
+    "seconds": 669.652,
+    "failures_by_test": [
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RT]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[rt]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RT_DOWN]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RT_UP]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER_DOWN]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[R2]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[ABS_RZ]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[QUIT]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[PLAYER_ALEX]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[GUIDE+BACK]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[GUIDE BACK]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[A\\nRT]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[A\\rRT]",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_repeated_buttons_combinations_and_release",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_stopped_caller_hold_lease_neutralizes",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_deferred_measurement_review::test_real_http_shared_operator_server",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_connection_failure_leaves_pending",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_corrected_memory_is_filtered_from_recall",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_failure_survives_restart_then_recovers",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_partial_semantic_success_is_not_retried",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_persist_deliver_scope_and_no_resend",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_recall_uses_charlie_project_and_session",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_passive_eyes::test_http_reuses_frames_without_camera_or_tracking_pass",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_passive_eyes::test_eof_shuts_down_remote_server_without_systemd",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_ppal_arcade_transport.ArcadeTransportTests::test_current_absolute_position_protocol_and_neutral",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_ppal_arcade_transport.ArcadeTransportTests::test_independent_sticks_and_held_direction_changes",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_ppal_arcade_transport.ArcadeTransportTests::test_rejected_command_stops_and_releases",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_ppal_hands.HandsTests::test_tcp_round_trip_ack_and_release",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_robotron.RobotronTests::test_camera_failure_releases_controls",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_robotron.RobotronTests::test_ppal_action_maps_to_confirmed_protocol",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_robotron.RobotronTests::test_rejection_disconnects_and_cannot_be_reused",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_robotron.RobotronTests::test_reset_is_not_fabricated",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_score_review_queue::test_http_batch_review_preserves_originals_and_restart",
+        "classification": "sandbox_socket_creation",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      }
+    ],
+    "skips_by_test": [
+      {
+        "test": "::tests.test_ala_foundry",
+        "message": "collection skipped",
+        "detail": "('/home/five/charlie-marathon-audit-20261020/tests/test_ala_foundry.py', 6, \"Skipped: could not import 'torch': No module named 'torch'\")"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_evidence_originated_cycle_resolution_memory_and_restart",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_cycle.py:33: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_multiple_offline_projects_share_evidence_without_physical_credit",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_cycle.py:60: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_productive_worker_deferred_not_resolved",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_cycle.py:75: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_checkpointed_resolution_recovery_does_not_retest",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_cycle.py:84: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_new_evidence_releases_wait_without_independent_confirmation",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_cycle.py:114: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_mutated_chooser_plan_cannot_execute",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_cycle.py:128: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_operational::test_evidence_cycle_deployment_operational_decision_and_rollback",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_operational.py:40: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_operational::test_autonomous_candidate_return_under_preexisting_bounded_authority",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_operational.py:95: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_operational::test_recovery_after_resolution_before_shadow_does_not_retest",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_operational.py:114: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_portable_tensor_math_matches_existing_model[channels0-3-relu]",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_portable.py:28: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_portable_tensor_math_matches_existing_model[channels1-5-relu]",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_portable.py:28: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_portable_tensor_math_matches_existing_model[channels2-3-gelu]",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_portable.py:28: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_export_relocates_without_torch_and_keeps_rollback_authority",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_portable.py:57: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_exported_weights_and_linkage_cannot_be_substituted",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_portable.py:101: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_training_data_extension_cannot_recertify_reused_final_games",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_portable.py:145: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_refinement::test_retrieved_failure_generates_intervention_without_reopening_test",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_refinement.py:13: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_refinement::test_cnn_unknown_clock_preserves_checkpoint_without_false_resolution",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_refinement.py:44: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_refinement::test_cnn_forecast_isolated_from_old_host_timestamps",
+        "message": "could not import 'torch': No module named 'torch'",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_ala_refinement.py:56: could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_episode_identity::test_actual_october1_collision_normal_discovery",
+        "message": "original October 1 artifacts required; use documented acceptance environment",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_episode_identity.py:176: original October 1 artifacts required; use documented acceptance environment"
+      },
+      {
+        "test": "tests.test_robotron_geometry_replay::test_full_original_archive_when_supplied",
+        "message": "Optional full 119-original archive replay; retained nine originals always run",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_robotron_geometry_replay.py:99: Optional full 119-original archive replay; retained nine originals always run"
+      },
+      {
+        "test": "tests.test_score_review_frontend::test_batch_navigation_correction_filters_and_keyboard",
+        "message": "Node unavailable; browser logic test requires JavaScript runtime",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_score_review_frontend.py:9: Node unavailable; browser logic test requires JavaScript runtime"
+      },
+      {
+        "test": "tests.test_score_review_frontend::test_measurement_review_marking_and_abstention",
+        "message": "Node unavailable; browser logic test requires JavaScript runtime",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_score_review_frontend.py:53: Node unavailable; browser logic test requires JavaScript runtime"
+      },
+      {
+        "test": "tests.test_score_review_navigation::test_stale_photo_guard_saved_review_and_acknowledged_advance",
+        "message": "Node unavailable",
+        "detail": "/home/five/charlie-marathon-audit-20261020/tests/test_score_review_navigation.py:9: Node unavailable"
+      }
+    ]
+  },
+  "focused": {
+    "passed": 165,
+    "failed": 0,
+    "seconds": 88.35
+  },
+  "defect_controls_before": {
+    "passed": 4,
+    "failed": 3
+  },
+  "no_physical_devices": true,
+  "physical_actions": 0,
+  "policy_activated": false,
+  "readiness": "NOT YET DEMONSTRATED: physical devices and host process ownership inaccessible",
+  "gates": {
+    "E1": "prior scoped recurrence PASS retained; no new Executive investigation",
+    "P1": "prior retrospective diagnostic PASS retained; two native fresh-process replays reproduced",
+    "I1": "NOT YET DEMONSTRATED",
+    "ALA2": "OPEN"
+  },
+  "publication": "Exact ending local/remote SHAs recorded separately in publication.json; no merge or deployment"
+}

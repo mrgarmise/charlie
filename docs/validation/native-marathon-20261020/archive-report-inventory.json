@@ -1,0 +1,178 @@
+[
+  {
+    "path": "/home/five/charlie-campaigns/pr5-fixed-three/runs/development-20261017-200109/game-01/report.json",
+    "result": "OBSERVATION UNCERTAIN",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 0,
+    "source": "73169db9ad2648ca7e4088979d22905900052c6a",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-campaigns/first-three/runs/development-20261017-182719/game-01/report.json",
+    "result": "OBSERVATION UNCERTAIN",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 0,
+    "source": "d74d7a620c39104ce58fb2c9551381543a66b5f2",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/Projects/charlie/robotron-runs/development-20261002-003511/game-01/report.json",
+    "result": "TIME LIMIT",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 22,
+    "source": "0bd08c1a2ce2019c37996ee6e72f99a1ba2d1636",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/Projects/charlie/robotron-runs/development-20261002-015817/game-01/report.json",
+    "result": "OBSERVATION UNCERTAIN",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 84,
+    "source": "b9624ce6cbd2283781b7a974c5af0da05f398d4b",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/Projects/charlie/robotron-runs/development-20261002-005944/game-01/report.json",
+    "result": "TIME LIMIT",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 97,
+    "source": "0bd08c1a2ce2019c37996ee6e72f99a1ba2d1636",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/Projects/charlie/robotron-runs/development-20261002-012801/game-01/report.json",
+    "result": "TIME LIMIT",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 72,
+    "source": "49632c45d744a1971d063deff5e943748cacdda6",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-marathon-camera-lifecycle/robotron-runs/development-20261011-203343/game-01/report.json",
+    "result": "GAME OVER",
+    "reported_boundary": "game_over",
+    "reported_confirmed": true,
+    "rule": "persistent_not_gameplay_plus_no_controlled_self",
+    "ticks": 33,
+    "source": "9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-restart-recovery/robotron-runs/development-20261011-192041/game-02/report.json",
+    "result": "ERROR: ValueError: sensory preflight deadline; assistance required",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 0,
+    "source": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-restart-recovery/robotron-runs/development-20261011-192041/game-01/report.json",
+    "result": "GAME OVER",
+    "reported_boundary": "game_over",
+    "reported_confirmed": true,
+    "rule": "gameplay_terminal_attract_sequence",
+    "ticks": 2,
+    "source": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-terminal-restart/robotron-runs/development-20261011-221727/game-01/report.json",
+    "result": "OBSERVATION UNCERTAIN",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 4,
+    "source": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/development-20261009-024021/game-01/report.json",
+    "result": "GAME OVER",
+    "reported_boundary": "game_over",
+    "reported_confirmed": true,
+    "rule": "gameplay_terminal_attract_sequence",
+    "ticks": 45,
+    "source": "f422718a79e08225a170ecac5d4671c4f4095e74",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/marathon-20261008-031501/game-01/report.json",
+    "result": "ERROR: RuntimeError: initial START not authorized: no stable positive pregame or gameplay evidence",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 0,
+    "source": "99d561382a0a55d0dc2bb4dea4b511350c8cdae5",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/marathon-20261008-032614/game-01/report.json",
+    "result": "ERROR: RuntimeError: initial START not authorized: no stable positive pregame or gameplay evidence",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 0,
+    "source": "99d561382a0a55d0dc2bb4dea4b511350c8cdae5",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/development-20261011-001506/game-01/report.json",
+    "result": "ERROR: ValueError: No complete game border found; include all corners and aim more squarely at TV; preflight could not establish stable Robotron geometry",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 0,
+    "source": "6ba21fb9b56e492a85bf3b7fc2e9b5fb63ab9789",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/marathon-20261009-004249/game-01/report.json",
+    "result": "ERROR: ValueError: No complete game border found; include all corners and aim more squarely at TV; preflight could not establish stable Robotron geometry",
+    "reported_boundary": "unknown",
+    "reported_confirmed": false,
+    "rule": null,
+    "ticks": 0,
+    "source": "7991731b95a54997b161c64c153c9f68b4f420af",
+    "armed": true,
+    "independently_qualified": false
+  },
+  {
+    "path": "/home/five/charlie-ala2-bae659f60b0e/robotron-runs/marathon-20261009-021200/game-01/report.json",
+    "result": "GAME OVER",
+    "reported_boundary": "game_over",
+    "reported_confirmed": true,
+    "rule": "gameplay_terminal_attract_sequence",
+    "ticks": 33,
+    "source": "f422718a79e08225a170ecac5d4671c4f4095e74",
+    "armed": true,
+    "independently_qualified": false
+  }
+]

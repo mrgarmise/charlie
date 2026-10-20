@@ -1,0 +1,53 @@
+{
+  "scope": "operator-reported authentic TRAINING fit; private pixels/checkpoint/logits not accessed by Work",
+  "source": "Charlie_Hailo_Score_Reader_Crop_Diagnostics_Work_Mission.md and Pasted text(9).txt",
+  "manifest_digest": "7a91c73d9ce47d8616abf07a5fbf03727398774972ab8e5fc9d2d9fbc437276f",
+  "onnx_sha256": "e3b44a0894429a148e4fccf51301f4c6179eed00ba33309e2f865b0ff3002686",
+  "checkpoint_sha256": "1dd9422c159630eac49e882b509065bdd86647cd952fab2d11b543f5e08477a9",
+  "training_steps": 1000,
+  "images": 64,
+  "raw_exact": 39,
+  "accepted": 0,
+  "always_00_raw_exact": 37,
+  "both_edge_timesteps_nonblank": 64,
+  "per_label": {
+    "100": {
+      "samples": 4,
+      "raw_exact": 0
+    },
+    "200": {
+      "samples": 2,
+      "raw_exact": 0
+    },
+    "300": {
+      "samples": 5,
+      "raw_exact": 0
+    },
+    "700": {
+      "samples": 2,
+      "raw_exact": 0
+    },
+    "800": {
+      "samples": 8,
+      "raw_exact": 0
+    },
+    "1200": {
+      "samples": 4,
+      "raw_exact": 4
+    },
+    "2200": {
+      "samples": 2,
+      "raw_exact": 0
+    },
+    "00": {
+      "samples": 37,
+      "raw_exact": 35
+    }
+  },
+  "actual_onnx_opset": "NOT INSPECTED; operator log reports failed downgrade; ORT agreement does not establish opset 11",
+  "native_hailo_model_002": "NOT DEMONSTRATED",
+  "admissible_independent_validation": "NOT ESTABLISHED; reported earlier overlap failure",
+  "final_test_used": false,
+  "original_failed_100_step_model": "preserve; not resumed",
+  "actual_0000_supersession_history": "not supplied; fixture behavior verified; no original records rewritten"
+}

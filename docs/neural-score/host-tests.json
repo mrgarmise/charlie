@@ -1,0 +1,65 @@
+{
+  "schema": "charlie-neural-score-host-test-receipt-v1",
+  "native": false,
+  "python": "3.12.14",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "results": {
+    "focused": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "113",
+      "time": "9.293",
+      "timestamp": "2026-10-18T14:09:41.080309-05:00",
+      "hostname": "ea1e9376b9b6",
+      "passed": 113,
+      "skips": [],
+      "log_sha256": "e79e283c11a8a16d731909175b8bfff138bbabe446cf4ed127814f0d336f022c",
+      "xml_sha256": "46301ef8dbb0affdc3c8e0ef5018c8a34bb7478728489e317bd058f254109824"
+    },
+    "full": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "2",
+      "tests": "1323",
+      "time": "323.787",
+      "timestamp": "2026-10-18T14:09:51.238734-05:00",
+      "hostname": "ea1e9376b9b6",
+      "passed": 1321,
+      "skips": [
+        {
+          "test": "tests.test_episode_identity.test_actual_october1_collision_normal_discovery",
+          "reason": "original October 1 artifacts required; use documented acceptance environment"
+        },
+        {
+          "test": "tests.test_robotron_geometry_replay.test_full_original_archive_when_supplied",
+          "reason": "Optional full 119-original archive replay; retained nine originals always run"
+        }
+      ],
+      "log_sha256": "b40b46b92108b3e34b95750ca3ba6c0bc33b82434c3f08ba9356f1fa65bf7fcc",
+      "xml_sha256": "96ef498f6222bc59f5e1480ff5f2a9b6153f370ffb78b95520e64bfd4f1a83e6"
+    }
+  },
+  "commands": [
+    "<score-ml-env>/bin/python -m pytest tests/test_neural_score.py tests/test_score_observer.py tests/test_score_feedback_learning.py tests/test_score_feedback_recovery.py tests/test_score_tracker.py tests/test_robotron_hud.py tests/test_score_human_review.py tests/test_score_review_frontend.py tests/test_prompt_terminal_restart.py -q --junitxml=score-focused.xml",
+    "TMPDIR=<isolated score-test-tmp> <score-ml-env>/bin/python -m pytest tests -q --junitxml=score-final-full.xml"
+  ],
+  "previous_development_failure": {
+    "test": "test_gameplay_score_freezes_1100_and_keeps_1300_attract_separate",
+    "passed": 1320,
+    "failed": 1,
+    "skipped": 2,
+    "repair": "pass source metadata only to readers declaring bind_source; preserve legacy call interface"
+  },
+  "development_test_fixture_repair": "clear simulated urgent reservation before asserting independent thermal resume",
+  "interrupted_development_rerun": "stopped before final frozen-source run; no pass claimed",
+  "source_parent": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+  "new_neural_tests": 49,
+  "scope": "host engineering, actual synthetic optimizer/ONNX and fake Hailo adapter tests; no authentic model or hardware qualification",
+  "binaries": "SYNTHETIC_ONLY/score.pt and score.onnx; HEF ABSENT",
+  "original_training_labels": 0,
+  "physical_actions": false,
+  "notebook_writer_started": false
+}

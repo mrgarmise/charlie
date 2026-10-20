@@ -1,0 +1,11 @@
+{
+  "torch": "2.5.1+cpu",
+  "numpy": "2.3.5",
+  "Pillow": "12.3.0",
+  "opencv-python-headless": "5.0.0.93",
+  "onnx": "1.17.0",
+  "onnxruntime": "1.20.1",
+  "pytest": "9.1.1",
+  "pyserial": "3.5",
+  "mpremote": "1.29.0"
+}

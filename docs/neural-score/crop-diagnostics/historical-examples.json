@@ -1,0 +1,76 @@
+[
+  {
+    "image": "../../../tests/fixtures/robotron-developmental/012801-score-raw-0097.png",
+    "sha256": "4de1bb7249cc9208fff051cfa1c2465a824cd385c0f1f904b43658339b9101a9",
+    "calibration": {
+      "corners": [
+        [
+          0.09963384097880594,
+          0.20747015127050908
+        ],
+        [
+          0.6681453831266196,
+          0.10064728677221926
+        ],
+        [
+          0.7524643450650015,
+          0.7831966089678687
+        ],
+        [
+          0.11436825649577206,
+          0.9430826357763197
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "channel": 1,
+    "provenance": {
+      "path": "012801-score-raw-0097.png",
+      "source_run": "development-20261002-012801",
+      "source_file": "score-raw-0097.png",
+      "sha256": "4de1bb7249cc9208fff051cfa1c2465a824cd385c0f1f904b43658339b9101a9",
+      "external_timestamp": null,
+      "external_source": "Alex physical screen observation; not adjudicated; not necessarily same capture time"
+    }
+  },
+  {
+    "image": "../../../tests/fixtures/robotron-developmental/015817-score-raw-0175.png",
+    "sha256": "2ca8fb8ae67b415f7bd2dfe1d77e48daaefb295aad2719bf0d1693a8bd55ffc8",
+    "calibration": {
+      "corners": [
+        [
+          0.10082746758585914,
+          0.20634565701326216
+        ],
+        [
+          0.6665691972014437,
+          0.0992401696617243
+        ],
+        [
+          0.7503820458251076,
+          0.7847879464049893
+        ],
+        [
+          0.11479849682654923,
+          0.9437745277911843
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "channel": 1,
+    "provenance": {
+      "path": "015817-score-raw-0175.png",
+      "source_run": "development-20261002-015817",
+      "source_file": "score-raw-0175.png",
+      "sha256": "2ca8fb8ae67b415f7bd2dfe1d77e48daaefb295aad2719bf0d1693a8bd55ffc8",
+      "external_timestamp": null,
+      "external_source": "Alex physical screen observation; not adjudicated; not necessarily same capture time"
+    }
+  }
+]

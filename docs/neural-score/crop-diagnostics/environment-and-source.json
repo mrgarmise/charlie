@@ -1,0 +1,34 @@
+{
+  "parent": "d45cce134e10d342f64a4d33f8baf9fcc1a41b01",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "packages": {
+    "torch": "2.5.1+cpu",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.20.1",
+    "numpy": "2.3.5",
+    "Pillow": "12.3.0",
+    "opencv-python-headless": "5.0.0.93",
+    "pytest": "9.1.1"
+  },
+  "source_sha256": {
+    ".github/workflows/neural-score-sampler.yml": "5186b0438eb3568998c7942378ab6533e5329e453ce8281e79445c8e6fa26de3",
+    "experiments/ppal/neural_score/backends.py": "e267daad3807956b436e51f8d6a5a4f80ee09a5b2d65593526250c7aacfc05cc",
+    "experiments/ppal/neural_score/cli.py": "cafad3fabc205e56a6ab4bed79188f99e6a747fe19b21e89551aff05dea52225",
+    "experiments/ppal/neural_score/compile.py": "517439eaad42c32b50c0fce3eb3889afef2fff40c629485bd45b4f704f427a58",
+    "experiments/ppal/neural_score/contract.py": "cc348e41c4ba86acc6f483aeddddbc0d4c69c6c91fe0404a266339c44538fecf",
+    "experiments/ppal/neural_score/corpus.py": "2ad818e384f9059005285f2e87b94e375d99c1cfadfbdc049ec0773178c00515",
+    "experiments/ppal/neural_score/diagnose.py": "2c9c72bf4d0610b4072613be595d329e7c91603027d4bc7f934ff826a1b10550",
+    "experiments/ppal/neural_score/evaluate.py": "67fd13dee97b01b0fafeb13473c5572e702cd14f5cb478688379ce5322940d41",
+    "experiments/ppal/neural_score/model.py": "55bffe8ede1f9462580c467afaeca348db380daa422f024336ae3f375acf1a8d",
+    "experiments/ppal/neural_score/reader.py": "7791927544e7b5762105ce4221453905a5be76d1b1ff6389294ab7e93ca8d95d",
+    "experiments/ppal/neural_score/train.py": "6414a724934dfb922b5dbd56bab3ac22e2588b046a78c7b744e9b55d56fd5049",
+    "experiments/ppal/score_digits.py": "7891aad80d33045481f0e0de5179e1532ee993ce88c5919b36eab4c5f20a5a31",
+    "experiments/ppal/score_feedback.py": "e4d508189aebf4798f53726113b31315d621880e7c0f5079922120e69e0b64ef",
+    "experiments/ppal/score_observer.py": "58574dd3a920ba659750929344a112a7e0fcfb663223b4b86e4d29e73ff45302",
+    "tests/test_score_crop_diagnostics.py": "50e7b7828bbe7ef8941d2f101091e65834b2a460ce34d377169f642abba67ee6",
+    "tools/bundle_score_crop_diagnostics.py": "d1d9a29bd78066829f1627c92e3e06ffc824d958022377feb3ce6336a78c1413",
+    "tools/score_alignment_experiment.py": "bea3dcf452eab7ec208c4383353d2adb72a23d1984bd78623a8d10c833317cb7",
+    "tools/train_score_to_hef.py": "85c0442740f5db7002fe3b9042664f61378d7bfea0f13568d1e412a3b2fd5a12"
+  }
+}

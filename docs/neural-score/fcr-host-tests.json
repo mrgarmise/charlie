@@ -1,0 +1,78 @@
+{
+  "results": {
+    "fcr-full": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "1356",
+      "time": "363.713",
+      "timestamp": "2026-10-19T08:08:12.933533-05:00",
+      "hostname": "2b5368bd7c88"
+    },
+    "fcr-focused-final": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "126",
+      "time": "3.932",
+      "timestamp": "2026-10-19T08:08:14.164686-05:00",
+      "hostname": "2b5368bd7c88"
+    },
+    "fcr-original-archives": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "2",
+      "time": "42.126",
+      "timestamp": "2026-10-19T08:07:00.721610-05:00",
+      "hostname": "2b5368bd7c88"
+    },
+    "fcr-development-full": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "1",
+      "skipped": "2",
+      "tests": "1356",
+      "time": "328.473",
+      "timestamp": "2026-10-19T08:02:08.938449-05:00",
+      "hostname": "2b5368bd7c88"
+    }
+  },
+  "receipt_sha256": {
+    "fcr-development-full.log.gz": "187301ba091ea7bfddf81d4e8f059db2ab5694e30c48c13396bace00a1b4b836",
+    "fcr-focused-final.xml.gz": "78e827f98a2559d4d55b4b99122ff95a3b094f48a9e95837741a72364edc6369",
+    "fcr-focused.xml.gz": "928f91a0ccdd98dbaecad455a711cf1e4de73e52372e9bc519b9a6cabfccd792",
+    "fcr-original-archives.xml.gz": "75fa6c4bd1acd9ac117b2c9193ed0425f31d2bd479a3c91edb8debc687cdfc3b",
+    "fcr-development-full.xml.gz": "39ae3cb858645fe74be211838004eaa8ff32b9d15e1f26ba64334e9e1dd32f33",
+    "fcr-full.xml.gz": "bca4d24584c5135e918ab5cf3eb3e58f16b24383fa01e6bd606299a614d7a993",
+    "fcr-original-archives.log.gz": "e9a8ed6a63a218519c7082d3dc0e1d1f043db85cd41161b9eedb26953a83293f",
+    "fcr-focused.log.gz": "a879c75140b247cd28ef01953d8447eeac60cc1dacb767d8af0ccca8f1a2945f",
+    "fcr-focused-final.log.gz": "6450bb66a5a04f1226eda479f4d016ec9574b328f043798789dd41d70969df10",
+    "fcr-full.log.gz": "7f5837124499bd5d21a17238900fce01dc70ae31fc1772b8b94a7c93e14b85d7"
+  },
+  "schema": "charlie-hailo-fcr-host-tests-v1",
+  "native": false,
+  "parent": "207c3f053b86d4b75078badef574535d8853dd91",
+  "commands": {
+    "full": "CHARLIE_IDENTITY_ACCEPTANCE_ROOT=<recovered October 1 root> CHARLIE_GEOMETRY_ACCEPTANCE_ROOT=<recovered marathon-20261009-004249/game-01> <isolated-env>/bin/python -m pytest tests -q --junitxml=docs/neural-score/fcr-full.xml",
+    "focused": "<isolated-env>/bin/python -m pytest tests/test_neural_score.py tests/test_neural_score_sampler.py tests/test_score_archive_recovery.py tests/test_score_feedback_recovery.py tests/test_score_feedback_learning.py tests/test_score_human_review.py tests/test_score_review_frontend.py tests/test_score_tracker.py tests/test_score_review_navigation.py -q --junitxml=docs/neural-score/fcr-focused-final.xml"
+  },
+  "host_source": "fcr-environment-and-source.json",
+  "archive_recovery": "authentic-recovery-20261019.json",
+  "operator_evidence": "operator-synthetic-parity-20261018.json",
+  "pip_check": "No broken requirements found",
+  "development_failure": "Pre-existing DOM test expected numeric 1300 after exact-visible-string UI update. Corrected expectation to string '1300'; UI/runtime behavior unchanged; failed development receipt retained.",
+  "authentic_training_crops": 0,
+  "authentic_model_trained": false,
+  "authentic_hef_generated": false,
+  "physical_actions": false,
+  "original_notebook_modified": false,
+  "gates": {
+    "E1": "OPEN",
+    "P1": "OPEN",
+    "I1": "OPEN"
+  }
+}

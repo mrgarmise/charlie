@@ -1,0 +1,28 @@
+{
+  "qualification": "SYNTHETIC / NOT ROBOTRON-QUALIFIED",
+  "metrics": {
+    "samples": 14,
+    "readable": 14,
+    "accepted": 10,
+    "correct": 10,
+    "coverage": 0.7142857142857143,
+    "exact_accuracy_at_coverage": 1.0,
+    "exact_over_all_readable": 0.7142857142857143,
+    "correct_over_all_wilson95": [
+      0.4535045882751561,
+      0.882788120898909
+    ],
+    "total_digit_edit_distance": 20,
+    "high_confidence_wrong": 0,
+    "no_score_samples": 0,
+    "no_score_false_positives": 0,
+    "p1_p2_swaps": "unmeasured without paired channel truth",
+    "quantization_drift": "unmeasured without real HEF",
+    "latency": {
+      "p50": 0.0009945269998752337,
+      "p95": 0.03952629400009755,
+      "p99": 0.03952629400009755
+    }
+  },
+  "scope": "fresh unpack of the released fixture ZIP; validation replay only"
+}

@@ -725,6 +725,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             episode_observer.entry_evidence=dict(method='causal_SELF',capture_timestamp=source.timestamp,agency=dict(snapshot))
         if score_observer is not None and source.raw is not None:
             score_observer.submit(source.raw, timestamp=source.timestamp,observation_id=source.observation_id,
+                                  capture_metadata=dict(source.capture or {},
+                                      timestamp_basis='first_pixel_exposure_at' if source.capture and source.capture.get('first_pixel_exposure_at') is not None else 'read_completion'),
                                   screen=dict(current_screen,episode_retired=bool(episode_observer and episode_observer.terminal_suspected)),
                                   sample=visual_agency.tick, preceding_action={
                                       "action":preceding_action, "agency_command":snapshot.get("command"),

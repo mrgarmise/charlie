@@ -1,0 +1,8 @@
+{
+  "experiments/ppal/compile_hailo_lab.py": "4f3e912e245502b8ed6b36a500c04f9d163af2d25a503296ca6e6b0656a42bb7",
+  "experiments/ppal/detector_bridge.py": "886ed0c1651448f4de420670668bc97ceb28e45603a4eb0892dca56d18902494",
+  "experiments/ppal/replay_detectors.py": "fb9d110e4e1947eea4fd95293fb09f42fbe38faca141594cad5be71982b00446",
+  "experiments/ppal/inventory_robotron.py": "93e5d152b6f35547b5802b2b716c4730b69abacba544444385359f636b5b9516",
+  "experiments/ppal/benchmark_detector_candidates.py": "3ced31b1004029ccf6539606a53a7743d6681cd5e27c19f7c2727d4519feb7bb",
+  "tests/test_detector_bridge.py": "8a46bf4ddabd6e10df5d473d374836c52928432b9f2737c8a81af815c9c6e35a"
+}

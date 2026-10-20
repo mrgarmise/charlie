@@ -1,0 +1,66 @@
+{
+  "native": false,
+  "qualification": "host engineering tests only; no model training, HEF compile or device inference",
+  "results": {
+    "full": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "21",
+      "tests": "1373",
+      "time": "320.791",
+      "timestamp": "2026-10-18T13:22:10.766805-05:00",
+      "hostname": "ea1e9376b9b6",
+      "log_sha256": "d660ef274d523a5f34f3cf6513d0b9df347c8549a655e8ed0e575012ecbdc3a4",
+      "xml_sha256": "38256d8f555d51d7a9f410cbd2658e459b46cb7109fdb4e37bf6f0ac3f5cf0d7"
+    },
+    "focused": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "28",
+      "time": "0.153",
+      "timestamp": "2026-10-18T13:22:10.409285-05:00",
+      "hostname": "ea1e9376b9b6",
+      "log_sha256": "3f3ef91606da62cc47586e656087d94d3a121bc77dd4392a3aaa7c8a4425b187",
+      "xml_sha256": "85dd578597685705870012c3d374fb9add10ae9ce4362cc3e0a76a0764c1a19e"
+    }
+  },
+  "python": "3.12.14",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "packages": {
+    "pytest": "9.1.1",
+    "opencv-python-headless": "5.0.0.93",
+    "numpy": "2.3.5",
+    "Pillow": "12.3.0",
+    "pyserial": "3.5",
+    "mpremote": "1.29.0"
+  },
+  "unavailable": [
+    "torch",
+    "ultralytics",
+    "hailo_platform",
+    "hailo-dataflow-compiler",
+    "Hailo-8L hardware",
+    "verified Robotron labels"
+  ],
+  "commands": [
+    "TMPDIR=<isolated temp directory> <venv>/bin/python -m pytest tests -q --junitxml=<full.xml>",
+    "<venv>/bin/python -m pytest tests/test_detector_bridge.py -q --junitxml=<focused.xml>"
+  ],
+  "prior_full_run": {
+    "passed": 1344,
+    "skipped": 21,
+    "failures": 0,
+    "seconds": 322.91,
+    "scope": "before final metadata and added regression cases"
+  },
+  "original_source_parent": "8c96db003b87246ee6b0f9dc9918cb42af726370",
+  "vision_lab_ref": "9156940a89651ec0b16d8972f8fed1261ae8f3da",
+  "gates": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  }
+}

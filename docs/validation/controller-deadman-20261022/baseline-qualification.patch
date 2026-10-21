@@ -1,0 +1,91 @@
+--- a/scripts/install_rom_intake.py
++++ b/scripts/install_rom_intake.py
+@@ -78,6 +78,10 @@
+ OPERATOR_ACCEPTED_RELEASE = {  # Native-accepted d09f4dbe, exact module pair.
+     'launcher.py': '54c16dfcd7ec108eecef6944ecaa0c31dd7500902a9f24639336ab0c39d7bdcf',
+     'rom_intake.py': '6261d1a9fa898c70d25743affde970085d6e5835ceb6a7f00c8f18ef83049e3e',
++}
++INSPECTED_20261022_RELEASE = {  # Authentic installed sources, exact GitHub 0825f596 base.
++    'launcher.py': 'b528b5e751fdd9fd4f39d2e0b282b7e669cbaa5b0133e7bc8c04450feed8a3c2',
++    'rom_intake.py': 'f53b06abacf2f3a3436452e79f1b7fe9562050a120b8d4cd501a47d12f0ea98c',
+ }
+ FILES = ('launcher.py', 'controller.py', 'rom_intake.py', 'mame2000_catalog.json.gz',
+          'controller_lease.py')
+@@ -116,7 +120,7 @@
+         raise ValueError('installed controller differs from inspected baseline')
+     if digest(repo / 'src/controller.py') != BASELINE_CONTROLLER:
+         raise ValueError('release attempts to change existing controller')
+-    reviewed_recent = (OPERATOR_ACCEPTED_RELEASE, PERSISTENT_NATIVE_RELEASE, CALLABLE_INTAKE_MILESTONE, PLAYABILITY_MILESTONE)
++    reviewed_recent = (INSPECTED_20261022_RELEASE, OPERATOR_ACCEPTED_RELEASE, PERSISTENT_NATIVE_RELEASE, CALLABLE_INTAKE_MILESTONE, PLAYABILITY_MILESTONE)
+     installed_pair = {n: digest(arcade / n) if (arcade / n).is_file() else None for n in PERSISTENT_NATIVE_RELEASE}
+     if installed_pair['launcher.py'] in {r['launcher.py'] for r in reviewed_recent} and installed_pair not in reviewed_recent:
+         raise ValueError('installed baseline module pair is mixed or changed; preserve and review')
+@@ -181,7 +185,7 @@
+         protected = protected_manifest(arcade)
+         preserved = None
+         installed_pair = {n: digest(arcade / n) if (arcade / n).is_file() else None for n in OPERATOR_ACCEPTED_RELEASE}
+-        recent = (OPERATOR_ACCEPTED_RELEASE, PERSISTENT_NATIVE_RELEASE, CALLABLE_INTAKE_MILESTONE, PLAYABILITY_MILESTONE)
++        recent = (INSPECTED_20261022_RELEASE, OPERATOR_ACCEPTED_RELEASE, PERSISTENT_NATIVE_RELEASE, CALLABLE_INTAKE_MILESTONE, PLAYABILITY_MILESTONE)
+         candidate_pair = {n: digest(repo / 'src' / n) for n in OPERATOR_ACCEPTED_RELEASE}
+         if installed_pair in recent or installed_pair == candidate_pair:
+             from preflight_playable_library import inspect
+--- a/scripts/preflight_playable_library.py
++++ b/scripts/preflight_playable_library.py
+@@ -11,7 +11,7 @@
+ REPO = Path(__file__).resolve().parents[1]
+ sys.path.insert(0, str(REPO / 'src'))
+ from rom_intake import Catalog, digest, fingerprint, HISTORICAL_XEVIOUS
+-from install_rom_intake import BASELINE_ROMS, BASELINE_CONTROLLER, OPERATOR_ACCEPTED_RELEASE, protected_manifest, run
++from install_rom_intake import BASELINE_ROMS, BASELINE_CONTROLLER, INSPECTED_20261022_RELEASE, OPERATOR_ACCEPTED_RELEASE, protected_manifest, run
+ 
+ NATIVE_MEMBERS = {
+     **{name: dict(hash=h, artifact_hash=h) for name, h in BASELINE_ROMS.items()},
+@@ -159,14 +159,18 @@
+     if head.returncode or head.stdout.strip() != args.expected_commit or dirty.returncode or dirty.stdout:
+         parser.error('expected exact clean pinned checkout')
+     arcade = Path.home() / 'arcade'
++    installed_pair = {n: digest(arcade / n) if (arcade / n).is_file() else None
++                      for n in OPERATOR_ACCEPTED_RELEASE}
+     expected_modules = ({n: digest(REPO / 'src' / n) for n in OPERATOR_ACCEPTED_RELEASE}
+-                        if args.installed_candidate else OPERATOR_ACCEPTED_RELEASE)
++                        if args.installed_candidate else
++                        INSPECTED_20261022_RELEASE if installed_pair == INSPECTED_20261022_RELEASE
++                        else OPERATOR_ACCEPTED_RELEASE)
+     if args.installed_candidate:
+         expected_modules['controller_lease.py'] = digest(REPO / 'src/controller_lease.py')
+     for name, h in {**expected_modules, 'controller.py': BASELINE_CONTROLLER}.items():
+         p = arcade / name
+         if p.is_symlink() or not p.is_file() or digest(p) != h:
+-            parser.error('installed module differs from reviewed d09f4dbe/candidate: ' + name)
++            parser.error('installed module differs from reviewed baseline/candidate: ' + name)
+     service = run(['systemctl', 'is-active', 'charlie-arcade.service'])
+     emulator = run(['pgrep', '-x', 'retroarch'])
+     if (emulator.returncode != 1 or service.returncode not in {0, 3} or
+--- a/tests/test_install_rom_intake.py
++++ b/tests/test_install_rom_intake.py
+@@ -182,6 +182,25 @@
+             with self.assertRaisesRegex(ValueError, 'module pair'):
+                 installer.preflight(self.release, self.arcade, self.sha)
+ 
++    def test_inspected_20261022_pair_preserves_evidence_and_rejects_mixing(self):
++        import preflight_playable_library as preflight
++        (self.arcade / 'launcher.py').write_bytes(b'inspected October 22 launcher')
++        (self.arcade / 'rom_intake.py').write_bytes(b'inspected October 22 intake')
++        hashes = {n: digest(self.arcade / n) for n in ('launcher.py', 'rom_intake.py')}
++        with patch.dict(installer.INSPECTED_20261022_RELEASE, hashes), \
++             patch.object(preflight, 'inspect', return_value={'retained': 'evidence'}) as inspect, \
++             patch.object(preflight, 'compare_preserved') as compare:
++            self.assertTrue(installer.preflight(self.release, self.arcade, self.sha))
++            (self.arcade / 'rom_intake.py').write_bytes(b'mixed release')
++            with self.assertRaisesRegex(ValueError, 'module pair'):
++                installer.preflight(self.release, self.arcade, self.sha)
++            (self.arcade / 'rom_intake.py').write_bytes(b'inspected October 22 intake')
++            report = installer.install(self.release, self.arcade, self.sha)
++            self.assertTrue(report['persistent_evidence_preserved'])
++            self.assertFalse(report['service_started'])
++            compare.assert_called_once_with({'retained': 'evidence'}, {'retained': 'evidence'})
++            self.assertGreaterEqual(inspect.call_count, 4)
++
+     def test_manifest_preserves_session_logs_provenance_and_kept_runtime(self):
+         for path in ('rom-intake/sessions/example/retroarch.log',
+                      'rom-intake/sessions/example/provenance.json',

@@ -80,7 +80,9 @@ def test_monitoring_failure_stops_owned_process_without_retry(tmp_path,monkeypat
     children=[];stopped=[]
     class Child:
         pid=100;returncode=None
-        def __init__(self,*a,**kw):children.append(self)
+        def __init__(self,*a,**kw):
+            assert kw['env']['CHARLIE_CONTROLLER_LEASE'] == 'required'
+            children.append(self)
         def poll(self):return self.returncode
     monkeypatch.setattr(runner.subprocess,'Popen',Child)
     def stop(child):stopped.append(child);child.returncode=-2;return True

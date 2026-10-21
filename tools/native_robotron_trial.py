@@ -169,6 +169,9 @@ def main():
     if args.learned_policy:command+=['--learned-policy',str(args.learned_policy.resolve())]
     # Prevent an ambient policy/semantic selection from contradicting the freeze.
     env=os.environ.copy()
+    # Required server capability; renewal happens in gameplay execute(), never
+    # in this independent monitor, so frozen workers lose their controller lease.
+    env['CHARLIE_CONTROLLER_LEASE']='required'
     env.pop('CHARLIE_LEARNING_STATE',None)
     identity=dict(revision=revision,command=command,policy=policy_identity,
                   policy_file_sha256=checksum(args.learned_policy) if args.learned_policy else None,

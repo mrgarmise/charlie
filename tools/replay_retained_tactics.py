@@ -48,13 +48,13 @@ def predictions(path, identifiers):
             raise ValueError('source changed during replay')
 
 
-def evaluate(expected, memory):
+def evaluate(expected, memory, policy=None):
     w = expected['observed_world']
     objects = lambda key: tuple(Object(str(o['id']), Position(*o['position'])) for o in w.get(key, []))
     world = WorldState(w['tick'], Position(*w['player']), objects('targets'),
                        objects('threats'), unresolved=objects('unresolved'),
                        alive=w.get('alive', True), observation_safe=w.get('observation_safe', True))
-    brain = Hindbrain(tactical_learning=True, tactical_memory=memory)
+    brain = Hindbrain(tactical_learning=True, tactical_memory=memory, policy=policy)
     intent, action = brain.decide(world, Goal(**expected['goal']))
     return dict(intent=asdict(intent), action=asdict(action), plan=brain.tactical_plan)
 

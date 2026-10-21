@@ -1,3 +1,11 @@
+> **2026-10-21 authority update:** [Standing operator authorization](../../OPERATOR_GAMEPLAY_AUTHORIZATION.md)
+> now covers ordinary Robotron gameplay and qualified adaptations until revoked.
+> The historical separate-approval instructions below are preserved as the prior
+> runbook; they do not require renewed permission within that grant. Host safety,
+> phase review and independent technical qualification remain mandatory. These
+> old baseline commands do not select a newly qualified learning attachment;
+> see [current integration status](../experience-action-20261021/README.md).
+
 # Separate operator trial — prepared, not executed
 
 No command in the physical-trial sections below is authorized by the software

@@ -1,0 +1,112 @@
+[
+  {
+    "path": "/home/five/Projects/charlie",
+    "head": "bb40d02d3a128706e204cfd8e636fb1a9c5fd21b",
+    "status": [
+      "?? head2_sessions/",
+      "?? robotron-evidence/"
+    ]
+  },
+  {
+    "path": "/home/five/charlie-agency-recovery",
+    "head": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+    "status": [
+      " M experiments/ppal/play_robotron.py",
+      " M experiments/ppal/preflight.py",
+      " M experiments/ppal/robotron_agency.py",
+      " M tests/test_ppal_agency.py",
+      " M tests/test_robotron_agency_integration.py",
+      "?? tests/test_agency_recovery_boundaries.py"
+    ]
+  },
+  {
+    "path": "/home/five/charlie-ala2-bae659f60b0e",
+    "head": "6ba21fb9b56e492a85bf3b7fc2e9b5fb63ab9789",
+    "status": [
+      "?? ala2-readiness.json",
+      "?? ala2-regression.txt"
+    ]
+  },
+  {
+    "path": "/home/five/charlie-ala2-recovery-20261019",
+    "head": "365bc84ca7f2b02cde94a3f604b2f957bb66a6f9",
+    "status": []
+  },
+  {
+    "path": "/home/five/charlie-best-of-v0.1.0",
+    "head": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+    "status": []
+  },
+  {
+    "path": "/home/five/charlie-camera-calibration",
+    "head": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+    "status": [
+      " M experiments/ppal/preflight.py",
+      "?? experiments/ppal/preflight.py.before-fixed-focus"
+    ]
+  },
+  {
+    "path": "/home/five/charlie-closed-loop-validation",
+    "head": "d74d7a620c39104ce58fb2c9551381543a66b5f2",
+    "status": []
+  },
+  {
+    "path": "/home/five/charlie-e1-probe",
+    "head": "9152ee0c71df95f8aaeafe34cc923f5372681dcd",
+    "status": [
+      "?? audit/"
+    ]
+  },
+  {
+    "path": "/home/five/charlie-fast-self-validation",
+    "head": "73169db9ad2648ca7e4088979d22905900052c6a",
+    "status": []
+  },
+  {
+    "path": "/home/five/charlie-learning-loop-validation",
+    "head": "72b3ce5a42f74fa41d8e25a50805636efeca7ea9",
+    "status": []
+  },
+  {
+    "path": "/home/five/charlie-marathon-audit-20261020",
+    "head": "f43bb2be17d8d687683f35edda86d0b8734f7f59",
+    "status": []
+  },
+  {
+    "path": "/home/five/charlie-marathon-camera-lifecycle",
+    "head": "9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+    "status": []
+  },
+  {
+    "path": "/home/five/charlie-native-integration-20261020",
+    "head": "5608bd6cbfe639f4a0a789ffa27d7198519f44be",
+    "status": [
+      " M docs/validation/native-integration-20261021/OPERATOR.md",
+      " M experiments/ppal/hindbrain.py",
+      " M experiments/ppal/play_robotron.py",
+      " M experiments/ppal/qualified_policy.py",
+      " M experiments/ppal/tactical_memory.py",
+      " M learning/policy.py",
+      " M tests/test_qualified_ppal_policy.py",
+      " M tools/replay_retained_tactics.py",
+      "?? docs/OPERATOR_GAMEPLAY_AUTHORIZATION.md",
+      "?? docs/validation/experience-action-20261021/",
+      "?? tools/replay_experience_action.py"
+    ]
+  },
+  {
+    "path": "/home/five/charlie-progress-watchdog",
+    "head": "3723132e0a7643d24b7670c202aba0f4a1acee12",
+    "status": []
+  },
+  {
+    "path": "/home/five/charlie-restart-recovery",
+    "head": "a785c9f745bd0645dd01ac70af3beb5a8d44d37b",
+    "status": []
+  },
+  {
+    "path": "/home/five/charlie-terminal-restart",
+    "head": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+    "status": []
+  }
+]

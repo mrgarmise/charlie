@@ -132,6 +132,8 @@ class Hindbrain:
                     valuation=dict(signed_support=preference((a,e))[0],
                                    samples_used=preference((a,e))[1])) for a,e in remembered],
                 applied_to_physical_action=False,
+                qualified_positioning_policy=(self.policy.trace(self._applied)
+                    if self.policy and getattr(self.policy, 'tactical_memory', None) is self.tactical_memory else None),
                 interpretation='retained response valuation, not a qualified tactical or score policy')
         return intent,selected
 

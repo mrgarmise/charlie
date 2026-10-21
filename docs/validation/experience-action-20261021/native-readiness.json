@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-21T21:40:20.143605+00:00",
+  "scope": "read-only sandbox visibility; not authoritative host ownership",
+  "devices": [],
+  "pid1": "codex",
+  "disk_free_bytes": 872017543168,
+  "throttled": {
+    "returncode": 255,
+    "stdout": "Can't open device file: /dev/vcio_gencmd\n",
+    "stderr": ""
+  },
+  "services": {
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "Failed to connect to system scope bus via local transport: Operation not permitted (consider using --machine=<user>@.host --user to connect to bus of other user)\n"
+  },
+  "cpu_temperature_millidegrees": "54000",
+  "tcp_socket": {
+    "error": "[Errno 1] Operation not permitted",
+    "errno": 1
+  },
+  "physical_trial": "BLOCKED: host ownership, independent stop/release, throttling unavailable; no arming"
+}

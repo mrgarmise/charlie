@@ -592,7 +592,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
     from .policy_loading import load_startup_policy
     policy,policy_error=load_startup_policy(args.learned_policy,physical=args.arm)
     forebrain = Forebrain(policy=policy)
-    hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire,policy=policy,tactical_learning=True)
+    hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire,policy=policy,tactical_learning=True,
+                          tactical_memory=policy.tactical_memory if policy else None)
     shadow_forebrain = Forebrain()
     shadow_hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
     shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)

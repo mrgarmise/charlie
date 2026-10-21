@@ -2,7 +2,8 @@
 
 This is evidence collection, not a qualified live strategy or score learner.
 Only confirmed same-track, completed response windows enter this artifact.
-The existing controller and safety decisions never consult it for actuation.
+Raw ledgers never authorize actuation. A frozen attachment may supply bounded
+positioning tie breaks only after existing independent policy qualification.
 """
 from __future__ import annotations
 
@@ -122,3 +123,51 @@ class TacticalDiagnosticMemory:
                     evidence_ids=[r["evidence_id"] for r in selected],
                     eligible_for_physical_activation=False,
                     interpretation="retained same-track diagnostics; session origins are not independent game certificates")
+
+
+def positioning_spec(memory):
+    """Freeze response valuations for independent candidate evaluation.
+
+    This engineering adapter is not a Charlie proposal or deployment grant.
+    Signed response supports movement attribution, not survival/score utility.
+    Existing geometric route/clearance ranks still precede these tie breaks.
+    """
+    rows = [dict(row) for row in memory.rows]
+    values = {}
+    for move in sorted(MOVES):
+        selected = [row for row in rows if row['move'] == move]
+        if len({row['episode'] for row in selected}) < 2:
+            continue
+        values[move] = sum(1 if row['result'] == 'supported' else -1
+                           for row in selected) / len(selected)
+    if not values:
+        raise ValueError('repeated retained response origins required')
+    evidence = dict(schema=SCHEMA, outcomes=rows)
+    return dict(adapter='decision-parameters-v1',
+                parameters=dict(positioning_preference=values),
+                retained_tactics=dict(evidence=evidence,
+                    sha256=sha256(_canonical(evidence).encode()).hexdigest()))
+
+
+def memory_from_spec(spec):
+    """Validate a frozen evidence attachment without filesystem access."""
+    attachment = spec['retained_tactics']
+    if not isinstance(attachment, dict) or set(attachment) != {'evidence', 'sha256'}:
+        raise ValueError('invalid retained tactics attachment')
+    evidence = attachment['evidence']
+    if (not isinstance(evidence, dict) or set(evidence) != {'schema', 'outcomes'}
+            or evidence['schema'] != SCHEMA or not isinstance(evidence['outcomes'], list)
+            or not 1 <= len(evidence['outcomes']) <= MAX_ROWS
+            or any(not TacticalDiagnosticMemory._valid_row(row) for row in evidence['outcomes'])
+            or sha256(_canonical(evidence).encode()).hexdigest() != attachment['sha256']):
+        raise ValueError('invalid retained tactics evidence/integrity')
+    identities = [(row['episode'], row['prediction_id']) for row in evidence['outcomes']]
+    if len(set(identities)) != len(identities):
+        raise ValueError('duplicate retained tactics identity')
+    # Construct an in-memory snapshot; never open or write a ledger in decisions.
+    memory = object.__new__(TacticalDiagnosticMemory)
+    memory.path = None
+    memory.rows = [dict(row) for row in evidence['outcomes']]
+    if positioning_spec(memory) != spec:
+        raise ValueError('retained response values differ from frozen experience')
+    return memory

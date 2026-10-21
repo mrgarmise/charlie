@@ -1,0 +1,206 @@
+[
+  {
+    "path": "experiments/ppal/inspect_robotron_score.py",
+    "git_blob": "466f0a613256b3fde4364c2675546c2f08adbac5",
+    "downloaded_blob": "466f0a613256b3fde4364c2675546c2f08adbac5",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/__init__.py",
+    "git_blob": "df551077c25a658d6f64c9907b92991239c6af59",
+    "downloaded_blob": "df551077c25a658d6f64c9907b92991239c6af59",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/attest_reviews.py",
+    "git_blob": "12b9a9834f0053123da89b9b341019bfbcfe998b",
+    "downloaded_blob": "12b9a9834f0053123da89b9b341019bfbcfe998b",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/backends.py",
+    "git_blob": "659c6ae3d48056770fc2456c5cde88cb22a5699a",
+    "downloaded_blob": "659c6ae3d48056770fc2456c5cde88cb22a5699a",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/benchmark.py",
+    "git_blob": "8426b7a948b35e8e735290fb42d89dd022c8842a",
+    "downloaded_blob": "8426b7a948b35e8e735290fb42d89dd022c8842a",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/cli.py",
+    "git_blob": "8953bdfc9513d0f3504bc697666603881dadf8e1",
+    "downloaded_blob": "8953bdfc9513d0f3504bc697666603881dadf8e1",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/compile.py",
+    "git_blob": "387ba6b39505345530c34ad9f611c1f4cda133ec",
+    "downloaded_blob": "387ba6b39505345530c34ad9f611c1f4cda133ec",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/contract.py",
+    "git_blob": "cef511e3b5696841d1dea048ed8d1f0b022353ee",
+    "downloaded_blob": "cef511e3b5696841d1dea048ed8d1f0b022353ee",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/corpus.py",
+    "git_blob": "36c4458a39f2a939e47ababab832934bab121f72",
+    "downloaded_blob": "36c4458a39f2a939e47ababab832934bab121f72",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/diagnose.py",
+    "git_blob": "96c8e9ff0b804c39f54f283a6f087e88bfdbe513",
+    "downloaded_blob": "96c8e9ff0b804c39f54f283a6f087e88bfdbe513",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/evaluate.py",
+    "git_blob": "7ac0d1b96fd4b426e67a09a9379fe48860ae8d14",
+    "downloaded_blob": "7ac0d1b96fd4b426e67a09a9379fe48860ae8d14",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/export_reviews.py",
+    "git_blob": "c2a9b67dbc4ad89e2832dd67ba5766470930eab9",
+    "downloaded_blob": "c2a9b67dbc4ad89e2832dd67ba5766470930eab9",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/model.py",
+    "git_blob": "19505f73f0f929d67a6ebc6e5c83ee85b8be59cd",
+    "downloaded_blob": "19505f73f0f929d67a6ebc6e5c83ee85b8be59cd",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/reader.py",
+    "git_blob": "dabc5c7f8a8b415e27580ab8296fadb60f4dfbb5",
+    "downloaded_blob": "dabc5c7f8a8b415e27580ab8296fadb60f4dfbb5",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/sample.py",
+    "git_blob": "a4a6c76b06f35661d5693f255f2831e1ecc20811",
+    "downloaded_blob": "a4a6c76b06f35661d5693f255f2831e1ecc20811",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/neural_score/train.py",
+    "git_blob": "0ebdfe5c91c9591622f86a605cd4988828eb91d0",
+    "downloaded_blob": "0ebdfe5c91c9591622f86a605cd4988828eb91d0",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/robotron_score_system.py",
+    "git_blob": "7ba33bca6d614b58d0d9304c7cbe44fcb255ffbb",
+    "downloaded_blob": "7ba33bca6d614b58d0d9304c7cbe44fcb255ffbb",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/score-review.html",
+    "git_blob": "8eb36d8a1e295bf7aa8c1b857c7a055fa04f7dae",
+    "downloaded_blob": "8eb36d8a1e295bf7aa8c1b857c7a055fa04f7dae",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/score_digits.py",
+    "git_blob": "349074744d2d4430e1763aef90e566a27b0301b1",
+    "downloaded_blob": "349074744d2d4430e1763aef90e566a27b0301b1",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/score_feedback.py",
+    "git_blob": "6511e3c53d45d69512ce099750745ac2efd26a29",
+    "downloaded_blob": "6511e3c53d45d69512ce099750745ac2efd26a29",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/score_observer.py",
+    "git_blob": "383709b2f041e17ce172e6faf3469fe5fdc43b40",
+    "downloaded_blob": "383709b2f041e17ce172e6faf3469fe5fdc43b40",
+    "verified": true
+  },
+  {
+    "path": "experiments/ppal/score_review_attestation.py",
+    "git_blob": "99d65f4bb7d85bc798f645a80b970c2adab5e1c9",
+    "downloaded_blob": "99d65f4bb7d85bc798f645a80b970c2adab5e1c9",
+    "verified": true
+  },
+  {
+    "path": "requirements-neural-score.txt",
+    "git_blob": "1f0fd75174d9d5a58a21a78b67a7023ca11c97a6",
+    "downloaded_blob": "1f0fd75174d9d5a58a21a78b67a7023ca11c97a6",
+    "verified": true
+  },
+  {
+    "path": "tests/test_neural_score.py",
+    "git_blob": "a5ec6fb32a975a14ae06a4d58c4b25c13ac9715e",
+    "downloaded_blob": "a5ec6fb32a975a14ae06a4d58c4b25c13ac9715e",
+    "verified": true
+  },
+  {
+    "path": "tests/test_neural_score_sampler.py",
+    "git_blob": "90e8281a5d036bef7c107a589f7f5188110d3cea",
+    "downloaded_blob": "90e8281a5d036bef7c107a589f7f5188110d3cea",
+    "verified": true
+  },
+  {
+    "path": "tests/test_score_archive_recovery.py",
+    "git_blob": "0c8c1f14654ec24c9e92b764b74475dafea9b1e5",
+    "downloaded_blob": "0c8c1f14654ec24c9e92b764b74475dafea9b1e5",
+    "verified": true
+  },
+  {
+    "path": "tests/test_score_crop_diagnostics.py",
+    "git_blob": "638516b6024857974e006f7f083748bb59a5f533",
+    "downloaded_blob": "638516b6024857974e006f7f083748bb59a5f533",
+    "verified": true
+  },
+  {
+    "path": "tests/test_score_feedback_recovery.py",
+    "git_blob": "f98354510cf9174c78a82b32e9279c304c9a349f",
+    "downloaded_blob": "f98354510cf9174c78a82b32e9279c304c9a349f",
+    "verified": true
+  },
+  {
+    "path": "tests/test_score_review_frontend.py",
+    "git_blob": "b508b4f9fc00c5ac4d0628aff2b322c1c78f7e33",
+    "downloaded_blob": "b508b4f9fc00c5ac4d0628aff2b322c1c78f7e33",
+    "verified": true
+  },
+  {
+    "path": "tests/test_score_review_navigation.py",
+    "git_blob": "976d029fa36055fd07be51100ae9cea397217d2b",
+    "downloaded_blob": "976d029fa36055fd07be51100ae9cea397217d2b",
+    "verified": true
+  },
+  {
+    "path": "tools/bundle_score_crop_diagnostics.py",
+    "git_blob": "37dde6ec990bd6f4133ba717d48fa61cf6f97419",
+    "downloaded_blob": "37dde6ec990bd6f4133ba717d48fa61cf6f97419",
+    "verified": true
+  },
+  {
+    "path": "tools/recover_score_review_evidence.py",
+    "git_blob": "0a1d454ece6a5d6b6ec32285473c8a186556af0e",
+    "downloaded_blob": "0a1d454ece6a5d6b6ec32285473c8a186556af0e",
+    "verified": true
+  },
+  {
+    "path": "tools/score_alignment_experiment.py",
+    "git_blob": "92852fde9581a2ab4eff4f56f441f7036ba37f3b",
+    "downloaded_blob": "92852fde9581a2ab4eff4f56f441f7036ba37f3b",
+    "verified": true
+  },
+  {
+    "path": "tools/train_score_to_hef.py",
+    "git_blob": "fb08ecb7de59e782fe268ae73ff8b5a7abcac5d0",
+    "downloaded_blob": "fb08ecb7de59e782fe268ae73ff8b5a7abcac5d0",
+    "verified": true
+  }
+]

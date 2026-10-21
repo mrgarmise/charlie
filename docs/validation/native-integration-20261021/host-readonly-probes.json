@@ -1,0 +1,23 @@
+{
+  "/proc/device-tree/model": "Raspberry Pi 5 Model B Rev 1.0",
+  "/etc/hostname": "charlie",
+  "pytest": "not in system interpreter; see runtime probe",
+  "Pillow": "11.1.0",
+  "numpy": "2.2.4",
+  "opencv-python": "not in system interpreter; see runtime probe",
+  "picamera2": "0.3.37",
+  "torch": "not in system interpreter; see runtime probe",
+  "onnx": "not in system interpreter; see runtime probe",
+  "onnxruntime": "not in system interpreter; see runtime probe",
+  "hailort": "4.23.0",
+  "systemctl list-units --type=service --state=running --no-pager": {
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "Failed to connect to system scope bus via local transport: Operation not permitted (consider using --machine=<user>@.host --user to connect to bus of other user)\n"
+  },
+  "vcgencmd get_throttled": {
+    "returncode": 255,
+    "stdout": "Can't open device file: /dev/vcio_gencmd\n",
+    "stderr": ""
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "actual_after_reload_score": 1.5,
+  "alternatives": 19,
+  "before_score": 2.0000000000000004,
+  "goal": "The unresolved question may recur in independent experience: score_reader_review_uncertainty",
+  "independent_new_experiment": false,
+  "interpretation": "authentic retained investigation changed actual later evaluation; controlled replay is not an independent trial",
+  "physical_actions": 0,
+  "project_id": "08b0e92fa61c9db86e50557e04a092748d1bdd5664adf8d634f6926c5cf1e696",
+  "question_scope": "recurrence of score-reader review uncertainty; no explanation of reading errors",
+  "resolution_id": "99697ab53914ee39fdb8f1cbb557cd7131cdfc781a803babf465d69949da31d5",
+  "same_opportunity_set": true,
+  "schema": "ala2-executive-native-fresh-process-v1",
+  "scoped_ablated_score": 2.0000000000000004,
+  "source_checkpoint_sequence": 4158
+}

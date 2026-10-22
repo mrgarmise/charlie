@@ -1,0 +1,21 @@
+{
+  "starting_remote_head": "e2f265cdbafaa231722f2f90bb3a4f9da469e1bd",
+  "files": {
+    "experiments/ppal/hindbrain.py": "74bdcee272de4fa896e4f4ec0ff53837e1d25d4a051f1aeecce222af777d2ed8",
+    "experiments/ppal/play_robotron.py": "d250e0012dfcdb6ad01e73bf2396717a2f3019a333a859de528411c08770cdaa",
+    "experiments/ppal/qualified_policy.py": "25b657f9d189e768a9484bb92feabf026b8ad2f7ee382cbbdaa5b7f7613db86f",
+    "experiments/ppal/tactical_memory.py": "c04db02670878e230bef2da7d1e2efecbc492df21d05a52b29248f61afba2868",
+    "learning/policy.py": "15b010cbf46bb9598b0bf4151201c8bf11749e623deb934de8eeb0252e192813",
+    "tests/test_qualified_ppal_policy.py": "07905e55977e6ef690c66e2902ba8dd121ba27dbd5bed0a21331d77553e38ed7",
+    "tools/replay_retained_tactics.py": "cb1434387e8cb1693c418c471d504cb18852f6f5110f9ce2bc49cb57318abc80",
+    "tools/replay_experience_action.py": "570fdb6e138cff4bae7bf4f068d848e427fb7447164f0425a5ecaa7d4fa290ad",
+    "tests/test_buffered_recording.py": "0f696f1cbd8d423616d8a5691f4f6b5be47376717df6d3703e31fe024703a349",
+    "tests/test_robotron_agency_integration.py": "9d15ee646f2d9b79690efe196a8dc3dd92cdc89d827733384802e83036af8c69",
+    "tests/test_native_integration_contracts.py": "8d157e98a910d6e18a1e298ef44e54c4dd83361d236bb74d86cd1b15152c8df4",
+    "tests/test_recording_handoff.py": "c3717025f268ec459ecdcbe189671d08e746a13035bdf70ef93f7ae9cde5be8d",
+    "tests/test_recording_benchmark.py": "67fa46a41c68647afd58345408070401a0b1d6811d1639c648b7a6048d32fbc2",
+    "tools/native_robotron_trial.py": "344d49eb120001a9f037b6467b8d0fb7548988710551499b58eb941f2b19c5fb",
+    "tests/test_native_robotron_trial.py": "fef03fc391e67136c5edc5549f783b41f5fe47d5b52b573770e2654c397ecda6"
+  },
+  "runtime_sha256": "855df7cc8eee21504db9cfa6f0aec6337c32ee8ff29a6b2975f10d0c05fd9243"
+}

@@ -10,8 +10,8 @@ from .score_tracker import VisualScoreTracker, DualScoreTracker
 
 class RobotronScoreSystem:
     def __init__(self, calibration, *, log_path: Path | None = None,
-                 self_channel: int | None = 1, confirm_baseline: bool = False) -> None:
-        self.reader = RobotronHUDReader(calibration)
+                 self_channel: int | None = 1, confirm_baseline: bool = False, reader=None) -> None:
+        self.reader = reader if reader is not None else RobotronHUDReader(calibration)
         self.tracker = VisualScoreTracker(self.reader, DualScoreTracker(self_channel=self_channel,
                                                 confirm_baseline=confirm_baseline))
         self.log = ScoreEventLog(log_path) if log_path is not None else None
@@ -24,7 +24,9 @@ class RobotronScoreSystem:
     def set_self_channel(self, player: int | None) -> None:
         self.tracker.set_self_channel(player)
 
-    def observe(self, raw_frame, *, t: float):
+    def observe(self, raw_frame, *, t: float, source=None):
+        if hasattr(self.reader, "bind_source"):
+            self.reader.bind_source(t=t, source=source)
         self.latest = self.tracker.observe(raw_frame)
         if self.log is not None:
             self.log.append(t=t, channels=self.latest)

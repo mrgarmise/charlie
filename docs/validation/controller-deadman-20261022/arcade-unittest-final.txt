@@ -1,0 +1,401 @@
+test_empty_stored_inventory_does_not_rescan_on_entry (test_callable_intake.CallableIntakeTests.test_empty_stored_inventory_does_not_rescan_on_entry) ... ok
+test_explicit_raw_xbox_refresh_discovers_added_upload_once (test_callable_intake.CallableIntakeTests.test_explicit_raw_xbox_refresh_discovers_added_upload_once) ... ok
+test_mutation_reads_sessions_without_discovery_or_worker_request (test_callable_intake.CallableIntakeTests.test_mutation_reads_sessions_without_discovery_or_worker_request) ... ok
+test_startup_and_thousand_idle_wakeups_never_initialize_or_request_intake (test_callable_intake.CallableIntakeTests.test_startup_and_thousand_idle_wakeups_never_initialize_or_request_intake) ... ok
+test_stored_intake_opens_without_metadata_or_discovery (test_callable_intake.CallableIntakeTests.test_stored_intake_opens_without_metadata_or_discovery) ... ok
+test_any_client_neutral_is_safe_and_repeated (test_controller_lease.LeaseTests.test_any_client_neutral_is_safe_and_repeated) ... ok
+test_concurrent_clients_cannot_renew_change_or_disconnect_owner (test_controller_lease.LeaseTests.test_concurrent_clients_cannot_renew_change_or_disconnect_owner) ... ok
+test_explicit_renewal_preserves_controls_without_neutral (test_controller_lease.LeaseTests.test_explicit_renewal_preserves_controls_without_neutral) ... ok
+test_invalid_traffic_does_not_renew_and_expiry_requires_reconnect (test_controller_lease.LeaseTests.test_invalid_traffic_does_not_renew_and_expiry_requires_reconnect) ... ok
+test_legacy_commands_and_exact_deadline (test_controller_lease.LeaseTests.test_legacy_commands_and_exact_deadline) ... ok
+test_neutral_failure_inhibits_commands_and_retries (test_controller_lease.LeaseTests.test_neutral_failure_inhibits_commands_and_retries) ... ok
+test_simultaneous_claims_have_exactly_one_owner (test_controller_lease.LeaseTests.test_simultaneous_claims_have_exactly_one_owner) ... ok
+test_tap_keeps_normal_timing (test_controller_lease.LeaseTests.test_tap_keeps_normal_timing) ... ok
+test_frozen_real_charlie_client_releases_with_socket_still_open (test_controller_lease.WorkerTests.test_frozen_real_charlie_client_releases_with_socket_still_open) ... ok
+test_stalled_open_socket_and_partial_line_release (test_controller_lease.WorkerTests.test_stalled_open_socket_and_partial_line_release) ... ok
+test_worker_disconnect_and_nonowner_disconnect (test_controller_lease.WorkerTests.test_worker_disconnect_and_nonowner_disconnect) ... ok
+test_worker_renewal_then_neutral_from_other_client (test_controller_lease.WorkerTests.test_worker_renewal_then_neutral_from_other_client) ... ok
+test_concurrent_user_requests_fail_without_writing_or_replacing_preference (test_display_control.ConcurrencyTests.test_concurrent_user_requests_fail_without_writing_or_replacing_preference) ... ok
+test_ambiguous_no_connected_and_non_hdmi_fail_closed (test_display_control.DRMTests.test_ambiguous_no_connected_and_non_hdmi_fail_closed) ... ok
+test_backend_library_and_permissions_failures_are_testable (test_display_control.DRMTests.test_backend_library_and_permissions_failures_are_testable) ... ok
+test_dynamic_connector_id_exact_names_and_unrelated_connectors_unchanged (test_display_control.DRMTests.test_dynamic_connector_id_exact_names_and_unrelated_connectors_unchanged) ... ok
+test_full_charlie_repeated_and_unchanged_no_writes (test_display_control.DRMTests.test_full_charlie_repeated_and_unchanged_no_writes) ... ok
+test_missing_case_mismatch_readonly_and_incompatible_ranges (test_display_control.DRMTests.test_missing_case_mismatch_readonly_and_incompatible_ranges) ... ok
+test_partial_update_rolls_back_every_property (test_display_control.DRMTests.test_partial_update_rolls_back_every_property) ... ok
+test_permission_error_reported_and_previous_state_verified (test_display_control.DRMTests.test_permission_error_reported_and_previous_state_verified) ... ok
+test_rollback_failure_reports_actual_mixed_state (test_display_control.DRMTests.test_rollback_failure_reports_actual_mixed_state) ... ok
+test_silent_write_failure_detected_by_readback (test_display_control.DRMTests.test_silent_write_failure_detected_by_readback) ... ok
+test_unavailable_or_corrupt_read_never_writes (test_display_control.DRMTests.test_unavailable_or_corrupt_read_never_writes) ... ok
+test_real_ffi_discovery_atomic_flag_read_write_and_free (test_display_control.LibDRMABITests.test_real_ffi_discovery_atomic_flag_read_write_and_free) ... ok
+test_real_ffi_null_connector_is_explicit_error (test_display_control.LibDRMABITests.test_real_ffi_null_connector_is_explicit_error) ... ok
+test_real_ffi_partial_permission_failure_and_rollback (test_display_control.LibDRMABITests.test_real_ffi_partial_permission_failure_and_rollback) ... ok
+test_active_game_blocks_changes_and_guide_back_remains_stop_only (test_display_control.MenuTests.test_active_game_blocks_changes_and_guide_back_remains_stop_only) ... ok
+test_empty_library_display_and_intake_remain_reachable (test_display_control.MenuTests.test_empty_library_display_and_intake_remain_reachable) ... ok
+test_intake_action_library_player_and_network_preserved (test_display_control.MenuTests.test_intake_action_library_player_and_network_preserved) ... ok
+test_physical_xbox_navigation_selection_repeated_switch_and_wrap (test_display_control.MenuTests.test_physical_xbox_navigation_selection_repeated_switch_and_wrap) ... ok
+test_verified_and_failed_labels_are_visible_on_display_page (test_display_control.MenuTests.test_verified_and_failed_labels_are_visible_on_display_page) ... ok
+test_boolean_measurements_cannot_be_verified (test_display_control.PreferenceTests.test_boolean_measurements_cannot_be_verified) ... ok
+test_corrupt_and_unsupported_configs_default_safely_preserving_original (test_display_control.PreferenceTests.test_corrupt_and_unsupported_configs_default_safely_preserving_original) ... ok
+test_failed_switch_not_saved_and_rollback_reported (test_display_control.PreferenceTests.test_failed_switch_not_saved_and_rollback_reported) ... ok
+test_helper_permission_failure_and_invalid_json_are_graceful (test_display_control.PreferenceTests.test_helper_permission_failure_and_invalid_json_are_graceful) ... ok
+test_helper_rejects_false_success_and_does_not_use_shell (test_display_control.PreferenceTests.test_helper_rejects_false_success_and_does_not_use_shell) ... ok
+test_missing_defaults_full_and_saved_charlie_restores_on_restart (test_display_control.PreferenceTests.test_missing_defaults_full_and_saved_charlie_restores_on_restart) ... ok
+test_persistence_failure_restores_previous_verified_display (test_display_control.PreferenceTests.test_persistence_failure_restores_previous_verified_display) ... ok
+test_recovery_full_overwrites_corrupt_preference_after_verification (test_display_control.PreferenceTests.test_recovery_full_overwrites_corrupt_preference_after_verification) ... ok
+test_transient_startup_failure_preserves_valid_preference (test_display_control.PreferenceTests.test_transient_startup_failure_preserves_valid_preference) ... ok
+test_normal_launcher_startup_restores_default_or_saved_preference (test_display_control.StartupIntegrationTests.test_normal_launcher_startup_restores_default_or_saved_preference) ... ok
+test_atomic_file_replacement_and_restore_only_affected_files (test_display_installation.InstallationTests.test_atomic_file_replacement_and_restore_only_affected_files) ... ok
+test_guarded_install_backs_up_and_restores_on_failure_without_data_changes (test_display_installation.InstallationTests.test_guarded_install_backs_up_and_restores_on_failure_without_data_changes) ... ok
+test_installer_requires_authorization_and_refuses_wrong_hardware (test_display_installation.InstallationTests.test_installer_requires_authorization_and_refuses_wrong_hardware) ... usage: install [-h] --expected-commit EXPECTED_COMMIT
+               --native-report NATIVE_REPORT [--authorized-install]
+install: error: explicit user installation authorization required
+usage: install [-h] --expected-commit EXPECTED_COMMIT
+               --native-report NATIVE_REPORT [--authorized-install]
+install: error: root installer on ARMv6 charlie-arcade only
+ok
+test_native_gate_requires_exact_revision_every_check_and_matching_log (test_display_installation.InstallationTests.test_native_gate_requires_exact_revision_every_check_and_matching_log) ... ok
+test_native_runner_refuses_host_before_any_command (test_display_installation.InstallationTests.test_native_runner_refuses_host_before_any_command) ... usage: validate [-h] --expected-commit EXPECTED_COMMIT --report REPORT
+validate: error: only native ARMv6 charlie-arcade
+ok
+test_recovery_verification_rejects_partial_invalid_and_boolean_values (test_display_installation.InstallationTests.test_recovery_verification_rejects_partial_invalid_and_boolean_values) ... ok
+test_running_service_or_emulator_refuses_installation (test_display_installation.InstallationTests.test_running_service_or_emulator_refuses_installation) ... ok
+test_sudoers_only_three_exact_commands_no_shell_or_wildcards (test_display_installation.InstallationTests.test_sudoers_only_three_exact_commands_no_shell_or_wildcards) ... ok
+test_connected_connector_is_discovered_without_fixed_id_or_delay (test_hdmi_readiness.HDMIReadinessTests.test_connected_connector_is_discovered_without_fixed_id_or_delay) ... ok
+test_disconnected_or_missing_status_fails_after_exactly_thirty_checks (test_hdmi_readiness.HDMIReadinessTests.test_disconnected_or_missing_status_fails_after_exactly_thirty_checks) ... ok
+test_dropin_is_separate_from_unchanged_controller_permissions (test_hdmi_readiness.HDMIReadinessTests.test_dropin_is_separate_from_unchanged_controller_permissions) ... ok
+test_late_connector_readiness_allows_start (test_hdmi_readiness.HDMIReadinessTests.test_late_connector_readiness_allows_start) ... ok
+test_rollback_accepts_original_four_target_and_new_five_target_manifests (test_hdmi_readiness.HDMIReadinessTests.test_rollback_accepts_original_four_target_and_new_five_target_manifests) ... ok
+test_admission_database_failure_is_restart_safe_after_artifact_publication (test_historical_xevious.HistoricalXeviousTests.test_admission_database_failure_is_restart_safe_after_artifact_publication) ... ok
+test_admission_io_failure_keeps_original_pass_and_restart_retry (test_historical_xevious.HistoricalXeviousTests.test_admission_io_failure_keeps_original_pass_and_restart_retry) ... ok
+test_cfg_exception_is_not_available_to_ordinary_admission (test_historical_xevious.HistoricalXeviousTests.test_cfg_exception_is_not_available_to_ordinary_admission) ... ok
+test_changed_proof_between_review_and_confirm_refuses (test_historical_xevious.HistoricalXeviousTests.test_changed_proof_between_review_and_confirm_refuses) ... ok
+test_changed_source_artifact_and_pinned_hash_refuse (test_historical_xevious.HistoricalXeviousTests.test_changed_source_artifact_and_pinned_hash_refuse) ... ok
+test_existing_pass_recovers_without_replay_or_historical_rewrite (test_historical_xevious.HistoricalXeviousTests.test_existing_pass_recovers_without_replay_or_historical_rewrite) ... ok
+test_missing_pass_bad_startup_and_changed_provenance_refuse (test_historical_xevious.HistoricalXeviousTests.test_missing_pass_bad_startup_and_changed_provenance_refuse) ... ok
+test_native_preflight_main_checks_states_and_never_starts_anything (test_historical_xevious.HistoricalXeviousTests.test_native_preflight_main_checks_states_and_never_starts_anything) ... ok
+test_production_native_hash_pins_are_exact (test_historical_xevious.HistoricalXeviousTests.test_production_native_hash_pins_are_exact) ... ok
+test_raw_xbox_cancel_first_recovery_commits_existing_pass_without_new_trial (test_historical_xevious.HistoricalXeviousTests.test_raw_xbox_cancel_first_recovery_commits_existing_pass_without_new_trial) ... ok
+test_readonly_native_shape_preflight_validates_without_verdict_or_admission (test_historical_xevious.HistoricalXeviousTests.test_readonly_native_shape_preflight_validates_without_verdict_or_admission) ... ok
+test_timing_load_failure_and_logged_paths_refuse (test_historical_xevious.HistoricalXeviousTests.test_timing_load_failure_and_logged_paths_refuse) ... ok
+test_unexplained_drift_and_changed_cfg_refuse_recovery (test_historical_xevious.HistoricalXeviousTests.test_unexplained_drift_and_changed_cfg_refuse_recovery) ... ok
+test_active_service_and_live_emulator_refuse_before_writes (test_install_rom_intake.InstallTests.test_active_service_and_live_emulator_refuse_before_writes) ... ok
+test_c360_upgrade_requires_exact_module_pair_and_three_member_preflight (test_install_rom_intake.InstallTests.test_c360_upgrade_requires_exact_module_pair_and_three_member_preflight) ... ok
+test_catalog_readers_prevent_upgrade_exclusive_lock (test_install_rom_intake.InstallTests.test_catalog_readers_prevent_upgrade_exclusive_lock) ... ok
+test_failed_upgrade_restores_modules_and_keeps_failure_evidence (test_install_rom_intake.InstallTests.test_failed_upgrade_restores_modules_and_keeps_failure_evidence) ... ok
+test_inspected_20261022_pair_preserves_evidence_and_rejects_mixing (test_install_rom_intake.InstallTests.test_inspected_20261022_pair_preserves_evidence_and_rejects_mixing) ... /usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679da80>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679d4e0>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679f100>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:799: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679f1f0>
+  def __setattr__(self, name, value):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_manifest_preserves_session_logs_provenance_and_kept_runtime (test_install_rom_intake.InstallTests.test_manifest_preserves_session_logs_provenance_and_kept_runtime) ... ok
+test_native_recovery_predecessor_allowlist_remains_exact (test_install_rom_intake.InstallTests.test_native_recovery_predecessor_allowlist_remains_exact) ... ok
+test_native_validated_upgrade_requires_existing_baseline_pass_authority (test_install_rom_intake.InstallTests.test_native_validated_upgrade_requires_existing_baseline_pass_authority) ... /usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679f1f0>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679f100>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679e980>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679f010>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_pi5_wrong_sha_dirty_checkout_and_changed_launcher_refuse (test_install_rom_intake.InstallTests.test_pi5_wrong_sha_dirty_checkout_and_changed_launcher_refuse) ... ok
+test_reviewed_predecessor_upgrade_preserves_existing_evidence (test_install_rom_intake.InstallTests.test_reviewed_predecessor_upgrade_preserves_existing_evidence) ... ok
+test_stopped_upgrade_preserves_all_protected_files_and_ready_library (test_install_rom_intake.InstallTests.test_stopped_upgrade_preserves_all_protected_files_and_ready_library) ... /usr/lib/python3.13/unittest/mock.py:2247: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679eb60>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_real_command_parser_without_device_activation (test_launcher_intake.ControllerProtocolTests.test_real_command_parser_without_device_activation) ... ok
+test_background_refresh_failure_retains_evidence_and_can_retry (test_launcher_intake.LauncherTests.test_background_refresh_failure_retains_evidence_and_can_retry) ... ok
+test_confirmation_rejects_environment_drift (test_launcher_intake.LauncherTests.test_confirmation_rejects_environment_drift) ... ok
+test_discovery_and_queue_do_not_launch_or_create_controller (test_launcher_intake.LauncherTests.test_discovery_and_queue_do_not_launch_or_create_controller) ... ok
+test_existing_player_selection_and_controller_protocol_preserved (test_launcher_intake.LauncherTests.test_existing_player_selection_and_controller_protocol_preserved) ... /usr/lib/python3.13/unittest/mock.py:2596: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679f1f0>
+  return tuple.__new__(cls, (name, args, kwargs))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/unittest/mock.py:2596: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679f010>
+  return tuple.__new__(cls, (name, args, kwargs))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_human_failure_and_launch_exception_leave_library_empty (test_launcher_intake.LauncherTests.test_human_failure_and_launch_exception_leave_library_empty) ... SUPERVISED ROM QUALIFICATION AS ALEX
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_initial_repeat_and_old_screen_events_cannot_confirm (test_launcher_intake.LauncherTests.test_initial_repeat_and_old_screen_events_cannot_confirm) ... ok
+test_large_archive_background_audit_progress_and_navigation (test_launcher_intake.LauncherTests.test_large_archive_background_audit_progress_and_navigation) ... ok
+test_launch_rechecks_receipt_before_mocked_popen (test_launcher_intake.LauncherTests.test_launch_rechecks_receipt_before_mocked_popen) ... ok
+test_legacy_network_menu_actions_cannot_enter_or_operate_queue (test_launcher_intake.LauncherTests.test_legacy_network_menu_actions_cannot_enter_or_operate_queue) ... ok
+test_mocked_qualification_full_launcher_path_and_human_pass (test_launcher_intake.LauncherTests.test_mocked_qualification_full_launcher_path_and_human_pass) ... SUPERVISED ROM QUALIFICATION AS ALEX
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_network_actions_cannot_confirm_and_cannot_open_intake_entry (test_launcher_intake.LauncherTests.test_network_actions_cannot_confirm_and_cannot_open_intake_entry) ... ok
+test_operator_screens_show_xbox_help_and_cancel_first_review (test_launcher_intake.LauncherTests.test_operator_screens_show_xbox_help_and_cancel_first_review) ... ok
+test_queue_visible_in_normal_launcher_empty_library_no_modulo_error (test_launcher_intake.LauncherTests.test_queue_visible_in_normal_launcher_empty_library_no_modulo_error) ... ok
+test_raw_worker_routes_physical_events_and_ignores_virtual_device (test_launcher_intake.LauncherTests.test_raw_worker_routes_physical_events_and_ignores_virtual_device) ... ok
+test_repeated_and_stale_xbox_rescan_events_do_not_refresh (test_launcher_intake.LauncherTests.test_repeated_and_stale_xbox_rescan_events_do_not_refresh) ... ok
+test_slow_background_archive_audit_does_not_block_xbox_navigation (test_launcher_intake.LauncherTests.test_slow_background_archive_audit_does_not_block_xbox_navigation) ... ok
+test_slow_large_archive_hash_still_audits_with_responsive_xbox (test_launcher_intake.LauncherTests.test_slow_large_archive_hash_still_audits_with_responsive_xbox) ... ok
+test_stop_finishes_session_once_and_preserves_verdict_prompt (test_launcher_intake.LauncherTests.test_stop_finishes_session_once_and_preserves_verdict_prompt) ... SUPERVISED ROM QUALIFICATION AS ALEX
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_wire_replies_only_ok_or_error_and_disconnect_neutral (test_launcher_intake.LauncherTests.test_wire_replies_only_ok_or_error_and_disconnect_neutral) ... ok
+test_xbox_ambiguous_identity_requires_verified_choice_and_confirmation (test_launcher_intake.LauncherTests.test_xbox_ambiguous_identity_requires_verified_choice_and_confirmation) ... ok
+test_xbox_bios_approval_is_deliberate_and_never_playable (test_launcher_intake.LauncherTests.test_xbox_bios_approval_is_deliberate_and_never_playable) ... ok
+test_xbox_confirmation_defaults_cancel_and_back_never_records_verdict (test_launcher_intake.LauncherTests.test_xbox_confirmation_defaults_cancel_and_back_never_records_verdict) ... ok
+test_xbox_diagnostic_target_review_network_block_and_explicit_keep (test_launcher_intake.LauncherTests.test_xbox_diagnostic_target_review_network_block_and_explicit_keep) ... TRY REVIEWED TARGET — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_xbox_document_normalization_trial_pass_and_baseline_preservation (test_launcher_intake.LauncherTests.test_xbox_document_normalization_trial_pass_and_baseline_preservation) ... SUPERVISED ROM QUALIFICATION AS ALEX
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_xbox_failed_verdict_survives_restart_and_library_return (test_launcher_intake.LauncherTests.test_xbox_failed_verdict_survives_restart_and_library_return) ... ok
+test_xbox_only_menu_inspection_trial_confirmation_verdict_return (test_launcher_intake.LauncherTests.test_xbox_only_menu_inspection_trial_confirmation_verdict_return) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_xbox_unresolved_identity_and_missing_dependencies_review (test_launcher_intake.LauncherTests.test_xbox_unresolved_identity_and_missing_dependencies_review) ... ok
+test_native_binary_extras_require_retained_diagnostic_only_review (test_native_manifest.NativeManifestTests.test_native_binary_extras_require_retained_diagnostic_only_review) ... ok
+test_native_duplicated_names_remain_one_content_hash_and_no_forced_alias (test_native_manifest.NativeManifestTests.test_native_duplicated_names_remain_one_content_hash_and_no_forced_alias) ... ok
+test_native_manifest_unchanged_diagnosis_is_cached_without_weaker_gates (test_native_manifest.NativeManifestTests.test_native_manifest_unchanged_diagnosis_is_cached_without_weaker_gates) ... ok
+test_native_missing_revisions_parent_and_bios_cannot_gain_trial_eligibility (test_native_manifest.NativeManifestTests.test_native_missing_revisions_parent_and_bios_cannot_gain_trial_eligibility) ... ok
+test_native_uncertain_manifests_offer_only_nonqualifying_attempts (test_native_manifest.NativeManifestTests.test_native_uncertain_manifests_offer_only_nonqualifying_attempts) ... ok
+test_native_xevious_mappy_berzerk1_have_unique_document_review_path (test_native_manifest.NativeManifestTests.test_native_xevious_mappy_berzerk1_have_unique_document_review_path) ... ok
+test_actual_launch_health_failure_survives_nonhashing_redraw (test_operator_feedback.OperatorFeedbackTests.test_actual_launch_health_failure_survives_nonhashing_redraw) ... ========================================
+            CHARLIE ARCADE
+========================================
+
+ Starting Test game as ALEX...
+
+ Xbox: GUIDE + BACK returns to menu
+
+ok
+test_bios_even_successful_direct_attempt_cannot_be_kept (test_operator_feedback.OperatorFeedbackTests.test_bios_even_successful_direct_attempt_cannot_be_kept) ... ok
+test_bios_only_primary_has_no_try_or_keep (test_operator_feedback.OperatorFeedbackTests.test_bios_only_primary_has_no_try_or_keep) ... ok
+test_blocking_modal_rejects_actions_and_unwinds_after_failure (test_operator_feedback.OperatorFeedbackTests.test_blocking_modal_rejects_actions_and_unwinds_after_failure) ... ok
+test_changed_dependency_cannot_be_staged_from_cached_receipt (test_operator_feedback.OperatorFeedbackTests.test_changed_dependency_cannot_be_staged_from_cached_receipt) ... ok
+test_complete_clone_explains_parent_is_not_required (test_operator_feedback.OperatorFeedbackTests.test_complete_clone_explains_parent_is_not_required) ... ok
+test_diagnosis_reports_member_crc_size_and_real_load_failure (test_operator_feedback.OperatorFeedbackTests.test_diagnosis_reports_member_crc_size_and_real_load_failure) ... ok
+test_leaving_reviewed_and_reentering_refilters_to_review_without_scan (test_operator_feedback.OperatorFeedbackTests.test_leaving_reviewed_and_reentering_refilters_to_review_without_scan) ... ok
+test_library_management_preserves_full_reviewed_inventory (test_operator_feedback.OperatorFeedbackTests.test_library_management_preserves_full_reviewed_inventory) ... ok
+test_paging_and_selected_content_survive_queue_redraw (test_operator_feedback.OperatorFeedbackTests.test_paging_and_selected_content_survive_queue_redraw) ... ok
+test_refresh_is_nonmodal_and_friendly (test_operator_feedback.OperatorFeedbackTests.test_refresh_is_nonmodal_and_friendly) ... ok
+test_set_aside_parent_is_reported_and_staged_without_modification (test_operator_feedback.OperatorFeedbackTests.test_set_aside_parent_is_reported_and_staged_without_modification) ... ok
+test_unknown_failure_does_not_invent_reason (test_operator_feedback.OperatorFeedbackTests.test_unknown_failure_does_not_invent_reason) ... ok
+test_dont_keep_then_try_again_is_xbox_only_and_preserves_original (test_operator_keep.OperatorKeepTests.test_dont_keep_then_try_again_is_xbox_only_and_preserves_original) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_existing_diagnostic_pass_keeps_without_replay_or_reclassification (test_operator_keep.OperatorKeepTests.test_existing_diagnostic_pass_keeps_without_replay_or_reclassification) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_failed_launch_bookkeeping_terminates_started_mock_process (test_operator_keep.OperatorKeepTests.test_failed_launch_bookkeeping_terminates_started_mock_process) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_keep_held_initial_stale_network_rejected (test_operator_keep.OperatorKeepTests.test_keep_held_initial_stale_network_rejected) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_keep_never_overwrites_same_filename_existing_rom (test_operator_keep.OperatorKeepTests.test_keep_never_overwrites_same_filename_existing_rom) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_keep_publication_failure_keeps_pass_and_retries_after_restart (test_operator_keep.OperatorKeepTests.test_keep_publication_failure_keeps_pass_and_retries_after_restart) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_keep_requires_fresh_launch_artifact_source_and_provenance (test_operator_keep.OperatorKeepTests.test_keep_requires_fresh_launch_artifact_source_and_provenance) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_load_failure_crash_interruption_and_forced_abort_cannot_keep (test_operator_keep.OperatorKeepTests.test_load_failure_crash_interruption_and_forced_abort_cannot_keep) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_missing_metadata_explicit_refresh_try_keep_and_unchanged_cache (test_operator_keep.OperatorKeepTests.test_missing_metadata_explicit_refresh_try_keep_and_unchanged_cache) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_plain_begin_finish_cannot_manufacture_launch_authority (test_operator_keep.OperatorKeepTests.test_plain_begin_finish_cannot_manufacture_launch_authority) ... ok
+test_protected_names_cannot_keep_and_bytes_untouched (test_operator_keep.OperatorKeepTests.test_protected_names_cannot_keep_and_bytes_untouched) ... ok
+test_publication_rename_interruption_rejects_tampered_configuration (test_operator_keep.OperatorKeepTests.test_publication_rename_interruption_rejects_tampered_configuration) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_unknown_exact_artifact_keep_cancel_then_confirm_without_replay (test_operator_keep.OperatorKeepTests.test_unknown_exact_artifact_keep_cancel_then_confirm_without_replay) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+========================================
+            CHARLIE ARCADE
+========================================
+
+ Starting unknown.zip as ALEX...
+
+ Xbox: GUIDE + BACK returns to menu
+
+ok
+test_global_and_metadata_changes_never_revoke_admission (test_persistent_library.MembershipTests.test_global_and_metadata_changes_never_revoke_admission) ... ok
+test_management_transaction_rolls_back_on_audit_failure (test_persistent_library.MembershipTests.test_management_transaction_rolls_back_on_audit_failure) ... ok
+test_migration_uses_existing_admitted_pass_only_and_is_idempotent (test_persistent_library.MembershipTests.test_migration_uses_existing_admitted_pass_only_and_is_idempotent) ... ok
+test_missing_changed_restored_exact_artifact_keeps_membership (test_persistent_library.MembershipTests.test_missing_changed_restored_exact_artifact_keeps_membership) ... ok
+test_missing_pass_and_unadmitted_files_cannot_migrate (test_persistent_library.MembershipTests.test_missing_pass_and_unadmitted_files_cannot_migrate) ... ok
+test_normalized_rejection_blocks_source_and_artifact_but_not_other_hashes (test_persistent_library.MembershipTests.test_normalized_rejection_blocks_source_and_artifact_but_not_other_hashes) ... ok
+test_parent_hash_drift_blocks_launch_without_hiding_member (test_persistent_library.MembershipTests.test_parent_hash_drift_blocks_launch_without_hiding_member) ... ok
+test_remove_restore_block_reversal_preserve_all_evidence (test_persistent_library.MembershipTests.test_remove_restore_block_reversal_preserve_all_evidence) ... ok
+test_symlink_and_stat_cache_substitution_refused_by_fresh_launch_hash (test_persistent_library.MembershipTests.test_symlink_and_stat_cache_substitution_refused_by_fresh_launch_hash) ... ok
+test_failed_worker_initialization_keeps_library_responsive_and_cannot_stay_busy (test_persistent_library.XboxLibraryTests.test_failed_worker_initialization_keeps_library_responsive_and_cannot_stay_busy) ... ok
+test_normal_launch_exception_and_runtime_failure_retain_membership (test_persistent_library.XboxLibraryTests.test_normal_launch_exception_and_runtime_failure_retain_membership) ... ========================================
+            CHARLIE ARCADE
+========================================
+
+ Starting Test game as ALEX...
+
+ Xbox: GUIDE + BACK returns to menu
+
+ok
+test_protected_games_cannot_be_removed_or_blocked (test_persistent_library.XboxLibraryTests.test_protected_games_cannot_be_removed_or_blocked) ... ok
+test_startup_robotron_joust_renders_without_scan_hash_or_metadata (test_persistent_library.XboxLibraryTests.test_startup_robotron_joust_renders_without_scan_hash_or_metadata) ... ok
+test_worker_snapshots_cannot_blank_or_resurrect_removed_membership (test_persistent_library.XboxLibraryTests.test_worker_snapshots_cannot_blank_or_resurrect_removed_membership) ... ok
+test_xbox_block_cancel_stale_held_network_then_reverse (test_persistent_library.XboxLibraryTests.test_xbox_block_cancel_stale_held_network_then_reverse) ... ok
+test_xbox_remove_is_cancel_first_then_restore_and_protected_preservation (test_persistent_library.XboxLibraryTests.test_xbox_remove_is_cancel_first_then_restore_and_protected_preservation) ... ok
+test_changed_artifact_membership_pass_or_recovery_evidence_refuses (test_playable_preflight.PlayablePreflightTests.test_changed_artifact_membership_pass_or_recovery_evidence_refuses) ... ok
+test_readonly_preflight_preserves_evidence_and_does_not_recover_again (test_playable_preflight.PlayablePreflightTests.test_readonly_preflight_preserves_evidence_and_does_not_recover_again) ... ok
+test_three_admitted_games_render_without_metadata_replay_or_requalification (test_playable_preflight.PlayablePreflightTests.test_three_admitted_games_render_without_metadata_replay_or_requalification) ... ok
+test_completed_normalized_session_recovery_is_explicit_and_idempotent (test_qualification_recovery.ScopeTests.test_completed_normalized_session_recovery_is_explicit_and_idempotent) ... ok
+test_duplicate_suffix_is_not_forced_into_driver_identity (test_qualification_recovery.ScopeTests.test_duplicate_suffix_is_not_forced_into_driver_identity) ... ok
+test_incomplete_and_missing_bios_attempts_do_not_gain_eligibility (test_qualification_recovery.ScopeTests.test_incomplete_and_missing_bios_attempts_do_not_gain_eligibility) ... ok
+test_isolation_precreates_paths_and_preserves_sorted_mame_assignments (test_qualification_recovery.ScopeTests.test_isolation_precreates_paths_and_preserves_sorted_mame_assignments) ... ok
+test_legacy_flag_cannot_authorize_arbitrary_game_or_missing_pass (test_qualification_recovery.ScopeTests.test_legacy_flag_cannot_authorize_arbitrary_game_or_missing_pass) ... ok
+test_malformed_candidate_cannot_start_diagnostic_attempt (test_qualification_recovery.ScopeTests.test_malformed_candidate_cannot_start_diagnostic_attempt) ... ok
+test_native_manifest_attempts_are_additive_and_never_qualifying (test_qualification_recovery.ScopeTests.test_native_manifest_attempts_are_additive_and_never_qualifying) ... ok
+test_old_baselines_project_without_receipt_mutation_or_requalification (test_qualification_recovery.ScopeTests.test_old_baselines_project_without_receipt_mutation_or_requalification) ... ok
+test_pass_survives_io_admission_failure_and_idempotent_restart_retry (test_qualification_recovery.ScopeTests.test_pass_survives_io_admission_failure_and_idempotent_restart_retry) ... ok
+test_preflight_helper_has_no_authority_writes_and_reports_missing_native_proof (test_qualification_recovery.ScopeTests.test_preflight_helper_has_no_authority_writes_and_reports_missing_native_proof) ... ok
+test_readonly_scope_preflight_preserves_database_and_reports_readiness (test_qualification_recovery.ScopeTests.test_readonly_scope_preflight_preserves_database_and_reports_readiness) ... ok
+test_recovery_refuses_changed_original_and_load_failure_evidence (test_qualification_recovery.ScopeTests.test_recovery_refuses_changed_original_and_load_failure_evidence) ... ok
+test_recovery_refuses_changed_source_provenance_context_and_collision (test_qualification_recovery.ScopeTests.test_recovery_refuses_changed_source_provenance_context_and_collision) ... ok
+test_recovery_refuses_missing_or_changed_artifact_without_pass (test_qualification_recovery.ScopeTests.test_recovery_refuses_missing_or_changed_artifact_without_pass) ... ok
+test_relevant_changes_invalidate_receipt_but_never_membership (test_qualification_recovery.ScopeTests.test_relevant_changes_invalidate_receipt_but_never_membership) ... ok
+test_trial_without_seed_cfg_never_falls_back_to_normal_save_directory (test_qualification_recovery.ScopeTests.test_trial_without_seed_cfg_never_falls_back_to_normal_save_directory) ... ok
+test_uncertain_attempt_retains_all_members_and_never_admits_after_pass (test_qualification_recovery.ScopeTests.test_uncertain_attempt_retains_all_members_and_never_admits_after_pass) ... ok
+test_unrelated_overrides_and_remaps_are_scoped_but_own_are_not (test_qualification_recovery.ScopeTests.test_unrelated_overrides_and_remaps_are_scoped_but_own_are_not) ... ok
+test_confirmed_xbox_pass_survives_background_refresh_start (test_qualification_recovery.XboxRecoveryTests.test_confirmed_xbox_pass_survives_background_refresh_start) ... ok
+test_failed_refresh_retains_verified_snapshot_and_launch_rechecks (test_qualification_recovery.XboxRecoveryTests.test_failed_refresh_retains_verified_snapshot_and_launch_rechecks) ... ok
+test_raw_xbox_native_xevious_finished_session_shape_recovers_without_replay (test_qualification_recovery.XboxRecoveryTests.test_raw_xbox_native_xevious_finished_session_shape_recovers_without_replay) ... ok
+test_raw_xbox_pass_commits_despite_changed_catalog_context (test_qualification_recovery.XboxRecoveryTests.test_raw_xbox_pass_commits_despite_changed_catalog_context) ... ok
+test_stale_held_initial_and_network_events_cannot_record_recovery_pass (test_qualification_recovery.XboxRecoveryTests.test_stale_held_initial_and_network_events_cannot_record_recovery_pass) ... ok
+test_xbox_completed_trial_recovery_cancel_then_confirm_no_replay (test_qualification_recovery.XboxRecoveryTests.test_xbox_completed_trial_recovery_cancel_then_confirm_no_replay) ... ok
+test_xbox_uncertain_attempt_and_cancel_first_observation_workflow (test_qualification_recovery.XboxRecoveryTests.test_xbox_uncertain_attempt_and_cancel_first_observation_workflow) ... TRY IN RETROARCH — decide Keep after returning
+Check gameplay, controls, audio and acceptable speed.
+GUIDE + BACK stops the trial; verdict is recorded afterward.
+ok
+test_explicit_refresh_never_hashes_or_audits_admitted_rom (test_queue_experience.QueueExperienceTests.test_explicit_refresh_never_hashes_or_audits_admitted_rom) ... ok
+test_failed_trial_is_not_automatically_set_aside (test_queue_experience.QueueExperienceTests.test_failed_trial_is_not_automatically_set_aside) ... ok
+test_fresh_primary_has_no_legacy_controls_and_keep_requires_trial (test_queue_experience.QueueExperienceTests.test_fresh_primary_has_no_legacy_controls_and_keep_requires_trial) ... ok
+test_no_unchecked_and_x_legend_without_startup_hashing (test_queue_experience.QueueExperienceTests.test_no_unchecked_and_x_legend_without_startup_hashing) ... ok
+test_set_aside_shrinks_restart_alias_refresh_and_xbox_reconsider (test_queue_experience.QueueExperienceTests.test_set_aside_shrinks_restart_alias_refresh_and_xbox_reconsider) ... ok
+test_set_aside_stale_held_network_and_cancel_first (test_queue_experience.QueueExperienceTests.test_set_aside_stale_held_network_and_cancel_first) ... ok
+test_actual_guarded_install_preserves_six_members_and_history (test_refinement_handoff.RefinementHandoffTests.test_actual_guarded_install_preserves_six_members_and_history) ... ok
+test_comparison_rejects_missing_report_fields_and_lost_any_member (test_refinement_handoff.RefinementHandoffTests.test_comparison_rejects_missing_report_fields_and_lost_any_member) ... ok
+test_each_extra_game_artifact_is_checked (test_refinement_handoff.RefinementHandoffTests.test_each_extra_game_artifact_is_checked) ... ok
+test_four_members_and_discovered_berzerk_survive_schema_migration (test_refinement_handoff.RefinementHandoffTests.test_four_members_and_discovered_berzerk_survive_schema_migration) ... ok
+test_guarded_six_member_comparison_failure_rolls_back_and_preserves_evidence (test_refinement_handoff.RefinementHandoffTests.test_guarded_six_member_comparison_failure_rolls_back_and_preserves_evidence) ... /usr/lib/python3.13/json/encoder.py:252: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679eb60>
+  _iterencode = c_make_encoder(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/lib/python3.13/json/encoder.py:252: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679d4e0>
+  _iterencode = c_make_encoder(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_history_log_and_source_drift_are_detected_between_reports (test_refinement_handoff.RefinementHandoffTests.test_history_log_and_source_drift_are_detected_between_reports) ... ok
+test_installer_pin_is_exact_native_accepted_module_pair (test_refinement_handoff.RefinementHandoffTests.test_installer_pin_is_exact_native_accepted_module_pair) ... ok
+test_missing_or_changed_berzerk_refuses_handoff (test_refinement_handoff.RefinementHandoffTests.test_missing_or_changed_berzerk_refuses_handoff) ... ok
+test_own_recorded_dependencies_cannot_be_changed_or_removed_from_launch_record (test_refinement_handoff.RefinementHandoffTests.test_own_recorded_dependencies_cannot_be_changed_or_removed_from_launch_record) ... ok
+test_readonly_six_member_validation_ignores_metadata_and_later_settings (test_refinement_handoff.RefinementHandoffTests.test_readonly_six_member_validation_ignores_metadata_and_later_settings) ... /tmp/charlie-arcade-deadman/scripts/preflight_playable_library.py:97: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679d4e0>
+  history[table] = (sorted([dict(r) for r in cat.db.execute('SELECT * FROM ' + table)],
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/tmp/charlie-arcade-deadman/scripts/preflight_playable_library.py:97: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679eb60>
+  history[table] = (sorted([dict(r) for r in cat.db.execute('SELECT * FROM ' + table)],
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/tmp/charlie-arcade-deadman/scripts/preflight_playable_library.py:97: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679ec50>
+  history[table] = (sorted([dict(r) for r in cat.db.execute('SELECT * FROM ' + table)],
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/tmp/charlie-arcade-deadman/scripts/preflight_playable_library.py:97: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7ffec679e7a0>
+  history[table] = (sorted([dict(r) for r in cat.db.execute('SELECT * FROM ' + table)],
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_removed_ordinary_member_is_valid_and_all_disabled_evidence_is_preserved (test_refinement_handoff.RefinementHandoffTests.test_removed_ordinary_member_is_valid_and_all_disabled_evidence_is_preserved) ... ok
+test_six_dynamic_members_and_future_noncanonical_additions_need_no_game_list (test_refinement_handoff.RefinementHandoffTests.test_six_dynamic_members_and_future_noncanonical_additions_need_no_game_list) ... ok
+test_source_session_pass_and_provenance_binding_failures_are_rejected (test_refinement_handoff.RefinementHandoffTests.test_source_session_pass_and_provenance_binding_failures_are_rejected) ... ok
+test_tested_artifact_hash_is_distinct_from_source_when_recorded_normalized (test_refinement_handoff.RefinementHandoffTests.test_tested_artifact_hash_is_distinct_from_source_when_recorded_normalized) ... ok
+test_active_timer_and_operator_requests_coalesce_without_followup (test_refresh_runtime.RefreshTests.test_active_timer_and_operator_requests_coalesce_without_followup) ... ok
+test_actual_pre_audit_digest_runaway_hits_unchanged_production_budget (test_refresh_runtime.RefreshTests.test_actual_pre_audit_digest_runaway_hits_unchanged_production_budget) ... ok
+test_archive_cancellation_is_not_corruption (test_refresh_runtime.RefreshTests.test_archive_cancellation_is_not_corruption) ... ok
+test_authority_mutations_queue_only_one_followup (test_refresh_runtime.RefreshTests.test_authority_mutations_queue_only_one_followup) ... ok
+test_budget_interrupts_busy_work_with_durable_phase_evidence (test_refresh_runtime.RefreshTests.test_budget_interrupts_busy_work_with_durable_phase_evidence) ... ok
+test_changed_archive_and_duplicate_name_invalidate_once (test_refresh_runtime.RefreshTests.test_changed_archive_and_duplicate_name_invalidate_once) ... ok
+test_discovery_transaction_rolls_back_interruption_and_recovers (test_refresh_runtime.RefreshTests.test_discovery_transaction_rolls_back_interruption_and_recovers) ... ok
+test_environment_dependency_and_logical_authority_invalidate (test_refresh_runtime.RefreshTests.test_environment_dependency_and_logical_authority_invalidate) ... ok
+test_explicit_refresh_reloads_advisory_metadata_and_reuses_archive_audit (test_refresh_runtime.RefreshTests.test_explicit_refresh_reloads_advisory_metadata_and_reuses_archive_audit) ... ok
+test_finite_native_work_and_unchanged_pass_have_distinct_work_counts (test_refresh_runtime.RefreshTests.test_finite_native_work_and_unchanged_pass_have_distinct_work_counts) ... ok
+test_finite_slow_evidence_check_and_retry_use_production_budget (test_refresh_runtime.RefreshTests.test_finite_slow_evidence_check_and_retry_use_production_budget) ... ok
+test_scanner_outputs_and_diagnostics_do_not_retrigger_work (test_refresh_runtime.RefreshTests.test_scanner_outputs_and_diagnostics_do_not_retrigger_work) ... ok
+test_shutdown_interrupts_work_and_reopen_recovers (test_refresh_runtime.RefreshTests.test_shutdown_interrupts_work_and_reopen_recovers) ... ok
+test_uncatalogued_dependency_audit_is_cached_by_actual_hash (test_refresh_runtime.RefreshTests.test_uncatalogued_dependency_audit_is_cached_by_actual_hash) ... ok
+test_unchanged_discovery_does_not_rewrite_receipts (test_refresh_runtime.RefreshTests.test_unchanged_discovery_does_not_rewrite_receipts) ... ok
+test_unchanged_refresh_has_no_hash_audit_diagnosis_or_sql_writes (test_refresh_runtime.RefreshTests.test_unchanged_refresh_has_no_hash_audit_diagnosis_or_sql_writes) ... ok
+test_warm_input_check_reads_stats_and_rows_not_rom_payloads (test_refresh_runtime.RefreshTests.test_warm_input_check_reads_stats_and_rows_not_rom_payloads) ... ok
+test_ambiguous_shared_signature_needs_human_candidate_selection (test_rom_intake.IntakeTests.test_ambiguous_shared_signature_needs_human_candidate_selection) ... ok
+test_bad_crc_is_detected (test_rom_intake.IntakeTests.test_bad_crc_is_detected) ... ok
+test_binary_disguised_as_document_cannot_normalize_and_failure_is_durable (test_rom_intake.IntakeTests.test_binary_disguised_as_document_cannot_normalize_and_failure_is_durable) ... ok
+test_bios_can_be_installed_but_never_playable (test_rom_intake.IntakeTests.test_bios_can_be_installed_but_never_playable) ... ok
+test_bios_missing_signatures_and_redundant_binary_do_not_normalize (test_rom_intake.IntakeTests.test_bios_missing_signatures_and_redundant_binary_do_not_normalize) ... ok
+test_collision_never_overwrites_installed_rom (test_rom_intake.IntakeTests.test_collision_never_overwrites_installed_rom) ... ok
+test_completed_session_awaits_verdict_across_restart (test_rom_intake.IntakeTests.test_completed_session_awaits_verdict_across_restart) ... ok
+test_config_drift_during_session_pass_retained_but_not_admitted (test_rom_intake.IntakeTests.test_config_drift_during_session_pass_retained_but_not_admitted) ... ok
+test_dependency_change_preserves_clone_membership (test_rom_intake.IntakeTests.test_dependency_change_preserves_clone_membership) ... ok
+test_document_normalization_qualification_preserves_original_and_provenance (test_rom_intake.IntakeTests.test_document_normalization_qualification_preserves_original_and_provenance) ... ok
+test_duplicate_uploads_preserve_names_and_one_queue_item (test_rom_intake.IntakeTests.test_duplicate_uploads_preserve_names_and_one_queue_item) ... ok
+test_environment_changes_preserve_membership_and_wrong_rom_cannot_launch (test_rom_intake.IntakeTests.test_environment_changes_preserve_membership_and_wrong_rom_cannot_launch) ... ok
+test_existing_library_migration_preserves_original_bytes (test_rom_intake.IntakeTests.test_existing_library_migration_preserves_original_bytes) ... ok
+test_failed_human_verdict_excluded_after_restart (test_rom_intake.IntakeTests.test_failed_human_verdict_excluded_after_restart) ... ok
+test_interrupted_normalization_has_durable_session_and_cannot_auto_resume (test_rom_intake.IntakeTests.test_interrupted_normalization_has_durable_session_and_cannot_auto_resume) ... ok
+test_known_incompatibility_not_archive_error (test_rom_intake.IntakeTests.test_known_incompatibility_not_archive_error) ... ok
+test_launch_exception_durable (test_rom_intake.IntakeTests.test_launch_exception_durable) ... ok
+test_malformed_archive_is_separate_from_compatibility (test_rom_intake.IntakeTests.test_malformed_archive_is_separate_from_compatibility) ... ok
+test_missing_game_payload_cannot_use_normalization_or_diagnostic_bypass (test_rom_intake.IntakeTests.test_missing_game_payload_cannot_use_normalization_or_diagnostic_bypass) ... ok
+test_normalized_collision_and_missing_dependencies_remain_guarded (test_rom_intake.IntakeTests.test_normalized_collision_and_missing_dependencies_remain_guarded) ... ok
+test_parent_clone_distinct_and_missing_dependency (test_rom_intake.IntakeTests.test_parent_clone_distinct_and_missing_dependency) ... ok
+test_partial_and_filename_diagnosis_never_grant_identity (test_rom_intake.IntakeTests.test_partial_and_filename_diagnosis_never_grant_identity) ... ok
+test_read_access_time_change_does_not_hide_new_upload (test_rom_intake.IntakeTests.test_read_access_time_change_does_not_hide_new_upload) ... ok
+test_removed_upload_and_reused_filename_keep_history (test_rom_intake.IntakeTests.test_removed_upload_and_reused_filename_keep_history) ... ok
+test_running_session_interrupted_on_restart (test_rom_intake.IntakeTests.test_running_session_interrupted_on_restart) ... ok
+test_second_session_and_verdict_before_finish_rejected (test_rom_intake.IntakeTests.test_second_session_and_verdict_before_finish_rejected) ... ok
+test_standalone_clone_does_not_require_parent_archive (test_rom_intake.IntakeTests.test_standalone_clone_does_not_require_parent_archive) ... ok
+test_startup_failure_cannot_be_admitted_by_pass (test_rom_intake.IntakeTests.test_startup_failure_cannot_be_admitted_by_pass) ... ok
+test_unknown_binary_extra_retained_in_diagnostic_trial_and_never_admitted (test_rom_intake.IntakeTests.test_unknown_binary_extra_retained_in_diagnostic_trial_and_never_admitted) ... ok
+test_unknown_filename_and_known_hint_collision_are_distinct (test_rom_intake.IntakeTests.test_unknown_filename_and_known_hint_collision_are_distinct) ... ok
+test_unsafe_and_duplicate_members_rejected (test_rom_intake.IntakeTests.test_unsafe_and_duplicate_members_rejected) ... ok
+test_wrong_filename_never_forces_identity (test_rom_intake.IntakeTests.test_wrong_filename_never_forces_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 256 tests in 9.197s
+
+OK

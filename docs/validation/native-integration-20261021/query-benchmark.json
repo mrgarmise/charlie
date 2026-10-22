@@ -1,0 +1,21 @@
+{
+  "source_copy_sha256": "c87dcda9238bf89f1ef011d9d55a3d4878312f7b23d1d4846ec335b9e1916c22",
+  "read_only": true,
+  "original_untouched": true,
+  "rows": [
+    {
+      "category": "learning_context_reference",
+      "count": 45,
+      "ordered_ids_identical": true,
+      "old_seconds": 1.2837082410005678,
+      "category_seconds": 0.20100682399970538
+    },
+    {
+      "category": "normal_meditation_result",
+      "count": 45,
+      "ordered_ids_identical": true,
+      "old_seconds": 1.2693350560002727,
+      "category_seconds": 0.20228734800002712
+    }
+  ]
+}

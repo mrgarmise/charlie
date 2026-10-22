@@ -1,0 +1,53 @@
+{
+  "activated": false,
+  "changed_actions": 0,
+  "charlie_originated_proposal": false,
+  "contexts": 99,
+  "learning_state_sha256": "ce51ef5f2c2ce00fde58a8ae087dfc75fdea6e8e7264acb11f0b3e43786174fe",
+  "ledger_sha256": "5a9fdde534694216390e963df2bc5e66b4c5f6f2a0a6be1d7547baabeb70d77a",
+  "physical_actions": 0,
+  "qualification": "NOT QUALIFIED: engineering interface replay; no physical utility or I1 claim",
+  "runtime_sha256": "855df7cc8eee21504db9cfa6f0aec6337c32ee8ff29a6b2975f10d0c05fd9243",
+  "schema": "experience-action-engineering-ablation-v1",
+  "source_journals": [
+    {
+      "path": "/inputs/j0.sqlite3",
+      "sha256": "03f9afd3886b525097ea9cfa39d0231b01264a56810f6c9a93339db50ef7eaba"
+    },
+    {
+      "path": "/inputs/j1.sqlite3",
+      "sha256": "a57ef042b140b57cb1cbf61f0040ba488d1453dacd67c03acdab8cf922f294de"
+    },
+    {
+      "path": "/inputs/j2.sqlite3",
+      "sha256": "ee0ad9c21519f40917543133f2916074440b7c6d48fc922ccc2150dc96367f39"
+    },
+    {
+      "path": "/inputs/j3.sqlite3",
+      "sha256": "8eb31321bac4b96c13ad9780350650bc9d5844b75c11163a67d5ce534a70d38e"
+    },
+    {
+      "path": "/inputs/j4.sqlite3",
+      "sha256": "538dee3b84e130336b6aaf234780951cf918d6fc4fb5a71d3600afbba556109b"
+    },
+    {
+      "path": "/inputs/j5.sqlite3",
+      "sha256": "d26e3aff5208e14d214a782ad4f11964686c35e04414b60327a7420f208a447c"
+    }
+  ],
+  "fresh_processes_byte_identical": true,
+  "full_report_sha256": "6af64cd2dfe6e14b430a1cf1d9016173c16e204a6167feca1f6759d0e30a04d7",
+  "compiled_parameters": {
+    "positioning_preference": {
+      "E": 1.0,
+      "N": 1.0,
+      "NE": 0.8571428571428571,
+      "NW": 1.0,
+      "S": 1.0,
+      "SE": 1.0,
+      "SW": 1.0,
+      "W": 0.7647058823529411
+    }
+  },
+  "local_report": "/home/five/charlie-native-integration-evidence-20261020/experience-action-ablation-3.json"
+}

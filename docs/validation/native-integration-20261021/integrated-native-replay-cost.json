@@ -1,0 +1,73 @@
+{
+  "schema": "agency-engine-replay-cost-v1",
+  "authentic_new_experience": false,
+  "native": false,
+  "caveat": "CPU costs on archived pixels; hypothetical SELF/policy inputs are benchmark fixtures, not recovered identity",
+  "images": [
+    "docs/validation/agency-first-stream/baseline/raw-0003.png",
+    "docs/validation/agency-first-stream/baseline/raw-0004.png",
+    "docs/validation/agency-first-stream/baseline/raw-0005.png",
+    "docs/validation/agency-first-stream/baseline/raw-0006.png",
+    "docs/validation/agency-first-stream/baseline/raw-0007.png",
+    "docs/validation/agency-first-stream/baseline/raw-0008.png"
+  ],
+  "repeats": 4,
+  "stages": {
+    "image_decode": {
+      "samples": 24,
+      "median": 0.011160172000018065,
+      "p95": 0.01163074800024333,
+      "worst": 0.022942384000089078
+    },
+    "full_terminal_classifier": {
+      "samples": 24,
+      "median": 0.21209847599948262,
+      "p95": 0.22380515499935427,
+      "worst": 0.2250767649993577
+    },
+    "hypothetical_supported_SELF_screen": {
+      "samples": 24,
+      "median": 0.002438086999973166,
+      "p95": 0.0026656999998522224,
+      "worst": 0.0027357560002201353
+    },
+    "legacy_patch_classification": {
+      "samples": 24,
+      "median": 0.07741143699968234,
+      "p95": 0.09190842299994983,
+      "worst": 0.09805021299962391
+    },
+    "batched_detection_and_classification": {
+      "samples": 24,
+      "median": 0.07045095500052412,
+      "p95": 0.07215615000040998,
+      "worst": 0.07576985099967715
+    },
+    "class_free_detection": {
+      "samples": 24,
+      "median": 0.02312197599985666,
+      "p95": 0.023640552999495412,
+      "worst": 0.023789312999724643
+    },
+    "tracking_and_belief": {
+      "samples": 24,
+      "median": 0.002421476000563416,
+      "p95": 0.004287393999220512,
+      "worst": 0.004288412999812863
+    },
+    "hypothetical_existing_tactical_policy": {
+      "samples": 24,
+      "median": 7.024099977570586e-05,
+      "p95": 9.613000020181062e-05,
+      "worst": 0.00010161099999095313
+    }
+  },
+  "unmeasured": [
+    "native camera delivery",
+    "perspective correction on full raw pixels",
+    "controller response",
+    "complete-game performance",
+    "sustained native gameplay update rate"
+  ],
+  "original_trajectory_gates_unchanged": true
+}

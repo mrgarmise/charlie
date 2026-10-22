@@ -18,12 +18,22 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     from experiments.ppal import play_robotron as play
     import time as real_time
     real_sleep=real_time.sleep
+    # As in the two-game transition fixture, advance synthetic exposures only
+    # after prior evidence is durable. These tests qualify causal/state logic,
+    # not native writer throughput. Real overflow tests retain production limits.
+    from experiments.ppal import progress_evidence
+    real_recorder=progress_evidence.CaptureEvidence
+    recorders=[]
+    def recorder(*values,**options):
+        value=real_recorder(*values,**options);recorders.append(value);return value
+    monkeypatch.setattr(progress_evidence,'CaptureEvidence',recorder)
     start_read=[0]
     clock=[0.]; points=[(20.,20.),(50.,50.)]; commands=[]; closed=[]; reads=[0]
     image=Image.new('RGB',(100,100))
     pending = [None]; response_reads = [0]
     class Source:
         def read(self):
+            if recorders and not recorders[-1]._closed:recorders[-1].flush()
             real_sleep(.05)  # bounded 20 Hz host fixture; no native latency claim
             clock[0]+=1. if persistent else .01; reads[0]+=1
             if persistent and reads[0]>200:raise AssertionError('bounded simulated scene did not reach terminal')

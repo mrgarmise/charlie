@@ -241,6 +241,8 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
     doc={'schema':'charlie-developmental-marathon-v1','status':'running','games':[],
          'objective':'official_game_score','policy':'existing policy plus at most one explicit actuator experiment',
          'seed':str(args.seed_episode) if args.seed_episode else None}
+    doc['features'] = runtime_features(args)
+    print('RUNTIME FEATURES: '+json.dumps(doc['features'],sort_keys=True),flush=True)
     play_first=getattr(args,'play_first',False)
     doc['development_timing']='after_marathon' if play_first else 'between_games'
     doc['phase']='gameplay'
@@ -271,6 +273,9 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
         from . import play_robotron
         camera_session=CameraSession(play_robotron.PiCameraSource)
         def episode_driver(cmd, timeout):
+            nonlocal camera_session
+            if camera_session is None:
+                camera_session=CameraSession(play_robotron.PiCameraSource)
             try:
                 play_robotron.main(cmd[3:]+['--supervised-child'],
                     camera_session=camera_session,progress_path=progress_path)
@@ -352,6 +357,11 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             from .score_observer import ScoreObserver
             ScoreObserver.queue_game(commitments,game,session=session,number=index)
             rc=episode_driver(cmd,30.)
+            if getattr(args,'recovery_trial',False) and camera_session:
+                # Recovery processes eligible experience between games. Release
+                # the continuous producer before any offline investigation.
+                camera_session.close()
+                camera_session=None
             previous_game=game
             report=load_report(game/'report.json')
             from .progress_supervision import Progress
@@ -804,6 +814,49 @@ def meditate_session(session_dir, games):
     review_session(session_dir, games)
     print(f"MEDITATION COMPLETE: {p}")
 
+def recovery_resource_check(output):
+    """Reuse the existing supervisor poll hook and offline resource guard.
+
+    No host-wide process scan, background lease renewal, or automatic resumption.
+    A safety exception makes supervise() stop its owned child process group.
+    """
+    import shutil
+    from learning.resources import ResourceGuard, DevelopmentResources
+    guard=ResourceGuard(DevelopmentResources(require_thermal=True), owner=lambda:False)
+    checked=None
+    def check():
+        nonlocal checked
+        now=time.monotonic()
+        if checked is not None and now-checked<1.:return
+        guard.check(force=True)
+        flags=subprocess.check_output(['vcgencmd','get_throttled'],text=True,timeout=2).strip()
+        if not flags.startswith('throttled=') or int(flags.split('=',1)[1],16)!=0:
+            raise InterruptedError('native throttling telemetry invalid or flags set')
+        if shutil.disk_usage(output).free<2*1024**3:
+            raise InterruptedError('native evidence disk below 2 GiB')
+        with (output/'recovery-resources.jsonl').open('a') as stream:
+            stream.write(json.dumps(dict(guard.sample,at=time.time(),throttling=flags))+'\n')
+        checked=now
+    return check
+
+
+def runtime_features(args):
+    """Describe selected mechanisms, never imply qualified learning from flags."""
+    return dict(camera='continuous owner; fresh geometry; manual focus 2.0',
+        controller_lease='required' if __import__('os').environ.get('CHARLIE_CONTROLLER_LEASE')=='required' else 'not required by environment',
+        self='temporal visual and causal discovery; physical acceptance pending',
+        projectile_self=bool(getattr(args,'projectile_self',False)),
+        terminal_restart='independent completion and restart evidence required',
+        score='fixed reader; independent outcome verification required',
+        neural_score_hailo='inactive: no qualified reader wired into this player',
+        executive_projects=bool(getattr(args,'learning_projects',False)),
+        executive_experiments=bool(getattr(args,'developmental',False) and not getattr(args,'baseline_only',False)),
+        offline_ala_investigation=bool(getattr(args,'ala_learning',False)),
+        ppal_policy=str(getattr(args,'learned_policy',None) or 'existing policy; qualified retained-policy manifest absent'),
+        semantics=str(getattr(args,'learned_semantics',None) or 'inactive unless separately authorized qualified manifest supplied'),
+        learning_acceptance='E1/P1/I1 not established by this launch')
+
+
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--supervised-marathon',action='store_true',help=argparse.SUPPRESS)
@@ -824,6 +877,7 @@ def main():
     ap.add_argument("--root",type=Path,default=Path("robotron-runs"))
     ap.add_argument("--arm",action="store_true",help="required to send controls")
     ap.add_argument('--processing-budget',type=float,default=300.,help='offline work budget; failure stops marathon and retains partial evidence')
+    ap.add_argument('--recovery-trial',action='store_true',help='bounded 1..2-game integrated recovery; learning enabled, server lease required')
     ap.add_argument('--developmental',action='store_true',help='automatic between-game evidence-backed experiments; 3..5 attempts')
     ap.add_argument('--seed-episode',type=Path,help='optional prior episode to process before developmental game 1')
     ap.add_argument('--learning-projects',action='store_true',help='opt-in durable diagnostic project continuity between developmental games')
@@ -870,14 +924,21 @@ def main():
     single=a.single_observation and a.baseline_only and a.play_first and 1<=a.max_games<=2 and a.qualified_games==a.max_games
     if a.single_observation and not single:
         ap.error('--observation-block requires --baseline-only --play-first and matching max/qualified games in 1..2')
-    if a.developmental and not (3<=a.max_games<=5 or single):
+    recovery=a.recovery_trial and a.developmental and a.learning_projects and not a.baseline_only and not a.play_first and 1<=a.max_games<=2 and a.qualified_games==a.max_games
+    if a.recovery_trial and not recovery:
+        ap.error('--recovery-trial requires developmental learning projects, matching max/qualified games in 1..2, and between-game learning')
+    if recovery:
+        import os
+        os.environ['CHARLIE_CONTROLLER_LEASE']='required'
+    if a.developmental and not (3<=a.max_games<=5 or single or recovery):
         ap.error('developmental mode requires 3..5 bounded attempts')
     if not a.supervised_marathon:
         from .progress_supervision import supervise
         a.root.mkdir(parents=True,exist_ok=True)
         progress=a.root/('marathon-watchdog-'+stamp()+'.json')
         rc=supervise([sys.executable,'-m','experiments.ppal.marathon_robotron',*sys.argv[1:],
-            '--supervised-marathon','--marathon-progress',str(progress)],progress,processing=90.)
+            '--supervised-marathon','--marathon-progress',str(progress)],progress,processing=90.,
+            on_poll=recovery_resource_check(a.root) if recovery else None)
         final=load_report(progress) or {}
         if rc==0 and a.play_first and final.get('gameplay_finished'):
             session=Path(final['session'])
@@ -893,8 +954,9 @@ def main():
                 rc=2
         raise SystemExit(rc)
     if a.developmental:
-        if not (3<=a.max_games<=5 or single):ap.error('developmental mode requires 3..5 bounded attempts')
+        if not (3<=a.max_games<=5 or single or recovery):ap.error('developmental mode requires 3..5 bounded attempts')
         doc=developmental_marathon(a)
+        if recovery and (not doc.get('target_met') or doc.get('camera_cleanup_error') or doc.get('error')):raise SystemExit(2)
         if a.play_first and not single and not scheduled_learning(doc)['eligible']:raise SystemExit(2)
         return
     if a.seed_episode:ap.error('--seed-episode requires --developmental')

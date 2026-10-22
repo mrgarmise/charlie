@@ -1,0 +1,16 @@
+{
+  "schema": "charlie-terminal-replay-v1",
+  "qualification": "read-only diagnostic replay of one original episode; not new experience or native acceptance",
+  "physical_authorization": false,
+  "start_authorized": false,
+  "source_report_sha256": "6da3e3ad73aa0b877674961c4ebbd8342524e1fe7f2511efc345487c9ed98268",
+  "original_result": "OBSERVATION UNCERTAIN",
+  "original_episode_end": {
+    "state": "unknown",
+    "confirmed": false,
+    "evidence": null
+  },
+  "observations": 65,
+  "first_terminal_at": 15840.790938,
+  "source_capture_id": "capture:4b5feb18af64c2d54065b4dc45b005205dfdd3b6f043e2ba6892034e0b97f0b6"
+}

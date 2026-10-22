@@ -4,26 +4,34 @@ import json
 import queue
 import threading
 import time
+from collections import deque
 from .robotron_score_system import RobotronScoreSystem
 from .score_events import ScoreEventLog
 
 
 class ScoreObserver:
-    def __init__(self, calibration, path):
-        self.system = RobotronScoreSystem(calibration, self_channel=1, confirm_baseline=True)
+    def __init__(self, calibration, path, *, reader_factory=None):
+        self.closed = False
+        self.neural_enabled = reader_factory is not None
+        self.system = RobotronScoreSystem(calibration, self_channel=1, confirm_baseline=True,
+            reader=reader_factory(calibration) if reader_factory else None)
         self.log = ScoreEventLog(path)
         self.queue = queue.Queue(maxsize=2)
         self.dropped = 0
-        self.costs = []
+        self.costs = deque(maxlen=2048)
+        self.processed_samples = 0
+        self.processing_seconds_total = 0.
+        self.processing_seconds_max = 0.
         self.errors = 0
         self.frames = []
         self.latest_frame = None
         self.latest_gameplay_frame=None
         self.final_observation = None
         self.gameplay_report=None
-        self.gameplay_observations=[]
+        self.gameplay_observations=deque(maxlen=256)
         self.frozen_at=None
-        self.non_gameplay_system=RobotronScoreSystem(calibration,self_channel=1,confirm_baseline=True)
+        self.non_gameplay_system=RobotronScoreSystem(calibration,self_channel=1,confirm_baseline=True,
+            reader=reader_factory(calibration) if reader_factory else None)
         self.late_change_frames = 0
         self.omitted_change_frames = 0
         self.accepted_confidence = {1:None, 2:None}
@@ -33,18 +41,20 @@ class ScoreObserver:
     def reframe(self,calibration):
         # FIFO changes reader geometry between old/new observations. Preserve
         # game score history; a viewpoint change is not a new game/reset.
+        if self.closed:raise RuntimeError('score observer is closed')
         self.queue.put(('geometry',calibration),timeout=1.)
 
-    def submit(self, frame, *, timestamp, sample, preceding_action,observation_id=None,screen=None):
+    def submit(self, frame, *, timestamp, sample, preceding_action,observation_id=None,screen=None,capture_metadata=None):
         begin = time.monotonic()
-        if self.queue.full():
+        if self.closed or self.queue.full():
             self.dropped += 1
             return
         # Independent pixels: camera buffers may be reused by the next capture.
         try:
             copied = frame.copy()
             self.queue.put_nowait((copied, timestamp, sample, preceding_action,
-                                  time.monotonic()-begin,observation_id,screen))
+                                  time.monotonic()-begin,observation_id,screen,
+                                  dict(capture_metadata or {},enqueued_at=time.monotonic())))
         except Exception:
             self.errors += 1
 
@@ -58,14 +68,19 @@ class ScoreObserver:
                     self.system.reader.calibration=item[1]
                     self.non_gameplay_system.reader.calibration=item[1]
                     continue
-                frame, timestamp, sample, action, copy_seconds, observation_id, screen = item
-                eligible=(screen is None or (screen.get('phase')=='gameplay' and not screen.get('episode_retired')))
+                frame, timestamp, sample, action, copy_seconds, observation_id, screen, capture_metadata = item
+                eligible=((screen is None and not self.neural_enabled) or (screen is not None and screen.get('phase')=='gameplay' and not screen.get('episode_retired')))
                 if self.frozen_at is not None and timestamp>self.frozen_at:eligible=False
                 system=self.system if eligible else self.non_gameplay_system
                 begin = time.monotonic()
                 error = None
                 try:
-                    channels = system.observe(frame, t=timestamp)
+                    source=dict(capture_metadata,observation_id=observation_id,
+                        queue_wait_seconds=time.monotonic()-capture_metadata["enqueued_at"])
+                    if hasattr(system.reader,"bind_source"):
+                        channels = system.observe(frame, t=timestamp, source=source)
+                    else:
+                        channels = system.observe(frame, t=timestamp)
                 except Exception as exc:
                     self.errors += 1
                     error = f'{type(exc).__name__}: {exc}'
@@ -74,6 +89,9 @@ class ScoreObserver:
                     system.latest = channels
                 elapsed = time.monotonic()-begin
                 self.costs.append(elapsed)
+                self.processed_samples += 1
+                self.processing_seconds_total += elapsed
+                self.processing_seconds_max = max(self.processing_seconds_max, elapsed)
                 # Build the canonical score evidence without a second disk write.
                 row = self._row(channels, timestamp)
                 for player, observation in ((1, channels.player1), (2, channels.player2)):
@@ -94,7 +112,7 @@ class ScoreObserver:
                     self.omitted_change_frames += 1
                 row.update(sample=sample, timestamp=timestamp, preceding_action=action,observation_id=observation_id,
                            processing_seconds=elapsed, enqueue_copy_seconds=copy_seconds,
-                           error=error, reward_evidence=channels.self_delta,
+                           error=error, neural_score=getattr(system.reader,"last_packet",None), reward_evidence=channels.self_delta,
                            attribution='temporal_association_only',score_partition='gameplay' if eligible else 'non_gameplay',
                            screen=screen)
                 # The final image is retained at close even when this row did
@@ -108,7 +126,7 @@ class ScoreObserver:
                 if eligible:
                     self.final_observation=observation
                     self.gameplay_report=dict(self.system.report())
-                    self.gameplay_observations=(self.gameplay_observations+[(timestamp,self.gameplay_report,observation)])[-256:]
+                    self.gameplay_observations.append((timestamp,self.gameplay_report,observation))
                 with self.log.path.open('a', encoding='utf-8') as stream:
                     stream.write(json.dumps(row)+'\n')
                 for player, observation in ((1, channels.player1), (2, channels.player2)):
@@ -129,11 +147,17 @@ class ScoreObserver:
 
     def close(self):
         # Called only after camera and controls have closed.
+        if self.closed: return
+        self.closed = True
         try:
             self.queue.put(None, timeout=.1)
         except queue.Full:
-            return
+            try:
+                self.queue.get_nowait(); self.queue.task_done(); self.dropped += 1
+                self.queue.put_nowait(None)
+            except queue.Empty: self.queue.put_nowait(None)
         self.thread.join(timeout=5.)
+        if self.thread.is_alive(): self.errors += 1
         if not self.thread.is_alive() and self.latest_frame is not None:
             if all(name != self.latest_frame[0] for name, _ in self.frames):
                 self.frames.append(self.latest_frame)
@@ -345,7 +369,7 @@ class ScoreObserver:
         raise ValueError('original score image missing or changed')
 
     @staticmethod
-    def annotate_review(journal,proposal_id,*,annotator,verdict,value=None,reason,independent=False,supersedes=None):
+    def annotate_review(journal,proposal_id,*,annotator,verdict,value=None,visible_digits=None,reason,independent=False,supersedes=None):
         import hashlib
         from datetime import datetime,timezone
         from pathlib import Path
@@ -357,12 +381,18 @@ class ScoreObserver:
         elif verdict=='unreadable':value=None
         elif verdict!='correct':raise ValueError('confirm, correct or unreadable required')
         if verdict!='unreadable' and (type(value) is not int or value<0):raise ValueError('readable annotation requires exact nonnegative digits')
+        if visible_digits is not None:
+            from .score_digits import valid_display_digits
+            if (verdict=='unreadable' or not isinstance(visible_digits,str) or
+                    not visible_digits.isascii() or not visible_digits.isdigit() or
+                    not valid_display_digits(visible_digits) or int(visible_digits)!=value):
+                raise ValueError('visible digits must be 1–7 exact ASCII digits matching reviewed numeric value')
         if supersedes:
             prior=journal.get(supersedes).data['payload']
             if prior.get('category')!='score_human_annotation' or prior.get('proposal_id')!=proposal_id or prior.get('annotator')!=annotator:
                 raise ValueError('correction must supersede this reviewer and proposal')
         return journal.append('observation',dict(category='score_human_annotation',proposal_id=proposal_id,
-            annotator=annotator,verdict=verdict,value=value,reason=reason,independence_attested=bool(independent),
+            annotator=annotator,verdict=verdict,value=value,visible_digits=visible_digits,reason=reason,independence_attested=bool(independent),
             reviewed_at=datetime.now(timezone.utc).isoformat(),artifact_sha256=p['artifact']['sha256'],
             source_episode=p['source_episode'],timestamp=p['timestamp'],partition=p['partition'],synthetic=p['synthetic'],
             supersedes=supersedes,qualification='human annotation; complete-game boundary and independent qualification still required'),
@@ -375,6 +405,8 @@ class ScoreObserver:
                    if r.data['payload']['partition']==partition and not r.data['payload']['synthetic']}
         annotations={}
         all_annotations=journal.category_records('observation','score_human_annotation')
+        from .score_review_attestation import attested_photo_annotation_ids
+        retrospectively_attested=attested_photo_annotation_ids(journal)
         superseded={r.data['payload'].get('supersedes') for r in all_annotations}
         latest_status={r.data['payload'].get('proposal_id'):r.data['payload'] for r in
             journal.category_records('observation','score_review_status')}
@@ -382,7 +414,8 @@ class ScoreObserver:
             if r.id in superseded:continue
             p=r.data['payload']
             if latest_status.get(p['proposal_id'],{}).get('status') in ('pending','insufficient','disputed'):continue
-            if p['proposal_id'] in proposals and p['independence_attested']:
+            if p['proposal_id'] in proposals and (
+                    p['independence_attested'] or r.id in retrospectively_attested):
                 annotations.setdefault(p['proposal_id'],[]).append(p)
         eligible=correct=accepted=false_confident=abstained=disagreement=unreadable=0
         seen_pixels=set();bins={}
@@ -436,12 +469,14 @@ class ScoreObserver:
         summary=supported[-1][1] if supported else None
         final=supported[-1][2] if supported else None
         return {**(summary or dict(p1_score=None,p2_score=None,self_channel=None,self_score=None,status='unmeasured')),
-                'score_scope':'supported_gameplay_only','frozen_at':self.frozen_at, 'log':'score.jsonl', 'samples':len(self.costs),
+                'score_scope':'supported_gameplay_only','frozen_at':self.frozen_at, 'log':'score.jsonl', 'samples':self.processed_samples,
                 'dropped_samples':self.dropped, 'errors':self.errors,
                 'worker_finished':not self.thread.is_alive(),
                 'final_observation':final if not self.thread.is_alive() else None,
-                'processing_seconds_total':sum(self.costs),
-                'processing_seconds_max':max(self.costs, default=0.),
+                'processing_seconds_total':self.processing_seconds_total,
+                'processing_seconds_max':self.processing_seconds_max,
+                'timing_samples_retained':len(self.costs),
+                'timing_sample_capacity':self.costs.maxlen,
                 'raw_frames':[name for name, _ in self.frames],
                 'retained_instrumentation_bytes':sum(f.width*f.height*len(f.getbands()) for _,f in self.frames),
                 'queue_capacity':2,'queue_occupancy':self.queue.qsize(),

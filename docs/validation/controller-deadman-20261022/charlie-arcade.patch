@@ -1,0 +1,614 @@
+diff --git a/docs/controller-lease.md b/docs/controller-lease.md
+new file mode 100644
+index 0000000..44f2810
+--- /dev/null
++++ b/docs/controller-lease.md
+@@ -0,0 +1,40 @@
++# Controller lease protocol
++
++TCP 8765 remains ASCII lines with only `OK\n` or `ERROR\n` responses.
++No game state is returned. Existing controller tokens retain their meaning.
++Lines are limited to 127 bytes plus newline; invalid ASCII closes the connection.
++
++The first accepted controller command, or `LEASE`, claims exclusive control for
++that connection. Each accepted controller command and `LEASE` renews a fixed
++one-second monotonic lease. `LEASE` changes no controls. Renew at least every
++200–300 ms while the gameplay execution path is progressing. Never renew from
++an unrelated supervisor or autonomous heartbeat thread.
++
++The independent launcher deadman checks every 25 ms, independently of socket
++reads, writes, the UI loop and Charlie. Expiration neutralizes all sticks, hats,
++triggers and buttons. The expired connection cannot acquire/renew controls again;
++close it, reconnect, and compute fresh intent. Blank, partial, malformed, rejected,
++menu, player-selection and QUIT traffic cannot renew the lease. Existing 100 ms
++button taps remain synchronous; watchdog scheduling can be delayed by a tap
++holding the lease lock, plus operating-system scheduling. This is not a hard
++real-time or hardware watchdog. A frozen launcher/kernel or failed uinput output
++requires the independent operator stop path.
++
++Other connections receive ERROR for controller commands/renewals while an owner
++exists. A non-owner disconnect no longer releases the owner's controls.
++NEUTRAL is always allowed globally and releases ownership, including from an
++expired client or during a supervised qualification session. Owner disconnect
++releases immediately. Repeated neutral releases are safe. Failed neutral writes
++inhibit subsequent actuation, are logged, and are retried by the watchdog;
++successful physical release is never inferred from a failed write.
++
++Legacy clients need no negotiation for ordinary command sequences. Silence
++longer than one second now releases held controls; there is no unsafe unlimited
++hold compatibility mode. Charlie's native trial runner must require `LEASE`
++support and renew from gameplay execute(), including when positions are unchanged.
++
++Install the new module through the extended stopped-service
++`scripts/install_rom_intake.py`; post-install preflight checks its exact hash.
++The fresh-machine installer also copies it, but must never be rerun on an existing
++appliance. Preserve installed state and follow the guarded native handoff before
++any service stop/start. Source changes do not activate the watchdog.
+diff --git a/install.sh b/install.sh
+index d9b9b96..57c5f94 100755
+--- a/install.sh
++++ b/install.sh
+@@ -56,6 +56,7 @@ mkdir -p \
+ echo
+ echo "[4/8] Installing Charlie Arcade software..."
+ install -m 755 src/launcher.py "$HOME_DIR/arcade/launcher.py"
++install -m 644 src/controller_lease.py "$HOME_DIR/arcade/controller_lease.py"
+ install -m 644 src/controller.py "$HOME_DIR/arcade/controller.py"
+ install -m 644 src/rom_intake.py "$HOME_DIR/arcade/rom_intake.py"
+ install -m 644 src/mame2000_catalog.json.gz "$HOME_DIR/arcade/mame2000_catalog.json.gz"
+diff --git a/scripts/install_rom_intake.py b/scripts/install_rom_intake.py
+index 9b60b5a..d9c2ce4 100644
+--- a/scripts/install_rom_intake.py
++++ b/scripts/install_rom_intake.py
+@@ -79,7 +79,8 @@ OPERATOR_ACCEPTED_RELEASE = {  # Native-accepted d09f4dbe, exact module pair.
+     'launcher.py': '54c16dfcd7ec108eecef6944ecaa0c31dd7500902a9f24639336ab0c39d7bdcf',
+     'rom_intake.py': '6261d1a9fa898c70d25743affde970085d6e5835ceb6a7f00c8f18ef83049e3e',
+ }
+-FILES = ('launcher.py', 'controller.py', 'rom_intake.py', 'mame2000_catalog.json.gz')
++FILES = ('launcher.py', 'controller.py', 'rom_intake.py', 'mame2000_catalog.json.gz',
++         'controller_lease.py')
+ 
+ 
+ def run(args):
+diff --git a/scripts/preflight_playable_library.py b/scripts/preflight_playable_library.py
+index e510a46..42b1622 100644
+--- a/scripts/preflight_playable_library.py
++++ b/scripts/preflight_playable_library.py
+@@ -161,6 +161,8 @@ def main():
+     arcade = Path.home() / 'arcade'
+     expected_modules = ({n: digest(REPO / 'src' / n) for n in OPERATOR_ACCEPTED_RELEASE}
+                         if args.installed_candidate else OPERATOR_ACCEPTED_RELEASE)
++    if args.installed_candidate:
++        expected_modules['controller_lease.py'] = digest(REPO / 'src/controller_lease.py')
+     for name, h in {**expected_modules, 'controller.py': BASELINE_CONTROLLER}.items():
+         p = arcade / name
+         if p.is_symlink() or not p.is_file() or digest(p) != h:
+diff --git a/src/controller_lease.py b/src/controller_lease.py
+new file mode 100644
+index 0000000..2b4786d
+--- /dev/null
++++ b/src/controller_lease.py
+@@ -0,0 +1,87 @@
++"""Independent server-side deadman; no socket or game-state dependency."""
++import logging
++import threading
++import time
++
++
++class ControllerLease:
++    SECONDS = 1.0
++    PERIOD = 0.025
++
++    def __init__(self, controller, clock=time.monotonic):
++        self.controller = controller
++        self.clock = clock
++        self.lock = threading.RLock()
++        self.owner = None
++        self.deadline = 0.0
++        self.expired = set()
++        self.failed = False
++        self.stop = threading.Event()
++        self.thread = None
++
++    def start(self):
++        self.thread = threading.Thread(target=self._watch, name='controller-deadman', daemon=True)
++        self.thread.start()
++
++    def _watch(self):
++        while not self.stop.wait(self.PERIOD):
++            try:
++                self.poll()
++            except Exception:
++                logging.exception('Controller neutral release failed; commands inhibited; retrying')
++
++    def _neutral(self):
++        try:
++            self.controller.neutral()
++        except Exception:
++            self.failed = True
++            raise
++        self.owner = None
++        self.deadline = 0.0
++
++    def poll(self):
++        with self.lock:
++            if self.failed or (self.owner is not None and self.clock() >= self.deadline):
++                if self.owner is not None:
++                    self.expired.add(self.owner)
++                self._neutral()
++
++    def command(self, session, command):
++        with self.lock:
++            self.poll()
++            if self.failed or session in self.expired:
++                return False
++            if self.owner is not None and self.owner is not session:
++                return False
++            # LEASE acquires/renews without changing held state. Legacy accepted
++            # controller commands also renew, but arbitrary traffic cannot.
++            began = self.clock()
++            if command != 'LEASE':
++                try:
++                    self.controller.command(command)
++                except ValueError:
++                    return False
++                except Exception:
++                    self.expired.add(session)
++                    self._neutral()
++                    raise
++            self.owner = session
++            self.deadline = began + self.SECONDS
++            return True
++
++    def neutral(self):
++        # Any client/operator may release globally; never requires ownership.
++        with self.lock:
++            self._neutral()
++
++    def disconnect(self, session):
++        with self.lock:
++            if self.owner is session:
++                self._neutral()
++            self.expired.discard(session)
++
++    def close(self):
++        self.stop.set()
++        if self.thread:
++            self.thread.join(timeout=2)
++        self.neutral()
+diff --git a/src/launcher.py b/src/launcher.py
+index ec599b2..77a3e7b 100755
+--- a/src/launcher.py
++++ b/src/launcher.py
+@@ -18,6 +18,7 @@ from pathlib import Path
+ 
+ from display_control import DisplayControl
+ from controller import CharlieController
++from controller_lease import ControllerLease
+ from rom_intake import Catalog, fingerprint
+ import getpass
+ import json
+@@ -45,7 +46,7 @@ from rom_intake import CatalogWorkStopped
+ #
+ # Safety:
+ #   Charlie's virtual controller is neutralized on disconnect,
+-#   game exit, and launcher shutdown.
++#   game exit, launcher shutdown, and expiry of its independent control lease.
+ # ============================================================
+ 
+ 
+@@ -104,6 +105,8 @@ retroarch_process = None
+ game_running = threading.Event()
+ 
+ charlie_controller = CharlieController()
++controller_lease = ControllerLease(charlie_controller)
++_direct_session = object()
+ 
+ 
+ # ============================================================
+@@ -1730,10 +1733,10 @@ def xbox_worker():
+ 
+ 
+ # ============================================================
+-# Charlie network protocol: unchanged vocabulary and wire replies
++# Charlie network protocol: LEASE renewal plus existing OK/ERROR wire replies
+ # ============================================================
+ 
+-def handle_network_command(command):
++def handle_network_command(command, session=_direct_session):
+     global player_mode
+     global message
+ 
+@@ -1767,7 +1770,7 @@ def handle_network_command(command):
+     # vocabulary and OK/ERROR replies; expose no intake commands or state.
+     if active_session:
+         if command == 'NEUTRAL':
+-            charlie_controller.neutral()
++            controller_lease.neutral()
+             return True
+         return False
+ 
+@@ -1790,7 +1793,7 @@ def handle_network_command(command):
+     # --------------------------------------------------------
+ 
+     if command == "NEUTRAL":
+-        charlie_controller.neutral()
++        controller_lease.neutral()
+         return True
+ 
+     # --------------------------------------------------------
+@@ -1799,10 +1802,9 @@ def handle_network_command(command):
+ 
+     if player_mode == "CHARLIE":
+         try:
+-            charlie_controller.command(
+-                command
+-            )
+-            return True
++            accepted = controller_lease.command(session, command)
++            if accepted or command not in {'UP', 'DOWN', 'SELECT'}:
++                return accepted
+ 
+         except ValueError:
+             pass
+@@ -1847,20 +1849,27 @@ def network_connection_worker(connection):
+ 
+     without reconnecting for every action.
+ 
+-    On disconnect, Charlie's controller is neutralized.
++    Owner disconnect releases controls. A separate worker releases an expired
++    owner even while this thread is blocked reading a still-open connection.
+     """
+ 
++    session = object()
+     try:
+         with connection:
+             file = connection.makefile(
+                 "r",
+                 encoding="ascii",
+-                errors="ignore",
++                errors="strict",
+                 newline="\n"
+             )
+ 
+             try:
+-                for line in file:
++                while True:
++                    line = file.readline(128)
++                    if not line:
++                        break
++                    if not line.endswith("\n"):
++                        break
+                     command = (
+                         line
+                         .strip()
+@@ -1872,7 +1881,7 @@ def network_connection_worker(connection):
+ 
+                     try:
+                         ok = handle_network_command(
+-                            command
++                            command, session
+                         )
+ 
+                     except Exception:
+@@ -1895,12 +1904,12 @@ def network_connection_worker(connection):
+                     pass
+ 
+     finally:
+-        # Critical safety rule:
+-        # a lost Charlie connection can never leave a control held.
++        # Only the owning connection's disconnect releases held controls.
+         try:
+-            charlie_controller.neutral()
++            controller_lease.disconnect(session)
+         except Exception:
+-            pass
++            import logging
++            logging.exception('Disconnect neutral release failed')
+ 
+ 
+ def network_worker():
+@@ -1965,6 +1974,7 @@ def main():
+     # Create Charlie's virtual controller before starting
+     # network service or accepting commands.
+     charlie_controller.create()
++    controller_lease.start()
+ 
+     message = display_control.message
+ 
+@@ -2019,6 +2029,12 @@ if __name__ == "__main__":
+         except Exception:
+             pass
+ 
++        try:
++            controller_lease.close()
++        except Exception:
++            import logging
++            logging.exception('Shutdown neutral release failed')
++
+         try:
+             charlie_controller.close()
+         except Exception:
+diff --git a/tests/test_callable_intake.py b/tests/test_callable_intake.py
+index 9694fb8..105d82f 100644
+--- a/tests/test_callable_intake.py
++++ b/tests/test_callable_intake.py
+@@ -25,7 +25,7 @@ class CallableIntakeTests(ui.LauncherTests):
+             with self.assertRaises(StopLoop):
+                 launcher.main()
+             self.assertEqual(factory.call_count, 1)
+-            self.assertEqual(threads.call_count, 2)  # Existing Xbox and TCP only.
++            self.assertEqual(threads.call_count, 3)  # Xbox, TCP and independent controller deadman.
+             self.assertEqual(launcher.catalog_jobs.stats['requests'], 0)
+             self.assertIsNone(launcher.catalog_jobs.thread.ident)
+             self.assertEqual([g['rom'] for g in launcher.GAMES], ['robotron.zip'])
+diff --git a/tests/test_controller_lease.py b/tests/test_controller_lease.py
+new file mode 100644
+index 0000000..c1f104e
+--- /dev/null
++++ b/tests/test_controller_lease.py
+@@ -0,0 +1,219 @@
++"""Real controller event generation and launcher workers, without /dev/uinput."""
++import os
++from pathlib import Path
++import signal
++import socket
++import subprocess
++import sys
++import threading
++import time
++import unittest
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
++import launcher
++from controller import CharlieController, BUTTONS, EV_ABS, EV_KEY
++from controller_lease import ControllerLease
++
++
++class RecordingController(CharlieController):
++    def __init__(self):
++        super().__init__()
++        self.events = []
++
++    def _emit(self, kind, code, value):
++        self.events.append((kind, code, value))
++
++
++class LeaseTests(unittest.TestCase):
++    def setUp(self):
++        self.c = RecordingController()
++        self.now = 10.0
++        self.lease = ControllerLease(self.c, lambda: self.now)
++        self.a, self.b = object(), object()
++
++    def test_legacy_commands_and_exact_deadline(self):
++        for command in ('LS_UP_RIGHT', 'RS_LEFT', 'A_DOWN', 'LT_DOWN'):
++            self.assertTrue(self.lease.command(self.a, command))
++        self.now += .999
++        self.lease.poll()
++        self.assertTrue(self.c.held['A'])
++        self.now += .001
++        self.lease.poll()
++        self.assertFalse(any(self.c.held.values()))
++        values = {(k, code): value for k, code, value in self.c.events}
++        self.assertTrue(all(v == 0 for (k, _), v in values.items() if k in (EV_ABS, EV_KEY)))
++        self.assertEqual(sum(k == EV_KEY for k, _ in values), len(BUTTONS))
++
++    def test_explicit_renewal_preserves_controls_without_neutral(self):
++        self.lease.command(self.a, 'LS_RIGHT')
++        count = len(self.c.events)
++        for _ in range(20):
++            self.now += .4
++            self.assertTrue(self.lease.command(self.a, 'LEASE'))
++            self.lease.poll()
++            self.assertTrue(self.c.held['LS_RIGHT'])
++        self.assertEqual(len(self.c.events), count)
++
++    def test_invalid_traffic_does_not_renew_and_expiry_requires_reconnect(self):
++        self.lease.command(self.a, 'A_DOWN')
++        self.now += .9
++        self.assertFalse(self.lease.command(self.a, 'INVALID'))
++        self.now += .11
++        self.assertFalse(self.lease.command(self.a, 'LEASE'))
++        self.assertFalse(self.lease.command(self.a, 'A_DOWN'))
++        self.assertFalse(any(self.c.held.values()))
++        self.assertTrue(self.lease.command(self.b, 'LEASE'))
++
++    def test_concurrent_clients_cannot_renew_change_or_disconnect_owner(self):
++        self.lease.command(self.a, 'A_DOWN')
++        self.assertFalse(self.lease.command(self.b, 'LEASE'))
++        self.assertFalse(self.lease.command(self.b, 'LS_RIGHT'))
++        self.lease.disconnect(self.b)
++        self.assertTrue(self.c.held['A'])
++        self.lease.disconnect(self.a)
++        self.assertFalse(any(self.c.held.values()))
++        self.assertTrue(self.lease.command(self.b, 'LS_LEFT'))
++
++    def test_any_client_neutral_is_safe_and_repeated(self):
++        self.lease.command(self.a, 'A_DOWN')
++        self.lease.neutral()
++        self.lease.neutral()
++        self.assertFalse(any(self.c.held.values()))
++        self.assertTrue(self.lease.command(self.b, 'LEASE'))
++
++    def test_simultaneous_claims_have_exactly_one_owner(self):
++        barrier = threading.Barrier(3)
++        results = []
++        def claim(session):
++            barrier.wait()
++            results.append((session, self.lease.command(session, 'A_DOWN')))
++        threads = [threading.Thread(target=claim, args=(s,)) for s in (self.a, self.b)]
++        for t in threads:
++            t.start()
++        barrier.wait()
++        for t in threads:
++            t.join(2)
++        self.assertEqual(sum(ok for _, ok in results), 1)
++        self.assertIs(self.lease.owner, next(s for s, ok in results if ok))
++
++    def test_tap_keeps_normal_timing(self):
++        began = time.monotonic()
++        self.assertTrue(self.lease.command(self.a, 'A'))
++        self.assertGreaterEqual(time.monotonic() - began, .09)
++        self.assertFalse(self.c.held['A'])
++
++    def test_neutral_failure_inhibits_commands_and_retries(self):
++        self.lease.command(self.a, 'A_DOWN')
++        neutral = self.c.neutral
++        self.c.neutral = lambda: (_ for _ in ()).throw(OSError('write failed'))
++        self.now += 2
++        with self.assertRaises(OSError):
++            self.lease.poll()
++        self.c.neutral = neutral
++        self.lease.poll()
++        self.assertFalse(self.lease.command(self.b, 'A_DOWN'))
++        self.assertFalse(any(self.c.held.values()))
++
++
++class WorkerTests(unittest.TestCase):
++    def setUp(self):
++        self.c = RecordingController()
++        self.old = launcher.charlie_controller, launcher.controller_lease, launcher.player_mode
++        launcher.charlie_controller = self.c
++        self.lease = launcher.controller_lease = ControllerLease(self.c)
++        launcher.player_mode = 'CHARLIE'
++        self.lease.start()
++        self.clients = []
++        self.workers = []
++
++    def connect(self):
++        client, server = socket.socketpair()
++        client.settimeout(3)
++        worker = threading.Thread(target=launcher.network_connection_worker, args=(server,), daemon=True)
++        worker.start()
++        self.clients.append(client)
++        self.workers.append(worker)
++        return client
++
++    def send(self, client, command):
++        client.sendall(command.encode() + b'\n')
++        return client.recv(64)
++
++    def wait_neutral(self):
++        deadline = time.monotonic() + 1.4
++        while any(self.c.held.values()) and time.monotonic() < deadline:
++            time.sleep(.005)
++        self.assertFalse(any(self.c.held.values()))
++
++    def tearDown(self):
++        for c in self.clients:
++            c.close()
++        for w in self.workers:
++            w.join(2)
++        self.lease.close()
++        launcher.charlie_controller, launcher.controller_lease, launcher.player_mode = self.old
++
++    def test_stalled_open_socket_and_partial_line_release(self):
++        client = self.connect()
++        self.assertEqual(self.send(client, 'LS_RIGHT'), b'OK\n')
++        client.sendall(b'LEA')
++        self.wait_neutral()
++        client.sendall(b'SE\n')
++        self.assertEqual(client.recv(64), b'ERROR\n')
++
++    def test_worker_disconnect_and_nonowner_disconnect(self):
++        a, b = self.connect(), self.connect()
++        self.assertEqual(self.send(a, 'A_DOWN'), b'OK\n')
++        self.assertEqual(self.send(b, 'LEASE'), b'ERROR\n')
++        b.close()
++        self.workers[1].join(2)
++        self.assertTrue(self.c.held['A'])
++        a.close()
++        self.workers[0].join(2)
++        self.assertFalse(any(self.c.held.values()))
++
++    def test_worker_renewal_then_neutral_from_other_client(self):
++        a, b = self.connect(), self.connect()
++        self.assertEqual(self.send(a, 'RS_UP'), b'OK\n')
++        for _ in range(4):
++            time.sleep(.3)
++            self.assertEqual(self.send(a, 'LEASE'), b'OK\n')
++            self.assertTrue(self.c.held['RS_UP'])
++        self.assertEqual(self.send(b, 'NEUTRAL'), b'OK\n')
++        self.assertFalse(any(self.c.held.values()))
++
++    def test_frozen_real_charlie_client_releases_with_socket_still_open(self):
++        root = os.environ.get('CHARLIE_TEST_ROOT')
++        if not root:
++            self.skipTest('set CHARLIE_TEST_ROOT for cross-repository SIGSTOP integration')
++        client = self.connect()
++        code = '''
++import socket, sys, time
++from experiments.ppal import arcade_transport as transport
++from experiments.ppal.models import Action
++connection = socket.socket(fileno=int(sys.argv[1]))
++transport.socket.create_connection = lambda *a, **k: connection
++c = transport.ArcadeController('unused', require_lease=True, pulse=False)
++c.execute(Action('E', 'N'), 30)
++print('READY', flush=True)
++time.sleep(60)
++'''
++        child = subprocess.Popen([sys.executable, '-c', code, str(client.fileno())],
++            cwd=root, pass_fds=(client.fileno(),), stdout=subprocess.PIPE, text=True)
++        try:
++            import select
++            self.assertTrue(select.select([child.stdout], [], [], 5)[0])
++            self.assertEqual(child.stdout.readline().strip(), 'READY')
++            self.assertTrue(self.c.held['LS_RIGHT'])
++            os.kill(child.pid, signal.SIGSTOP)
++            self.wait_neutral()
++            self.assertIsNone(child.poll())
++            self.assertEqual(self.send(client, 'LEASE'), b'ERROR\n')
++        finally:
++            child.kill()
++            child.wait(timeout=3)
++            child.stdout.close()
++
++
++if __name__ == '__main__':
++    unittest.main()
+diff --git a/tests/test_install_rom_intake.py b/tests/test_install_rom_intake.py
+index 5f4c4de..9132d3d 100644
+--- a/tests/test_install_rom_intake.py
++++ b/tests/test_install_rom_intake.py
+@@ -75,6 +75,9 @@ class InstallTests(fixture.IntakeTests):
+         report = installer.install(self.release, self.arcade, self.sha)
+         self.assertEqual(installer.protected_manifest(self.arcade), before)
+         self.assertFalse(report['service_started'])
++        self.assertEqual((self.arcade / 'controller_lease.py').read_bytes(),
++                         (self.release / 'src/controller_lease.py').read_bytes())
++        self.assertFalse(report['module_existed']['controller_lease.py'])
+         self.assertEqual((Path(report['backup']) / 'launcher.py').read_bytes(), self.original_launcher)
+         cat = Catalog(self.arcade, self.root / 'RetroArch/retroarch',
+                       self.arcade / 'mame2000_catalog.json.gz', self.root / '.config/retroarch')
+@@ -116,6 +119,7 @@ class InstallTests(fixture.IntakeTests):
+                 installer.install(self.release, self.arcade, self.sha)
+         self.assertEqual((self.arcade / 'launcher.py').read_bytes(), self.original_launcher)
+         self.assertFalse((self.arcade / 'rom_intake.py').exists())
++        self.assertFalse((self.arcade / 'controller_lease.py').exists())
+         self.assertEqual(installer.protected_manifest(self.arcade), protected)
+         self.assertTrue(list((self.arcade / 'rom-intake/install-backups').glob('*/failed-catalog.sqlite3')))
+ 
+diff --git a/tests/test_launcher_intake.py b/tests/test_launcher_intake.py
+index 6fb1f98..06a6c5e 100644
+--- a/tests/test_launcher_intake.py
++++ b/tests/test_launcher_intake.py
+@@ -75,6 +75,7 @@ class LauncherTests(fixture.IntakeTests):
+         self.controller = Mock()
+         self.controller.command.side_effect = lambda c: 'OK' if c in {'LS_UP','A','START'} else (_ for _ in ()).throw(ValueError())
+         self.mocks = [patch.object(launcher, 'charlie_controller', self.controller),
++                      patch.object(launcher, 'controller_lease', launcher.ControllerLease(self.controller)),
+                       patch.object(launcher, 'render'), patch.object(launcher, 'clear_screen')]
+         for p in self.mocks:
+             p.start()
+@@ -216,7 +217,9 @@ class LauncherTests(fixture.IntakeTests):
+             right.close()
+             thread.join(timeout=2)
+         self.assertFalse(thread.is_alive())
+-        self.assertGreaterEqual(self.controller.neutral.call_count, 2)
++        # NEUTRAL is global; disconnect of a client with no lease no longer
++        # interrupts an unrelated owner.
++        self.assertGreaterEqual(self.controller.neutral.call_count, 1)
+ 
+     def test_existing_player_selection_and_controller_protocol_preserved(self):
+         self.assertTrue(launcher.handle_network_command('PLAYER_CHARLIE'))

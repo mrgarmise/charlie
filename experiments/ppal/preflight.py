@@ -31,7 +31,7 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
     """
     from dataclasses import asdict
     from learning.foundry import atomic_json
-    from .eyes.exposure import optimize_screen_exposure, screen_evidence
+    from .eyes.exposure import optimize_screen_exposure
     from .eyes.autofocus import establish_focus, verify_focus_lock
     output.mkdir(parents=True, exist_ok=True)
     started=time.monotonic();deadline=started+timeout
@@ -42,6 +42,8 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
             read = getattr(source, 'read_fresh', source.read)
             self.last_frame = read()
             return self.last_frame
+        def save_rejected_final_image(self, frame, attempt):
+            frame.save(output/f'sensory-final-rejected-{attempt:02d}.png')
         def __getattr__(self,name):return getattr(source,name)
     bounded=BoundedSource()
     report=dict(status='preparing',started_at=started,physical_motion=False,
@@ -65,17 +67,7 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
         # Require actual detail, not a successful method return or zero-valued
         # focus optimum. Limits reuse established exposure qualification.
         report['stage'] = 'final geometry and image detail'
-        frame=bounded.read()
-        import numpy as np
-        quality=screen_evidence(frame,np.array(optics.geometry.corners))
-        final_points=locate(frame,require_uniform_border=False,previous=np.array(optics.geometry.corners))
-        if np.max(np.linalg.norm(final_points-np.array(optics.geometry.corners),axis=1))>PreflightConfig().max_jitter_pixels:
-            raise ValueError('final image geometry differs from stable calibration; assistance required')
-        quality['sharpness']=screen_sharpness(optics.calibration.apply(frame))
-        report['quality']=quality
-        if (quality['detail_pixels']<50 or not np.isfinite(optics.focus.score) or optics.focus.score<=0
-                or not np.isfinite(quality['sharpness']) or quality['sharpness']<=0):
-            raise ValueError('insufficient visual detail for meaningful observation; assistance required')
+        frame, quality = verify_final_image(bounded, optics, report=report)
         lock=getattr(bounded,'lock_white_balance',None)
         report['white_balance_locked']=bool(lock(getattr(source,'capture',getattr(source,'last_capture',None)))) if callable(lock) else False
         report.update(status='usable',stage='complete')
@@ -95,6 +87,49 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
         raise
     finally:
         atomic_json(output/'sensory-preflight.json',report)
+
+
+def verify_final_image(source, optics, *, report, attempts=4):
+    """Bound transient border misses; every accepted image has fresh support.
+
+    Stable calibration ranks candidates but never substitutes for visible four
+    edge/endpoint evidence. A supported moved rectangle fails immediately.
+    The caller's BoundedSource also enforces the overall sensory deadline.
+    """
+    from .eyes.exposure import screen_evidence
+    corners = np.asarray(optics.geometry.corners)
+    checks = report.setdefault('final_image_attempts', [])
+    for index in range(attempts):
+        frame = source.read()
+        check = {'attempt': index + 1, 'geometry': {}}
+        checks.append(check)
+        quality = screen_evidence(frame, corners)
+        quality['sharpness'] = screen_sharpness(optics.calibration.apply(frame))
+        check['quality'] = quality
+        report['quality'] = quality
+        try:
+            points = locate(frame, require_uniform_border=False, previous=corners,
+                            max_jitter_pixels=PreflightConfig().max_jitter_pixels,
+                            diagnostics=check['geometry'])
+        except ValueError as exc:
+            check.update(status='border_unavailable', reason=str(exc))
+            # Retain the actual rejected input as well as numeric diagnostics.
+            save = getattr(source, 'save_rejected_final_image', None)
+            if callable(save): save(frame, index + 1)
+            continue
+        jitter = float(np.max(np.linalg.norm(points-corners, axis=1)))
+        check['jitter_pixels'] = jitter
+        if jitter > PreflightConfig().max_jitter_pixels:
+            check['status'] = 'geometry_changed'
+            raise ValueError('final image geometry differs from stable calibration; assistance required')
+        if (quality['detail_pixels'] < 50 or not np.isfinite(optics.focus.score)
+                or optics.focus.score <= 0 or not np.isfinite(quality['sharpness'])
+                or quality['sharpness'] <= 0):
+            check['status'] = 'insufficient_detail'
+            raise ValueError('insufficient visual detail for meaningful observation; assistance required')
+        check['status'] = 'accepted'
+        return frame, quality
+    raise ValueError('final image border unavailable after bounded fresh-frame retries; assistance required')
 
 
 @dataclass(frozen=True)

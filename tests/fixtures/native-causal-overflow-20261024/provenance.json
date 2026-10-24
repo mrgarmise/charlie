@@ -1,0 +1,16 @@
+{
+  "source": "/home/five/charlie-native-trials/visual-readiness-20261024-6ajF25mY/development-20261024-224738/game-01",
+  "kind": "authentic SELF discovery failure; no gameplay decisions",
+  "files": {
+    "report.json": "9daee2240238e9064f275ee11461e00eba04e477f4b2517f25bbf10822e6f25a"
+  },
+  "example_original_frame": {
+    "path": "/home/five/charlie-native-trials/visual-readiness-20261024-6ajF25mY/development-20261024-224738/game-01/observations/camera-000062.png",
+    "sha256": "fef3fc6d358c271e9ac8c639bc3168f68479d0ef447e12b8e04846f47f3c520c",
+    "size": [
+      1280,
+      720
+    ],
+    "mode": "RGB"
+  }
+}

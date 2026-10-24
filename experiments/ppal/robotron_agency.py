@@ -197,19 +197,29 @@ class VisualAgency:
                 execution,packets,capture_status=capture_shots(controller,
                     Action('STAY',fire,'shot-origin acquisition'),duration,deadline,should_stop)
                 self.last_discovery.setdefault('shot_capture',[]).append(capture_status)
-                self.shots.begin(VECTORS[fire],execution,bodies,baseline)
-                for endpoint,packet in enumerate(packets,1):
-                    pairs=accept_exposure(packet)
-                    if pairs is None:continue # already recorded baseline, never replayed twice
-                    at=packet.at
-                    evidence=self.shots.observe(getattr(accept_exposure,'projectiles',[]),at)
-                    snapshot=self.observe(pairs,observed_at=at)
-                    snapshot.update(phase='shot_origin_experiment',shot_evidence=evidence,
-                        projectile_candidate=self.shots.confirmed,projectile_confirmation_enabled=self.projectile_confirmation,
-                        capture_window=capture_status,control_execution=execution,
-                        actuators=dict(body='STAY',fire=fire,endpoint=endpoint))
-                    self.last_discovery['capture_timestamps'].append(at)
-                    if record:record(snapshot)
+                try:
+                    self.shots.begin(VECTORS[fire],execution,bodies,baseline)
+                    for endpoint,packet in enumerate(packets,1):
+                        pairs=accept_exposure(packet)
+                        if pairs is None:continue # already recorded baseline, never replayed twice
+                        at=packet.at
+                        evidence=self.shots.observe(getattr(accept_exposure,'projectiles',[]),at)
+                        snapshot=self.observe(pairs,observed_at=at)
+                        snapshot.update(phase='shot_origin_experiment',shot_evidence=evidence,
+                            projectile_candidate=self.shots.confirmed,projectile_confirmation_enabled=self.projectile_confirmation,
+                            capture_window=capture_status,control_execution=execution,
+                            actuators=dict(body='STAY',fire=fire,endpoint=endpoint))
+                        self.last_discovery['capture_timestamps'].append(at)
+                        if record:record(snapshot)
+                except BaseException as exc:
+                    close=getattr(packets,'close',None)
+                    if callable(close):
+                        try:close(replayed=False)
+                        except Exception as cleanup:exc.add_note(f'causal replay cleanup: {cleanup}')
+                    raise
+                else:
+                    close=getattr(packets,'close',None)
+                    if callable(close):close(replayed=True)
                 if self.agency.self_id is not None and self.player is not None:
                     self.last_discovery['confirmed_self']=True
                     return self.player

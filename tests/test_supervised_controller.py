@@ -26,6 +26,13 @@ def rig(tmp_path, monkeypatch):
             stream._append(Image.new('RGB', (20, 20)),
                            dict(first_pixel_exposure_at=at, sensor_timestamp_ns=int(at*1e9)))
     expose()
+    # This fixture now supplies a continuous source while protected frames drain.
+    def acquire():
+        time.sleep(.005)
+        at=time.monotonic()
+        return Image.new('RGB',(20,20)),dict(first_pixel_exposure_at=at,sensor_timestamp_ns=int(at*1e9))
+    stream.acquire=acquire
+    stream.start()
     class Wire:
         closed = False
         reject = None
@@ -48,6 +55,7 @@ def rig(tmp_path, monkeypatch):
     yield SimpleNamespace(controller=controller, transport=transport, progress=progress,
                           stream=stream, wire=wire)
     controller.close()
+    stream.close()
 
 
 @pytest.mark.parametrize('outcome', ['success', 'cancelled_before', 'cancelled_during', 'rejected'])
@@ -72,6 +80,7 @@ def test_self_discovery_capture_forwards_cancel_event_and_deadline(rig, outcome)
     if outcome == 'success':
         discover()
         assert captured[0][0]['fire'] == 'E'
+        captured[0][1].close(replayed=True)
         assert rig.wire.commands == ['NEUTRAL', 'LEASE', 'LEASE', 'RS_RIGHT', 'LS_CENTER', 'RS_CENTER']
         assert not rig.transport.closed
         assert 'failure_kind' not in rig.progress.data
@@ -174,7 +183,7 @@ def test_lookahead_worker_forwards_keywords_and_is_joined(rig, camera_failure):
         with pytest.raises(RuntimeError): call()
         assert rig.transport.closed and rig.wire.commands[-1] == 'NEUTRAL'
     else:
-        assert call() is None
+        assert call().sequence > 0  # Continuous fixture supplies independent lookahead.
         assert not rig.transport.closed
     assert rig.progress.data['phase'] == 'perception'
     assert not any(t.name == 'charlie-bounded-controller' and t.is_alive() for t in threading.enumerate())

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import math
 import threading
 import time
+import traceback
 
 
 @dataclass(frozen=True)
@@ -27,6 +28,8 @@ class ObservationStream:
         if capacity<3 or byte_capacity<1:raise ValueError('invalid capture bounds')
         self.acquire=acquire;self.capacity=capacity;self.byte_capacity=byte_capacity
         self.frames=deque();self.bytes=0;self.pin=None;self.error=None
+        self.window_end_at=None;self.window_end_sequence=None
+        self.window_drained=0;self.last_capture=None;self.error_traceback=None
         self.condition=threading.Condition();self.stop_event=threading.Event();self.failed=threading.Event()
         self.sequence=0;self.evicted=0;self.first_at=None;self.intervals=deque(maxlen=2048);self.maximum_bytes=0;self.previous_sensor=None;self.previous_at=None
         self.thread=threading.Thread(target=self._run,name='charlie-camera-owner',daemon=False)
@@ -44,12 +47,25 @@ class ObservationStream:
         if completed is not None and (not math.isfinite(completed) or not 0<=completed-at<=1.):
             raise ValueError('stale or future exposure relative to capture completion')
         self.sequence+=1;packet=Exposure(self.sequence,image,capture)
-        while self.frames and (len(self.frames)>=self.capacity or self.bytes+packet.nbytes>self.byte_capacity):
-            if self.pin is not None and self.frames[0].sequence>=self.pin:
-                raise BufferError('critical capture window overflow; no frames silently discarded')
-            old=self.frames.popleft();self.bytes-=old.nbytes;self.evicted+=1
         if packet.nbytes>self.byte_capacity:raise BufferError('camera image exceeds memory bound')
-        self.frames.append(packet);self.bytes+=packet.nbytes;self.maximum_bytes=max(self.maximum_bytes,self.bytes)
+        if self.pin is not None and self.window_end_at is not None and at>self.window_end_at and self.window_end_sequence is None:
+            self.window_end_sequence=packet.sequence-1
+        retain=True
+        while self.frames and (len(self.frames)>=self.capacity or self.bytes+packet.nbytes>self.byte_capacity):
+            ordinary=next((i for i,p in enumerate(self.frames) if not self._protected(p.sequence)),None)
+            if ordinary is None:
+                if self._protected(packet.sequence):
+                    raise BufferError('critical capture window overflow; no frames silently discarded')
+                # The closed causal interval owns the remaining RAM. Acquisition
+                # continues; explicitly count this *ordinary* frame as unretained.
+                self.evicted+=1;retain=False
+                break
+            old=self.frames[ordinary];del self.frames[ordinary]
+            self.bytes-=old.nbytes;self.evicted+=1
+        if retain:
+            self.frames.append(packet);self.bytes+=packet.nbytes
+            self.maximum_bytes=max(self.maximum_bytes,self.bytes)
+        self.last_capture=capture
         if self.previous_at is not None:self.intervals.append(at-self.previous_at)
         if self.first_at is None:self.first_at=at
         self.previous_at=at;self.previous_sensor=sensor
@@ -63,7 +79,8 @@ class ObservationStream:
                 with self.condition:self._append(image,capture)
         except BaseException as exc:
             with self.condition:
-                if not self.stop_event.is_set():self.error=exc;self.failed.set()
+                if not self.stop_event.is_set():
+                    self.error=exc;self.error_traceback=traceback.format_exc()[-65536:];self.failed.set()
                 self.condition.notify_all()
 
     def latest(self, *, after=0, not_before=None, timeout=1.):
@@ -85,20 +102,72 @@ class ObservationStream:
             if self.error is not None:raise RuntimeError('camera stream failed') from self.error
             if not self.frames:raise RuntimeError('capture must precede command submission')
             self.pin=self.frames[-1].sequence
+            self.window_end_at=self.window_end_sequence=None
+            self.window_drained=0
             return self.frames[-1]
 
-    def end_window(self):
+    def _protected(self, sequence):
+        return (self.pin is not None and sequence>=self.pin
+                and (self.window_end_sequence is None or sequence<=self.window_end_sequence))
+
+    def limit_window(self, end_at):
+        """Controller completion sets an exposure-time cutoff, not caller wakeup time."""
+        if not math.isfinite(end_at):raise ValueError('finite causal cutoff required')
         with self.condition:
-            packets=[p for p in self.frames if self.pin is not None and p.sequence>=self.pin]
+            if self.pin is None:raise RuntimeError('no protected capture window')
+            self.window_end_at=end_at
+            if self.previous_at is not None and self.previous_at>end_at:
+                self.window_end_sequence=max((p.sequence for p in self.frames if p.at<=end_at),default=self.pin-1)
+            self.condition.notify_all()
+
+    def next_window(self, *, timeout=.02):
+        """Oldest unacknowledged protected exposure; never newest-frame sampling."""
+        until=time.monotonic()+timeout
+        with self.condition:
+            while True:
+                if self.error is not None:raise RuntimeError('causal capture failed') from self.error
+                if self.stop_event.is_set():raise RuntimeError('camera stream stopped')
+                if self.pin is None:raise RuntimeError('no protected capture window')
+                packet=next((p for p in self.frames if self._protected(p.sequence)),None)
+                if packet is not None:return packet
+                if self.window_end_sequence is not None:return None
+                remaining=until-time.monotonic()
+                if remaining<=0:raise TimeoutError('waiting for protected exposure')
+                self.condition.wait(remaining)
+
+    def acknowledge_window(self, sequence):
+        """Release RAM after lossless transfer; the archive commits before replay."""
+        with self.condition:
+            first=next((p for p in self.frames if self._protected(p.sequence)),None)
+            if first is None or first.sequence!=sequence:
+                raise ValueError('protected evidence must be acknowledged in sequence')
+            self.pin=sequence+1;self.window_drained+=1
+            self.condition.notify_all()
+
+    def abort_window(self):
+        """Atomically detach available evidence on failure; it cannot qualify a probe."""
+        with self.condition:
+            packets=[p for p in self.frames if self._protected(p.sequence)]
             self.pin=None
-            if self.error is not None:raise RuntimeError('causal capture failed') from self.error
+            self.window_end_at=self.window_end_sequence=None
+            self.condition.notify_all()
             return packets
+
+    def end_window(self):
+        packets=self.abort_window()
+        if self.error is not None:raise RuntimeError('causal capture failed') from self.error
+        return packets
 
     def stats(self):
         with self.condition:return dict(acquired=self.sequence,ordinary_history_evictions=self.evicted,
             retained=len(self.frames),retained_bytes=self.bytes,maximum_bytes=self.maximum_bytes,
             capacity=self.capacity,byte_capacity=self.byte_capacity,failed=self.error is not None,
-            error=str(self.error) if self.error else None,worker_alive=self.thread.is_alive(),
+            error=str(self.error) if self.error else None,
+            error_type=type(self.error).__name__ if self.error else None,
+            error_traceback=self.error_traceback,last_capture=self.last_capture,
+            protected_retained=sum(self._protected(p.sequence) for p in self.frames),
+            protected_drained=self.window_drained,window_end_at=self.window_end_at,
+            worker_alive=self.thread.is_alive(),
             producer_hz=(self.sequence-1)/(self.previous_at-self.first_at)
                 if self.sequence>1 and self.previous_at>self.first_at else None,
             first_exposure_at=self.first_at,last_exposure_at=self.previous_at,

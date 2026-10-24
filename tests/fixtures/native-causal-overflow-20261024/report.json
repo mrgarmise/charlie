@@ -1,0 +1,5906 @@
+{
+  "performance": {
+    "schema": "charlie-gameplay-performance-v1",
+    "meaningful_updates": 0,
+    "meaningful_definition": "one distinct exposure at most 250ms old with supported SELF used for an existing Forebrain/Hindbrain decision",
+    "sustained_hz": null,
+    "sample_retention": "last 2048 samples; sustained counter spans the whole run",
+    "camera_to_decision_seconds": {
+      "samples": 0,
+      "median": null,
+      "p95": null,
+      "worst": null
+    },
+    "interruptions_seconds": {
+      "samples": 0,
+      "median": null,
+      "p95": null,
+      "worst": null
+    },
+    "stage_seconds": {
+      "evidence_preparation": {
+        "samples": 2,
+        "median": 0.040240128000277764,
+        "p95": 0.040240128000277764,
+        "worst": 0.040240128000277764
+      }
+    },
+    "controller_visual_feedback_seconds": {
+      "samples": 0,
+      "median": null,
+      "p95": null,
+      "worst": null
+    },
+    "feedback_status": "only independently resolved command-to-visual attribution may populate this metric; otherwise unmeasured",
+    "self_identity_changes": 0,
+    "stream": {
+      "acquired": 655,
+      "ordinary_history_evictions": 636,
+      "retained": 18,
+      "retained_bytes": 66355200,
+      "maximum_bytes": 66355200,
+      "capacity": 24,
+      "byte_capacity": 67108864,
+      "failed": true,
+      "error": "critical capture window overflow; no frames silently discarded",
+      "worker_alive": false,
+      "producer_hz": 77.36277629689837,
+      "first_exposure_at": 3459.943095,
+      "last_exposure_at": 3468.396773,
+      "largest_exposure_gap": 0.03768399999989924
+    },
+    "full_screen_calls": 26,
+    "fast_screen_calls": 0,
+    "recording": null,
+    "process_cpu_seconds": 54.67437700000001,
+    "maximum_rss_kib": 332768,
+    "temperature_c": 56.75,
+    "native_target_hz": [
+      8,
+      12
+    ],
+    "native_target_qualification": "requires authentic sustained native run; host replay is not acceptance"
+  },
+  "session_timing": {
+    "clock": "monotonic",
+    "gameplay_timer_boundary": "after SELF discovery; includes reacquisition",
+    "first_life_lost_at": null,
+    "life_tracking": "unmeasured; SELF loss is not a life boundary",
+    "camera_initialization_started": 3435.549835933,
+    "evidence_recording_started": 3435.792696808,
+    "calibration_started": 3436.763792437,
+    "calibration_finished": 3459.959350297,
+    "evidence_ready": 3459.959462094,
+    "camera_ready": 3459.976038794,
+    "start_decision": 3460.799746709,
+    "exploration_started": 3460.847409384,
+    "start_requested": 3465.578816482,
+    "start_acknowledged": 3465.698233541,
+    "start_transport": {
+      "command": "START",
+      "write_started_at": 3465.579813121,
+      "write_completed_at": 3465.579913455,
+      "ack_at": 3465.697823426,
+      "accepted": true
+    },
+    "exploration_finished": 3467.337252019,
+    "candidate_watch_finished": 3467.894522762,
+    "first_visual_candidates_at": 3467.303953,
+    "first_classified_gameplay_at": 3466.562841,
+    "gameplay_confirmed_at": 3467.0527270000002,
+    "self_discovery_started": 3467.895062359,
+    "stopped_at": 3468.4538593
+  },
+  "session_transitions": [
+    {
+      "at": 3459.975545493,
+      "old": "unknown",
+      "new": "camera_ready",
+      "reason": "optics and geometric calibration complete"
+    },
+    {
+      "at": 3460.847175956,
+      "old": "camera_ready",
+      "new": "starting",
+      "reason": "explicit session authority and usable recorded view; screen semantics may be unknown"
+    },
+    {
+      "at": 3467.338091101,
+      "old": "starting",
+      "new": "waiting_for_gameplay",
+      "reason": "fresh visual commencement; controls alone never establish an episode"
+    },
+    {
+      "at": 3467.894628633,
+      "old": "waiting_for_gameplay",
+      "new": "acquiring",
+      "reason": "candidate watch complete; direct actuator evidence follows"
+    },
+    {
+      "at": 3468.453869614,
+      "old": "acquiring",
+      "new": "stopped",
+      "reason": "ERROR: RuntimeError: camera stream failed"
+    }
+  ],
+  "session_events": "events.jsonl",
+  "provenance": {
+    "git_commit": "795db6cdddc7c317f513d7939719c7c37f12600d",
+    "dirty_worktree": false,
+    "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+  },
+  "review_frames": [],
+  "result": "ERROR: RuntimeError: camera stream failed",
+  "armed": true,
+  "seconds": null,
+  "failure_kind": "player_failure",
+  "cal_recovery": null,
+  "progress": {
+    "pid": 5443,
+    "phase": "finalizing",
+    "phase_started_at": 3468.712610905,
+    "updated_at": 3472.015789431,
+    "fresh_at": 3467.896547983,
+    "sensor_at": 3467.856643,
+    "perception_at": 3468.21557628,
+    "cycle_at": 3468.216520251,
+    "cycles": 1,
+    "mode": "acquiring",
+    "mode_started_at": 3467.894676911,
+    "operation": "diagnostic_frame_save",
+    "operation_started_at": 3471.483698501,
+    "work_sequence": 884,
+    "work_completed_at": 3472.015472446,
+    "last_work": {
+      "completed_operation": "diagnostic_frame_save"
+    },
+    "publication_seconds": 0.3728059399968515
+  },
+  "partial_action_evidence": "steps.jsonl",
+  "pulse_ms": 80,
+  "ticks": 0,
+  "episode_end": {
+    "state": "unknown",
+    "confirmed": false,
+    "evidence": null
+  },
+  "score": null,
+  "score_status": "unresolved",
+  "score_summary": {
+    "p1_score": null,
+    "p2_score": null,
+    "self_channel": 1,
+    "self_score": null,
+    "status": "unresolved",
+    "score_scope": "supported_gameplay_only",
+    "frozen_at": null,
+    "log": "score.jsonl",
+    "samples": 2,
+    "dropped_samples": 0,
+    "errors": 0,
+    "worker_finished": true,
+    "final_observation": {
+      "sample": 2,
+      "timestamp": 3467.856643,
+      "observation_id": "736cd0cf10b98ea3cbdfa3d19d0a90f5c6d083c120137082f3d5cc759b990477",
+      "raw_frame": "score-raw-0002.png",
+      "observed_score": 100,
+      "confidence": 0.9,
+      "retained_score": null,
+      "status": "pending_baseline",
+      "error": null
+    },
+    "processing_seconds_total": 0.026735011000255327,
+    "processing_seconds_max": 0.014631628000188357,
+    "timing_samples_retained": 2,
+    "timing_sample_capacity": 2048,
+    "raw_frames": [
+      "score-raw-0001.png",
+      "score-raw-0002.png"
+    ],
+    "retained_instrumentation_bytes": 5529600,
+    "queue_capacity": 2,
+    "queue_occupancy": 0,
+    "raw_frame_retention": "first 16 samples, up to 16 later accepted changes, final sample",
+    "omitted_change_frames": 0,
+    "accepted_confidence": {
+      "1": null,
+      "2": null
+    },
+    "mode": "observational_background",
+    "timestamp_clock": "monotonic",
+    "metric": "official_game_score",
+    "policy_feedback": false
+  },
+  "learning_mode": "session_tactical_feedback_with_guarded_persistent_policy",
+  "auto_start": true,
+  "start_decision": {
+    "action": "explore",
+    "reason": "usable recorded view and explicit session authority; explore permitted inputs",
+    "observations": [
+      {
+        "at": 3460.243218621,
+        "capture_timestamp": 3459.943095,
+        "capture": {
+          "mode": "continuous_exposure",
+          "requested_at": 3459.961000533,
+          "completed_at": 3459.973319085,
+          "capture_seconds": 0.012318552000124328,
+          "sensor_timestamp_ns": 3459955214000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3459.943095,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.248520612716675,
+            1.5418847799301147
+          ],
+          "colour_temperature": 6211,
+          "ae_locked": null,
+          "stream_sequence": 1,
+          "ordinary_skipped_total": 0
+        },
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.7942,
+            "heroes": 0.5806,
+            "all-time": 0.5138
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.9489,
+            0.9467
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.18613702058792114,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.4989514946937561,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "consecutive": 1
+      },
+      {
+        "at": 3460.516516316,
+        "capture_timestamp": 3460.232004,
+        "capture": {
+          "mode": "continuous_exposure",
+          "requested_at": 3460.251320247,
+          "completed_at": 3460.261684097,
+          "capture_seconds": 0.010363849999976082,
+          "sensor_timestamp_ns": 3460244123000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3460.232004,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.248520612716675,
+            1.5418847799301147
+          ],
+          "colour_temperature": 6211,
+          "ae_locked": null,
+          "stream_sequence": 22,
+          "ordinary_skipped_total": 20
+        },
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.01,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.7953,
+            "heroes": 0.5823,
+            "all-time": 0.5543
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.94,
+            0.9489
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.18114660680294037,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.49080321192741394,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "consecutive": 2
+      },
+      {
+        "at": 3460.798738534,
+        "capture_timestamp": 3460.508347,
+        "capture": {
+          "mode": "continuous_exposure",
+          "requested_at": 3460.528223492,
+          "completed_at": 3460.537842132,
+          "capture_seconds": 0.009618640000098821,
+          "sensor_timestamp_ns": 3460520466000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3460.508347,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.248520612716675,
+            1.5418847799301147
+          ],
+          "colour_temperature": 6211,
+          "ae_locked": null,
+          "stream_sequence": 43,
+          "ordinary_skipped_total": 40
+        },
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0112,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.796,
+            "heroes": 0.5822,
+            "all-time": 0.5531
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.9289,
+            0.9378
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.1820054054260254,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.4839836061000824,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "consecutive": 3
+      }
+    ],
+    "classifier_recommendation": "start"
+  },
+  "exploratory_startup": {
+    "action": "attach",
+    "reason": "three fresh gameplay observations after exploration",
+    "observations": [
+      {
+        "prediction_id": "d14591e2a987bca817d3824ce79cae614b4999c1d94b73c9dc0219042ad3767d",
+        "origin_at": 3460.809815,
+        "observed_at": 3461.199211,
+        "controls": [
+          "A"
+        ],
+        "scene_changed": true,
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.7956,
+            "heroes": 0.5826,
+            "all-time": 0.5328
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.9489,
+            0.9489
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.17733047902584076,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.4853253960609436,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "interpretation": "visual change is association, not independently established control causation",
+        "result": "provisional_response",
+        "proposed_sequence": [
+          [
+            "A"
+          ]
+        ]
+      },
+      {
+        "prediction_id": "80f5560a278576d86c5d5c7d9a805fcd4b60821c4ee2e37f125efbbdfc719569",
+        "origin_at": 3461.450448,
+        "observed_at": 3461.8398310000002,
+        "controls": [
+          "B"
+        ],
+        "scene_changed": true,
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.7974,
+            "heroes": 0.5832,
+            "all-time": 0.5466
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.7933,
+            0.8
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.18086913228034973,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.49614301323890686,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "interpretation": "visual change is association, not independently established control causation",
+        "result": "provisional_response",
+        "proposed_sequence": [
+          [
+            "A"
+          ],
+          [
+            "B"
+          ]
+        ]
+      },
+      {
+        "prediction_id": "2546651b5e6f518a00dd5daca048360cf976863ed2122767cf7710783cd8059c",
+        "origin_at": 3462.091057,
+        "observed_at": 3462.467892,
+        "controls": [
+          "X"
+        ],
+        "scene_changed": true,
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0013,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.7989,
+            "heroes": 0.5811,
+            "all-time": 0.5644
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.8733,
+            0.8822
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.1812216341495514,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.5262418389320374,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "interpretation": "visual change is association, not independently established control causation",
+        "result": "provisional_response",
+        "proposed_sequence": [
+          [
+            "A"
+          ],
+          [
+            "B"
+          ],
+          [
+            "X"
+          ]
+        ]
+      },
+      {
+        "prediction_id": "eb3667ec14b52a8caf88b7ad94831eb6ca943c8c66691da1157a835e7c526a90",
+        "origin_at": 3462.719118,
+        "observed_at": 3463.108512,
+        "controls": [
+          "Y"
+        ],
+        "scene_changed": true,
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.7987,
+            "heroes": 0.581,
+            "all-time": 0.558
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.9489,
+            0.9356
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.18660621345043182,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.5436216592788696,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "interpretation": "visual change is association, not independently established control causation",
+        "result": "provisional_response",
+        "proposed_sequence": [
+          [
+            "A"
+          ],
+          [
+            "B"
+          ],
+          [
+            "X"
+          ],
+          [
+            "Y"
+          ]
+        ]
+      },
+      {
+        "prediction_id": "91a171911847255c796f15c72615a9c751b93609c9662620d0d11299d39dc191",
+        "origin_at": 3463.359739,
+        "observed_at": 3463.736571,
+        "controls": [
+          "LB"
+        ],
+        "scene_changed": true,
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.7996,
+            "heroes": 0.58,
+            "all-time": 0.5568
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.7111,
+            0.7111
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.18636511266231537,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.5450641512870789,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "interpretation": "visual change is association, not independently established control causation",
+        "result": "provisional_response",
+        "proposed_sequence": [
+          [
+            "B"
+          ],
+          [
+            "X"
+          ],
+          [
+            "Y"
+          ],
+          [
+            "LB"
+          ]
+        ]
+      },
+      {
+        "prediction_id": "705d564d4b46743f52be046f2f06bce1a3f059e490fb0013ec0e8056ae15a6e5",
+        "origin_at": 3464.0003580000002,
+        "observed_at": 3464.389756,
+        "controls": [
+          "RB"
+        ],
+        "scene_changed": true,
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.766,
+            "heroes": 0.6165,
+            "all-time": 0.1576
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.9467,
+            0.9378
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.14917607605457306,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.0,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "interpretation": "visual change is association, not independently established control causation",
+        "result": "provisional_response",
+        "proposed_sequence": [
+          [
+            "X"
+          ],
+          [
+            "Y"
+          ],
+          [
+            "LB"
+          ],
+          [
+            "RB"
+          ]
+        ]
+      },
+      {
+        "prediction_id": "2b98b266c2722438697378756c63ebfd997d814c726c94cded2fcecca91bab75",
+        "origin_at": 3464.653539,
+        "observed_at": 3465.030374,
+        "controls": [
+          "BACK"
+        ],
+        "scene_changed": true,
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.7693,
+            "heroes": 0.6159,
+            "all-time": 0.4145
+          },
+          "geometric_border_support": [
+            1.0,
+            1.0,
+            0.9489,
+            0.9489
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.14950187504291534,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.0,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "interpretation": "visual change is association, not independently established control causation",
+        "result": "provisional_response",
+        "proposed_sequence": [
+          [
+            "Y"
+          ],
+          [
+            "LB"
+          ],
+          [
+            "RB"
+          ],
+          [
+            "BACK"
+          ]
+        ]
+      },
+      {
+        "prediction_id": "917718d1c43a41971cdb046563176af803010f81a2d27324ec2efa1212cd8ecc",
+        "origin_at": 3465.294161,
+        "observed_at": 3465.658435,
+        "controls": [
+          "START"
+        ],
+        "scene_changed": true,
+        "screen": {
+          "state": "not_gameplay",
+          "reason": "recorded_robotron_instruction_heading",
+          "coverage": 0.0,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.7608,
+            "heroes": 0.6286,
+            "all-time": 0.5365
+          },
+          "geometric_border_support": [
+            1.0,
+            0.023,
+            1.0,
+            0.9867
+          ],
+          "phase": "startable",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.15844978392124176,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.4899404048919678,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          }
+        },
+        "interpretation": "visual change is association, not independently established control causation",
+        "result": "provisional_response",
+        "proposed_sequence": [
+          [
+            "LB"
+          ],
+          [
+            "RB"
+          ],
+          [
+            "BACK"
+          ],
+          [
+            "START"
+          ]
+        ]
+      },
+      {
+        "prediction_id": "2c8e20902bacebb59f654d9c3af72984000dea250fb4e5ec9a6f50410cc3b723",
+        "origin_at": 3465.922223,
+        "observed_at": 3466.311615,
+        "controls": [
+          "LS_CLICK"
+        ],
+        "scene_changed": true,
+        "screen": {
+          "state": "gameplay",
+          "reason": "complete_border_and_small_interior_regions",
+          "coverage": 0.005,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.2035,
+            "heroes": 0.1962,
+            "all-time": 0.2173
+          },
+          "geometric_border_support": [
+            0.9852,
+            0.9918,
+            1.0,
+            1.0
+          ],
+          "phase": "gameplay",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.14234188199043274,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.25135666131973267,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          },
+          "interior_regions": 293
+        },
+        "interpretation": "visual change is association, not independently established control causation",
+        "result": "provisional_response",
+        "proposed_sequence": [
+          [
+            "RB"
+          ],
+          [
+            "BACK"
+          ],
+          [
+            "START"
+          ],
+          [
+            "LS_CLICK"
+          ]
+        ]
+      }
+    ],
+    "gameplay_verified": true,
+    "exploratory_actions": 9,
+    "gameplay_observations": [
+      {
+        "screen_state": {
+          "state": "gameplay",
+          "reason": "complete_border_and_small_interior_regions",
+          "coverage": 0.0055,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.1668,
+            "heroes": 0.1699,
+            "all-time": 0.1985
+          },
+          "geometric_border_support": [
+            0.9836,
+            0.9967,
+            1.0,
+            1.0
+          ],
+          "phase": "gameplay",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.10534057766199112,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.0,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          },
+          "interior_regions": 148
+        },
+        "capture_timestamp": 3466.562841
+      },
+      {
+        "screen_state": {
+          "state": "gameplay",
+          "reason": "complete_border_and_small_interior_regions",
+          "coverage": 0.0075,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.2092,
+            "heroes": 0.1824,
+            "all-time": 0.178
+          },
+          "geometric_border_support": [
+            0.9311,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "phase": "gameplay",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.12660427391529083,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.0,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          },
+          "interior_regions": 58
+        },
+        "capture_timestamp": 3466.814065
+      },
+      {
+        "screen_state": {
+          "state": "gameplay",
+          "reason": "complete_border_and_small_interior_regions",
+          "coverage": 0.0114,
+          "border_state": "unknown",
+          "label_scores": {
+            "pregame": 0.2225,
+            "heroes": 0.1982,
+            "all-time": 0.1879
+          },
+          "geometric_border_support": [
+            0.9279,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "phase": "gameplay",
+          "title_reference": {
+            "matched": false,
+            "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+            "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+            "similarity": 0.12362080067396164,
+            "minimum_similarity": 0.82,
+            "basis": "complete recorded logo pixels; similarity is not a probability"
+          },
+          "terminal_reference": {
+            "matched": false,
+            "similarity": 0.21618016064167023,
+            "minimum_similarity": 0.85,
+            "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+            "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+            "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+          },
+          "interior_regions": 136
+        },
+        "capture_timestamp": 3467.0527270000002
+      }
+    ]
+  },
+  "sensory_preflight": {
+    "status": "usable",
+    "started_at": 3436.765168801,
+    "physical_motion": false,
+    "color_fidelity": "unqualified without an independent color reference",
+    "stage": "complete",
+    "viewpoint_handoff": {
+      "path": "/home/five/.local/share/charlie/vision/robotron-view.json",
+      "status": "not_available"
+    },
+    "initial_focus": {
+      "status": "stable manual starting point; image quality pending",
+      "started_at": 3436.767112336,
+      "mode": "manual diagnostic",
+      "image_sharpness": "unqualified until playfield refinement and final quality gates",
+      "hardware_limits": [
+        0.0,
+        15.0
+      ],
+      "selected_position": 2.0,
+      "lock_samples": [
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3436.847774039,
+          "completed_at": 3436.988505839,
+          "capture_seconds": 0.14073180000013963,
+          "sensor_timestamp_ns": 3436970922000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 3436.904267,
+          "frame_duration_us": 67106,
+          "lens_position": 1.0,
+          "af_state": 1,
+          "analogue_gain": 4.432900428771973,
+          "digital_gain": 1.003989338874817,
+          "colour_gains": [
+            2.2941198348999023,
+            1.5175052881240845
+          ],
+          "colour_temperature": 6510,
+          "ae_locked": null,
+          "rejection": "manual mode not confirmed"
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3436.992075315,
+          "completed_at": 3437.122478988,
+          "capture_seconds": 0.1304036729998188,
+          "sensor_timestamp_ns": 3437105113000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 3437.038458,
+          "frame_duration_us": 67106,
+          "lens_position": 0.0,
+          "af_state": 1,
+          "analogue_gain": 4.432900428771973,
+          "digital_gain": 1.003989338874817,
+          "colour_gains": [
+            2.293739080429077,
+            1.5177006721496582
+          ],
+          "colour_temperature": 6508,
+          "ae_locked": null,
+          "rejection": "manual mode not confirmed"
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3437.128549375,
+          "completed_at": 3437.257022679,
+          "capture_seconds": 0.12847330399972634,
+          "sensor_timestamp_ns": 3437239306000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 3437.172651,
+          "frame_duration_us": 67106,
+          "lens_position": 0.0,
+          "af_state": 1,
+          "analogue_gain": 4.432900428771973,
+          "digital_gain": 1.003989338874817,
+          "colour_gains": [
+            2.293395519256592,
+            1.5178769826889038
+          ],
+          "colour_temperature": 6506,
+          "ae_locked": null,
+          "rejection": "manual mode not confirmed"
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3437.263104732,
+          "completed_at": 3437.391235108,
+          "capture_seconds": 0.12813037599971722,
+          "sensor_timestamp_ns": 3437373502000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 3437.306847,
+          "frame_duration_us": 67106,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 4.145749092102051,
+          "digital_gain": 1.0030252933502197,
+          "colour_gains": [
+            2.2930853366851807,
+            1.518036127090454
+          ],
+          "colour_temperature": 6504,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3437.397170456,
+          "completed_at": 3437.52555839,
+          "capture_seconds": 0.1283879339998748,
+          "sensor_timestamp_ns": 3437506850000,
+          "exposure_time_us": 65807,
+          "first_pixel_exposure_at": 3437.4410430000003,
+          "frame_duration_us": 66249,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 4.0,
+          "digital_gain": 1.0000147819519043,
+          "colour_gains": [
+            2.2929904460906982,
+            1.5180842876434326
+          ],
+          "colour_temperature": 6504,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3437.531464682,
+          "completed_at": 3437.656924386,
+          "capture_seconds": 0.1254597039996952,
+          "sensor_timestamp_ns": 3437639348000,
+          "exposure_time_us": 65807,
+          "first_pixel_exposure_at": 3437.573541,
+          "frame_duration_us": 67106,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 4.0,
+          "digital_gain": 1.0000147819519043,
+          "colour_gains": [
+            2.2930805683135986,
+            1.51803719997406
+          ],
+          "colour_temperature": 6504,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3437.661509722,
+          "completed_at": 3437.791900933,
+          "capture_seconds": 0.13039121099973272,
+          "sensor_timestamp_ns": 3437773544000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 3437.706889,
+          "frame_duration_us": 67106,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 4.471615791320801,
+          "digital_gain": 1.00396728515625,
+          "colour_gains": [
+            2.2931618690490723,
+            1.51799476146698
+          ],
+          "colour_temperature": 6505,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3437.797825503,
+          "completed_at": 3437.925288373,
+          "capture_seconds": 0.12746287000027223,
+          "sensor_timestamp_ns": 3437907739000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 3437.841084,
+          "frame_duration_us": 67106,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 5.171717166900635,
+          "digital_gain": 1.0000680685043335,
+          "colour_gains": [
+            2.2932353019714355,
+            1.5179563760757446
+          ],
+          "colour_temperature": 6505,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3437.929637096,
+          "completed_at": 3438.05974473,
+          "capture_seconds": 0.13010763400006908,
+          "sensor_timestamp_ns": 3438041935000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 3437.97528,
+          "frame_duration_us": 67106,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 5.535135269165039,
+          "digital_gain": 1.0040751695632935,
+          "colour_gains": [
+            2.293301582336426,
+            1.5179216861724854
+          ],
+          "colour_temperature": 6505,
+          "ae_locked": null
+        }
+      ],
+      "locked_position": 2.0,
+      "finished_at": 3438.072312117
+    },
+    "exposure": {
+      "status": "selected",
+      "samples": [
+        {
+          "ev": 0.0,
+          "frame": "exposure-ev-0.png",
+          "attempt": 0,
+          "capture": {
+            "mode": "fresh_exposure",
+            "requested_at": 3438.871520933,
+            "completed_at": 3438.999207953,
+            "capture_seconds": 0.1276870200003941,
+            "sensor_timestamp_ns": 3438981298000,
+            "exposure_time_us": 66655,
+            "first_pixel_exposure_at": 3438.914643,
+            "frame_duration_us": 67106,
+            "lens_position": 2.0,
+            "af_state": 0,
+            "analogue_gain": 5.88505744934082,
+            "digital_gain": 1.004708170890808,
+            "colour_gains": [
+              2.291456460952759,
+              1.518873929977417
+            ],
+            "colour_temperature": 6495,
+            "ae_locked": null
+          },
+          "geometry_diagnostics": {
+            "rejections": {
+              "area": 468,
+              "edge_or_endpoint_support": 174
+            },
+            "candidate_checks": 660,
+            "accepted": 18,
+            "hough_lines": 122,
+            "selected_lines": [
+              12,
+              5
+            ],
+            "best_candidate_support": [
+              0.92,
+              0.5
+            ],
+            "best_support_corners": [
+              [
+                187.99529402340974,
+                158.73411232264976
+              ],
+              [
+                1065.9644941069243,
+                112.00188989464843
+              ],
+              [
+                1085.7786561264822,
+                669.0
+              ],
+              [
+                197.02654867256638,
+                669.0
+              ]
+            ],
+            "best_edge_support": [
+              1.0,
+              0.98,
+              0.92,
+              0.93
+            ],
+            "best_endpoint_support": [
+              1.0,
+              0.9,
+              0.9,
+              0.5
+            ]
+          },
+          "corners": [
+            [
+              192.11321272825938,
+              165.5160214709286
+            ],
+            [
+              1062.2500934830146,
+              119.30536226700374
+            ],
+            [
+              1081.0684684684684,
+              669.0
+            ],
+            [
+              200.86100386100387,
+              669.0
+            ]
+          ],
+          "detail_pixels": 28456,
+          "clipped_channel_fraction": 0.5720410458251335,
+          "clipped_white_fraction": 0.29930418892324995,
+          "colored_fraction": 0.33391903289288727
+        },
+        {
+          "ev": -1.0,
+          "frame": "exposure-ev-1.png",
+          "attempt": 0,
+          "capture": {
+            "mode": "fresh_exposure",
+            "requested_at": 3441.153005775,
+            "completed_at": 3441.280313088,
+            "capture_seconds": 0.12730731300007392,
+            "sensor_timestamp_ns": 3441262608000,
+            "exposure_time_us": 66655,
+            "first_pixel_exposure_at": 3441.195953,
+            "frame_duration_us": 67106,
+            "lens_position": 2.0,
+            "af_state": 0,
+            "analogue_gain": 9.660377502441406,
+            "digital_gain": 1.0001729726791382,
+            "colour_gains": [
+              2.285468578338623,
+              1.5220515727996826
+            ],
+            "colour_temperature": 6462,
+            "ae_locked": null
+          },
+          "geometry_diagnostics": {
+            "rejections": {
+              "area": 551,
+              "outside_frame_or_nonfinite": 600,
+              "edge_or_endpoint_support": 227
+            },
+            "candidate_checks": 1386,
+            "accepted": 8,
+            "hough_lines": 69,
+            "selected_lines": [
+              12,
+              7
+            ],
+            "best_candidate_support": [
+              0.89,
+              0.9
+            ],
+            "best_support_corners": [
+              [
+                184.06564465920783,
+                159.8927543404926
+              ],
+              [
+                1059.126653313248,
+                114.4606929431045
+              ],
+              [
+                1087.7720588235295,
+                671.0
+              ],
+              [
+                201.79190751445086,
+                671.0
+              ]
+            ],
+            "best_edge_support": [
+              0.97,
+              0.98,
+              0.89,
+              0.99
+            ],
+            "best_endpoint_support": [
+              0.9,
+              0.9,
+              0.9,
+              0.9
+            ]
+          },
+          "corners": [
+            [
+              184.06564465920783,
+              159.8927543404926
+            ],
+            [
+              1059.126653313248,
+              114.4606929431045
+            ],
+            [
+              1087.7720588235295,
+              671.0
+            ],
+            [
+              201.79190751445086,
+              671.0
+            ]
+          ],
+          "detail_pixels": 11025,
+          "clipped_channel_fraction": 0.7034013605442176,
+          "clipped_white_fraction": 0.5771428571428572,
+          "colored_fraction": 0.08
+        },
+        {
+          "ev": -2.0,
+          "frame": "exposure-ev-2.png",
+          "attempt": 0,
+          "capture": {
+            "mode": "fresh_exposure",
+            "requested_at": 3443.322399066,
+            "completed_at": 3443.407077508,
+            "capture_seconds": 0.08467844200004038,
+            "sensor_timestamp_ns": 3443389450000,
+            "exposure_time_us": 49986,
+            "first_pixel_exposure_at": 3443.339464,
+            "frame_duration_us": 50437,
+            "lens_position": 2.0,
+            "af_state": 0,
+            "analogue_gain": 2.3432493209838867,
+            "digital_gain": 1.0019536018371582,
+            "colour_gains": [
+              2.3013100624084473,
+              1.5141366720199585
+            ],
+            "colour_temperature": 6547,
+            "ae_locked": null
+          },
+          "geometry_diagnostics": {
+            "rejections": {
+              "area": 1156,
+              "edge_or_endpoint_support": 222
+            },
+            "candidate_checks": 1386,
+            "accepted": 8,
+            "hough_lines": 88,
+            "selected_lines": [
+              12,
+              7
+            ],
+            "best_candidate_support": [
+              0.84,
+              0.9
+            ],
+            "best_support_corners": [
+              [
+                185.10036664210762,
+                160.88832892287436
+              ],
+              [
+                1063.079583367239,
+                114.20843844088209
+              ],
+              [
+                1083.144144144144,
+                671.0
+              ],
+              [
+                202.82625482625483,
+                671.0
+              ]
+            ],
+            "best_edge_support": [
+              1.0,
+              1.0,
+              0.84,
+              1.0
+            ],
+            "best_endpoint_support": [
+              1.0,
+              1.0,
+              0.9,
+              1.0
+            ]
+          },
+          "corners": [
+            [
+              185.10036664210762,
+              160.88832892287436
+            ],
+            [
+              1063.079583367239,
+              114.20843844088209
+            ],
+            [
+              1083.144144144144,
+              671.0
+            ],
+            [
+              202.82625482625483,
+              671.0
+            ]
+          ],
+          "detail_pixels": 21253,
+          "clipped_channel_fraction": 0.4684985649084835,
+          "clipped_white_fraction": 0.33665835411471323,
+          "colored_fraction": 0.1961605420411236
+        },
+        {
+          "ev": -3.0,
+          "frame": "exposure-ev-3.png",
+          "attempt": 0,
+          "capture": {
+            "mode": "fresh_exposure",
+            "requested_at": 3445.166033148,
+            "completed_at": 3445.201292047,
+            "capture_seconds": 0.035258898999927624,
+            "sensor_timestamp_ns": 3445184136000,
+            "exposure_time_us": 14495,
+            "first_pixel_exposure_at": 3445.169641,
+            "frame_duration_us": 14946,
+            "lens_position": 2.0,
+            "af_state": 0,
+            "analogue_gain": 1.4992679357528687,
+            "digital_gain": 1.0008574724197388,
+            "colour_gains": [
+              2.250124454498291,
+              1.5415260791778564
+            ],
+            "colour_temperature": 6260,
+            "ae_locked": null
+          },
+          "geometry_diagnostics": {
+            "rejections": {
+              "area": 534,
+              "edge_or_endpoint_support": 120
+            },
+            "candidate_checks": 660,
+            "accepted": 6,
+            "hough_lines": 69,
+            "selected_lines": [
+              12,
+              5
+            ],
+            "best_candidate_support": [
+              0.98,
+              0.9
+            ],
+            "best_support_corners": [
+              [
+                186.10083337714917,
+                162.89055681160946
+              ],
+              [
+                1057.7262793813961,
+                117.48311568341538
+              ],
+              [
+                1076.166270783848,
+                672.0
+              ],
+              [
+                203.86046511627907,
+                672.0
+              ]
+            ],
+            "best_edge_support": [
+              1.0,
+              0.98,
+              0.98,
+              0.99
+            ],
+            "best_endpoint_support": [
+              1.0,
+              0.9,
+              0.9,
+              0.9
+            ]
+          },
+          "corners": [
+            [
+              186.10083337714917,
+              162.89055681160946
+            ],
+            [
+              1061.1136101133955,
+              117.30665224777329
+            ],
+            [
+              1080.1717902350813,
+              672.0
+            ],
+            [
+              203.86046511627907,
+              672.0
+            ]
+          ],
+          "detail_pixels": 14969,
+          "clipped_channel_fraction": 0.22386264947558288,
+          "clipped_white_fraction": 0.02298082704255461,
+          "colored_fraction": 0.8655888836929655
+        }
+      ],
+      "selected_ev": -3.0,
+      "awb": "unchanged; original RGB retained",
+      "reference_ev": 0.0,
+      "exposure_locked": true,
+      "selected_capture": {
+        "mode": "fresh_exposure",
+        "requested_at": 3446.562310331,
+        "completed_at": 3446.595080728,
+        "capture_seconds": 0.03277039700014939,
+        "sensor_timestamp_ns": 3446577396000,
+        "exposure_time_us": 12137,
+        "first_pixel_exposure_at": 3446.565259,
+        "frame_duration_us": 12579,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 1.4992679357528687,
+        "digital_gain": 1.0008437633514404,
+        "colour_gains": [
+          2.24338436126709,
+          1.5449649095535278
+        ],
+        "colour_temperature": 6226,
+        "ae_locked": null
+      },
+      "processing_seconds": 8.526881481000146
+    },
+    "geometry_attempts": [
+      {
+        "rejections": {},
+        "candidate_checks": 0,
+        "accepted": 0,
+        "hough_lines": 45,
+        "selected_lines": [
+          12,
+          0
+        ],
+        "reason": "No complete game border found; include all corners and aim more squarely at TV"
+      },
+      {
+        "rejections": {},
+        "candidate_checks": 0,
+        "accepted": 0,
+        "hough_lines": 50,
+        "selected_lines": [
+          12,
+          0
+        ],
+        "reason": "No complete game border found; include all corners and aim more squarely at TV"
+      },
+      {
+        "rejections": {},
+        "candidate_checks": 0,
+        "accepted": 0,
+        "hough_lines": 43,
+        "selected_lines": [
+          11,
+          0
+        ],
+        "reason": "No complete game border found; include all corners and aim more squarely at TV"
+      },
+      {
+        "rejections": {},
+        "candidate_checks": 0,
+        "accepted": 0,
+        "hough_lines": 41,
+        "selected_lines": [
+          12,
+          0
+        ],
+        "reason": "No complete game border found; include all corners and aim more squarely at TV"
+      },
+      {
+        "rejections": {},
+        "candidate_checks": 0,
+        "accepted": 0,
+        "hough_lines": 47,
+        "selected_lines": [
+          12,
+          0
+        ],
+        "reason": "No complete game border found; include all corners and aim more squarely at TV"
+      },
+      {
+        "rejections": {
+          "area": 10
+        },
+        "candidate_checks": 10,
+        "accepted": 0,
+        "hough_lines": 20,
+        "selected_lines": [
+          2,
+          5
+        ],
+        "reason": "No complete game border found; include all corners and aim more squarely at TV"
+      },
+      {
+        "rejections": {
+          "area": 10
+        },
+        "candidate_checks": 10,
+        "accepted": 0,
+        "hough_lines": 21,
+        "selected_lines": [
+          2,
+          5
+        ],
+        "reason": "No complete game border found; include all corners and aim more squarely at TV"
+      },
+      {
+        "rejections": {
+          "area": 114,
+          "edge_or_endpoint_support": 72
+        },
+        "candidate_checks": 210,
+        "accepted": 24,
+        "hough_lines": 33,
+        "selected_lines": [
+          7,
+          5
+        ],
+        "best_candidate_support": [
+          1.0,
+          1.0
+        ],
+        "best_support_corners": [
+          [
+            183.76438801345276,
+            159.9593594608232
+          ],
+          [
+            1060.013410071004,
+            113.37145896681314
+          ],
+          [
+            1080.0361010830325,
+            668.0
+          ],
+          [
+            200.76574803149606,
+            668.0
+          ]
+        ],
+        "best_edge_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "best_endpoint_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "corners": [
+          [
+            183.76438801345276,
+            159.9593594608232
+          ],
+          [
+            1060.013410071004,
+            113.37145896681314
+          ],
+          [
+            1080.0361010830325,
+            668.0
+          ],
+          [
+            200.76574803149606,
+            668.0
+          ]
+        ],
+        "stable_views": 1,
+        "jitter_pixels": 0.0
+      },
+      {
+        "rejections": {
+          "area": 160,
+          "edge_or_endpoint_support": 96
+        },
+        "candidate_checks": 280,
+        "accepted": 24,
+        "hough_lines": 45,
+        "selected_lines": [
+          8,
+          5
+        ],
+        "best_candidate_support": [
+          1.0,
+          1.0
+        ],
+        "best_support_corners": [
+          [
+            182.96692955903885,
+            159.05381793916672
+          ],
+          [
+            1066.9837682497407,
+            113.00084559514376
+          ],
+          [
+            1076.0,
+            668.0
+          ],
+          [
+            200.75533980582523,
+            668.0
+          ]
+        ],
+        "best_edge_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "best_endpoint_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "corners": [
+          [
+            182.96692955903885,
+            159.05381793916672
+          ],
+          [
+            1066.9837682497407,
+            113.00084559514376
+          ],
+          [
+            1076.0,
+            668.0
+          ],
+          [
+            200.75533980582523,
+            668.0
+          ]
+        ],
+        "stable_views": 2,
+        "jitter_pixels": 3.4901019831496756
+      },
+      {
+        "rejections": {},
+        "candidate_checks": 0,
+        "accepted": 0,
+        "hough_lines": 30,
+        "selected_lines": [
+          7,
+          0
+        ],
+        "reason": "No complete game border found; include all corners and aim more squarely at TV"
+      },
+      {
+        "rejections": {
+          "area": 226,
+          "edge_or_endpoint_support": 96
+        },
+        "candidate_checks": 330,
+        "accepted": 8,
+        "hough_lines": 56,
+        "selected_lines": [
+          11,
+          4
+        ],
+        "best_candidate_support": [
+          0.96,
+          0.9
+        ],
+        "best_support_corners": [
+          [
+            182.96654044750431,
+            159.05383820998279
+          ],
+          [
+            1064.9692767180527,
+            113.10579079385003
+          ],
+          [
+            1084.137432188065,
+            671.0
+          ],
+          [
+            201.07072691552062,
+            671.0
+          ]
+        ],
+        "best_edge_support": [
+          1.0,
+          0.99,
+          0.96,
+          1.0
+        ],
+        "best_endpoint_support": [
+          1.0,
+          0.9,
+          1.0,
+          1.0
+        ],
+        "corners": [
+          [
+            182.96654044750431,
+            159.05383820998279
+          ],
+          [
+            1064.9692767180527,
+            113.10579079385003
+          ],
+          [
+            1084.137432188065,
+            671.0
+          ],
+          [
+            201.07072691552062,
+            671.0
+          ]
+        ],
+        "stable_views": 1,
+        "jitter_pixels": 0.0
+      },
+      {
+        "rejections": {
+          "area": 158,
+          "edge_or_endpoint_support": 96
+        },
+        "candidate_checks": 270,
+        "accepted": 16,
+        "hough_lines": 59,
+        "selected_lines": [
+          10,
+          4
+        ],
+        "best_candidate_support": [
+          0.97,
+          0.9
+        ],
+        "best_support_corners": [
+          [
+            184.96336558178663,
+            158.9498133445502
+          ],
+          [
+            1058.9789079650077,
+            113.4178598342125
+          ],
+          [
+            1079.144927536232,
+            670.0
+          ],
+          [
+            202.7906976744186,
+            670.0
+          ]
+        ],
+        "best_edge_support": [
+          1.0,
+          0.99,
+          0.97,
+          1.0
+        ],
+        "best_endpoint_support": [
+          1.0,
+          0.9,
+          1.0,
+          1.0
+        ],
+        "corners": [
+          [
+            184.96336558178663,
+            158.9498133445502
+          ],
+          [
+            1058.9789079650077,
+            113.4178598342125
+          ],
+          [
+            1079.144927536232,
+            670.0
+          ],
+          [
+            202.7906976744186,
+            670.0
+          ]
+        ],
+        "stable_views": 2,
+        "jitter_pixels": 2.999245942041546
+      },
+      {
+        "rejections": {
+          "area": 252,
+          "edge_or_endpoint_support": 128
+        },
+        "candidate_checks": 396,
+        "accepted": 16,
+        "hough_lines": 58,
+        "selected_lines": [
+          12,
+          4
+        ],
+        "best_candidate_support": [
+          0.82,
+          0.9
+        ],
+        "best_support_corners": [
+          [
+            185.96089134905702,
+            158.89784710978864
+          ],
+          [
+            1059.978665292985,
+            113.36577734600532
+          ],
+          [
+            1078.8715596330276,
+            675.0
+          ],
+          [
+            204.2741935483871,
+            675.0
+          ]
+        ],
+        "best_edge_support": [
+          1.0,
+          0.82,
+          0.93,
+          0.82
+        ],
+        "best_endpoint_support": [
+          1.0,
+          0.9,
+          0.9,
+          0.9
+        ],
+        "corners": [
+          [
+            186.13798780532224,
+            163.88874724089953
+          ],
+          [
+            1060.1483006070987,
+            118.40857259284329
+          ],
+          [
+            1078.703363914373,
+            670.0
+          ],
+          [
+            204.09677419354838,
+            670.0
+          ]
+        ],
+        "stable_views": 3,
+        "jitter_pixels": 5.0916699322103565
+      },
+      {
+        "rejections": {
+          "area": 444,
+          "edge_or_endpoint_support": 192
+        },
+        "candidate_checks": 660,
+        "accepted": 24,
+        "hough_lines": 58,
+        "selected_lines": [
+          12,
+          5
+        ],
+        "best_candidate_support": [
+          0.97,
+          1.0
+        ],
+        "best_support_corners": [
+          [
+            186.99218444020943,
+            159.78774584989836
+          ],
+          [
+            1057.376796883921,
+            113.51164088965578
+          ],
+          [
+            1076.1348314606741,
+            670.0
+          ],
+          [
+            205.77906976744185,
+            670.0
+          ]
+        ],
+        "best_edge_support": [
+          1.0,
+          1.0,
+          0.97,
+          1.0
+        ],
+        "best_endpoint_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "corners": [
+          [
+            186.99218444020943,
+            159.78774584989836
+          ],
+          [
+            1057.376796883921,
+            113.51164088965578
+          ],
+          [
+            1076.1348314606741,
+            670.0
+          ],
+          [
+            205.77906976744185,
+            670.0
+          ]
+        ],
+        "stable_views": 4,
+        "jitter_pixels": 5.417577541078424
+      },
+      {
+        "rejections": {
+          "area": 280,
+          "edge_or_endpoint_support": 108
+        },
+        "candidate_checks": 396,
+        "accepted": 8,
+        "hough_lines": 60,
+        "selected_lines": [
+          12,
+          4
+        ],
+        "best_candidate_support": [
+          0.71,
+          0.9
+        ],
+        "best_support_corners": [
+          [
+            186.02979341393458,
+            159.84234106669572
+          ],
+          [
+            1060.0484889097368,
+            114.3617302151042
+          ],
+          [
+            1079.833827893175,
+            670.0
+          ],
+          [
+            204.07395498392282,
+            670.0
+          ]
+        ],
+        "best_edge_support": [
+          1.0,
+          0.71,
+          0.97,
+          0.73
+        ],
+        "best_endpoint_support": [
+          1.0,
+          0.9,
+          1.0,
+          1.0
+        ],
+        "corners": [
+          [
+            186.02979341393458,
+            159.84234106669572
+          ],
+          [
+            1060.0484889097368,
+            114.3617302151042
+          ],
+          [
+            1079.833827893175,
+            670.0
+          ],
+          [
+            204.07395498392282,
+            670.0
+          ]
+        ],
+        "stable_views": 5,
+        "jitter_pixels": 5.0916699322103565
+      },
+      {
+        "rejections": {
+          "area": 126,
+          "edge_or_endpoint_support": 64
+        },
+        "candidate_checks": 198,
+        "accepted": 8,
+        "hough_lines": 55,
+        "selected_lines": [
+          12,
+          3
+        ],
+        "best_candidate_support": [
+          0.98,
+          0.9
+        ],
+        "best_support_corners": [
+          [
+            186.02932799832263,
+            159.84236528515515
+          ],
+          [
+            1059.0510337181242,
+            114.4136339920433
+          ],
+          [
+            1079.1083032490974,
+            670.0
+          ],
+          [
+            203.79110251450678,
+            670.0
+          ]
+        ],
+        "best_edge_support": [
+          1.0,
+          0.99,
+          0.98,
+          1.0
+        ],
+        "best_endpoint_support": [
+          1.0,
+          0.9,
+          1.0,
+          1.0
+        ],
+        "corners": [
+          [
+            186.02932799832263,
+            159.84236528515515
+          ],
+          [
+            1059.0510337181242,
+            114.4136339920433
+          ],
+          [
+            1079.1083032490974,
+            670.0
+          ],
+          [
+            203.79110251450678,
+            670.0
+          ]
+        ],
+        "stable_views": 6,
+        "jitter_pixels": 5.4828398950972765
+      },
+      {
+        "stage": "unchanged_focus_continuity",
+        "reference_observations": 6,
+        "observations": [
+          {
+            "attempt": 1,
+            "capture": {
+              "mode": "fresh_exposure",
+              "requested_at": 3453.967865217,
+              "completed_at": 3454.005930993,
+              "capture_seconds": 0.03806577600016681,
+              "sensor_timestamp_ns": 3453988646000,
+              "exposure_time_us": 12119,
+              "first_pixel_exposure_at": 3453.976527,
+              "frame_duration_us": 12570,
+              "lens_position": 2.0,
+              "af_state": 0,
+              "analogue_gain": 1.4992679357528687,
+              "digital_gain": 1.0007169246673584,
+              "colour_gains": [
+                2.2275888919830322,
+                1.5536056756973267
+              ],
+              "colour_temperature": 6138,
+              "ae_locked": null
+            },
+            "status": "supported",
+            "geometry": {
+              "rejections": {
+                "area": 252,
+                "edge_or_endpoint_support": 128
+              },
+              "candidate_checks": 396,
+              "accepted": 16,
+              "hough_lines": 55,
+              "selected_lines": [
+                12,
+                4
+              ],
+              "best_candidate_support": [
+                0.99,
+                1.0
+              ],
+              "best_support_corners": [
+                [
+                  188.95430792258605,
+                  158.69016044746724
+                ],
+                [
+                  1066.981933817278,
+                  113.000940095481
+                ],
+                [
+                  1077.0,
+                  667.0
+                ],
+                [
+                  206.6860465116279,
+                  667.0
+                ]
+              ],
+              "best_edge_support": [
+                1.0,
+                1.0,
+                0.99,
+                1.0
+              ],
+              "best_endpoint_support": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "jitter_pixels": 7.490848261687275,
+            "edge_support": [
+              1.0,
+              0.99,
+              0.98,
+              1.0
+            ],
+            "endpoint_support": [
+              1.0,
+              0.9,
+              1.0,
+              1.0
+            ],
+            "quality": {
+              "detail_pixels": 10295,
+              "clipped_channel_fraction": 0.1352112676056338,
+              "clipped_white_fraction": 0.0036911121903836813,
+              "colored_fraction": 0.7340456532297231,
+              "sharpness": 627.7868219501992
+            },
+            "consecutive": 1
+          },
+          {
+            "attempt": 2,
+            "capture": {
+              "mode": "fresh_exposure",
+              "requested_at": 3454.600798379,
+              "completed_at": 3454.633948316,
+              "capture_seconds": 0.03314993699996194,
+              "sensor_timestamp_ns": 3454616705000,
+              "exposure_time_us": 12119,
+              "first_pixel_exposure_at": 3454.604586,
+              "frame_duration_us": 12570,
+              "lens_position": 2.0,
+              "af_state": 0,
+              "analogue_gain": 1.4992679357528687,
+              "digital_gain": 1.0007169246673584,
+              "colour_gains": [
+                2.2266788482666016,
+                1.554129958152771
+              ],
+              "colour_temperature": 6132,
+              "ae_locked": null
+            },
+            "status": "unsupported_or_unreadable",
+            "geometry": {
+              "rejections": {
+                "area": 394,
+                "edge_or_endpoint_support": 156
+              },
+              "candidate_checks": 550,
+              "accepted": 0,
+              "hough_lines": 54,
+              "selected_lines": [
+                11,
+                5
+              ]
+            },
+            "discovery_miss": "No complete game border found; include all corners and aim more squarely at TV",
+            "reason": "fresh four-edge/endpoint evidence unavailable",
+            "rejected_frame": "sensory-final-rejected-01.png"
+          },
+          {
+            "attempt": 3,
+            "capture": {
+              "mode": "fresh_exposure",
+              "requested_at": 3455.745661519,
+              "completed_at": 3455.776960291,
+              "capture_seconds": 0.031298771999900055,
+              "sensor_timestamp_ns": 3455759774000,
+              "exposure_time_us": 12119,
+              "first_pixel_exposure_at": 3455.747655,
+              "frame_duration_us": 12570,
+              "lens_position": 2.0,
+              "af_state": 0,
+              "analogue_gain": 1.4992679357528687,
+              "digital_gain": 1.0007169246673584,
+              "colour_gains": [
+                2.2249059677124023,
+                1.555151104927063
+              ],
+              "colour_temperature": 6121,
+              "ae_locked": null
+            },
+            "status": "supported",
+            "geometry": {
+              "rejections": {
+                "area": 252,
+                "edge_or_endpoint_support": 128
+              },
+              "candidate_checks": 396,
+              "accepted": 16,
+              "hough_lines": 60,
+              "selected_lines": [
+                12,
+                4
+              ],
+              "best_candidate_support": [
+                0.98,
+                0.9
+              ],
+              "best_support_corners": [
+                [
+                  187.0290455162895,
+                  159.79034378535144
+                ],
+                [
+                  1059.1741940447796,
+                  114.40722519676487
+                ],
+                [
+                  1078.1022044088177,
+                  670.0
+                ],
+                [
+                  205.77949709864603,
+                  670.0
+                ]
+              ],
+              "best_edge_support": [
+                1.0,
+                0.99,
+                0.98,
+                1.0
+              ],
+              "best_endpoint_support": [
+                1.0,
+                0.9,
+                1.0,
+                1.0
+              ]
+            },
+            "jitter_pixels": 1.8469683494312505,
+            "edge_support": [
+              1.0,
+              0.99,
+              0.98,
+              1.0
+            ],
+            "endpoint_support": [
+              1.0,
+              0.9,
+              1.0,
+              1.0
+            ],
+            "quality": {
+              "detail_pixels": 9093,
+              "clipped_channel_fraction": 0.15352468932145608,
+              "clipped_white_fraction": 0.003849114703618168,
+              "colored_fraction": 0.7579456724953261,
+              "sharpness": 609.0911252242976
+            },
+            "consecutive": 1
+          },
+          {
+            "attempt": 4,
+            "capture": {
+              "mode": "fresh_exposure",
+              "requested_at": 3456.361354456,
+              "completed_at": 3456.392664543,
+              "capture_seconds": 0.0313100870002927,
+              "sensor_timestamp_ns": 3456375273000,
+              "exposure_time_us": 12119,
+              "first_pixel_exposure_at": 3456.363154,
+              "frame_duration_us": 12570,
+              "lens_position": 2.0,
+              "af_state": 0,
+              "analogue_gain": 1.4992679357528687,
+              "digital_gain": 1.0007169246673584,
+              "colour_gains": [
+                2.221529483795166,
+                1.5570734739303589
+              ],
+              "colour_temperature": 6102,
+              "ae_locked": null
+            },
+            "status": "supported",
+            "geometry": {
+              "rejections": {
+                "area": 158,
+                "edge_or_endpoint_support": 104
+              },
+              "candidate_checks": 270,
+              "accepted": 8,
+              "hough_lines": 58,
+              "selected_lines": [
+                10,
+                4
+              ],
+              "best_candidate_support": [
+                0.92,
+                1.0
+              ],
+              "best_support_corners": [
+                [
+                  186.02932799832263,
+                  159.84236528515515
+                ],
+                [
+                  1066.0189720030355,
+                  114.05104896816783
+                ],
+                [
+                  1076.0541516245487,
+                  670.0
+                ],
+                [
+                  203.79110251450678,
+                  670.0
+                ]
+              ],
+              "best_edge_support": [
+                1.0,
+                1.0,
+                0.97,
+                0.92
+              ],
+              "best_endpoint_support": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "jitter_pixels": 6.470221474640663,
+            "edge_support": [
+              1.0,
+              0.99,
+              0.98,
+              0.92
+            ],
+            "endpoint_support": [
+              1.0,
+              0.9,
+              1.0,
+              1.0
+            ],
+            "quality": {
+              "detail_pixels": 9185,
+              "clipped_channel_fraction": 0.1412084921066957,
+              "clipped_white_fraction": 0.003810560696788242,
+              "colored_fraction": 0.7832335329341318,
+              "sharpness": 606.6737223638646
+            },
+            "consecutive": 2
+          },
+          {
+            "attempt": 5,
+            "capture": {
+              "mode": "fresh_exposure",
+              "requested_at": 3456.882418624,
+              "completed_at": 3456.91990071,
+              "capture_seconds": 0.03748208600018188,
+              "sensor_timestamp_ns": 3456902843000,
+              "exposure_time_us": 12119,
+              "first_pixel_exposure_at": 3456.890724,
+              "frame_duration_us": 12570,
+              "lens_position": 2.0,
+              "af_state": 0,
+              "analogue_gain": 1.4992679357528687,
+              "digital_gain": 1.0007169246673584,
+              "colour_gains": [
+                2.222139835357666,
+                1.5567048788070679
+              ],
+              "colour_temperature": 6106,
+              "ae_locked": null
+            },
+            "status": "supported",
+            "geometry": {
+              "rejections": {
+                "area": 252,
+                "edge_or_endpoint_support": 128
+              },
+              "candidate_checks": 396,
+              "accepted": 16,
+              "hough_lines": 55,
+              "selected_lines": [
+                12,
+                4
+              ],
+              "best_candidate_support": [
+                0.97,
+                1.0
+              ],
+              "best_support_corners": [
+                [
+                  182.96470149783488,
+                  159.00183679988643
+                ],
+                [
+                  1059.9781959708082,
+                  113.36538799246925
+                ],
+                [
+                  1079.1030741410489,
+                  670.0
+                ],
+                [
+                  201.03536345776033,
+                  670.0
+                ]
+              ],
+              "best_edge_support": [
+                1.0,
+                1.0,
+                0.97,
+                1.0
+              ],
+              "best_endpoint_support": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ]
+            },
+            "jitter_pixels": 3.17090949665018,
+            "edge_support": [
+              1.0,
+              1.0,
+              0.98,
+              1.0
+            ],
+            "endpoint_support": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "quality": {
+              "detail_pixels": 9129,
+              "clipped_channel_fraction": 0.14941395552634462,
+              "clipped_white_fraction": 0.0030671486471683645,
+              "colored_fraction": 0.7789462153576514,
+              "sharpness": 606.2862085308411
+            },
+            "consecutive": 3
+          }
+        ]
+      }
+    ],
+    "final_focus_lock": {
+      "lock_samples": [
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3457.579663105,
+          "completed_at": 3457.612270167,
+          "capture_seconds": 0.032607062000352016,
+          "sensor_timestamp_ns": 3457593707000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3457.581588,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.2349462509155273,
+            1.5496084690093994
+          ],
+          "colour_temperature": 6179,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3457.618842724,
+          "completed_at": 3457.649109673,
+          "capture_seconds": 0.03026694900017901,
+          "sensor_timestamp_ns": 3457631392000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3457.619273,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.237288475036621,
+            1.5483226776123047
+          ],
+          "colour_temperature": 6192,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3457.652841169,
+          "completed_at": 3457.687339099,
+          "capture_seconds": 0.034497929999815824,
+          "sensor_timestamp_ns": 3457669075000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3457.656956,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.243635892868042,
+            1.544838547706604
+          ],
+          "colour_temperature": 6228,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3457.691259096,
+          "completed_at": 3457.724030456,
+          "capture_seconds": 0.03277135999996972,
+          "sensor_timestamp_ns": 3457706760000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3457.694641,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.2455437183380127,
+            1.5437912940979004
+          ],
+          "colour_temperature": 6239,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3457.736091598,
+          "completed_at": 3457.774082058,
+          "capture_seconds": 0.03799046000040107,
+          "sensor_timestamp_ns": 3457757003000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3457.744884,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.2473561763763428,
+            1.5427964925765991
+          ],
+          "colour_temperature": 6249,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3457.777738905,
+          "completed_at": 3457.812110001,
+          "capture_seconds": 0.03437109599963151,
+          "sensor_timestamp_ns": 3457794687000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3457.782568,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.247436285018921,
+            1.5427342653274536
+          ],
+          "colour_temperature": 6249,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3457.816732596,
+          "completed_at": 3457.849860681,
+          "capture_seconds": 0.03312808500004394,
+          "sensor_timestamp_ns": 3457832370000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3457.820251,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.2475123405456543,
+            1.542675256729126
+          ],
+          "colour_temperature": 6250,
+          "ae_locked": null
+        },
+        {
+          "mode": "fresh_exposure",
+          "requested_at": 3457.863774747,
+          "completed_at": 3457.900225435,
+          "capture_seconds": 0.03645068799960427,
+          "sensor_timestamp_ns": 3457882615000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3457.870496,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.247584581375122,
+            1.5426191091537476
+          ],
+          "colour_temperature": 6250,
+          "ae_locked": null
+        }
+      ]
+    },
+    "geometry": {
+      "calibration": {
+        "corners": [
+          [
+            0.14533559430166298,
+            0.2219653381365237
+          ],
+          [
+            0.8277732510265082,
+            0.15824539660052778
+          ],
+          [
+            0.8430676682755193,
+            0.9305555555555556
+          ],
+          [
+            0.15932228808532406,
+            0.9305555555555556
+          ]
+        ],
+        "output_size": [
+          640,
+          480
+        ]
+      },
+      "corners": [
+        [
+          186.02956070612862,
+          159.81504345829705
+        ],
+        [
+          1059.5497613139305,
+          113.93668555238
+        ],
+        [
+          1079.1266153926647,
+          670.0
+        ],
+        [
+          203.93252874921478,
+          670.0
+        ]
+      ],
+      "jitter_pixels": 5.4828398950972765,
+      "observations": 6
+    },
+    "focus": {
+      "lens_position": 2.0,
+      "score": 632.6709317642996,
+      "previous_score": 632.6709317642996,
+      "changed": false
+    },
+    "final_image_attempts": [
+      {
+        "attempt": 1,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 3457.905098496,
+          "completed_at": 3457.937513648,
+          "capture_seconds": 0.032415151999884984,
+          "sensor_timestamp_ns": 3457920298000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3457.908179,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.2476532459259033,
+            1.5425658226013184
+          ],
+          "colour_temperature": 6251,
+          "ae_locked": null
+        },
+        "status": "supported",
+        "geometry": {
+          "rejections": {
+            "area": 12
+          },
+          "candidate_checks": 18,
+          "accepted": 6,
+          "hough_lines": 32,
+          "selected_lines": [
+            3,
+            4
+          ],
+          "best_candidate_support": [
+            0.96,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              187.02751956947162,
+              159.79042318982388
+            ],
+            [
+              1058.1508245131863,
+              114.46047745745862
+            ],
+            [
+              1076.1618122977347,
+              671.0
+            ],
+            [
+              204.82591876208897,
+              671.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            0.99,
+            0.96,
+            1.0
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            1.0
+          ]
+        },
+        "jitter_pixels": 4.741707430892014,
+        "edge_support": [
+          1.0,
+          0.99,
+          0.97,
+          1.0
+        ],
+        "endpoint_support": [
+          1.0,
+          0.9,
+          0.9,
+          1.0
+        ],
+        "quality": {
+          "detail_pixels": 6163,
+          "clipped_channel_fraction": 0.12558818757098816,
+          "clipped_white_fraction": 0.015576829466169074,
+          "colored_fraction": 0.6464384228460166,
+          "sharpness": 201.19248529340192
+        },
+        "consecutive": 1
+      },
+      {
+        "attempt": 2,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 3458.19528069,
+          "completed_at": 3458.226270441,
+          "capture_seconds": 0.03098975100010648,
+          "sensor_timestamp_ns": 3458209208000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3458.1970890000002,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.2481889724731445,
+            1.542171835899353
+          ],
+          "colour_temperature": 6255,
+          "ae_locked": null
+        },
+        "status": "supported",
+        "geometry": {
+          "rejections": {
+            "area": 178,
+            "edge_or_endpoint_support": 90
+          },
+          "candidate_checks": 280,
+          "accepted": 12,
+          "hough_lines": 43,
+          "selected_lines": [
+            8,
+            5
+          ],
+          "best_candidate_support": [
+            0.95,
+            1.0
+          ],
+          "best_support_corners": [
+            [
+              189.02390271176964,
+              159.68653899916131
+            ],
+            [
+              1062.04378204767,
+              114.25790274412577
+            ],
+            [
+              1072.8393351800555,
+              671.0
+            ],
+            [
+              206.82591876208897,
+              671.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            1.0,
+            0.95,
+            1.0
+          ],
+          "best_endpoint_support": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "jitter_pixels": 6.366309171872419,
+        "edge_support": [
+          1.0,
+          0.99,
+          0.97,
+          1.0
+        ],
+        "endpoint_support": [
+          1.0,
+          0.9,
+          0.9,
+          1.0
+        ],
+        "quality": {
+          "detail_pixels": 7229,
+          "clipped_channel_fraction": 0.11536865403236962,
+          "clipped_white_fraction": 0.005256605339604372,
+          "colored_fraction": 0.8511550698575183,
+          "sharpness": 178.77179000064376
+        },
+        "consecutive": 2
+      },
+      {
+        "attempt": 3,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 3458.748975124,
+          "completed_at": 3458.779097924,
+          "capture_seconds": 0.030122799999844574,
+          "sensor_timestamp_ns": 3458761899000,
+          "exposure_time_us": 12119,
+          "first_pixel_exposure_at": 3458.74978,
+          "frame_duration_us": 12570,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007169246673584,
+          "colour_gains": [
+            2.248520612716675,
+            1.5418847799301147
+          ],
+          "colour_temperature": 6257,
+          "ae_locked": null
+        },
+        "status": "supported",
+        "geometry": {
+          "rejections": {
+            "area": 100,
+            "edge_or_endpoint_support": 60
+          },
+          "candidate_checks": 168,
+          "accepted": 8,
+          "hough_lines": 42,
+          "selected_lines": [
+            8,
+            4
+          ],
+          "best_candidate_support": [
+            0.95,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              182.99815233011702,
+              158.9469308150277
+            ],
+            [
+              1063.005450517077,
+              112.15921247250836
+            ],
+            [
+              1082.136936936937,
+              671.0
+            ],
+            [
+              200.82591876208897,
+              671.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            0.99,
+            0.95,
+            1.0
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            1.0
+          ]
+        },
+        "jitter_pixels": 3.8860260444844306,
+        "edge_support": [
+          1.0,
+          0.99,
+          0.97,
+          1.0
+        ],
+        "endpoint_support": [
+          1.0,
+          0.9,
+          0.9,
+          1.0
+        ],
+        "quality": {
+          "detail_pixels": 8823,
+          "clipped_channel_fraction": 0.1474555139975065,
+          "clipped_white_fraction": 0.03898900600702709,
+          "colored_fraction": 0.582228267029355,
+          "sharpness": 367.4887972278063
+        },
+        "consecutive": 3
+      }
+    ],
+    "quality": {
+      "detail_pixels": 8823,
+      "clipped_channel_fraction": 0.1474555139975065,
+      "clipped_white_fraction": 0.03898900600702709,
+      "colored_fraction": 0.582228267029355,
+      "sharpness": 367.4887972278063
+    },
+    "white_balance_locked": true,
+    "finished_at": 3459.226923047,
+    "final_capture": {
+      "mode": "fresh_exposure",
+      "requested_at": 3458.748975124,
+      "completed_at": 3458.779097924,
+      "capture_seconds": 0.030122799999844574,
+      "sensor_timestamp_ns": 3458761899000,
+      "exposure_time_us": 12119,
+      "first_pixel_exposure_at": 3458.74978,
+      "frame_duration_us": 12570,
+      "lens_position": 2.0,
+      "af_state": 0,
+      "analogue_gain": 1.4992679357528687,
+      "digital_gain": 1.0007169246673584,
+      "colour_gains": [
+        2.248520612716675,
+        1.5418847799301147
+      ],
+      "colour_temperature": 6257,
+      "ae_locked": null
+    },
+    "visual_readiness": {
+      "schema": "charlie-visual-readiness-v1",
+      "task": "robotron",
+      "status": "qualified",
+      "calibration": {
+        "corners": [
+          [
+            0.14533559430166298,
+            0.2219653381365237
+          ],
+          [
+            0.8277732510265082,
+            0.15824539660052778
+          ],
+          [
+            0.8430676682755193,
+            0.9305555555555556
+          ],
+          [
+            0.15932228808532406,
+            0.9305555555555556
+          ]
+        ],
+        "output_size": [
+          640,
+          480
+        ]
+      },
+      "focus": {
+        "lens_position": 2.0,
+        "score": 632.6709317642996,
+        "previous_score": 632.6709317642996,
+        "changed": false
+      },
+      "frame_size": [
+        1280,
+        720
+      ],
+      "origin": "/home/five/charlie-native-trials/visual-readiness-20261024-6ajF25mY/development-20261024-224738/game-01",
+      "observations": [
+        {
+          "attempt": 1,
+          "capture": {
+            "mode": "fresh_exposure",
+            "requested_at": 3457.905098496,
+            "completed_at": 3457.937513648,
+            "capture_seconds": 0.032415151999884984,
+            "sensor_timestamp_ns": 3457920298000,
+            "exposure_time_us": 12119,
+            "first_pixel_exposure_at": 3457.908179,
+            "frame_duration_us": 12570,
+            "lens_position": 2.0,
+            "af_state": 0,
+            "analogue_gain": 1.4992679357528687,
+            "digital_gain": 1.0007169246673584,
+            "colour_gains": [
+              2.2476532459259033,
+              1.5425658226013184
+            ],
+            "colour_temperature": 6251,
+            "ae_locked": null
+          },
+          "status": "supported",
+          "geometry": {
+            "rejections": {
+              "area": 12
+            },
+            "candidate_checks": 18,
+            "accepted": 6,
+            "hough_lines": 32,
+            "selected_lines": [
+              3,
+              4
+            ],
+            "best_candidate_support": [
+              0.96,
+              0.9
+            ],
+            "best_support_corners": [
+              [
+                187.02751956947162,
+                159.79042318982388
+              ],
+              [
+                1058.1508245131863,
+                114.46047745745862
+              ],
+              [
+                1076.1618122977347,
+                671.0
+              ],
+              [
+                204.82591876208897,
+                671.0
+              ]
+            ],
+            "best_edge_support": [
+              1.0,
+              0.99,
+              0.96,
+              1.0
+            ],
+            "best_endpoint_support": [
+              1.0,
+              0.9,
+              0.9,
+              1.0
+            ]
+          },
+          "jitter_pixels": 4.741707430892014,
+          "edge_support": [
+            1.0,
+            0.99,
+            0.97,
+            1.0
+          ],
+          "endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            1.0
+          ],
+          "quality": {
+            "detail_pixels": 6163,
+            "clipped_channel_fraction": 0.12558818757098816,
+            "clipped_white_fraction": 0.015576829466169074,
+            "colored_fraction": 0.6464384228460166,
+            "sharpness": 201.19248529340192
+          },
+          "consecutive": 1
+        },
+        {
+          "attempt": 2,
+          "capture": {
+            "mode": "fresh_exposure",
+            "requested_at": 3458.19528069,
+            "completed_at": 3458.226270441,
+            "capture_seconds": 0.03098975100010648,
+            "sensor_timestamp_ns": 3458209208000,
+            "exposure_time_us": 12119,
+            "first_pixel_exposure_at": 3458.1970890000002,
+            "frame_duration_us": 12570,
+            "lens_position": 2.0,
+            "af_state": 0,
+            "analogue_gain": 1.4992679357528687,
+            "digital_gain": 1.0007169246673584,
+            "colour_gains": [
+              2.2481889724731445,
+              1.542171835899353
+            ],
+            "colour_temperature": 6255,
+            "ae_locked": null
+          },
+          "status": "supported",
+          "geometry": {
+            "rejections": {
+              "area": 178,
+              "edge_or_endpoint_support": 90
+            },
+            "candidate_checks": 280,
+            "accepted": 12,
+            "hough_lines": 43,
+            "selected_lines": [
+              8,
+              5
+            ],
+            "best_candidate_support": [
+              0.95,
+              1.0
+            ],
+            "best_support_corners": [
+              [
+                189.02390271176964,
+                159.68653899916131
+              ],
+              [
+                1062.04378204767,
+                114.25790274412577
+              ],
+              [
+                1072.8393351800555,
+                671.0
+              ],
+              [
+                206.82591876208897,
+                671.0
+              ]
+            ],
+            "best_edge_support": [
+              1.0,
+              1.0,
+              0.95,
+              1.0
+            ],
+            "best_endpoint_support": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "jitter_pixels": 6.366309171872419,
+          "edge_support": [
+            1.0,
+            0.99,
+            0.97,
+            1.0
+          ],
+          "endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            1.0
+          ],
+          "quality": {
+            "detail_pixels": 7229,
+            "clipped_channel_fraction": 0.11536865403236962,
+            "clipped_white_fraction": 0.005256605339604372,
+            "colored_fraction": 0.8511550698575183,
+            "sharpness": 178.77179000064376
+          },
+          "consecutive": 2
+        },
+        {
+          "attempt": 3,
+          "capture": {
+            "mode": "fresh_exposure",
+            "requested_at": 3458.748975124,
+            "completed_at": 3458.779097924,
+            "capture_seconds": 0.030122799999844574,
+            "sensor_timestamp_ns": 3458761899000,
+            "exposure_time_us": 12119,
+            "first_pixel_exposure_at": 3458.74978,
+            "frame_duration_us": 12570,
+            "lens_position": 2.0,
+            "af_state": 0,
+            "analogue_gain": 1.4992679357528687,
+            "digital_gain": 1.0007169246673584,
+            "colour_gains": [
+              2.248520612716675,
+              1.5418847799301147
+            ],
+            "colour_temperature": 6257,
+            "ae_locked": null
+          },
+          "status": "supported",
+          "geometry": {
+            "rejections": {
+              "area": 100,
+              "edge_or_endpoint_support": 60
+            },
+            "candidate_checks": 168,
+            "accepted": 8,
+            "hough_lines": 42,
+            "selected_lines": [
+              8,
+              4
+            ],
+            "best_candidate_support": [
+              0.95,
+              0.9
+            ],
+            "best_support_corners": [
+              [
+                182.99815233011702,
+                158.9469308150277
+              ],
+              [
+                1063.005450517077,
+                112.15921247250836
+              ],
+              [
+                1082.136936936937,
+                671.0
+              ],
+              [
+                200.82591876208897,
+                671.0
+              ]
+            ],
+            "best_edge_support": [
+              1.0,
+              0.99,
+              0.95,
+              1.0
+            ],
+            "best_endpoint_support": [
+              1.0,
+              0.9,
+              0.9,
+              1.0
+            ]
+          },
+          "jitter_pixels": 3.8860260444844306,
+          "edge_support": [
+            1.0,
+            0.99,
+            0.97,
+            1.0
+          ],
+          "endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            1.0
+          ],
+          "quality": {
+            "detail_pixels": 8823,
+            "clipped_channel_fraction": 0.1474555139975065,
+            "clipped_white_fraction": 0.03898900600702709,
+            "colored_fraction": 0.582228267029355,
+            "sharpness": 367.4887972278063
+          },
+          "consecutive": 3
+        }
+      ],
+      "physical_motion": false,
+      "readiness_scope": "screen readable before START; gameplay and SELF unqualified",
+      "record_id": "54e57dad3058284165bca0d12f83cf8ad6adbc95fb80837d1925525e2bc56233"
+    },
+    "camera_session": {
+      "id": "camera-session:d376f59d1aba49368aff544b7f1c0e51",
+      "reused": false,
+      "qualification_origin": "/home/five/charlie-native-trials/visual-readiness-20261024-6ajF25mY/development-20261024-224738/game-01",
+      "scope": "current uninterrupted live camera session; not a saved profile"
+    }
+  },
+  "session_evidence": "session-evidence.sqlite3",
+  "recording_error": null,
+  "recording_pipeline": {
+    "accepted": 143,
+    "written": 143,
+    "captures_written": 110,
+    "max_occupancy": 7,
+    "max_bytes": 19362032,
+    "backpressure": 0,
+    "enqueue_ns": 140753283,
+    "encode_ns": 9418035879,
+    "write_ns": 4434199389,
+    "occupancy": 0,
+    "frame_occupancy": 0,
+    "buffered_bytes": 0,
+    "record_capacity": 512,
+    "frame_capacity": 16,
+    "byte_capacity": 134217728,
+    "emergency_slots": 1,
+    "schema": "charlie-buffered-recording-v1",
+    "worker_encoding_allowance_bytes": 5529600,
+    "emergency_byte_allowance": 2764800,
+    "throughput_records_per_second": 3.9437239599157783,
+    "writer_error": null,
+    "paused": false,
+    "recovery": {
+      "previous_status": null,
+      "interrupted_flush": false,
+      "uncommitted_tail": null
+    },
+    "writer_alive": false,
+    "visual_contract": "strict-full-frame-v1",
+    "visual_hz": null,
+    "retention_counts": {
+      "selected": 110,
+      "not_selected": 0,
+      "unavailable": 0
+    },
+    "rolling": {
+      "seconds": 0.0,
+      "capacity_frames": 60,
+      "capacity_bytes": 33554432,
+      "frames": 0,
+      "bytes": 0,
+      "peak_bytes": 0,
+      "evictions": 0
+    },
+    "incidents": {
+      "requests": 0,
+      "active": 0,
+      "extra_frames": 0
+    },
+    "total_accounted_snapshot_bytes": 0
+  },
+  "prediction_commitment_mode": "buffered_live_prospective",
+  "calibration_mode": "fresh_session",
+  "exposure_preflight": {
+    "status": "selected",
+    "samples": [
+      {
+        "ev": 0.0,
+        "frame": "exposure-ev-0.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 3438.871520933,
+          "completed_at": 3438.999207953,
+          "capture_seconds": 0.1276870200003941,
+          "sensor_timestamp_ns": 3438981298000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 3438.914643,
+          "frame_duration_us": 67106,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 5.88505744934082,
+          "digital_gain": 1.004708170890808,
+          "colour_gains": [
+            2.291456460952759,
+            1.518873929977417
+          ],
+          "colour_temperature": 6495,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 468,
+            "edge_or_endpoint_support": 174
+          },
+          "candidate_checks": 660,
+          "accepted": 18,
+          "hough_lines": 122,
+          "selected_lines": [
+            12,
+            5
+          ],
+          "best_candidate_support": [
+            0.92,
+            0.5
+          ],
+          "best_support_corners": [
+            [
+              187.99529402340974,
+              158.73411232264976
+            ],
+            [
+              1065.9644941069243,
+              112.00188989464843
+            ],
+            [
+              1085.7786561264822,
+              669.0
+            ],
+            [
+              197.02654867256638,
+              669.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            0.98,
+            0.92,
+            0.93
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            0.5
+          ]
+        },
+        "corners": [
+          [
+            192.11321272825938,
+            165.5160214709286
+          ],
+          [
+            1062.2500934830146,
+            119.30536226700374
+          ],
+          [
+            1081.0684684684684,
+            669.0
+          ],
+          [
+            200.86100386100387,
+            669.0
+          ]
+        ],
+        "detail_pixels": 28456,
+        "clipped_channel_fraction": 0.5720410458251335,
+        "clipped_white_fraction": 0.29930418892324995,
+        "colored_fraction": 0.33391903289288727
+      },
+      {
+        "ev": -1.0,
+        "frame": "exposure-ev-1.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 3441.153005775,
+          "completed_at": 3441.280313088,
+          "capture_seconds": 0.12730731300007392,
+          "sensor_timestamp_ns": 3441262608000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 3441.195953,
+          "frame_duration_us": 67106,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 9.660377502441406,
+          "digital_gain": 1.0001729726791382,
+          "colour_gains": [
+            2.285468578338623,
+            1.5220515727996826
+          ],
+          "colour_temperature": 6462,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 551,
+            "outside_frame_or_nonfinite": 600,
+            "edge_or_endpoint_support": 227
+          },
+          "candidate_checks": 1386,
+          "accepted": 8,
+          "hough_lines": 69,
+          "selected_lines": [
+            12,
+            7
+          ],
+          "best_candidate_support": [
+            0.89,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              184.06564465920783,
+              159.8927543404926
+            ],
+            [
+              1059.126653313248,
+              114.4606929431045
+            ],
+            [
+              1087.7720588235295,
+              671.0
+            ],
+            [
+              201.79190751445086,
+              671.0
+            ]
+          ],
+          "best_edge_support": [
+            0.97,
+            0.98,
+            0.89,
+            0.99
+          ],
+          "best_endpoint_support": [
+            0.9,
+            0.9,
+            0.9,
+            0.9
+          ]
+        },
+        "corners": [
+          [
+            184.06564465920783,
+            159.8927543404926
+          ],
+          [
+            1059.126653313248,
+            114.4606929431045
+          ],
+          [
+            1087.7720588235295,
+            671.0
+          ],
+          [
+            201.79190751445086,
+            671.0
+          ]
+        ],
+        "detail_pixels": 11025,
+        "clipped_channel_fraction": 0.7034013605442176,
+        "clipped_white_fraction": 0.5771428571428572,
+        "colored_fraction": 0.08
+      },
+      {
+        "ev": -2.0,
+        "frame": "exposure-ev-2.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 3443.322399066,
+          "completed_at": 3443.407077508,
+          "capture_seconds": 0.08467844200004038,
+          "sensor_timestamp_ns": 3443389450000,
+          "exposure_time_us": 49986,
+          "first_pixel_exposure_at": 3443.339464,
+          "frame_duration_us": 50437,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 2.3432493209838867,
+          "digital_gain": 1.0019536018371582,
+          "colour_gains": [
+            2.3013100624084473,
+            1.5141366720199585
+          ],
+          "colour_temperature": 6547,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 1156,
+            "edge_or_endpoint_support": 222
+          },
+          "candidate_checks": 1386,
+          "accepted": 8,
+          "hough_lines": 88,
+          "selected_lines": [
+            12,
+            7
+          ],
+          "best_candidate_support": [
+            0.84,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              185.10036664210762,
+              160.88832892287436
+            ],
+            [
+              1063.079583367239,
+              114.20843844088209
+            ],
+            [
+              1083.144144144144,
+              671.0
+            ],
+            [
+              202.82625482625483,
+              671.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            1.0,
+            0.84,
+            1.0
+          ],
+          "best_endpoint_support": [
+            1.0,
+            1.0,
+            0.9,
+            1.0
+          ]
+        },
+        "corners": [
+          [
+            185.10036664210762,
+            160.88832892287436
+          ],
+          [
+            1063.079583367239,
+            114.20843844088209
+          ],
+          [
+            1083.144144144144,
+            671.0
+          ],
+          [
+            202.82625482625483,
+            671.0
+          ]
+        ],
+        "detail_pixels": 21253,
+        "clipped_channel_fraction": 0.4684985649084835,
+        "clipped_white_fraction": 0.33665835411471323,
+        "colored_fraction": 0.1961605420411236
+      },
+      {
+        "ev": -3.0,
+        "frame": "exposure-ev-3.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 3445.166033148,
+          "completed_at": 3445.201292047,
+          "capture_seconds": 0.035258898999927624,
+          "sensor_timestamp_ns": 3445184136000,
+          "exposure_time_us": 14495,
+          "first_pixel_exposure_at": 3445.169641,
+          "frame_duration_us": 14946,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0008574724197388,
+          "colour_gains": [
+            2.250124454498291,
+            1.5415260791778564
+          ],
+          "colour_temperature": 6260,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 534,
+            "edge_or_endpoint_support": 120
+          },
+          "candidate_checks": 660,
+          "accepted": 6,
+          "hough_lines": 69,
+          "selected_lines": [
+            12,
+            5
+          ],
+          "best_candidate_support": [
+            0.98,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              186.10083337714917,
+              162.89055681160946
+            ],
+            [
+              1057.7262793813961,
+              117.48311568341538
+            ],
+            [
+              1076.166270783848,
+              672.0
+            ],
+            [
+              203.86046511627907,
+              672.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            0.98,
+            0.98,
+            0.99
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            0.9
+          ]
+        },
+        "corners": [
+          [
+            186.10083337714917,
+            162.89055681160946
+          ],
+          [
+            1061.1136101133955,
+            117.30665224777329
+          ],
+          [
+            1080.1717902350813,
+            672.0
+          ],
+          [
+            203.86046511627907,
+            672.0
+          ]
+        ],
+        "detail_pixels": 14969,
+        "clipped_channel_fraction": 0.22386264947558288,
+        "clipped_white_fraction": 0.02298082704255461,
+        "colored_fraction": 0.8655888836929655
+      }
+    ],
+    "selected_ev": -3.0,
+    "awb": "unchanged; original RGB retained",
+    "reference_ev": 0.0,
+    "exposure_locked": true,
+    "selected_capture": {
+      "mode": "fresh_exposure",
+      "requested_at": 3446.562310331,
+      "completed_at": 3446.595080728,
+      "capture_seconds": 0.03277039700014939,
+      "sensor_timestamp_ns": 3446577396000,
+      "exposure_time_us": 12137,
+      "first_pixel_exposure_at": 3446.565259,
+      "frame_duration_us": 12579,
+      "lens_position": 2.0,
+      "af_state": 0,
+      "analogue_gain": 1.4992679357528687,
+      "digital_gain": 1.0008437633514404,
+      "colour_gains": [
+        2.24338436126709,
+        1.5449649095535278
+      ],
+      "colour_temperature": 6226,
+      "ae_locked": null
+    },
+    "processing_seconds": 8.526881481000146
+  },
+  "calibration": {
+    "corners": [
+      [
+        0.14533559430166298,
+        0.2219653381365237
+      ],
+      [
+        0.8277732510265082,
+        0.15824539660052778
+      ],
+      [
+        0.8430676682755193,
+        0.9305555555555556
+      ],
+      [
+        0.15932228808532406,
+        0.9305555555555556
+      ]
+    ],
+    "output_size": [
+      640,
+      480
+    ]
+  },
+  "acquisition": "generic_visual_ready",
+  "gameplay_visual_frame": 0,
+  "startup_watch": [
+    {
+      "screen_state": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0055,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1668,
+          "heroes": 0.1699,
+          "all-time": 0.1985
+        },
+        "geometric_border_support": [
+          0.9836,
+          0.9967,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.10534057766199112,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": false,
+          "similarity": 0.0,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "interior_regions": 148
+      },
+      "capture_timestamp": 3466.562841,
+      "candidate_count": null,
+      "prior_commencement": true
+    },
+    {
+      "screen_state": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0075,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.2092,
+          "heroes": 0.1824,
+          "all-time": 0.178
+        },
+        "geometric_border_support": [
+          0.9311,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.12660427391529083,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": false,
+          "similarity": 0.0,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "interior_regions": 58
+      },
+      "capture_timestamp": 3466.814065,
+      "candidate_count": null,
+      "prior_commencement": true
+    },
+    {
+      "screen_state": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0114,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.2225,
+          "heroes": 0.1982,
+          "all-time": 0.1879
+        },
+        "geometric_border_support": [
+          0.9279,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.12362080067396164,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": false,
+          "similarity": 0.21618016064167023,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "interior_regions": 136
+      },
+      "capture_timestamp": 3467.0527270000002,
+      "candidate_count": null,
+      "prior_commencement": true
+    },
+    {
+      "frame": 0,
+      "t": 0.382,
+      "candidate_count": 64,
+      "capture_timestamp": 3467.303953,
+      "observed_at_monotonic": 3467.721668478,
+      "screen_state": {
+        "state": "gameplay",
+        "reason": "complete_border_and_small_interior_regions",
+        "coverage": 0.0096,
+        "border_state": "unknown",
+        "label_scores": {
+          "pregame": 0.1781,
+          "heroes": 0.1849,
+          "all-time": 0.1793
+        },
+        "geometric_border_support": [
+          0.9377,
+          0.9984,
+          1.0,
+          1.0
+        ],
+        "phase": "gameplay",
+        "title_reference": {
+          "matched": false,
+          "sha256": "1a6c37eb4084b306ade3cc3957312db563fbc9e5d71690cf51fd70eb69a7739c",
+          "anchor_sha256": "a55be5192c25f9f8c0b6e4eae61fdd9999e82b453f08089e7ef19f0eea28da02",
+          "similarity": 0.12162193655967712,
+          "minimum_similarity": 0.82,
+          "basis": "complete recorded logo pixels; similarity is not a probability"
+        },
+        "terminal_reference": {
+          "matched": false,
+          "similarity": 0.23267051577568054,
+          "minimum_similarity": 0.85,
+          "sha256": "a7e326db33d51702eb5fa84305e8118d077f48034125a8f180e82e5a22c0498c",
+          "anchor_sha256": "9e5b9510cc95a15b9996ec727dfc14832a264af758b0c7dd1f43465594e30a03",
+          "basis": "complete recorded GAME OVER pixels; similarity is not a probability"
+        },
+        "interior_regions": 203
+      },
+      "stable_center": null,
+      "stable_appearance": null,
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            58.828,
+            3.958
+          ],
+          "player_score": 0.553,
+          "mine_score": 0.6566,
+          "best_score": 0.6582,
+          "runner_up": 0.6566
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            84.922,
+            4.271
+          ],
+          "player_score": 0.5549,
+          "mine_score": 0.6572,
+          "best_score": 0.6572,
+          "runner_up": 0.6564
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            29.844,
+            5.312
+          ],
+          "player_score": 0.5577,
+          "mine_score": 0.6604,
+          "best_score": 0.6634,
+          "runner_up": 0.6604
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            77.578,
+            5.312
+          ],
+          "player_score": 0.5513,
+          "mine_score": 0.6599,
+          "best_score": 0.6599,
+          "runner_up": 0.653
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            85.625,
+            10.521
+          ],
+          "player_score": 0.5203,
+          "mine_score": 0.8066,
+          "best_score": 0.8378,
+          "runner_up": 0.8066
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            14.531,
+            13.229
+          ],
+          "player_score": 0.5544,
+          "mine_score": 0.7106,
+          "best_score": 0.7106,
+          "runner_up": 0.7005
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            46.406,
+            13.229
+          ],
+          "player_score": 0.5549,
+          "mine_score": 0.6784,
+          "best_score": 0.6784,
+          "runner_up": 0.6725
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            13.125,
+            21.354
+          ],
+          "player_score": 0.5338,
+          "mine_score": 0.6549,
+          "best_score": 0.6549,
+          "runner_up": 0.6489
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            21.771
+          ],
+          "player_score": 0.6413,
+          "mine_score": 0.6906,
+          "best_score": 0.8507,
+          "runner_up": 0.8208
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            24.688
+          ],
+          "player_score": 0.6673,
+          "mine_score": 0.6842,
+          "best_score": 0.7509,
+          "runner_up": 0.7241
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            27.604
+          ],
+          "player_score": 0.615,
+          "mine_score": 0.6734,
+          "best_score": 0.7482,
+          "runner_up": 0.7373
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            30.625
+          ],
+          "player_score": 0.6337,
+          "mine_score": 0.7087,
+          "best_score": 0.7172,
+          "runner_up": 0.7087
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            43.203,
+            33.125
+          ],
+          "player_score": 0.7386,
+          "mine_score": 0.6831,
+          "best_score": 0.7386,
+          "runner_up": 0.7151
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            35.833
+          ],
+          "player_score": 0.5878,
+          "mine_score": 0.6251,
+          "best_score": 0.7261,
+          "runner_up": 0.6859
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            10.156,
+            36.458
+          ],
+          "player_score": 0.5289,
+          "mine_score": 0.8106,
+          "best_score": 0.8356,
+          "runner_up": 0.8106
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            38.438,
+            37.396
+          ],
+          "player_score": 0.6229,
+          "mine_score": 0.619,
+          "best_score": 0.7072,
+          "runner_up": 0.6675
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            63.828,
+            37.188
+          ],
+          "player_score": 0.5658,
+          "mine_score": 0.5416,
+          "best_score": 0.7279,
+          "runner_up": 0.6561
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            90.078,
+            43.229
+          ],
+          "player_score": 0.3896,
+          "mine_score": 0.4365,
+          "best_score": 0.4705,
+          "runner_up": 0.4491
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            39.766,
+            39.375
+          ],
+          "player_score": 0.5594,
+          "mine_score": 0.5305,
+          "best_score": 0.6716,
+          "runner_up": 0.6282
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.172,
+            39.375
+          ],
+          "player_score": 0.5786,
+          "mine_score": 0.5603,
+          "best_score": 0.7019,
+          "runner_up": 0.6451
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            40.833
+          ],
+          "player_score": 0.6471,
+          "mine_score": 0.7323,
+          "best_score": 0.7477,
+          "runner_up": 0.7448
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            58.984,
+            41.354
+          ],
+          "player_score": 0.4201,
+          "mine_score": 0.4536,
+          "best_score": 0.5237,
+          "runner_up": 0.4959
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            43.359,
+            43.333
+          ],
+          "player_score": 0.4688,
+          "mine_score": 0.4504,
+          "best_score": 0.5623,
+          "runner_up": 0.5398
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            7.266,
+            44.792
+          ],
+          "player_score": 0.551,
+          "mine_score": 0.6738,
+          "best_score": 0.6738,
+          "runner_up": 0.6609
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            57.422,
+            43.958
+          ],
+          "player_score": 0.5223,
+          "mine_score": 0.5218,
+          "best_score": 0.5802,
+          "runner_up": 0.5223
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            44.271
+          ],
+          "player_score": 0.6374,
+          "mine_score": 0.6196,
+          "best_score": 0.7897,
+          "runner_up": 0.7123
+        },
+        {
+          "kind": "mine",
+          "center": [
+            47.578,
+            46.042
+          ],
+          "player_score": 0.5977,
+          "mine_score": 0.822,
+          "best_score": 0.822,
+          "runner_up": 0.7552
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            53.359,
+            46.146
+          ],
+          "player_score": 0.5686,
+          "mine_score": 0.7914,
+          "best_score": 0.7914,
+          "runner_up": 0.7071
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            45.0,
+            46.562
+          ],
+          "player_score": 0.6989,
+          "mine_score": 0.6752,
+          "best_score": 0.8066,
+          "runner_up": 0.773
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            56.172,
+            46.562
+          ],
+          "player_score": 0.7619,
+          "mine_score": 0.7368,
+          "best_score": 0.8234,
+          "runner_up": 0.7952
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            47.396
+          ],
+          "player_score": 0.8168,
+          "mine_score": 0.871,
+          "best_score": 0.8775,
+          "runner_up": 0.8759
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            49.375,
+            51.771
+          ],
+          "player_score": 0.5529,
+          "mine_score": 0.4964,
+          "best_score": 0.5963,
+          "runner_up": 0.5676
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            53.828,
+            48.229
+          ],
+          "player_score": 0.5037,
+          "mine_score": 0.499,
+          "best_score": 0.6772,
+          "runner_up": 0.65
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            38.203,
+            49.688
+          ],
+          "player_score": 0.4634,
+          "mine_score": 0.4918,
+          "best_score": 0.6395,
+          "runner_up": 0.574
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.047,
+            50.417
+          ],
+          "player_score": 0.4799,
+          "mine_score": 0.5018,
+          "best_score": 0.6833,
+          "runner_up": 0.5964
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            43.594,
+            50.521
+          ],
+          "player_score": 0.7598,
+          "mine_score": 0.7138,
+          "best_score": 0.8447,
+          "runner_up": 0.7923
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            58.047,
+            49.583
+          ],
+          "player_score": 0.5658,
+          "mine_score": 0.5948,
+          "best_score": 0.7799,
+          "runner_up": 0.6917
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            23.203,
+            48.75
+          ],
+          "player_score": 0.7896,
+          "mine_score": 0.7722,
+          "best_score": 0.8928,
+          "runner_up": 0.8575
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            28.359,
+            49.688
+          ],
+          "player_score": 0.5198,
+          "mine_score": 0.5392,
+          "best_score": 0.7544,
+          "runner_up": 0.6784
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            53.359,
+            50.729
+          ],
+          "player_score": 0.5507,
+          "mine_score": 0.5779,
+          "best_score": 0.8303,
+          "runner_up": 0.704
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            86.797,
+            56.979
+          ],
+          "player_score": 0.5796,
+          "mine_score": 0.6786,
+          "best_score": 0.6892,
+          "runner_up": 0.6786
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            45.625,
+            56.25
+          ],
+          "player_score": 0.4998,
+          "mine_score": 0.5504,
+          "best_score": 0.5888,
+          "runner_up": 0.5538
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            54.922,
+            56.25
+          ],
+          "player_score": 0.5104,
+          "mine_score": 0.5018,
+          "best_score": 0.5947,
+          "runner_up": 0.5735
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.313,
+            58.333
+          ],
+          "player_score": 0.7221,
+          "mine_score": 0.7466,
+          "best_score": 0.7674,
+          "runner_up": 0.7466
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            43.984,
+            59.062
+          ],
+          "player_score": 0.5398,
+          "mine_score": 0.5933,
+          "best_score": 0.6871,
+          "runner_up": 0.6355
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            57.266,
+            59.062
+          ],
+          "player_score": 0.6208,
+          "mine_score": 0.5824,
+          "best_score": 0.6704,
+          "runner_up": 0.6443
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            58.594,
+            60.833
+          ],
+          "player_score": 0.6021,
+          "mine_score": 0.572,
+          "best_score": 0.6881,
+          "runner_up": 0.671
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            42.734,
+            60.938
+          ],
+          "player_score": 0.5833,
+          "mine_score": 0.5902,
+          "best_score": 0.7019,
+          "runner_up": 0.7012
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            60.938
+          ],
+          "player_score": 0.6407,
+          "mine_score": 0.6944,
+          "best_score": 0.8108,
+          "runner_up": 0.7665
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            40.234,
+            63.021
+          ],
+          "player_score": 0.5229,
+          "mine_score": 0.5922,
+          "best_score": 0.8223,
+          "runner_up": 0.7575
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            50.469,
+            63.438
+          ],
+          "player_score": 0.6587,
+          "mine_score": 0.6832,
+          "best_score": 0.8877,
+          "runner_up": 0.8268
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            38.281,
+            64.896
+          ],
+          "player_score": 0.7918,
+          "mine_score": 0.781,
+          "best_score": 0.9472,
+          "runner_up": 0.902
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            39.453,
+            64.896
+          ],
+          "player_score": 0.8015,
+          "mine_score": 0.7968,
+          "best_score": 0.9164,
+          "runner_up": 0.8959
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            69.896
+          ],
+          "player_score": 0.6381,
+          "mine_score": 0.6871,
+          "best_score": 0.748,
+          "runner_up": 0.7043
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            86.094,
+            72.604
+          ],
+          "player_score": 0.526,
+          "mine_score": 0.8096,
+          "best_score": 0.8131,
+          "runner_up": 0.8096
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            72.604
+          ],
+          "player_score": 0.6924,
+          "mine_score": 0.7475,
+          "best_score": 0.8263,
+          "runner_up": 0.7935
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            78.203,
+            77.188
+          ],
+          "player_score": 0.5586,
+          "mine_score": 0.6512,
+          "best_score": 0.6794,
+          "runner_up": 0.6512
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            50.469,
+            75.104
+          ],
+          "player_score": 0.6526,
+          "mine_score": 0.6779,
+          "best_score": 0.8902,
+          "runner_up": 0.8241
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            48.203,
+            81.146
+          ],
+          "player_score": 0.4642,
+          "mine_score": 0.7852,
+          "best_score": 0.7852,
+          "runner_up": 0.741
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            8.672,
+            82.188
+          ],
+          "player_score": 0.5596,
+          "mine_score": 0.6735,
+          "best_score": 0.6762,
+          "runner_up": 0.6735
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            67.344,
+            81.875
+          ],
+          "player_score": 0.5585,
+          "mine_score": 0.6354,
+          "best_score": 0.6669,
+          "runner_up": 0.6388
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            78.906,
+            85.104
+          ],
+          "player_score": 0.5849,
+          "mine_score": 0.6506,
+          "best_score": 0.6897,
+          "runner_up": 0.6519
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            81.797,
+            89.271
+          ],
+          "player_score": 0.576,
+          "mine_score": 0.638,
+          "best_score": 0.6843,
+          "runner_up": 0.6448
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            90.312,
+            89.896
+          ],
+          "player_score": 0.5316,
+          "mine_score": 0.7987,
+          "best_score": 0.8123,
+          "runner_up": 0.7987
+        }
+      ]
+    }
+  ],
+  "diagnostic_buffer_bytes": 17510400,
+  "agency_frames": [
+    {
+      "sample": 1,
+      "path": "agency-000.png",
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            58.828,
+            3.958
+          ],
+          "player_score": 0.553,
+          "mine_score": 0.6566,
+          "best_score": 0.6582,
+          "runner_up": 0.6566
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            84.922,
+            4.271
+          ],
+          "player_score": 0.5549,
+          "mine_score": 0.6572,
+          "best_score": 0.6572,
+          "runner_up": 0.6564
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            29.844,
+            5.312
+          ],
+          "player_score": 0.5577,
+          "mine_score": 0.6604,
+          "best_score": 0.6634,
+          "runner_up": 0.6604
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            77.578,
+            5.312
+          ],
+          "player_score": 0.5513,
+          "mine_score": 0.6599,
+          "best_score": 0.6599,
+          "runner_up": 0.653
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            85.625,
+            10.521
+          ],
+          "player_score": 0.5203,
+          "mine_score": 0.8066,
+          "best_score": 0.8378,
+          "runner_up": 0.8066
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            14.531,
+            13.229
+          ],
+          "player_score": 0.5544,
+          "mine_score": 0.7106,
+          "best_score": 0.7106,
+          "runner_up": 0.7005
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            46.406,
+            13.229
+          ],
+          "player_score": 0.5549,
+          "mine_score": 0.6784,
+          "best_score": 0.6784,
+          "runner_up": 0.6725
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            13.125,
+            21.354
+          ],
+          "player_score": 0.5338,
+          "mine_score": 0.6549,
+          "best_score": 0.6549,
+          "runner_up": 0.6489
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            21.771
+          ],
+          "player_score": 0.6413,
+          "mine_score": 0.6906,
+          "best_score": 0.8507,
+          "runner_up": 0.8208
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            24.688
+          ],
+          "player_score": 0.6673,
+          "mine_score": 0.6842,
+          "best_score": 0.7509,
+          "runner_up": 0.7241
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            27.604
+          ],
+          "player_score": 0.615,
+          "mine_score": 0.6734,
+          "best_score": 0.7482,
+          "runner_up": 0.7373
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            30.625
+          ],
+          "player_score": 0.6337,
+          "mine_score": 0.7087,
+          "best_score": 0.7172,
+          "runner_up": 0.7087
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            43.203,
+            33.125
+          ],
+          "player_score": 0.7386,
+          "mine_score": 0.6831,
+          "best_score": 0.7386,
+          "runner_up": 0.7151
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            35.833
+          ],
+          "player_score": 0.5878,
+          "mine_score": 0.6251,
+          "best_score": 0.7261,
+          "runner_up": 0.6859
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            10.156,
+            36.458
+          ],
+          "player_score": 0.5289,
+          "mine_score": 0.8106,
+          "best_score": 0.8356,
+          "runner_up": 0.8106
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            38.438,
+            37.396
+          ],
+          "player_score": 0.6229,
+          "mine_score": 0.619,
+          "best_score": 0.7072,
+          "runner_up": 0.6675
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            63.828,
+            37.188
+          ],
+          "player_score": 0.5658,
+          "mine_score": 0.5416,
+          "best_score": 0.7279,
+          "runner_up": 0.6561
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            90.078,
+            43.229
+          ],
+          "player_score": 0.3896,
+          "mine_score": 0.4365,
+          "best_score": 0.4705,
+          "runner_up": 0.4491
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            39.766,
+            39.375
+          ],
+          "player_score": 0.5594,
+          "mine_score": 0.5305,
+          "best_score": 0.6716,
+          "runner_up": 0.6282
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            61.172,
+            39.375
+          ],
+          "player_score": 0.5786,
+          "mine_score": 0.5603,
+          "best_score": 0.7019,
+          "runner_up": 0.6451
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            40.833
+          ],
+          "player_score": 0.6471,
+          "mine_score": 0.7323,
+          "best_score": 0.7477,
+          "runner_up": 0.7448
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            58.984,
+            41.354
+          ],
+          "player_score": 0.4201,
+          "mine_score": 0.4536,
+          "best_score": 0.5237,
+          "runner_up": 0.4959
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            43.359,
+            43.333
+          ],
+          "player_score": 0.4688,
+          "mine_score": 0.4504,
+          "best_score": 0.5623,
+          "runner_up": 0.5398
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            7.266,
+            44.792
+          ],
+          "player_score": 0.551,
+          "mine_score": 0.6738,
+          "best_score": 0.6738,
+          "runner_up": 0.6609
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            57.422,
+            43.958
+          ],
+          "player_score": 0.5223,
+          "mine_score": 0.5218,
+          "best_score": 0.5802,
+          "runner_up": 0.5223
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            44.271
+          ],
+          "player_score": 0.6374,
+          "mine_score": 0.6196,
+          "best_score": 0.7897,
+          "runner_up": 0.7123
+        },
+        {
+          "kind": "mine",
+          "center": [
+            47.578,
+            46.042
+          ],
+          "player_score": 0.5977,
+          "mine_score": 0.822,
+          "best_score": 0.822,
+          "runner_up": 0.7552
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            53.359,
+            46.146
+          ],
+          "player_score": 0.5686,
+          "mine_score": 0.7914,
+          "best_score": 0.7914,
+          "runner_up": 0.7071
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            45.0,
+            46.562
+          ],
+          "player_score": 0.6989,
+          "mine_score": 0.6752,
+          "best_score": 0.8066,
+          "runner_up": 0.773
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            56.172,
+            46.562
+          ],
+          "player_score": 0.7619,
+          "mine_score": 0.7368,
+          "best_score": 0.8234,
+          "runner_up": 0.7952
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            47.396
+          ],
+          "player_score": 0.8168,
+          "mine_score": 0.871,
+          "best_score": 0.8775,
+          "runner_up": 0.8759
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            49.375,
+            51.771
+          ],
+          "player_score": 0.5529,
+          "mine_score": 0.4964,
+          "best_score": 0.5963,
+          "runner_up": 0.5676
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            53.828,
+            48.229
+          ],
+          "player_score": 0.5037,
+          "mine_score": 0.499,
+          "best_score": 0.6772,
+          "runner_up": 0.65
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            38.203,
+            49.688
+          ],
+          "player_score": 0.4634,
+          "mine_score": 0.4918,
+          "best_score": 0.6395,
+          "runner_up": 0.574
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            33.047,
+            50.417
+          ],
+          "player_score": 0.4799,
+          "mine_score": 0.5018,
+          "best_score": 0.6833,
+          "runner_up": 0.5964
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            43.594,
+            50.521
+          ],
+          "player_score": 0.7598,
+          "mine_score": 0.7138,
+          "best_score": 0.8447,
+          "runner_up": 0.7923
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            58.047,
+            49.583
+          ],
+          "player_score": 0.5658,
+          "mine_score": 0.5948,
+          "best_score": 0.7799,
+          "runner_up": 0.6917
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            23.203,
+            48.75
+          ],
+          "player_score": 0.7896,
+          "mine_score": 0.7722,
+          "best_score": 0.8928,
+          "runner_up": 0.8575
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            28.359,
+            49.688
+          ],
+          "player_score": 0.5198,
+          "mine_score": 0.5392,
+          "best_score": 0.7544,
+          "runner_up": 0.6784
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            53.359,
+            50.729
+          ],
+          "player_score": 0.5507,
+          "mine_score": 0.5779,
+          "best_score": 0.8303,
+          "runner_up": 0.704
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            86.797,
+            56.979
+          ],
+          "player_score": 0.5796,
+          "mine_score": 0.6786,
+          "best_score": 0.6892,
+          "runner_up": 0.6786
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            45.625,
+            56.25
+          ],
+          "player_score": 0.4998,
+          "mine_score": 0.5504,
+          "best_score": 0.5888,
+          "runner_up": 0.5538
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            54.922,
+            56.25
+          ],
+          "player_score": 0.5104,
+          "mine_score": 0.5018,
+          "best_score": 0.5947,
+          "runner_up": 0.5735
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.313,
+            58.333
+          ],
+          "player_score": 0.7221,
+          "mine_score": 0.7466,
+          "best_score": 0.7674,
+          "runner_up": 0.7466
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            43.984,
+            59.062
+          ],
+          "player_score": 0.5398,
+          "mine_score": 0.5933,
+          "best_score": 0.6871,
+          "runner_up": 0.6355
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            57.266,
+            59.062
+          ],
+          "player_score": 0.6208,
+          "mine_score": 0.5824,
+          "best_score": 0.6704,
+          "runner_up": 0.6443
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            58.594,
+            60.833
+          ],
+          "player_score": 0.6021,
+          "mine_score": 0.572,
+          "best_score": 0.6881,
+          "runner_up": 0.671
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            42.734,
+            60.938
+          ],
+          "player_score": 0.5833,
+          "mine_score": 0.5902,
+          "best_score": 0.7019,
+          "runner_up": 0.7012
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            60.938
+          ],
+          "player_score": 0.6407,
+          "mine_score": 0.6944,
+          "best_score": 0.8108,
+          "runner_up": 0.7665
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            40.234,
+            63.021
+          ],
+          "player_score": 0.5229,
+          "mine_score": 0.5922,
+          "best_score": 0.8223,
+          "runner_up": 0.7575
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            50.469,
+            63.438
+          ],
+          "player_score": 0.6587,
+          "mine_score": 0.6832,
+          "best_score": 0.8877,
+          "runner_up": 0.8268
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            38.281,
+            64.896
+          ],
+          "player_score": 0.7918,
+          "mine_score": 0.781,
+          "best_score": 0.9472,
+          "runner_up": 0.902
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            39.453,
+            64.896
+          ],
+          "player_score": 0.8015,
+          "mine_score": 0.7968,
+          "best_score": 0.9164,
+          "runner_up": 0.8959
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            69.896
+          ],
+          "player_score": 0.6381,
+          "mine_score": 0.6871,
+          "best_score": 0.748,
+          "runner_up": 0.7043
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            86.094,
+            72.604
+          ],
+          "player_score": 0.526,
+          "mine_score": 0.8096,
+          "best_score": 0.8131,
+          "runner_up": 0.8096
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            50.469,
+            72.604
+          ],
+          "player_score": 0.6924,
+          "mine_score": 0.7475,
+          "best_score": 0.8263,
+          "runner_up": 0.7935
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            78.203,
+            77.188
+          ],
+          "player_score": 0.5586,
+          "mine_score": 0.6512,
+          "best_score": 0.6794,
+          "runner_up": 0.6512
+        },
+        {
+          "kind": "grunt",
+          "center": [
+            50.469,
+            75.104
+          ],
+          "player_score": 0.6526,
+          "mine_score": 0.6779,
+          "best_score": 0.8902,
+          "runner_up": 0.8241
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            48.203,
+            81.146
+          ],
+          "player_score": 0.4642,
+          "mine_score": 0.7852,
+          "best_score": 0.7852,
+          "runner_up": 0.741
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            8.672,
+            82.188
+          ],
+          "player_score": 0.5596,
+          "mine_score": 0.6735,
+          "best_score": 0.6762,
+          "runner_up": 0.6735
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            67.344,
+            81.875
+          ],
+          "player_score": 0.5585,
+          "mine_score": 0.6354,
+          "best_score": 0.6669,
+          "runner_up": 0.6388
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            78.906,
+            85.104
+          ],
+          "player_score": 0.5849,
+          "mine_score": 0.6506,
+          "best_score": 0.6897,
+          "runner_up": 0.6519
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            81.797,
+            89.271
+          ],
+          "player_score": 0.576,
+          "mine_score": 0.638,
+          "best_score": 0.6843,
+          "runner_up": 0.6448
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            90.312,
+            89.896
+          ],
+          "player_score": 0.5316,
+          "mine_score": 0.7987,
+          "best_score": 0.8123,
+          "runner_up": 0.7987
+        }
+      ]
+    },
+    {
+      "sample": 2,
+      "path": "agency-001.png",
+      "candidates": [
+        {
+          "kind": "unknown",
+          "center": [
+            50.391,
+            50.313
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            45.391,
+            35.0
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            48.594,
+            81.146
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            67.344,
+            81.875
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            46.406,
+            13.229
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            76.797,
+            75.521
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            86.797,
+            56.979
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            90.078,
+            44.167
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            10.234,
+            36.354
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            86.094,
+            72.604
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            7.266,
+            44.792
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            14.531,
+            23.125
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            57.422,
+            5.938
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            78.906,
+            85.208
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            17.422,
+            17.083
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            29.844,
+            5.208
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            76.172,
+            7.5
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            8.672,
+            82.188
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        },
+        {
+          "kind": "unknown",
+          "center": [
+            90.312,
+            89.896
+          ],
+          "player_score": -1.0,
+          "mine_score": -1.0,
+          "best_score": -1.0,
+          "runner_up": -1.0
+        }
+      ]
+    }
+  ],
+  "raw_frames": [
+    {
+      "sample": 1,
+      "path": "raw-0001.png"
+    },
+    {
+      "sample": 2,
+      "path": "raw-0002.png"
+    }
+  ],
+  "tracking_log": "agency.jsonl",
+  "tracking_schema": "sprite-tracking-v3",
+  "capture_mode": "fresh_exposure",
+  "passive_observer": {
+    "offers": 112,
+    "dropped": 111,
+    "published": 0,
+    "errors": 0,
+    "submit_seconds": 0.0017631159985285194,
+    "encode_seconds": 0.0,
+    "max_pending": 1,
+    "fps_limit": 3.0,
+    "attached": false,
+    "demand_checked_at": 3468.450743421
+  },
+  "camera_lease_handoff_seconds": 0.0001551680002194189,
+  "agency_acquisition_protocol": "two_fresh_endpoints_then_independent_neutral",
+  "planning_mode": "rescue_with_open_space_fallback",
+  "learned_semantics": {
+    "status": "baseline",
+    "error": null
+  },
+  "bootstrap_body_fire": true,
+  "fire_agency_status": "exploratory evidence only; projectile/origin interpretation unvalidated",
+  "experiment_status": {
+    "status": "not_requested",
+    "attempted": false,
+    "reason": null
+  },
+  "tracks": "tracks.json",
+  "agency_samples": 2,
+  "agency_log": "agency.jsonl",
+  "steps": [],
+  "policy_identity": {
+    "kind": "baseline",
+    "code_revision": "795db6cdddc7c317f513d7939719c7c37f12600d",
+    "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8",
+    "bootstrap_body_fire": true
+  },
+  "deferred_score_review": {
+    "schema": "deferred-score-review-v1",
+    "status": "pending",
+    "artifact": {
+      "path": "/home/five/charlie-native-trials/visual-readiness-20261024-6ajF25mY/development-20261024-224738/game-01/score-raw-0002.png",
+      "sha256": "4592073f383fb6b9806e98e831dfc549ea244d61337c7ba07411828169a4ba38"
+    },
+    "timestamp": 3467.856643,
+    "camera_observation_id": "736cd0cf10b98ea3cbdfa3d19d0a90f5c6d083c120137082f3d5cc759b990477",
+    "proposed_score": 100,
+    "confidence": 0.9,
+    "qualification": "pending original-image inspection; no complete-game score certificate",
+    "journal_delivery": "existing marathon diary or normal evidence acquisition",
+    "physical_authorization": false
+  }
+}

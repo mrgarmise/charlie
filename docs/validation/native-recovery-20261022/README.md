@@ -1,3 +1,10 @@
+> **2026-10-24 continuation:** The operator supplied the existing controller
+> timing evidence (approximately 0.92 seconds) and directed software recovery
+> using the October 22 sources, without another physical trial unless a specific
+> correction needs it. Standing gameplay authorization remains effective; the
+> historical separate-approval wording below does not override it. See
+> [current software verification and evidence limits](../native-resume-20261024/README.md).
+
 # PR #9 native border recovery — 22 October 2026
 
 Recovery assignment: https://github.com/mrgarmise/charlie/pull/9#issuecomment-6330939115

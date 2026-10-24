@@ -828,14 +828,33 @@ def recovery_resource_check(output):
         nonlocal checked
         now=time.monotonic()
         if checked is not None and now-checked<1.:return
-        guard.check(force=True)
-        flags=subprocess.check_output(['vcgencmd','get_throttled'],text=True,timeout=2).strip()
-        if not flags.startswith('throttled=') or int(flags.split('=',1)[1],16)!=0:
-            raise InterruptedError('native throttling telemetry invalid or flags set')
-        if shutil.disk_usage(output).free<2*1024**3:
-            raise InterruptedError('native evidence disk below 2 GiB')
-        with (output/'recovery-resources.jsonl').open('a') as stream:
-            stream.write(json.dumps(dict(guard.sample,at=time.time(),throttling=flags))+'\n')
+        flags=None
+        free_disk=None
+        def retain(status, error=None):
+            import os
+            row=dict(guard.sample,at=time.time(),monotonic=now,status=status,
+                     throttling=flags,free_disk_bytes=free_disk)
+            if error is not None:
+                row['stop_reason']=f'{type(error).__name__}: {error}'
+            with (output/'recovery-resources.jsonl').open('a') as stream:
+                stream.write(json.dumps(row,allow_nan=False)+'\n')
+                stream.flush()
+                os.fsync(stream.fileno())
+        try:
+            guard.check(force=True)
+            flags=subprocess.check_output(['vcgencmd','get_throttled'],text=True,timeout=2).strip()
+            if not flags.startswith('throttled=') or int(flags.split('=',1)[1],16)!=0:
+                raise InterruptedError('native throttling telemetry invalid or flags set')
+            free_disk=shutil.disk_usage(output).free
+            if free_disk<2*1024**3:
+                raise InterruptedError('native evidence disk below 2 GiB')
+        except Exception as exc:
+            try:
+                retain('stopped',exc)
+            except Exception as trace_error:
+                exc.add_note(f'Resource stop trace unavailable: {type(trace_error).__name__}: {trace_error}')
+            raise
+        retain('admitted')  # Writer/fsync failure also stops the owned trial.
         checked=now
     return check
 

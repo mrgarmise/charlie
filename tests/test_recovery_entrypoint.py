@@ -92,3 +92,61 @@ def test_native_throttling_fails_closed(tmp_path,monkeypatch,flags):
     monkeypatch.setattr(r.ResourceGuard,'check',lambda *a,**kw:None)
     monkeypatch.setattr(m.subprocess,'check_output',lambda *a,**kw:flags)
     with pytest.raises(InterruptedError):m.recovery_resource_check(tmp_path)()
+
+
+def test_thermal_refusal_retains_failed_sample_before_propagating(tmp_path,monkeypatch):
+    import json
+    import learning.resources as r
+    def refuse(guard,**kw):
+        guard.sample.update(temperature_c=75.1)
+        raise r.ThermalSuspended('hot')
+    monkeypatch.setattr(r.ResourceGuard,'check',refuse)
+    with pytest.raises(r.ThermalSuspended):m.recovery_resource_check(tmp_path)()
+    row=json.loads((tmp_path/'recovery-resources.jsonl').read_text())
+    assert row['status']=='stopped' and row['temperature_c']==75.1
+    assert row['throttling'] is None and row['free_disk_bytes'] is None
+    assert row['stop_reason']=='ThermalSuspended: hot'
+
+
+@pytest.mark.parametrize('flags',['throttled=0x1','unknown'])
+def test_throttle_refusal_is_durable(tmp_path,monkeypatch,flags):
+    import json
+    import learning.resources as r
+    monkeypatch.setattr(r.ResourceGuard,'check',lambda *a,**kw:None)
+    monkeypatch.setattr(m.subprocess,'check_output',lambda *a,**kw:flags)
+    with pytest.raises(InterruptedError):m.recovery_resource_check(tmp_path)()
+    row=json.loads((tmp_path/'recovery-resources.jsonl').read_text())
+    assert row['status']=='stopped' and row['throttling']==flags
+    assert 'throttling' in row['stop_reason']
+
+
+def test_disk_refusal_retains_measured_free_bytes(tmp_path,monkeypatch):
+    import json,shutil
+    import learning.resources as r
+    monkeypatch.setattr(r.ResourceGuard,'check',lambda *a,**kw:None)
+    monkeypatch.setattr(m.subprocess,'check_output',lambda *a,**kw:'throttled=0x0')
+    monkeypatch.setattr(shutil,'disk_usage',lambda *a:SimpleNamespace(free=123))
+    with pytest.raises(InterruptedError):m.recovery_resource_check(tmp_path)()
+    row=json.loads((tmp_path/'recovery-resources.jsonl').read_text())
+    assert row['status']=='stopped' and row['free_disk_bytes']==123
+    assert 'disk below' in row['stop_reason']
+
+
+def test_failed_stop_trace_preserves_original_resource_exception(tmp_path,monkeypatch):
+    import learning.resources as r
+    def refuse(*a,**kw):raise r.ThermalSuspended('hot')
+    monkeypatch.setattr(r.ResourceGuard,'check',refuse)
+    with pytest.raises(r.ThermalSuspended) as caught:
+        m.recovery_resource_check(tmp_path/'missing-output')()
+    assert 'Resource stop trace unavailable' in caught.value.__notes__[0]
+
+
+def test_admission_writer_failure_cannot_continue_trial(tmp_path,monkeypatch):
+    import os,shutil
+    import learning.resources as r
+    monkeypatch.setattr(r.ResourceGuard,'check',lambda *a,**kw:None)
+    monkeypatch.setattr(m.subprocess,'check_output',lambda *a,**kw:'throttled=0x0')
+    monkeypatch.setattr(shutil,'disk_usage',lambda *a:SimpleNamespace(free=3*1024**3))
+    def full(*a):raise OSError('evidence fsync failed')
+    monkeypatch.setattr(os,'fsync',full)
+    with pytest.raises(OSError,match='fsync failed'):m.recovery_resource_check(tmp_path)()

@@ -1,5 +1,5 @@
 """Mobile observations share the existing camera transport; no actuator imports."""
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, fields
 import hashlib
 import math
 import time
@@ -24,6 +24,7 @@ class MobileFrame:
     clock_domain: str = 'pi-monotonic'
     sync_uncertainty_seconds: float | None = None
     compression: str = 'MJPEG'
+    artifact: dict | None = None
 
     def validate(self):
         import numpy as np
@@ -36,8 +37,7 @@ class MobileFrame:
             if x is not None and not finite(x): raise ValueError('invalid pose')
 
     def metadata(self):
-        d = asdict(self)
-        d.pop('image')
+        d = {f.name:getattr(self,f.name) for f in fields(self) if f.name!='image'}
         d.update(sha256=hashlib.sha256(self.image.tobytes()).hexdigest(),
                  geometry=list(self.image.shape[:2][::-1]), pixel_format='BGR uint8',
                  calibration='unknown', timestamp_basis='local decode receipt, NOT exposure',
@@ -95,6 +95,8 @@ class MobilePerception:
         self.cadence, self.max_age, self.clock = cadence, max_age, clock
         self.last_at = None
         self.last_id = None
+        self.effective_cadence = cadence
+        self.stats = dict(processed=0, cadence_skipped=0)
 
     def observe(self, frame):
         frame.validate()
@@ -102,7 +104,9 @@ class MobilePerception:
         if not 0 <= start-frame.received_at <= self.max_age or frame.id == self.last_id:
             raise ValueError('stale or duplicate frame')
         if self.last_at is not None and frame.received_at <= self.last_at: raise ValueError('reordered frame')
-        if self.last_at is not None and frame.received_at-self.last_at < self.cadence: return None
+        if self.last_at is not None and frame.received_at-self.last_at < self.effective_cadence:
+            self.stats['cadence_skipped'] += 1
+            return None
         self.last_at, self.last_id = frame.received_at, frame.id
         outputs = {}
         timings = {}
@@ -113,6 +117,8 @@ class MobilePerception:
             timings[name] = self.clock()-at
         end = self.clock()
         if not 0 <= end-frame.received_at <= self.max_age: raise ValueError('late inference discarded')
+        self.effective_cadence = max(self.cadence, min(self.max_age, (end-start)*1.2))
+        self.stats['processed'] += 1
         rows = outputs['objects']
         if not isinstance(rows, list) or len(rows) > 128: raise ValueError('bounded objects required')
         w,h = frame.image.shape[:2][::-1]
@@ -126,4 +132,37 @@ class MobilePerception:
                     depth=outputs['depth'], model=[self.detector.metadata, self.depth.metadata],
                     inference_seconds=timings, receipt_to_decision_seconds=end-frame.received_at,
                     completed_at=end, software_revision=self.revision, motion_authorized=False,
-                    qualification='unqualified', sensors={})
+                    qualification='unqualified', sensors={},
+                    resources=dict(getattr(self.resources,'sample',{})),
+                    scheduling=dict(self.stats, effective_cadence_seconds=self.effective_cadence))
+
+
+class FrameArtifactStore:
+    """Bounded content-addressed authentic pixels for later independent replay."""
+    def __init__(self, directory, *, max_bytes=64*1024*1024):
+        from pathlib import Path
+        self.directory=Path(directory)
+        self.directory.mkdir(parents=True,exist_ok=True)
+        self.max_bytes=max_bytes
+        self.used=sum(p.stat().st_size for p in self.directory.glob('*.png'))
+
+    def retain(self, frame):
+        import cv2
+        from dataclasses import replace
+        ok,encoded=cv2.imencode('.png',frame.image)
+        if not ok:raise ValueError('frame encoding failed')
+        raw=encoded.tobytes();digest=hashlib.sha256(raw).hexdigest()
+        path=self.directory/(digest+'.png')
+        if not path.exists():
+            if self.used+len(raw)>self.max_bytes:raise OSError('mobile pixel budget exhausted; acquisition paused')
+            with path.open('xb') as out:out.write(raw)
+            self.used+=len(raw)
+        return replace(frame,artifact=dict(path=str(path.resolve()),sha256=digest,encoding='PNG',bytes=len(raw)))
+
+
+class RecordingFrameSource:
+    def __init__(self,source,store):self.source,self.store=source,store
+    def read(self):
+        frame=self.source.read()
+        return self.store.retain(frame) if frame.authentic else frame
+    def close(self):self.source.close()

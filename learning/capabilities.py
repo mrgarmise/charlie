@@ -23,6 +23,11 @@ class CapabilityRegistry:
         capability=self.get(identifier)
         if identifier not in authorized or set(capability.inputs)-set(resources):
             raise ValueError('available inputs and separate method authorization required')
+        if identifier == 'mobile-observe':
+            from .mobile import observe_capability
+            return observe_capability(**inputs)
+        if identifier == 'mobile-navigation-proposal':
+            return inputs['navigator'].propose(inputs['observation'], inputs['tracking'], inputs['telemetry'])
         if identifier in ('cnn-reconstruction','cnn-classification','cnn-validation-extension'):
             from .cycle import run_plan, gameplay_active
             if gameplay_active(): raise RuntimeError('offline capability unavailable during gameplay')
@@ -55,6 +60,9 @@ class CapabilityRegistry:
 def default_registry():
     registry=CapabilityRegistry()
     for item in (
+        Capability('mobile-observe','Acquire unarmed mobile species/depth evidence for an existing Executive investigation',('mobile-camera','mobile-models'),('mobile-observation','evidence-deficiency'),.3,('no actuation authority','species is not individual pet identity','native model qualification required for authentic projects'),'independent replay labels and native source provenance',execution='unarmed-perception'),
+        Capability('mobile-navigation-proposal','Evaluate bounded local motion proposals without physical execution',('mobile-observation','car-telemetry'),('mobile-proposal','safety-veto'),.1,('relative depth is not metric clearance','no qualified car-local backend supplied'),'independent safety fault injection'),
+        Capability('mobile-mobility','Prospective independently qualified car-local motion',('qualified-car-local-controller','motion-lease'),('execution-acknowledgement',),1.,('no physical implementation authorized by software mission',),'separately authorized empty-room then pet-present qualification',execution='unavailable'),
         Capability('score-reader-evaluation','Independently compare an existing Charlie-originated score-reader candidate with immutable pre-review predictions',('score-reader-candidate','reviewed-score-evidence'),('reader-evaluation','evidence-deficiency'),.1,('no candidate generation or deployment authority','sealed final reader protocol unavailable','source groups may not overlap training'),'hash-bound independent labels; diagnostic or validation only'),
         Capability('meditation-motion','Generate executable temporal planning candidates from preserved meditation',('meditation-evidence',),('candidate','evidence-gate-result'),.1,('unverified retrospective tracks cannot qualify evaluation','no physical activation adapter'),'fresh independently verified trajectories required'),
         Capability('evidence-review','Search frozen experience references for recurring unresolved questions',('context-evidence',),('retrieval-resolution',),.05,('reported questions are not established causal facts',),'distinct source episodes; unknown provenance abstains'),

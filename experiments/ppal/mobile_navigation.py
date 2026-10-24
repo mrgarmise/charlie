@@ -87,8 +87,9 @@ class MobileExecutionGate:
     Only a future, verified car-local bounded-motion adapter may be injected.
     Disarmed mode doesn't even connect/send STOP. Queued != executed != observed.
     """
-    def __init__(self, *, backend=None, clock=time.monotonic, boot_id=None):
+    def __init__(self, *, backend=None, clock=time.monotonic, boot_id=None, safety_check=None):
         self.backend,self.clock=backend,clock
+        self.safety_check=safety_check
         self.boot_id=boot_id or uuid4().hex
         self.lease=MotionLease()
 
@@ -96,12 +97,19 @@ class MobileExecutionGate:
         now=self.clock(); errors=[]
         if not self.lease.valid(now,self.boot_id):errors.append('disarmed_or_expired_authority')
         if self.backend is None:errors.append('no_qualified_car_local_adapter')
+        if self.safety_check is None:errors.append('independent_safety_check_unavailable')
+        else:
+            try:
+                if self.safety_check(proposal) is not True:errors.append('independent_safety_veto')
+            except Exception:errors.append('independent_safety_error')
         if proposal.get('action') not in ('stop','turn','advance'):errors.append('invalid_action')
         if proposal.get('reasons'):errors.append('safety_veto')
         age=now-proposal.get('at',float('inf'))
         if not finite(age) or not 0<=age<=.1:errors.append('stale_proposal')
         if not finite(proposal.get('speed')) or not 0<=proposal['speed']<=.15:errors.append('speed_limit')
         if not finite(proposal.get('duration')) or not 0<=proposal['duration']<=.2:errors.append('duration_limit')
+        if finite(proposal.get('duration')) and (not finite(self.lease.expires_at) or now+proposal['duration']>self.lease.expires_at):errors.append('lease_horizon')
+        if proposal.get('action')=='turn' and proposal.get('direction') not in ('LEFT','RIGHT'):errors.append('invalid_turn')
         if self.backend is not None and getattr(self.backend,'car_local_qualified',False) is not True:errors.append('unqualified_backend')
         result=dict(proposal_id=proposal.get('id'), requested=proposal.get('action'), approved=not errors,
                     rejected=errors, dispatched=False, acknowledged=False, executed=None, observed_consequence=None)

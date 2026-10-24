@@ -36,6 +36,11 @@ def parser():
     p.add_argument('--learning-cooldown-seconds',type=float,help='maximum continuous cooldown; bounded runs default 120s')
     p.add_argument('--allow-offline-improvements',action='store_true',
         help='external authority for independently qualified offline-shadow candidates only')
+    mobile=p.add_mutually_exclusive_group()
+    mobile.add_argument('--mobile-replay',type=Path,help='unarmed offline mobile fixture replay')
+    mobile.add_argument('--mobile-observe',action='store_true',help='unarmed car-camera perception only; no Deck or mobile actuator initialization')
+    p.add_argument('--mobile-manifest',type=Path,help='hash-bound Hailo-8L object/depth export contracts')
+    p.add_argument('--mobile-frames',type=int,default=30)
     return p
 
 
@@ -55,6 +60,12 @@ def main(argv=None):
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
                 turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources,
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
+    if args.mobile_replay or args.mobile_observe:
+        if not args.offline:
+            raise ValueError('mobile observation entry point cannot combine with --hardware')
+        from learning.mobile_runtime import run_mobile
+        run_mobile(args,resources)
+        return
     if args.offline:
         run(args.learning_state,roots,**kwargs)
         return

@@ -87,7 +87,7 @@ def test_proposal_not_authority_and_ack_not_consequence():
     p,t,s=qualified();r=MobileNavigator(clock=lambda:1).propose(p,t,s)
     assert r['action']=='advance'
     backend=Mock(car_local_qualified=True);backend.execute_bounded.return_value=dict(acknowledged=True)
-    gate=MobileExecutionGate(backend=backend,clock=lambda:1,boot_id='boot')
+    gate=MobileExecutionGate(backend=backend,clock=lambda:1,boot_id='boot',safety_check=lambda p:True)
     assert not gate.execute(r)['approved'];backend.execute_bounded.assert_not_called()
     gate.lease=MotionLease('supervised_trial',2,'test-fixture-only','boot')
     result=gate.execute(r)
@@ -103,7 +103,7 @@ def test_proposal_not_authority_and_ack_not_consequence():
 def test_controller_error_stops_and_unbounded_proposal_rejected():
     p,t,s=qualified();r=MobileNavigator(clock=lambda:1).propose(p,t,s)
     backend=Mock(car_local_qualified=True);backend.execute_bounded.side_effect=RuntimeError()
-    gate=MobileExecutionGate(backend=backend,clock=lambda:1,boot_id='boot')
+    gate=MobileExecutionGate(backend=backend,clock=lambda:1,boot_id='boot',safety_check=lambda p:True)
     gate.lease=MotionLease('supervised_trial',2,'fixture','boot')
     assert gate.execute(r)['rejected']==['controller_error'];backend.stop.assert_called_once()
     r['duration']=10

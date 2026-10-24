@@ -21,6 +21,14 @@ def hailo_lease(path=None):
         finally: fcntl.flock(handle, fcntl.LOCK_UN)
 
 
+def runtime_version():
+    import importlib.metadata
+    try:return importlib.metadata.version('hailort')
+    except importlib.metadata.PackageNotFoundError:
+        import hailo_platform
+        return getattr(hailo_platform,'__version__','unknown')
+
+
 class HailoObjects:
     def __init__(self, path, *, sha256, classes, size=640, lock=None):
         from experiments.ppal.detector_bridge import HailoBackend
@@ -29,7 +37,7 @@ class HailoObjects:
         self.backend = HailoBackend(path, sha256=sha256, classes=classes, size=size)
         self.lock = lock
         self.metadata = dict(backend='hailort-hef', sha256=sha256, path=str(path),
-                             architecture='hailo8l', classes=classes, qualification='unqualified')
+                             architecture='hailo8l', classes=classes, runtime=runtime_version(), qualification='unqualified')
 
     def infer(self, frame):
         from PIL import Image
@@ -61,7 +69,7 @@ class HailoRelativeDepth:
         self.nearer,self.lock = larger_is_nearer,lock
         self.metadata=dict(backend='hailort-hef', sha256=sha256, architecture='hailo8l',
                            input_shape=input_shape, output_shape=output_shape, kind='relative',
-                           larger_is_nearer=larger_is_nearer, qualification='unqualified')
+                           larger_is_nearer=larger_is_nearer, runtime=runtime_version(), qualification='unqualified')
 
     @staticmethod
     def summarize(array, shape, larger_is_nearer):

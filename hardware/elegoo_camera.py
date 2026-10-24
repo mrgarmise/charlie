@@ -45,6 +45,7 @@ class ElegooCamera:
         if self._running:
             return
 
+        self.close()  # Release a previous failed stream before reconnecting.
         request = urllib.request.Request(
             self.stream_url,
             headers={

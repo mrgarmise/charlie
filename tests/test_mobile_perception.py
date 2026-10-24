@@ -102,3 +102,19 @@ def test_hailo_lease_yields_to_other_workload(tmp_path):
 def test_fixture_cannot_label_live_frame():
     from dataclasses import replace
     with pytest.raises(ValueError):pipeline().observe(replace(frame(),authentic=True))
+
+
+def test_pixel_artifacts_hash_roundtrip_and_budget(tmp_path):
+    import cv2
+    import hashlib
+    from vision.mobile_perception import FrameArtifactStore
+    store=FrameArtifactStore(tmp_path,max_bytes=1000)
+    f=store.retain(frame())
+    from pathlib import Path
+    path=Path(f.artifact['path'])
+    assert hashlib.sha256(path.read_bytes()).hexdigest()==f.artifact['sha256']
+    assert np.array_equal(cv2.imread(str(path)),f.image)
+    before=store.used;store.retain(frame());assert store.used==before
+    store.max_bytes=0
+    different=frame();different.image[:]=255
+    with pytest.raises(OSError):store.retain(different)

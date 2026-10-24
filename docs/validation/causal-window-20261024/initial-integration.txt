@@ -1,0 +1,59 @@
+............F........................................................... [ 50%]
+........................................................................ [100%]
+=================================== FAILURES ===================================
+_ test_actual_self_discovery_replays_lazy_originals_and_closes_archive[False] __
+
+rig = namespace(source=namespace(stream=<experiments.ppal.observation_stream.ObservationStream object at 0x7ffed31705a0>, re.../test_actual_self_discovery_rep0'), progress=<experiments.ppal.progress_supervision.Progress object at 0x7ffed3169310>)
+replay_failure = False
+
+    @pytest.mark.parametrize('replay_failure',[False,True])
+    def test_actual_self_discovery_replays_lazy_originals_and_closes_archive(rig,replay_failure):
+        from experiments.ppal.robotron_agency import VisualAgency
+        captured=[];delivered=[];rows=[];v=VisualAgency()
+        def read():return []
+        def accept(packet):
+            delivered.append(packet.sequence)
+            image=packet.image
+            assert hashlib.sha256(image.tobytes()).hexdigest()==packet.rgb_sha256
+            image.close()
+            if replay_failure:raise ValueError('injected causal analysis failure')
+            return []
+        read.accept_exposure=accept
+        def capture(controller,action,duration,deadline,stop):
+            result=capture_window(rig.source,controller,action,duration,deadline,stop)
+            captured.append(result);return result
+        def discover():
+            return v.discover(read,rig.controller,capture_shots=capture,record=rows.append,
+                              deadline=time.monotonic()+5,should_stop=lambda:bool(captured))
+        if replay_failure:
+            with pytest.raises(ValueError,match='causal analysis failure'):discover()
+        else:
+>           discover()
+
+tests/test_causal_window_capacity.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_causal_window_capacity.py:259: in discover
+    return v.discover(read,rig.controller,capture_shots=capture,record=rows.append,
+experiments/ppal/robotron_agency.py:207: in discover
+    snapshot=self.observe(pairs,observed_at=at)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments/ppal/robotron_agency.py:33: in observe
+    assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.eyes.tracking.SpriteTracker object at 0x7ffed30de3c0>
+tick = 1, detections = [], observed_at = 5190.270188427
+
+    def update(self, tick, detections, *, observed_at=None):
+        detections = list(detections)
+        seconds_mode = observed_at is not None
+        at = float(observed_at if seconds_mode else tick)
+        if not math.isfinite(at) or (self._last_time is not None and at <= self._last_time):
+>           raise ValueError('tracking observation times must increase')
+E           ValueError: tracking observation times must increase
+
+experiments/ppal/eyes/tracking.py:137: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_causal_window_capacity.py::test_actual_self_discovery_replays_lazy_originals_and_closes_archive[False]
+1 failed, 143 passed in 103.77s (0:01:43)

@@ -47,9 +47,11 @@ def test_unarmed_attention_never_emits_legacy_actuator_events():
 def qualified():
     p=packet();p['frame'].update(source_age_known=True,authentic=True,pan_deg=90)
     p.update(qualification='native-qualified',depth=dict(kind='relative',valid=True,anomaly=False))
-    target=dict(box=[15,1,25,15],observed=True,ambiguous=False)
+    target=dict(id='fixture-target',box=[15,1,25,15],observed=True,ambiguous=False)
     sensors={k:dict(valid=True,source='car-qualified',at=1,clear=True,meters=2) for k in
-             ('ultrasonic','yaw','heartbeat','floor_clearance','hazard_map','blind_spot')}
+             ('ultrasonic','target_range','yaw','heartbeat','floor_clearance','hazard_map','blind_spot')}
+    sensors['target_range']['track_id']='fixture-target'
+    sensors['yaw']['degrees']=0
     sensors['pet_distress']=False
     return p,dict(target=target),sensors
 
@@ -62,7 +64,7 @@ def test_unknown_real_world_conditions_veto_motion():
     assert gate.execute(r)['dispatched'] is False
 
 
-@pytest.mark.parametrize('sensor',['ultrasonic','yaw','heartbeat','floor_clearance','hazard_map','blind_spot'])
+@pytest.mark.parametrize('sensor',['target_range','ultrasonic','yaw','heartbeat','floor_clearance','hazard_map','blind_spot'])
 def test_missing_and_stale_sensor_each_veto(sensor):
     p,t,s=qualified();s[sensor]['at']=0
     r=MobileNavigator(clock=lambda:1).propose(p,t,s)
@@ -108,3 +110,14 @@ def test_controller_error_stops_and_unbounded_proposal_rejected():
     assert gate.execute(r)['rejected']==['controller_error'];backend.stop.assert_called_once()
     r['duration']=10
     assert 'duration_limit' in gate.execute(r)['rejected']
+
+
+@pytest.mark.parametrize('bad',[None,'bad',float('nan'),float('inf')])
+def test_invalid_telemetry_timestamps_fail_closed(bad):
+    p,t,s=qualified();s['ultrasonic']['at']=bad
+    assert MobileNavigator(clock=lambda:1).propose(p,t,s)['action']=='stop'
+
+
+def test_target_range_must_refer_to_selected_pet():
+    p,t,s=qualified();s['target_range']['track_id']='another-pet'
+    assert MobileNavigator(clock=lambda:1).propose(p,t,s)['action']=='stop'

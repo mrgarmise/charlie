@@ -7,6 +7,8 @@ from uuid import uuid4
 
 def finite(x):return type(x) in (int,float) and math.isfinite(x)
 
+def age(now, then):return now-then if finite(now) and finite(then) else float('inf')
+
 
 @dataclass(frozen=True)
 class MobileLimits:
@@ -48,8 +50,8 @@ class MobileNavigator:
         """
         now=self.clock(); l=self.limits; reasons=[]
         frame=observation['frame']; depth=observation.get('depth',{})
-        age=now-frame['received_at']
-        if not finite(age) or not 0<=age<=l.max_receipt_age:reasons.append('stale_frame')
+        frame_age=age(now,frame.get('received_at'))
+        if not finite(frame_age) or not 0<=frame_age<=l.max_receipt_age:reasons.append('stale_frame')
         if frame.get('source_age_known') is not True:reasons.append('unknown_capture_age')
         if not frame.get('authentic'):reasons.append('offline_fixture')
         if observation.get('qualification')!='native-qualified':reasons.append('unqualified_perception')
@@ -59,15 +61,19 @@ class MobileNavigator:
         if not finite(pan) or abs(pan-90)>5:reasons.append('off_axis_or_unknown_camera')
         target=tracking.get('target')
         if target is None or not target.get('observed') or target.get('ambiguous'):reasons.append('target_lost_or_ambiguous')
-        for name in ('ultrasonic','yaw','heartbeat','floor_clearance','hazard_map','blind_spot'):
+        for name in ('ultrasonic','target_range','yaw','heartbeat','floor_clearance','hazard_map','blind_spot'):
             sensor=telemetry.get(name,{})
-            sensor_age=now-sensor.get('at',float('inf'))
+            sensor_age=age(now,sensor.get('at'))
             if (not finite(sensor_age) or not 0<=sensor_age<=l.max_sensor_age
                     or sensor.get('valid') is not True or sensor.get('source')!='car-qualified'):
                 reasons.append(f'{name}_unverified')
         distance=telemetry.get('ultrasonic',{}).get('meters')
         if not finite(distance) or not 0<distance<=10:reasons.append('invalid_range')
         elif distance<=l.stand_off_m:reasons.append('stand_off')
+        target_range=telemetry.get('target_range',{})
+        if (not finite(target_range.get('meters')) or target_range['meters']<=l.stand_off_m
+                or target is None or target_range.get('track_id')!=target.get('id')):reasons.append('target_distance_unverified_or_near')
+        if not finite(telemetry.get('yaw',{}).get('degrees')):reasons.append('invalid_yaw')
         for name in ('floor_clearance','hazard_map','blind_spot'):
             if telemetry.get(name,{}).get('clear') is not True:reasons.append(f'{name}_uncertain')
         if telemetry.get('pet_distress') is not False:reasons.append('humane_condition_unverified')
@@ -104,8 +110,8 @@ class MobileExecutionGate:
             except Exception:errors.append('independent_safety_error')
         if proposal.get('action') not in ('stop','turn','advance'):errors.append('invalid_action')
         if proposal.get('reasons'):errors.append('safety_veto')
-        age=now-proposal.get('at',float('inf'))
-        if not finite(age) or not 0<=age<=.1:errors.append('stale_proposal')
+        proposal_age=age(now,proposal.get('at'))
+        if not finite(proposal_age) or not 0<=proposal_age<=.1:errors.append('stale_proposal')
         if not finite(proposal.get('speed')) or not 0<=proposal['speed']<=.15:errors.append('speed_limit')
         if not finite(proposal.get('duration')) or not 0<=proposal['duration']<=.2:errors.append('duration_limit')
         if finite(proposal.get('duration')) and (not finite(self.lease.expires_at) or now+proposal['duration']>self.lease.expires_at):errors.append('lease_horizon')

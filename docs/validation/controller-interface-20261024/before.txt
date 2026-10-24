@@ -1,0 +1,512 @@
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+___ test_self_discovery_capture_forwards_cancel_event_and_deadline[success] ____
+
+rig = namespace(controller=<experiments.ppal.progress_supervision.SupervisedController object at 0x7fff139338c0>, transport=...ervationStream object at 0x7fff149f56a0>, wire=<test_supervised_controller.rig.<locals>.Wire object at 0x7fff13933380>)
+outcome = 'success'
+
+    @pytest.mark.parametrize('outcome', ['success', 'cancelled_before', 'cancelled_during', 'rejected'])
+    def test_self_discovery_capture_forwards_cancel_event_and_deadline(rig, outcome):
+        """Exact live chain: VisualAgency.discover -> capture_window -> supervised execute."""
+        if outcome == 'cancelled_before': rig.stream.failed.set()
+        if outcome == 'cancelled_during': rig.wire.cancel_on = 'RS_RIGHT'
+        if outcome == 'rejected': rig.wire.reject = 'RS_RIGHT'
+        captured = []
+        deadline = time.monotonic()+5
+        def read_pairs(): return []
+        read_pairs.accept_exposure = lambda packet: None
+        def capture(controller, action, duration, until, stop):
+            assert until == deadline
+            result = capture_window(SimpleNamespace(stream=rig.stream), controller, action,
+                                    duration, until, stop, post_seconds=.001)
+            captured.append(result)
+            return result
+        def discover():
+            return VisualAgency().discover(read_pairs, rig.controller, capture_shots=capture,
+                                           deadline=deadline, should_stop=lambda: bool(captured))
+        if outcome == 'success':
+>           discover()
+
+tests/test_supervised_controller.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_supervised_controller.py:70: in discover
+    return VisualAgency().discover(read_pairs, rig.controller, capture_shots=capture,
+experiments/ppal/robotron_agency.py:197: in discover
+    execution,packets,capture_status=capture_shots(controller,
+tests/test_supervised_controller.py:65: in capture
+    result = capture_window(SimpleNamespace(stream=rig.stream), controller, action,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = namespace(stream=<experiments.ppal.observation_stream.ObservationStream object at 0x7fff149f56a0>)
+controller = <experiments.ppal.progress_supervision.SupervisedController object at 0x7fff139338c0>
+action = Action(move='STAY', fire='E', reason='shot-origin acquisition', controls=())
+duration_ms = 60, deadline = 1013.174192979
+should_stop = <function test_self_discovery_capture_forwards_cancel_event_and_deadline.<locals>.discover.<locals>.<lambda> at 0x7fff130c5da0>
+post_seconds = 0.001
+
+    def capture_window(source,controller,action,duration_ms,deadline=None,should_stop=None,*,post_seconds=.25):
+        if not 30<=duration_ms<=400:raise ValueError('firing duration must be explicitly bounded at 30..400 ms')
+        if not 0<post_seconds<=.35:raise ValueError('post-fire window must be bounded')
+        def stopped():return should_stop is not None and should_stop()
+        if stopped() or (deadline is not None and time.monotonic()+duration_ms/1000+post_seconds>=deadline):
+            raise InterruptedError('insufficient existing acquisition budget; no FIRE sent')
+        stream=source.stream
+        baseline=stream.begin_window()
+        submitted=time.monotonic()
+        try:
+>           controller.execute(action,duration_ms,cancel_event=stream.failed,deadline=deadline)
+E           TypeError: SupervisedController.execute() got an unexpected keyword argument 'cancel_event'
+
+experiments/ppal/shot_capture.py:15: TypeError
+_ test_self_discovery_capture_forwards_cancel_event_and_deadline[cancelled_before] _
+
+rig = namespace(controller=<experiments.ppal.progress_supervision.SupervisedController object at 0x7fff13056e90>, transport=...ervationStream object at 0x7fff13056710>, wire=<test_supervised_controller.rig.<locals>.Wire object at 0x7fff130d4590>)
+outcome = 'cancelled_before'
+
+    @pytest.mark.parametrize('outcome', ['success', 'cancelled_before', 'cancelled_during', 'rejected'])
+    def test_self_discovery_capture_forwards_cancel_event_and_deadline(rig, outcome):
+        """Exact live chain: VisualAgency.discover -> capture_window -> supervised execute."""
+        if outcome == 'cancelled_before': rig.stream.failed.set()
+        if outcome == 'cancelled_during': rig.wire.cancel_on = 'RS_RIGHT'
+        if outcome == 'rejected': rig.wire.reject = 'RS_RIGHT'
+        captured = []
+        deadline = time.monotonic()+5
+        def read_pairs(): return []
+        read_pairs.accept_exposure = lambda packet: None
+        def capture(controller, action, duration, until, stop):
+            assert until == deadline
+            result = capture_window(SimpleNamespace(stream=rig.stream), controller, action,
+                                    duration, until, stop, post_seconds=.001)
+            captured.append(result)
+            return result
+        def discover():
+            return VisualAgency().discover(read_pairs, rig.controller, capture_shots=capture,
+                                           deadline=deadline, should_stop=lambda: bool(captured))
+        if outcome == 'success':
+            discover()
+            assert captured[0][0]['fire'] == 'E'
+            assert rig.wire.commands == ['NEUTRAL', 'LEASE', 'LEASE', 'RS_RIGHT', 'LS_CENTER', 'RS_CENTER']
+            assert not rig.transport.closed
+            assert 'failure_kind' not in rig.progress.data
+        else:
+            error = ConnectionError if outcome == 'rejected' else InterruptedError
+>           with pytest.raises(error): discover()
+                                       ^^^^^^^^^^
+
+tests/test_supervised_controller.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_supervised_controller.py:70: in discover
+    return VisualAgency().discover(read_pairs, rig.controller, capture_shots=capture,
+experiments/ppal/robotron_agency.py:197: in discover
+    execution,packets,capture_status=capture_shots(controller,
+tests/test_supervised_controller.py:65: in capture
+    result = capture_window(SimpleNamespace(stream=rig.stream), controller, action,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = namespace(stream=<experiments.ppal.observation_stream.ObservationStream object at 0x7fff13056710>)
+controller = <experiments.ppal.progress_supervision.SupervisedController object at 0x7fff13056e90>
+action = Action(move='STAY', fire='E', reason='shot-origin acquisition', controls=())
+duration_ms = 60, deadline = 1013.205338625
+should_stop = <function test_self_discovery_capture_forwards_cancel_event_and_deadline.<locals>.discover.<locals>.<lambda> at 0x7fff130c6fc0>
+post_seconds = 0.001
+
+    def capture_window(source,controller,action,duration_ms,deadline=None,should_stop=None,*,post_seconds=.25):
+        if not 30<=duration_ms<=400:raise ValueError('firing duration must be explicitly bounded at 30..400 ms')
+        if not 0<post_seconds<=.35:raise ValueError('post-fire window must be bounded')
+        def stopped():return should_stop is not None and should_stop()
+        if stopped() or (deadline is not None and time.monotonic()+duration_ms/1000+post_seconds>=deadline):
+            raise InterruptedError('insufficient existing acquisition budget; no FIRE sent')
+        stream=source.stream
+        baseline=stream.begin_window()
+        submitted=time.monotonic()
+        try:
+>           controller.execute(action,duration_ms,cancel_event=stream.failed,deadline=deadline)
+E           TypeError: SupervisedController.execute() got an unexpected keyword argument 'cancel_event'
+
+experiments/ppal/shot_capture.py:15: TypeError
+_ test_self_discovery_capture_forwards_cancel_event_and_deadline[cancelled_during] _
+
+rig = namespace(controller=<experiments.ppal.progress_supervision.SupervisedController object at 0x7fff130e8410>, transport=...ervationStream object at 0x7fff13057c50>, wire=<test_supervised_controller.rig.<locals>.Wire object at 0x7fff130d4c20>)
+outcome = 'cancelled_during'
+
+    @pytest.mark.parametrize('outcome', ['success', 'cancelled_before', 'cancelled_during', 'rejected'])
+    def test_self_discovery_capture_forwards_cancel_event_and_deadline(rig, outcome):
+        """Exact live chain: VisualAgency.discover -> capture_window -> supervised execute."""
+        if outcome == 'cancelled_before': rig.stream.failed.set()
+        if outcome == 'cancelled_during': rig.wire.cancel_on = 'RS_RIGHT'
+        if outcome == 'rejected': rig.wire.reject = 'RS_RIGHT'
+        captured = []
+        deadline = time.monotonic()+5
+        def read_pairs(): return []
+        read_pairs.accept_exposure = lambda packet: None
+        def capture(controller, action, duration, until, stop):
+            assert until == deadline
+            result = capture_window(SimpleNamespace(stream=rig.stream), controller, action,
+                                    duration, until, stop, post_seconds=.001)
+            captured.append(result)
+            return result
+        def discover():
+            return VisualAgency().discover(read_pairs, rig.controller, capture_shots=capture,
+                                           deadline=deadline, should_stop=lambda: bool(captured))
+        if outcome == 'success':
+            discover()
+            assert captured[0][0]['fire'] == 'E'
+            assert rig.wire.commands == ['NEUTRAL', 'LEASE', 'LEASE', 'RS_RIGHT', 'LS_CENTER', 'RS_CENTER']
+            assert not rig.transport.closed
+            assert 'failure_kind' not in rig.progress.data
+        else:
+            error = ConnectionError if outcome == 'rejected' else InterruptedError
+>           with pytest.raises(error): discover()
+                                       ^^^^^^^^^^
+
+tests/test_supervised_controller.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_supervised_controller.py:70: in discover
+    return VisualAgency().discover(read_pairs, rig.controller, capture_shots=capture,
+experiments/ppal/robotron_agency.py:197: in discover
+    execution,packets,capture_status=capture_shots(controller,
+tests/test_supervised_controller.py:65: in capture
+    result = capture_window(SimpleNamespace(stream=rig.stream), controller, action,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = namespace(stream=<experiments.ppal.observation_stream.ObservationStream object at 0x7fff13057c50>)
+controller = <experiments.ppal.progress_supervision.SupervisedController object at 0x7fff130e8410>
+action = Action(move='STAY', fire='E', reason='shot-origin acquisition', controls=())
+duration_ms = 60, deadline = 1013.227262786
+should_stop = <function test_self_discovery_capture_forwards_cancel_event_and_deadline.<locals>.discover.<locals>.<lambda> at 0x7fff130f8040>
+post_seconds = 0.001
+
+    def capture_window(source,controller,action,duration_ms,deadline=None,should_stop=None,*,post_seconds=.25):
+        if not 30<=duration_ms<=400:raise ValueError('firing duration must be explicitly bounded at 30..400 ms')
+        if not 0<post_seconds<=.35:raise ValueError('post-fire window must be bounded')
+        def stopped():return should_stop is not None and should_stop()
+        if stopped() or (deadline is not None and time.monotonic()+duration_ms/1000+post_seconds>=deadline):
+            raise InterruptedError('insufficient existing acquisition budget; no FIRE sent')
+        stream=source.stream
+        baseline=stream.begin_window()
+        submitted=time.monotonic()
+        try:
+>           controller.execute(action,duration_ms,cancel_event=stream.failed,deadline=deadline)
+E           TypeError: SupervisedController.execute() got an unexpected keyword argument 'cancel_event'
+
+experiments/ppal/shot_capture.py:15: TypeError
+___ test_self_discovery_capture_forwards_cancel_event_and_deadline[rejected] ___
+
+rig = namespace(controller=<experiments.ppal.progress_supervision.SupervisedController object at 0x7fff130bab10>, transport=...ervationStream object at 0x7fff130ba3f0>, wire=<test_supervised_controller.rig.<locals>.Wire object at 0x7fff130d5010>)
+outcome = 'rejected'
+
+    @pytest.mark.parametrize('outcome', ['success', 'cancelled_before', 'cancelled_during', 'rejected'])
+    def test_self_discovery_capture_forwards_cancel_event_and_deadline(rig, outcome):
+        """Exact live chain: VisualAgency.discover -> capture_window -> supervised execute."""
+        if outcome == 'cancelled_before': rig.stream.failed.set()
+        if outcome == 'cancelled_during': rig.wire.cancel_on = 'RS_RIGHT'
+        if outcome == 'rejected': rig.wire.reject = 'RS_RIGHT'
+        captured = []
+        deadline = time.monotonic()+5
+        def read_pairs(): return []
+        read_pairs.accept_exposure = lambda packet: None
+        def capture(controller, action, duration, until, stop):
+            assert until == deadline
+            result = capture_window(SimpleNamespace(stream=rig.stream), controller, action,
+                                    duration, until, stop, post_seconds=.001)
+            captured.append(result)
+            return result
+        def discover():
+            return VisualAgency().discover(read_pairs, rig.controller, capture_shots=capture,
+                                           deadline=deadline, should_stop=lambda: bool(captured))
+        if outcome == 'success':
+            discover()
+            assert captured[0][0]['fire'] == 'E'
+            assert rig.wire.commands == ['NEUTRAL', 'LEASE', 'LEASE', 'RS_RIGHT', 'LS_CENTER', 'RS_CENTER']
+            assert not rig.transport.closed
+            assert 'failure_kind' not in rig.progress.data
+        else:
+            error = ConnectionError if outcome == 'rejected' else InterruptedError
+>           with pytest.raises(error): discover()
+                                       ^^^^^^^^^^
+
+tests/test_supervised_controller.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_supervised_controller.py:70: in discover
+    return VisualAgency().discover(read_pairs, rig.controller, capture_shots=capture,
+experiments/ppal/robotron_agency.py:197: in discover
+    execution,packets,capture_status=capture_shots(controller,
+tests/test_supervised_controller.py:65: in capture
+    result = capture_window(SimpleNamespace(stream=rig.stream), controller, action,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source = namespace(stream=<experiments.ppal.observation_stream.ObservationStream object at 0x7fff130ba3f0>)
+controller = <experiments.ppal.progress_supervision.SupervisedController object at 0x7fff130bab10>
+action = Action(move='STAY', fire='E', reason='shot-origin acquisition', controls=())
+duration_ms = 60, deadline = 1013.249391487
+should_stop = <function test_self_discovery_capture_forwards_cancel_event_and_deadline.<locals>.discover.<locals>.<lambda> at 0x7fff130f91c0>
+post_seconds = 0.001
+
+    def capture_window(source,controller,action,duration_ms,deadline=None,should_stop=None,*,post_seconds=.25):
+        if not 30<=duration_ms<=400:raise ValueError('firing duration must be explicitly bounded at 30..400 ms')
+        if not 0<post_seconds<=.35:raise ValueError('post-fire window must be bounded')
+        def stopped():return should_stop is not None and should_stop()
+        if stopped() or (deadline is not None and time.monotonic()+duration_ms/1000+post_seconds>=deadline):
+            raise InterruptedError('insufficient existing acquisition budget; no FIRE sent')
+        stream=source.stream
+        baseline=stream.begin_window()
+        submitted=time.monotonic()
+        try:
+>           controller.execute(action,duration_ms,cancel_event=stream.failed,deadline=deadline)
+E           TypeError: SupervisedController.execute() got an unexpected keyword argument 'cancel_event'
+
+experiments/ppal/shot_capture.py:15: TypeError
+____________ test_all_transport_execute_keywords_command_and_close _____________
+
+rig = namespace(controller=<experiments.ppal.progress_supervision.SupervisedController object at 0x7fff130b95b0>, transport=...ervationStream object at 0x7fff130b8e90>, wire=<test_supervised_controller.rig.<locals>.Wire object at 0x7fff149f56a0>)
+
+    def test_all_transport_execute_keywords_command_and_close(rig):
+        """Bind every wrapped transport method's real keyword interface through the proxy."""
+        for name, kwargs in [('execute', dict(action=Action('E', 'N'), duration_ms=30,
+                                            cancel_event=threading.Event(), deadline=time.monotonic()+5)),
+                             ('_command', dict(command='NEUTRAL')), ('close', {})]:
+            inspect.signature(getattr(rig.transport, name)).bind(**kwargs)
+>           inspect.signature(getattr(rig.controller, name)).bind(**kwargs)
+
+tests/test_supervised_controller.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/inspect.py:3295: in bind
+    return self._bind(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Signature (*args)>, args = ()
+kwargs = {'action': Action(move='E', fire='N', reason='', controls=()), 'duration_ms': 30, 'cancel_event': <threading.Event at 0x7fff130a5cd0: unset>, 'deadline': 1013.27536042}
+partial = False
+
+    def _bind(self, args, kwargs, *, partial=False):
+        """Private method. Don't use directly."""
+    
+        arguments = {}
+    
+        parameters = iter(self.parameters.values())
+        parameters_ex = ()
+        arg_vals = iter(args)
+    
+        pos_only_param_in_kwargs = []
+    
+        while True:
+            # Let's iterate through the positional arguments and corresponding
+            # parameters
+            try:
+                arg_val = next(arg_vals)
+            except StopIteration:
+                # No more positional arguments
+                try:
+                    param = next(parameters)
+                except StopIteration:
+                    # No more parameters. That's it. Just need to check that
+                    # we have no `kwargs` after this while loop
+                    break
+                else:
+                    if param.kind == _VAR_POSITIONAL:
+                        # That's OK, just empty *args.  Let's start parsing
+                        # kwargs
+                        break
+                    elif param.name in kwargs:
+                        if param.kind == _POSITIONAL_ONLY:
+                            if param.default is _empty:
+                                msg = f'missing a required positional-only argument: {param.name!r}'
+                                raise TypeError(msg)
+                            # Raise a TypeError once we are sure there is no
+                            # **kwargs param later.
+                            pos_only_param_in_kwargs.append(param)
+                            continue
+                        parameters_ex = (param,)
+                        break
+                    elif (param.kind == _VAR_KEYWORD or
+                                                param.default is not _empty):
+                        # That's fine too - we have a default value for this
+                        # parameter.  So, lets start parsing `kwargs`, starting
+                        # with the current parameter
+                        parameters_ex = (param,)
+                        break
+                    else:
+                        # No default, not VAR_KEYWORD, not VAR_POSITIONAL,
+                        # not in `kwargs`
+                        if partial:
+                            parameters_ex = (param,)
+                            break
+                        else:
+                            if param.kind == _KEYWORD_ONLY:
+                                argtype = ' keyword-only'
+                            else:
+                                argtype = ''
+                            msg = 'missing a required{argtype} argument: {arg!r}'
+                            msg = msg.format(arg=param.name, argtype=argtype)
+                            raise TypeError(msg) from None
+            else:
+                # We have a positional argument to process
+                try:
+                    param = next(parameters)
+                except StopIteration:
+                    raise TypeError('too many positional arguments') from None
+                else:
+                    if param.kind in (_VAR_KEYWORD, _KEYWORD_ONLY):
+                        # Looks like we have no parameter for this positional
+                        # argument
+                        raise TypeError(
+                            'too many positional arguments') from None
+    
+                    if param.kind == _VAR_POSITIONAL:
+                        # We have an '*args'-like argument, let's fill it with
+                        # all positional arguments we have left and move on to
+                        # the next phase
+                        values = [arg_val]
+                        values.extend(arg_vals)
+                        arguments[param.name] = tuple(values)
+                        break
+    
+                    if param.name in kwargs and param.kind != _POSITIONAL_ONLY:
+                        raise TypeError(
+                            'multiple values for argument {arg!r}'.format(
+                                arg=param.name)) from None
+    
+                    arguments[param.name] = arg_val
+    
+        # Now, we iterate through the remaining parameters to process
+        # keyword arguments
+        kwargs_param = None
+        for param in itertools.chain(parameters_ex, parameters):
+            if param.kind == _VAR_KEYWORD:
+                # Memorize that we have a '**kwargs'-like parameter
+                kwargs_param = param
+                continue
+    
+            if param.kind == _VAR_POSITIONAL:
+                # Named arguments don't refer to '*args'-like parameters.
+                # We only arrive here if the positional arguments ended
+                # before reaching the last parameter before *args.
+                continue
+    
+            param_name = param.name
+            try:
+                arg_val = kwargs.pop(param_name)
+            except KeyError:
+                # We have no value for this parameter.  It's fine though,
+                # if it has a default value, or it is an '*args'-like
+                # parameter, left alone by the processing of positional
+                # arguments.
+                if (not partial and param.kind != _VAR_POSITIONAL and
+                                                    param.default is _empty):
+                    raise TypeError('missing a required argument: {arg!r}'. \
+                                    format(arg=param_name)) from None
+    
+            else:
+                arguments[param_name] = arg_val
+    
+        if kwargs:
+            if kwargs_param is not None:
+                # Process our '**kwargs'-like parameter
+                arguments[kwargs_param.name] = kwargs
+            elif pos_only_param_in_kwargs:
+                raise TypeError(
+                    'got some positional-only arguments passed as '
+                    'keyword arguments: {arg!r}'.format(
+                        arg=', '.join(
+                            param.name
+                            for param in pos_only_param_in_kwargs
+                        ),
+                    ),
+                )
+            else:
+>               raise TypeError(
+                    'got an unexpected keyword argument {arg!r}'.format(
+                        arg=next(iter(kwargs))))
+E               TypeError: got an unexpected keyword argument 'action'
+
+/usr/lib/python3.13/inspect.py:3284: TypeError
+________________ test_forwarded_lease_and_deadman_are_preserved ________________
+
+rig = namespace(controller=<experiments.ppal.progress_supervision.SupervisedController object at 0x7fff130cd010>, transport=...ervationStream object at 0x7fff130cccb0>, wire=<test_supervised_controller.rig.<locals>.Wire object at 0x7fff14bb63c0>)
+
+    def test_forwarded_lease_and_deadman_are_preserved(rig):
+>       rig.controller.execute(action=Action('E', 'N'), duration_ms=30)
+E       TypeError: SupervisedController.execute() got an unexpected keyword argument 'action'
+
+tests/test_supervised_controller.py:105: TypeError
+__________ test_expired_deadline_neutralizes_and_preserves_finalizing __________
+
+rig = namespace(controller=<experiments.ppal.progress_supervision.SupervisedController object at 0x7fff12714f30>, transport=...ervationStream object at 0x7fff127149e0>, wire=<test_supervised_controller.rig.<locals>.Wire object at 0x7fff139330e0>)
+
+    def test_expired_deadline_neutralizes_and_preserves_finalizing(rig):
+        rig.progress.enter('finalizing')
+        with pytest.raises(InterruptedError):
+>           rig.controller.execute(action=Action('E', 'N'), duration_ms=30, deadline=time.monotonic()-1)
+E           TypeError: SupervisedController.execute() got an unexpected keyword argument 'action'
+
+tests/test_supervised_controller.py:119: TypeError
+_ test_proxy_preserves_additional_backend_keywords_and_return_values[execute] __
+
+tmp_path = PosixPath('/work/run-okLeHi/tmp/pytest-of-five/pytest-0/test_proxy_preserves_additiona0')
+name = 'execute'
+
+    @pytest.mark.parametrize('name', ['execute', '_command', 'close'])
+    def test_proxy_preserves_additional_backend_keywords_and_return_values(tmp_path, name):
+        progress = Progress(tmp_path/'progress.json')
+        token = object()
+        def method(*args, **kwargs):
+            assert progress.data['phase'] == 'controller'
+            assert args == (token,) and kwargs == dict(option=token)
+            return token
+        controller = SupervisedController(SimpleNamespace(**{name: method}), progress)
+>       assert getattr(controller, name)(token, option=token) is token
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: SupervisedController.execute() got an unexpected keyword argument 'option'
+
+tests/test_supervised_controller.py:134: TypeError
+_ test_proxy_preserves_additional_backend_keywords_and_return_values[_command] _
+
+tmp_path = PosixPath('/work/run-okLeHi/tmp/pytest-of-five/pytest-0/test_proxy_preserves_additiona1')
+name = '_command'
+
+    @pytest.mark.parametrize('name', ['execute', '_command', 'close'])
+    def test_proxy_preserves_additional_backend_keywords_and_return_values(tmp_path, name):
+        progress = Progress(tmp_path/'progress.json')
+        token = object()
+        def method(*args, **kwargs):
+            assert progress.data['phase'] == 'controller'
+            assert args == (token,) and kwargs == dict(option=token)
+            return token
+        controller = SupervisedController(SimpleNamespace(**{name: method}), progress)
+>       assert getattr(controller, name)(token, option=token) is token
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: SupervisedController._command() got an unexpected keyword argument 'option'
+
+tests/test_supervised_controller.py:134: TypeError
+__ test_proxy_preserves_additional_backend_keywords_and_return_values[close] ___
+
+tmp_path = PosixPath('/work/run-okLeHi/tmp/pytest-of-five/pytest-0/test_proxy_preserves_additiona2')
+name = 'close'
+
+    @pytest.mark.parametrize('name', ['execute', '_command', 'close'])
+    def test_proxy_preserves_additional_backend_keywords_and_return_values(tmp_path, name):
+        progress = Progress(tmp_path/'progress.json')
+        token = object()
+        def method(*args, **kwargs):
+            assert progress.data['phase'] == 'controller'
+            assert args == (token,) and kwargs == dict(option=token)
+            return token
+        controller = SupervisedController(SimpleNamespace(**{name: method}), progress)
+>       assert getattr(controller, name)(token, option=token) is token
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: SupervisedController.close() got an unexpected keyword argument 'option'
+
+tests/test_supervised_controller.py:134: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_supervised_controller.py::test_self_discovery_capture_forwards_cancel_event_and_deadline[success]
+FAILED tests/test_supervised_controller.py::test_self_discovery_capture_forwards_cancel_event_and_deadline[cancelled_before]
+FAILED tests/test_supervised_controller.py::test_self_discovery_capture_forwards_cancel_event_and_deadline[cancelled_during]
+FAILED tests/test_supervised_controller.py::test_self_discovery_capture_forwards_cancel_event_and_deadline[rejected]
+FAILED tests/test_supervised_controller.py::test_all_transport_execute_keywords_command_and_close
+FAILED tests/test_supervised_controller.py::test_forwarded_lease_and_deadman_are_preserved
+FAILED tests/test_supervised_controller.py::test_expired_deadline_neutralizes_and_preserves_finalizing
+FAILED tests/test_supervised_controller.py::test_proxy_preserves_additional_backend_keywords_and_return_values[execute]
+FAILED tests/test_supervised_controller.py::test_proxy_preserves_additional_backend_keywords_and_return_values[_command]
+FAILED tests/test_supervised_controller.py::test_proxy_preserves_additional_backend_keywords_and_return_values[close]
+10 failed in 0.35s

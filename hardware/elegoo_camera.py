@@ -39,6 +39,7 @@ class ElegooCamera:
         self._last_read_id = 0
 
         self._error = None
+        self._received_at = None
 
     def open(self):
         if self._running:
@@ -58,6 +59,9 @@ class ElegooCamera:
 
         self.buffer = bytearray()
         self._error = None
+        with self._condition:
+            self._latest_frame = None
+            self._received_at = None
         self._running = True
 
         self._thread = threading.Thread(
@@ -97,6 +101,8 @@ class ElegooCamera:
                     )
 
                 self.buffer.extend(chunk)
+                if len(self.buffer) > 2 * 1024 * 1024:
+                    raise ValueError("MJPEG frame exceeds bounded buffer")
 
                 while True:
                     jpg_start = self.buffer.find(
@@ -142,6 +148,7 @@ class ElegooCamera:
                     # Store only the newest frame. Older frames are
                     # intentionally discarded.
                     with self._condition:
+                        self._received_at = time.monotonic()
                         self._latest_frame = frame
                         self._frame_id += 1
                         self._condition.notify_all()
@@ -159,6 +166,7 @@ class ElegooCamera:
         self,
         timeout=2.0,
         require_new=True,
+        with_metadata=False,
     ):
         """
         Return the latest decoded frame.
@@ -198,6 +206,10 @@ class ElegooCamera:
                         self._frame_id
                     )
 
+                    if with_metadata:
+                        return frame, dict(sequence=self._frame_id, received_at=self._received_at,
+                            clock_domain="pi-monotonic", captured_at_source=None,
+                            sync_uncertainty_seconds=None, compression="MJPEG")
                     return frame
 
                 remaining = (

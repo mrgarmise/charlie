@@ -3,7 +3,7 @@
 Healthy gameplay continues to a confirmed terminal state. Diagnostic duration
 limits are opt-in, and the
 controller is neutralized on every pulse, during vision uncertainty, and on exit.
-Normal play reuses the promoted playfield calibration for fast startup. Charlie
+Normal play freshly confirms a qualified viewpoint through the existing camera owner. Charlie
 may start Robotron himself after the camera is ready, then waits for visual proof
 of gameplay before acquiring self. Fresh geometric calibration is completed
 before START using either an attract or gameplay border. The
@@ -487,9 +487,11 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                         default=Path("config/robotron/sprite-knowledge.json"))
     parser.add_argument("--calibration", type=Path,
                         default=Path("config/robotron/playfield-latest.json"),
-                        help="promoted playfield calibration used for fast startup")
+                        help="legacy polygon location; does not authorize visual readiness")
+    parser.add_argument('--viewpoint', type=Path,
+                        help='released Active Vision view.json or qualified visual-readiness record; always freshly confirmed')
     parser.add_argument("--recalibrate", action="store_true",
-                        help="before START, rediscover screen geometry instead of loading --calibration")
+                        help="legacy startup option; qualified views always require fresh pre-START confirmation")
     parser.add_argument("--no-start-game", action="store_true",
                         help="do not tap START; use when Robotron gameplay is already running")
     parser.add_argument("--focus", type=float, default=None,
@@ -771,7 +773,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 diary.event('verified_terminal_self_retired',tracks=retired,screen=screen,
                     last_supported_gameplay_at=episode_observer.last_gameplay_at)
         if imaging_monitor is not None:
-            drift=imaging_monitor.observe(frame,screen,source.timestamp)
+            drift=imaging_monitor.observe(frame,screen,source.timestamp,
+                raw=source.raw, calibration=calibration)
             if drift:
                 if controller is not None:controller._command('NEUTRAL')
                 from .cal_recovery import request_recovery
@@ -860,7 +863,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             source.neck_service = neck
         # Start the camera first. In normal operation this happens while Robotron
         # is still in attract/demo mode, giving exposure/AF time without costing
-        # any gameplay. No demo-screen calibration is attempted.
+        # any gameplay. Attract-mode screen readability does not require gameplay.
         for _ in range(6):
             source.read()
             time.sleep(0.04)
@@ -868,10 +871,14 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         # Task-aware optics preflight runs before START, with neutral controls,
         # and never inside the time-critical tracking/score observation loop.
         mark('calibration_started')
+        prepare_view = sensory_preflight
+        if args.viewpoint is not None:
+            def prepare_view(source, output, **kwargs):
+                return sensory_preflight(source, output, viewpoint_path=args.viewpoint, **kwargs)
         if camera_session is None:
-            calibration,sensory_report=sensory_preflight(source,args.output,seed_position=args.focus)
+            calibration,sensory_report=prepare_view(source,args.output,seed_position=args.focus)
         else:
-            calibration,sensory_report=camera_session.establish(source,args.output,sensory_preflight,seed_position=args.focus)
+            calibration,sensory_report=camera_session.establish(source,args.output,prepare_view,seed_position=args.focus)
         original_detect=recognizer.detect
         def trace_pairs(pairs):
             recorder.event('detector_trace',dict(schema='first-person-trace-v1',

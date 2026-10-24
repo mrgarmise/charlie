@@ -10,6 +10,9 @@ class LiveViewMonitor:
         self.detail = self.border_detail(frame)
         self.blur_streak = 0
         self.last_timestamp = None
+        from .eyes.active_vision import DegradationGate
+        self.geometry = DegradationGate()
+        self.geometry_checked_at = -float('inf')
 
     @staticmethod
     def border_detail(frame):
@@ -21,10 +24,32 @@ class LiveViewMonitor:
                                  gradient[:,:width].ravel(),gradient[:,-width:].ravel()])
         return float(np.mean(border))
 
-    def observe(self, frame, screen, timestamp):
+    def observe(self, frame, screen, timestamp, *, raw=None, calibration=None):
         if timestamp is None or (self.last_timestamp is not None and timestamp <= self.last_timestamp):
             return None
         self.last_timestamp = timestamp
+        # Share Active Vision's hysteresis and fresh-structure contract without
+        # opening a camera, creating a worker, requesting motion or new controls.
+        if raw is not None and getattr(calibration, 'corners', None) is not None and timestamp-self.geometry_checked_at >= 1:
+            from .eyes.settle import locate, verify_supported_border
+            self.geometry_checked_at=timestamp
+            expected=screen.get('state') != 'gameplay'
+            current=None
+            if not expected:
+                try:
+                    verify_supported_border(raw, np.asarray(calibration.corners)*raw.size)
+                    # The known edges/endpoints were independently supported on
+                    # this exposure. This is verification, not a new neck pose.
+                    current=np.asarray(calibration.corners)
+                except ValueError:
+                    try: current=locate(raw, require_uniform_border=False)/raw.size
+                    except ValueError: pass
+            decision=self.geometry.observe(calibration.corners, current, now=timestamp,
+                expected_transition=expected, authorized=False)
+            if decision in ('request_permission','suspend_and_request'):
+                return dict(symptom='persistent structural viewpoint degradation',
+                            inference='cause and physical movement unqualified',
+                            active_vision_decision=decision, physical_authorization=False)
         # Recognized attract, terminal and ambiguous pages cannot prove failure.
         if screen.get('state') != 'gameplay':
             self.imaging.streak = self.blur_streak = 0

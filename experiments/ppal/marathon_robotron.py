@@ -328,6 +328,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
                  '--output',str(game)]
             if index>1:cmd.extend(['--restart-from',str(previous_game)])
             if args.focus is not None:cmd.extend(['--focus',str(args.focus)])
+            if getattr(args,'viewpoint',None) is not None:cmd.extend(['--viewpoint',str(args.viewpoint)])
             if getattr(args,'projectile_self',False):cmd.append('--projectile-self')
             if developmental:cmd.extend(['--bootstrap-body-fire','--recalibrate'])
             if args.game_seconds is not None:cmd.extend(['--diagnostic-seconds',str(args.game_seconds)])
@@ -861,7 +862,7 @@ def recovery_resource_check(output):
 
 def runtime_features(args):
     """Describe selected mechanisms, never imply qualified learning from flags."""
-    return dict(camera='continuous owner; fresh geometry; manual focus 2.0',
+    return dict(camera='continuous owner; fresh qualified-view handoff; manual focus 2.0',
         controller_lease='required' if __import__('os').environ.get('CHARLIE_CONTROLLER_LEASE')=='required' else 'not required by environment',
         self='temporal visual and causal discovery; physical acceptance pending',
         projectile_self=bool(getattr(args,'projectile_self',False)),
@@ -891,6 +892,7 @@ def main():
     ap.add_argument("--retry-wait",type=float,default=5.0)
     ap.add_argument("--projectile-self",action="store_true",
                     help="experimental shot-origin confirmation; native qualification required")
+    ap.add_argument('--viewpoint',type=Path,help='qualified Active Vision/view readiness candidate; fresh pre-START confirmation required')
     ap.add_argument("--focus",type=float,default=None,
                     help="optional diagnostic manual starting position; default is automatic calibration")
     ap.add_argument("--root",type=Path,default=Path("robotron-runs"))

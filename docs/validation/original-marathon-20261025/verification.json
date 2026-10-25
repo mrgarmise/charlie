@@ -1,0 +1,44 @@
+{
+  "schema": "charlie-original-marathon-software-validation-v1",
+  "published_parent": "bd9b3230a927522cb6b7e1243d4abf9e9dd4e144",
+  "starting_tree": "e0cf0826147637aa368e0ead9a2fdfb0932d72d3",
+  "changed_source_sha256": {
+    "config/robotron/screen-labels/game-over-oct24-anchor.json": "f2bc48dffcb70d3d0d01f93a3c6326c19d86eef630e780cf36ed62d89d5658fd",
+    "experiments/comparison/robotron.py": "cdad4ba7e6bcf10a682648c6ecdf2b5c976064a2e630383e046427def2dfeb69",
+    "experiments/ppal/marathon_robotron.py": "772f310949dcc9e8f0fb19c597f3a73a705a9c8eba43a36df155f02d7a2df9fb",
+    "experiments/ppal/play_robotron.py": "f77d1a0fc755eefc7c8aeb419b821f701e77bc120e7717f004e7e4745eba5f98",
+    "experiments/ppal/robotron_hud.py": "cc95ae14e873ef9684437298b1df2141720c2eb521380d237ad11784c99b946b",
+    "experiments/ppal/robotron_score_system.py": "5390e5e3a7820e8f4c569a8a4a67013fb414d37f29a91851486a9d317818be89",
+    "experiments/ppal/robotron_screen_state.py": "6b8d49319730c6f03a21583beb29b671a3addc1a7b8e37fa3eca02792ed422f4",
+    "learning/campaign.py": "fdb235f6abbbaa2ff0de1c5b72ca8624469f6def7bdbc2604e774bcddf4c3a99",
+    "tests/test_agency_recovery_boundaries.py": "8fe34f21eece0d539ccd5fe8de2783064f9b4463f20b83e1845459b17778d959",
+    "tests/test_native_robotron_trial.py": "a18f0cdb900b280f571f7ff3c68343bd3ddb73012b72d1e963314a0432a85b3f",
+    "tests/test_original_marathon_campaign.py": "eeb87e742324021b95156d9ffd37fde61c7f7965d59eb6058a75e470fdb38686",
+    "tests/test_projectile_agency.py": "83b0526102b252600323f57dff6ee928c9f4bbebad2d8a8c12454b28ce3852be",
+    "tests/test_robotron_agency_integration.py": "c2b21d356a60969d8500e56adcd1c9861e3654234ca7767a95019e21b17c3a48",
+    "tests/test_robotron_oct24_marathon.py": "4bb66a8551f55c449b42e4d11c011347dbb59c2cfd2e87354cf1775928ed44cf",
+    "tests/test_robotron_qualified_comparison.py": "85a5eb68138e15f41f8d163ab148e66aeee9863b384c8e27597b4845e131a05a",
+    "tests/test_sensory_recording.py": "9843613a70e779a1bd1998954ed64ba01dafb0262c27ab9b81d95291a483f05e",
+    "tools/native_robotron_trial.py": "ad11f993192c9700b23409f0bc24589d69d9030e6f35172ac142736c24882fcb"
+  },
+  "eligible_tests": {
+    "passed": 414,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 208.85,
+    "xml_sha256": "314a61fa1491b757ebb5de9175e2ee3b816c3d1803302135e7a10baaaf74af80"
+  },
+  "sandbox_blocked_lease_client_cases": 4,
+  "physical_gameplay": false,
+  "servo_motion": false,
+  "firmware_deployment": false,
+  "learned_policy_activation": false,
+  "gates": {
+    "native_autonomous_campaign": "NOT YET DEMONSTRATED",
+    "independent_performance": "NOT YET DEMONSTRATED",
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  }
+}

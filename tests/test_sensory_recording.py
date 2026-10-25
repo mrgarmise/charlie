@@ -7,6 +7,13 @@ from experiments.ppal.progress_evidence import CaptureEvidence
 from memory.evidence import EvidenceJournal
 
 
+@pytest.fixture(autouse=True)
+def isolated_visual_readiness(tmp_path,monkeypatch):
+    # Synthetic optics must never qualify the normal operator cache or depend
+    # on a previous test's retained viewpoint.
+    monkeypatch.setenv('XDG_DATA_HOME',str(tmp_path/'test-user-data'))
+
+
 def test_lossless_capture_before_prediction_and_ordered_outcome_restart(tmp_path):
     import time
     recorder=CaptureEvidence(tmp_path,'session:test',{'source':'simulation'})

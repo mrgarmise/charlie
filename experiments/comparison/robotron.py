@@ -163,3 +163,58 @@ def validate_certificates(journal,row,*,protocol=None):
                 or c.get('boundary_certificate')!=row['boundary_certificate']
                 or (m.get('artifact_sha256'),m.get('timestamp')) not in captures):
             raise ValueError('score must bind the same validated terminal capture and boundary')
+
+
+def compare_campaign(journal, games, record_ids, *, conditions):
+    """Descriptive 3/3 comparison using the existing independent certificates.
+
+    Block order is imposed by meditation. This is not the randomized-pair
+    protocol and cannot establish that learning caused a performance change.
+    Missing, conflicting or reused measurements remain inconclusive.
+    """
+    from pathlib import Path
+    from learning.datasets import sha
+    if len(games)!=6:raise ValueError('exactly six complete campaign games required')
+    reports=[Path(g['path'])/'report.json' for g in games]
+    hashes=[sha(p) for p in reports]
+    if len(set(hashes))!=6:raise ValueError('distinct original game reports required')
+    slots={};episodes=set();failures=[]
+    for identifier in record_ids:
+        try:
+            record=journal.get(identifier);row=record.data['payload']
+            if row.get('category')!='robotron_evaluation_episode' or row.get('confirmed_terminal') is not True:
+                raise ValueError('independent complete-game evaluation required')
+            if row.get('conditions')!=conditions or not all(conditions.get(k) for k in ('camera','game','system','measurement')):
+                raise ValueError('measurement conditions differ from frozen campaign')
+            validate_certificates(journal,row)
+            boundary=journal.get(row['boundary_certificate']).data['payload']
+            slot=hashes.index(boundary['source_report']['sha256'])
+            from learning.episode_identity import canonical_experience,eligible
+            group=canonical_experience(journal,row['source_episode'])
+            if slot in slots or group in episodes or not eligible(journal,row):
+                raise ValueError('duplicate or quarantined game measurement')
+            measurements=row.get('score_observations',[])
+            values=[m['value'] for m in measurements if m.get('qualification')=='independently_validated'
+                and m.get('phase')=='final']
+            if not values or len(values)!=len(measurements) or len(set(values))!=1 or any(type(v) is not int or v<0 for v in values):
+                raise ValueError('missing or conflicting independently validated final scores')
+            import json
+            original=json.loads(reports[slot].read_text())
+            if row.get('policy')!=original.get('policy_identity'):
+                raise ValueError('measurement policy must bind original game policy identity')
+            slots[slot]=dict(score=values[0],measurement_id=identifier,source_episode=row['source_episode'],
+                report_sha256=hashes[slot],policy=original['policy_identity'])
+            episodes.add(group)
+        except (ValueError,KeyError,OSError) as exc:
+            failures.append(dict(record_id=identifier,reason=str(exc)))
+    complete=len(slots)==6 and not failures
+    result=dict(schema='charlie-three-meditation-three-comparison-v1',status='measured' if complete else 'inconclusive',
+        games=[dict(slot=i,**slots[i]) for i in sorted(slots)],failures=failures,
+        learning_gates={g:'NOT YET DEMONSTRATED' for g in ('E1','P1','I1')},
+        limitations=['Fixed 3/meditation/3 order; environment and Robotron randomness are not controlled',
+            'Score change does not demonstrate Executive or PPAL learning; independent causal evidence required'])
+    if complete:
+        before=[slots[i]['score'] for i in range(3)];after=[slots[i]['score'] for i in range(3,6)]
+        result.update(first_scores=before,second_scores=after,first_mean=sum(before)/3,
+            second_mean=sum(after)/3,mean_change=(sum(after)-sum(before))/3)
+    return result

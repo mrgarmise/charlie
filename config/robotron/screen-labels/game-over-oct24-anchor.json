@@ -1,0 +1,21 @@
+{
+  "schema": "recorded-robotron-game-over-anchor-v1",
+  "source_sha256": "309d90b88582a66d17ccdffec688ecd90e2a3369769507aafbdd66b8a06a320c",
+  "source_path": "raw-0087.png",
+  "source_commit": "c8db98768776bb43141530f90d331c0222f273eb",
+  "source_capture": "/home/five/charlie-native-trials/causal-window-20261024-wPgSCbwb/development-20261024-232840/game-01",
+  "roi": [
+    255,
+    234,
+    382,
+    256
+  ],
+  "shape": [
+    22,
+    127
+  ],
+  "mask_sha256": "bb1a8f441e4fa3e621e6113ee1c5a8c6459a567401502e67038d5798c9ae34d9",
+  "zlib_base64": "eJztluEOgzAIhPv+L33LEjfguDK6NdHE8UdL4T5asTrGRsNOsZsYnMUhz4FCpYBNPq+YmEwu4rsCNvtD9kn4hWqujG9sa4Vn7QFrJ4nPLcxKqs2dh18In6IUguO4C2OtuYpPk338XK+NT/5q9e9nsAtvLVLWQ8oI7qSo8IfLJVOVPfxr+ZNVIe6QPPUE3lcnNj+tO4bHwK/xYHeJl2m78JjiB98t4xNmCe+7/xM+fy9NwFNyqMJTN2o6nSX/v6RT7AE2GuJW",
+  "minimum_similarity": 0.85,
+  "qualification": "October 24 complete words; temporal holdouts are correlated, no independent-game qualification"
+}

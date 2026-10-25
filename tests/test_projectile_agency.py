@@ -185,6 +185,7 @@ def test_controller_records_actual_ack_and_pulse_intervals_without_socket(monkey
     monkeypatch.setattr(transport.time,'monotonic',lambda:clock[0])
     c=object.__new__(transport.ArcadeController) # bypass all I/O construction
     c.protocol='positions';c.pulse=True;c.closed=False;c.positions=('LS_CENTER','RS_CENTER')
+    c.require_lease=False  # explicit socket-free fixture; real lease behavior tested separately
     c.sandbox=ControllerSandbox();c.held=frozenset()
     def command(value):clock[0]+=.12
     def sleep(seconds):clock[0]+=seconds

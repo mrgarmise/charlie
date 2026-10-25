@@ -153,7 +153,7 @@ class RobotronHUDReader:
     def _read_channel(cls, channel: np.ndarray) -> tuple[int | None, float]:
         primary = cls._read_channel_at_threshold(channel)
         if primary[0] is not None:
-            nearby=[cls._read_channel_at_threshold(channel,t) for t in (190,205)]
+            nearby=[cls._read_channel_at_threshold(channel,t) for t in (190,205,235)]
             if all(value==primary[0] and confidence>=.70 for value,confidence in nearby):
                 return primary[0],min(primary[1],*(confidence for _,confidence in nearby))
             # An exact segment signature is not calibrated certainty. Unstable

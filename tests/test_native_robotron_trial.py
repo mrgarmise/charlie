@@ -89,7 +89,7 @@ def test_monitoring_failure_stops_owned_process_without_retry(tmp_path,monkeypat
     monkeypatch.setattr(runner,'stop_process',stop)
     output=tmp_path/'trial'
     monkeypatch.setattr(runner.sys,'argv',['runner','--run','--expected-revision','fixture-revision',
-        '--review',str(path),'--output',str(output)])
+        '--review',str(path),'--output',str(output),'--campaign',str(tmp_path/'campaign')])
     with pytest.raises(SystemExit):runner.main()
     assert len(children)==1 and stopped==children
     result=json.loads((output/'runner-result.json').read_text())

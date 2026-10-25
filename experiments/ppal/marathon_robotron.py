@@ -326,6 +326,9 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             write_session(session/'session.json',doc)
             cmd=[sys.executable,'-m','experiments.ppal.play_robotron','--arm',
                  '--output',str(game)]
+            if getattr(args,'frozen_policy',False):
+                cmd.append('--frozen-policy')
+                if index==1:cmd.append('--require-new-game')
             if index>1:cmd.extend(['--restart-from',str(previous_game)])
             if args.focus is not None:cmd.extend(['--focus',str(args.focus)])
             if getattr(args,'viewpoint',None) is not None:cmd.extend(['--viewpoint',str(args.viewpoint)])
@@ -334,7 +337,7 @@ def developmental_marathon(args, *, driver=run_bounded, gateway=None):
             if args.game_seconds is not None:cmd.extend(['--diagnostic-seconds',str(args.game_seconds)])
             if plan:cmd.extend(['--experiment-plan',str(plan_path)])
             semantic_manifest=getattr(args,'learned_semantics',None)
-            if semantic_manifest is None and authority:
+            if semantic_manifest is None and authority and not getattr(args,'frozen_policy',False):
                 candidate_root=getattr(args,'learning_root',None) or gateway.evaluator.path.with_name('autonomous-learning')
                 candidate_manifest=Path(candidate_root)/'semantic-activation.json'
                 if candidate_manifest.exists():semantic_manifest=candidate_manifest
@@ -902,6 +905,7 @@ def main():
     ap.add_argument('--developmental',action='store_true',help='automatic between-game evidence-backed experiments; 3..5 attempts')
     ap.add_argument('--seed-episode',type=Path,help='optional prior episode to process before developmental game 1')
     ap.add_argument('--learning-projects',action='store_true',help='opt-in durable diagnostic project continuity between developmental games')
+    ap.add_argument('--frozen-policy',action='store_true',help='exclude ambient policy/semantic selection for a frozen campaign')
     ap.add_argument('--baseline-only',action='store_true',help='freeze existing policy; no actuator experiment selection')
     ap.add_argument('--single-observation','--observation-block',dest='single_observation',action='store_true',help='one or two explicit baseline observations; offline handoff is separate from three-game reliability')
     ap.add_argument('--learned-policy',type=Path,help='explicit separately qualified physical PPAL policy; never auto-activated')

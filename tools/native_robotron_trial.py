@@ -1,4 +1,4 @@
-"""Foreground host-only two-game runner; never a sandbox escape or service.
+"""Foreground host-only durable marathon runner; never a sandbox escape or service.
 
 Uses existing marathon/control supervision. Operator-reviewed independent stop,
 release and host-readiness proofs are mandatory; this monitor cannot certify them.
@@ -125,7 +125,7 @@ def main():
     parser.add_argument('--expected-revision',required=True)
     parser.add_argument('--review',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
-    parser.add_argument('--learned-policy',type=Path)
+    parser.add_argument('--campaign',type=Path,required=True,help='prepared learning.campaign --marathon state; existing authority required')
     parser.add_argument('--run',action='store_true',help='explicit foreground native launch after review; otherwise inspect only')
     args=parser.parse_args()
     args.output=args.output.expanduser().resolve()
@@ -143,11 +143,7 @@ def main():
     initial=sample(disk_path=disk_path)
     reason=stop_reason(initial)
     if reason:parser.error(reason)
-    if args.learned_policy:
-        from experiments.ppal.qualified_policy import load_policy
-        policy=load_policy(args.learned_policy,physical=True)
-        policy_identity=dict(policy.identity)
-    else:policy_identity={'kind':'baseline','learned_policy':None}
+    policy_identity={'campaign':str(args.campaign.resolve()),'selection':'frozen campaign grants; no wrapper policy substitution'}
     if not args.run:
         print(json.dumps(dict(native_checks=initial,policy=policy_identity,review_verified=True,armed=False),indent=2))
         return
@@ -159,14 +155,7 @@ def main():
         if checksum(target) != proof['sha256']:
             raise ValueError('proof changed before launch: '+name)
     (args.output/'operator-review.json').write_text(json.dumps(review,indent=2)+'\n')
-    command=[sys.executable,'-m','experiments.ppal.marathon_robotron',
-        '--arm','--developmental','--learning-projects','--play-first','--baseline-only',
-        '--observation-block','--max-games','2','--qualified-games','2',
-        '--root',str(args.output/'games'),
-        '--learning-root','/home/five/.local/share/charlie/development',
-        '--campaign-notebook','/home/five/.local/share/charlie/development',
-        '--project-evidence','/home/five/.local/share/charlie/development/learning-project-evidence.sqlite3']
-    if args.learned_policy:command+=['--learned-policy',str(args.learned_policy.resolve())]
+    command=[sys.executable,'-m','learning.campaign','run',str(args.campaign.resolve()),'--arm']
     # Prevent an ambient policy/semantic selection from contradicting the freeze.
     env=os.environ.copy()
     # Required server capability; renewal happens in gameplay execute(), never
@@ -174,7 +163,7 @@ def main():
     env['CHARLIE_CONTROLLER_LEASE']='required'
     env.pop('CHARLIE_LEARNING_STATE',None)
     identity=dict(revision=revision,command=command,policy=policy_identity,
-                  policy_file_sha256=checksum(args.learned_policy) if args.learned_policy else None,
+                  campaign=str(args.campaign.resolve()),
                   configuration_sha256={str(p.relative_to(ROOT)):checksum(p)
                       for p in (ROOT/'config/robotron').rglob('*') if p.is_file()},
                   review_sha256=checksum(args.review),started_at=time.time())

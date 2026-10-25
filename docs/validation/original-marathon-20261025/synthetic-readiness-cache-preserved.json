@@ -1,0 +1,272 @@
+{
+  "schema": "charlie-visual-readiness-v1",
+  "task": "robotron",
+  "status": "qualified",
+  "calibration": {
+    "corners": [
+      [
+        0.16423712638076673,
+        0.15640296729478018
+      ],
+      [
+        0.8432137834036568,
+        0.17256907817627756
+      ],
+      [
+        0.8236292369799244,
+        0.8351795655125595
+      ],
+      [
+        0.1823633257709346,
+        0.8210302782676014
+      ]
+    ],
+    "output_size": [
+      640,
+      480
+    ]
+  },
+  "focus": {
+    "lens_position": 2.0,
+    "score": 124.53861938238434,
+    "changed": false
+  },
+  "frame_size": [
+    640,
+    480
+  ],
+  "origin": "/tmp/pytest-of-five/pytest-9/test_actual_sensory_preflight_0",
+  "observations": [
+    {
+      "attempt": 1,
+      "capture": {
+        "lens_position": 2.0,
+        "af_state": 0,
+        "sensor_timestamp_ns": 700000000
+      },
+      "status": "supported",
+      "geometry": {
+        "rejections": {
+          "area": 64
+        },
+        "candidate_checks": 100,
+        "accepted": 36,
+        "hough_lines": 33,
+        "selected_lines": [
+          5,
+          5
+        ],
+        "best_candidate_support": [
+          0.98,
+          0.8
+        ],
+        "best_support_corners": [
+          [
+            105.1117608836907,
+            75.07342430149448
+          ],
+          [
+            539.6568213783404,
+            82.83315752461323
+          ],
+          [
+            527.1227116671516,
+            400.88619144602853
+          ],
+          [
+            116.71252849339814,
+            394.0945335684487
+          ]
+        ],
+        "best_edge_support": [
+          0.98,
+          0.98,
+          0.98,
+          0.98
+        ],
+        "best_endpoint_support": [
+          0.8,
+          0.8,
+          0.9,
+          0.8
+        ]
+      },
+      "jitter_pixels": 0.0,
+      "edge_support": [
+        0.98,
+        0.98,
+        0.98,
+        0.98
+      ],
+      "endpoint_support": [
+        0.8,
+        0.8,
+        0.9,
+        0.8
+      ],
+      "quality": {
+        "detail_pixels": 610,
+        "clipped_channel_fraction": 0.0,
+        "clipped_white_fraction": 0.0,
+        "colored_fraction": 0.0,
+        "sharpness": 124.53861938238434
+      },
+      "consecutive": 1
+    },
+    {
+      "attempt": 2,
+      "capture": {
+        "lens_position": 2.0,
+        "af_state": 0,
+        "sensor_timestamp_ns": 800000000
+      },
+      "status": "supported",
+      "geometry": {
+        "rejections": {
+          "area": 64
+        },
+        "candidate_checks": 100,
+        "accepted": 36,
+        "hough_lines": 33,
+        "selected_lines": [
+          5,
+          5
+        ],
+        "best_candidate_support": [
+          0.98,
+          0.8
+        ],
+        "best_support_corners": [
+          [
+            105.1117608836907,
+            75.07342430149448
+          ],
+          [
+            539.6568213783404,
+            82.83315752461323
+          ],
+          [
+            527.1227116671516,
+            400.88619144602853
+          ],
+          [
+            116.71252849339814,
+            394.0945335684487
+          ]
+        ],
+        "best_edge_support": [
+          0.98,
+          0.98,
+          0.98,
+          0.98
+        ],
+        "best_endpoint_support": [
+          0.8,
+          0.8,
+          0.9,
+          0.8
+        ]
+      },
+      "jitter_pixels": 0.0,
+      "edge_support": [
+        0.98,
+        0.98,
+        0.98,
+        0.98
+      ],
+      "endpoint_support": [
+        0.8,
+        0.8,
+        0.9,
+        0.8
+      ],
+      "quality": {
+        "detail_pixels": 610,
+        "clipped_channel_fraction": 0.0,
+        "clipped_white_fraction": 0.0,
+        "colored_fraction": 0.0,
+        "sharpness": 124.53861938238434
+      },
+      "consecutive": 2
+    },
+    {
+      "attempt": 3,
+      "capture": {
+        "lens_position": 2.0,
+        "af_state": 0,
+        "sensor_timestamp_ns": 900000000
+      },
+      "status": "supported",
+      "geometry": {
+        "rejections": {
+          "area": 64
+        },
+        "candidate_checks": 100,
+        "accepted": 36,
+        "hough_lines": 33,
+        "selected_lines": [
+          5,
+          5
+        ],
+        "best_candidate_support": [
+          0.98,
+          0.8
+        ],
+        "best_support_corners": [
+          [
+            105.1117608836907,
+            75.07342430149448
+          ],
+          [
+            539.6568213783404,
+            82.83315752461323
+          ],
+          [
+            527.1227116671516,
+            400.88619144602853
+          ],
+          [
+            116.71252849339814,
+            394.0945335684487
+          ]
+        ],
+        "best_edge_support": [
+          0.98,
+          0.98,
+          0.98,
+          0.98
+        ],
+        "best_endpoint_support": [
+          0.8,
+          0.8,
+          0.9,
+          0.8
+        ]
+      },
+      "jitter_pixels": 0.0,
+      "edge_support": [
+        0.98,
+        0.98,
+        0.98,
+        0.98
+      ],
+      "endpoint_support": [
+        0.8,
+        0.8,
+        0.9,
+        0.8
+      ],
+      "quality": {
+        "detail_pixels": 610,
+        "clipped_channel_fraction": 0.0,
+        "clipped_white_fraction": 0.0,
+        "colored_fraction": 0.0,
+        "sharpness": 124.53861938238434
+      },
+      "consecutive": 3
+    }
+  ],
+  "physical_motion": false,
+  "readiness_scope": "screen readable before START; gameplay and SELF unqualified",
+  "record_id": "bf251fd1f2d4b13135846a0468aa7b80d8ec1518e137d3ecbc4e0a9428821683"
+}

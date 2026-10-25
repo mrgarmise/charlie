@@ -143,7 +143,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
             return transition(self,change)
         monkeypatch.setattr(play.GameDiary,'transition',faulty_diary)
     monkeypatch.setattr(sys,'argv',['play','--arm','--supervised-child','--output',str(tmp_path/'run')]
-                        + ([] if extended or terminal or persistent else ['--seconds','3' if rejected_challenge else '1'])
+                        + ([] if extended or terminal or persistent else ['--seconds','3' if rejected_challenge or respawn else '1'])
                         + (['--bootstrap-body-fire'] if bootstrap else [])
                         + (['--experiment-plan',str(tmp_path/'plan.json')] if experiment else [])
                         + (['--recalibrate'] if recalibrate else [])
@@ -203,7 +203,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     if extended or terminal:
         assert t['gameplay_deadline'] is None
     else:
-        assert t['gameplay_deadline']-t['gameplay_timer_started_at']==pytest.approx(3. if rejected_challenge else 1.)
+        assert t['gameplay_deadline']-t['gameplay_timer_started_at']==pytest.approx(3. if rejected_challenge or respawn else 1.)
     telemetry_events=list(map(json.loads,(tmp_path/'run/events.jsonl').read_text().splitlines()))
     assert any(e['kind']=='state_transition' and e['new']=='playing' for e in telemetry_events)
     assert t['first_life_lost_at'] is None
@@ -221,6 +221,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     assert closed==['controller','camera']
     assert (tmp_path/'run/agency.jsonl').exists()
     telemetry=list(map(json.loads,(tmp_path/'run/agency.jsonl').read_text().splitlines()))
+    assert not any(row.get('phase')=='shot_origin_experiment' for row in telemetry)
     assert telemetry[0]['command'] is None  # pre-command anchor is now recorded
     assert all(row['tracking']['clock']=='seconds' for row in telemetry)
     assert all(row['tracking']['detections'] for row in telemetry)

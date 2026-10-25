@@ -69,5 +69,15 @@
     "reused": "existing PR10 HailoBackend / HailoObjects class output; optional full class exposure",
     "new_models": 0,
     "new_inference_passes": 0
+  },
+  "ci": {
+    "status": "success",
+    "passed": 1344,
+    "skipped": 21,
+    "warnings": 1,
+    "seconds": 362.08,
+    "commit": "469a10ffa11dd1d15e773bd9ac6ff5f6306b9770",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/40206127789",
+    "checkout_history": "full; existing rollback regression retained"
   }
 }

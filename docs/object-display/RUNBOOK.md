@@ -24,7 +24,7 @@ Policy defaults: three confirmations spanning at least .2 seconds, confidence >=
 
 ## Protocol and display priority
 
-The existing 115200-baud locked serial transport handles `DISPLAY_CAPS`, `OBJECT_LABEL <ttl_ms> <step_ms> <TEXT>`, and `OBJECT_CLEAR`. Capability version is `charlie-display-v1`, object_labels=1, width=17, height=7. Unsupported old firmware disables this feature for that link session; there is no generic MESSAGE fallback. Exchanges are bounded to 150ms. Labels are uppercase ASCII letters/digits/spaces, collapsed and capped at 24 characters, with OBJECT fallback. Firmware strictly validates TTL 500..10000ms and step 100..250ms. Default TTL is4500ms and step100ms.
+The existing 115200-baud locked serial transport handles `DISPLAY_CAPS`, `OBJECT_LABEL <ttl_ms> <step_ms> <TEXT>`, and `OBJECT_CLEAR`. Capability version is `charlie-display-v1`, object_labels=1, width=17, height=7. Unsupported old firmware disables this feature for that link session; there is no generic MESSAGE fallback. Exchanges are bounded to 150ms. Labels are uppercase ASCII letters/digits/spaces, collapsed and capped at 24 characters, with OBJECT fallback. Firmware strictly validates TTL 500..10000ms and step 100..250ms. Default TTL is 4500ms and step 100ms.
 
 There is one expiring object slot, not a scrolling queue. The renderer uses existing 5x7 glyph pixels on the 17x7 matrix and advances cooperatively through Display.update. It never invokes the vendor's blocking long-string scroll. ERROR/NO_BRAIN override text. Existing text, feedback, capability and progress occupy higher priority than object labels; SLEEP suppresses/clears objects. STOP/IDLE/SESSION clear objects without changing existing authority rules.
 

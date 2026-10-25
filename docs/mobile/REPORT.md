@@ -1,3 +1,5 @@
+> Continuation: see [2026-10-25 report](continuation/REPORT.md) and [native runbook](continuation/RUNBOOK.md). This original report is preserved as the first milestone history.
+
 # ELEGOO mobile implementation handoff — 2026-10-24
 
 Review: https://github.com/mrgarmise/charlie/pull/10 (draft). Tracking: CHA-15.

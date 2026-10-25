@@ -1,4 +1,10 @@
 {
+  "event_interval_seconds": {
+    "p50": 0.4321908950805664,
+    "p95": 0.4520534038543701,
+    "p99": 0.4561477756500244
+  },
+  "event_rate_not_camera_fps": 2.3045132363456964,
   "events": 614,
   "events_sha256": "03490c149e57795b013190bfaa5b9261f43cf8b9883f652014b446c5191130f3",
   "annotated_frames": 9,
@@ -151,5 +157,10 @@
   "detection_recall": null,
   "localization_accuracy": null,
   "qualification": "historical replay, not new native inference",
-  "motion_commands": 0
+  "motion_commands": 0,
+  "tracking_replay": {
+    "observed_track_count_in_reviewed_images": 1,
+    "automated_individual_identity": false,
+    "uses_operator_names_for_association": false
+  }
 }

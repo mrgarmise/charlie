@@ -3,6 +3,7 @@ from dataclasses import dataclass, fields
 import hashlib
 import math
 import time
+import threading
 from uuid import uuid4
 
 
@@ -50,19 +51,35 @@ class MobileFrameSource:
 
     Source exposure time is unknown. Receipt age cannot certify capture age.
     """
-    def __init__(self, camera=None, *, max_age=.5, clock=time.monotonic):
+    def __init__(self, camera=None, *, max_age=.5, clock=time.monotonic, reconnect_attempts=0, backoff=.1, cancel=None, on_fault=None):
         if not finite(max_age) or not 0 < max_age <= 5: raise ValueError('invalid max age')
         if camera is None:
             from hardware.elegoo_camera import ElegooCamera
             camera = ElegooCamera(timeout=2)
         self.camera, self.max_age, self.clock = camera, max_age, clock
+        if type(reconnect_attempts) is not int or not 0<=reconnect_attempts<=10 or not finite(backoff) or not 0<=backoff<=2:
+            raise ValueError('bounded camera recovery required')
+        self.reconnect_attempts,self.backoff=reconnect_attempts,backoff
+        self.cancel=cancel or threading.Event()
+        self.on_fault=on_fault
         self.session = uuid4().hex
         self.last_sequence = -1
         self.stats = dict(frames=0, dropped=0, faults=0, reconnects=0)
 
     def read(self):
+        for attempt in range(self.reconnect_attempts+1):
+            if self.cancel.is_set():raise InterruptedError('mobile source cancelled')
+            started=self.clock()
+            try:return self._read_once()
+            except (OSError,EOFError,TimeoutError,ValueError) as exc:
+                if self.on_fault:self.on_fault(exc,dict(self.stats,attempt=attempt,read_seconds=self.clock()-started))
+                if attempt==self.reconnect_attempts:raise
+                if self.cancel.wait(min(2,self.backoff*2**attempt)):raise InterruptedError('mobile recovery cancelled')
+
+    def _read_once(self):
         try:
             image, m = self.camera.read(timeout=2, with_metadata=True)
+            if self.cancel.is_set():raise InterruptedError('mobile source cancelled')
             age = self.clock() - m['received_at']
             if not finite(age) or not 0 <= age <= self.max_age or m['sequence'] <= self.last_sequence:
                 raise ValueError('stale or reordered mobile frame')
@@ -79,7 +96,9 @@ class MobileFrameSource:
             self.stats['reconnects'] += 1
             raise
 
-    def close(self): self.camera.close()
+    def close(self):
+        self.cancel.set()
+        self.camera.close()
 
 
 class MobilePerception:
@@ -112,6 +131,10 @@ class MobilePerception:
         timings = {}
         for name, model in (('objects', self.detector), ('depth', self.depth)):
             self.resources.check(force=True)
+            if name=='depth' and model.metadata.get('backend') not in ('unavailable','offline-fixture'):
+                # Until native multi-network scheduling is qualified, release
+                # the persistent detector before the depth network takes lease.
+                if hasattr(self.detector,'close'):self.detector.close()
             at = self.clock()
             outputs[name] = model.infer(frame)
             timings[name] = self.clock()-at
@@ -162,6 +185,10 @@ class FrameArtifactStore:
 
 class RecordingFrameSource:
     def __init__(self,source,store):self.source,self.store=source,store
+    @property
+    def on_fault(self):return self.source.on_fault
+    @on_fault.setter
+    def on_fault(self,callback):self.source.on_fault=callback
     def read(self):
         frame=self.source.read()
         return self.store.retain(frame) if frame.authentic else frame

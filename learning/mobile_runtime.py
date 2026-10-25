@@ -3,12 +3,13 @@ from pathlib import Path
 import json
 import subprocess
 import time
+import threading
 from uuid import uuid4
 from memory.evidence import EvidenceJournal
 from .mobile import MobileEvidenceAdapter
 from .resources import ResourceGuard
 from vision.mobile_perception import MobileFrame, MobileFrameSource, MobilePerception, FrameArtifactStore, RecordingFrameSource
-from vision.mobile_models import FixtureModel, HailoObjects, HailoRelativeDepth
+from vision.mobile_models import FixtureModel, HailoObjects, HailoRelativeDepth, UnavailableDepth
 from behaviors.mobile_observe import MobileObserveBehavior
 
 
@@ -52,38 +53,79 @@ def run_mobile(args, resources):
         if not args.mobile_manifest:raise ValueError('--mobile-manifest required for live unarmed models')
         config=json.loads(args.mobile_manifest.read_text())
         if config.get('schema')!='charlie.mobile.models.v1':raise ValueError('model manifest required')
-        detector=HailoObjects(**config['objects']);depth=HailoRelativeDepth(**config['depth'])
+        detector=HailoObjects(**config['objects']);depth=HailoRelativeDepth(**config['depth']) if config.get('depth') else UnavailableDepth()
         # Only a camera transport is initialized, never MobileBase/Deck/face behavior.
         from hardware.elegoo_camera import ElegooCamera
-        source=MobileFrameSource(ElegooCamera(stream_url=config.get('stream_url','http://192.168.4.1:81/stream'),timeout=2))
+        source=MobileFrameSource(ElegooCamera(stream_url=config.get('stream_url','http://192.168.4.1:81/stream'),timeout=2),reconnect_attempts=3)
         clock=time.monotonic
-    if not args.mobile_replay:
-        source=RecordingFrameSource(source,FrameArtifactStore(state/'mobile-pixels'))
     journal=EvidenceJournal(state/'mobile-evidence.sqlite3')
     adapter=MobileEvidenceAdapter(journal,episode='mobile:'+uuid4().hex,revision=revision)
     guard=ResourceGuard(resources)
     perception=MobilePerception(detector,depth,resources=guard,revision=revision,clock=clock)
-    behavior=MobileObserveBehavior(source,perception,adapter)
-    counts=dict(records=0,frames=0,motion_authorized=False,mode='fixture' if args.mobile_replay else 'unarmed-perception',
-                native_qualified=False,physical_qualified=False)
-    latencies=[]
+    from vision.mobile_tracking import PetTracker
+    behavior=MobileObserveBehavior(source,perception,adapter,tracker=PetTracker(loss_seconds=2.))
+    behavior.retention=EventRetention(FrameArtifactStore(state/'mobile-pixels'),mode=args.mobile_retain,limit=args.mobile_captures)
     try:
-        for _ in range(args.mobile_frames):
+        return watch(behavior,frames=args.mobile_frames,seconds=args.mobile_seconds,max_faults=args.mobile_max_faults,
+                     clock=clock,fixture=bool(args.mobile_replay))
+    finally:
+        behavior.close();journal.close()
+
+
+class EventRetention:
+    def __init__(self,store,*,mode='events',limit=100):
+        if mode not in ('none','events','all') or type(limit) is not int or not 0<=limit<=10000:raise ValueError('invalid retention policy')
+        self.store,self.mode,self.limit=store,mode,limit
+        self.saved=0;self.last_at=None
+    def __call__(self,frame,observation,tracking):
+        if not frame.authentic or self.mode=='none' or self.saved>=self.limit:return None
+        event=any(d['label'] in ('cat','dog') for d in observation['objects'])
+        if self.mode=='events' and (not event or (self.last_at is not None and frame.received_at-self.last_at<1.)):return None
+        retained=self.store.retain(frame)
+        self.saved+=1;self.last_at=frame.received_at
+        return retained.artifact
+
+
+def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,fixture=False,publish=None):
+    import math
+    if (type(frames) is not int or not 1<=frames<=10000 or not math.isfinite(seconds) or not 0<seconds<=3600
+            or type(max_faults) is not int or not 1<=max_faults<=100):raise ValueError('bounded watcher required')
+    cancel=cancel or threading.Event();started=clock();last_status=started;consecutive=0
+    counts=dict(records=0,frames=0,faults=0,motion_authorized=False,mode='fixture' if fixture else 'unarmed-perception',
+                native_qualified=False,physical_qualified=False)
+    latencies=[];inference=[]
+    if publish is None:publish=lambda v:print(json.dumps(v,allow_nan=False),flush=True)
+    try:
+        for _ in range(frames):
+            if cancel.is_set() or clock()-started>=seconds:break
             try:result=behavior.step()
             except StopIteration:break
-            counts['frames']+=1
+            except (TimeoutError,EOFError,OSError,InterruptedError) as exc:
+                counts['faults']+=1;consecutive+=1
+                for model in (behavior.perception.detector,behavior.perception.depth):
+                    if hasattr(model,'close'):model.close()
+                publish(dict(status='observation suspended',error=type(exc).__name__,**counts))
+                if consecutive>=max_faults or cancel.is_set():break
+                if not fixture:cancel.wait(min(2.,.1*2**min(consecutive,4)))
+                continue
+            consecutive=0;counts['frames']+=1
             if result:
                 counts['records']+=1
                 latencies.append(result['observation']['receipt_to_decision_seconds'])
-                print(json.dumps(dict(evidence_id=result['evidence_id'],target=result['tracking']['target'],
-                    proposal=result['proposal'],execution=result['execution']),allow_nan=False),flush=True)
-    finally:
-        behavior.close();journal.close()
-    if latencies:
-        import numpy as np
-        counts['receipt_to_decision_seconds']={f'p{q}':float(np.percentile(latencies,q)) for q in (50,95,99)}
-    counts['source_capture_age']='unknown; receipt age is not exposure age'
-    print(json.dumps(counts),flush=True)
+                inference.append(sum(result['observation']['inference_seconds'].values()))
+                publish(dict(evidence_id=result['evidence_id'],target=result['tracking']['target'],
+                             proposal=result['proposal'],execution=result['execution']))
+            if clock()-last_status>=5:
+                publish(dict(status='stationary observing',**counts));last_status=clock()
+    except KeyboardInterrupt:
+        behavior.acquisition_fault(InterruptedError('operator cancelled stationary watcher'))
+        counts['cancelled']=True
+    finally:behavior.close()
+    import numpy as np
+    for name,values in (('receipt_to_decision_seconds',latencies),('inference_seconds',inference)):
+        if values:counts[name]={f'p{q}':float(np.percentile(values,q)) for q in (50,95,99)}
+    counts.update(source_capture_age='unknown; receipt age is not exposure age',elapsed_seconds=max(0,clock()-started))
+    publish(counts)
     return counts
 
 

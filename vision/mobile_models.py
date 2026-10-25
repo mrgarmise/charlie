@@ -12,13 +12,7 @@ import os
 import time
 
 
-@contextmanager
-def hailo_lease(path=None):
-    path = Path(path or os.environ.get('CHARLIE_HAILO_LOCK', '/tmp/charlie-hailo.lock'))
-    with path.open('a') as handle:
-        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        try: yield
-        finally: fcntl.flock(handle, fcntl.LOCK_UN)
+from hardware.hailo_session import accelerator_lease as hailo_lease, HailoSession
 
 
 def runtime_version():
@@ -30,11 +24,11 @@ def runtime_version():
 
 
 class HailoObjects:
-    def __init__(self, path, *, sha256, classes, size=640, lock=None):
+    def __init__(self, path, *, sha256, classes, size=640, lock=None, persistent=True):
         from experiments.ppal.detector_bridge import HailoBackend
         # Explicit classes from artifact manifest; never silently assume an 80-class order.
         if not {'cat','dog','person'} <= set(classes): raise ValueError('pet/person classes required')
-        self.backend = HailoBackend(path, sha256=sha256, classes=classes, size=size)
+        self.backend = HailoBackend(path, sha256=sha256, classes=classes, size=size, persistent=persistent, lock=lock)
         self.lock = lock
         self.metadata = dict(backend='hailort-hef', sha256=sha256, path=str(path),
                              architecture='hailo8l', classes=classes, runtime=runtime_version(), qualification='unqualified')
@@ -43,9 +37,10 @@ class HailoObjects:
         from PIL import Image
         from experiments.ppal.detector_bridge import Frame
         rgb = Image.fromarray(frame.image[:,:,::-1])
-        with hailo_lease(self.lock):
-            rows = self.backend.infer(Frame(frame.id, rgb, frame.received_at, 'decode receipt', frame.metadata()))
+        rows = self.backend.infer(Frame(frame.id, rgb, frame.received_at, 'decode receipt', frame.metadata()))
         return [r for r in rows if r['label'] in ('cat','dog','person')]
+
+    def close(self):self.backend.close()
 
 
 class HailoRelativeDepth:
@@ -87,24 +82,14 @@ class HailoRelativeDepth:
     def infer(self, frame):
         import numpy as np
         from PIL import Image
-        from hailo_platform import (HEF,VDevice,ConfigureParams,HailoStreamInterface,
-            InputVStreamParams,OutputVStreamParams,FormatType,InferVStreams)
-        with hailo_lease(self.lock):
-            hef=HEF(self.path)
-            ins,outs=hef.get_input_vstream_infos(),hef.get_output_vstream_infos()
-            if len(ins)!=1 or len(outs)!=1 or tuple(ins[0].shape)!=self.input_shape or tuple(outs[0].shape)!=self.output_shape:
-                raise ValueError('depth HEF differs from manifest')
-            image=Image.fromarray(frame.image[:,:,::-1]).resize((self.input_shape[1],self.input_shape[0]))
-            with VDevice() as device:
-                groups=device.configure(hef,ConfigureParams.create_from_hef(hef,interface=HailoStreamInterface.PCIe))
-                if len(groups)!=1: raise ValueError('one network group required')
-                group=groups[0]
-                inp=InputVStreamParams.make_from_network_group(group,quantized=False,format_type=FormatType.FLOAT32,timeout_ms=500)
-                out=OutputVStreamParams.make_from_network_group(group,quantized=False,format_type=FormatType.FLOAT32,timeout_ms=500)
-                with group.activate(group.create_params()):
-                    with InferVStreams(group,inp,out) as pipeline:
-                        result=pipeline.infer({ins[0].name:np.asarray(image,dtype=np.float32)[None]})
-            return self.summarize(result[outs[0].name],self.output_shape,self.nearer)
+        image=Image.fromarray(frame.image[:,:,::-1]).resize((self.input_shape[1],self.input_shape[0]))
+        with HailoSession(self.path,sha256=self.metadata['sha256'],input_shape=self.input_shape,
+                          output_shape=self.output_shape,lock=self.lock) as session:
+            result=session.infer(np.asarray(image,dtype=np.float32)[None])
+            return self.summarize(result[session.output_name],self.output_shape,self.nearer)
+
+    def close(self):pass
+
 
 
 class FixtureModel:
@@ -116,3 +101,9 @@ class FixtureModel:
         if frame.authentic: raise ValueError('fixture inference cannot label live frames')
         import copy
         return copy.deepcopy(self.result)
+
+
+class UnavailableDepth:
+    metadata=dict(backend='unavailable',kind='relative',qualification='missing-artifact')
+    def infer(self,frame):return dict(kind='relative',valid=False,anomaly=True,clearance_certified=False,reason='no verified depth artifact')
+    def close(self):pass

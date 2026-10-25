@@ -30,9 +30,9 @@ class MobileEvidenceAdapter:
                 confidence=tracking['target']['confidence'],evidence=row.id,tags=('mobile','species-only')))
         return row
 
-    def fault(self, error):
+    def fault(self, error, metrics=None):
         return self.journal.append('event',dict(category='mobile_acquisition_fault',
-            error=type(error).__name__,message=str(error)[:512],physical_authorization=False,
+            error=type(error).__name__,message=str(error)[:512],metrics=metrics or {},physical_authorization=False,
             learning_outcome='inconclusive; acquisition interrupted'),episode=self.episode,
             producer='mobile-perception',version=self.revision)
 

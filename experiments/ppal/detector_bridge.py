@@ -84,7 +84,7 @@ class HailoBackend:
     coordinates on the host; raw-head HEFs are rejected. No CPU device emulation.
     """
     name = 'hailort-hef'
-    def __init__(self, path, *, sha256, classes, size=640, timeout_seconds=1.):
+    def __init__(self, path, *, sha256, classes, size=640, timeout_seconds=1., persistent=False, lock=None):
         path = Path(path)
         if path.suffix.lower() != '.hef' or hashlib.sha256(path.read_bytes()).hexdigest() != sha256:
             raise ValueError('HEF integrity mismatch')
@@ -107,6 +107,8 @@ class HailoBackend:
             raise ValueError('only one Hailo NMS output supported')
         self.path,self.classes,self.size,self.timeout = str(path),list(classes),size,timeout_seconds
         self.input_name=inputs[0].name
+        self.sha256,self.persistent,self.lock=sha256,persistent,lock
+        self._session=None
 
     def preprocessing(self, frame):
         transform=Letterbox(*frame.image.size,self.size)
@@ -123,17 +125,14 @@ class HailoBackend:
         from PIL import Image
         canvas=Image.new('RGB',(self.size,self.size),(114,114,114))
         canvas.paste(frame.image.convert('RGB').resize((round(frame.image.width*transform.scale),round(frame.image.height*transform.scale))),transform.padding)
-        hef=HEF(self.path)
-        # Contexts close on every error; no background inference or camera reader.
-        with VDevice() as device:
-            groups=device.configure(hef,ConfigureParams.create_from_hef(hef,interface=HailoStreamInterface.PCIe))
-            if len(groups)!=1: raise ValueError('one network group required')
-            group=groups[0]
-            inp=InputVStreamParams.make_from_network_group(group,quantized=False,format_type=FormatType.FLOAT32,timeout_ms=round(self.timeout*1000))
-            out=OutputVStreamParams.make_from_network_group(group,quantized=False,format_type=FormatType.FLOAT32,timeout_ms=round(self.timeout*1000))
-            with group.activate(group.create_params()):
-                with InferVStreams(group,inp,out) as pipeline:
-                    results=pipeline.infer({self.input_name:np.asarray(canvas,dtype=np.float32)[None]})
+        from hardware.hailo_session import HailoSession
+        if self.persistent:
+            if self._session is None:
+                self._session=HailoSession(self.path,sha256=self.sha256,input_shape=(self.size,self.size,3),timeout=self.timeout,lock=self.lock)
+            results=self._session.infer(np.asarray(canvas,dtype=np.float32)[None])
+        else:
+            with HailoSession(self.path,sha256=self.sha256,input_shape=(self.size,self.size,3),timeout=self.timeout,lock=self.lock) as session:
+                results=session.infer(np.asarray(canvas,dtype=np.float32)[None])
         classes=next(iter(results.values()))[0]
         if len(classes)!=len(self.classes): raise ValueError('HEF NMS class count mismatch')
         rows=[]
@@ -144,6 +143,10 @@ class HailoBackend:
                 if box[2]<=box[0] or box[3]<=box[1]: continue
                 rows.append(dict(label=name,box=box,confidence=float(score),class_scores=None))
         return rows
+
+    def close(self):
+        if self._session is not None:self._session.close()
+
 
 
 class DetectorBridge:

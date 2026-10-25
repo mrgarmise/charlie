@@ -40,7 +40,11 @@ def parser():
     mobile.add_argument('--mobile-replay',type=Path,help='unarmed offline mobile fixture replay')
     mobile.add_argument('--mobile-observe',action='store_true',help='unarmed car-camera perception only; no Deck or mobile actuator initialization')
     p.add_argument('--mobile-manifest',type=Path,help='hash-bound Hailo-8L object/depth export contracts')
-    p.add_argument('--mobile-frames',type=int,default=30)
+    p.add_argument('--mobile-frames',type=int,default=10000)
+    p.add_argument('--mobile-seconds',type=float,default=300.)
+    p.add_argument('--mobile-max-faults',type=int,default=10)
+    p.add_argument('--mobile-retain',choices=['none','events','all'],default='events')
+    p.add_argument('--mobile-captures',type=int,default=100)
     return p
 
 

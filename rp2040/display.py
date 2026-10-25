@@ -70,6 +70,11 @@ class Display:
 
         self.progress = None
         self.capability_message = None
+        self.object_label = None
+        self.object_until = 0
+        self.object_offset = self.WIDTH
+        self.object_step_ms = 100
+        self.last_object_step = 0
 
 
         if DISPLAY_AVAILABLE:
@@ -112,6 +117,7 @@ class Display:
     def status(self, state):
 
         self.state = str(state).upper()
+        if self.state in (self.NO_BRAIN,self.ERROR,self.SLEEP):self.clear_object_label()
         self.frame = 0
 
     def capability_status(self, text):
@@ -161,6 +167,35 @@ class Display:
 
     def queue_text(self, text):
         self.show_text(text)
+
+    def show_object_label(self, text, ttl_ms=4500, step_ms=100):
+        try:from object_label import label_request
+        except ImportError:from rp2040.object_label import label_request
+        label_request(text,ttl_ms,step_ms)
+        now=time.ticks_ms()
+        if text!=self.object_label:
+            self.object_offset=self.WIDTH
+            self.last_object_step=now
+        self.object_label=text
+        self.object_step_ms=step_ms
+        self.object_until=time.ticks_add(now,ttl_ms)
+
+    def clear_object_label(self):
+        self.object_label=None
+        self.object_until=0
+        self.object_offset=self.WIDTH
+
+    def _draw_object_label(self, now):
+        # One replaceable slot, no queue/sleep or vendor long-string show().
+        if time.ticks_diff(now,self.last_object_step)>=self.object_step_ms:
+            self.object_offset-=1
+            if self.object_offset < -len(self.object_label)*6:self.object_offset=self.WIDTH
+            self.last_object_step=now
+        font=getattr(matrix,'wordStock',{})
+        for index,char in enumerate(self.object_label):
+            origin=index*6+self.object_offset
+            if origin>self.WIDTH-1 or origin+4<0:continue
+            for x,y in font.get(char,()):self._pixel(origin+x,y,40)
 
     def rx_activity(self):
         self.show_text("RX", 600)
@@ -606,6 +641,11 @@ class Display:
         self.frame += 1
 
         self.clear()
+        if self.object_label and time.ticks_diff(self.object_until,now)<=0:self.clear_object_label()
+        # Safety/watchdog states always outrank observational labels.
+        if self.state in (self.NO_BRAIN,self.ERROR):
+            self._draw_named_state(self.state)
+            return
 
         # Temporary text has highest priority.
 
@@ -658,6 +698,10 @@ class Display:
             self.message = self.capability_message
             self._draw_message()
             self.message = temporary
+            return
+
+        if self.object_label and self.state!=self.SLEEP and self.progress is None:
+            self._draw_object_label(now)
             return
 
         self._draw_named_state(

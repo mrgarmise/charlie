@@ -1,0 +1,33 @@
+name: Object label display software validation
+on:
+  push:
+    branches: [feature/object-label-picoed-display]
+    paths:
+      - '.github/workflows/object-label-display.yml'
+      - 'attention/**'
+      - 'behaviors/**'
+      - 'hardware/**'
+      - 'learning/**'
+      - 'main.py'
+      - 'rp2040/**'
+      - 'vision/**'
+      - 'tests/**'
+permissions:
+  contents: read
+jobs:
+  software:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Existing recovery test executes preserved historical firmware.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest
+      - run: python -m pytest tests -q --junitxml=object-label-tests.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: object-label-software-tests
+          path: object-label-tests.xml

@@ -45,6 +45,9 @@ def parser():
     p.add_argument('--mobile-max-faults',type=int,default=10)
     p.add_argument('--mobile-retain',choices=['none','events','all'],default='events')
     p.add_argument('--mobile-captures',type=int,default=100)
+    p.add_argument('--object-label-display',choices=['off','dry-run','rp2040'],default='off',help='opt-in stabilized object labels; rp2040 needs reviewed firmware and separately authorized hardware use')
+    p.add_argument('--object-label-port',default='/dev/ttyACM0')
+    p.add_argument('--object-label-replay',type=Path,help='no-device JSONL event-to-display diagnostic')
     return p
 
 
@@ -52,6 +55,16 @@ def main(argv=None):
     args=parser().parse_args(argv)
     if args.learning_turns and not args.offline:
         raise ValueError('bounded acceptance runs must be offline')
+    if args.object_label_replay:
+        if not args.offline or args.mobile_replay or args.mobile_observe or args.object_label_display=='rp2040':
+            raise ValueError('object label replay is an isolated no-device diagnostic')
+        from attention.object_display_runtime import replay
+        replay(args.object_label_replay)
+        return
+    if args.mobile_replay and args.object_label_display=='rp2040':
+        raise ValueError('fixture replay cannot activate a physical display')
+    if args.object_label_display!='off' and args.offline and not (args.mobile_replay or args.mobile_observe):
+        raise ValueError('object label display requires an existing observation source')
     roots=args.episode_root or [Path(__file__).resolve().parent/'robotron-runs']
     from learning.lifecycle import run
     from learning.resources import DevelopmentResources
@@ -97,7 +110,10 @@ def main(argv=None):
             neck.attach_brain(authorized=os.environ.get('CHARLIE_NECK_MOTION_AUTHORIZED')=='1',
                 supervised=os.environ.get('CHARLIE_NECK_SUPERVISED')=='1')
             bus=StimulusBus()
-            attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1')
+            from attention.object_display_runtime import attach
+            labels,label_owned=attach(args.object_label_display,clock=time.monotonic,body=deck.body)
+            if label_owned is not None:lifecycle.callback(label_owned.close)
+            attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1',object_labels=labels)
             lifecycle.callback(attention.close)
             KeyboardStimulus(bus)
             camera=Camera()

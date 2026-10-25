@@ -1,7 +1,10 @@
 class AttentionManager:
 
-    def __init__(self, bus, *, mobile_enabled=True):
+    def __init__(self, bus, *, mobile_enabled=True, object_labels=None):
         self.bus = bus
+        self.object_labels = object_labels
+        self.object_attention = None
+        self.visual_target = None
         self.active = None
         self.priority = 0
         self.pending = None
@@ -27,6 +30,10 @@ class AttentionManager:
         self.pending = (behavior, priority)
 
     def handle_event(self, event, data):
+        if event in ('object_attention','object_observation','object_observation_fault'):
+            try:self._handle_object_event(event,data)
+            except Exception as exc:self.object_display_error=type(exc).__name__+': '+str(exc)[:128]
+            return
         if event in ('calibrate_neck', 'confirm_neck_start'):
             self.deck.brain_calibration(confirm=event == 'confirm_neck_start')
 
@@ -35,6 +42,7 @@ class AttentionManager:
             self.set(ScanBehavior(), None, priority=50)
 
         elif event == "vision_target":
+            self.visual_target=data
             from behaviors.track import TrackBehavior
 
             # Existing RP2040 tracking path.
@@ -58,6 +66,7 @@ class AttentionManager:
                 )
 
         elif event == "vision_lost":
+            self.visual_target=None
             from behaviors.track import TrackBehavior
 
             # Existing RP2040 path.
@@ -98,12 +107,37 @@ class AttentionManager:
 
             self.set(behavior, None, priority=80)
 
+    def _handle_object_event(self,event,data):
+        if event == 'object_attention':
+            if data is None or (isinstance(data,dict) and isinstance(data.get('source'),str) and data.get('id') is not None):self.object_attention=data
+        elif event == 'object_observation':
+            if self.object_labels is not None:
+                selected=self.object_attention or data.get('attention_target')
+                # Existing Pi attention coordinates are in the primary 1280x720
+                # frame. Never apply these to ELEGOO or another camera source.
+                if selected is None and data.get('source')=='pi-primary' and self.visual_target is not None:
+                    geometry=data.get('geometry',())
+                    if len(geometry)==2 and all(type(v) in (int,float) and v>0 for v in geometry):
+                        x=self.visual_target[0]*geometry[0]/1280
+                        y=self.visual_target[1]*geometry[1]/720
+                        boxes=[r for r in data.get('objects',[]) if len(r.get('box',()))==4 and r['box'][0]<=x<=r['box'][2] and r['box'][1]<=y<=r['box'][3]]
+                        if boxes:
+                            chosen=max(boxes,key=lambda r:(r.get('confidence',0),str(r.get('id'))))
+                            selected=dict(source=data['source'],id=chosen.get('id'))
+                self.object_labels.observe(data,selected)
+        elif event == 'object_observation_fault':
+            if self.object_labels is not None:self.object_labels.invalidate(data)
+
     def update(self, deck):
         self.deck = deck
 
         # Process stimuli first.
         for event, data in self.bus.get_all():
             self.handle_event(event, data)
+
+        if self.object_labels is not None:
+            try:self.object_labels.tick()
+            except Exception as exc:self.object_display_error=type(exc).__name__+': '+str(exc)[:128]
 
         # Apply pending RP2040 behavior switch second.
         if self.pending:
@@ -179,6 +213,9 @@ class AttentionManager:
         """
         Stop the mobile sidecar cleanly when Charlie shuts down.
         """
+        if self.object_labels is not None:
+            try:self.object_labels.close()
+            except Exception as exc:self.object_display_error=type(exc).__name__+': '+str(exc)[:128]
         if self.mobile is not None:
             try:
                 self.mobile.exit()

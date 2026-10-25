@@ -11,6 +11,7 @@ class MobileObserveBehavior:
         self.gate=gate or MobileExecutionGate(clock=perception.clock)
         self.bus=bus
         self.retention=None
+        self.display_attention=None
         if hasattr(source,'on_fault'):source.on_fault=self.acquisition_fault
         if self.gate.backend is not None:raise ValueError('observation behavior has no physical execution backend')
 
@@ -20,7 +21,10 @@ class MobileObserveBehavior:
         for model in (self.perception.detector,self.perception.depth):
             if hasattr(model,'close'):model.close()
         self.evidence.fault(error,metrics)
-        if self.bus is not None:self.bus.emit('mobile_observation',dict(target=None,target_lost=True,reason='acquisition_fault'))
+        if self.bus is not None:
+            self.bus.emit('mobile_observation',dict(target=None,target_lost=True,reason='acquisition_fault'))
+            self.bus.emit('object_observation_fault',None)
+            if self.display_attention is not None:self.display_attention.update(None)
 
     def step(self):
         try:
@@ -35,7 +39,11 @@ class MobileObserveBehavior:
                 if artifact is not None:observation['frame']['artifact']=artifact
             row=self.evidence.record(observation,tracking,proposal,execution)
             self.evidence.opportunities(row.id)
-            if self.bus is not None:emit_attention(self.bus,tracking,observation['frame'])
+            if self.bus is not None:
+                emit_attention(self.bus,tracking,observation['frame'])
+                from vision.object_observation import object_observation
+                self.bus.emit('object_observation',object_observation(observation,tracking))
+                if self.display_attention is not None:self.display_attention.update(None)
             return dict(observation=observation,tracking=tracking,proposal=proposal,execution=execution,evidence_id=row.id)
         except StopIteration:
             self.gate.close()
@@ -45,7 +53,9 @@ class MobileObserveBehavior:
             raise
 
     def close(self):
-        try:self.gate.close()
+        try:
+            self.gate.close()
+            if self.display_attention is not None:self.display_attention.close()
         finally:
             try:self.source.close()
             finally:

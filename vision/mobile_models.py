@@ -24,12 +24,14 @@ def runtime_version():
 
 
 class HailoObjects:
-    def __init__(self, path, *, sha256, classes, size=640, lock=None, persistent=True):
+    def __init__(self, path, *, sha256, classes, size=640, lock=None, persistent=True, include_all=False):
         from experiments.ppal.detector_bridge import HailoBackend
         # Explicit classes from artifact manifest; never silently assume an 80-class order.
+        if type(include_all) is not bool:raise ValueError('include_all must be boolean')
         if not {'cat','dog','person'} <= set(classes): raise ValueError('pet/person classes required')
         self.backend = HailoBackend(path, sha256=sha256, classes=classes, size=size, persistent=persistent, lock=lock)
         self.lock = lock
+        self.include_all = include_all
         self.metadata = dict(backend='hailort-hef', sha256=sha256, path=str(path),
                              architecture='hailo8l', classes=classes, runtime=runtime_version(), qualification='unqualified')
 
@@ -41,7 +43,7 @@ class HailoObjects:
         if self.backend.persistent:rows=self.backend.infer(wrapped)
         else:
             with hailo_lease(self.lock):rows=self.backend.infer(wrapped)
-        return [r for r in rows if r['label'] in ('cat','dog','person')]
+        return [r for r in rows if self.include_all or r['label'] in ('cat','dog','person')]
 
     def close(self):self.backend.close()
 

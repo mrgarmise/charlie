@@ -49,6 +49,7 @@ class PetTracker:
         at=packet['frame']['received_at']
         if not math.isfinite(at) or (self.last_at is not None and at<=self.last_at): raise ValueError('reordered track update')
         self.last_at=at
+        expired=[dict(id=t.id,lifecycle='expired',last_seen=t.at) for t in self.tracks.values() if at-t.at>self.loss_seconds]
         self.tracks={k:t for k,t in self.tracks.items() if at-t.at<=self.loss_seconds}
         previous_seen={k:t.observed for k,t in self.tracks.items()}
         for t in self.tracks.values():
@@ -56,9 +57,17 @@ class PetTracker:
         pose=(packet['frame'].get('pan_deg'),packet['frame'].get('yaw_deg'))
         rows=[r for r in packet['objects'] if r['label'] in self.categories and r['confidence']>=self.min_score]
         if len(rows)>128: raise ValueError('too many objects')
+        def association(row,t):
+            dt=at-t.at
+            width,height=t.box[2]-t.box[0],t.box[3]-t.box[1]
+            dx=max(-2*width,min(2*width,t.velocity[0]*dt))
+            dy=max(-2*height,min(2*height,t.velocity[1]*dt))
+            predicted=(t.box[0]+dx,t.box[1]+dy,t.box[2]+dx,t.box[3]+dy)
+            # Image-space prediction only when viewpoint metadata is unchanged.
+            return .6*iou(row['box'],t.box)+.4*iou(row['box'],predicted)
         matches={}
         for index,row in enumerate(rows):
-            candidates=sorted([(iou(row['box'],t.box),t.id) for t in self.tracks.values() if ((t.label in ('cat','dog') and row['label'] in ('cat','dog')) or t.label==row['label']) and t.pose==pose],reverse=True)
+            candidates=sorted([(association(row,t),t.id) for t in self.tracks.values() if ((t.label in ('cat','dog') and row['label'] in ('cat','dog')) or t.label==row['label']) and t.pose==pose],reverse=True)
             candidates=[c for c in candidates if c[0]>=.15]
             if candidates and (len(candidates)==1 or candidates[0][0]-candidates[1][0]>.15):
                 matches[index]=candidates[0][1]
@@ -99,6 +108,7 @@ class PetTracker:
                      species_calibration='uncalibrated accumulated detector support; NOT ground truth')
             return d
         return dict(target=describe(target) if target else None, tracks=[describe(t) for t in self.tracks.values()],
+                    expired=expired,association='bounded image-velocity and IoU; no appearance/individual recognition claim',
                     species_only=True, individual_pet_identity='unverified', target_lost=target is None)
 
 

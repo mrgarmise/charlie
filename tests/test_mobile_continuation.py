@@ -188,3 +188,14 @@ def test_normal_executive_selects_native_review_and_retains_result(tmp_path,monk
     try:
         assert len(list(lifecycle.executive.projects().values())[0]['experiment_history'])==1
     finally:lifecycle.close()
+
+
+def test_bounded_image_motion_can_reacquire_without_species_identity():
+    t=PetTracker(confirmations=1,loss_seconds=1)
+    first=t.update(packet(1,box=(1,1,7,15)))['target']['id']
+    assert t.update(packet(1.2,box=(3,1,9,15)))['target']['id']==first
+    assert t.update(packet(1.4,box=(5,1,11,15)))['target']['id']==first
+    t.update(dict(frame=dict(received_at=1.5),objects=[]))
+    assert t.update(packet(1.8,label='dog',box=(11,1,17,15)))['target']['id']==first
+    result=t.update(dict(frame=dict(received_at=3),objects=[]))
+    assert result['tracks']==[] and result['expired'][0]['lifecycle']=='expired'

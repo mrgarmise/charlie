@@ -290,7 +290,7 @@ class RP2040Controller:
                             if sink is not None: sink(json.loads(line.split(' ',1)[1]))
                             continue
                         if line.startswith(prefix):return line
-                        if prefix.startswith("OK ") and line.startswith("ERR "):
+                        if (prefix.startswith("OK ") or prefix=="DISPLAY_CAPS ") and line.startswith("ERR "):
                             return line
                 finally:self.serial.timeout = old_timeout
         except Exception:
@@ -367,6 +367,32 @@ class RP2040Controller:
         return self.send(
             str(state).upper()
         )
+
+    def display_capabilities(self):
+        # Capability query is safe on old firmware; no generic MESSAGE fallback.
+        session=getattr(self,'link_session',None)
+        if not self.connected or not session:return None
+        if getattr(self,'_object_caps_session',None)==session:return getattr(self,'_object_caps',None)
+        self._object_caps_session=session;self._object_caps=None
+        reply=self._exchange('DISPLAY_CAPS','DISPLAY_CAPS ',timeout=.15)
+        try:
+            caps=json.loads(reply.split(' ',1)[1]) if reply else None
+            if (not isinstance(caps,dict) or caps.get('schema')!='charlie-display-v1'
+                    or caps.get('object_labels')!=1 or caps.get('width')!=17 or caps.get('height')!=7
+                    or type(caps.get('max_label')) is not int or caps['max_label']<24):return None
+            self._object_caps=caps
+        except (ValueError,TypeError,IndexError):pass
+        return self._object_caps
+
+    def show_object_label(self,text,ttl_ms=4500,step_ms=100):
+        from rp2040.object_label import normalize_label,label_request
+        command=label_request(normalize_label(text),ttl_ms,step_ms)
+        if self.display_capabilities() is None:return False
+        return self._exchange(command,'OK OBJECT_LABEL',timeout=.15)=='OK OBJECT_LABEL'
+
+    def clear_object_label(self):
+        if self.display_capabilities() is None:return False
+        return self._exchange('OBJECT_CLEAR','OK OBJECT_CLEAR',timeout=.15)=='OK OBJECT_CLEAR'
 
     def think(self):
 

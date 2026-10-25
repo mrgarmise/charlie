@@ -38,6 +38,7 @@ class CommandHandler:
                 arguments(cmd,(0,)); print('ALIVE')
             elif name=='SESSION':
                 values=arguments(cmd,(1,));servos.establish_session(values[0])
+                if self.display and hasattr(self.display,'clear_object_label'):self.display.clear_object_label()
                 self.behaviors.set_mode(self.behaviors.IDLE)
                 if self.display and hasattr(self.display, 'show_text'):
                     self.display.show_text('BRAIN ONLINE', 3000)
@@ -83,6 +84,7 @@ class CommandHandler:
                 arguments(cmd,(0,))
                 # IDLE and SLEEP must not leave a pending servo target alive.
                 servos.stop(name)
+                if self.display and hasattr(self.display,'clear_object_label'):self.display.clear_object_label()
                 self.behaviors.set_mode(self.behaviors.SLEEP if name=='SLEEP' else self.behaviors.IDLE)
                 print('OK',name)
             elif name=='MOVE':
@@ -119,6 +121,24 @@ class CommandHandler:
                 arguments(cmd,(0,))
                 if self.display:self.display.clear_progress()
                 print('OK PROGRESS_CLEAR')
+            elif name=='DISPLAY_CAPS':
+                arguments(cmd,(0,))
+                try:from object_label import capabilities
+                except ImportError:from rp2040.object_label import capabilities
+                print('DISPLAY_CAPS',json.dumps(capabilities()))
+            elif name=='OBJECT_LABEL':
+                values=arguments(cmd,tuple(range(3,27)))
+                if not values[0].isdigit() or not values[1].isdigit():raise ValueError('INVALID_OBJECT_LABEL')
+                try:from object_label import label_request
+                except ImportError:from rp2040.object_label import label_request
+                text=' '.join(values[2:]);ttl,step=int(values[0]),int(values[1])
+                label_request(text,ttl,step)
+                if self.display:self.display.show_object_label(text,ttl,step)
+                print('OK OBJECT_LABEL')
+            elif name=='OBJECT_CLEAR':
+                arguments(cmd,(0,))
+                if self.display:self.display.clear_object_label()
+                print('OK OBJECT_CLEAR')
             elif name=='MESSAGE':
                 values=arguments(cmd,tuple(range(1,33)))
                 if self.display:self.display.show_text(' '.join(values))

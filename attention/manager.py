@@ -1,7 +1,9 @@
 class AttentionManager:
 
-    def __init__(self, bus, *, mobile_enabled=True):
+    def __init__(self, bus, *, mobile_enabled=True, object_labels=None):
         self.bus = bus
+        self.object_labels = object_labels
+        self.object_attention = None
         self.active = None
         self.priority = 0
         self.pending = None
@@ -27,7 +29,13 @@ class AttentionManager:
         self.pending = (behavior, priority)
 
     def handle_event(self, event, data):
-        if event in ('calibrate_neck', 'confirm_neck_start'):
+        if event == 'object_attention':
+            self.object_attention=data
+        elif event == 'object_observation':
+            if self.object_labels is not None:self.object_labels.observe(data,self.object_attention)
+        elif event == 'object_observation_fault':
+            if self.object_labels is not None:self.object_labels.invalidate(data)
+        elif event in ('calibrate_neck', 'confirm_neck_start'):
             self.deck.brain_calibration(confirm=event == 'confirm_neck_start')
 
         elif event == "scan":
@@ -105,6 +113,8 @@ class AttentionManager:
         for event, data in self.bus.get_all():
             self.handle_event(event, data)
 
+        if self.object_labels is not None:self.object_labels.tick()
+
         # Apply pending RP2040 behavior switch second.
         if self.pending:
             behavior, priority = self.pending
@@ -179,6 +189,7 @@ class AttentionManager:
         """
         Stop the mobile sidecar cleanly when Charlie shuts down.
         """
+        if self.object_labels is not None:self.object_labels.close()
         if self.mobile is not None:
             try:
                 self.mobile.exit()

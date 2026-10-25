@@ -25,7 +25,7 @@ class MobileEvidenceAdapter:
         # successful physical execution, learned utility or individual identity.
         if self.gateway is not None and observation['frame']['authentic'] and tracking['target']:
             self.gateway.remember(Experience(kind='observation',
-                summary=f"Mobile view contains a {tracking['target']['label']}; individual identity unverified",
+                summary=f"Detector maintains an animal candidate; species hypothesis {tracking['target']['label']} is unverified; individual identity unverified",
                 source='mobile:perception',subject=tracking['target']['label'],
                 confidence=tracking['target']['confidence'],evidence=row.id,tags=('mobile','species-only')))
         return row
@@ -43,13 +43,13 @@ class MobileEvidenceAdapter:
         """
         if self.executive is None:return []
         row=self.journal.get(observation_id); p=row.data['payload']; o=p['observation']
-        if not o['frame']['authentic'] or o['qualification']!='native-qualified':return []
+        if not o['frame']['authentic']:return []
         target=p['tracking']['target']
         if target is None:return []
-        hypotheses=[dict(method='mobile-observe',scope=dict(body=o['frame']['source'],category=target['label']),
-            expected='confirmed species track persists across independent viewing conditions',
-            evidence_ids=[row.id],conditions=[dict(view='centered'),dict(view='off-axis')],
-            observed_conditions=[dict(view='centered' if o['frame'].get('pan_deg')==90 else 'off-axis')],
+        hypotheses=[dict(method='mobile-observe',scope=dict(body=o['frame']['source'],category=target.get('kind',target['label'])),
+            expected='detector animal candidates and species uncertainty persist across independent observation conditions',
+            evidence_ids=[row.id],conditions=[dict(view='centered'),dict(view='off-axis'),dict(view='pose-unknown')],
+            observed_conditions=[dict(view='centered' if o['frame'].get('pan_deg')==90 else 'pose-unknown' if o['frame'].get('pan_deg') is None else 'off-axis')],
             requires=['mobile-camera','mobile-models'])]
         proposals=reflect_project_opportunities(self.journal,self.episode,hypotheses)
         return [self.executive.propose(x['proposal'],self.journal,[x['evidence_id']]) for x in proposals]

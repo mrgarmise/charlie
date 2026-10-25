@@ -126,13 +126,22 @@ class HailoBackend:
         canvas=Image.new('RGB',(self.size,self.size),(114,114,114))
         canvas.paste(frame.image.convert('RGB').resize((round(frame.image.width*transform.scale),round(frame.image.height*transform.scale))),transform.padding)
         from hardware.hailo_session import HailoSession
-        if self.persistent:
+        if getattr(self,'persistent',False):
             if self._session is None:
                 self._session=HailoSession(self.path,sha256=self.sha256,input_shape=(self.size,self.size,3),timeout=self.timeout,lock=self.lock)
             results=self._session.infer(np.asarray(canvas,dtype=np.float32)[None])
         else:
-            with HailoSession(self.path,sha256=self.sha256,input_shape=(self.size,self.size,3),timeout=self.timeout,lock=self.lock) as session:
-                results=session.infer(np.asarray(canvas,dtype=np.float32)[None])
+            hef=HEF(self.path)
+            # Contexts close on every error; no background inference or camera reader.
+            with VDevice() as device:
+                groups=device.configure(hef,ConfigureParams.create_from_hef(hef,interface=HailoStreamInterface.PCIe))
+                if len(groups)!=1: raise ValueError('one network group required')
+                group=groups[0]
+                inp=InputVStreamParams.make_from_network_group(group,quantized=False,format_type=FormatType.FLOAT32,timeout_ms=round(self.timeout*1000))
+                out=OutputVStreamParams.make_from_network_group(group,quantized=False,format_type=FormatType.FLOAT32,timeout_ms=round(self.timeout*1000))
+                with group.activate(group.create_params()):
+                    with InferVStreams(group,inp,out) as pipeline:
+                        results=pipeline.infer({self.input_name:np.asarray(canvas,dtype=np.float32)[None]})
         classes=next(iter(results.values()))[0]
         if len(classes)!=len(self.classes): raise ValueError('HEF NMS class count mismatch')
         rows=[]
@@ -145,7 +154,7 @@ class HailoBackend:
         return rows
 
     def close(self):
-        if self._session is not None:self._session.close()
+        if getattr(self,'_session',None) is not None:self._session.close()
 
 
 

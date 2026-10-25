@@ -1,0 +1,18 @@
+{
+  "qualification": "host-only fake serial; no Hailo/camera/LED device",
+  "observations": 10000,
+  "virtual_seconds": 99.99,
+  "policy_microseconds": {
+    "p50": 3.1650001801608596,
+    "p95": 3.395000021555461,
+    "p99": 13.019100106248517
+  },
+  "object_label_commands": 50,
+  "clear_commands": 1,
+  "capability_queries": 1,
+  "virtual_command_rate_hz": 0.5000500050005001,
+  "camera_reads_added": 0,
+  "inferences_added": 0,
+  "physical_serial_calls": 0,
+  "native_throughput": null
+}

@@ -378,7 +378,7 @@ class RP2040Controller:
         try:
             caps=json.loads(reply.split(' ',1)[1]) if reply else None
             if (not isinstance(caps,dict) or caps.get('schema')!='charlie-display-v1'
-                    or caps.get('object_labels')!=1 or caps.get('width')!=17 or caps.get('height')!=7
+                    or type(caps.get('object_labels')) is not int or caps['object_labels']!=1 or caps.get('width')!=17 or caps.get('height')!=7
                     or type(caps.get('max_label')) is not int or caps['max_label']<24):return None
             self._object_caps=caps
         except (ValueError,TypeError,IndexError):pass

@@ -19,7 +19,7 @@ def object_observation(observation, tracking=None):
         objects.append(dict(id=identifier,label=label,confidence=float(confidence),box=list(box),
                             prominence=(box[2]-box[0])*(box[3]-box[1])/(w*h)))
     return dict(schema='charlie.object-observation.v1',source=frame['source'],frame_id=frame['id'],
-                at=frame['received_at'],clock_domain=frame['clock_domain'],objects=objects,
+                at=frame['received_at'],clock_domain=frame['clock_domain'],geometry=[w,h],objects=objects,
                 attention_target=dict(source=frame['source'],id=target['id']) if target else None,
                 exposure_age_known=frame.get('source_age_known',False),qualification=observation['qualification'],
                 identity='class hypothesis only; no individual recognition')

@@ -152,7 +152,7 @@ class MobilePerception:
             box,score = r['box'],r['confidence']
             if (len(box)!=4 or not all(finite(v) for v in box) or not 0<=box[0]<box[2]<=w
                     or not 0<=box[1]<box[3]<=h or not finite(score) or not 0<=score<=1
-                    or r['label'] not in ('cat','dog','person','human_face','unknown')):
+                    or r['label'] not in self.detector.metadata.get('classes',('cat','dog','person','human_face','unknown'))):
                 raise ValueError('invalid object contract')
         return dict(schema='charlie.mobile.perception.v1', frame=frame.metadata(), objects=rows,
                     depth=outputs['depth'], model=[self.detector.metadata, self.depth.metadata],

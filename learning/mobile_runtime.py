@@ -53,7 +53,9 @@ def run_mobile(args, resources):
         if not args.mobile_manifest:raise ValueError('--mobile-manifest required for live unarmed models')
         config=json.loads(args.mobile_manifest.read_text())
         if config.get('schema')!='charlie.mobile.models.v1':raise ValueError('model manifest required')
-        detector=HailoObjects(**config['objects']);depth=HailoRelativeDepth(**config['depth']) if config.get('depth') else UnavailableDepth()
+        objects=dict(config['objects'])
+        if getattr(args,'object_label_display','off')!='off':objects['include_all']=True
+        detector=HailoObjects(**objects);depth=HailoRelativeDepth(**config['depth']) if config.get('depth') else UnavailableDepth()
         # Only a camera transport is initialized, never MobileBase/Deck/face behavior.
         from hardware.elegoo_camera import ElegooCamera
         source=MobileFrameSource(ElegooCamera(stream_url=config.get('stream_url','http://192.168.4.1:81/stream'),timeout=2),reconnect_attempts=3)
@@ -65,11 +67,22 @@ def run_mobile(args, resources):
     from vision.mobile_tracking import PetTracker
     behavior=MobileObserveBehavior(source,perception,adapter,tracker=PetTracker(loss_seconds=2.))
     behavior.retention=EventRetention(FrameArtifactStore(state/'mobile-pixels'),mode=args.mobile_retain,limit=args.mobile_captures)
+    display_owned=None
     try:
+        mode=getattr(args,'object_label_display','off')
+        if mode!='off':
+            if args.mobile_replay and mode=='rp2040':raise ValueError('fixture replay cannot activate physical display')
+            from attention.object_display_runtime import attach
+            from attention.manager import AttentionManager
+            from stimulus.bus import StimulusBus
+            labels,display_owned=attach(mode,clock=clock,port=args.object_label_port)
+            behavior.bus=StimulusBus()
+            behavior.display_attention=AttentionManager(behavior.bus,mobile_enabled=False,object_labels=labels)
         return watch(behavior,frames=args.mobile_frames,seconds=args.mobile_seconds,max_faults=args.mobile_max_faults,
                      clock=clock,fixture=bool(args.mobile_replay))
     finally:
         behavior.close();journal.close()
+        if display_owned is not None:display_owned.close()
 
 
 class EventRetention:

@@ -161,3 +161,138 @@ def test_legacy_firmware_is_not_sent_new_commands():
     host._exchange.assert_called_once_with('DISPLAY_CAPS','DISPLAY_CAPS ',timeout=.15)
     assert host.motion_owner=='KEEP'
     host.link_session='new';host.show_object_label('DOG');assert host._exchange.call_count==2
+
+
+def test_canonical_observation_normalization_preserves_source_and_attention():
+    from vision.object_observation import object_observation
+    obs=dict(frame=dict(source='remote-eye',id='frame',geometry=[100,100],received_at=1,clock_domain='pi-monotonic'),
+        objects=[dict(label='dining table',box=[10,10,90,90],confidence=.9)],qualification='unqualified')
+    packet=object_observation(obs,dict(target=dict(id='attended',box=[10,10,90,90])))
+    assert packet['source']=='remote-eye' and packet['attention_target']['id']=='attended'
+    assert packet['objects'][0]['id']=='attended' and packet['objects'][0]['label']=='dining table'
+    assert 'class hypothesis' in packet['identity']
+
+
+def test_real_policy_events_to_real_uart_cat_and_dog(board,screen):
+    _,_,handler,_=board.create(calibrated=False,electrical=False,interlock=False);handler.display=screen.d
+    host=transport(handler,board);now=[0.];labels=ObjectLabels(host,clock=lambda:now[0])
+    bus=StimulusBus();manager=AttentionManager(bus,mobile_enabled=False,object_labels=labels)
+    for at,label in ((1,'cat'),(1.11,'cat'),(1.22,'cat'),(3.5,'dog'),(3.61,'dog'),(3.72,'dog')):
+        now[0]=at;bus.emit('object_observation',packet(at,label));manager.update(None)
+    wires=host.serial.writes
+    assert b'OBJECT_LABEL 4500 100 CAT\n' in wires and b'OBJECT_LABEL 4500 100 DOG\n' in wires
+    assert screen.d.object_label=='DOG' and manager.mobile is None and not board.pwms
+    assert all(b'LOOK' not in w and b'ARM' not in w and b'MOVE' not in w for w in wires)
+
+
+def test_dry_run_normal_main_never_opens_serial_or_camera(monkeypatch,capsys):
+    import serial
+    import socket
+    from main import main
+    monkeypatch.setattr(serial,'Serial',Mock(side_effect=AssertionError('physical serial not permitted')))
+    monkeypatch.setattr(socket,'create_connection',Mock(side_effect=AssertionError('camera/control not permitted')))
+    main(['--object-label-replay',str(ROOT/'tests/fixtures/object-display/cat-dog.jsonl')])
+    rows=[json.loads(s) for s in capsys.readouterr().out.splitlines()]
+    commands=[c for row in rows for c in row['outgoing']]
+    assert commands==['DISPLAY_CAPS','OBJECT_LABEL 4500 100 CAT','OBJECT_CLEAR','OBJECT_LABEL 4500 100 DOG','OBJECT_CLEAR']
+    serial.Serial.assert_not_called();socket.create_connection.assert_not_called()
+    with pytest.raises(ValueError):main(['--object-label-replay','unused','--object-label-display','rp2040'])
+
+
+def test_refresh_does_not_restart_firmware_scroll(screen):
+    d=screen.d;d.show_object_label('CAT')
+    screen.now[0]=100;d.update();offset=d.object_offset
+    screen.now[0]=200;d.show_object_label('CAT')
+    assert d.object_offset==offset
+    d.show_object_label('DOG');assert d.object_offset==17
+
+
+@pytest.mark.parametrize('command',['OBJECT_LABEL 999999 100 CAT','OBJECT_LABEL 4500 0 CAT','OBJECT_LABEL 4500 100 CAT;STOP','OBJECT_LABEL 4500 100 '+'A'*25])
+def test_bad_firmware_labels_cannot_change_motion(board,screen,command,capsys):
+    a,_,handler,_=board.create(calibrated=False,electrical=False,interlock=False);handler.display=screen.d
+    board.command(handler,command)
+    assert 'ERR' in capsys.readouterr().out and screen.d.object_label is None and not board.pwms
+    assert a.status()['state']=='DISARMED'
+
+
+def test_stale_future_reordered_and_faults_do_not_hold_current_label():
+    now,h,p=fake_policy();feed(now,p)
+    p.observe(packet(99));p.tick();assert p.current is None
+    h.show_object_label.reset_mock()
+    now[0]=5;p.observe(packet(1));p.tick();h.show_object_label.assert_not_called()
+
+
+def test_safety_suppression_and_failed_acks_are_bounded():
+    now,h,p=fake_policy();feed(now,p)
+    p.suppressed=True;p.tick();assert p.current is None
+    assert h.clear_object_label.call_count==1
+    p.suppressed=False;h.show_object_label.return_value=False
+    for i in range(100):
+        now[0]=3+i*.01;p.observe(packet(now[0],'dog'));p.tick()
+    assert h.show_object_label.call_count<=3
+
+
+def test_existing_primary_visual_target_selects_matching_object_not_strongest():
+    now,h,p=fake_policy();bus=StimulusBus();manager=AttentionManager(bus,mobile_enabled=False,object_labels=p)
+    manager.handle_event('vision_target',(900,360))
+    for at in (1,1.11,1.22):
+        now[0]=at
+        observation=packet(at,'cat',score=.99,source='pi-primary')
+        observation.update(geometry=[1280,720])
+        observation['objects'][0]['box']=[0,0,200,200]
+        observation['objects'].append(dict(id='attended-chair',label='chair',confidence=.8,prominence=.1,box=[800,300,1000,500]))
+        manager.handle_event('object_observation',observation);p.tick()
+    h.show_object_label.assert_called_once_with('CHAIR',4500,100)
+    assert manager.mobile is None
+
+
+def test_all_existing_model_classes_can_flow_without_new_inference():
+    import numpy as np
+    from vision.mobile_models import FixtureModel
+    from vision.mobile_perception import MobileFrame,MobilePerception
+    detector=FixtureModel([dict(label='chair',box=[1,1,10,10],confidence=.9)])
+    detector.metadata['classes']=['chair']
+    depth=FixtureModel(dict(kind='relative',valid=False))
+    resources=SimpleNamespace(check=lambda **k:None)
+    perception=MobilePerception(detector,depth,resources=resources,revision='explicit-fixture',clock=lambda:1.)
+    result=perception.observe(MobileFrame('test',np.zeros((20,20,3),np.uint8),1))
+    assert result['objects'][0]['label']=='chair'
+
+
+def test_rp2040_scheduler_services_stop_and_ping_while_long_label_scrolls(board,screen,monkeypatch,capsys):
+    import runpy
+    from test_active_vision_firmware import load
+    instances=[];base=board.module.ServoController
+    class Controller(base):
+        def __init__(self,**kw):
+            super().__init__(clock=lambda:board.now[0],**kw);instances.append(self)
+    board.module.ServoController=Controller
+    for name in ('scanner','behaviors','commands'):
+        monkeypatch.setitem(sys.modules,name,load('object_scheduler_'+name,'rp2040/'+name+'.py'))
+    monkeypatch.setitem(sys.modules,'display',SimpleNamespace(Display=lambda:screen.d))
+    monkeypatch.setitem(sys.modules,'heartbeat',SimpleNamespace(Heartbeat=lambda:SimpleNamespace(alive=lambda:True,beat=lambda:None)))
+    lines=iter(['DISPLAY_CAPS\n','OBJECT_LABEL 4500 100 TRAFFIC LIGHT\n','PING\n','PING\n','STOP\n','PING\n'])
+    monkeypatch.setattr(sys,'stdin',SimpleNamespace(readline=lambda:next(lines)))
+    monkeypatch.setitem(sys.modules,'select',SimpleNamespace(POLLIN=1,poll=lambda:SimpleNamespace(register=lambda *a:None,poll=lambda _:True)))
+    sleeps=[]
+    class Finished(Exception):pass
+    def sleep(ms):
+        sleeps.append(ms);screen.now[0]+=100;board.now[0]+=20
+        if len(sleeps)==6:raise Finished()
+    monkeypatch.setattr('time.sleep_ms',sleep,raising=False)
+    with pytest.raises(Finished):runpy.run_path(str(ROOT/'rp2040/main.py'))
+    text=capsys.readouterr().out
+    assert 'DISPLAY_CAPS' in text and 'OK OBJECT_LABEL' in text and 'OK STOP' in text and text.count('ALIVE')==3
+    assert sleeps==[20]*6 and not board.pwms and len(instances)==1
+
+
+def test_display_failure_cannot_prevent_existing_behavior_update_or_shutdown():
+    labels=Mock();labels.observe.side_effect=ValueError('malformed observation');labels.tick.side_effect=OSError('serial offline');labels.close.side_effect=OSError('closed')
+    bus=StimulusBus();manager=AttentionManager(bus,mobile_enabled=False,object_labels=labels)
+    behavior=Mock();behavior.is_finished.return_value=False;manager.active=behavior
+    mobile=Mock();manager.mobile=mobile
+    bus.emit('object_observation',dict(objects=None))
+    manager.update('fake-deck')
+    behavior.update.assert_called_once_with('fake-deck');mobile.update.assert_called_once()
+    manager.close();mobile.exit.assert_called_once()
+    assert manager.object_display_error

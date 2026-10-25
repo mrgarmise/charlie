@@ -1,0 +1,155 @@
+{
+  "events": 614,
+  "events_sha256": "03490c149e57795b013190bfaa5b9261f43cf8b9883f652014b446c5191130f3",
+  "annotated_frames": 9,
+  "unlabeled_events": 605,
+  "classification": {
+    "annotated_frames": 9,
+    "wrong_species": 6,
+    "predicted_dog": 6,
+    "correct_species": 3,
+    "predicted_cat": 3
+  },
+  "captures": [
+    {
+      "artifact": {
+        "name": "pet-001.png",
+        "pixel_sha256": "c36b63b32f4bf309821abb3f7e1bd10607c13c555f58c5ea90d54f274dd1dc7c",
+        "encoded_sha256": "c72bc0d565a656a6d70b36eb47f84cbd5f955948f68da7170565e3b24182b026",
+        "geometry": [
+          800,
+          600
+        ]
+      },
+      "predicted_species": [
+        "dog"
+      ],
+      "at": 1792885707.447867
+    },
+    {
+      "artifact": {
+        "name": "pet-002.png",
+        "pixel_sha256": "26403b8eabc5c55d61c14ae14246319b91bc15e422ecbb11d33254f9d735ffe3",
+        "encoded_sha256": "fc004c24261e611aec4b5e6da28ea38b14c71643bd7b08928c7972b47d64fd62",
+        "geometry": [
+          800,
+          600
+        ]
+      },
+      "predicted_species": [
+        "dog"
+      ],
+      "at": 1792885707.903712
+    },
+    {
+      "artifact": {
+        "name": "pet-003.png",
+        "pixel_sha256": "c0786316e9ef41516e11adfb5ca73ac0b03d5f6b72bc9379363c7fd51b777378",
+        "encoded_sha256": "c679c2ee30259fcd0987fd4f3fb977602edb357c119f6c54d885f6ffac5f957f",
+        "geometry": [
+          800,
+          600
+        ]
+      },
+      "predicted_species": [
+        "dog"
+      ],
+      "at": 1792885708.307689
+    },
+    {
+      "artifact": {
+        "name": "pet-004.png",
+        "pixel_sha256": "6947bdda9facdc4e0dc87df21407bb91a1a426ec0c8efbe96e3db4b1cb5e1082",
+        "encoded_sha256": "9f6d400c9433eac70e047a3855109bebbe4005be524b810e58b87cdbe2c6755a",
+        "geometry": [
+          800,
+          600
+        ]
+      },
+      "predicted_species": [
+        "dog"
+      ],
+      "at": 1792885708.711707
+    },
+    {
+      "artifact": {
+        "name": "pet-005.png",
+        "pixel_sha256": "debd31379b36d59b3f8ae16aa0dba9475792700d2639182114d9fc93173b6532",
+        "encoded_sha256": "50187d8279fae9a769efb4e83827aa55994c550e34058b6890fc0d4f11294d6f",
+        "geometry": [
+          800,
+          600
+        ]
+      },
+      "predicted_species": [
+        "dog"
+      ],
+      "at": 1792885709.123886
+    },
+    {
+      "artifact": {
+        "name": "pet-006.png",
+        "pixel_sha256": "44ffc8e6039df107b6d54931200d705d373eeeef0be374cde2d4e206ea50140d",
+        "encoded_sha256": "145872ff62ac3fe06b5930873344188f17682b1ce1e738bf92d34a2af4355a8f",
+        "geometry": [
+          800,
+          600
+        ]
+      },
+      "predicted_species": [
+        "dog"
+      ],
+      "at": 1792885709.54396
+    },
+    {
+      "artifact": {
+        "name": "pet-007.png",
+        "pixel_sha256": "f34080d2f2b7f9ff650d892cbffe1af5f919adbd53e30b2bb61ef48a50f16edd",
+        "encoded_sha256": "bf790be9636bfb31712a7f6a36ce8ecdf209a3622e9bc555e4b9b61e8c953b10",
+        "geometry": [
+          800,
+          600
+        ]
+      },
+      "predicted_species": [
+        "cat"
+      ],
+      "at": 1792885710.791693
+    },
+    {
+      "artifact": {
+        "name": "pet-008.png",
+        "pixel_sha256": "20efb801cc2df94c53e6ddeec73411520c5d9865ba019d33ae091c84743fa8fd",
+        "encoded_sha256": "47f200ec79b870e8a22baa550c2da8fd1267461d9d05603267aebf8f37c87e3d",
+        "geometry": [
+          800,
+          600
+        ]
+      },
+      "predicted_species": [
+        "cat"
+      ],
+      "at": 1792885711.239718
+    },
+    {
+      "artifact": {
+        "name": "pet-009.png",
+        "pixel_sha256": "6e42540afbbd5a9b56f8e593af90b4811d8f1deba977eab05bafaceb8cfefd01",
+        "encoded_sha256": "ee0e1c970bc34833343d6c521b4ff5de2bcbf3e0e4fda4b82d8b5e1ac7ae30e5",
+        "geometry": [
+          800,
+          600
+        ]
+      },
+      "predicted_species": [
+        "cat"
+      ],
+      "at": 1792885712.127802
+    }
+  ],
+  "independent_animals": "operator reports Monty in nine reviewed images; not nine independent animals",
+  "detection_recall": null,
+  "localization_accuracy": null,
+  "qualification": "historical replay, not new native inference",
+  "motion_commands": 0
+}

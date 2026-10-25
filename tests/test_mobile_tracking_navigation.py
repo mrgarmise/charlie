@@ -49,7 +49,9 @@ def qualified():
     p.update(qualification='native-qualified',depth=dict(kind='relative',valid=True,anomaly=False))
     target=dict(id='fixture-target',box=[15,1,25,15],observed=True,ambiguous=False)
     sensors={k:dict(valid=True,source='car-qualified',at=1,clear=True,meters=2) for k in
-             ('ultrasonic','target_range','yaw','heartbeat','floor_clearance','hazard_map','blind_spot')}
+             ('ultrasonic','target_range','yaw','heartbeat','floor_clearance','hazard_map','blind_spot','lateral_clearance')}
+    for name in ('ultrasonic','target_range'):
+        sensors[name].update(frame_id=p['frame']['id'],field_of_view_verified=True)
     sensors['target_range']['track_id']='fixture-target'
     sensors['yaw']['degrees']=0
     sensors['pet_distress']=False

@@ -56,12 +56,13 @@ class MobileNavigator:
         if not frame.get('authentic'):reasons.append('offline_fixture')
         if observation.get('qualification')!='native-qualified':reasons.append('unqualified_perception')
         if depth.get('kind')!='relative' or depth.get('valid') is not True:reasons.append('uncertain_depth')
+        if depth.get('zones') and (depth.get('frame_id')!=frame['id'] or depth.get('received_at')!=frame.get('received_at')):reasons.append('depth_frame_mismatch')
         if depth.get('anomaly') is not False:reasons.append('depth_anomaly_or_unknown')
         pan=frame.get('pan_deg')
         if not finite(pan) or abs(pan-90)>5:reasons.append('off_axis_or_unknown_camera')
         target=tracking.get('target')
         if target is None or not target.get('observed') or target.get('ambiguous'):reasons.append('target_lost_or_ambiguous')
-        for name in ('ultrasonic','target_range','yaw','heartbeat','floor_clearance','hazard_map','blind_spot'):
+        for name in ('ultrasonic','target_range','yaw','heartbeat','floor_clearance','hazard_map','blind_spot','lateral_clearance'):
             sensor=telemetry.get(name,{})
             sensor_age=age(now,sensor.get('at'))
             if (not finite(sensor_age) or not 0<=sensor_age<=l.max_sensor_age
@@ -73,8 +74,11 @@ class MobileNavigator:
         target_range=telemetry.get('target_range',{})
         if (not finite(target_range.get('meters')) or target_range['meters']<=l.stand_off_m
                 or target is None or target_range.get('track_id')!=target.get('id')):reasons.append('target_distance_unverified_or_near')
+        for name in ('target_range','ultrasonic'):
+            sensor=telemetry.get(name,{})
+            if sensor.get('frame_id')!=frame['id'] or sensor.get('field_of_view_verified') is not True:reasons.append(name+'_field_of_view_unknown')
         if not finite(telemetry.get('yaw',{}).get('degrees')):reasons.append('invalid_yaw')
-        for name in ('floor_clearance','hazard_map','blind_spot'):
+        for name in ('floor_clearance','hazard_map','blind_spot','lateral_clearance'):
             if telemetry.get(name,{}).get('clear') is not True:reasons.append(f'{name}_uncertain')
         if telemetry.get('pet_distress') is not False:reasons.append('humane_condition_unverified')
         action='stop'

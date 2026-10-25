@@ -33,6 +33,11 @@ class MemoryEvaluator:
     THRESHOLD = 0.4
 
     @staticmethod
+    def evaluate_mobile_labels(journal, source_ids):
+        from learning.mobile_review import evaluate_labels
+        return evaluate_labels(journal,source_ids)
+
+    @staticmethod
     def assess_motion_measurement_provenance(corpus):
         """Check the external verification protocol, never a candidate's claims.
 

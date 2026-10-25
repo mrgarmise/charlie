@@ -138,6 +138,9 @@ class MobilePerception:
             at = self.clock()
             outputs[name] = model.infer(frame)
             timings[name] = self.clock()-at
+        if isinstance(outputs['depth'],dict):
+            outputs['depth']=dict(outputs['depth'],frame_id=frame.id,received_at=frame.received_at,
+                                  source_pose=dict(pan_deg=frame.pan_deg,yaw_deg=frame.yaw_deg))
         end = self.clock()
         if not 0 <= end-frame.received_at <= self.max_age: raise ValueError('late inference discarded')
         self.effective_cadence = max(self.cadence, min(self.max_age, (end-start)*1.2))

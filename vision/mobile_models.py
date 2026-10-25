@@ -49,7 +49,7 @@ class HailoRelativeDepth:
     Supports single RGB input resized to export size; single HWC/1-channel output.
     FastDepth/SCDepthV3 names alone do not establish that a HEF meets this contract.
     """
-    def __init__(self, path, *, sha256, input_shape, output_shape, larger_is_nearer, lock=None):
+    def __init__(self, path, *, sha256, input_shape, output_shape, larger_is_nearer, lock=None, preprocessing='resize-rgb'):
         import subprocess
         import re
         self.path = str(path)
@@ -60,10 +60,13 @@ class HailoRelativeDepth:
                 or type(larger_is_nearer) is not bool): raise ValueError('explicit HWC depth export required')
         report=subprocess.run(['hailortcli','parse-hef',str(path)],capture_output=True,text=True,timeout=5,check=True).stdout
         if not re.search(r'Architecture[^\n]*\bHAILO[-_ ]?8L\b',report,re.I): raise ValueError('requires hailo8l')
+        if preprocessing not in ('resize-rgb','fast-depth-v2.19'):raise ValueError('unknown depth preprocessing')
+        if preprocessing=='fast-depth-v2.19' and (tuple(input_shape)!=(224,224,3) or tuple(output_shape)!=(224,224,1) or larger_is_nearer is not False):raise ValueError('FastDepth export/sign mismatch')
+        self.preprocessing=preprocessing
         self.input_shape,self.output_shape = tuple(input_shape),tuple(output_shape)
         self.nearer,self.lock = larger_is_nearer,lock
         self.metadata=dict(backend='hailort-hef', sha256=sha256, architecture='hailo8l',
-                           input_shape=input_shape, output_shape=output_shape, kind='relative',
+                           input_shape=input_shape, output_shape=output_shape, kind='relative',preprocessing=preprocessing,
                            larger_is_nearer=larger_is_nearer, runtime=runtime_version(), qualification='unqualified')
 
     @staticmethod
@@ -73,16 +76,36 @@ class HailoRelativeDepth:
         if a.shape!=(1,*shape) or not np.isfinite(a).all() or a.size<4:
             raise ValueError('invalid depth tensor/layout')
         a=a[0,:,:,0]
+        if (a<0).any():raise ValueError('negative relative depth')
         if float(np.ptp(a))<=1e-8: raise ValueError('degenerate relative depth')
-        # Only summaries enter journals; relative values cannot certify free floor.
-        return dict(kind='relative', median=float(np.median(a)), minimum=float(a.min()),
+        zones=[]
+        for iy,ys in enumerate(np.array_split(np.arange(a.shape[0]),3)):
+            for ix,xs in enumerate(np.array_split(np.arange(a.shape[1]),3)):
+                if not len(ys) or not len(xs):continue
+                values=a[np.ix_(ys,xs)]
+                zones.append(dict(row=iy,column=ix,median=float(np.median(values)),
+                    near_quantile=float(np.percentile(values,90 if larger_is_nearer else 10)),
+                    valid_fraction=1.,interpretation='relative appearance; floor/obstacle identity unknown'))
+        return dict(kind='relative',zones=zones,spatial_valid=True,valid=True,anomaly=False, median=float(np.median(a)), minimum=float(a.min()),
                     maximum=float(a.max()), larger_is_nearer=larger_is_nearer,
                     clearance_certified=False, qualification='unqualified')
+
+    @staticmethod
+    def prepare(bgr,shape,contract):
+        import cv2
+        import numpy as np
+        rgb=bgr[:,:,::-1].astype(np.float32)
+        if contract=='fast-depth-v2.19':
+            # Official Model Zoo: resize 250x332, central crop .91, 224x224.
+            # OpenCV bilinear implementation; TensorFlow/native parity pending.
+            rgb=cv2.resize(rgb,(332,250),interpolation=cv2.INTER_LINEAR)[11:239,14:318]
+        elif contract!='resize-rgb':raise ValueError('unknown depth preprocessing')
+        return cv2.resize(rgb,(shape[1],shape[0]),interpolation=cv2.INTER_LINEAR)
 
     def infer(self, frame):
         import numpy as np
         from PIL import Image
-        image=Image.fromarray(frame.image[:,:,::-1]).resize((self.input_shape[1],self.input_shape[0]))
+        image=self.prepare(frame.image,self.input_shape,self.preprocessing)
         with HailoSession(self.path,sha256=self.metadata['sha256'],input_shape=self.input_shape,
                           output_shape=self.output_shape,lock=self.lock) as session:
             result=session.infer(np.asarray(image,dtype=np.float32)[None])

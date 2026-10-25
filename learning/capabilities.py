@@ -60,6 +60,7 @@ class CapabilityRegistry:
 def default_registry():
     registry=CapabilityRegistry()
     for item in (
+        Capability('mobile-evidence-review','Retrieve original species predictions and independent operator labels',('native-labeled-mobile-evidence',),('label-review','evidence-gap'),.1,('correlated frames are one evidence group','no physical or model activation'),'immutable pixel-bound operator annotations'),
         Capability('mobile-observe','Acquire unarmed mobile species/depth evidence for an existing Executive investigation',('mobile-camera','mobile-models'),('mobile-observation','evidence-deficiency'),.3,('no actuation authority','species is not individual pet identity','native model qualification required for authentic projects'),'independent replay labels and native source provenance',execution='unarmed-perception'),
         Capability('mobile-navigation-proposal','Evaluate bounded local motion proposals without physical execution',('mobile-observation','car-telemetry'),('mobile-proposal','safety-veto'),.1,('relative depth is not metric clearance','no qualified car-local backend supplied'),'independent safety fault injection'),
         Capability('mobile-mobility','Prospective independently qualified car-local motion',('qualified-car-local-controller','motion-lease'),('execution-acknowledgement',),1.,('no physical implementation authorized by software mission',),'separately authorized empty-room then pet-present qualification',execution='unavailable'),

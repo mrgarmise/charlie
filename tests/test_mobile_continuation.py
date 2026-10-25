@@ -134,3 +134,57 @@ def test_session_timeout_and_bad_hash_release_everything(tmp_path,monkeypatch):
     session=HailoSession(path,sha256='wrong',input_shape=(2,2,3),lock=tmp_path/'lock')
     with pytest.raises(ValueError):session.open()
     with accelerator_lease(tmp_path/'lock'):pass
+
+
+def test_spatial_depth_is_bounded_relative_and_model_preprocessing():
+    from vision.mobile_models import HailoRelativeDepth
+    a=np.arange(81,dtype=float).reshape(1,9,9,1)
+    result=HailoRelativeDepth.summarize(a,(9,9,1),False)
+    assert len(result['zones'])==9 and result['clearance_certified'] is False
+    assert result['zones'][0]['near_quantile']<result['zones'][-1]['near_quantile']
+    image=np.zeros((20,30,3),np.uint8);image[:,:,2]=255
+    prepared=HailoRelativeDepth.prepare(image,(224,224,3),'fast-depth-v2.19')
+    assert prepared.shape==(224,224,3) and prepared.dtype==np.float32
+    assert np.all(prepared[:,:,0]==255) and np.all(prepared[:,:,2]==0)
+    with pytest.raises(ValueError):HailoRelativeDepth.summarize(-a,(9,9,1),False)
+
+
+def test_watcher_recovers_without_commands_and_is_bounded():
+    from learning.mobile_runtime import watch
+    from unittest.mock import Mock
+    b=Mock();b.step.side_effect=[TimeoutError('dropout'),StopIteration()]
+    messages=[];r=watch(b,frames=5,seconds=5,max_faults=2,fixture=True,clock=lambda:1,publish=messages.append)
+    assert r['faults']==1 and r['records']==0 and r['motion_authorized'] is False
+    b.close.assert_called_once()
+    b=Mock();b.step.side_effect=EOFError('offline')
+    r=watch(b,frames=100,seconds=5,max_faults=2,fixture=True,clock=lambda:1,publish=lambda x:None)
+    assert b.step.call_count==2 and r['faults']==2
+
+
+def test_normal_executive_selects_native_review_and_retains_result(tmp_path,monkeypatch):
+    from memory.evidence import EvidenceJournal
+    from learning.lifecycle import DevelopmentLifecycle
+    monkeypatch.setattr('learning.cycle.gameplay_active',lambda:False)
+    state=tmp_path/'state';path=state/'mobile-native'/'test-batch'/'native-evidence.sqlite3'
+    j=EvidenceJournal(path)
+    raw=j.append('observation',dict(category='mobile_native_prediction',artifact=dict(pixel_sha256='fixture'),raw=dict(model_sha256='fixture-model',detections=[dict(label='dog',confidence=.4)])),episode='fixture-native',producer='test-fixture',version='1')
+    j.append('observation',dict(category='mobile_operator_annotation',artifact=dict(pixel_sha256='fixture'),annotation=dict(species='cat',source='explicit test-only label')),episode='fixture-native',sources=[raw.id],producer='test-fixture',version='1')
+    j.close()
+    lifecycle=DevelopmentLifecycle(state,[tmp_path/'empty'],budget_seconds=2)
+    lifecycle.resources.check=lambda **k:None
+    try:
+        lifecycle.turn()
+        evaluations=lifecycle.journal.category_records('observation','mobile_independent_label_evaluation')
+        assert len(evaluations)==1
+        assert evaluations[0].data['payload']['metrics']['wrong_species']==1
+        assert len(lifecycle.executive.projects())==1
+        histories=list(lifecycle.executive.projects().values())[0]['experiment_history']
+        assert len(histories)==1 and histories[0]['result']=='contradicted'
+        count=len(lifecycle.journal.records())
+        lifecycle.turn()
+        assert len(lifecycle.journal.category_records('observation','mobile_independent_label_evaluation'))==1
+    finally:lifecycle.close()
+    lifecycle=DevelopmentLifecycle(state,[tmp_path/'empty'],budget_seconds=2)
+    try:
+        assert len(list(lifecycle.executive.projects().values())[0]['experiment_history'])==1
+    finally:lifecycle.close()

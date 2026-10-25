@@ -131,13 +131,19 @@ def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,
 
 def import_mobile_evidence(lifecycle):
     """Called by existing Executive acquisition turn; never another scheduler."""
-    path=lifecycle.output/'mobile-evidence.sqlite3'
-    if not path.exists():return False
-    source=EvidenceJournal(path,read_only=True)
-    try:
-        before=len(lifecycle.journal.records())
-        lifecycle.journal.merge_from(source)
-    finally:source.close()
+    before=len(lifecycle.journal.records())
+    paths=[lifecycle.output/'mobile-evidence.sqlite3']
+    paths+=sorted((lifecycle.output/'mobile-native').glob('*/native-evidence.sqlite3'))
+    for path in paths[:17]:
+        if not path.exists():continue
+        source=EvidenceJournal(path,read_only=True)
+        try:
+            if path.name=='native-evidence.sqlite3' and any(r.data['payload'].get('category') not in ('mobile_native_prediction','mobile_operator_annotation','mobile_native_reported_fault','mobile_reference_frame','mobile_reference_annotation') for r in source.records()):
+                raise ValueError('native mobile intake contains non-mobile records')
+            lifecycle.journal.merge_from(source)
+        finally:source.close()
+    from .mobile_review import reflect_native
+    reflect_native(lifecycle.executive,lifecycle.journal)
     # Interpretation stays on the existing Executive's thread/journal, where
     # native qualification and fixture exclusions are independently rechecked.
     adapter=MobileEvidenceAdapter(lifecycle.journal,episode='mobile-opportunities',revision='mobile-v1',

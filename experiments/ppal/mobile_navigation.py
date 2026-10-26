@@ -90,7 +90,10 @@ class MobileNavigator:
         return dict(schema='charlie.mobile.proposal.v1', id=uuid4().hex, frame_id=frame['id'],
                     at=now, action=action, direction=('LEFT' if target and sum(target['box'][::2])/2<frame['geometry'][0]/2 else 'RIGHT') if action=='turn' else None,
                     speed=l.max_speed if action!='stop' else 0, duration=l.max_duration if action!='stop' else 0,
-                    reasons=reasons, limits=asdict(l), physical_authorization=False)
+                    reasons=reasons, limits=asdict(l), physical_authorization=False,
+                    handoff=dict(owner='existing ELEGOO body',camera_pan_deg=pan,
+                        yaw_deg=telemetry.get('yaw',{}).get('degrees'),camera_limits_deg=[20,160],
+                        status='centered camera required before chassis steering; no blind alignment' if not finite(pan) or abs(pan-90)>5 else 'chassis steering owns centered view'))
 
 
 class MobileExecutionGate:
@@ -142,6 +145,9 @@ class MobileExecutionGate:
             if not result['acknowledged']:self.backend.stop(); self.active=False
         except Exception as exc:
             result.update(approved=False,rejected=['controller_error'],error=type(exc).__name__)
+            attempt=getattr(self.backend,'last_attempt',None)
+            if isinstance(attempt,dict) and attempt:
+                result.update(dispatched=None,wire_attempt=attempt,physical_uncertainty=True)
             try:self.backend.stop()
             finally:self.active=False
         return result
@@ -160,6 +166,7 @@ class QualifiedMobileExecutor:
     """
     def __init__(self,base,context,*,clock=time.monotonic,cancel=None):
         self.base,self.context,self.clock,self.cancel=base,context,clock,cancel
+        self.last_attempt=None
         self.car_local_qualified=True;self.used=set();self.last_stop=None
 
     def execute_bounded(self,proposal,*,lease):
@@ -175,6 +182,7 @@ class QualifiedMobileExecutor:
         direction=proposal['direction'] if proposal['action']=='turn' else 'FORWARD'
         envelope=report['envelope']
         pwm=max(1,int(envelope['max_pwm']*proposal['speed']/.15))
+        self.last_attempt=dict(wire_delivery='unknown until independent response',proposal_id=proposal['id'])
         result=self.base.pulse(direction,pwm=pwm,seconds=min(proposal['duration'],envelope['max_duration']),
             lease=lease,boot_id=self.context.boot_id,envelope=envelope,
             safety_check=lambda:self.context.safe(proposal),cancel=self.cancel)

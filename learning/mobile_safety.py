@@ -11,6 +11,7 @@ from memory.evidence import digest
 RUNTIME_FILES=('hardware/elegoo_mobile.py','motion/mobile_base.py','experiments/ppal/mobile_navigation.py',
  'attention/manager.py','behaviors/mobile_observe.py','learning/mobile.py','learning/mobile_runtime.py',
  'learning/mobile_safety.py','learning/capabilities.py','learning/deployment.py','main.py',
+ 'memory/learning_projects.py','memory/evaluator.py','learning/resources.py',
  'vision/mobile_perception.py','vision/mobile_tracking.py','vision/mobile_models.py')
 REQUIRED=('stationary_vision','explicit_stop','tcp_loss','pi_loss','local_expiry','power_cutoff',
  'wheels_up','floor_braking','obstacle_abort','edge_abort','target_loss','preemption','proxy_follow')
@@ -69,7 +70,8 @@ def validate_report(report, *, autonomous=False):
             if (row.get('stage')!=stage or row.get('authentic') is not True or row.get('passed') is not True
                     or row.get('hardware_id')!=report['hardware_id'] or row.get('zone')!=report['zone']
                     or row.get('firmware_sha256')!=report['firmware_sha256'] or not row.get('witness')
-                    or not row.get('utc') or not row.get('measurements') or not row.get('raw_artifacts')):
+                    or not row.get('utc') or not row.get('measurements') or not row.get('raw_artifacts')
+                    or not row.get('surface') or not finite(row.get('battery_v')) or not 0<row['battery_v']<30):
                 raise ValueError('incomplete independent trial: '+stage)
             if not row.get('trial_id') or row['trial_id'] in groups:raise ValueError('independent trial identities required')
             groups.add(row['trial_id'])
@@ -78,8 +80,10 @@ def validate_report(report, *, autonomous=False):
                 if hashlib.sha256(p.read_bytes()).hexdigest()!=raw['sha256']:raise ValueError('raw measurement changed')
             if stage in ('explicit_stop','tcp_loss','pi_loss','local_expiry','floor_braking'):
                 m=row['measurements']
-                if (not finite(m.get('stop_seconds')) or not 0<=m['stop_seconds']<=env['max_stop_seconds']
-                        or not finite(m.get('post_stop_m')) or not 0<=m['post_stop_m']<=env['max_stop_m']):
+                if (not finite(m.get('stop_uncertainty_seconds')) or not 0<=m['stop_uncertainty_seconds']<=.05
+                        or not finite(m.get('distance_uncertainty_m')) or not 0<=m['distance_uncertainty_m']<=.02
+                        or not finite(m.get('stop_seconds')) or not 0<=m['stop_seconds']+m['stop_uncertainty_seconds']<=env['max_stop_seconds']
+                        or not finite(m.get('post_stop_m')) or not 0<=m['post_stop_m']+m['distance_uncertainty_m']<=env['max_stop_m']):
                     raise ValueError('stopping measurements exceed envelope')
     if (len({r['sha256'] for s in required for r in report['trials'][s]})!=sum(len(report['trials'][s]) for s in required)):
         raise ValueError('trial files must be distinct; replays are not independent')
@@ -120,7 +124,7 @@ class MobileSafetyContext:
         import time
         self.deployment,self.boot_id,self.hardware_id,self.zone=deployment,boot_id,hardware_id,zone
         self.feed=Path(feed) if feed else None;self.clock=clock or time.monotonic
-        self.current=None;self.failure='no fresh qualified sensor context'
+        self.current=None;self.failure='no fresh qualified sensor context';self.health_check=None
 
     def activation(self):
         return active_mobile(self.deployment,now=self.clock(),boot_id=self.boot_id,
@@ -148,6 +152,8 @@ class MobileSafetyContext:
                 raise ValueError('frame-bound animal/sensor/capture provenance unavailable')
             models=out.get('model',[])
             if not any(m.get('sha256')==report['model_sha256'] for m in models):raise ValueError('model differs from qualification')
+            if abs(feed['sensors'].get('yaw',{}).get('degrees',float('inf'))-feed['yaw_deg'])>2:
+                raise ValueError('camera and chassis pose disagree')
             required=('pet_willing','human_clear','zone_inspected','power_ok')
             if any(feed['sensors'].get(k) is not True for k in required):raise ValueError('welfare/intrusion/zone/power unverified')
             out['raw_frame']=deepcopy(frame)
@@ -155,7 +161,7 @@ class MobileSafetyContext:
             out.update(qualification='native-qualified',sensors=feed['sensors'],grounded_animal=True)
             out['safety_provenance']=dict(qualification_id=active['qualification_id'],firmware_sha256=report['firmware_sha256'],
                 bridge_sha256=report['bridge_sha256'],sensor_producer_sha256=report['sensor_producer_sha256'])
-            self.current=dict(observation=out,tracking=tracking,activation=active,report=report,at=feed['at'])
+            self.current=dict(observation=out,tracking=tracking,activation=active,report=report,at=feed['at'],feed_digest=digest(feed))
             self.failure=None
         except (KeyError,TypeError,ValueError,OSError) as exc:self.failure=str(exc)
         return out
@@ -163,7 +169,10 @@ class MobileSafetyContext:
     def safe(self,proposal):
         from experiments.ppal.mobile_navigation import MobileNavigator
         if self.current is None:return False
+        if self.health_check is not None:self.health_check()
         active,report=self.activation();c=self.current
+        if self.feed is None or self.feed.stat().st_size>256*1024:return False
+        if digest(json.loads(self.feed.read_text()))!=c['feed_digest']:return False
         if active['activation_key']!=c['activation']['activation_key'] or self.clock()-c['at']>.25:return False
         from experiments.ppal.mobile_navigation import MobileLimits
         limits=MobileLimits(stand_off_m=report['envelope']['stand_off_m']+report['envelope']['margin_m'],
@@ -171,3 +180,41 @@ class MobileSafetyContext:
         check=MobileNavigator(limits,clock=self.clock).propose(c['observation'],c['tracking'],c['observation']['sensors'])
         return (not check['reasons'] and check['action']==proposal['action'] and
                 check['frame_id']==proposal['frame_id'] and check.get('direction')==proposal.get('direction'))
+
+
+def main(argv=None):
+    """Native acceptance record tools. None of these commands opens a device."""
+    import argparse
+    import platform
+    import socket
+    p=argparse.ArgumentParser(description=main.__doc__)
+    p.add_argument('--journal',type=Path)
+    sub=p.add_subparsers(dest='action',required=True)
+    sub.add_parser('inventory')
+    e=sub.add_parser('evaluate');e.add_argument('--report',type=Path,required=True);e.add_argument('--autonomous',action='store_true')
+    a=sub.add_parser('activate');a.add_argument('--qualification',required=True);a.add_argument('--authorization',type=Path,required=True)
+    r=sub.add_parser('revoke');r.add_argument('--reason',required=True);r.add_argument('--source',required=True)
+    args=p.parse_args(argv)
+    if args.action=='inventory':
+        try:address=socket.gethostbyname('charlie.local')
+        except OSError:address=None
+        print(json.dumps(dict(platform=platform.platform(),machine=platform.machine(),python=platform.python_version(),
+            runtime_sha256=runtime_hash(),charlie_address=address,device_connections=0,physical_qualification=False)))
+        return
+    if args.journal is None:raise ValueError('--journal required for durable qualification/authority')
+    from memory.evidence import EvidenceJournal
+    from learning.deployment import CapabilityDeployment
+    journal=EvidenceJournal(args.journal)
+    try:
+        if args.action=='evaluate':
+            ref=dict(path=str(args.report.resolve()),sha256=hashlib.sha256(args.report.read_bytes()).hexdigest())
+            row=evaluate(journal,ref,autonomous=args.autonomous)
+        elif args.action=='activate':
+            if args.authorization.stat().st_size>65536:raise ValueError('bounded authorization required')
+            row=CapabilityDeployment(journal).activate_mobile(args.qualification,authorization=json.loads(args.authorization.read_text()))
+        else:row=CapabilityDeployment(journal).revoke_mobile(reason=args.reason,authorization={'source':args.source})
+        print(json.dumps(dict(record_id=row.id,action=args.action,device_connections=0)))
+    finally:journal.close()
+
+
+if __name__=='__main__':main()

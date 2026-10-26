@@ -57,7 +57,7 @@ def test_nonretry_wire_failure_never_reconnects():
 
 def test_stop_failure_surfaces_uncertainty_and_sensor_is_never_speculative():
     c=ElegooMobileBase();c._send=Mock(side_effect=ConnectionError())
-    assert c.stop_verified()==dict(sent=False,acknowledged=False,physically_stopped=None,error='ConnectionError')
+    assert c.stop_verified()==dict(sent=None,acknowledged=False,physically_stopped=None,error='ConnectionError')
     c._send.reset_mock()
     with pytest.raises(ValueError):c.read_ultrasonic(protocol={})
     c._send.assert_not_called()
@@ -190,3 +190,127 @@ def test_normal_main_replay_has_attention_evaluation_and_no_activation(tmp_path,
     assert not j.category_records('event','capability_activation')
     assert not j.category_records('event','learning_project_proposal')
     j.verify();j.close();ElegooMobileBase.connect.assert_not_called()
+
+
+def qualification_control(tmp_path):
+    """Fictional files test proof validation ONLY. Not car/native measurements."""
+    import hashlib
+    from learning.mobile_safety import REQUIRED,runtime_hash
+    def write(name,value):
+        p=tmp_path/name;p.write_text(json.dumps(value,sort_keys=True))
+        return {'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+    protocol=write('protocol.json',dict(firmware_sha256='a'*64,bridge_sha256='b'*64,installed_match=True,
+        motion={'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4},local_expiry_verified=True))
+    report=dict(schema='charlie.mobile.qualification.v1',authentic=True,runtime_sha256=runtime_hash(),
+        witness='SOFTWARE CONTROL ONLY',zone='fixture-bench',hardware_id='fictional-car',measured_utc='fixture-not-native',
+        firmware_sha256='a'*64,bridge_sha256='b'*64,model_sha256='c'*64,sensor_producer_sha256='d'*64,
+        protocol_artifact=protocol,envelope=dict(max_pwm=35,max_duration=.1,max_stop_seconds=.3,max_stop_m=.1,
+                                               stand_off_m=1.,margin_m=.2),trials={})
+    for stage in REQUIRED+('live_pet_follow','voluntary_decline','restart_revoke'):
+        refs=[]
+        for n in range(3):
+            raw=write(f'{stage}-{n}-raw.json',{'software_control_only':True,'stage':stage,'sample':n})
+            refs.append(write(f'{stage}-{n}.json',dict(stage=stage,authentic=True,passed=True,
+                hardware_id='fictional-car',zone='fixture-bench',firmware_sha256='a'*64,witness='SOFTWARE CONTROL ONLY',
+                utc='fixture',surface='fixture-flat',battery_v=7.5,trial_id=f'{stage}-{n}',measurements={'stop_seconds':.1,'post_stop_m':.01,'stop_uncertainty_seconds':.01,'distance_uncertainty_m':.005},raw_artifacts=[raw])))
+        report['trials'][stage]=refs
+    return report,write
+
+
+def test_independent_measurement_validation_activation_revocation_and_restart(tmp_path):
+    from learning.mobile_safety import evaluate,active_mobile
+    from learning.deployment import CapabilityDeployment
+    from memory.evidence import EvidenceJournal
+    report,write=qualification_control(tmp_path)
+    ref=write('report.json',report);j=EvidenceJournal(tmp_path/'q.sqlite3');d=CapabilityDeployment(j)
+    q=evaluate(j,ref,autonomous=True)
+    auth=dict(target='mobile-pet-follow',qualification_id=q.id,execution='physical',source='software control only',
+        boot_id='boot',mode='qualified_autonomous',hardware_id='fictional-car',zone='fixture-bench',issued_at=.5,expires_at=2.)
+    d.activate_mobile(q.id,authorization=auth)
+    assert active_mobile(d,now=1,boot_id='boot',hardware_id='fictional-car',zone='fixture-bench')[1]==report
+    for changes in ({'now':3},{'boot_id':'restart'},{'zone':'stairs'},{'hardware_id':'other'}):
+        kw=dict(now=1,boot_id='boot',hardware_id='fictional-car',zone='fixture-bench');kw.update(changes)
+        with pytest.raises(ValueError):active_mobile(d,**kw)
+    d.revoke_mobile(reason='test revocation',authorization={'source':'software control'})
+    with pytest.raises(ValueError):active_mobile(d,now=1,boot_id='boot',hardware_id='fictional-car',zone='fixture-bench')
+    with pytest.raises(ValueError):d.activate_mobile(q.id,authorization=auth)
+    j.close()
+
+
+@pytest.mark.parametrize('change',['stopping','raw','repeated','firmware','runtime','autonomous'])
+def test_incomplete_or_changed_measurements_never_admit(change,tmp_path):
+    from learning.mobile_safety import validate_report
+    from pathlib import Path
+    report,write=qualification_control(tmp_path)
+    if change=='stopping':report['envelope']['max_stop_seconds']=.01
+    if change=='raw':Path(json.loads(Path(report['trials']['pi_loss'][0]['path']).read_text())['raw_artifacts'][0]['path']).write_text('changed')
+    if change=='repeated':report['trials']['explicit_stop'][2]=report['trials']['explicit_stop'][0]
+    if change=='firmware':report['firmware_sha256']='e'*64
+    if change=='runtime':report['runtime_sha256']='0'*64
+    if change=='autonomous':report['trials'].pop('live_pet_follow')
+    with pytest.raises(ValueError):validate_report(report,autonomous=True)
+
+
+def test_evaluator_wont_infer_pet_following_from_ack(tmp_path):
+    from memory.evidence import EvidenceJournal
+    from memory.evaluator import MemoryEvaluator
+    j=EvidenceJournal(tmp_path/'e.sqlite3')
+    event=j.append('event',dict(category='mobile_attention_episode',frame={'id':'fixture'},execution={'dispatched':True,'acknowledged':True}),
+        episode='fixture',producer='AttentionManager',version='test',provenance={'authentic':False})
+    row=MemoryEvaluator.evaluate_mobile_attention(j,event.id)
+    assert row.data['payload']['outcome']=='unobserved' and row.data['payload']['learned_improvement'] is False
+    assert MemoryEvaluator.evaluate_mobile_attention(j,event.id).id==row.id
+    j.close()
+
+
+def test_offline_cannot_enable_physical_pet_ability():
+    from main import main
+    with pytest.raises(ValueError,match='--offline never actuates'):main(['--offline','--pet-follow'])
+
+
+def safety_control(tmp_path):
+    from learning.mobile_safety import evaluate,MobileSafetyContext
+    from learning.deployment import CapabilityDeployment
+    from memory.evidence import EvidenceJournal
+    from test_mobile_tracking_navigation import qualified
+    report,write=qualification_control(tmp_path);j=EvidenceJournal(tmp_path/'feed.sqlite3');d=CapabilityDeployment(j)
+    q=evaluate(j,write('report.json',report))
+    d.activate_mobile(q.id,authorization=dict(target='mobile-pet-follow',qualification_id=q.id,execution='physical',source='software control only',
+        boot_id='boot',mode='supervised_trial',hardware_id='fictional-car',zone='fixture-bench',issued_at=.5,expires_at=2.))
+    o,t,s=qualified();o['frame']['sha256']='e'*64;o['frame']['source_age_known']=False;o['model']=[{'sha256':'c'*64}]
+    o['qualification']='unqualified'
+    s.update(pet_willing=True,human_clear=True,zone_inspected=True,power_ok=True)
+    feed=dict(schema='charlie.mobile.safety-snapshot.v1',boot_id='boot',hardware_id='fictional-car',zone='fixture-bench',
+        frame_id=o['frame']['id'],frame_sha256='e'*64,track_id=t['target']['id'],firmware_sha256='a'*64,
+        producer_sha256='d'*64,scene='live-animal-grounded',capture_timing_verified=True,capture_age_seconds=.1,
+        at=1.,pan_deg=90,yaw_deg=0,sensors=s)
+    path=tmp_path/'feed.json';path.write_text(json.dumps(feed))
+    c=MobileSafetyContext(d,boot_id='boot',hardware_id='fictional-car',zone='fixture-bench',feed=path,clock=lambda:1.)
+    return j,c,o,t,feed,path
+
+
+def test_bound_feed_rechecks_changes_during_continuing_pulse(tmp_path):
+    from experiments.ppal.mobile_navigation import MobileNavigator
+    j,c,o,t,feed,path=safety_control(tmp_path)
+    out=c.bind(o,t)
+    assert out['qualification']=='native-qualified' and not o['frame']['source_age_known']
+    p=MobileNavigator(clock=lambda:1).propose(out,t,out['sensors']);assert p['action']=='advance'
+    assert c.safe(p)
+    feed['sensors']['human_clear']=False;path.write_text(json.dumps(feed))
+    assert not c.safe(p)
+    j.close()
+
+
+@pytest.mark.parametrize('change',['screen','frame','pose','stale','welfare','producer','model'])
+def test_unqualified_scene_pose_or_feed_never_admits(change,tmp_path):
+    j,c,o,t,feed,path=safety_control(tmp_path)
+    if change=='screen':feed['scene']='phone-photo'
+    if change=='frame':feed['frame_sha256']='f'*64
+    if change=='pose':feed['yaw_deg']=40
+    if change=='stale':feed['at']=0
+    if change=='welfare':feed['sensors'].pop('pet_willing')
+    if change=='producer':feed['producer_sha256']='0'*64
+    if change=='model':o['model']=[{'sha256':'0'*64}]
+    path.write_text(json.dumps(feed))
+    assert c.bind(o,t)['qualification']=='unqualified' and c.current is None
+    j.close()

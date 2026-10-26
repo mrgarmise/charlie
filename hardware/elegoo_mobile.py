@@ -531,13 +531,14 @@ class ElegooMobileBase:
         self.align.active = False
 
     def stop_verified(self):
-        """No reconnect, no concealed fallback; ACK is not measured stopping."""
+        """No reconnect/concealed fallback; even an ACK is not measured stopping."""
+        ident=self._next_id('safestop')
         try:
-            result=self._send({'N':1,'H':self._next_id('safestop'),'D1':0,'D2':0,'D3':0},
-                              expected_id=None,timeout=.1,retry=False)
-            return dict(sent=result['ok'],acknowledged=False,physically_stopped=None)
+            result=self._send({'N':1,'H':ident,'D1':0,'D2':0,'D3':0},
+                              expected_id=ident,timeout=.05,retry=False)
+            return dict(sent=True,acknowledged=result['ok'],physically_stopped=None)
         except Exception as exc:
-            return dict(sent=False,acknowledged=False,physically_stopped=None,error=type(exc).__name__)
+            return dict(sent=None,acknowledged=False,physically_stopped=None,error=type(exc).__name__)
         finally:self.align.active=False
 
     def pulse(self, direction, *, pwm, seconds, lease, boot_id, envelope, safety_check,
@@ -563,6 +564,7 @@ class ElegooMobileBase:
             result['command']=payload
             started=clock()
             # A bounded start must not wait a full legacy one-second ACK timeout.
+            result['sent']=None  # A failed write/ACK has ambiguous physical delivery.
             response=self._send(payload,expected_id=ident,timeout=min(.05,seconds),retry=False)
             result.update(sent=True,acknowledged=response['ok'])
             if not response['ok']:raise TimeoutError('ambiguous motion ACK')

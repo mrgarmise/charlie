@@ -12,6 +12,7 @@ class MobileEvidenceAdapter:
         if not episode or not revision:raise ValueError('episode/revision required')
         self.journal,self.episode,self.revision=journal,episode,revision
         self.gateway,self.executive=gateway,executive
+        self.opportunity_keys=set()
 
     def record(self, observation, tracking, proposal, execution):
         payload=dict(category='mobile_perception',observation=observation,tracking=tracking,
@@ -46,6 +47,9 @@ class MobileEvidenceAdapter:
         if not o['frame']['authentic']:return []
         target=p['tracking']['target']
         if target is None:return []
+        key=(o['frame']['source'],target['id'],o['frame'].get('pan_deg'),o.get('grounded_animal',False))
+        if key in self.opportunity_keys or len(self.opportunity_keys)>=256:return []
+        self.opportunity_keys.add(key)
         hypotheses=[dict(method='mobile-observe',scope=dict(body=o['frame']['source'],category=target.get('kind',target['label'])),
             expected='detector animal candidates and species uncertainty persist across independent observation conditions',
             evidence_ids=[row.id],conditions=[dict(view='centered'),dict(view='off-axis'),dict(view='pose-unknown')],

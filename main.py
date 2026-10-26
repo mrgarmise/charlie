@@ -74,7 +74,9 @@ def main(argv=None):
                 turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources,
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
     if args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow:
-        if not args.offline:
+        if args.pet_follow and args.offline:
+            raise ValueError('physical pet following requires explicit --hardware; --offline never actuates')
+        if not args.pet_follow and not args.offline:
             raise ValueError('mobile observation entry point cannot combine with --hardware')
         from learning.mobile_runtime import run_mobile
         run_mobile(args,resources)

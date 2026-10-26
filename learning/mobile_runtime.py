@@ -65,39 +65,62 @@ def run_mobile(args, resources):
     from stimulus.bus import StimulusBus
     lifecycle=DevelopmentLifecycle(state,args.episode_root or [Path(__file__).resolve().parents[1]/'robotron-runs'],
         budget_seconds=args.learning_budget,resources=resources,history_roots=args.history_root)
-    lifecycle.acquire()
-    journal=EvidenceJournal(state/'mobile-evidence.sqlite3')
-    adapter=MobileEvidenceAdapter(journal,episode='mobile:'+uuid4().hex,revision=revision,executive=lifecycle.executive)
-    guard=ResourceGuard(resources)
-    perception=MobilePerception(detector,depth,resources=guard,revision=revision,clock=clock)
-    from vision.mobile_tracking import PetTracker
-    bus=StimulusBus();attention=AttentionManager(bus,mobile_enabled=False)
-    behavior=MobileObserveBehavior(source,perception,adapter,tracker=PetTracker(loss_seconds=2.),bus=bus)
-    context=None
-    if getattr(args,'pet_follow',False):
-        from learning.mobile_safety import MobileSafetyContext
-        from learning.deployment import CapabilityDeployment
-        # Boot ID is emitted, never restored. Prior process grants cannot revive motion.
-        boot_id=uuid4().hex
-        print(json.dumps(dict(mobile_boot_id=boot_id,motion_authorized=False)),flush=True)
-        context=MobileSafetyContext(CapabilityDeployment(lifecycle.journal),boot_id=boot_id,
-            hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.mobile_safety_feed,clock=clock)
-    from motion.mobile_base import MobileBase
-    behavior.bind_attention(attention,lifecycle.executive,default_registry(),context=context,base_factory=MobileBase)
-    behavior.before_attention=lambda:lifecycle.journal.merge_from(journal)
-    behavior.executive_resources={'offline-slot','context-evidence','model-evaluation','meditation-evidence'}
-    # Existing face/body activity can preempt on this same bus; no legacy conversion.
-    def between_steps():
-        if not args.mobile_replay and behavior.intent in ('decline','yield'):
-            lifecycle.turn()  # Existing lifecycle owns the work; never a second chooser.
+    from contextlib import ExitStack
+    with ExitStack() as owners:
+        owners.callback(lifecycle.close)
+        owners.callback(source.close)
+        owners.callback(detector.close) if hasattr(detector,'close') else None
+        owners.callback(depth.close) if hasattr(depth,'close') else None
+        lifecycle.acquire()
+        journal=EvidenceJournal(state/'mobile-evidence.sqlite3')
+        adapter=MobileEvidenceAdapter(journal,episode='mobile:'+uuid4().hex,revision=revision,executive=lifecycle.executive)
+        guard=ResourceGuard(resources)
+        perception=MobilePerception(detector,depth,resources=guard,revision=revision,clock=clock)
+        from vision.mobile_tracking import PetTracker
+        bus=StimulusBus();attention=AttentionManager(bus,mobile_enabled=False)
+        behavior=MobileObserveBehavior(source,perception,adapter,tracker=PetTracker(loss_seconds=2.),bus=bus)
+        context=None
+        if getattr(args,'pet_follow',False):
+            from learning.mobile_safety import MobileSafetyContext
+            from learning.deployment import CapabilityDeployment
+            # Boot ID is emitted, never restored. Prior process grants cannot revive motion.
+            boot_id=uuid4().hex
+            print(json.dumps(dict(mobile_boot_id=boot_id,motion_authorized=False)),flush=True)
+            context=MobileSafetyContext(CapabilityDeployment(lifecycle.journal),boot_id=boot_id,
+                hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.mobile_safety_feed,clock=clock)
+        if context is not None:context.health_check=lambda:guard.check(force=True)
+        from motion.mobile_base import MobileBase
+        behavior.bind_attention(attention,lifecycle.executive,default_registry(),context=context,base_factory=MobileBase)
+        behavior.before_attention=lambda:lifecycle.journal.merge_from(journal)
+        behavior.executive_resources={'offline-slot','context-evidence','model-evaluation','meditation-evidence'}
+        # Existing face/body activity can preempt on this same bus; no legacy conversion.
+        status_at=[None]
+        def between_steps():
+            if status_at[0] is None or clock()-status_at[0]>=2:
+                from .foundry import atomic_json
+                atomic_json(state/'pet-ability-status.json',dict(abilities=default_registry().describe(behavior.readiness()),
+                    attention=behavior.last_decision,execution=behavior.last_execution,
+                    boot_id=context.boot_id if context else None,hardware_id=context.hardware_id if context else None,
+                    zone=context.zone if context else None,physical_demonstration=False))
+                status_at[0]=clock()
+            if not args.mobile_replay and behavior.intent in ('decline','yield'):
+                lifecycle.turn()  # Existing lifecycle owns the work; never a second chooser.
 
-    behavior.retention=EventRetention(FrameArtifactStore(state/'mobile-pixels'),mode=args.mobile_retain,limit=args.mobile_captures)
-    try:
-        return watch(behavior,frames=args.mobile_frames,seconds=args.mobile_seconds,max_faults=args.mobile_max_faults,
-                     clock=clock,fixture=bool(args.mobile_replay),between_steps=between_steps)
-    finally:
-        try:behavior.close();attention.close();lifecycle.journal.merge_from(journal)
-        finally:journal.close();lifecycle.close()
+        behavior.retention=EventRetention(FrameArtifactStore(state/'mobile-pixels'),mode=args.mobile_retain,limit=args.mobile_captures)
+        owners.callback(journal.close)
+        owners.callback(attention.close)
+        owners.callback(behavior.close)
+        import signal
+        if threading.current_thread() is threading.main_thread():
+            previous=signal.getsignal(signal.SIGTERM)
+            def terminate(signum,frame):raise KeyboardInterrupt('application termination; STOP on exit')
+            signal.signal(signal.SIGTERM,terminate)
+            owners.callback(signal.signal,signal.SIGTERM,previous)
+        try:
+            return watch(behavior,frames=args.mobile_frames,seconds=args.mobile_seconds,max_faults=args.mobile_max_faults,
+                         clock=clock,fixture=bool(args.mobile_replay),between_steps=between_steps)
+        finally:
+            lifecycle.journal.merge_from(journal)
 
 
 class EventRetention:
@@ -139,6 +162,13 @@ def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,
             consecutive=0;counts['frames']+=1
             if result:
                 counts['records']+=1
+                execution=result['execution']
+                counts['dispatch_attempts']=counts.get('dispatch_attempts',0)+(execution.get('dispatched') is not False)
+                counts['acknowledged']=counts.get('acknowledged',0)+(execution.get('acknowledged') is True)
+                counts['last_attention']=result.get('attention')
+                counts['native_qualified']=result['observation'].get('qualification')=='native-qualified'
+                counts['motion_authorized']=bool(getattr(behavior.gate,'lease',None) and
+                    behavior.gate.lease.valid(clock(),behavior.gate.boot_id))
                 latencies.append(result['observation']['receipt_to_decision_seconds'])
                 inference.append(sum(result['observation']['inference_seconds'].values()))
                 publish(dict(evidence_id=result['evidence_id'],target=result['tracking']['target'],

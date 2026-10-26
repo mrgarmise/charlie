@@ -93,6 +93,8 @@ def run_mobile(args, resources):
         behavior.bind_attention(attention,lifecycle.executive,default_registry(),context=context,base_factory=MobileBase)
         behavior.before_attention=lambda:lifecycle.journal.merge_from(journal)
         behavior.executive_resources={'offline-slot','context-evidence','model-evaluation','meditation-evidence'}
+        from .mobile_review import labeled_pairs
+        if labeled_pairs(lifecycle.journal):behavior.executive_resources.add('native-labeled-mobile-evidence')
         # Existing face/body activity can preempt on this same bus; no legacy conversion.
         status_at=[None]
         def between_steps():

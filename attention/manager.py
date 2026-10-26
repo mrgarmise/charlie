@@ -5,6 +5,7 @@ class AttentionManager:
         self.active = None
         self.priority = 0
         self.pending = None
+        self.pet_service = None
 
         # Independent Elegoo mobile-attention sidecar.
         # This does not replace or modify the RP2040 TrackBehavior.
@@ -12,7 +13,7 @@ class AttentionManager:
         self.mobile_enabled = mobile_enabled
 
     def _ensure_mobile(self):
-        if not self.mobile_enabled:
+        if self.pet_service is not None or not self.mobile_enabled:
             return None
         if self.mobile is None:
             from behaviors.mobile_track import MobileTrackBehavior
@@ -26,7 +27,48 @@ class AttentionManager:
         """Request a behavior change (safe, queued)."""
         self.pending = (behavior, priority)
 
+    def attach_pet_service(self, service, executive, registry):
+        if self.mobile is not None:raise ValueError('legacy mobile controller owns ELEGOO; yield before pet service')
+        self.pet_service=service;self.pet_executive=executive;self.pet_registry=registry
+
+    def _consider_pet(self, result):
+        service=self.pet_service
+        if service is None:return
+        opportunity=result['tracking'].get('target')
+        if opportunity is None:
+            service.yield_attention('target_lost_or_ambiguous',result)
+            return
+        readiness=service.readiness()
+        resources={'mobile-camera','mobile-models'} if readiness['pet_observe']['available'] else set()
+        if readiness['pet_follow']['available']:resources|={'qualified-car-local-controller','motion-lease'}
+        # Existing registry + whole Executive portfolio, not a pet-only ranker.
+        methods={p['method'] for p in self.pet_executive.projects().values()}
+        available={c['id'] for c in self.pet_registry.describe()}
+        methods &= available
+        from learning.cycle import gameplay_active
+        if gameplay_active():
+            service.yield_attention('primary_gameplay_resource_ownership',result);return
+        key=(opportunity['id'],max(self.priority,self.pending[1] if self.pending else 0),
+             readiness['pet_follow']['available'])
+        at=service.perception.clock()
+        if (getattr(self,'pet_choice_key',None)==key and at-getattr(self,'pet_choice_at',0)<2
+                and getattr(self,'pet_choice',None) is not None):
+            service.accept_attention(result,self.pet_choice);return
+        decision=self.pet_executive.consider_mobile_attention(result['evidence_id'],
+            primary_priority=max(self.priority,self.pending[1] if self.pending else 0),
+            methods=methods,resources=resources|service.executive_resources,
+            authorized_methods=methods-({'pet_follow'} if not readiness['pet_follow']['available'] else set()))
+        self.pet_choice_key=key;self.pet_choice_at=at;self.pet_choice=decision
+        service.accept_attention(result,decision)
+
     def handle_event(self, event, data):
+        if event == 'mobile_opportunity':
+            self._consider_pet(data)
+            return
+        if self.pet_service is not None and event in ('scan','vision_target','calibrate_neck','confirm_neck_start','emergency_stop','pet_yield'):
+            self.pet_choice_key=None
+            self.pet_service.yield_attention(event)
+        if event in ('emergency_stop','pet_yield'):return
         if event in ('calibrate_neck', 'confirm_neck_start'):
             self.deck.brain_calibration(confirm=event == 'confirm_neck_start')
 
@@ -179,6 +221,8 @@ class AttentionManager:
         """
         Stop the mobile sidecar cleanly when Charlie shuts down.
         """
+        if self.pet_service is not None:
+            self.pet_service.yield_attention('application_shutdown')
         if self.mobile is not None:
             try:
                 self.mobile.exit()

@@ -33,6 +33,34 @@ class MemoryEvaluator:
     THRESHOLD = 0.4
 
     @staticmethod
+    def evaluate_mobile_attention(journal, event_id, measurement_ref=None):
+        """Conservative operational review; wire ACK never proves following."""
+        from learning.mobile_safety import artifact
+        event=journal.get(event_id);p=event.data['payload']
+        if p.get('category')!='mobile_attention_episode':raise ValueError('attention episode required')
+        measured=artifact(measurement_ref) if measurement_ref else None
+        outcome='unobserved' if p['execution'].get('dispatched') else 'abstained'
+        if measured is not None:
+            if (measured.get('attention_event_id')!=event_id or measured.get('authentic') is not True
+                    or not event.data['provenance'].get('authentic') or not measured.get('witness')
+                    or not measured.get('raw_artifacts') or measured.get('frame_id')!=p['frame']['id']):
+                raise ValueError('independent episode/frame-bound observation required')
+            import hashlib
+            from pathlib import Path
+            for ref in measured['raw_artifacts']:
+                if hashlib.sha256(Path(ref['path']).read_bytes()).hexdigest()!=ref['sha256']:
+                    raise ValueError('changed consequence measurement')
+            outcome='measured; physical acceptance evaluated separately'
+        return journal.append('event',dict(category='mobile_attention_evaluation',attention_event_id=event_id,
+            outcome=outcome,measurement=measurement_ref,learned_improvement=False,identity_established=False),
+            episode=event.data['episode'],sources=[event_id],producer='MemoryEvaluator',version='mobile-evaluation-v1')
+
+    @staticmethod
+    def evaluate_mobile_labels(journal, source_ids):
+        from learning.mobile_review import evaluate_labels
+        return evaluate_labels(journal,source_ids)
+
+    @staticmethod
     def assess_motion_measurement_provenance(corpus):
         """Check the external verification protocol, never a candidate's claims.
 

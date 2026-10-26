@@ -36,11 +36,29 @@ def parser():
     p.add_argument('--learning-cooldown-seconds',type=float,help='maximum continuous cooldown; bounded runs default 120s')
     p.add_argument('--allow-offline-improvements',action='store_true',
         help='external authority for independently qualified offline-shadow candidates only')
+    mobile=p.add_mutually_exclusive_group()
+    mobile.add_argument('--mobile-replay',type=Path,help='unarmed offline mobile fixture replay')
+    mobile.add_argument('--mobile-observe',action='store_true',help='unarmed car-camera perception only; no Deck or mobile actuator initialization')
+    mobile.add_argument('--pet-abilities',action='store_true',help='normal AttentionManager/Executive pet abilities using existing mobile sensing')
+    mobile.add_argument('--pet-follow',action='store_true',help='same abilities; physical follow still requires independent current activation')
+    p.add_argument('--list-capabilities',action='store_true',help='inspect normal ability catalog without initializing any devices')
+    p.add_argument('--mobile-zone',default='unqualified',help='independently inspected zone identity')
+    p.add_argument('--mobile-hardware-id',default='unverified',help='verified physical car identity')
+    p.add_argument('--mobile-safety-feed',type=Path,help='independently qualified, frame-bound sensor snapshots; absent fails closed')
+    p.add_argument('--mobile-manifest',type=Path,help='hash-bound Hailo-8L object/depth export contracts')
+    p.add_argument('--mobile-frames',type=int,default=10000)
+    p.add_argument('--mobile-seconds',type=float,default=300.)
+    p.add_argument('--mobile-max-faults',type=int,default=10)
+    p.add_argument('--mobile-retain',choices=['none','events','all'],default='events')
+    p.add_argument('--mobile-captures',type=int,default=100)
     return p
 
 
 def main(argv=None):
     args=parser().parse_args(argv)
+    if args.list_capabilities:
+        from learning.capabilities import default_registry
+        print(json.dumps(default_registry().describe(),indent=2));return
     if args.learning_turns and not args.offline:
         raise ValueError('bounded acceptance runs must be offline')
     roots=args.episode_root or [Path(__file__).resolve().parent/'robotron-runs']
@@ -55,6 +73,14 @@ def main(argv=None):
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
                 turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources,
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
+    if args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow:
+        if args.pet_follow and args.offline:
+            raise ValueError('physical pet following requires explicit --hardware; --offline never actuates')
+        if not args.pet_follow and not args.offline:
+            raise ValueError('mobile observation entry point cannot combine with --hardware')
+        from learning.mobile_runtime import run_mobile
+        run_mobile(args,resources)
+        return
     if args.offline:
         run(args.learning_state,roots,**kwargs)
         return

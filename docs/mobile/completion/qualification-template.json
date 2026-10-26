@@ -1,0 +1,61 @@
+{
+  "schema": "charlie.mobile.qualification.v1",
+  "authentic": false,
+  "runtime_sha256": "77990e4eff18e44d568b72338d23709a34fb0ec0a1b8ceb1bfd58f8c30610514",
+  "hardware_id": null,
+  "zone": null,
+  "witness": null,
+  "measured_utc": null,
+  "firmware_sha256": null,
+  "bridge_sha256": null,
+  "model_sha256": null,
+  "sensor_producer_sha256": null,
+  "protocol_artifact": {
+    "path": null,
+    "sha256": null
+  },
+  "envelope": {
+    "max_pwm": null,
+    "max_duration": null,
+    "max_stop_seconds": null,
+    "max_stop_m": null,
+    "stand_off_m": null,
+    "margin_m": null
+  },
+  "direction_envelopes": {
+    "LEFT": {
+      "max_pwm": null,
+      "max_duration": null
+    },
+    "RIGHT": {
+      "max_pwm": null,
+      "max_duration": null
+    },
+    "FORWARD": {
+      "max_pwm": null,
+      "max_duration": null
+    },
+    "REVERSE": {
+      "max_pwm": null,
+      "max_duration": null
+    }
+  },
+  "trials": {
+    "stationary_vision": [],
+    "explicit_stop": [],
+    "tcp_loss": [],
+    "pi_loss": [],
+    "local_expiry": [],
+    "power_cutoff": [],
+    "wheels_up": [],
+    "floor_braking": [],
+    "obstacle_abort": [],
+    "edge_abort": [],
+    "target_loss": [],
+    "preemption": [],
+    "proxy_follow": [],
+    "live_pet_follow": [],
+    "voluntary_decline": [],
+    "restart_revoke": []
+  }
+}

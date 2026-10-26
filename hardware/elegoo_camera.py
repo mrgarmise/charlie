@@ -1,6 +1,7 @@
 import threading
 import time
 import urllib.request
+import hashlib
 
 import cv2
 import numpy as np
@@ -26,6 +27,7 @@ class ElegooCamera:
         self.user_agent = user_agent
 
         self.response = None
+        self._camera_lease = None
         self.buffer = bytearray()
 
         self._running = False
@@ -39,11 +41,18 @@ class ElegooCamera:
         self._last_read_id = 0
 
         self._error = None
+        self._received_at = None
+        self._generation = 0
+        self._closed = False
 
     def open(self):
         if self._running:
             return
 
+        self.close()  # Release a previous failed stream before reconnecting.
+        if self._thread is not None and self._thread.is_alive():
+            raise TimeoutError("previous camera reader has not stopped")
+        self._closed = False
         request = urllib.request.Request(
             self.stream_url,
             headers={
@@ -51,23 +60,33 @@ class ElegooCamera:
             },
         )
 
-        self.response = urllib.request.urlopen(
-            request,
-            timeout=self.timeout,
-        )
+        from hardware.hailo_session import accelerator_lease
+        key=hashlib.sha256(self.stream_url.encode()).hexdigest()[:16]
+        lease=accelerator_lease(f'/tmp/charlie-elegoo-camera-{key}.lock')
+        lease.__enter__();self._camera_lease=lease
+        try:
+            self.response = urllib.request.urlopen(request,timeout=self.timeout)
+        except BaseException:
+            self.close();raise
 
         self.buffer = bytearray()
         self._error = None
+        with self._condition:
+            self._latest_frame = None
+            self._received_at = None
         self._running = True
 
         self._thread = threading.Thread(
             target=self._reader_loop,
+            args=(self.response, self._generation),
             name="ElegooCameraRX",
             daemon=True,
         )
         self._thread.start()
 
     def close(self):
+        self._closed = True
+        self._generation += 1
         self._running = False
 
         response = self.response
@@ -81,15 +100,21 @@ class ElegooCamera:
 
         if self._thread is not None:
             self._thread.join(timeout=1)
-            self._thread = None
+            if not self._thread.is_alive():
+                self._thread = None
 
+        if self._thread is None or not self._thread.is_alive():
+            lease,self._camera_lease=self._camera_lease,None
+            if lease is not None:lease.__exit__(None,None,None)
         with self._condition:
             self._condition.notify_all()
 
-    def _reader_loop(self):
+    def _reader_loop(self, response=None, generation=None):
+        response = response or self.response
+        generation = self._generation if generation is None else generation
         try:
-            while self._running:
-                chunk = self.response.read(4096)
+            while self._running and generation == self._generation:
+                chunk = response.read(4096)
 
                 if not chunk:
                     raise EOFError(
@@ -97,6 +122,8 @@ class ElegooCamera:
                     )
 
                 self.buffer.extend(chunk)
+                if len(self.buffer) > 2 * 1024 * 1024:
+                    raise ValueError("MJPEG frame exceeds bounded buffer")
 
                 while True:
                     jpg_start = self.buffer.find(
@@ -142,15 +169,17 @@ class ElegooCamera:
                     # Store only the newest frame. Older frames are
                     # intentionally discarded.
                     with self._condition:
+                        if generation != self._generation:return
+                        self._received_at = time.monotonic()
                         self._latest_frame = frame
                         self._frame_id += 1
                         self._condition.notify_all()
 
         except Exception as exc:
-            self._error = exc
+            if generation == self._generation:self._error = exc
 
         finally:
-            self._running = False
+            if generation == self._generation:self._running = False
 
             with self._condition:
                 self._condition.notify_all()
@@ -159,6 +188,7 @@ class ElegooCamera:
         self,
         timeout=2.0,
         require_new=True,
+        with_metadata=False,
     ):
         """
         Return the latest decoded frame.
@@ -176,6 +206,9 @@ class ElegooCamera:
             while True:
                 if self._error is not None:
                     raise self._error
+
+                if self._closed:
+                    raise InterruptedError("camera closed")
 
                 has_frame = (
                     self._latest_frame
@@ -198,6 +231,10 @@ class ElegooCamera:
                         self._frame_id
                     )
 
+                    if with_metadata:
+                        return frame, dict(sequence=self._frame_id, received_at=self._received_at,
+                            clock_domain="pi-monotonic", stream_generation=self._generation, captured_at_source=None,
+                            sync_uncertainty_seconds=None, compression="MJPEG")
                     return frame
 
                 remaining = (

@@ -11,21 +11,33 @@ class Capability:
     limitations: tuple
     evaluation: str
     execution: str = 'offline'
+    body: str | None = None
+    prerequisites: tuple = ()
+    conflicts: tuple = ()
+    lifecycle: str | None = None
 
 class CapabilityRegistry:
     def __init__(self): self._items={}
     def register(self, capability):
         if capability.id in self._items: raise ValueError('capability already registered')
         self._items[capability.id]=capability
-    def describe(self): return [asdict(c) for c in self._items.values()]
+    def describe(self, readiness=None):
+        rows=[asdict(c) for c in self._items.values()]
+        for row in rows:
+            if row['id'] in ('pet_observe','pet_follow'):
+                state=(readiness or {}).get(row['id'],dict(available=False,reasons=['runtime not attached']))
+                row.update(readiness=state,independently_qualified=state.get('qualified',False))
+        return rows
     def get(self, identifier): return self._items[identifier]
     def invoke(self, identifier, *, resources, authorized, **inputs):
         capability=self.get(identifier)
         if identifier not in authorized or set(capability.inputs)-set(resources):
             raise ValueError('available inputs and separate method authorization required')
-        if identifier == 'mobile-observe':
+        if identifier in ('mobile-observe','pet_observe'):
             from .mobile import observe_capability
             return observe_capability(**inputs)
+        if identifier == 'pet_follow':
+            return inputs['service'].follow_step()
         if identifier == 'mobile-navigation-proposal':
             return inputs['navigator'].propose(inputs['observation'], inputs['tracking'], inputs['telemetry'])
         if identifier in ('cnn-reconstruction','cnn-classification','cnn-validation-extension'):
@@ -60,10 +72,23 @@ class CapabilityRegistry:
 def default_registry():
     registry=CapabilityRegistry()
     for item in (
+        Capability('pet_observe','Electively inspect animal hypotheses with existing camera and Executive',
+          ('mobile-camera','mobile-models'),('mobile-observation','attention-decision'),.3,
+          ('class hypothesis is not identity','no physical authority'), 'immutable observations and independent review',
+          execution='unarmed-perception',body='ELEGOO',prerequisites=('camera lease','Hailo lease'),
+          conflicts=('legacy mobile face control','Robotron Hailo','thermal/power','higher attention'),
+          lifecycle='discover/consider/lease/observe/yield/bookmark; fresh inputs after restart'),
+        Capability('pet_follow','Electively follow a sensor-grounded willing animal in an independently qualified zone',
+          ('mobile-camera','mobile-models','qualified-car-local-controller','motion-lease'),('proposal','guard','wire','ack','unknown-or-measured-consequence'),1.,
+          ('requires independent activation and fresh frame/pose/range','no identity or welfare inference from classifier'),
+          'staged witnessed physical qualification',execution='guarded-physical',body='ELEGOO',
+          prerequisites=('deployment qualification','boot/zone-bound authority','pet-associated range','safe corridor'),
+          conflicts=('legacy mobile face control','Robotron Hailo','primary activity','human/pet avoidance'),
+          lifecycle='consider/activate/bounded approach/hold/yield/abort/journal; never resume motion on restart'),
         Capability('mobile-evidence-review','Retrieve original species predictions and independent operator labels',('native-labeled-mobile-evidence',),('label-review','evidence-gap'),.1,('correlated frames are one evidence group','no physical or model activation'),'immutable pixel-bound operator annotations'),
         Capability('mobile-observe','Acquire unarmed mobile species/depth evidence for an existing Executive investigation',('mobile-camera','mobile-models'),('mobile-observation','evidence-deficiency'),.3,('no actuation authority','species is not individual pet identity','native model qualification required for authentic projects'),'independent replay labels and native source provenance',execution='unarmed-perception'),
         Capability('mobile-navigation-proposal','Evaluate bounded local motion proposals without physical execution',('mobile-observation','car-telemetry'),('mobile-proposal','safety-veto'),.1,('relative depth is not metric clearance','no qualified car-local backend supplied'),'independent safety fault injection'),
-        Capability('mobile-mobility','Prospective independently qualified car-local motion',('qualified-car-local-controller','motion-lease'),('execution-acknowledgement',),1.,('no physical implementation authorized by software mission',),'separately authorized empty-room then pet-present qualification',execution='unavailable'),
+        Capability('mobile-mobility','Prospective independently qualified car-local motion',('qualified-car-local-controller','motion-lease'),('execution-acknowledgement',),1.,('independent mobile qualification and activation required',),'separately authorized empty-room then pet-present qualification',execution='unavailable'),
         Capability('score-reader-evaluation','Independently compare an existing Charlie-originated score-reader candidate with immutable pre-review predictions',('score-reader-candidate','reviewed-score-evidence'),('reader-evaluation','evidence-deficiency'),.1,('no candidate generation or deployment authority','sealed final reader protocol unavailable','source groups may not overlap training'),'hash-bound independent labels; diagnostic or validation only'),
         Capability('meditation-motion','Generate executable temporal planning candidates from preserved meditation',('meditation-evidence',),('candidate','evidence-gate-result'),.1,('unverified retrospective tracks cannot qualify evaluation','no physical activation adapter'),'fresh independently verified trajectories required'),
         Capability('evidence-review','Search frozen experience references for recurring unresolved questions',('context-evidence',),('retrieval-resolution',),.05,('reported questions are not established causal facts',),'distinct source episodes; unknown provenance abstains'),

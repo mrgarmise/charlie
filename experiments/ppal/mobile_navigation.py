@@ -81,6 +81,8 @@ class MobileNavigator:
         for name in ('floor_clearance','hazard_map','blind_spot','lateral_clearance'):
             if telemetry.get(name,{}).get('clear') is not True:reasons.append(f'{name}_uncertain')
         if telemetry.get('pet_distress') is not False:reasons.append('humane_condition_unverified')
+        for name in ('pet_willing','human_clear','zone_inspected','power_ok'):
+            if name in telemetry and telemetry[name] is not True:reasons.append(name+'_veto')
         action='stop'
         if not reasons:
             w=frame['geometry'][0]; x,_,r,_=target['box']; offset=((x+r)/2)/w-.5
@@ -134,6 +136,9 @@ class MobileExecutionGate:
             ack=self.backend.execute_bounded(proposal,lease=self.lease)
             result.update(dispatched=True, acknowledged=ack.get('acknowledged') is True,
                           executed=ack.get('executed') if type(ack.get('executed')) is bool else None)
+            if 'stop' in ack:result['stop']=ack['stop']
+            if 'wire' in ack:result['wire']=ack['wire']
+            if ack.get('bounded_complete'):self.active=False
             if not result['acknowledged']:self.backend.stop(); self.active=False
         except Exception as exc:
             result.update(approved=False,rejected=['controller_error'],error=type(exc).__name__)
@@ -146,3 +151,47 @@ class MobileExecutionGate:
             try:self.backend.stop()
             finally:self.active=False
         self.lease=MotionLease()
+
+
+class QualifiedMobileExecutor:
+    """Adapter behind the existing gate, using the existing MobileBase only.
+
+    No direct detector motor calls. No device opens until deployment validates.
+    """
+    def __init__(self,base,context,*,clock=time.monotonic,cancel=None):
+        self.base,self.context,self.clock,self.cancel=base,context,clock,cancel
+        self.car_local_qualified=True;self.used=set();self.last_stop=None
+
+    def execute_bounded(self,proposal,*,lease):
+        active,report=self.context.activation()
+        c=self.context.current
+        if (c is None or proposal['id'] in self.used or not self.context.safe(proposal)
+                or not lease.valid(self.clock(),self.context.boot_id)
+                or proposal.get('binding')!=self.binding(c)):
+            raise ValueError('expired/replayed/unbound mobile dispatch')
+        self.used.add(proposal['id'])
+        if len(self.used)>256:raise ValueError('bounded executor session exhausted; renew episode')
+        if proposal['action']=='stop':return self.stop()
+        direction=proposal['direction'] if proposal['action']=='turn' else 'FORWARD'
+        envelope=report['envelope']
+        pwm=max(1,int(envelope['max_pwm']*proposal['speed']/.15))
+        result=self.base.pulse(direction,pwm=pwm,seconds=min(proposal['duration'],envelope['max_duration']),
+            lease=lease,boot_id=self.context.boot_id,envelope=envelope,
+            safety_check=lambda:self.context.safe(proposal),cancel=self.cancel)
+        self.last_stop=result.get('stop')
+        return dict(acknowledged=result['acknowledged'],executed=None,bounded_complete=True,
+                    wire=result.get('command'),stop=result.get('stop'),physically_observed=None)
+
+    @staticmethod
+    def binding(context):
+        from memory.evidence import digest
+        return digest(dict(frame=context['observation']['frame'],sensors=context['observation']['sensors'],
+            target=context['tracking']['target'],activation=context['activation']['activation_key']))
+
+    def stop(self):
+        self.last_stop=self.base.stop_verified()
+        return self.last_stop
+
+    def close(self):
+        try:self.stop()
+        finally:self.base.close()

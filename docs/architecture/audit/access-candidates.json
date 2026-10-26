@@ -1,6 +1,6 @@
 {
   "schema": "charlie.sensory-audit.candidates.v1",
-  "source_commit": "a19c90822687739f79f69587302006a1bd6364d4",
+  "source_commit": "ed37a3ac1dd863342b9cce30a60fe98258c4a5e5",
   "scope": "Tracked Python and current checkout; tests excluded. Lexical candidates include comments, mocks and legacy scripts; not proof of runtime access. See CONFORMANCE.md for classification.",
   "candidates": [
     {
@@ -45,8 +45,28 @@
     },
     {
       "path": "experiments/ppal/detector_bridge.py",
+      "line": 100,
+      "excerpt": "hef = HEF(str(path))"
+    },
+    {
+      "path": "experiments/ppal/detector_bridge.py",
+      "line": 101,
+      "excerpt": "if not Device.scan(): raise RuntimeError('no Hailo device')"
+    },
+    {
+      "path": "experiments/ppal/detector_bridge.py",
       "line": 131,
       "excerpt": "self._session=HailoSession(self.path,sha256=self.sha256,input_shape=(self.size,self.size,3),timeout=self.timeout,lock=self.lock)"
+    },
+    {
+      "path": "experiments/ppal/detector_bridge.py",
+      "line": 134,
+      "excerpt": "hef=HEF(self.path)"
+    },
+    {
+      "path": "experiments/ppal/detector_bridge.py",
+      "line": 136,
+      "excerpt": "with VDevice() as device:"
     },
     {
       "path": "experiments/ppal/eyes/autofocus.py",
@@ -122,6 +142,11 @@
       "path": "experiments/ppal/play_robotron.py",
       "line": 617,
       "excerpt": "source = ObservedCamera(camera_session.borrow() if camera_session else PiCameraSource(), require_fresh=args.arm, progress=progress)"
+    },
+    {
+      "path": "experiments/ppal/play_robotron.py",
+      "line": 792,
+      "excerpt": "recorder=CaptureEvidence(args.output,diary.capture_origin['capture_id'],provenance,"
     },
     {
       "path": "experiments/ppal/preflight.py",
@@ -202,6 +227,16 @@
       "path": "hardware/hailo_session.py",
       "line": 34,
       "excerpt": "stack.enter_context(accelerator_lease(self.lock))"
+    },
+    {
+      "path": "hardware/hailo_session.py",
+      "line": 38,
+      "excerpt": "hef=HEF(self.path);inputs=hef.get_input_vstream_infos();outputs=hef.get_output_vstream_infos()"
+    },
+    {
+      "path": "hardware/hailo_session.py",
+      "line": 42,
+      "excerpt": "device=stack.enter_context(VDevice())"
     },
     {
       "path": "hardware/rp2040_controller.py",
@@ -322,6 +357,16 @@
       "path": "tools/benchmark_buffered_recording.py",
       "line": 51,
       "excerpt": "camera=ObservedCamera(raw,require_fresh=args.native_camera)"
+    },
+    {
+      "path": "tools/benchmark_tactical_feedback.py",
+      "line": 71,
+      "excerpt": "root=Path(directory);recorder=CaptureEvidence(root,'recording-benchmark-not-a-game',"
+    },
+    {
+      "path": "tools/benchmark_tactical_feedback.py",
+      "line": 80,
+      "excerpt": "restarted=CaptureEvidence(root,'recording-benchmark-not-a-game',dict(simulated=True))"
     },
     {
       "path": "tools/calibrate_neck.py",

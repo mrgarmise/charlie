@@ -13,6 +13,7 @@ def test_late_subscribers_history_and_provenance_do_not_control_capture():
     original = frame()
     bus.publish_frame('pi-primary', owner, original)
     original.camera_identity['device'] = 'producer mutation'
+    assert bus.latest_frame('pi-primary', clock=lambda: 1.).camera_identity == {'device': 'fixture'}
     for seq in (2, 3):
         bus.publish_frame('pi-primary', owner, frame(sequence=seq))
     late = bus.subscribe_frames('pi-primary', clock=lambda: 1.)
@@ -69,5 +70,7 @@ def test_ordering_generation_and_oversize_retention():
     assert consumer.read().id == '1'  # live delivery survives history budget
     assert tiny.latest_frame('pi-primary', clock=lambda: 1.) is None
     assert tiny.frame_evictions['pi-primary'] == 1
+    with pytest.raises(ValueError, match='out-of-order'):
+        tiny.publish_frame('pi-primary', owner, frame())
     with pytest.raises(ValueError):
         StimulusBus(history_frames=0)

@@ -39,7 +39,7 @@ Canonical changes: `docs/CHARLIE_ARCHITECTURE.md`,
 `CONFORMANCE.md`, this report and machine audit inventories/validation receipts.
 The conformance matrix classifies acquisition owners, wrappers/borrowers,
 Robotron/Active Vision/mobile/legacy consumers, Hailo, telemetry, evidence and
-serial/motor transports. The candidate inventory contains 80 lexical source
+serial/motor transports. The candidate inventory contains 89 lexical source
 matches; it is not an assertion that every match opens hardware.
 
 Confirmed remaining gaps: general modality discovery, remote clock mappings and
@@ -67,9 +67,16 @@ host environment; installing `opencv-python-headless` resolved those import
 failures. No production source was changed to hide them. Python 3.12, pytest
 9.1.1, pyserial 3.5, NumPy 2.3.5 and OpenCV 5.0.0 were used.
 
-The broader device-free suite is running at this milestone; its result must not
-be inferred from this focused success. `.github/workflows/sensory-audit.yml`
-provides independent full-suite CI and retains JUnit output. Host fixtures and
+The full device-free host suite passed **1,373 tests / 21 skipped / zero failures**
+in 327.80 seconds, with one existing pytest `record_property`/JUnit compatibility
+warning. It ran the published runtime tree (local commit `d25faed`, identical tree
+`6ddb926da7fcbbe06bd594e72f2516ccaa6b71ab` to published commit
+`ed37a3ac1dd863342b9cce30a60fe98258c4a5e5`). Final test-only strengthening adds
+explicit producer-mutation isolation and duplicate rejection after byte eviction;
+all 3 history tests then passed in 0.10 seconds. No runtime changes followed the
+full run. Full console output and compressed JUnit are retained under `audit/`.
+`.github/workflows/sensory-audit.yml` provides independent full-suite CI and
+retains JUnit output. Independent [GitHub CI run 40254634149](https://github.com/mrgarmise/charlie/actions/runs/40254634149) passed **1,373 tests / 21 skipped / zero failures** in 354.64 seconds on the published runtime increment. Its exact test summary and source identity are retained in `audit/validation.json`. Host fixtures and
 simulations do not establish new Pi/Hailo inference, physical capture, firmware
 installation, thermal throughput or safe navigation.
 
@@ -90,3 +97,23 @@ calibration, physical servo/chassis movement, navigation or policy activation.
 None occurred. To undo the audit software, revert its commit(s) in a clean
 isolated checkout; no device rollback is required. Preserve both active feature
 branches and all original journals before any future reconciliation.
+
+## Publication and preservation receipt
+
+[Draft PR #12](https://github.com/mrgarmise/charlie/pull/12) targets PR #11 and
+preserves both existing feature branches. Direct shell push lacked authentication;
+publication used the connected GitHub service. The published initial commit and
+tested local commit have different metadata/SHAs but exactly the same tree.
+The final documentation/test receipt is a separate descendant, without runtime
+changes. `git diff --check` and local relative-document-link checks passed.
+A final read confirmed PR #10 remained at `cafe21aa` and PR #11 at `a19c908`.
+No changes occurred under `rp2040/`, `hardware/`, `motion/`, `tests/fixtures/`,
+`docs/mobile/` or `docs/object-display/` relative to the examined PR #11 head.
+
+Remaining implementation is intentionally staged rather than hidden behind a
+conformance claim: cross-body discovery needs authority/clock adapters for actual
+installed producers; remote history needs a qualified bounded remote publisher;
+default bookmarks need reconciliation of normal/object and latest pet evidence
+retention so preservation failures remain explicit; fair Hailo scheduling needs
+native resource measurements. Each is mapped to code and qualification in the
+conformance table. None is certified by this RAM-history correction.

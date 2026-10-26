@@ -180,7 +180,7 @@ class QualifiedMobileExecutor:
         if len(self.used)>256:raise ValueError('bounded executor session exhausted; renew episode')
         if proposal['action']=='stop':return self.stop()
         direction=proposal['direction'] if proposal['action']=='turn' else 'FORWARD'
-        envelope=report['envelope']
+        envelope=report['direction_envelopes'][direction]
         pwm=max(1,int(envelope['max_pwm']*proposal['speed']/.15))
         self.last_attempt=dict(wire_delivery='unknown until independent response',proposal_id=proposal['id'])
         result=self.base.pulse(direction,pwm=pwm,seconds=min(proposal['duration'],envelope['max_duration']),

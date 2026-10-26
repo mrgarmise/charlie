@@ -153,7 +153,7 @@ def test_attention_uses_executive_and_debounces_species_flip(monkeypatch):
 def test_existing_gate_binds_frame_sensors_authority_and_single_dispatch():
     from experiments.ppal.mobile_navigation import QualifiedMobileExecutor,MobileExecutionGate
     from memory.evidence import digest
-    c=Mock();c.boot_id='boot';c.activation.return_value=({'activation_key':'grant'},{'envelope':{'max_pwm':35,'max_duration':.2}})
+    c=Mock();c.boot_id='boot';c.activation.return_value=({'activation_key':'grant'},{'envelope':{'max_pwm':35,'max_duration':.2},'direction_envelopes':{'FORWARD':{'max_pwm':35,'max_duration':.2}}})
     c.current={'observation':{'frame':{'id':'frame'},'sensors':{}},'tracking':{'target':{'id':'animal'}},'activation':{'activation_key':'grant'}}
     c.safe.return_value=True
     base=Mock();base.pulse.return_value={'acknowledged':True,'command':{'N':3},'stop':{'sent':True}}
@@ -206,13 +206,14 @@ def qualification_control(tmp_path):
         firmware_sha256='a'*64,bridge_sha256='b'*64,model_sha256='c'*64,sensor_producer_sha256='d'*64,
         protocol_artifact=protocol,envelope=dict(max_pwm=35,max_duration=.1,max_stop_seconds=.3,max_stop_m=.1,
                                                stand_off_m=1.,margin_m=.2),trials={})
+    report['direction_envelopes']={d:{'max_pwm':35,'max_duration':.1} for d in ('LEFT','RIGHT','FORWARD','REVERSE')}
     for stage in REQUIRED+('live_pet_follow','voluntary_decline','restart_revoke'):
         refs=[]
-        for n in range(3):
+        for n in range(12 if stage in ('wheels_up','floor_braking') else 3):
             raw=write(f'{stage}-{n}-raw.json',{'software_control_only':True,'stage':stage,'sample':n})
             refs.append(write(f'{stage}-{n}.json',dict(stage=stage,authentic=True,passed=True,
                 hardware_id='fictional-car',zone='fixture-bench',firmware_sha256='a'*64,witness='SOFTWARE CONTROL ONLY',
-                utc='fixture',surface='fixture-flat',battery_v=7.5,trial_id=f'{stage}-{n}',measurements={'stop_seconds':.1,'post_stop_m':.01,'stop_uncertainty_seconds':.01,'distance_uncertainty_m':.005},raw_artifacts=[raw])))
+                direction=('LEFT','RIGHT','FORWARD','REVERSE')[n%4],utc='fixture',surface='fixture-flat',battery_v=7.5,trial_id=f'{stage}-{n}',measurements={'command_pwm':35,'requested_seconds':.1,'stop_seconds':.1,'post_stop_m':.01,'stop_uncertainty_seconds':.01,'distance_uncertainty_m':.005},raw_artifacts=[raw])))
         report['trials'][stage]=refs
     return report,write
 
@@ -314,3 +315,46 @@ def test_unqualified_scene_pose_or_feed_never_admits(change,tmp_path):
     path.write_text(json.dumps(feed))
     assert c.bind(o,t)['qualification']=='unqualified' and c.current is None
     j.close()
+
+
+def test_existing_motor_owner_excludes_second_client_and_releases(monkeypatch):
+    from uuid import uuid4
+    sock=Mock();sock.recv.return_value=b''
+    monkeypatch.setattr('hardware.elegoo_mobile.socket.create_connection',Mock(return_value=sock))
+    key=uuid4().hex;a=ElegooMobileBase(host=key);b=ElegooMobileBase(host=key)
+    a.connect()
+    with pytest.raises(BlockingIOError):b.connect()
+    a.close();b.connect();b.close()
+
+
+def test_existing_camera_lease_excludes_second_and_cleans_failed_open(monkeypatch):
+    from hardware.elegoo_camera import ElegooCamera
+    from uuid import uuid4
+    response=Mock();response.read.return_value=b''
+    monkeypatch.setattr('hardware.elegoo_camera.urllib.request.urlopen',Mock(return_value=response))
+    key='http://fixture-'+uuid4().hex+'/stream';a=ElegooCamera(key);b=ElegooCamera(key)
+    a.open()
+    with pytest.raises(BlockingIOError):b.open()
+    a.close();b.open();b.close()
+    monkeypatch.setattr('hardware.elegoo_camera.urllib.request.urlopen',Mock(side_effect=OSError('fixture')))
+    for _ in range(2):
+        with pytest.raises(OSError,match='fixture'):a.open()
+    a.close()
+
+
+def test_supervised_calibration_dry_run_has_no_device_and_cannot_skip_staging(tmp_path):
+    from learning.mobile_safety import calibration_trial,runtime_hash
+    from memory.evidence import EvidenceJournal
+    report,write=qualification_control(tmp_path)
+    protocol=json.loads(__import__('pathlib').Path(report['protocol_artifact']['path']).read_text())
+    protocol['local_expiry_source_verified']=True
+    trial=dict(schema='charlie.mobile.calibration-trial.v1',runtime_sha256=runtime_hash(),stage='wheels_up',
+        witness='software control only',hardware_id='fictional-car',zone='fixture-bench',supervised=True,
+        power_cutoff_accessible=True,no_animals=True,no_people_in_path=True,isolated_flat_test_area=True,wheels_clear=True,
+        firmware_sha256='a'*64,bridge_sha256='b'*64,protocol_artifact=write('cal-protocol.json',protocol),direction='FORWARD',pwm=25,seconds=.1)
+    j=EvidenceJournal(tmp_path/'cal.sqlite3');base=Mock(side_effect=AssertionError('no hardware'))
+    result=calibration_trial(j,write('trial.json',trial),base_factory=base)
+    assert result['executed'] is None and 'no device' in result['disposition'];base.assert_not_called()
+    trial['stage']='empty_floor'
+    with pytest.raises((KeyError,ValueError)):calibration_trial(j,write('floor.json',trial),execute=True,base_factory=base)
+    base.assert_not_called();j.close()

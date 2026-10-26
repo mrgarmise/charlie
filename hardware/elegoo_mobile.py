@@ -4,6 +4,7 @@ import threading
 import time
 import itertools
 import math
+import hashlib
 from dataclasses import dataclass
 
 
@@ -64,6 +65,7 @@ class ElegooMobileBase:
         self.min_pan_step = min_pan_step
 
         self.sock = None
+        self._body_lease = None
         self._rx_buffer = ""
         self._counter = itertools.count(1)
 
@@ -89,10 +91,15 @@ class ElegooMobileBase:
 
         self.close()
 
-        self.sock = socket.create_connection(
-            (self.host, self.port),
-            timeout=5,
-        )
+        from hardware.hailo_session import accelerator_lease
+        key=hashlib.sha256(f'{self.host}:{self.port}'.encode()).hexdigest()[:16]
+        lease=accelerator_lease(f'/tmp/charlie-elegoo-body-{key}.lock')
+        lease.__enter__()
+        self._body_lease=lease
+        try:
+            self.sock = socket.create_connection((self.host,self.port),timeout=5)
+        except BaseException:
+            self.close();raise
         self.sock.settimeout(0.25)
 
         self._running = True
@@ -136,6 +143,8 @@ class ElegooMobileBase:
             self._pending.clear()
 
         self._rx_buffer = ""
+        lease,self._body_lease=self._body_lease,None
+        if lease is not None:lease.__exit__(None,None,None)
 
     def __enter__(self):
         self.connect()

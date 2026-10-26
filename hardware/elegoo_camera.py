@@ -1,6 +1,7 @@
 import threading
 import time
 import urllib.request
+import hashlib
 
 import cv2
 import numpy as np
@@ -26,6 +27,7 @@ class ElegooCamera:
         self.user_agent = user_agent
 
         self.response = None
+        self._camera_lease = None
         self.buffer = bytearray()
 
         self._running = False
@@ -58,10 +60,14 @@ class ElegooCamera:
             },
         )
 
-        self.response = urllib.request.urlopen(
-            request,
-            timeout=self.timeout,
-        )
+        from hardware.hailo_session import accelerator_lease
+        key=hashlib.sha256(self.stream_url.encode()).hexdigest()[:16]
+        lease=accelerator_lease(f'/tmp/charlie-elegoo-camera-{key}.lock')
+        lease.__enter__();self._camera_lease=lease
+        try:
+            self.response = urllib.request.urlopen(request,timeout=self.timeout)
+        except BaseException:
+            self.close();raise
 
         self.buffer = bytearray()
         self._error = None
@@ -97,6 +103,9 @@ class ElegooCamera:
             if not self._thread.is_alive():
                 self._thread = None
 
+        if self._thread is None or not self._thread.is_alive():
+            lease,self._camera_lease=self._camera_lease,None
+            if lease is not None:lease.__exit__(None,None,None)
         with self._condition:
             self._condition.notify_all()
 

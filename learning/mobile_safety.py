@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 from memory.evidence import digest
 
-RUNTIME_FILES=('hardware/elegoo_mobile.py','motion/mobile_base.py','experiments/ppal/mobile_navigation.py',
+RUNTIME_FILES=('hardware/elegoo_camera.py','hardware/hailo_session.py','hardware/elegoo_mobile.py','motion/mobile_base.py','experiments/ppal/mobile_navigation.py',
  'attention/manager.py','behaviors/mobile_observe.py','learning/mobile.py','learning/mobile_runtime.py',
  'learning/mobile_safety.py','learning/capabilities.py','learning/deployment.py','main.py',
  'memory/learning_projects.py','memory/evaluator.py','learning/resources.py',
@@ -58,13 +58,19 @@ def validate_report(report, *, autonomous=False):
             or not finite(env.get('stand_off_m')) or env['stand_off_m']<1
             or not finite(env.get('margin_m')) or env['margin_m']<2*env['max_stop_m']
             or env['stand_off_m']<=env['margin_m']):raise ValueError('measured conservative envelope required')
+    directions=report.get('direction_envelopes',{})
+    if set(directions)!={'LEFT','RIGHT','FORWARD','REVERSE'}:raise ValueError('direction-specific calibration required')
+    for direction,limits in directions.items():
+        if (type(limits.get('max_pwm')) is not int or not 1<=limits['max_pwm']<=env['max_pwm']
+                or not finite(limits.get('max_duration')) or not 0<limits['max_duration']<=env['max_duration']):
+            raise ValueError('invalid direction-specific envelope: '+direction)
     required=REQUIRED+(('live_pet_follow','voluntary_decline','restart_revoke') if autonomous else ())
     if not isinstance(report.get('sensor_producer_sha256'),str) or len(report['sensor_producer_sha256'])!=64:
         raise ValueError('qualified sensor producer code identity required')
     for stage in required:
         trials=report.get('trials',{}).get(stage,[])
         if len(trials)<3:raise ValueError('three independent measured trials required: '+stage)
-        groups=set()
+        groups=set();direction_counts={d:0 for d in directions}
         for ref in trials:
             row=artifact(ref)
             if (row.get('stage')!=stage or row.get('authentic') is not True or row.get('passed') is not True
@@ -75,6 +81,13 @@ def validate_report(report, *, autonomous=False):
                 raise ValueError('incomplete independent trial: '+stage)
             if not row.get('trial_id') or row['trial_id'] in groups:raise ValueError('independent trial identities required')
             groups.add(row['trial_id'])
+            if stage in ('wheels_up','floor_braking'):
+                direction=row.get('direction')
+                if direction not in directions:raise ValueError('measured motion direction required')
+                direction_counts[direction]+=1
+                m=row['measurements'];limits=directions[direction]
+                if m.get('command_pwm')!=limits['max_pwm'] or m.get('requested_seconds')!=limits['max_duration']:
+                    raise ValueError('trial must exercise declared direction envelope')
             for raw in row['raw_artifacts']:
                 p=Path(raw['path'])
                 if hashlib.sha256(p.read_bytes()).hexdigest()!=raw['sha256']:raise ValueError('raw measurement changed')
@@ -85,6 +98,8 @@ def validate_report(report, *, autonomous=False):
                         or not finite(m.get('stop_seconds')) or not 0<=m['stop_seconds']+m['stop_uncertainty_seconds']<=env['max_stop_seconds']
                         or not finite(m.get('post_stop_m')) or not 0<=m['post_stop_m']+m['distance_uncertainty_m']<=env['max_stop_m']):
                     raise ValueError('stopping measurements exceed envelope')
+        if stage in ('wheels_up','floor_braking') and min(direction_counts.values())<3:
+            raise ValueError('each direction requires three distinct measured envelope trials')
     if (len({r['sha256'] for s in required for r in report['trials'][s]})!=sum(len(report['trials'][s]) for s in required)):
         raise ValueError('trial files must be distinct; replays are not independent')
     return report
@@ -182,8 +197,69 @@ class MobileSafetyContext:
                 check['frame_id']==proposal['frame_id'] and check.get('direction')==proposal.get('direction'))
 
 
+
+def calibration_trial(journal, trial_ref, *, execute=False, base_factory=None):
+    """One explicitly supervised empty-bench/floor pulse, never a follower.
+
+    Allows staged qualification without needing an already-passed follow trial.
+    The dry-run default opens no device. Installed protocol proof remains required.
+    """
+    trial=artifact(trial_ref)
+    if (trial.get('schema')!='charlie.mobile.calibration-trial.v1' or trial.get('runtime_sha256')!=runtime_hash()
+            or trial.get('stage') not in ('wheels_up','empty_floor') or not trial.get('witness')
+            or not trial.get('hardware_id') or not trial.get('zone') or trial.get('supervised') is not True
+            or any(trial.get(k) is not True for k in ('power_cutoff_accessible','no_animals','no_people_in_path','isolated_flat_test_area'))):
+        raise ValueError('current reviewed supervised isolated calibration trial required')
+    protocol=artifact(trial['protocol_artifact'])
+    if (protocol.get('installed_match') is not True or protocol.get('firmware_sha256')!=trial.get('firmware_sha256')
+            or protocol.get('bridge_sha256')!=trial.get('bridge_sha256') or not trial.get('firmware_sha256')
+            or protocol.get('motion')!={'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}
+            or protocol.get('local_expiry_source_verified') is not True):
+        raise ValueError('installed source-bound timer protocol required before first motor trial')
+    if trial['stage']=='wheels_up' and trial.get('wheels_clear') is not True:raise ValueError('wheels must be raised')
+    if trial['stage']=='empty_floor':
+        safety=artifact(trial['local_safety_artifact'])
+        if (safety.get('hardware_id')!=trial['hardware_id'] or safety.get('firmware_sha256')!=trial['firmware_sha256']
+                or safety.get('independently_measured') is not True or not safety.get('witness')
+                or any(safety.get(k) is not True for k in ('explicit_stop','tcp_loss','pi_loss','local_expiry','power_cutoff'))
+                or not safety.get('raw_artifacts')):raise ValueError('measured car-local safety required before floor trial')
+        for raw in safety['raw_artifacts']:
+            if hashlib.sha256(Path(raw['path']).read_bytes()).hexdigest()!=raw['sha256']:raise ValueError('local safety evidence changed')
+    direction,pwm,seconds=trial.get('direction'),trial.get('pwm'),trial.get('seconds')
+    if (direction not in ('LEFT','RIGHT','FORWARD','REVERSE') or type(pwm) is not int or not 1<=pwm<=35
+            or not finite(seconds) or not 0<seconds<=.2):raise ValueError('single bounded low-speed trial required')
+    request=dict(category='mobile_calibration_attempt',trial_artifact=trial_ref,stage=trial['stage'],
+        direction=direction,pwm=pwm,seconds=seconds,executed=None,physically_observed=None,
+        disposition='reviewed dry-run; no device' if not execute else 'physical attempt; measurements still required')
+    if execute:
+        import time
+        from uuid import uuid4
+        from experiments.ppal.mobile_navigation import MotionLease
+        from learning.resources import ResourceGuard
+        if base_factory is None:
+            from motion.mobile_base import MobileBase
+            base_factory=MobileBase
+        guard=ResourceGuard();guard.check(force=True)
+        base=base_factory();boot=uuid4().hex
+        try:
+            base.connect();lease=MotionLease('supervised_trial',time.monotonic()+.5,trial['witness'],boot)
+            try:
+                request['wire_result']=base.pulse(direction,pwm=pwm,seconds=seconds,lease=lease,boot_id=boot,
+                    envelope={'max_pwm':35,'max_duration':.2},safety_check=lambda:(guard.check(force=True) is None))
+            except BaseException as exc:
+                request.update(error=type(exc).__name__,delivery='unknown; inspect actual controller and measurements')
+                raise
+        finally:
+            try:request['stop']=base.stop_verified()
+            finally:
+                try:base.close()
+                finally:journal.append('event',request,episode='mobile-calibration',producer='supervised-calibration',version='mobile-safety-v1')
+        return request
+    journal.append('event',request,episode='mobile-calibration',producer='supervised-calibration',version='mobile-safety-v1')
+    return request
+
 def main(argv=None):
-    """Native acceptance record tools. None of these commands opens a device."""
+    """Native acceptance tools. Only calibrate --execute-supervised can open a device."""
     import argparse
     import platform
     import socket
@@ -193,6 +269,7 @@ def main(argv=None):
     sub.add_parser('inventory')
     e=sub.add_parser('evaluate');e.add_argument('--report',type=Path,required=True);e.add_argument('--autonomous',action='store_true')
     a=sub.add_parser('activate');a.add_argument('--qualification',required=True);a.add_argument('--authorization',type=Path,required=True)
+    c=sub.add_parser('calibrate');c.add_argument('--trial',type=Path,required=True);c.add_argument('--execute-supervised',action='store_true')
     r=sub.add_parser('revoke');r.add_argument('--reason',required=True);r.add_argument('--source',required=True)
     args=p.parse_args(argv)
     if args.action=='inventory':
@@ -212,6 +289,9 @@ def main(argv=None):
         elif args.action=='activate':
             if args.authorization.stat().st_size>65536:raise ValueError('bounded authorization required')
             row=CapabilityDeployment(journal).activate_mobile(args.qualification,authorization=json.loads(args.authorization.read_text()))
+        elif args.action=='calibrate':
+            ref=dict(path=str(args.trial.resolve()),sha256=hashlib.sha256(args.trial.read_bytes()).hexdigest())
+            print(json.dumps(calibration_trial(journal,ref,execute=args.execute_supervised)));return
         else:row=CapabilityDeployment(journal).revoke_mobile(reason=args.reason,authorization={'source':args.source})
         print(json.dumps(dict(record_id=row.id,action=args.action,device_connections=0)))
     finally:journal.close()

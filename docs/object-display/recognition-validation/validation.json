@@ -136,9 +136,31 @@
     "verification": "read-only installed bytes match existing manifest; no inference activation"
   },
   "limitations": [
-    "24 skips: missing torch (18), missing Node/browser runtime (3), unavailable original/archive acceptance artifacts (2), collection skip (1)",
+    "Local native suite: 24 skips (torch 18, Node/browser 3, archived originals 2, collection 1). Independent final-code CI: 21 skips; Node/browser checks execute there.",
     "No physical camera, UART, firmware flash, servo/motor, navigation or policy activation",
     "Physical accuracy, shared native throughput, thermals, lens configuration and display timing remain unqualified"
   ],
-  "earlier_receipts": "Failures and interruption remain historical; they are not relabeled as passing tests"
+  "earlier_receipts": "Failures and interruption remain historical; they are not relabeled as passing tests",
+  "github_actions": {
+    "source_commit": "217a329fc8850dac92ccbd38387b65a644eb8abb",
+    "source_tree": "26868e0212d235d5517d3cb7265d370f495f220f",
+    "run_id": 40252336655,
+    "job_id": 121346749169,
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/40252336655",
+    "conclusion": "success",
+    "passed": 1370,
+    "skipped": 21,
+    "failures": 0,
+    "seconds": 306.31,
+    "scope": "independent GitHub Actions full suite of exact published final runtime/test code",
+    "artifact": {
+      "id": 12620294978,
+      "name": "object-label-software-tests",
+      "digest": "sha256:6bb1a6e13fc60b96196522cd74d9f7b76f1bd83038702d0fcc7ced49fd031fb5"
+    },
+    "retained_log": {
+      "path": "docs/object-display/recognition-validation/github-ci.txt",
+      "sha256": "7bf148dc11854cd8aa0bf11c35fc81ce3aaff79be9a4e77622513690e9823106"
+    }
+  }
 }

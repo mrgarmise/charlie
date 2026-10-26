@@ -6,6 +6,7 @@ Normal Object Recognition uses Charlie's existing Hailo-8L object model, Attenti
 
 | Validation | Result and scope |
 |---|---|
+| Independent GitHub Actions, exact final published code | **1,370 passed, 21 skipped**, 306.31 seconds, zero failures. [Run 40252336655](https://github.com/mrgarmise/charlie/actions/runs/40252336655), source `217a329fc8850dac92ccbd38387b65a644eb8abb`. [Retained log and artifact digest](recognition-validation/github-ci.json). |
 | Native device-free full suite | **1,365 passed, 24 skipped**, 455.06 seconds; no failures. This run preceded the final mobile CLI subscription/poll-accounting refinements. |
 | Final focused selection | **97 passed**, including those refinements, owner-only capture, concurrent subscribers, source switching, uninterrupted other-consumer delivery, one-element backpressure, freshness, source generations, isolated provenance, separate-process subscribers, mode startup, existing learning supervision, real label serializer and legacy main startup/cleanup. |
 | Final publication subset | **3 passed** after the decode-freshness check. |
@@ -14,7 +15,7 @@ Normal Object Recognition uses Charlie's existing Hailo-8L object model, Attenti
 | Compilation / whitespace | Python compilation and `git diff --check` passed. |
 | Installed model identity | Existing manifest's 80-class, 640-input HEF matches installed SHA256 `90e2cdad2875f23fb436ecdba88b4789de3bd8112cdf6b34beb1c8aa9fd7eed1`; read-only inspection only. |
 
-The full suite's 24 skips remain explicit: torch absent (18), Node/browser runtime absent (3), original/archive acceptance artifacts unavailable (2), collection skip (1). One pytest JUnit `record_property` compatibility warning remains. No skipped neural/browser/archive case is represented as executed.
+The local native full suite's 24 skips remain explicit: torch absent (18), Node/browser runtime absent (3), original/archive acceptance artifacts unavailable (2), collection skip (1). The independent CI run executes the three Node/browser cases and has 21 skips. One pytest JUnit `record_property` compatibility warning remains. No skipped neural/browser/archive case is represented as executed.
 
 JUnit receipts are losslessly compressed (`*.xml.gz`) with original and compressed SHA256 values in the validation JSON. Earlier failed, sandbox-blocked and interrupted receipts/logs remain preserved. The first full sandbox run had 1,314 passes, 42 failures and 24 skips before corrections; it is not a passing receipt. The interrupted native run stopped after 22 passes/one skip while completing explicit no-device guards. The final suite allows loopback fixtures but rejects unmocked physical camera construction, serial opening and nonlocal HTTP video I/O.
 
@@ -23,3 +24,5 @@ The existing OpenCV preprocessing test now compares float32 values with a 0.0001
 No firmware or motion implementation changed. No physical camera activation, serial connection, firmware flash, servo/motor movement, navigation or policy activation was performed. Native inference accuracy/latency, thermal behavior, camera configuration and actual display timing remain outside these software receipts. PR #11 remains draft.
 
 For later authorized native operation, use the [normal command and subscription controls](ARCHITECTURE.md#normal-mode-and-provenance). The compatibility subscriber APIs require an existing authoritative publication; they never start a camera as a fallback. A standalone mobile observation command subscribes to the running application's feed. Physical Active Vision retains its actual feeder-role, calibration, firmware and scoped-motion gates.
+
+The final CI evidence update changes documentation/receipts only. Runtime and test source bytes remain those independently tested at `217a329fc8850dac92ccbd38387b65a644eb8abb`; the earlier native/focused receipts retain their original scopes.

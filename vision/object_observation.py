@@ -21,5 +21,6 @@ def object_observation(observation, tracking=None):
     return dict(schema='charlie.object-observation.v1',source=frame['source'],frame_id=frame['id'],
                 at=frame['received_at'],clock_domain=frame['clock_domain'],geometry=[w,h],objects=objects,
                 attention_target=dict(source=frame['source'],id=target['id']) if target else None,
+                camera_identity=frame.get('camera_identity'), stream_generation=frame.get('stream_generation'),
                 exposure_age_known=frame.get('source_age_known',False),qualification=observation['qualification'],
                 identity='class hypothesis only; no individual recognition')

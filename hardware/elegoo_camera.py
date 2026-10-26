@@ -42,6 +42,7 @@ class ElegooCamera:
         self._received_at = None
         self._generation = 0
         self._closed = False
+        self._ownership = None
 
     def open(self):
         if self._running:
@@ -58,10 +59,14 @@ class ElegooCamera:
             },
         )
 
-        self.response = urllib.request.urlopen(
-            request,
-            timeout=self.timeout,
-        )
+        from hardware.camera_ownership import ElegooCameraLease
+        self._ownership = ElegooCameraLease(self.stream_url)
+        try:
+            self.response = urllib.request.urlopen(request, timeout=self.timeout)
+        except BaseException:
+            self._ownership.close()
+            self._ownership = None
+            raise
 
         self.buffer = bytearray()
         self._error = None
@@ -97,6 +102,9 @@ class ElegooCamera:
             if not self._thread.is_alive():
                 self._thread = None
 
+        if self._ownership is not None and self._thread is None:
+            self._ownership.close()
+            self._ownership = None
         with self._condition:
             self._condition.notify_all()
 

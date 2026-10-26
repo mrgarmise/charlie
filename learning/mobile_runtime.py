@@ -57,8 +57,8 @@ def run_mobile(args, resources):
         if getattr(args,'object_label_display','off')!='off':objects['include_all']=True
         detector=HailoObjects(**objects);depth=HailoRelativeDepth(**config['depth']) if config.get('depth') else UnavailableDepth()
         # Only a camera transport is initialized, never MobileBase/Deck/face behavior.
-        from hardware.elegoo_camera import ElegooCamera
-        source=MobileFrameSource(ElegooCamera(stream_url=config.get('stream_url','http://192.168.4.1:81/stream'),timeout=2),reconnect_attempts=3)
+        from vision.camera_source import create_camera_source
+        source=create_camera_source('elegoo',stream_url=config.get('stream_url','http://192.168.4.1:81/stream'))
         clock=time.monotonic
     journal=EvidenceJournal(state/'mobile-evidence.sqlite3')
     adapter=MobileEvidenceAdapter(journal,episode='mobile:'+uuid4().hex,revision=revision)

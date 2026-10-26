@@ -35,6 +35,12 @@ class CameraLease:
                     break
                 except BlockingIOError:
                     owner=read_json(self.directory/'owner.json') or {}
+                    # close() removes metadata just before releasing flock. A
+                    # reader in that tiny window must retry the actual lock,
+                    # never infer conflicting ownership or bypass admission.
+                    if not owner and time.monotonic()-begin<.1:
+                        time.sleep(.001)
+                        continue
                     preview=purpose=='active' and owner.get('purpose')=='preview'
                     preempt=(self.role=='primary' and owner.get('role')=='active_vision')
                     if not preview and not preempt:

@@ -64,6 +64,7 @@ class MobileFrameSource:
         self.on_fault=on_fault
         self.session = uuid4().hex
         self.last_sequence = -1
+        self.last_generation = None
         self.stats = dict(frames=0, dropped=0, faults=0, reconnects=0)
 
     def read(self):
@@ -80,6 +81,11 @@ class MobileFrameSource:
         try:
             image, m = self.camera.read(timeout=2, with_metadata=True)
             if self.cancel.is_set():raise InterruptedError('mobile source cancelled')
+            generation=m.get('stream_generation')
+            if self.last_generation is not None and generation!=self.last_generation:
+                self.last_sequence=-1
+                self.session=uuid4().hex
+            self.last_generation=generation
             age = self.clock() - m['received_at']
             if not finite(age) or not 0 <= age <= self.max_age or m['sequence'] <= self.last_sequence:
                 raise ValueError('stale or reordered mobile frame')
@@ -92,7 +98,8 @@ class MobileFrameSource:
             return frame
         except Exception:
             self.stats['faults'] += 1
-            self.camera.close()  # Next caller's read reconnects; no unbounded retry loop.
+            self.camera.close()  # Raw recovery belongs only to an authoritative feeder.
+            if getattr(self.camera,'is_subscription',False):self.camera.open()
             self.stats['reconnects'] += 1
             raise
 

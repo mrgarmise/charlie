@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 from vision.mobile_perception import MobileFrame, MobileFrameSource, MobilePerception
 from vision.mobile_models import FixtureModel, HailoRelativeDepth, hailo_lease
-from hardware.elegoo_camera import ElegooCamera
+from hardware.elegoo_camera import _ElegooCameraDevice as ElegooCamera
 
 
 class Guard:

@@ -1,3 +1,7 @@
+# Current continuation
+
+Normal Object Recognition now uses authoritative shared feeders and subscription-only capabilities. See [the current report and test receipts](CONTINUATION.md) and [architecture/source/test mapping](ARCHITECTURE.md). The earlier display-only report below remains historical.
+
 # Object recognition / pico:ed implementation report
 
 2026-10-25. Draft PR #11: https://github.com/mrgarmise/charlie/pull/11 . Branch `feature/object-label-picoed-display`, stacked on PR #10 at 96e651373e513d24b4163b87c5f85bdd5549cf1d. This preserves the ongoing mobile integration rather than rebuilding on old master. Runtime/test source frozen at 19a12fcd27c6173c2809212534c78354eeffa359; CI-only follow-up dc8b4a6b3a5e8f7462263e99e40e63491e5479a1.

@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 
 
-class ElegooCamera:
+class _ElegooCameraDevice:
     """
     Threaded MJPEG reader for the ELEGOO camera.
 
@@ -285,3 +285,49 @@ class ElegooCamera:
         tb,
     ):
         self.close()
+
+
+class ElegooCamera:
+    """Compatibility subscriber; only the application feeder opens the MJPEG URL."""
+    def __init__(self,stream_url='http://192.168.4.1:81/stream',timeout=10,user_agent='CharlieVision/3.0'):
+        self.is_subscription=True
+        self.stream_url,self.timeout=stream_url,timeout
+        self.subscription=None
+        self.closed=False
+        self._last_frame=None
+
+    def open(self):
+        if self.subscription is None:
+            from stimulus.bus import subscribe_to_frames
+            self.subscription=subscribe_to_frames('elegoo-v4')
+            self.closed=False
+
+    def read(self,timeout=2.,require_new=True,with_metadata=False):
+        if self.closed:raise InterruptedError('camera subscription closed')
+        self.open()
+        frame=self.subscription.wait(timeout=min(timeout,5))
+        from urllib.parse import urlsplit
+        identity=frame.camera_identity or {}
+        endpoint=identity.get('endpoint')
+        if endpoint and urlsplit(endpoint).hostname!=urlsplit(self.stream_url).hostname:
+            raise ValueError('subscribed ELEGOO endpoint identity mismatch')
+        self._last_frame=frame
+        image=frame.image.copy()
+        if with_metadata:
+            return image,dict(sequence=frame.sequence,received_at=frame.received_at,
+                clock_domain=frame.clock_domain,stream_generation=frame.stream_generation,
+                captured_at_source=frame.captured_at_source,sync_uncertainty_seconds=frame.sync_uncertainty_seconds,
+                compression=frame.compression)
+        return image
+
+    def discard_until_new(self,frame_count=2,timeout=2.):
+        frame=None
+        for _ in range(frame_count):frame=self.read(timeout=timeout)
+        return frame
+
+    def close(self):
+        if self.subscription is not None:self.subscription.close()
+        self.subscription=None
+        self.closed=True
+    def __enter__(self):self.open();return self
+    def __exit__(self,*args):self.close()

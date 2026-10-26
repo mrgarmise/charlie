@@ -49,6 +49,9 @@ def main():
     from hardware.rp2040_controller import RP2040Controller
     from .sources import PiCameraSource
     from .passive import PassivePublisher
+    from contextlib import ExitStack
+    from types import SimpleNamespace
+    feeders = ExitStack()
     controller = RP2040Controller(port=args.port)
     neck = None
     handlers = {}
@@ -64,6 +67,12 @@ def main():
             if time.monotonic()>=deadline:
                 raise RuntimeError('RP2040 is DISARMED; Pi authorization cannot physically arm it')
             time.sleep(.1)
+        # Application root owns the feeder. ActiveVision gets only its existing
+        # source facade/subscription and retains the actual role/firmware gates.
+        from main import application_camera_feeders
+        feeders.enter_context(application_camera_feeders(SimpleNamespace(elegoo_stream_url=None,
+            mobile_observe=False,mobile_manifest=None,object_model_manifest=None),
+            selected=('pi',),pi_role='active_vision'))
         optimizer = ActiveVision(lambda:PiCameraSource(role='active_vision'), controller, args.output,
             initial_pose=(status['pan'],status['tilt']), authorized=True,
             detector=robotron_target if args.target=='robotron' else discover,
@@ -75,8 +84,10 @@ def main():
         for number in (signal.SIGINT, signal.SIGTERM):
             handlers[number] = signal.signal(number, interrupt)
         result = optimizer.run()
+        feeders.close()
         print(f"{result['state']}: validated configuration at {args.output/'view.json'}; camera released")
     finally:
+        feeders.close()
         for number, handler in handlers.items():
             signal.signal(number, handler)
         try:

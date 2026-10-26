@@ -312,7 +312,9 @@ def test_normal_pi_main_keeps_idle_camera_and_request_lifecycle(service, monkeyp
     camera = SimpleNamespace(read=lambda: calls.append(('camera', 'read')) or 'frame',
                              close=lambda: calls.append(('camera', 'closed')))
     monkeypatch.setitem(sys.modules, 'vision.camera', SimpleNamespace(Camera=lambda: camera))
-    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus: None))
+    from camera_application_fixture import install
+    install(monkeypatch,main,camera)
+    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus: SimpleNamespace(close=lambda:None)))
     monkeypatch.setattr(vision.detector, 'ColorDetector', lambda **kw: SimpleNamespace(detect=lambda frame: None))
     ticks = []
     class Finished(Exception): pass

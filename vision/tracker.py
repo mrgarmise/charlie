@@ -2,13 +2,16 @@ import cv2
 
 class Tracker:
     def __init__(self, cam_index=0):
-        self.cap = cv2.VideoCapture(cam_index)
+        if cam_index!=0:raise ValueError('explicit published camera identity required')
+        from stimulus.bus import subscribe_to_frames
+        self.subscription=subscribe_to_frames('pi-primary')
 
     def get_frame_and_error(self):
-        ret, frame = self.cap.read()
-        if not ret:
+        packet = self.subscription.read()
+        if packet is None:
             return None, 0
 
+        frame=packet.image.copy()
         h, w, _ = frame.shape
 
         # Frame center
@@ -42,3 +45,6 @@ class Tracker:
         )
 
         return frame, error
+
+    def close(self):
+        self.subscription.close()

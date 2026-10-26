@@ -175,18 +175,18 @@ def test_camera_wrapper_releases_driver_and_lease_on_failure(tmp_path,monkeypatc
     monkeypatch.setitem(sys.modules,'picamera2',SimpleNamespace(Picamera2=Picamera))
     spec=importlib.util.spec_from_file_location('tested_camera','vision/camera.py')
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-    camera=module.Camera()
-    with pytest.raises(RuntimeError):module.Camera()
+    camera=module._PiCameraDevice()
+    with pytest.raises(RuntimeError):module._PiCameraDevice()
     with pytest.raises(OSError):camera.close()
     assert camera.picam2.closed and camera.lease.closed
     camera.close()  # idempotent
     lease=CameraLease(directory=camera.lease.directory);lease.close()
     import experiments.ppal.eyes.camera_lease as leases
     monkeypatch.setattr(leases,'CameraLease',lambda *_:(_ for _ in ()).throw(OSError('observer storage unavailable')))
-    fallback=module.Camera()
-    assert fallback.lease is None and fallback.lease_error
-    with pytest.raises(OSError):fallback.close()
-    with pytest.raises(OSError):module.Camera(purpose='preview')
+    # The authoritative feeder fails closed if cooperative admission is unavailable.
+    # A capability's public Camera facade is now a subscriber, not a driver owner.
+    with pytest.raises(OSError):module._PiCameraDevice()
+    with pytest.raises(OSError):module._PiCameraDevice(purpose='preview')
 
 
 def test_launcher_window_exit_closes_ssh_input_and_remote_lifetime(monkeypatch):

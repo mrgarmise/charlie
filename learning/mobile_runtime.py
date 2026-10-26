@@ -38,7 +38,7 @@ class ReplayModel(FixtureModel):
         return super().infer(frame)
 
 
-def run_mobile(args, resources):
+def run_mobile(args, resources, frame_bus=None):
     if not 1<=args.mobile_frames<=10000:raise ValueError('mobile frames must be 1..10000')
     state=args.learning_state.resolve();state.mkdir(parents=True,exist_ok=True)
     revision=subprocess.run(['git','rev-parse','HEAD'],cwd=Path(__file__).resolve().parents[1],
@@ -57,8 +57,9 @@ def run_mobile(args, resources):
         if getattr(args,'object_label_display','off')!='off':objects['include_all']=True
         detector=HailoObjects(**objects);depth=HailoRelativeDepth(**config['depth']) if config.get('depth') else UnavailableDepth()
         # Only a camera transport is initialized, never MobileBase/Deck/face behavior.
-        from vision.camera_source import create_camera_source
-        source=create_camera_source('elegoo',stream_url=config.get('stream_url','http://192.168.4.1:81/stream'))
+        from vision.camera_source import CameraSubscription
+        source=CameraSubscription(frame_bus)
+        source.switch('elegoo')
         clock=time.monotonic
     journal=EvidenceJournal(state/'mobile-evidence.sqlite3')
     adapter=MobileEvidenceAdapter(journal,episode='mobile:'+uuid4().hex,revision=revision)
@@ -104,13 +105,14 @@ def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,
     if (type(frames) is not int or not 1<=frames<=10000 or not math.isfinite(seconds) or not 0<seconds<=3600
             or type(max_faults) is not int or not 1<=max_faults<=100):raise ValueError('bounded watcher required')
     cancel=cancel or threading.Event();started=clock();last_status=started;consecutive=0
-    counts=dict(records=0,frames=0,faults=0,motion_authorized=False,mode='fixture' if fixture else 'unarmed-perception',
+    counts=dict(records=0,frames=0,polls=0,faults=0,motion_authorized=False,mode='fixture' if fixture else 'unarmed-perception',
                 native_qualified=False,physical_qualified=False)
     latencies=[];inference=[]
     if publish is None:publish=lambda v:print(json.dumps(v,allow_nan=False),flush=True)
     try:
         for _ in range(frames):
             if cancel.is_set() or clock()-started>=seconds:break
+            counts['polls']+=1
             try:result=behavior.step()
             except StopIteration:break
             except (TimeoutError,EOFError,OSError,InterruptedError) as exc:
@@ -121,7 +123,9 @@ def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,
                 if consecutive>=max_faults or cancel.is_set():break
                 if not fixture:cancel.wait(min(2.,.1*2**min(consecutive,4)))
                 continue
-            consecutive=0;counts['frames']+=1
+            consecutive=0
+            if getattr(behavior,'frame_acquired',result is not None):counts['frames']+=1
+            if result is None and not fixture:cancel.wait(.02)
             if result:
                 counts['records']+=1
                 latencies.append(result['observation']['receipt_to_decision_seconds'])

@@ -27,8 +27,11 @@ class MobileObserveBehavior:
             if self.display_attention is not None:self.display_attention.update(None)
 
     def step(self):
+        self.frame_acquired=False
         try:
             frame=self.source.read()
+            if frame is None:return None
+            self.frame_acquired=True
             observation=self.perception.observe(frame)
             if observation is None:return None
             tracking=self.tracker.update(observation)

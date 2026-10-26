@@ -504,6 +504,8 @@ class ActiveVision:
                         if self.source:self.source.close()
                 if result is not None:
                     result['resources_released'] = True
+                    if getattr(getattr(self.source,'camera',None),'is_subscription',False):
+                        result['camera_lifecycle_scope']='consumer subscription released; physical capture remains application feeder-owned'
                     atomic_json(self.output/'view.json', result)
             except BaseException:
                 self.state = State.FAILED

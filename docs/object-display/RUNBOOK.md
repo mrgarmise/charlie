@@ -35,3 +35,7 @@ No physical serial connection, firmware flash, production service change, servo/
 Do not instantiate RP2040Controller as a supposedly read-only probe: its existing constructor opens/resets serial and sends STOP/SESSION. Do not run tools/sync_rp2040.py without separate authorization. Later native work should first use an isolated checkout and repeat the safe fake-I/O commands above, record Python/Hailo/model manifest/device inventory without opening devices, and obtain authorization before display deployment or real transport tests. Record actual PING/STOP latency during a long label before accepting native scheduling. This mission supplies no physical acceptance result.
 
 Disable with the default `--object-label-display off`; existing behavior is preserved. Existing firmware needs no update when the feature remains off. Any later firmware deployment needs its own known-good backup and explicitly authorized rollback procedure.
+
+## Normal Object Recognition continuation
+
+The earlier display-only and direct-camera source-selection descriptions above are historical. The current implementation uses application-owned continuous feeders and subscription-only capabilities. See [the architecture, normal command, source files and mandatory acceptance tests](ARCHITECTURE.md). The installed pico:ed protocol is reused through capability negotiation; this continuation changes no firmware and performs no physical qualification or deployment.

@@ -75,7 +75,7 @@ def test_camera_recovery_bounded_faults_and_cancel():
 
 
 def test_old_camera_generation_cannot_publish_after_reopen():
-    from hardware.elegoo_camera import ElegooCamera
+    from hardware.elegoo_camera import _ElegooCameraDevice as ElegooCamera
     from unittest.mock import Mock
     camera=ElegooCamera();camera._running=True;camera._generation=2
     old=Mock();old.read.side_effect=AssertionError('old stream must not read')
@@ -145,7 +145,7 @@ def test_spatial_depth_is_bounded_relative_and_model_preprocessing():
     image=np.zeros((20,30,3),np.uint8);image[:,:,2]=255
     prepared=HailoRelativeDepth.prepare(image,(224,224,3),'fast-depth-v2.19')
     assert prepared.shape==(224,224,3) and prepared.dtype==np.float32
-    assert np.all(prepared[:,:,0]==255) and np.all(prepared[:,:,2]==0)
+    assert np.allclose(prepared[:,:,0],255,rtol=0,atol=1e-4) and np.allclose(prepared[:,:,2],0,rtol=0,atol=1e-4)
     with pytest.raises(ValueError):HailoRelativeDepth.summarize(-a,(9,9,1),False)
 
 

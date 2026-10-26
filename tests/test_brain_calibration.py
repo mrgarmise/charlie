@@ -225,6 +225,8 @@ def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, mo
     camera = SimpleNamespace(read=f.frame, close=lambda: None)
     f.s.request('uncertain', dict(reason='simulated normal-brain calibration request'))
     monkeypatch.setitem(sys.modules, 'vision.camera', SimpleNamespace(Camera=lambda: camera))
+    from camera_application_fixture import install
+    install(monkeypatch,main,camera)
     monkeypatch.setattr(hardware.rp2040_controller, 'RP2040Controller', lambda: f.host)
     monkeypatch.setattr(motion.controller, 'RP2040Controller', lambda: f.host)
     f.host.close = lambda: None
@@ -232,7 +234,7 @@ def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, mo
     attach = f.s.attach_brain
     monkeypatch.setattr(f.s, 'attach_brain', lambda **options: attach(**options, simulated=True, maximum_steps=8))
     bus_ref = []
-    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus: bus_ref.append(bus)))
+    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus: (bus_ref.append(bus) or SimpleNamespace(close=lambda:None))))
     monkeypatch.setattr(vision.detector, 'ColorDetector', lambda **options:
         SimpleNamespace(detect=lambda frame: dict(x=460, y=180, width=10, height=10)
                         if f.s.brain.session is None and f.s.brain.responses else None))
@@ -347,12 +349,22 @@ def test_normal_application_startup_failure_releases_transport_and_camera(integr
     camera = SimpleNamespace(read=f.frame, close=lambda: calls.append('camera closed'))
     monkeypatch.setitem(sys.modules, 'vision.camera', SimpleNamespace(
         Camera=unavailable if failure == 'camera' else lambda: camera))
+    from camera_application_fixture import install
+    if failure=='camera':
+        from contextlib import contextmanager
+        @contextmanager
+        def unavailable_feeder(*args,**kwargs):
+            unavailable()
+            yield
+        monkeypatch.setattr(main,'application_camera_feeders',unavailable_feeder)
+    else:
+        install(monkeypatch,main,camera)
     monkeypatch.setattr(hardware.rp2040_controller, 'RP2040Controller', lambda: f.host)
     monkeypatch.setattr(motion.controller, 'RP2040Controller', lambda: f.host)
     monkeypatch.setattr(f.host, 'close', lambda: calls.append('transport closed'))
     monkeypatch.setattr(f.host, 'stop', lambda: calls.append('STOP'))
     monkeypatch.setattr(CalibrationService, 'open', classmethod(lambda cls, *args: f.s))
-    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus: None))
+    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus: SimpleNamespace(close=lambda:None)))
     monkeypatch.setenv('CHARLIE_VISION_TARGET', 'face')
     monkeypatch.setattr(vision.detector, 'FaceDetector', unavailable)
     with pytest.raises(RuntimeError, match='startup failure'):

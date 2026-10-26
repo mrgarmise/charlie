@@ -58,9 +58,12 @@ def validate_report(report, *, autonomous=False):
             or not finite(env.get('margin_m')) or env['margin_m']<2*env['max_stop_m']
             or env['stand_off_m']<=env['margin_m']):raise ValueError('measured conservative envelope required')
     required=REQUIRED+(('live_pet_follow','voluntary_decline','restart_revoke') if autonomous else ())
+    if not isinstance(report.get('sensor_producer_sha256'),str) or len(report['sensor_producer_sha256'])!=64:
+        raise ValueError('qualified sensor producer code identity required')
     for stage in required:
         trials=report.get('trials',{}).get(stage,[])
         if len(trials)<3:raise ValueError('three independent measured trials required: '+stage)
+        groups=set()
         for ref in trials:
             row=artifact(ref)
             if (row.get('stage')!=stage or row.get('authentic') is not True or row.get('passed') is not True
@@ -68,6 +71,8 @@ def validate_report(report, *, autonomous=False):
                     or row.get('firmware_sha256')!=report['firmware_sha256'] or not row.get('witness')
                     or not row.get('utc') or not row.get('measurements') or not row.get('raw_artifacts')):
                 raise ValueError('incomplete independent trial: '+stage)
+            if not row.get('trial_id') or row['trial_id'] in groups:raise ValueError('independent trial identities required')
+            groups.add(row['trial_id'])
             for raw in row['raw_artifacts']:
                 p=Path(raw['path'])
                 if hashlib.sha256(p.read_bytes()).hexdigest()!=raw['sha256']:raise ValueError('raw measurement changed')
@@ -94,7 +99,8 @@ def active_mobile(deployment, *, now, boot_id, hardware_id, zone):
     auth=active['authorization']
     if (auth.get('boot_id')!=boot_id or auth.get('hardware_id')!=hardware_id or auth.get('zone')!=zone
             or not finite(auth.get('expires_at')) or not now<auth['expires_at']
-            or auth.get('execution')!='physical'):raise ValueError('fresh boot-bound physical authority required')
+            or auth.get('execution')!='physical' or not finite(auth.get('issued_at'))
+            or not auth['issued_at']<=now or not 0<auth['expires_at']-auth['issued_at']<=600):raise ValueError('fresh boot-bound physical authority required')
     q=deployment.journal.get(active['qualification_id'])
     if q.data['producer']!='independent-mobile-evaluator':raise ValueError('independent mobile evaluator required')
     p=q.data['payload']
@@ -142,8 +148,13 @@ class MobileSafetyContext:
                 raise ValueError('frame-bound animal/sensor/capture provenance unavailable')
             models=out.get('model',[])
             if not any(m.get('sha256')==report['model_sha256'] for m in models):raise ValueError('model differs from qualification')
+            required=('pet_willing','human_clear','zone_inspected','power_ok')
+            if any(feed['sensors'].get(k) is not True for k in required):raise ValueError('welfare/intrusion/zone/power unverified')
+            out['raw_frame']=deepcopy(frame)
             frame.update(source_age_known=True,pan_deg=feed['pan_deg'],yaw_deg=feed['yaw_deg'])
-            out.update(qualification='native-qualified',sensors=feed['sensors'])
+            out.update(qualification='native-qualified',sensors=feed['sensors'],grounded_animal=True)
+            out['safety_provenance']=dict(qualification_id=active['qualification_id'],firmware_sha256=report['firmware_sha256'],
+                bridge_sha256=report['bridge_sha256'],sensor_producer_sha256=report['sensor_producer_sha256'])
             self.current=dict(observation=out,tracking=tracking,activation=active,report=report,at=feed['at'])
             self.failure=None
         except (KeyError,TypeError,ValueError,OSError) as exc:self.failure=str(exc)
@@ -154,6 +165,9 @@ class MobileSafetyContext:
         if self.current is None:return False
         active,report=self.activation();c=self.current
         if active['activation_key']!=c['activation']['activation_key'] or self.clock()-c['at']>.25:return False
-        check=MobileNavigator(clock=self.clock).propose(c['observation'],c['tracking'],c['observation']['sensors'])
+        from experiments.ppal.mobile_navigation import MobileLimits
+        limits=MobileLimits(stand_off_m=report['envelope']['stand_off_m']+report['envelope']['margin_m'],
+            max_duration=min(.2,report['envelope']['max_duration']))
+        check=MobileNavigator(limits,clock=self.clock).propose(c['observation'],c['tracking'],c['observation']['sensors'])
         return (not check['reasons'] and check['action']==proposal['action'] and
                 check['frame_id']==proposal['frame_id'] and check.get('direction')==proposal.get('direction'))

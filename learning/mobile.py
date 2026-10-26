@@ -51,6 +51,11 @@ class MobileEvidenceAdapter:
             evidence_ids=[row.id],conditions=[dict(view='centered'),dict(view='off-axis'),dict(view='pose-unknown')],
             observed_conditions=[dict(view='centered' if o['frame'].get('pan_deg')==90 else 'pose-unknown' if o['frame'].get('pan_deg') is None else 'off-axis')],
             requires=['mobile-camera','mobile-models'])]
+        if o.get('grounded_animal') is True:
+            hypotheses.append(dict(method='pet_follow',scope=dict(body=o['frame']['source'],kind='animal'),
+                expected='bounded changes of viewpoint improve continued animal observation without reducing safe separation',
+                evidence_ids=[row.id],conditions=[dict(view='far'),dict(view='stand-off'),dict(view='yield')],
+                observed_conditions=[dict(view='far')],requires=['mobile-camera','mobile-models','qualified-car-local-controller','motion-lease']))
         proposals=reflect_project_opportunities(self.journal,self.episode,hypotheses)
         return [self.executive.propose(x['proposal'],self.journal,[x['evidence_id']]) for x in proposals]
 
@@ -75,6 +80,20 @@ class MobileEvidenceAdapter:
             observation_id=observation_id,outcome='observation acquired; learning not demonstrated'),
             episode=request.data['episode'],sources=[request_id],producer='mobile-acquisition',version=self.revision,
             provenance=dict(observation_episode=row.data['episode'],cross_episode_link='verified immutable observation ID'))
+
+    def attention_outcome(self, result, decision, execution, *, phase):
+        payload=dict(category='mobile_attention_episode',observation_id=result['evidence_id'],
+            frame=result['observation']['frame'],model=result['observation'].get('model'),
+            software_revision=self.revision,tracking=result['tracking'],proposal=result['proposal'],
+            sensors=result['observation'].get('sensors',{}),resources=result['observation'].get('resources',{}),
+            decision=decision,execution=execution,phase=phase,
+            consequence='unobserved; requires independent displacement and animal-reaction measurements',
+            learning='no learned improvement or individual identity established')
+        event=self.journal.append('event',payload,episode=self.episode,producer='AttentionManager',
+            version=self.revision,provenance=dict(authentic=result['observation']['frame']['authentic']))
+        from memory.evaluator import MemoryEvaluator
+        MemoryEvaluator.evaluate_mobile_attention(self.journal,event.id)
+        return event
 
 
 def observe_capability(*, service, request_id=None):

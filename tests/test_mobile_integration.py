@@ -51,7 +51,8 @@ def test_lifecycle_imports_once_without_second_executive(tmp_path):
     j=EvidenceJournal(state/'learning-evidence.sqlite3');gateway=Mock()
     e=LearningExecutive(j,gateway)
     lifecycle=SimpleNamespace(output=state,journal=j,executive=e,gateway=gateway)
-    assert import_mobile_evidence(lifecycle)
+    # Normal mobile application now uses the ONE lifecycle and imports live.
+    assert not import_mobile_evidence(lifecycle)
     assert not import_mobile_evidence(lifecycle)
     assert len(j.category_records('observation','mobile_perception'))==4
     assert e.projects()=={}

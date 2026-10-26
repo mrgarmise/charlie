@@ -58,18 +58,46 @@ def run_mobile(args, resources):
         from hardware.elegoo_camera import ElegooCamera
         source=MobileFrameSource(ElegooCamera(stream_url=config.get('stream_url','http://192.168.4.1:81/stream'),timeout=2),reconnect_attempts=3)
         clock=time.monotonic
+    # One normal lifecycle/Executive owns the existing durable learning agenda.
+    from .lifecycle import DevelopmentLifecycle
+    from learning.capabilities import default_registry
+    from attention.manager import AttentionManager
+    from stimulus.bus import StimulusBus
+    lifecycle=DevelopmentLifecycle(state,args.episode_root or [Path(__file__).resolve().parents[1]/'robotron-runs'],
+        budget_seconds=args.learning_budget,resources=resources,history_roots=args.history_root)
+    lifecycle.acquire()
     journal=EvidenceJournal(state/'mobile-evidence.sqlite3')
-    adapter=MobileEvidenceAdapter(journal,episode='mobile:'+uuid4().hex,revision=revision)
+    adapter=MobileEvidenceAdapter(journal,episode='mobile:'+uuid4().hex,revision=revision,executive=lifecycle.executive)
     guard=ResourceGuard(resources)
     perception=MobilePerception(detector,depth,resources=guard,revision=revision,clock=clock)
     from vision.mobile_tracking import PetTracker
-    behavior=MobileObserveBehavior(source,perception,adapter,tracker=PetTracker(loss_seconds=2.))
+    bus=StimulusBus();attention=AttentionManager(bus,mobile_enabled=False)
+    behavior=MobileObserveBehavior(source,perception,adapter,tracker=PetTracker(loss_seconds=2.),bus=bus)
+    context=None
+    if getattr(args,'pet_follow',False):
+        from learning.mobile_safety import MobileSafetyContext
+        from learning.deployment import CapabilityDeployment
+        # Boot ID is emitted, never restored. Prior process grants cannot revive motion.
+        boot_id=uuid4().hex
+        print(json.dumps(dict(mobile_boot_id=boot_id,motion_authorized=False)),flush=True)
+        context=MobileSafetyContext(CapabilityDeployment(lifecycle.journal),boot_id=boot_id,
+            hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.mobile_safety_feed,clock=clock)
+    from motion.mobile_base import MobileBase
+    behavior.bind_attention(attention,lifecycle.executive,default_registry(),context=context,base_factory=MobileBase)
+    behavior.before_attention=lambda:lifecycle.journal.merge_from(journal)
+    behavior.executive_resources={'offline-slot','context-evidence','model-evaluation','meditation-evidence'}
+    # Existing face/body activity can preempt on this same bus; no legacy conversion.
+    def between_steps():
+        if not args.mobile_replay and behavior.intent in ('decline','yield'):
+            lifecycle.turn()  # Existing lifecycle owns the work; never a second chooser.
+
     behavior.retention=EventRetention(FrameArtifactStore(state/'mobile-pixels'),mode=args.mobile_retain,limit=args.mobile_captures)
     try:
         return watch(behavior,frames=args.mobile_frames,seconds=args.mobile_seconds,max_faults=args.mobile_max_faults,
-                     clock=clock,fixture=bool(args.mobile_replay))
+                     clock=clock,fixture=bool(args.mobile_replay),between_steps=between_steps)
     finally:
-        behavior.close();journal.close()
+        try:behavior.close();attention.close();lifecycle.journal.merge_from(journal)
+        finally:journal.close();lifecycle.close()
 
 
 class EventRetention:
@@ -86,7 +114,7 @@ class EventRetention:
         return retained.artifact
 
 
-def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,fixture=False,publish=None):
+def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,fixture=False,publish=None,between_steps=None):
     import math
     if (type(frames) is not int or not 1<=frames<=10000 or not math.isfinite(seconds) or not 0<seconds<=3600
             or type(max_faults) is not int or not 1<=max_faults<=100):raise ValueError('bounded watcher required')
@@ -115,6 +143,7 @@ def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,
                 inference.append(sum(result['observation']['inference_seconds'].values()))
                 publish(dict(evidence_id=result['evidence_id'],target=result['tracking']['target'],
                              proposal=result['proposal'],execution=result['execution']))
+            if between_steps is not None:between_steps()
             if clock()-last_status>=5:
                 publish(dict(status='stationary observing',**counts));last_status=clock()
     except KeyboardInterrupt:

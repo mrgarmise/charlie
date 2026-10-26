@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="4" failures="0" skipped="0" tests="35" time="2.706" timestamp="2026-10-25T15:16:56.453256+00:00" hostname="charlie"><testcase classname="tests.test_native_preflight" name="test_passing_review_preserves_timestamp_hashes_and_launcher_validity" time="0.006" /><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[missing]" time="0.003" /><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[stale]" time="0.003" /><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[boot]" time="0.003" /><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[revision]" time="0.003" /><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[future]" time="0.003" /><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[nan]" time="0.003" /><testcase classname="tests.test_native_preflight" name="test_changed_and_conflicting_evidence_fail_closed" time="0.006" /><testcase classname="tests.test_native_preflight" name="test_independent_parts_assemble_with_oldest_actual_review_time" time="0.004" /><testcase classname="tests.test_native_preflight" name="test_historical_xml_keeps_scope_and_cannot_certify_host" time="0.002" /><testcase classname="tests.test_native_preflight" name="test_missing_lease_cases_and_suite_error_rejected" time="0.003" /><testcase classname="tests.test_native_preflight" name="test_full_diagnostic_preserves_campaign_and_evidence" time="0.003" /><testcase classname="tests.test_native_preflight" name="test_controller_probe_never_opens_transport" time="0.001" /><testcase classname="tests.test_native_preflight" name="test_full_pass_writes_exact_review_without_issuing_authority" time="0.006" /><testcase classname="tests.test_native_preflight" name="test_malformed_xml_is_a_diagnostic_not_a_crash" time="0.003" /><testcase classname="tests.test_native_robotron_trial" name="test_resource_and_ownership_stops[temperature_c-75.0]" time="0.000" /><testcase classname="tests.test_native_robotron_trial" name="test_resource_and_ownership_stops[temperature_c-nan]" time="0.000" /><testcase classname="tests.test_native_robotron_trial" name="test_resource_and_ownership_stops[throttled-1]" time="0.000" /><testcase classname="tests.test_native_robotron_trial" name="test_resource_and_ownership_stops[available_memory_bytes-1]" time="0.000" /><testcase classname="tests.test_native_robotron_trial" name="test_resource_and_ownership_stops[rss_bytes-806354944]" time="0.000" /><testcase classname="tests.test_native_robotron_trial" name="test_resource_and_ownership_stops[free_disk_bytes-1]" time="0.000" /><testcase classname="tests.test_native_robotron_trial" name="test_resource_and_ownership_stops[device_owners-value6]" time="0.000" /><testcase classname="tests.test_native_robotron_trial" name="test_review_exact_runtime_all_sockets_and_proof_integrity" time="0.003" /><testcase classname="tests.test_native_robotron_trial" name="test_blocked_socket_receipt_cannot_arm" time="0.003" /><testcase classname="tests.test_native_robotron_trial" name="test_expired_review_cannot_arm" time="0.002" /><testcase classname="tests.test_native_robotron_trial" name="test_monitoring_failure_stops_owned_process_without_retry" time="0.017" /><testcase classname="tests.test_original_marathon_campaign" name="test_original_six_game_order_offline_checkpoint_and_separate_review" time="0.447" /><testcase classname="tests.test_original_marathon_campaign" name="test_partial_block_never_meditates_or_counts_as_three" time="0.150" /><testcase classname="tests.test_original_marathon_campaign" name="test_completed_interrupted_handoff_resumes_without_start" time="0.145" /><testcase classname="tests.test_original_marathon_campaign" name="test_mode_and_second_policy_bound_to_authority" time="0.059" /><testcase classname="tests.test_original_marathon_campaign" name="test_existing_marathon_and_reflection_execute_both_blocks" time="1.458" /><testcase classname="tests.test_arcade_controller_lease_client" name="test_each_progressing_action_renews_even_when_positions_unchanged" time="0.000"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">@pytest.fixture
+    def server():
+&gt;       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</error></testcase><testcase classname="tests.test_arcade_controller_lease_client" name="test_unsupported_lease_fails_closed_without_gameplay" time="0.001"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">@pytest.fixture
+    def server():
+&gt;       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</error></testcase><testcase classname="tests.test_arcade_controller_lease_client" name="test_expired_renewal_closes_connection" time="0.000"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">@pytest.fixture
+    def server():
+&gt;       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</error></testcase><testcase classname="tests.test_arcade_controller_lease_client" name="test_old_local_timer_cannot_interrupt_renewed_hold" time="0.001"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">@pytest.fixture
+    def server():
+&gt;       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</error></testcase></testsuite></testsuites>

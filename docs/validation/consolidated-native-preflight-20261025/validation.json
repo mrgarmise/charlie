@@ -1,0 +1,18 @@
+{
+  "original_campaign": {
+    "path": "/home/five/charlie-native-trials/original-marathon-20261025/campaign.json",
+    "sha256": "5bb6b7275fb118b1fde4702ba3d389b83c8088031f7203bfcfaa86cf993ae98d",
+    "unchanged_since_first_diagnostic": true
+  },
+  "scope": "software regression and read-only diagnostic only; no physical readiness or gameplay claim",
+  "sandbox": {
+    "passed": 31,
+    "blocked_socket_cases": 4
+  },
+  "native_device_free": {
+    "passed": 35
+  },
+  "final_offline": {
+    "passed": 31
+  }
+}

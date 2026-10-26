@@ -27,7 +27,7 @@ def test_resource_and_ownership_stops(field,value):
 
 def review(tmp_path):
     prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
-    names=[r['test'] for r in prior['full_run']['failed_cases'] if 'Operation not permitted' in r['message']]
+    names=[r['test'] for r in prior['full_run']['failed_cases'] if 'Operation not permitted' in r['message']] + sorted(runner.LEASE_CASES)
     xml=ET.Element('testsuites');suite=ET.SubElement(xml,'testsuite')
     for name in names:
         cls,test=name.split('::',1);ET.SubElement(suite,'testcase',classname=cls,name=test)

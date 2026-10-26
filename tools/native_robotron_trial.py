@@ -42,19 +42,41 @@ def verify_review(path, revision):
         source = Path(proof.get('path', '')).expanduser().resolve(strict=True)
         if not source.is_file() or checksum(source) != proof.get('sha256'):
             raise ValueError('missing or changed independently reviewed proof: '+key)
-    # Review binds the actual device-free native socket receipt to this runtime.
-    receipt = review['proofs']['software_tests']['path']
-    tree = ET.parse(receipt)
-    cases = list(tree.iter('testcase'))
-    if not cases or any(t.find(k) is not None for t in cases for k in ('failure','error','skipped')):
-        raise ValueError('native software receipt must pass without blocked checks')
+    verify_software_receipt(review['proofs']['software_tests']['path'])
+    return review
+
+
+def required_socket_cases():
     prior = json.loads((ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
     required = {r['test'] for r in prior['full_run']['failed_cases']
                 if 'Operation not permitted' in r['message']}
-    actual = {t.attrib['classname']+'::'+t.attrib['name'] for t in cases}
-    if len(required) != 34 or not required <= actual:
+    if len(required) != 34:
+        raise ValueError('original socket acceptance list must contain 34 cases')
+    return required
+
+
+LEASE_CASES = {
+    'tests.test_arcade_controller_lease_client::'+name for name in (
+        'test_each_progressing_action_renews_even_when_positions_unchanged',
+        'test_unsupported_lease_fails_closed_without_gameplay',
+        'test_expired_renewal_closes_connection',
+        'test_old_local_timer_cannot_interrupt_renewed_hold')}
+
+
+def verify_software_receipt(path, *, require_lease=False):
+    """Historical receipts need coverage/integrity, not an arbitrary new test run."""
+    tree = ET.parse(path)
+    cases = list(tree.iter('testcase'))
+    if (not cases or any(t.find(k) is not None for t in cases for k in ('failure','error','skipped'))
+            or any(int(t.get(k, '0')) for t in tree.iter('testsuite')
+                   for k in ('failures', 'errors', 'skipped'))):
+        raise ValueError('native software receipt must pass without blocked checks')
+    actual = {t.attrib.get('classname', '')+'::'+t.attrib.get('name', '') for t in cases}
+    if not required_socket_cases() <= actual:
         raise ValueError('receipt must exercise all 34 originally blocked socket cases')
-    return review
+    if require_lease and not LEASE_CASES <= actual:
+        raise ValueError('receipt must exercise all four controller lease socket cases')
+    return dict(cases=len(cases), original_socket_cases=34, lease_socket_cases=len(LEASE_CASES & actual))
 
 
 def sample(root_pid=None, disk_path=ROOT):
@@ -121,6 +143,9 @@ def stop_reason(row):
 
 
 def main():
+    if '--preflight' in sys.argv[1:]:
+        from tools.native_preflight import main as preflight
+        raise SystemExit(preflight([arg for arg in sys.argv[1:] if arg != '--preflight']))
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--expected-revision',required=True)
     parser.add_argument('--review',type=Path,required=True)

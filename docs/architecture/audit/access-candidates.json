@@ -1,0 +1,407 @@
+{
+  "schema": "charlie.sensory-audit.candidates.v1",
+  "source_commit": "a19c90822687739f79f69587302006a1bd6364d4",
+  "scope": "Tracked Python and current checkout; tests excluded. Lexical candidates include comments, mocks and legacy scripts; not proof of runtime access. See CONFORMANCE.md for classification.",
+  "candidates": [
+    {
+      "path": "OldPicoFiles/Pico_ed.py",
+      "line": 368,
+      "excerpt": "i2c = I2C(1,scl=Pin(19),sda=Pin(18))"
+    },
+    {
+      "path": "charlie_ops/operator.py",
+      "line": 111,
+      "excerpt": "for p in Path('/sys/class/thermal').glob('thermal_zone*/temp'):"
+    },
+    {
+      "path": "experiments/ppal/arcade_transport.py",
+      "line": 49,
+      "excerpt": "self.connection = socket.create_connection((host, port), timeout=timeout)"
+    },
+    {
+      "path": "experiments/ppal/camera_session.py",
+      "line": 26,
+      "excerpt": "return _BorrowedCamera(self)"
+    },
+    {
+      "path": "experiments/ppal/camera_session.py",
+      "line": 64,
+      "excerpt": "class CameraFeeder(CameraSession):"
+    },
+    {
+      "path": "experiments/ppal/camera_session.py",
+      "line": 87,
+      "excerpt": "return self.bus.subscribe_frames(self.source_id)"
+    },
+    {
+      "path": "experiments/ppal/camera_session.py",
+      "line": 93,
+      "excerpt": "self.bus.claim_frames(self.source_id, self)"
+    },
+    {
+      "path": "experiments/ppal/capture_robotron_hud.py",
+      "line": 33,
+      "excerpt": "source = PiCameraSource()"
+    },
+    {
+      "path": "experiments/ppal/detector_bridge.py",
+      "line": 131,
+      "excerpt": "self._session=HailoSession(self.path,sha256=self.sha256,input_shape=(self.size,self.size,3),timeout=self.timeout,lock=self.lock)"
+    },
+    {
+      "path": "experiments/ppal/eyes/autofocus.py",
+      "line": 57,
+      "excerpt": "source.read_fresh()"
+    },
+    {
+      "path": "experiments/ppal/eyes/benchmark_passive.py",
+      "line": 31,
+      "excerpt": "lease=CameraLease(directory=directory)  # simulated owner, no camera"
+    },
+    {
+      "path": "experiments/ppal/eyes/benchmark_passive.py",
+      "line": 36,
+      "excerpt": "with urlopen(f'http://127.0.0.1:{server.server_port}/frame',timeout=1) as response:"
+    },
+    {
+      "path": "experiments/ppal/eyes/cli.py",
+      "line": 27,
+      "excerpt": "return PiCameraSource()"
+    },
+    {
+      "path": "experiments/ppal/eyes/passive_viewer.py",
+      "line": 64,
+      "excerpt": "self.preview=Camera(purpose='preview')"
+    },
+    {
+      "path": "experiments/ppal/eyes/run_active_vision.py",
+      "line": 76,
+      "excerpt": "optimizer = ActiveVision(lambda:PiCameraSource(role='active_vision'), controller, args.output,"
+    },
+    {
+      "path": "experiments/ppal/eyes/simulate_active_vision.py",
+      "line": 31,
+      "excerpt": "self.lease = CameraLease(directory=lease_dir) if lease_dir else None"
+    },
+    {
+      "path": "experiments/ppal/eyes/simulate_active_vision.py",
+      "line": 61,
+      "excerpt": "camera = SimulatedCamera(head)"
+    },
+    {
+      "path": "experiments/ppal/eyes/sources.py",
+      "line": 14,
+      "excerpt": "self.camera = Camera(width=width, height=height) if role is None else Camera(width=width, height=height, role=role)"
+    },
+    {
+      "path": "experiments/ppal/eyes/sources.py",
+      "line": 30,
+      "excerpt": "def read_fresh(self) -> Image.Image:"
+    },
+    {
+      "path": "experiments/ppal/eyes/sources.py",
+      "line": 39,
+      "excerpt": "request = self.camera.picam2.capture_request(flush=True)"
+    },
+    {
+      "path": "experiments/ppal/hands.py",
+      "line": 76,
+      "excerpt": "self.connection = socket.create_connection((host, port), timeout=timeout)"
+    },
+    {
+      "path": "experiments/ppal/marathon_robotron.py",
+      "line": 258,
+      "excerpt": "camera_session=CameraSession(play_robotron.PiCameraSource)"
+    },
+    {
+      "path": "experiments/ppal/observation_camera.py",
+      "line": 23,
+      "excerpt": "def read_fresh(self):"
+    },
+    {
+      "path": "experiments/ppal/play_robotron.py",
+      "line": 617,
+      "excerpt": "source = ObservedCamera(camera_session.borrow() if camera_session else PiCameraSource(), require_fresh=args.arm, progress=progress)"
+    },
+    {
+      "path": "experiments/ppal/preflight.py",
+      "line": 435,
+      "excerpt": "source = ObservedCamera(PiCameraSource(), require_fresh=True)"
+    },
+    {
+      "path": "experiments/ppal/run_camera.py",
+      "line": 22,
+      "excerpt": "camera = PiCameraSource(width=1536, height=864)"
+    },
+    {
+      "path": "experiments/ppal/run_closed_loop.py",
+      "line": 95,
+      "excerpt": "source = ArenaRenderer(arena) if arena else PiCameraSource()"
+    },
+    {
+      "path": "experiments/ppal/visual_control_probe.py",
+      "line": 277,
+      "excerpt": "source = PiCameraSource()"
+    },
+    {
+      "path": "experiments/robotron/capture.py",
+      "line": 31,
+      "excerpt": "camera = ElegooCamera(args.camera_url, timeout=2)"
+    },
+    {
+      "path": "experiments/robotron/live.py",
+      "line": 31,
+      "excerpt": "self.socket = socket.create_connection((self.host, self.port), self.timeout)"
+    },
+    {
+      "path": "hardware/calibration_behavior.py",
+      "line": 4,
+      "excerpt": "The installed RP2040 independently decides which paths require GP10."
+    },
+    {
+      "path": "hardware/calibration_behavior.py",
+      "line": 247,
+      "excerpt": "self.message('WAIT GP10 ' + str(status.get('direction', '')))"
+    },
+    {
+      "path": "hardware/calibration_behavior.py",
+      "line": 301,
+      "excerpt": "# RP2040 returned READY without confirmation: GP10 was withheld."
+    },
+    {
+      "path": "hardware/calibration_service.py",
+      "line": 215,
+      "excerpt": "\"\"\"Explicit supervisor entry; preparation never grants GP10/PWM permission.\"\"\""
+    },
+    {
+      "path": "hardware/elegoo_camera.py",
+      "line": 63,
+      "excerpt": "self._ownership = ElegooCameraLease(self.stream_url)"
+    },
+    {
+      "path": "hardware/elegoo_camera.py",
+      "line": 65,
+      "excerpt": "self.response = urllib.request.urlopen(request, timeout=self.timeout)"
+    },
+    {
+      "path": "hardware/elegoo_camera.py",
+      "line": 302,
+      "excerpt": "self.subscription=subscribe_to_frames('elegoo-v4')"
+    },
+    {
+      "path": "hardware/elegoo_mobile.py",
+      "line": 91,
+      "excerpt": "self.sock = socket.create_connection("
+    },
+    {
+      "path": "hardware/hailo_session.py",
+      "line": 11,
+      "excerpt": "def accelerator_lease(path=None):"
+    },
+    {
+      "path": "hardware/hailo_session.py",
+      "line": 34,
+      "excerpt": "stack.enter_context(accelerator_lease(self.lock))"
+    },
+    {
+      "path": "hardware/rp2040_controller.py",
+      "line": 71,
+      "excerpt": "self.serial = serial.Serial("
+    },
+    {
+      "path": "hardware/rp2040_controller.py",
+      "line": 341,
+      "excerpt": "GP10 is deliberately absent from normal activation."
+    },
+    {
+      "path": "hardware/system.py",
+      "line": 3,
+      "excerpt": "return psutil.cpu_percent()"
+    },
+    {
+      "path": "hardware/system.py",
+      "line": 5,
+      "excerpt": "return psutil.virtual_memory().percent"
+    },
+    {
+      "path": "learning/mobile_runtime.py",
+      "line": 70,
+      "excerpt": "behavior.retention=EventRetention(FrameArtifactStore(state/'mobile-pixels'),mode=args.mobile_retain,limit=args.mobile_captures)"
+    },
+    {
+      "path": "learning/resources.py",
+      "line": 84,
+      "excerpt": "def temperature():"
+    },
+    {
+      "path": "learning/resources.py",
+      "line": 87,
+      "excerpt": "for path in Path('/sys/class/thermal').glob('thermal_zone*/temp'):"
+    },
+    {
+      "path": "main.py",
+      "line": 89,
+      "excerpt": "feeder = CameraFeeder(lambda name=name: capture_factory(name, stream_url=stream_url, pi_role=pi_role),"
+    },
+    {
+      "path": "main.py",
+      "line": 192,
+      "excerpt": "camera=TrackingCamera(sources)"
+    },
+    {
+      "path": "motion/servo.py",
+      "line": 9,
+      "excerpt": "self.ser = serial.Serial(PORT, BAUD, timeout=1)"
+    },
+    {
+      "path": "rp2040/lib/Pico_ed.py",
+      "line": 370,
+      "excerpt": "i2c = I2C(1,scl=Pin(19),sda=Pin(18))"
+    },
+    {
+      "path": "rp2040/main.py",
+      "line": 52,
+      "excerpt": "raise RuntimeError('GP10_CALIBRATION_ONLY_NOT_ARM')"
+    },
+    {
+      "path": "rp2040/main.py",
+      "line": 165,
+      "excerpt": "notice = 'WAIT GP10 ' + str(cal_status.get('direction', ''))"
+    },
+    {
+      "path": "rp2040/motion_profile.py",
+      "line": 11,
+      "excerpt": "# CAL-1 commissioning is separate from normal arming. GP10 is ONLY an input"
+    },
+    {
+      "path": "run_elegoo_head2.py",
+      "line": 13,
+      "excerpt": "camera = ElegooCamera()"
+    },
+    {
+      "path": "run_elegoo_head2_diagnostic.py",
+      "line": 25,
+      "excerpt": "camera = ElegooCamera()"
+    },
+    {
+      "path": "setup/charlie_eyes_launcher.py",
+      "line": 68,
+      "excerpt": "with urlopen('http://127.0.0.1:8767/frame',timeout=.5) as response:"
+    },
+    {
+      "path": "stimulus/bus.py",
+      "line": 107,
+      "excerpt": "def subscribe_frames(self, source, *, max_age=.5, clock=time.monotonic):"
+    },
+    {
+      "path": "stimulus/bus.py",
+      "line": 126,
+      "excerpt": "def claim_frames(self, source, owner):"
+    },
+    {
+      "path": "stimulus/bus.py",
+      "line": 234,
+      "excerpt": "def subscribe_to_frames(source, **kwargs):"
+    },
+    {
+      "path": "stimulus/bus.py",
+      "line": 236,
+      "excerpt": "return _application_frames.subscribe_frames(source, **kwargs)"
+    },
+    {
+      "path": "tools/benchmark_buffered_recording.py",
+      "line": 44,
+      "excerpt": "raw=PiCameraSource();camera_kind='native Pi camera; tactical states remain software fixtures'"
+    },
+    {
+      "path": "tools/benchmark_buffered_recording.py",
+      "line": 50,
+      "excerpt": "raw=SoftwareCamera();camera_kind='software acquisition of supplied frozen pixels; source hash in benchmark report'"
+    },
+    {
+      "path": "tools/benchmark_buffered_recording.py",
+      "line": 51,
+      "excerpt": "camera=ObservedCamera(raw,require_fresh=args.native_camera)"
+    },
+    {
+      "path": "tools/calibrate_neck.py",
+      "line": 3,
+      "excerpt": "JSON operations are prepared/verified by the operator; GP10 is not an E-stop."
+    },
+    {
+      "path": "tools/observe_development_thermal.py",
+      "line": 30,
+      "excerpt": "try:row['independent_sensor_temperature_c']=temperature()"
+    },
+    {
+      "path": "vision/camera.py",
+      "line": 14,
+      "excerpt": "self.lease = CameraLease(purpose) if role is None else CameraLease(purpose, role=role)"
+    },
+    {
+      "path": "vision/camera.py",
+      "line": 17,
+      "excerpt": "self.picam2 = Picamera2()"
+    },
+    {
+      "path": "vision/camera.py",
+      "line": 30,
+      "excerpt": "return self.picam2.capture_array()"
+    },
+    {
+      "path": "vision/camera.py",
+      "line": 83,
+      "excerpt": "def capture_request(self, *, flush=False):"
+    },
+    {
+      "path": "vision/camera.py",
+      "line": 109,
+      "excerpt": "self.subscription=subscribe_to_frames('pi-primary')"
+    },
+    {
+      "path": "vision/camera_source.py",
+      "line": 43,
+      "excerpt": "request = self.camera.picam2.capture_request(flush=True)"
+    },
+    {
+      "path": "vision/camera_source.py",
+      "line": 118,
+      "excerpt": "self.active = subscribe_to_frames(sources[name], clock=self.clock)"
+    },
+    {
+      "path": "vision/camera_source.py",
+      "line": 120,
+      "excerpt": "self.active = self.bus.subscribe_frames(sources[name], clock=self.clock)"
+    },
+    {
+      "path": "vision/hsv_test.py",
+      "line": 5,
+      "excerpt": "camera = Camera()"
+    },
+    {
+      "path": "vision/mobile_models.py",
+      "line": 114,
+      "excerpt": "with HailoSession(self.path,sha256=self.metadata['sha256'],input_shape=self.input_shape,"
+    },
+    {
+      "path": "vision/mobile_perception.py",
+      "line": 58,
+      "excerpt": "camera = ElegooCamera(timeout=2)"
+    },
+    {
+      "path": "vision/test_orange.py",
+      "line": 11,
+      "excerpt": "camera = Camera()"
+    },
+    {
+      "path": "vision/test_stimulus.py",
+      "line": 10,
+      "excerpt": "camera = Camera()"
+    },
+    {
+      "path": "vision/tracker.py",
+      "line": 7,
+      "excerpt": "self.subscription=subscribe_to_frames('pi-primary')"
+    }
+  ]
+}

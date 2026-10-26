@@ -95,8 +95,10 @@ def validate_report(report, *, autonomous=False, live_pet=False):
                 m=row['measurements']
                 if (not finite(m.get('stop_uncertainty_seconds')) or not 0<=m['stop_uncertainty_seconds']<=.05
                         or not finite(m.get('distance_uncertainty_m')) or not 0<=m['distance_uncertainty_m']<=.02
-                        or not finite(m.get('stop_seconds')) or not 0<=m['stop_seconds']+m['stop_uncertainty_seconds']<=env['max_stop_seconds']
-                        or not finite(m.get('post_stop_m')) or not 0<=m['post_stop_m']+m['distance_uncertainty_m']<=env['max_stop_m']):
+                        or not finite(m.get('stop_seconds')) or m['stop_seconds']<0
+                        or not m['stop_seconds']+m['stop_uncertainty_seconds']<=env['max_stop_seconds']
+                        or not finite(m.get('post_stop_m')) or m['post_stop_m']<0
+                        or not m['post_stop_m']+m['distance_uncertainty_m']<=env['max_stop_m']):
                     raise ValueError('stopping measurements exceed envelope')
         if stage in ('wheels_up','floor_braking') and min(direction_counts.values())<3:
             raise ValueError('each direction requires three distinct measured envelope trials')

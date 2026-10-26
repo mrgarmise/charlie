@@ -252,6 +252,19 @@ def test_incomplete_or_changed_measurements_never_admit(change,tmp_path):
     with pytest.raises(ValueError):validate_report(report,autonomous=True)
 
 
+@pytest.mark.parametrize('stage',['explicit_stop','tcp_loss','pi_loss','local_expiry','floor_braking'])
+@pytest.mark.parametrize('field,value',[('stop_seconds',-.005),('post_stop_m',-.001)])
+def test_negative_measurements_cannot_be_hidden_by_uncertainty(tmp_path,stage,field,value):
+    from pathlib import Path
+    report,write=qualification_control(tmp_path)
+    ref=report['trials'][stage][0]
+    row=json.loads(Path(ref['path']).read_text())
+    row['measurements'][field]=value
+    report['trials'][stage][0]=write(Path(ref['path']).name,row)
+    with pytest.raises(ValueError,match='stopping measurements exceed envelope'):
+        validate_report(report)
+
+
 def test_evaluator_wont_infer_pet_following_from_ack(tmp_path):
     from memory.evidence import EvidenceJournal
     from memory.evaluator import MemoryEvaluator

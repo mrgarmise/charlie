@@ -13,9 +13,11 @@ class CapabilityDeployment:
             raise ValueError('independent current mobile qualification required')
         if (a.get('target')!='mobile-pet-follow' or a.get('qualification_id')!=qualification_id
                 or a.get('execution')!='physical' or not a.get('source') or not a.get('boot_id')
-                or a.get('mode') not in ('supervised_trial','qualified_autonomous')):
+                or a.get('mode') not in ('supervised_trial','qualified_autonomous')
+                or a.get('purpose') not in ('proxy','live_pet','operation')
+                or (a['mode']=='qualified_autonomous')!=(a['purpose']=='operation')):
             raise ValueError('separate boot-bound mobile authorization required')
-        report=validate_report(artifact(p['report_artifact']),autonomous=a['mode']=='qualified_autonomous')
+        report=validate_report(artifact(p['report_artifact']),autonomous=a['mode']=='qualified_autonomous',live_pet=a['purpose']=='live_pet')
         if report!=p['report'] or a.get('hardware_id')!=report['hardware_id'] or a.get('zone')!=report['zone']:
             raise ValueError('authorization differs from qualified hardware/zone')
         key=digest(dict(qualification=qualification_id,authorization=a))

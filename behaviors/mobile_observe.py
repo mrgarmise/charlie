@@ -99,6 +99,8 @@ class MobileObserveBehavior:
             try:
                 from experiments.ppal.mobile_navigation import QualifiedMobileExecutor, MotionLease
                 active,report=self.context.activation()
+                if result['proposal'].get('reasons') or result['proposal'].get('action')=='stop':
+                    raise ValueError('planner safety veto; no actuator connection')
                 if self.executor is None:
                     # No transport is even constructed until independent admission.
                     self.base=self.base_factory();self.base.connect()
@@ -124,6 +126,8 @@ class MobileObserveBehavior:
         self.last_decision=dict(intent='yield',reason=reason,project_id=(self.last_decision or {}).get('project_id'))
         previous=getattr(self,'yield_reason',None);self.yield_reason=reason
         self.last_attention_key=None
+        if result:
+            result['execution']=self.last_execution;result['attention']=self.last_decision
         if result and previous!=reason:self.evidence.attention_outcome(result,self.last_decision,self.last_execution,phase='yield/bookmark')
 
     def follow_step(self):

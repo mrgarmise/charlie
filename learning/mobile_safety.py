@@ -14,7 +14,7 @@ RUNTIME_FILES=('hardware/elegoo_camera.py','hardware/hailo_session.py','hardware
  'memory/learning_projects.py','memory/evaluator.py','learning/resources.py',
  'vision/mobile_perception.py','vision/mobile_tracking.py','vision/mobile_models.py')
 REQUIRED=('stationary_vision','explicit_stop','tcp_loss','pi_loss','local_expiry','power_cutoff',
- 'wheels_up','floor_braking','obstacle_abort','edge_abort','target_loss','preemption','proxy_follow')
+ 'wheels_up','floor_braking','obstacle_abort','edge_abort','target_loss','preemption')
 
 
 def runtime_hash():
@@ -33,7 +33,7 @@ def artifact(ref):
     return json.loads(raw)
 
 
-def validate_report(report, *, autonomous=False):
+def validate_report(report, *, autonomous=False, live_pet=False):
     """Require measured trials, identities, margins and retained original files.
 
     Witness assertions are externally supplied evidence, never inferred by code.
@@ -64,7 +64,7 @@ def validate_report(report, *, autonomous=False):
         if (type(limits.get('max_pwm')) is not int or not 1<=limits['max_pwm']<=env['max_pwm']
                 or not finite(limits.get('max_duration')) or not 0<limits['max_duration']<=env['max_duration']):
             raise ValueError('invalid direction-specific envelope: '+direction)
-    required=REQUIRED+(('live_pet_follow','voluntary_decline','restart_revoke') if autonomous else ())
+    required=REQUIRED+(('proxy_follow',) if live_pet or autonomous else ())+ (('live_pet_follow','voluntary_decline','restart_revoke') if autonomous else ())
     if not isinstance(report.get('sensor_producer_sha256'),str) or len(report['sensor_producer_sha256'])!=64:
         raise ValueError('qualified sensor producer code identity required')
     for stage in required:
@@ -124,7 +124,7 @@ def active_mobile(deployment, *, now, boot_id, hardware_id, zone):
     if q.data['producer']!='independent-mobile-evaluator':raise ValueError('independent mobile evaluator required')
     p=q.data['payload']
     if p.get('passed') is not True or p.get('runtime_sha256')!=runtime_hash():raise ValueError('runtime qualification changed')
-    report=validate_report(artifact(p['report_artifact']),autonomous=auth['mode']=='qualified_autonomous')
+    report=validate_report(artifact(p['report_artifact']),autonomous=auth['mode']=='qualified_autonomous',live_pet=auth.get('purpose')=='live_pet')
     if report!=p['report'] or report['hardware_id']!=hardware_id or report['zone']!=zone:raise ValueError('qualification identity changed')
     return active,report
 
@@ -160,7 +160,8 @@ class MobileSafetyContext:
                     or feed.get('frame_sha256')!=frame.get('sha256') or target is None
                     or feed.get('track_id')!=target['id'] or feed.get('firmware_sha256')!=report['firmware_sha256']
                     or feed.get('producer_sha256')!=report.get('sensor_producer_sha256')
-                    or not report.get('sensor_producer_sha256') or feed.get('scene')!='live-animal-grounded'
+                    or not report.get('sensor_producer_sha256')
+                    or feed.get('scene')!=('proxy-grounded' if active['authorization'].get('purpose')=='proxy' else 'live-animal-grounded')
                     or feed.get('capture_timing_verified') is not True
                     or not finite(feed.get('capture_age_seconds')) or not 0<=feed['capture_age_seconds']<=.5
                     or not finite(feed.get('at')) or not 0<=now-feed['at']<=.25):
@@ -173,7 +174,8 @@ class MobileSafetyContext:
             if any(feed['sensors'].get(k) is not True for k in required):raise ValueError('welfare/intrusion/zone/power unverified')
             out['raw_frame']=deepcopy(frame)
             frame.update(source_age_known=True,pan_deg=feed['pan_deg'],yaw_deg=feed['yaw_deg'])
-            out.update(qualification='native-qualified',sensors=feed['sensors'],grounded_animal=True)
+            out.update(qualification='native-qualified',sensors=feed['sensors'],
+                grounded_animal=feed['scene']=='live-animal-grounded',grounded_proxy=feed['scene']=='proxy-grounded')
             out['safety_provenance']=dict(qualification_id=active['qualification_id'],firmware_sha256=report['firmware_sha256'],
                 bridge_sha256=report['bridge_sha256'],sensor_producer_sha256=report['sensor_producer_sha256'])
             self.current=dict(observation=out,tracking=tracking,activation=active,report=report,at=feed['at'],feed_digest=digest(feed))

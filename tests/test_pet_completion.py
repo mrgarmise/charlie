@@ -156,7 +156,7 @@ def test_existing_gate_binds_frame_sensors_authority_and_single_dispatch():
     c=Mock();c.boot_id='boot';c.activation.return_value=({'activation_key':'grant'},{'envelope':{'max_pwm':35,'max_duration':.2},'direction_envelopes':{'FORWARD':{'max_pwm':35,'max_duration':.2}}})
     c.current={'observation':{'frame':{'id':'frame'},'sensors':{}},'tracking':{'target':{'id':'animal'}},'activation':{'activation_key':'grant'}}
     c.safe.return_value=True
-    base=Mock();base.pulse.return_value={'acknowledged':True,'command':{'N':3},'stop':{'sent':True}}
+    base=Mock();base.pulse.return_value={'acknowledged':True,'command':{'N':3},'stop':{'sent':True,'acknowledged':True}}
     backend=QualifiedMobileExecutor(base,c,clock=lambda:1)
     p=dict(id='proposal',frame_id='frame',at=1,action='advance',speed=.15,duration=.1,reasons=[],binding=backend.binding(c.current))
     gate=MobileExecutionGate(backend=backend,clock=lambda:1,boot_id='boot',safety_check=c.safe)
@@ -207,7 +207,7 @@ def qualification_control(tmp_path):
         protocol_artifact=protocol,envelope=dict(max_pwm=35,max_duration=.1,max_stop_seconds=.3,max_stop_m=.1,
                                                stand_off_m=1.,margin_m=.2),trials={})
     report['direction_envelopes']={d:{'max_pwm':35,'max_duration':.1} for d in ('LEFT','RIGHT','FORWARD','REVERSE')}
-    for stage in REQUIRED+('live_pet_follow','voluntary_decline','restart_revoke'):
+    for stage in REQUIRED+('proxy_follow','live_pet_follow','voluntary_decline','restart_revoke'):
         refs=[]
         for n in range(12 if stage in ('wheels_up','floor_braking') else 3):
             raw=write(f'{stage}-{n}-raw.json',{'software_control_only':True,'stage':stage,'sample':n})
@@ -226,7 +226,7 @@ def test_independent_measurement_validation_activation_revocation_and_restart(tm
     ref=write('report.json',report);j=EvidenceJournal(tmp_path/'q.sqlite3');d=CapabilityDeployment(j)
     q=evaluate(j,ref,autonomous=True)
     auth=dict(target='mobile-pet-follow',qualification_id=q.id,execution='physical',source='software control only',
-        boot_id='boot',mode='qualified_autonomous',hardware_id='fictional-car',zone='fixture-bench',issued_at=.5,expires_at=2.)
+        boot_id='boot',mode='qualified_autonomous',purpose='operation',hardware_id='fictional-car',zone='fixture-bench',issued_at=.5,expires_at=2.)
     d.activate_mobile(q.id,authorization=auth)
     assert active_mobile(d,now=1,boot_id='boot',hardware_id='fictional-car',zone='fixture-bench')[1]==report
     for changes in ({'now':3},{'boot_id':'restart'},{'zone':'stairs'},{'hardware_id':'other'}):
@@ -277,7 +277,7 @@ def safety_control(tmp_path):
     report,write=qualification_control(tmp_path);j=EvidenceJournal(tmp_path/'feed.sqlite3');d=CapabilityDeployment(j)
     q=evaluate(j,write('report.json',report))
     d.activate_mobile(q.id,authorization=dict(target='mobile-pet-follow',qualification_id=q.id,execution='physical',source='software control only',
-        boot_id='boot',mode='supervised_trial',hardware_id='fictional-car',zone='fixture-bench',issued_at=.5,expires_at=2.))
+        boot_id='boot',mode='supervised_trial',purpose='live_pet',hardware_id='fictional-car',zone='fixture-bench',issued_at=.5,expires_at=2.))
     o,t,s=qualified();o['frame']['sha256']='e'*64;o['frame']['source_age_known']=False;o['model']=[{'sha256':'c'*64}]
     o['qualification']='unqualified'
     s.update(pet_willing=True,human_clear=True,zone_inspected=True,power_ok=True)
@@ -358,3 +358,32 @@ def test_supervised_calibration_dry_run_has_no_device_and_cannot_skip_staging(tm
     trial['stage']='empty_floor'
     with pytest.raises((KeyError,ValueError)):calibration_trial(j,write('floor.json',trial),execute=True,base_factory=base)
     base.assert_not_called();j.close()
+
+
+def test_uncertain_stop_latches_executor_and_prevents_next_start():
+    from experiments.ppal.mobile_navigation import QualifiedMobileExecutor,MobileExecutionGate
+    c=Mock();c.boot_id='boot'
+    c.activation.return_value=({'activation_key':'grant'},{'direction_envelopes':{'FORWARD':{'max_pwm':35,'max_duration':.1}}})
+    c.current={'observation':{'frame':{'id':'frame'},'sensors':{}},'tracking':{'target':{'id':'animal'}},'activation':{'activation_key':'grant'}}
+    c.safe.return_value=True
+    base=Mock();base.pulse.return_value={'acknowledged':True,'command':{'N':3},'stop':{'sent':None,'acknowledged':False}}
+    backend=QualifiedMobileExecutor(base,c,clock=lambda:1)
+    gate=MobileExecutionGate(backend=backend,clock=lambda:1,boot_id='boot',safety_check=c.safe)
+    gate.lease=MotionLease('supervised_trial',2,'grant','boot')
+    p=dict(id='one',frame_id='frame',at=1,action='advance',speed=.15,duration=.1,reasons=[],binding=backend.binding(c.current))
+    first=gate.execute(p)
+    assert first['dispatched'] and first['physical_uncertainty'] and 'stop_unconfirmed' in first['rejected']
+    p['id']='two';assert not gate.execute(p)['approved']
+    assert base.pulse.call_count==1
+
+
+def test_proxy_authority_cannot_admit_a_live_pet(tmp_path):
+    j,c,o,t,feed,path=safety_control(tmp_path)
+    from learning.deployment import CapabilityDeployment
+    d=CapabilityDeployment(j);a=d.active('mobile-pet-follow')['authorization'];a=dict(a,purpose='proxy')
+    d.activate_mobile(a['qualification_id'],authorization=a)
+    assert c.bind(o,t)['qualification']=='unqualified'
+    feed['scene']='proxy-grounded';path.write_text(json.dumps(feed))
+    out=c.bind(o,t)
+    assert out['grounded_proxy'] and not out['grounded_animal']
+    j.close()

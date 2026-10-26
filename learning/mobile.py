@@ -47,7 +47,7 @@ class MobileEvidenceAdapter:
         if not o['frame']['authentic']:return []
         target=p['tracking']['target']
         if target is None:return []
-        key=(o['frame']['source'],target['id'],o['frame'].get('pan_deg'),o.get('grounded_animal',False))
+        key=(o['frame']['source'],target['id'],o['frame'].get('pan_deg'),o.get('grounded_animal',False),o.get('grounded_proxy',False))
         if key in self.opportunity_keys or len(self.opportunity_keys)>=256:return []
         self.opportunity_keys.add(key)
         hypotheses=[dict(method='mobile-observe',scope=dict(body=o['frame']['source'],category=target.get('kind',target['label'])),
@@ -55,9 +55,9 @@ class MobileEvidenceAdapter:
             evidence_ids=[row.id],conditions=[dict(view='centered'),dict(view='off-axis'),dict(view='pose-unknown')],
             observed_conditions=[dict(view='centered' if o['frame'].get('pan_deg')==90 else 'pose-unknown' if o['frame'].get('pan_deg') is None else 'off-axis')],
             requires=['mobile-camera','mobile-models'])]
-        if o.get('grounded_animal') is True:
-            hypotheses.append(dict(method='pet_follow',scope=dict(body=o['frame']['source'],kind='animal'),
-                expected='bounded changes of viewpoint improve continued animal observation without reducing safe separation',
+        if o.get('grounded_animal') is True or o.get('grounded_proxy') is True:
+            hypotheses.append(dict(method='pet_follow',scope=dict(body=o['frame']['source'],kind='animal' if o.get('grounded_animal') else 'nonliving-proxy'),
+                expected='bounded changes of viewpoint improve continued target observation without reducing safe separation',
                 evidence_ids=[row.id],conditions=[dict(view='far'),dict(view='stand-off'),dict(view='yield')],
                 observed_conditions=[dict(view='far')],requires=['mobile-camera','mobile-models','qualified-car-local-controller','motion-lease']))
         proposals=reflect_project_opportunities(self.journal,self.episode,hypotheses)

@@ -141,7 +141,10 @@ class MobileExecutionGate:
                           executed=ack.get('executed') if type(ack.get('executed')) is bool else None)
             if 'stop' in ack:result['stop']=ack['stop']
             if 'wire' in ack:result['wire']=ack['wire']
-            if ack.get('bounded_complete'):self.active=False
+            if ack.get('bounded_complete'):
+                confirmed=ack.get('stop',{}).get('acknowledged') is True
+                self.active=not confirmed
+                if not confirmed:result.update(approved=False,physical_uncertainty=True,rejected=['stop_unconfirmed'])
             if not result['acknowledged']:self.backend.stop(); self.active=False
         except Exception as exc:
             result.update(approved=False,rejected=['controller_error'],error=type(exc).__name__)
@@ -171,6 +174,8 @@ class QualifiedMobileExecutor:
 
     def execute_bounded(self,proposal,*,lease):
         active,report=self.context.activation()
+        if self.last_stop is not None and self.last_stop.get('acknowledged') is not True:
+            raise ValueError('uncertain previous STOP; revoke/requalify before further movement')
         c=self.context.current
         if (c is None or proposal['id'] in self.used or not self.context.safe(proposal)
                 or not lease.valid(self.clock(),self.context.boot_id)

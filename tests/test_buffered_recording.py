@@ -100,7 +100,9 @@ def test_writer_failure_blocks_sealing_and_retains_gap(tmp_path):
 
 
 def test_flush_timeout_cannot_become_completion_when_writer_later_finishes(tmp_path):
-    r=CaptureEvidence(tmp_path,'simulation',{},flush_timeout=.05);r.ready()
+    # Exercise the close/flush deadline, not SQLite schema/index startup time.
+    r=CaptureEvidence(tmp_path,'simulation',{});r.ready()
+    r.flush_timeout=.05
     entered,release=hold_writer(r);r.capture(Image.new('RGB',(40,40)),dict(timestamp=time.monotonic()))
     assert entered.wait(1)
     try:

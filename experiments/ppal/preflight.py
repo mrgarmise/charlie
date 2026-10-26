@@ -4,7 +4,7 @@ Preflight runs immediately before START.
 
 Important invariants:
 * Discover Robotron from the CURRENT full camera field of view.
-* Previous geometry is never required.
+* Previous qualified geometry is optional and always confirmed on fresh pixels.
 * Focus quality is measured on the Robotron playfield, not the whole frame.
 * Geometry is rechecked after focus.
 * Successful preflight leaves the camera in manual locked focus.
@@ -23,7 +23,7 @@ from .eyes.calibration import Calibration
 from .eyes.settle import locate
 
 
-def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
+def sensory_preflight(source, output, *, seed_position=None, timeout=60., viewpoint_path=None):
     """Reuse current camera owner/geometry/focus/exposure; no motion authority.
 
     White balance settles and locks measured gains only. Without an independent
@@ -31,22 +31,68 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
     """
     from dataclasses import asdict
     from learning.foundry import atomic_json
-    from .eyes.exposure import optimize_screen_exposure, screen_evidence
+    from .eyes.exposure import optimize_screen_exposure
     from .eyes.autofocus import establish_focus, verify_focus_lock
     output.mkdir(parents=True, exist_ok=True)
     started=time.monotonic();deadline=started+timeout
     class BoundedSource:
         last_frame = None
+        rejected_frames = 0
         def read(self):
             if time.monotonic()>=deadline:raise ValueError('sensory preflight deadline; assistance required')
             read = getattr(source, 'read_fresh', source.read)
             self.last_frame = read()
             return self.last_frame
+        def read_fresh(self):
+            return self.read()
+        def save_rejected_final_image(self, frame, attempt):
+            self.rejected_frames += 1
+            name=f'sensory-final-rejected-{self.rejected_frames:02d}.png'
+            frame.save(output/name)
+            return name
         def __getattr__(self,name):return getattr(source,name)
     bounded=BoundedSource()
     report=dict(status='preparing',started_at=started,physical_motion=False,
                 color_fidelity='unqualified without an independent color reference')
     try:
+        from .eyes.visual_readiness import default_view_path, confirm_view, record_view
+        from pathlib import Path
+        import json
+        candidate_path = Path(viewpoint_path) if viewpoint_path is not None else default_view_path()
+        report['stage'] = 'qualified viewpoint confirmation'
+        report['viewpoint_handoff'] = dict(path=str(candidate_path), status='not_available')
+        if candidate_path.exists():
+            handoff = report['viewpoint_handoff']
+            try:
+                candidate = json.loads(candidate_path.read_text())
+                if (seed_position is not None and abs(candidate['focus']['lens_position']-seed_position) > .05):
+                    raise ValueError('qualified view focus differs from explicitly requested focus')
+                calibration, frame = confirm_view(bounded, candidate, report=handoff)
+            except (ValueError, KeyError, TypeError) as exc:
+                handoff.update(status='rejected; fresh preparation follows', reason=str(exc))
+            else:
+                capture=getattr(source,'capture',getattr(source,'last_capture',None))
+                lock=getattr(source,'lock_exposure',None)
+                report['exposure']=dict(status='fresh readable view reused; no sweep',
+                    exposure_locked=bool(lock(capture)) if callable(lock) and isinstance(capture,dict) else False,
+                    selected_capture=capture)
+                white_balance=getattr(source,'lock_white_balance',None)
+                report['white_balance_locked']=bool(white_balance(capture)) if callable(white_balance) else False
+                report.update(status='usable', stage='complete', quality=handoff['quality'],
+                              focus=handoff['focus'], finished_at=time.monotonic(),
+                              final_capture=getattr(source,'capture',None))
+                frame.save(output/'sensory-final.png')
+                calibration.apply(frame).save(output/'sensory-playfield.png')
+                calibration.save(output/'calibration.json')
+                record=record_view(calibration, handoff['focus'], frame, origin=output,
+                                   observations=handoff['observations'])
+                report['visual_readiness']=record
+                atomic_json(output/'visual-readiness.json', record)
+                # The supplied Active Vision lock is immutable; only update the
+                # task's own continuity cache after new qualification.
+                default_view_path().parent.mkdir(parents=True, exist_ok=True)
+                atomic_json(default_view_path(), record)
+                return calibration, report
         report['stage'] = 'initial autofocus and manual lock'
         report['initial_focus'] = {}
         seed = establish_focus(bounded, report=report['initial_focus'], manual_position=2.0)
@@ -65,17 +111,7 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
         # Require actual detail, not a successful method return or zero-valued
         # focus optimum. Limits reuse established exposure qualification.
         report['stage'] = 'final geometry and image detail'
-        frame=bounded.read()
-        import numpy as np
-        quality=screen_evidence(frame,np.array(optics.geometry.corners))
-        final_points=locate(frame,require_uniform_border=False,previous=np.array(optics.geometry.corners))
-        if np.max(np.linalg.norm(final_points-np.array(optics.geometry.corners),axis=1))>PreflightConfig().max_jitter_pixels:
-            raise ValueError('final image geometry differs from stable calibration; assistance required')
-        quality['sharpness']=screen_sharpness(optics.calibration.apply(frame))
-        report['quality']=quality
-        if (quality['detail_pixels']<50 or not np.isfinite(optics.focus.score) or optics.focus.score<=0
-                or not np.isfinite(quality['sharpness']) or quality['sharpness']<=0):
-            raise ValueError('insufficient visual detail for meaningful observation; assistance required')
+        frame, quality = verify_final_image(bounded, optics, report=report)
         lock=getattr(bounded,'lock_white_balance',None)
         report['white_balance_locked']=bool(lock(getattr(source,'capture',getattr(source,'last_capture',None)))) if callable(lock) else False
         report.update(status='usable',stage='complete')
@@ -84,6 +120,12 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
         frame.save(output/'sensory-final.png')
         optics.calibration.apply(frame).save(output/'sensory-playfield.png')
         optics.calibration.save(output/'calibration.json')
+        record=record_view(optics.calibration, report['focus'], frame, origin=output,
+                           observations=report['final_image_attempts'])
+        report['visual_readiness']=record
+        atomic_json(output/'visual-readiness.json',record)
+        default_view_path().parent.mkdir(parents=True, exist_ok=True)
+        atomic_json(default_view_path(),record)
         return optics.calibration,report
     except Exception as exc:
         report.update(status='failed',reason=str(exc),finished_at=time.monotonic(),request='restore a complete readable display view')
@@ -95,6 +137,59 @@ def sensory_preflight(source, output, *, seed_position=None, timeout=60.):
         raise
     finally:
         atomic_json(output/'sensory-preflight.json',report)
+
+
+def verify_final_image(source, optics, *, report, attempts=4):
+    """Bound transient border misses; every accepted image has fresh support.
+
+    Stable calibration ranks candidates but never substitutes for visible four
+    edge/endpoint evidence. A supported moved rectangle fails immediately.
+    The caller's BoundedSource also enforces the overall sensory deadline.
+    """
+    from .eyes.exposure import screen_evidence
+    if getattr(optics, 'continuity_confirmed', False):
+        from dataclasses import replace
+        from .eyes.visual_readiness import confirm_geometry
+        if not np.isfinite(optics.focus.score) or optics.focus.score <= 0:
+            raise ValueError('insufficient visual detail for meaningful observation')
+        frame, quality = confirm_geometry(source, optics.calibration,
+            config=replace(PreflightConfig(), geometry_attempts=attempts),
+            diagnostics=report.setdefault('final_image_attempts', []))
+        report['quality']=quality
+        return frame, quality
+    corners = np.asarray(optics.geometry.corners)
+    checks = report.setdefault('final_image_attempts', [])
+    for index in range(attempts):
+        frame = source.read()
+        check = {'attempt': index + 1, 'geometry': {}}
+        checks.append(check)
+        quality = screen_evidence(frame, corners)
+        quality['sharpness'] = screen_sharpness(optics.calibration.apply(frame))
+        check['quality'] = quality
+        report['quality'] = quality
+        try:
+            points = locate(frame, require_uniform_border=False, previous=corners,
+                            max_jitter_pixels=PreflightConfig().max_jitter_pixels,
+                            diagnostics=check['geometry'])
+        except ValueError as exc:
+            check.update(status='border_unavailable', reason=str(exc))
+            # Retain the actual rejected input as well as numeric diagnostics.
+            save = getattr(source, 'save_rejected_final_image', None)
+            if callable(save): save(frame, index + 1)
+            continue
+        jitter = float(np.max(np.linalg.norm(points-corners, axis=1)))
+        check['jitter_pixels'] = jitter
+        if jitter > PreflightConfig().max_jitter_pixels:
+            check['status'] = 'geometry_changed'
+            raise ValueError('final image geometry differs from stable calibration; assistance required')
+        if (quality['detail_pixels'] < 50 or not np.isfinite(optics.focus.score)
+                or optics.focus.score <= 0 or not np.isfinite(quality['sharpness'])
+                or quality['sharpness'] <= 0):
+            check['status'] = 'insufficient_detail'
+            raise ValueError('insufficient visual detail for meaningful observation; assistance required')
+        check['status'] = 'accepted'
+        return frame, quality
+    raise ValueError('final image border unavailable after bounded fresh-frame retries; assistance required')
 
 
 @dataclass(frozen=True)
@@ -144,6 +239,7 @@ class PreflightResult:
     calibration: Calibration
     geometry: GeometryResult
     focus: FocusResult
+    continuity_confirmed: bool = False
 
 
 class ImagingMonitor:
@@ -401,18 +497,32 @@ def run_preflight(
     focus = FocusResult(
         lens_position=2.0,
         score=score,
-        previous_score=score,
-        changed=False,
+        previous_score=score if abs(float(seed_position)-2.0) <= .05 else None,
+        changed=abs(float(seed_position)-2.0) > .05,
     )
 
-    # Focus changes can slightly alter apparent edge position.  Geometry used
-    # for gameplay therefore comes from fresh post-focus observations.
-    final_geometry = locate_stable_geometry(source, cfg, **({'diagnostics': diagnostics} if diagnostics is not None else {}))
+    # The fixed lock often has not changed at all. Preserve the six-view
+    # qualification and confirm its current support, rather than discarding it
+    # and requiring another six consecutive successful Hough enumerations.
+    if not focus.changed:
+        from .eyes.visual_readiness import confirm_geometry
+        continuity=[]
+        try:
+            confirm_geometry(source, provisional.calibration, config=cfg, diagnostics=continuity)
+        finally:
+            if diagnostics is not None:
+                diagnostics.append(dict(stage='unchanged_focus_continuity',
+                                        reference_observations=provisional.observations,
+                                        observations=continuity))
+        final_geometry = provisional
+    else:
+        final_geometry = locate_stable_geometry(source, cfg, **({'diagnostics': diagnostics} if diagnostics is not None else {}))
 
     return PreflightResult(
         calibration=final_geometry.calibration,
         geometry=final_geometry,
         focus=focus,
+        continuity_confirmed=not focus.changed,
     )
 
 

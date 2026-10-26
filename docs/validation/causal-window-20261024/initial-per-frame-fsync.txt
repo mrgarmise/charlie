@@ -1,0 +1,263 @@
+.FFF....F....................................                            [100%]
+=================================== FAILURES ===================================
+____ test_full_interval_exceeds_ring_capacity_but_all_originals_survive[60] ____
+
+self = <experiments.ppal.observation_stream.ObservationStream object at 0x7fff56603b10>
+
+    def _run(self):
+        try:
+            while not self.stop_event.is_set():
+                image,capture=self.acquire()
+                if self.stop_event.is_set():break
+>               with self.condition:self._append(image,capture)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+experiments/ppal/observation_stream.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.observation_stream.ObservationStream object at 0x7fff56603b10>
+image = <PIL.Image.Image image mode=RGB size=1280x720 at 0x7FFF54423110>
+capture = {'first_pixel_exposure_at': 4858.832786051, 'sensor_timestamp_ns': 4858832786051, 'synthetic_sequence': 21, 'frame_duration_us': 12926.113149846873}
+
+    def _append(self,image,capture):
+        capture=dict(capture or {});at=capture.get('first_pixel_exposure_at');sensor=capture.get('sensor_timestamp_ns')
+        if (not isinstance(at,(int,float)) or isinstance(at,bool) or not math.isfinite(at) or
+            not isinstance(sensor,(int,float)) or isinstance(sensor,bool) or not math.isfinite(sensor) or
+            sensor<=0 or (self.previous_sensor is not None and sensor<=self.previous_sensor) or
+            (self.previous_at is not None and at<=self.previous_at)):
+            raise ValueError('missing, repeated, or nonmonotonic exposure metadata')
+        completed=capture.get('completed_at')
+        if completed is not None and (not math.isfinite(completed) or not 0<=completed-at<=1.):
+            raise ValueError('stale or future exposure relative to capture completion')
+        self.sequence+=1;packet=Exposure(self.sequence,image,capture)
+        if packet.nbytes>self.byte_capacity:raise BufferError('camera image exceeds memory bound')
+        if self.pin is not None and self.window_end_at is not None and at>self.window_end_at and self.window_end_sequence is None:
+            self.window_end_sequence=packet.sequence-1
+        retain=True
+        while self.frames and (len(self.frames)>=self.capacity or self.bytes+packet.nbytes>self.byte_capacity):
+            ordinary=next((i for i,p in enumerate(self.frames) if not self._protected(p.sequence)),None)
+            if ordinary is None:
+                if self._protected(packet.sequence):
+>                   raise BufferError('critical capture window overflow; no frames silently discarded')
+E                   BufferError: critical capture window overflow; no frames silently discarded
+
+experiments/ppal/observation_stream.py:58: BufferError
+
+The above exception was the direct cause of the following exception:
+
+rig = namespace(source=namespace(stream=<experiments.ppal.observation_stream.ObservationStream object at 0x7fff56603b10>, re.../test_full_interval_exceeds_rin0'), progress=<experiments.ppal.progress_supervision.Progress object at 0x7fff54e48590>)
+duration = 60
+
+    @pytest.mark.parametrize('duration',[60,400])
+    def test_full_interval_exceeds_ring_capacity_but_all_originals_survive(rig,duration):
+>       execution,frames,status=capture_window(rig.source,rig.controller,Action('STAY','E'),duration)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_causal_window_capacity.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/shot_capture.py:156: in capture_window
+    try:packet=stream.next_window(timeout=.02)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.observation_stream.ObservationStream object at 0x7fff56603b10>
+timeout = 0.02
+
+    def next_window(self, *, timeout=.02):
+        """Oldest unacknowledged protected exposure; never newest-frame sampling."""
+        until=time.monotonic()+timeout
+        with self.condition:
+            while True:
+>               if self.error is not None:raise RuntimeError('causal capture failed') from self.error
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               RuntimeError: causal capture failed
+
+experiments/ppal/observation_stream.py:128: RuntimeError
+___ test_full_interval_exceeds_ring_capacity_but_all_originals_survive[400] ____
+
+rig = namespace(source=namespace(stream=<experiments.ppal.observation_stream.ObservationStream object at 0x7fff5441d810>, re.../test_full_interval_exceeds_rin1'), progress=<experiments.ppal.progress_supervision.Progress object at 0x7fff5441de50>)
+duration = 400
+
+    @pytest.mark.parametrize('duration',[60,400])
+    def test_full_interval_exceeds_ring_capacity_but_all_originals_survive(rig,duration):
+>       execution,frames,status=capture_window(rig.source,rig.controller,Action('STAY','E'),duration)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_causal_window_capacity.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/shot_capture.py:154: in capture_window
+    if errors:raise errors[0]
+              ^^^^^^^^^^^^^^^
+experiments/ppal/shot_capture.py:135: in execute
+    controller.execute(action,duration_ms,cancel_event=cancellation,deadline=window_deadline-post_seconds)
+experiments/ppal/progress_supervision.py:235: in execute
+    return self._call('execute', *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments/ppal/progress_supervision.py:227: in _call
+    return getattr(self.controller, name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments/ppal/arcade_transport.py:193: in execute
+    check_cancel()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def check_cancel():
+        if (cancel_event is not None and cancel_event.is_set()) or (deadline is not None and time.monotonic()>=deadline):
+            timing['cancelled_at']=time.monotonic()
+>           raise InterruptedError('bounded controller operation cancelled')
+E           InterruptedError: bounded controller operation cancelled
+
+experiments/ppal/arcade_transport.py:153: InterruptedError
+_ test_slow_consumer_does_not_extend_protection_into_replay_or_future_history __
+
+self = <experiments.ppal.observation_stream.ObservationStream object at 0x7fff54dc1cd0>
+
+    def _run(self):
+        try:
+            while not self.stop_event.is_set():
+                image,capture=self.acquire()
+                if self.stop_event.is_set():break
+>               with self.condition:self._append(image,capture)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+experiments/ppal/observation_stream.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.observation_stream.ObservationStream object at 0x7fff54dc1cd0>
+image = <PIL.Image.Image image mode=RGB size=1280x720 at 0x7FFF54422C10>
+capture = {'first_pixel_exposure_at': 4862.500616925, 'sensor_timestamp_ns': 4862500616925, 'synthetic_sequence': 21, 'frame_duration_us': 12926.113149846873}
+
+    def _append(self,image,capture):
+        capture=dict(capture or {});at=capture.get('first_pixel_exposure_at');sensor=capture.get('sensor_timestamp_ns')
+        if (not isinstance(at,(int,float)) or isinstance(at,bool) or not math.isfinite(at) or
+            not isinstance(sensor,(int,float)) or isinstance(sensor,bool) or not math.isfinite(sensor) or
+            sensor<=0 or (self.previous_sensor is not None and sensor<=self.previous_sensor) or
+            (self.previous_at is not None and at<=self.previous_at)):
+            raise ValueError('missing, repeated, or nonmonotonic exposure metadata')
+        completed=capture.get('completed_at')
+        if completed is not None and (not math.isfinite(completed) or not 0<=completed-at<=1.):
+            raise ValueError('stale or future exposure relative to capture completion')
+        self.sequence+=1;packet=Exposure(self.sequence,image,capture)
+        if packet.nbytes>self.byte_capacity:raise BufferError('camera image exceeds memory bound')
+        if self.pin is not None and self.window_end_at is not None and at>self.window_end_at and self.window_end_sequence is None:
+            self.window_end_sequence=packet.sequence-1
+        retain=True
+        while self.frames and (len(self.frames)>=self.capacity or self.bytes+packet.nbytes>self.byte_capacity):
+            ordinary=next((i for i,p in enumerate(self.frames) if not self._protected(p.sequence)),None)
+            if ordinary is None:
+                if self._protected(packet.sequence):
+>                   raise BufferError('critical capture window overflow; no frames silently discarded')
+E                   BufferError: critical capture window overflow; no frames silently discarded
+
+experiments/ppal/observation_stream.py:58: BufferError
+
+The above exception was the direct cause of the following exception:
+
+rig = namespace(source=namespace(stream=<experiments.ppal.observation_stream.ObservationStream object at 0x7fff54dc1cd0>, re.../test_slow_consumer_does_not_ex0'), progress=<experiments.ppal.progress_supervision.Progress object at 0x7fff5441d090>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fff54415d90>
+
+    def test_slow_consumer_does_not_extend_protection_into_replay_or_future_history(rig,monkeypatch):
+        original=CapturedFrames.append
+        def slow(self,packet):
+            time.sleep(.025)  # Below camera FPS; ring absorbs finite pulse backlog.
+            return original(self,packet)
+        monkeypatch.setattr(CapturedFrames,'append',slow)
+>       execution,frames,status=capture_window(rig.source,rig.controller,Action('STAY','E'),60)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_causal_window_capacity.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/shot_capture.py:156: in capture_window
+    try:packet=stream.next_window(timeout=.02)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.observation_stream.ObservationStream object at 0x7fff54dc1cd0>
+timeout = 0.02
+
+    def next_window(self, *, timeout=.02):
+        """Oldest unacknowledged protected exposure; never newest-frame sampling."""
+        until=time.monotonic()+timeout
+        with self.condition:
+            while True:
+>               if self.error is not None:raise RuntimeError('causal capture failed') from self.error
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               RuntimeError: causal capture failed
+
+experiments/ppal/observation_stream.py:128: RuntimeError
+__________ test_archive_pixel_integrity_checked_before_causal_replay ___________
+
+self = <experiments.ppal.observation_stream.ObservationStream object at 0x7fff5443e690>
+
+    def _run(self):
+        try:
+            while not self.stop_event.is_set():
+                image,capture=self.acquire()
+                if self.stop_event.is_set():break
+>               with self.condition:self._append(image,capture)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+experiments/ppal/observation_stream.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.observation_stream.ObservationStream object at 0x7fff5443e690>
+image = <PIL.Image.Image image mode=RGB size=1280x720 at 0x7FFF544E5810>
+capture = {'first_pixel_exposure_at': 4874.245351185, 'sensor_timestamp_ns': 4874245351185, 'synthetic_sequence': 22, 'frame_duration_us': 12926.113149846873}
+
+    def _append(self,image,capture):
+        capture=dict(capture or {});at=capture.get('first_pixel_exposure_at');sensor=capture.get('sensor_timestamp_ns')
+        if (not isinstance(at,(int,float)) or isinstance(at,bool) or not math.isfinite(at) or
+            not isinstance(sensor,(int,float)) or isinstance(sensor,bool) or not math.isfinite(sensor) or
+            sensor<=0 or (self.previous_sensor is not None and sensor<=self.previous_sensor) or
+            (self.previous_at is not None and at<=self.previous_at)):
+            raise ValueError('missing, repeated, or nonmonotonic exposure metadata')
+        completed=capture.get('completed_at')
+        if completed is not None and (not math.isfinite(completed) or not 0<=completed-at<=1.):
+            raise ValueError('stale or future exposure relative to capture completion')
+        self.sequence+=1;packet=Exposure(self.sequence,image,capture)
+        if packet.nbytes>self.byte_capacity:raise BufferError('camera image exceeds memory bound')
+        if self.pin is not None and self.window_end_at is not None and at>self.window_end_at and self.window_end_sequence is None:
+            self.window_end_sequence=packet.sequence-1
+        retain=True
+        while self.frames and (len(self.frames)>=self.capacity or self.bytes+packet.nbytes>self.byte_capacity):
+            ordinary=next((i for i,p in enumerate(self.frames) if not self._protected(p.sequence)),None)
+            if ordinary is None:
+                if self._protected(packet.sequence):
+>                   raise BufferError('critical capture window overflow; no frames silently discarded')
+E                   BufferError: critical capture window overflow; no frames silently discarded
+
+experiments/ppal/observation_stream.py:58: BufferError
+
+The above exception was the direct cause of the following exception:
+
+rig = namespace(source=namespace(stream=<experiments.ppal.observation_stream.ObservationStream object at 0x7fff5443e690>, re.../test_archive_pixel_integrity_c0'), progress=<experiments.ppal.progress_supervision.Progress object at 0x7fff5443e9c0>)
+
+    def test_archive_pixel_integrity_checked_before_causal_replay(rig):
+>       _,frames,_=capture_window(rig.source,rig.controller,Action('STAY','E'),60)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_causal_window_capacity.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/shot_capture.py:156: in capture_window
+    try:packet=stream.next_window(timeout=.02)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.observation_stream.ObservationStream object at 0x7fff5443e690>
+timeout = 0.02
+
+    def next_window(self, *, timeout=.02):
+        """Oldest unacknowledged protected exposure; never newest-frame sampling."""
+        until=time.monotonic()+timeout
+        with self.condition:
+            while True:
+>               if self.error is not None:raise RuntimeError('causal capture failed') from self.error
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               RuntimeError: causal capture failed
+
+experiments/ppal/observation_stream.py:128: RuntimeError
+=========================== short test summary info ============================
+FAILED tests/test_causal_window_capacity.py::test_full_interval_exceeds_ring_capacity_but_all_originals_survive[60]
+FAILED tests/test_causal_window_capacity.py::test_full_interval_exceeds_ring_capacity_but_all_originals_survive[400]
+FAILED tests/test_causal_window_capacity.py::test_slow_consumer_does_not_extend_protection_into_replay_or_future_history
+FAILED tests/test_causal_window_capacity.py::test_archive_pixel_integrity_checked_before_causal_replay
+4 failed, 41 passed in 19.19s

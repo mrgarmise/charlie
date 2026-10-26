@@ -1,0 +1,865 @@
+.................................................FFF.EEEEFFFFFFFFFFFFFF. [ 42%]
+......FF................................................................ [ 84%]
+...........................                                              [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_each_progressing_action_renews_even_when_positions_unchanged _
+
+    @pytest.fixture
+    def server():
+>       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+____ ERROR at setup of test_unsupported_lease_fails_closed_without_gameplay ____
+
+    @pytest.fixture
+    def server():
+>       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+___________ ERROR at setup of test_expired_renewal_closes_connection ___________
+
+    @pytest.fixture
+    def server():
+>       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_____ ERROR at setup of test_old_local_timer_cannot_interrupt_renewed_hold _____
+
+    @pytest.fixture
+    def server():
+>       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+=================================== FAILURES ===================================
+___ ArcadeTransportTests.test_current_absolute_position_protocol_and_neutral ___
+
+self = <test_ppal_arcade_transport.ArcadeTransportTests testMethod=test_current_absolute_position_protocol_and_neutral>
+
+    def test_current_absolute_position_protocol_and_neutral(self):
+        self.assertEqual(positions_for(Action("SW", "NE")), ("LS_DOWN_LEFT", "RS_UP_RIGHT"))
+>       with LegacyServer(("127.0.0.1", 0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ppal_arcade_transport.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+___ ArcadeTransportTests.test_independent_sticks_and_held_direction_changes ____
+
+self = <test_ppal_arcade_transport.ArcadeTransportTests testMethod=test_independent_sticks_and_held_direction_changes>
+
+    def test_independent_sticks_and_held_direction_changes(self):
+>       with LegacyServer(("127.0.0.1", 0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ppal_arcade_transport.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+________ ArcadeTransportTests.test_rejected_command_stops_and_releases _________
+
+self = <test_ppal_arcade_transport.ArcadeTransportTests testMethod=test_rejected_command_stops_and_releases>
+
+    def test_rejected_command_stops_and_releases(self):
+>       with LegacyServer(("127.0.0.1", 0), reject=("RS_RIGHT_DOWN",)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ppal_arcade_transport.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_________________ test_forbidden_commands_never_reach_wire[RT] _________________
+
+token = 'RT'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_________________ test_forbidden_commands_never_reach_wire[rt] _________________
+
+token = 'rt'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+______________ test_forbidden_commands_never_reach_wire[RT_DOWN] _______________
+
+token = 'RT_DOWN'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_______________ test_forbidden_commands_never_reach_wire[RT_UP] ________________
+
+token = 'RT_UP'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+___________ test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER] ____________
+
+token = 'RIGHT_TRIGGER'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_________ test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER_DOWN] _________
+
+token = 'RIGHT_TRIGGER_DOWN'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_________________ test_forbidden_commands_never_reach_wire[R2] _________________
+
+token = 'R2'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_______________ test_forbidden_commands_never_reach_wire[ABS_RZ] _______________
+
+token = 'ABS_RZ'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+________________ test_forbidden_commands_never_reach_wire[QUIT] ________________
+
+token = 'QUIT'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+____________ test_forbidden_commands_never_reach_wire[PLAYER_ALEX] _____________
+
+token = 'PLAYER_ALEX'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_____________ test_forbidden_commands_never_reach_wire[GUIDE+BACK] _____________
+
+token = 'GUIDE+BACK'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_____________ test_forbidden_commands_never_reach_wire[GUIDE BACK] _____________
+
+token = 'GUIDE BACK'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_______________ test_forbidden_commands_never_reach_wire[A\nRT] ________________
+
+token = 'A\nRT'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+_______________ test_forbidden_commands_never_reach_wire[A\rRT] ________________
+
+token = 'A\rRT'
+
+    @pytest.mark.parametrize('token',['RT','rt','RT_DOWN','RT_UP','RIGHT_TRIGGER','RIGHT_TRIGGER_DOWN','R2','ABS_RZ','QUIT','PLAYER_ALEX','GUIDE+BACK','GUIDE BACK','A\nRT','A\rRT'])
+    def test_forbidden_commands_never_reach_wire(token):
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+________________ test_repeated_buttons_combinations_and_release ________________
+
+    def test_repeated_buttons_combinations_and_release():
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+__________________ test_stopped_caller_hold_lease_neutralizes __________________
+
+    def test_stopped_caller_hold_lease_neutralizes():
+>       with LegacyServer(('127.0.0.1',0)) as server:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_controller_sandbox.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+=========================== short test summary info ============================
+FAILED tests/test_ppal_arcade_transport.py::ArcadeTransportTests::test_current_absolute_position_protocol_and_neutral
+FAILED tests/test_ppal_arcade_transport.py::ArcadeTransportTests::test_independent_sticks_and_held_direction_changes
+FAILED tests/test_ppal_arcade_transport.py::ArcadeTransportTests::test_rejected_command_stops_and_releases
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[RT]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[rt]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[RT_DOWN]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[RT_UP]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER_DOWN]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[R2]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[ABS_RZ]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[QUIT]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[PLAYER_ALEX]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[GUIDE+BACK]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[GUIDE BACK]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[A\nRT]
+FAILED tests/test_controller_sandbox.py::test_forbidden_commands_never_reach_wire[A\rRT]
+FAILED tests/test_controller_sandbox.py::test_repeated_buttons_combinations_and_release
+FAILED tests/test_controller_sandbox.py::test_stopped_caller_hold_lease_neutralizes
+ERROR tests/test_arcade_controller_lease_client.py::test_each_progressing_action_renews_even_when_positions_unchanged
+ERROR tests/test_arcade_controller_lease_client.py::test_unsupported_lease_fails_closed_without_gameplay
+ERROR tests/test_arcade_controller_lease_client.py::test_expired_renewal_closes_connection
+ERROR tests/test_arcade_controller_lease_client.py::test_old_local_timer_cannot_interrupt_renewed_hold
+19 failed, 148 passed, 4 errors in 12.44s

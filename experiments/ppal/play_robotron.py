@@ -3,7 +3,7 @@
 Healthy gameplay continues to a confirmed terminal state. Diagnostic duration
 limits are opt-in, and the
 controller is neutralized on every pulse, during vision uncertainty, and on exit.
-Normal play reuses the promoted playfield calibration for fast startup. Charlie
+Normal play freshly confirms a qualified viewpoint through the existing camera owner. Charlie
 may start Robotron himself after the camera is ready, then waits for visual proof
 of gameplay before acquiring self. Fresh geometric calibration is completed
 before START using either an attract or gameplay border. The
@@ -487,13 +487,16 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                         default=Path("config/robotron/sprite-knowledge.json"))
     parser.add_argument("--calibration", type=Path,
                         default=Path("config/robotron/playfield-latest.json"),
-                        help="promoted playfield calibration used for fast startup")
+                        help="legacy polygon location; does not authorize visual readiness")
+    parser.add_argument('--viewpoint', type=Path,
+                        help='released Active Vision view.json or qualified visual-readiness record; always freshly confirmed')
     parser.add_argument("--recalibrate", action="store_true",
-                        help="before START, rediscover screen geometry instead of loading --calibration")
+                        help="legacy startup option; qualified views always require fresh pre-START confirmation")
     parser.add_argument("--no-start-game", action="store_true",
                         help="do not tap START; use when Robotron gameplay is already running")
     parser.add_argument("--focus", type=float, default=None,
                         help="diagnostic manual starting position; normal operation establishes autofocus")
+    parser.add_argument("--require-new-game",action="store_true",help="campaign: fresh recognized START permission, never attach to a partial game")
     parser.add_argument("--restart-from",type=Path,help="prior sealed completed episode; requires fresh startable screen and one START")
     parser.add_argument("--start-wait", type=float, default=4.0,
                         help="seconds to wait after START for visual gameplay/self evidence")
@@ -518,6 +521,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                         default=os.environ.get('CHARLIE_NECK_STATE'),
                         help='installed CAL-1 durable state; monitor only, never authorize neck motion')
     parser.add_argument('--learned-semantics',type=Path,help='separately authorized, independently validated candidate-crop activation manifest')
+    parser.add_argument('--frozen-policy',action='store_true',help='use only an explicit qualified policy; otherwise freeze baseline')
     parser.add_argument('--learned-policy',type=Path,help='qualified local PPAL decision policy; current acceptance is offline only')
     parser.add_argument('--rolling-seconds',type=float,default=0.,help='opt-in bounded original incident memory; native RAM tradeoff unmeasured')
     parser.add_argument('--rolling-frames',type=int,default=60)
@@ -590,9 +594,15 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             semantic_error=f'{type(exc).__name__}: {exc}'
             print('LEARNED SEMANTICS UNAVAILABLE: '+semantic_error+'; baseline retained')
     from .policy_loading import load_startup_policy
-    policy,policy_error=load_startup_policy(args.learned_policy,physical=args.arm)
+    if args.frozen_policy and args.learned_policy is None:
+        policy,policy_error=None,None
+    else:
+        policy,policy_error=load_startup_policy(args.learned_policy,physical=args.arm)
+    if args.learned_policy is not None and policy_error:
+        raise ValueError('explicit qualified policy unavailable: '+policy_error)
     forebrain = Forebrain(policy=policy)
-    hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire,policy=policy,tactical_learning=True)
+    hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire,policy=policy,tactical_learning=True,
+                          tactical_memory=policy.tactical_memory if policy else None)
     shadow_forebrain = Forebrain()
     shadow_hindbrain = Hindbrain(explore_fire=args.bootstrap_body_fire)
     shadow_predictor = ShadowPredictor(horizon_seconds=.15, max_speed=100.)
@@ -725,6 +735,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             episode_observer.entry_evidence=dict(method='causal_SELF',capture_timestamp=source.timestamp,agency=dict(snapshot))
         if score_observer is not None and source.raw is not None:
             score_observer.submit(source.raw, timestamp=source.timestamp,observation_id=source.observation_id,
+                                  capture_metadata=dict(source.capture or {},
+                                      timestamp_basis='first_pixel_exposure_at' if source.capture and source.capture.get('first_pixel_exposure_at') is not None else 'read_completion'),
                                   screen=dict(current_screen,episode_retired=bool(episode_observer and episode_observer.terminal_suspected)),
                                   sample=visual_agency.tick, preceding_action={
                                       "action":preceding_action, "agency_command":snapshot.get("command"),
@@ -768,7 +780,8 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 diary.event('verified_terminal_self_retired',tracks=retired,screen=screen,
                     last_supported_gameplay_at=episode_observer.last_gameplay_at)
         if imaging_monitor is not None:
-            drift=imaging_monitor.observe(frame,screen,source.timestamp)
+            drift=imaging_monitor.observe(frame,screen,source.timestamp,
+                raw=source.raw, calibration=calibration)
             if drift:
                 if controller is not None:controller._command('NEUTRAL')
                 from .cal_recovery import request_recovery
@@ -857,7 +870,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             source.neck_service = neck
         # Start the camera first. In normal operation this happens while Robotron
         # is still in attract/demo mode, giving exposure/AF time without costing
-        # any gameplay. No demo-screen calibration is attempted.
+        # any gameplay. Attract-mode screen readability does not require gameplay.
         for _ in range(6):
             source.read()
             time.sleep(0.04)
@@ -865,10 +878,14 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         # Task-aware optics preflight runs before START, with neutral controls,
         # and never inside the time-critical tracking/score observation loop.
         mark('calibration_started')
+        prepare_view = sensory_preflight
+        if args.viewpoint is not None:
+            def prepare_view(source, output, **kwargs):
+                return sensory_preflight(source, output, viewpoint_path=args.viewpoint, **kwargs)
         if camera_session is None:
-            calibration,sensory_report=sensory_preflight(source,args.output,seed_position=args.focus)
+            calibration,sensory_report=prepare_view(source,args.output,seed_position=args.focus)
         else:
-            calibration,sensory_report=camera_session.establish(source,args.output,sensory_preflight,seed_position=args.focus)
+            calibration,sensory_report=camera_session.establish(source,args.output,prepare_view,seed_position=args.focus)
         original_detect=recognizer.detect
         def trace_pairs(pairs):
             recorder.event('detector_trace',dict(schema='first-person-trace-v1',
@@ -893,12 +910,12 @@ def main(argv=None, *, camera_session=None, progress_path=None):
         imaging_monitor=LiveViewMonitor(reference)
 
         restart_completed=False
-        if args.restart_from is not None:
+        if args.restart_from is not None or args.require_new_game:
             from .marathon_robotron import safe_to_restart,load_report
-            if not args.arm or args.no_start_game or not safe_to_restart(load_report(args.restart_from/'report.json'),capture_root=args.restart_from):
+            if not args.arm or args.no_start_game or (args.restart_from is not None and not safe_to_restart(load_report(args.restart_from/'report.json'),capture_root=args.restart_from)):
                 raise RuntimeError('restart authority unavailable: previous episode unverified')
             controller=new_controller()
-            phase(SessionState.STARTING,'verified prior completion; waiting for fresh START permission')
+            phase(SessionState.STARTING,'waiting for fresh START permission for a new complete game')
             decision=_verified_restart(source,calibration,controller,classifier=screen_classifier,
                 timeout=20.,on_observation=observe_episode)
             mark('start_decision',decision=decision)
@@ -981,7 +998,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
             print("DISCOVERING SELF: short movement/neutral probes over all visual candidates")
             mark('self_discovery_started')
             initial_recovery_started=time.monotonic()
-            player = visual_agency.discover(read_agency_pairs, controller, record=record_agency, center_spawn=True,
+            player = visual_agency.discover(read_agency_pairs, controller, record=record_agency, center_spawn=True, fire_first=args.projectile_self,
                 capture_shots=capture_agency_shots if source.stream is not None else None,
                 fire_ms=args.acquisition_fire_ms,
                                            observation_time=lambda: source.timestamp,deadline=initial_recovery_started+20.,
@@ -1155,7 +1172,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
 
                 if recovery_since is None:recovery_since=time.monotonic()
                 recovery_elapsed=time.monotonic()-recovery_since
-                if recovery_elapsed>=3. or not episode_observer.agency_allowed:
+                if recovery_elapsed>=12. or not episode_observer.agency_allowed:
                     # The current fresh frame already reached the terminal observer.
                     # No redundant four-frame sprite batch during quiet investigation.
                     if recovery_elapsed>=20.:
@@ -1164,7 +1181,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                             boundary='incomplete_unverified',screen=current_screen)
                         break
                     recorder.event('terminal_investigation',dict(elapsed_seconds=recovery_elapsed,
-                        recovery_budget_seconds=3.,deadline_seconds=20.,screen=current_screen),at=source.timestamp)
+                        recovery_budget_seconds=12.,deadline_seconds=20.,screen=current_screen),at=source.timestamp)
                     if progress:progress.cycle()
                     tick+=1;time.sleep(.025)
                     continue
@@ -1191,11 +1208,11 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                     diary.event('terminal_investigation_expired',seconds=recovery_elapsed,
                         boundary='incomplete_unverified',screen=screen)
                     break
-                if recovery_elapsed>=3. or not episode_observer.agency_allowed:
+                if recovery_elapsed>=12. or not episode_observer.agency_allowed:
                     # Quiet fresh observation promptly replaces prolonged probes.
                     # A demonstration never supplies a new causal SELF.
                     recorder.event('terminal_investigation',dict(elapsed_seconds=recovery_elapsed,
-                        recovery_budget_seconds=3.,deadline_seconds=20.,screen=current_screen),at=source.timestamp)
+                        recovery_budget_seconds=12.,deadline_seconds=20.,screen=current_screen),at=source.timestamp)
                     if progress:progress.cycle()
                     tick+=1;time.sleep(.025)
                     continue
@@ -1204,9 +1221,9 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 response_frames = 2 if recovery_round == 1 else 3
                 # Recovery probes are declared diagnostic interventions, not a
                 # learned policy, a new baseline or proof that longer is better.
-                probe_deadline=min(deadline,recovery_since+3.)
+                probe_deadline=min(deadline,recovery_since+12.)
                 proposal = dict(round=recovery_round, baseline_pulse_ms=60,
-                    initial_budget_seconds=3., terminal_deadline_seconds=20., batch_deadline=probe_deadline,
+                    initial_budget_seconds=12., terminal_deadline_seconds=20., batch_deadline=probe_deadline,
                     pulse_ms=pulse_ms,response_frames=response_frames,
                     question='can a longer bounded BODY response window establish causal SELF?',
                     reason='prior discovery did not establish controllable SELF',
@@ -1214,7 +1231,7 @@ def main(argv=None, *, camera_session=None, progress_path=None):
                 recorder.event('agency_recovery_plan',proposal,at=time.monotonic())
                 recovered = visual_agency.discover(
                     read_agency_pairs, controller, pulse_ms=pulse_ms,
-                    response_frames=response_frames,deadline=probe_deadline,record=record_agency,
+                    response_frames=response_frames,deadline=probe_deadline,record=record_agency,fire_first=False,
                     capture_shots=capture_agency_shots if source.stream is not None else None,fire_ms=args.acquisition_fire_ms,
                     observation_time=lambda: source.timestamp,
                     should_stop=lambda: episode_observer.confirmed or not episode_observer.agency_allowed)

@@ -1,0 +1,2908 @@
+charlie-arcade
+Linux charlie-arcade 6.12.109+rpt-rpi-v6 #1 Raspbian 1:6.12.109-1+rpt1 (2026-09-11) armv6l GNU/Linux
+2026-10-21T23:29:15+00:00
+ebfbc09b-fdfb-4ac2-b10d-1d60ffc9799f
+# /etc/systemd/system/charlie-arcade.service
+[Unit]
+Description=Charlie Arcade Physical Interface
+After=local-fs.target
+
+[Service]
+Type=simple
+User=five
+WorkingDirectory=/home/five/arcade
+
+ExecStart=/usr/bin/python3 /home/five/arcade/launcher.py
+
+StandardInput=tty
+StandardOutput=tty
+StandardError=tty
+
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+
+# /etc/systemd/system/charlie-arcade.service.d/hdmi-ready.conf
+[Service]
+ExecStartPre=+/bin/sh -c 'i=0; while [ "$i" -lt 30 ]; do for p in /sys/class/drm/card*-HDMI-A-*/status; do if [ -f "$p" ] && [ "$(cat "$p")" = connected ]; then exit 0; fi; done; sleep 1; i=$((i+1)); done; echo "HDMI not ready after 30 seconds" >&2; exit 1'
+
+# /etc/systemd/system/charlie-arcade.service.d/override.conf
+[Service]
+PermissionsStartOnly=true
+ExecStartPre=+/bin/chgrp input /dev/uinput
+ExecStartPre=+/bin/chmod 0660 /dev/uinput
+Restart=on-failure
+RestartUSec=2s
+MainPID=399
+ExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 /home/five/arcade/launcher.py ; ignore_errors=no ; start_time=[Tue 2026-10-20 19:01:35 EDT] ; stop_time=[n/a] ; pid=399 ; code=(null) ; status=0/0 }
+KillMode=control-group
+ActiveState=active
+SubState=running
+FragmentPath=/etc/systemd/system/charlie-arcade.service
+DropInPaths=/etc/systemd/system/charlie-arcade.service.d/hdmi-ready.conf /etc/systemd/system/charlie-arcade.service.d/override.conf
+  PID  PPID USER                      STARTED COMMAND
+  399     1 five     Wed Oct 21 17:04:39 2026 /usr/bin/python3 /home/five/arcade/launcher.py
+  626   399 five     Wed Oct 21 17:21:09 2026 /home/five/RetroArch/retroarch -L /home/five/arcade/cores/mame2000_libretro.so /home/five/arcade/roms/robotron.zip
+ 1044  1043 five     Wed Oct 21 19:29:16 2026 grep -E launcher.py|retroarch|PID
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess                          
+LISTEN 0      5            0.0.0.0:8765      0.0.0.0:*    users:(("python3",pid=399,fd=8))
+
+SOURCE /home/five/arcade/launcher.py symlink= False
+SHA256 b528b5e751fdd9fd4f39d2e0b282b7e669cbaa5b0133e7bc8c04450feed8a3c2
+#!/usr/bin/env python3
+
+import glob
+import os
+import queue
+import re
+import socket
+import struct
+import subprocess
+import sys
+import termios
+import threading
+import time
+import tty
+import textwrap
+from contextlib import contextmanager
+from pathlib import Path
+
+from display_control import DisplayControl
+from controller import CharlieController
+from rom_intake import Catalog, fingerprint
+import getpass
+import json
+from rom_intake import CatalogWorkStopped
+
+
+# ============================================================
+# Charlie Arcade Launcher v1.0 - ALEX/CHARLIE
+#
+# PHYSICAL INTERFACE:
+#   TV / tty1
+#   physical Xbox controller
+#   optional local tty keyboard compatibility
+#
+# CHARLIE INTERFACE:
+#   TCP port 8765
+#   full virtual Xbox-style controller
+#
+# Experiment rule:
+#   Charlie receives NO menu state and NO game state.
+#   Network replies are only OK or ERROR.
+#
+# Machine-level command:
+#   QUIT = stop active RetroArch game and return to menu
+#
+# Safety:
+#   Charlie's virtual controller is neutralized on disconnect,
+#   game exit, and launcher shutdown.
+# ============================================================
+
+
+HOME = Path.home()
+
+RETROARCH = HOME / "RetroArch" / "retroarch"
+CORE = HOME / "arcade" / "cores" / "mame2000_libretro.so"
+ROM_DIR = HOME / "arcade" / "roms"
+
+HOST = "0.0.0.0"
+PORT = 8765
+
+
+GAMES = []  # Durable membership; health cannot erase an admitted game.
+library_view = False
+library_rows = []
+library_selected = 0
+library_action_selected = 0
+library_page = 'list'
+library_confirmation = None
+rom_catalog = None
+intake_view = False
+intake_items = []
+intake_inventory = []
+intake_reviewed = False
+operator_busy = ''
+intake_selected = 0
+intake_page = 'queue'
+intake_action_selected = 0
+identity_selected = 0
+identity_purpose = 'resolve'
+detail_offset = 0
+confirmation = None
+ui_epoch = 0
+catalog_jobs = None
+active_session = None
+active_normal_game = None
+active_log = None
+
+
+# ============================================================
+# Shared launcher state
+# ============================================================
+
+selected = 0
+message = "Ready."
+display_control = None
+player_mode = "ALEX"
+PLAYER_MODES = ("ALEX", "CHARLIE")
+
+action_queue = queue.Queue()
+
+state_lock = threading.RLock()
+
+retroarch_process = None
+game_running = threading.Event()
+
+charlie_controller = CharlieController()
+
+
+# ============================================================
+# Display
+# ============================================================
+
+def clear_screen():
+    print(
+        "\033[2J\033[H",
+        end="",
+        flush=True
+    )
+
+
+def render():
+    if operator_busy:
+        clear_screen()
+        print(' CHARLIE ARCADE\n\n ' + operator_busy)
+        print(' Please wait — menu navigation/confirmation temporarily unavailable.')
+        print(' Originals and evidence are retained. Errors return to the menu.')
+        print(' GUIDE+BACK returns safely once RetroArch is running.', flush=True)
+        return
+    clear_screen()
+
+    print("========================================")
+    print("            CHARLIE ARCADE")
+    print("========================================")
+    print()
+
+    if library_view:
+        render_library_management()
+        return
+    if intake_view:
+        render_intake()
+        return
+
+    if not GAMES:
+        print(" No enabled library members. Select ROM INTAKE below.")
+
+    print(f' Library page {selected // 6 + 1}/{(len(GAMES) + 7) // 6}')
+    start = (selected // 6) * 6
+    for number in range(start, min(start + 6, len(GAMES))):
+        game = GAMES[number]
+        pointer = ">" if number == selected else " "
+
+        suffix = ""
+
+        if game["status"] and game["status"] != "READY":
+            suffix = f"  [{game['status']}]"
+
+        print(
+            f" {pointer} {game['name']}{suffix}"
+        )
+
+    if start <= len(GAMES) < start + 6:
+        pointer = '>' if selected == len(GAMES) else ' '
+        print(f" {pointer} ROM INTAKE / QUALIFICATION  [OPERATOR]")
+
+    if start <= len(GAMES) + 1 < start + 6:
+        pointer = '>' if selected == len(GAMES) + 1 else ' '
+        label = display_control.label if display_control else 'DISPLAY SIZE: UNVERIFIED'
+        print(f" {pointer} {label}")
+
+    print()
+    print("----------------------------------------")
+    print(f" PLAYER: {player_mode}")
+    print(" D-PAD L/R     switch ALEX / CHARLIE")
+    print(" UP/DOWN       move")
+    print(" A             select")
+    print(" B             back")
+    print(" X             manage playable library [OPERATOR]")
+    print("----------------------------------------")
+    print()
+    print(f" {message}")
+    if catalog_jobs and catalog_jobs.busy:
+        print(' Refreshing Intake Folder: ' + refresh_progress(catalog_jobs.progress))
+    print(flush=True)
+
+
+def load_startup_library():
+    global GAMES
+    GAMES = rom_catalog.playable(verify=False)
+
+
+def library_screen(page):
+    global library_page, ui_epoch
+    library_page = page
+    ui_epoch += 1
+
+
+def open_library_management():
+    global library_view, library_rows, library_selected, library_action_selected
+    library_view = True
+    library_rows = rom_catalog.membership_records()
+    library_selected = min(library_selected, max(0, len(library_rows) - 1))
+    library_action_selected = 0
+    library_screen('list')
+
+
+def library_actions(row):
+    blocked = rom_catalog.is_blocked(row['hash']) or rom_catalog.is_blocked(row['artifact_hash'])
+    protected = row['shortname'] in {'robotron', 'joust'}
+    return [('Remove from playable library', 'remove', bool(row['enabled']) and not protected),
+            ('Restore membership (no new PASS)', 'restore', not row['enabled'] and not blocked and not protected),
+            ('Permanently reject artifact (retain files)', 'block', not blocked and not protected),
+            ('Reverse artifact block (keep disabled)', 'unblock', blocked and not protected)]
+
+
+def render_library_management():
+    print(' PLAYABLE LIBRARY MANAGEMENT / OPERATOR ONLY')
+    if library_page == 'confirm':
+        proposed = library_confirmation
+        print(' ' + proposed['label'])
+        print(' Exact game: ' + proposed['row']['shortname'])
+        print(' Source SHA256: ' + proposed['row']['hash'])
+        print(' Artifact SHA256: ' + proposed['row']['artifact_hash'])
+        print(' No files deleted. Originals, sessions, PASS and audit evidence retained.')
+        print(' Blocking rejects both hashes, including renamed identical uploads.')
+        for i, label in enumerate(('CANCEL', 'CONFIRM ' + proposed['label'])):
+            print((' > ' if proposed['choice'] == i else '   ') + label)
+        print(' UP/DOWN choose; A select; B cancel. Cancel is the default.')
+    elif not library_rows:
+        print(' No admitted records. B returns to playable library.')
+    elif library_page == 'list':
+        print(f' Records page {library_selected // 6 + 1}/{(len(library_rows) + 5) // 6}')
+        start = library_selected // 6 * 6
+        for i in range(start, min(start + 6, len(library_rows))):
+            row = library_rows[i]
+            state = 'IN' if row['enabled'] else 'REMOVED'
+            if rom_catalog.is_blocked(row['hash']) or rom_catalog.is_blocked(row['artifact_hash']):
+                state = 'BLOCKED'
+            print((' > ' if i == library_selected else '   ') + row['name'] + ' [' + state + ']')
+        print(' UP/DOWN choose; A manage; B ordinary playable library.')
+    else:
+        row = library_rows[library_selected]
+        print(' ' + row['name'] + ' / ' + row['shortname'])
+        if row['shortname'] in {'robotron', 'joust'}:
+            print(' PROTECTED: removal/blocking unavailable.')
+        for i, (label, _, enabled) in enumerate(library_actions(row)):
+            print((' > ' if i == library_action_selected else '   ') + label + ('' if enabled else ' [unavailable]'))
+        print(' UP/DOWN choose; A review; B library records.')
+    print(' ' + display_text(message), flush=True)
+
+
+def handle_library_management(action):
+    global library_view, library_rows, library_selected, library_action_selected, library_confirmation, message
+    if action == 'BACK':
+        if library_page == 'list':
+            library_view = False
+            library_screen('list')
+        else:
+            library_screen('actions' if library_page == 'confirm' else 'list')
+        return
+    if not library_rows:
+        return
+    if library_page == 'confirm':
+        if action in {'UP', 'DOWN'}:
+            library_confirmation['choice'] = 1 - library_confirmation['choice']
+        elif action == 'SELECT':
+            proposed = library_confirmation
+            library_screen('actions')
+            if proposed['choice'] == 0:
+                message = 'Cancelled; membership, files and evidence unchanged.'
+                return
+            try:
+                row = proposed['row']
+                if proposed['blocked'] != (rom_catalog.is_blocked(row['hash']) or rom_catalog.is_blocked(row['artifact_hash'])):
+                    raise ValueError('block changed after review; inspect again')
+                with blocking_operation('Saving library selection...'):
+                    message = rom_catalog.manage_membership(row['shortname'], proposed['action'], getpass.getuser(), row)
+                library_rows = rom_catalog.membership_records()
+                apply_library(rom_catalog.playable(verify=False), intake_inventory or intake_items)
+                refresh_library(reason='mutation')
+            except (ValueError, OSError) as exc:
+                message = 'Management stopped: ' + str(exc)
+        return
+    delta = -1 if action == 'UP' else 1
+    if library_page == 'list':
+        if action in {'UP', 'DOWN'}:
+            library_selected = (library_selected + delta) % len(library_rows)
+            library_screen('list')
+        elif action == 'SELECT':
+            library_action_selected = 0
+            library_screen('actions')
+    elif library_page == 'actions':
+        row = library_rows[library_selected]
+        actions = library_actions(row)
+        if action in {'UP', 'DOWN'}:
+            library_action_selected = (library_action_selected + delta) % len(actions)
+        elif action == 'SELECT':
+            label, chosen, enabled = actions[library_action_selected]
+            if not enabled:
+                message = 'Unavailable; protected, already applied or explicit block reversal required.'
+                return
+            library_confirmation = dict(label=label, action=chosen, row=dict(row), choice=0,
+                                        blocked=rom_catalog.is_blocked(row['hash']) or rom_catalog.is_blocked(row['artifact_hash']))
+            library_screen('confirm')
+
+
+def display_text(value):
+    return ''.join(c if c.isprintable() else '?' for c in str(value))[:140]
+
+
+def refresh_progress(progress):
+    labels = {'Checking input evidence': 'Scanning incoming ZIPs',
+              'Checking receipts and compatibility': 'Checking dependencies and compatibility',
+              'Formatting controller diagnosis pages': 'Updating intake list'}
+    return display_text(labels.get(progress, progress))[:65]
+
+
+@contextmanager
+def blocking_operation(label):
+    global operator_busy, ui_epoch
+    previous = operator_busy
+    operator_busy = label
+    ui_epoch += 1
+    try:
+        render()
+        yield
+    finally:
+        operator_busy = previous
+        ui_epoch += 1
+        if not game_running.is_set():
+            render()
+
+
+def render_intake():
+    print(' ROM INTAKE — ' + ('SET ASIDE / REVIEWED' if intake_reviewed else 'TO REVIEW'))
+    print(" This is separate from the playable game library.")
+    item = intake_items[intake_selected] if intake_items else None
+    if intake_page == 'confirm' and confirmation:
+        print()
+        print(' CONFIRM: ' + confirmation['label'])
+        review_lines = textwrap.wrap(confirmation['explanation'], 72)
+        for line in review_lines[:7]:
+            print(' ' + line)
+        if len(review_lines) > 7:
+            print(' Full member/exclusion manifest is on the diagnosis pages.')
+        print(' ROM SHA256: ' + confirmation['hash'][:32])
+        print('             ' + confirmation['hash'][32:])
+        if confirmation.get('recovery'):
+            proof = confirmation['recovery']
+            print(' Session: ' + proof['session'])
+            print(' Tested artifact: ' + proof['artifact_hash'][:32])
+            print('                  ' + proof['artifact_hash'][32:])
+        for i, label in enumerate(('CANCEL', 'CONFIRM ' + confirmation['label'])):
+            print((' > ' if i == confirmation['choice'] else '   ') + label)
+        print(' UP/DOWN choose; A select; B cancel. Cancel is the default.')
+    elif not item:
+        print(' Nothing awaiting intake. A REFRESH INTAKE FOLDER; B playable library.')
+        print(' X: To Review / Set Aside. Originals are retained.')
+    elif intake_page == 'queue':
+        start = (intake_selected // 5) * 5
+        print(f' Candidate {intake_selected + 1}/{len(intake_items)} | Page {start // 5 + 1}/{(len(intake_items) + 4) // 5}')
+        for i in range(start, min(start + 5, len(intake_items))):
+            candidate = intake_items[i]
+            names = ', '.join(x['name'] for x in candidate['uploads'] if x['present'])
+            print((' > ' if i == intake_selected else '   ') + display_text(names)[:70])
+            if len(candidate['uploads']) > 1:
+                print('   Same content: ' + str(len(candidate['uploads'])) + ' upload aliases')
+            status = ('document review / trial available' if candidate.get('trial_kind') == 'normalization'
+                      else 'complete target review / diagnostic only' if candidate.get('trial_options')
+                      else candidate['identity']['status'])
+            print('   ' + status + '; ZIP ' + candidate['archive'])
+        print(' UP/DOWN choose; A inspect; B playable library.')
+        print(' D-pad RIGHT: REFRESH INTAKE FOLDER. No game launches.')
+        print(' X: To Review / Set Aside. Kept games: normal library, X management.')
+    elif intake_page == 'detail':
+        lines = candidate_detail_lines(item)
+        offset = min(detail_offset, max(0, len(lines) - 10))
+        print(f' DIAGNOSIS lines {offset + 1}-{min(offset + 10, len(lines))}/{len(lines)}')
+        for line in lines[offset:offset + 10]:
+            print(' ' + line)
+        print(' UP/DOWN scroll; LEFT/RIGHT page; A actions; B queue.')
+    elif intake_page == 'identities':
+        candidates = ([p['shortname'] for p in item.get('trial_options', [])]
+                      if identity_purpose == 'trial' else item['identity']['candidates'])
+        print(' COMPLETE VERIFIED TRIAL TARGETS' if identity_purpose == 'trial' else ' VERIFIED CRC/SIZE IDENTITY CANDIDATES')
+        print(' Filename hints and partial matches are not selectable identities.')
+        if not candidates:
+            print(' None. B returns; review detailed mismatches first.')
+        start = (identity_selected // 6) * 6
+        for i in range(start, min(start + 6, len(candidates))):
+            name = candidates[i]
+            print((' > ' if i == identity_selected else '   ') + name)
+            print('   ' + display_text(rom_catalog.games[name]['description'])[:68])
+        print(' UP/DOWN choose; A review confirmation; B actions.')
+    elif intake_page == 'observations':
+        print(' HUMAN DIAGNOSTIC OBSERVATIONS — NEVER QUALIFICATION')
+        start = (identity_selected // 6) * 6
+        for i in range(start, min(start + 6, len(OBSERVATIONS))):
+            print((' > ' if i == identity_selected else '   ') + OBSERVATIONS[i])
+        print(' UP/DOWN choose; A Cancel-first review; B actions.')
+    else:
+        print(' CANDIDATE ACTIONS (nothing executes until confirmed)')
+        actions = candidate_actions(item)
+        order = action_indices(item)
+        if intake_page == 'technical':
+            position = order.index(intake_action_selected) if intake_action_selected in order else 0
+            start = position // 5 * 5
+            print(f' Technical tools | Page {start // 5 + 1}/{(len(order)+4)//5}')
+            order = order[start:start+5]
+        for i in order:
+            label, action, enabled = actions[i]
+            suffix = '' if enabled else ' [unavailable]'
+            print((' > ' if i == intake_action_selected else '   ') + label + suffix)
+        if not item.get('attempt_eligible'):
+            print(' Try unavailable: ' + display_text(item.get('archive_error', 'Archive invalid or emulator/core missing; A Details explains.')))
+        print(' UP/DOWN choose; A select; B diagnosis.')
+    print()
+    print(' ' + display_text(message)[:72], flush=True)
+    if catalog_jobs and catalog_jobs.busy:
+        print(' Refreshing Intake Folder: ' + refresh_progress(catalog_jobs.progress))
+        print(' Cached navigation remains available; consequential actions wait.')
+
+
+def candidate_detail_lines(item):
+    if '_detail_lines' in item:
+        return item['_detail_lines']
+    identity = item.get('identity', {})
+    lines = ['Game: ' + (item.get('description') or identity.get('shortname') or 'Identity not established'),
+             'Metadata confidence: ' + identity.get('status', 'unknown') + ' (advisory)',
+             'Native playability: human observation required after Try.']
+    if item.get('bios'):
+        lines.append('BIOS/dependency archive, not an ordinary playable game.')
+    for dep in item.get('dependency_availability', []):
+        lines.append(('Likely needs ' if dep['needed_for_missing_payload'] else 'Metadata relationship (payload self-contained): ') +
+                     dep['dependency_type'] + ' ' + dep['shortname'] + '; available: ' + dep['pool'])
+    missing = item.get('missing_members', [])
+    if missing:
+        lines.append('Expected payload missing: ' + str(len(missing)) + ' member(s).')
+        for member in missing:
+            lines.append('  ' + member['name'] + ': size ' + str(member['size']) + '; CRC ' + str(member['crc']))
+    last = item.get('last_session') or {}
+    if last:
+        try:
+            startup = json.loads(last.get('startup') or '{}')
+        except (ValueError, TypeError):
+            startup = {}
+        failures = startup.get('reported_load_failures') or []
+        if isinstance(failures, str): failures = [failures]
+        if startup.get('error'): failures = list(failures) + [startup['error']]
+        if failures:
+            lines.extend('Retained trial failure: ' + str(f) for f in failures)
+        elif not keep_possible(item):
+            lines.append('Trial exit: ' + str(startup.get('returncode')) + '. Reason not established from retained startup evidence.')
+    elif not item.get('attempt_eligible') and not item.get('archive_error') and not missing:
+        lines.append('Reason not established; inspect retained metadata evidence below.')
+    lines += ['Hash: ' + item['hash'], 'Archive: ' + item['archive'],
+             'Identity: ' + str(item['identity']), 'Compatibility: ' + item['compatibility'],
+             'Native Try available: ' + str(item.get('attempt_eligible', False)),
+             'Metadata-qualified legacy path: ' + str(item['eligible']),
+             'Qualification: ' + item.get('qualification_state', 'Unqualified'),
+             item.get('attempt_status', 'Diagnostic availability unknown'),
+             'Missing set ROMs: ' + str(item.get('missing_set_roms', [])),
+             'Missing dependency ROMs: ' + str(item.get('missing_dependency_roms', [])),
+             'Dependencies: ' + str(item.get('dependencies', []))]
+    lines += item.get('trial_reasons', [])
+    if item.get('previously_rejected'):
+        lines.insert(0, 'Previously removed/rejected. You may deliberately Try again.')
+    if item.get('metadata_error'):
+        lines.append('Metadata advisory unavailable: ' + item['metadata_error'])
+    for plan in item.get('trial_options', []):
+        lines.append('Complete target ' + plan['shortname'] + ': ' +
+                     ('normalization after document byte validation' if plan['qualifiable'] else 'diagnostic only; all extras retained'))
+        lines.append('Reviewed exclusions: ' + str(plan['excluded']))
+    if item.get('collision'):
+        lines.append('COLLISION: different installed contents will not be overwritten.')
+    if item.get('archive_error'):
+        lines.append('Archive error: ' + item['archive_error'])
+    if item.get('samples'):
+        lines.append(item['samples'])
+    if item.get('last_session'):
+        last = item['last_session']
+        lines += ['Last trial: ' + last['status'], 'Startup: ' + last['startup'], 'Log: ' + last['log']]
+    comparison = item.get('comparison', {})
+    for hint in comparison.get('filename_hints', []):
+        lines.append('Filename hint ' + hint['upload_stem'] + ': ' + hint['status'])
+        if 'matched_signatures' in hint:
+            lines.append(f"  CRC/size matches: {hint['matched_signatures']}/{hint['expected_signatures']}")
+            lines.append('  Hypothetical dependencies: ' + str(hint['dependencies']))
+            lines.append('  Missing payload for hint: ' + str(hint['missing_set_roms']))
+            lines.append('  Missing inherited payload for hint: ' + str(hint['missing_dependency_roms']))
+            lines.append('  Unexpected members for hint: ' + str(hint['unexpected_members']))
+            lines.append('  Installed filename collision for hint: ' + str(hint['filename_target_collision']))
+    lines.append(comparison.get('note', 'No identity is inferred from filenames.'))
+    lines.append('Partial signature matches: ' + str(comparison.get('partial_matches', [])))
+    lines.append('Audited ZIP members (name, size, CRC):')
+    lines.extend(str(r) for r in comparison.get('members', []))
+    item['_detail_lines'] = [wrapped for line in lines for wrapped in textwrap.wrap(display_text_full(line), 72)]
+    return item['_detail_lines']
+
+
+def display_text_full(value):
+    return ''.join(c if c.isprintable() else '?' for c in str(value))
+
+
+def set_intake_page(page):
+    global intake_page, confirmation, ui_epoch, detail_offset
+    intake_page = page
+    ui_epoch += 1
+    detail_offset = 0
+    if page != 'confirm':
+        confirmation = None
+
+
+def candidate_actions(item):
+    finished = (item.get('last_session') or {}).get('status') == 'finished'
+    diagnostic = 'diagnostic_only' in (item.get('last_session') or {}).get('details', '')
+    bios = item.get('bios') and item['archive'] == 'valid' and not item.get('missing_roms')
+    return [('Try in RetroArch', 'TRY', item.get('attempt_eligible', False)),
+            ('Record diagnostic PASS (never admit)' if diagnostic else 'Record human PASS', 'PASS', finished),
+            ('Record diagnostic FAIL' if diagnostic else 'Record human FAIL', 'FAIL', finished),
+            ('Review verified identities', 'IDENTITIES', True),
+            ('Approve audited BIOS dependency', 'BIOS', bool(bios)),
+            ('Refresh Intake Folder', 'RESCAN', True),
+            ('Review complete trial targets', 'TRIAL_TARGETS', bool(item.get('trial_options'))),
+            ('Return to queue', 'QUEUE', True),
+            ('Try original archive (with evidence)', 'ATTEMPT', item.get('attempt_eligible', False)),
+            ('Recover preserved PASS / retry admission', 'RECOVER',
+             (item.get('last_session') or {}).get('status') in {'finished', 'pass'}),
+            ('Record diagnostic observations', 'OBSERVATIONS',
+             (item.get('last_session') or {}).get('status') in {'finished', 'pass', 'fail'}),
+            ('KEEP IN ARCADE', 'KEEP', keep_possible(item)),
+            ('TRY AGAIN / Try in RetroArch', 'TRY', item.get('attempt_eligible', False)),
+            ("DON'T KEEP / SET ASIDE", 'DONT_KEEP', not protected_candidate(item)),
+            ('Details / technical evidence', 'MORE', True),
+            ('RECONSIDER — return to To Review', 'RECONSIDER', bool(item.get('intake_decision') and item['intake_decision']['disposition'] == 'set_aside'))]
+
+
+def protected_candidate(item):
+    return (item.get('identity', {}).get('shortname') in {'robotron', 'joust'} or
+            item['hash'] in {'f7269325f909b37ad29fc921660af9733afd66f90f07269d07c65215614d0b5d',
+                             '9cd89a867e3c0b92f3a23c890ab39e521fcb25410dcf84161f9ecebfc637bbf1'})
+
+
+def keep_possible(item):
+    last = item.get('last_session') or {}
+    try:
+        startup = json.loads(last.get('startup') or '{}')
+    except ValueError:
+        return False
+    return (not item.get('bios') and not protected_candidate(item) and last.get('status') in {'finished', 'pass'} and
+            startup.get('status') == 'awaiting_human_verdict' and not startup.get('reported_load_failures') and
+            (startup.get('returncode') == 0 or startup.get('operator_stop') and startup.get('returncode') in {-15, 143}))
+
+
+def action_indices(item):
+    if intake_page == 'technical':
+        return list(range(11))  # Optional existing metadata tools, never primary admission workflow.
+    if intake_reviewed:
+        return [15, 14]
+    if item.get('bios') or protected_candidate(item):
+        return [14, 13] if not protected_candidate(item) else [14]
+    return [11, 12, 13, 14] if item.get('last_session') else [0, 11, 13, 14]
+
+
+@blocking_operation('Checking selection...')
+def request_confirmation(action, value=None):
+    global confirmation, message
+    if not intake_items:
+        return
+    if catalog_jobs and catalog_jobs.busy:
+        message = 'Catalog refresh in progress; inspection/navigation available. Retry after completion.'
+        return
+    item = intake_items[intake_selected]
+    allowed = {a: enabled for _, a, enabled in candidate_actions(item)}
+    allowed['QUALIFY'] = item['eligible']  # Existing richer supervised route.
+    if action == 'TRIAL_TARGET':
+        plan = next((p for p in item.get('trial_options', []) if p['shortname'] == value), None)
+        valid = plan is not None
+        action = 'NORMALIZE' if plan and plan['qualifiable'] else 'DIAGNOSTIC'
+    elif action == 'RESOLVE':
+        valid = value in item['identity']['candidates']
+    elif action == 'OBSERVE':
+        valid = value in OBSERVATIONS and allowed.get('OBSERVATIONS')
+    else:
+        valid = allowed.get(action, False)
+    if not valid:
+        message = 'Action unavailable. Inspect the diagnosis and complete required checks.'
+        return
+    descriptions = {
+        'RECONSIDER': ('RECONSIDER', 'Return this exact content to To Review. All old decisions and evidence remain; this does not launch or admit.'),
+        'KEEP': ('KEEP IN ARCADE', 'Confirm the exact tested game played acceptably and is worth keeping. Preserve all original evidence. No replay; publish the exact tested artifact and its isolated launch resources.'),
+        'TRY': ('TRY IN RETROARCH', 'Try this exact archive in the isolated existing Xbox pathway. Metadata is advisory. GUIDE+BACK stops and returns. A previous rejection is a warning, not a ban.'),
+        'DONT_KEEP': ("DON'T KEEP", 'Record your preference without deleting any archive or evidence. You can try it again later.'),
+        'QUALIFY': ('START SUPERVISED TRIAL', 'Launch this candidate as ALEX for human gameplay qualification. GUIDE+BACK stops the trial. This is not normal library gameplay.'),
+        'PASS': ('RECORD PASS', 'Confirm you checked actual gameplay, controls, audio and acceptable speed. A pass may install a verified copy and admit it to the playable library; different contents are never overwritten.'),
+        'FAIL': ('RECORD FAIL', 'Record a failed human qualification. The candidate remains excluded from the playable library; original archives and earlier evidence are preserved.'),
+        'RESOLVE': ('SELECT IDENTITY ' + str(value), 'Record an operator choice among verified CRC/size candidates. This does not qualify playability or approve a filename guess.'),
+        'BIOS': ('INSTALL AUDITED BIOS', 'Install this complete metadata-verified BIOS as a dependency. It cannot enter the playable game library and cannot overwrite different installed contents.'),
+        'NORMALIZE': ('NORMALIZED TRIAL ' + str(value), 'Review the complete target identity and listed documentation exclusions. Preserve the original and create a canonical isolated trial ZIP only after document bytes validate. Admission still requires a separate human PASS.'),
+        'DIAGNOSTIC': ('TRY REVIEWED TARGET ' + str(value), 'Review the target signatures. All unknown binary extras remain in an unchanged isolated ZIP copy. After a successful trial, deliberate KEEP IN ARCADE can admit the exact tested artifact.'),
+        'ATTEMPT': ('TRY ORIGINAL ARCHIVE', 'Retain all source members in an isolated original-byte copy. The upload name is an emulator selector, not identity proof. Missing files or unsupported metadata may fail to boot. GUIDE+BACK stops it; deliberate Keep follows a successful trial.'),
+        'RECOVER': ('RECOVER PRESERVED COMPLETED TRIAL', 'Confirm human gameplay, controls, audio and speed from this preserved session, not a new launch. Evidence has been revalidated. Record an audited recovery PASS or retry its existing PASS; different installed bytes cannot be overwritten.'),
+        'OBSERVE': ('RECORD OBSERVATION ' + str(value), 'Record only what you personally observed in this reviewed session. This is not identity, qualification or admission authority.'),
+    }
+    label, explanation = descriptions[action]
+    selector = rom_catalog.attempt_selector(item['hash']) if action in {'ATTEMPT', 'TRY'} else None
+    if selector:
+        explanation += ' Unverified dispatch selector: ' + selector
+    recovery = None
+    if action == 'KEEP':
+        try:
+            recovery = rom_catalog.keep_review(item['last_session']['id'], item['hash'])
+        except (ValueError, OSError, KeyError) as exc:
+            message = 'Keep unavailable: ' + str(exc)
+            return
+    if action == 'RECOVER':
+        try:
+            recovery = rom_catalog.recovery_review(item['last_session']['id'], item['hash'])
+            explanation += ' Session: ' + recovery['session'] + ' Artifact: ' + recovery['artifact_hash']
+            if recovery.get('historical_cfg_side_effect'):
+                label = 'ADMIT EXISTING XEVIOUS PASS / NO REPLAY'
+                explanation = ('Preserve existing PASS verdict 3 by five. Admit only this exact tested artifact. '
+                               'The pinned logged/timed historical Xevious cfg side effect is validated; '
+                               'all other relevant evidence matches. No new trial or replacement PASS is created.')
+        except (ValueError, OSError, KeyError) as exc:
+            message = 'Recovery blocked; preserved evidence unchanged: ' + str(exc)
+            return
+    if action == 'QUALIFY' and item.get('trial_kind') == 'normalization':
+        label = 'NORMALIZED TRIAL ' + item['trial_shortname']
+        explanation = descriptions['NORMALIZE'][1]
+    if action in {'QUALIFY', 'NORMALIZE', 'DIAGNOSTIC'} and item.get('trial_options'):
+        chosen = value or item.get('trial_shortname')
+        plan = next((p for p in item['trial_options'] if p['shortname'] == chosen), None)
+        if plan:
+            explanation += ' Members reviewed: ' + ', '.join(x['name'] + ' (' + x['kind'] + ')' for x in plan['excluded'])
+    last = item.get('last_session') or {}
+    if action == 'PASS' and 'diagnostic_only' in last.get('details', ''):
+        explanation = 'Record diagnostic observations only. This legacy action does not admit. Use KEEP IN ARCADE to deliberately keep the exact successful trial without replay.'
+    confirmation = {'action': action, 'value': value, 'hash': item['hash'],
+                    'context': item['context'], 'choice': 0, 'label': label,
+                    'explanation': explanation,
+                    'session': (item.get('last_session') or {}).get('id')}
+    confirmation['recovery'] = recovery
+    if action in {'DONT_KEEP', 'RECONSIDER'}:
+        confirmation['decision_review'] = rom_catalog.decision_review(item['hash'])
+    confirmation['attempt_selector'] = selector
+    if action == 'TRY':
+        confirmation['attempt_environment'] = rom_catalog.environment(metadata_optional=True)
+    set_intake_page('confirm')
+
+
+@blocking_operation('Saving selection...')
+def execute_confirmation():
+    global message
+    proposed = dict(confirmation)
+    set_intake_page('actions')
+    try:
+        action = proposed['action']
+        if catalog_jobs and catalog_jobs.busy and action not in {'PASS', 'FAIL', 'OBSERVE'}:
+            raise ValueError('Catalog refresh started; inspect again after completion')
+        message = 'Checking reviewed candidate and evidence.'
+        render()
+        if action == 'KEEP':
+            message = rom_catalog.keep(proposed['session'], proposed['hash'], getpass.getuser(), proposed['recovery'])
+            refresh_library(reason='mutation')
+            return
+        if action == 'DONT_KEEP':
+            message = rom_catalog.decide_intake(proposed['hash'], 'set_aside', getpass.getuser(), proposed['decision_review'])
+            refresh_library(reason='mutation')
+            return
+        if action == 'RECONSIDER':
+            message = rom_catalog.decide_intake(proposed['hash'], 'review', getpass.getuser(), proposed['decision_review'])
+            refresh_library(reason='mutation')
+            return
+        if action == 'TRY':
+            if rom_catalog.environment(metadata_optional=True) != proposed['attempt_environment']:
+                raise ValueError('Trial emulator/configuration changed after review; inspect again')
+            launch_qualification({'hash': proposed['hash']}, diagnostic=True, attempt=True,
+                                 selector=proposed['attempt_selector'])
+            return
+        if action == 'RECOVER':
+            message = rom_catalog.recover_pass(proposed['session'], proposed['hash'],
+                                               getpass.getuser(), proposed['recovery'])
+            print('\a', end='', flush=True)  # Operator confirmation bell; durable event is authoritative.
+            refresh_library(reason='mutation')
+            return
+        if action == 'OBSERVE':
+            message = rom_catalog.observe(proposed['session'], proposed['hash'], proposed['value'], getpass.getuser())
+            return
+        if action in {'PASS', 'FAIL'}:
+            # A human verdict belongs to the explicitly reviewed finished
+            # session, not the mutable catalog snapshot. Admission rechecks
+            # session authority after the verdict has committed durably.
+            record_human_verdict(action.lower(), session=proposed['session'])
+            return
+        rom_catalog.source(proposed['hash'])  # Recheck actual current bytes.
+        current = rom_catalog.diagnose(proposed['hash'])
+        if current['context'] != proposed['context']:
+            raise ValueError('Candidate environment changed; inspect again before confirming')
+        if action in {'QUALIFY', 'NORMALIZE', 'DIAGNOSTIC', 'ATTEMPT'}:
+            set_intake_page('actions')
+            launch_qualification(current, target=proposed['value'], diagnostic=action in {'DIAGNOSTIC', 'ATTEMPT'},
+                                 attempt=action == 'ATTEMPT', selector=proposed.get('attempt_selector'))
+        elif action in {'PASS', 'FAIL'}:
+            record_human_verdict(action.lower(), session=proposed['session'])
+        elif action == 'RESOLVE':
+            rom_catalog.resolve(proposed['hash'], proposed['value'], getpass.getuser())
+            message = 'Verified identity choice recorded; playability remains unqualified.'
+            refresh_library(reason='mutation')
+        elif action == 'BIOS':
+            message = rom_catalog.approve_bios(proposed['hash'], getpass.getuser(),
+                                               'Xbox operator confirmed complete verified BIOS audit')
+            refresh_library(reason='mutation')
+    except (OSError, ValueError) as exc:
+        message = 'Action stopped: ' + str(exc)
+        refresh_library(reason='mutation')
+
+
+def apply_library(games, items):
+    global GAMES, intake_items, intake_inventory, selected, intake_selected, message
+    old_action = selected - len(GAMES) if selected >= len(GAMES) else None
+    old_game = (GAMES[selected]['rom'], GAMES[selected]['hash']) if selected < len(GAMES) else None
+    observed_health = {(g['rom'], g['hash']): g['status'] for g in GAMES
+                       if g['status'] in {'CHANGED', 'UNAVAILABLE'}}
+    old_hash = intake_items[intake_selected]['hash'] if intake_items else None
+    # Worker snapshots may precede an operator membership change. Membership
+    # always comes from the main connection, never from background diagnosis.
+    GAMES = rom_catalog.playable(verify=False) if rom_catalog else games
+    health = {(g['rom'], g['hash']): g['status'] for g in games}
+    for game in GAMES:
+        if (game['rom'], game['hash']) in health:
+            game['status'] = health[(game['rom'], game['hash'])]
+        if not game['status'] and (game['rom'], game['hash']) in observed_health:
+            game['status'] = observed_health[(game['rom'], game['hash'])]
+    intake_inventory = list(items)
+    admitted = {h for r in rom_catalog.membership_records() if r['enabled'] for h in (r['hash'], r['artifact_hash'])}
+    intake_items = []
+    for item in items:
+        decision = rom_catalog.intake_decision(item['hash'])
+        item['intake_decision'] = decision
+        aside = bool(decision and decision['disposition'] == 'set_aside')
+        if item['hash'] not in admitted and aside == intake_reviewed:
+            intake_items.append(item)
+    selected = next((i for i, g in enumerate(GAMES) if (g['rom'], g['hash']) == old_game),
+                    len(GAMES) + old_action if old_action in (0, 1) else min(selected, len(GAMES)))
+    intake_selected = next((i for i, x in enumerate(intake_items) if x['hash'] == old_hash),
+                           min(intake_selected, max(0, len(intake_items) - 1)))
+    new_hash = intake_items[intake_selected]['hash'] if intake_items else None
+    if new_hash != old_hash:
+        set_intake_page('queue')
+
+
+def refresh_library(discover=True, reason='operator'):
+    global GAMES, intake_items, message
+    if reason in {'mutation', 'periodic'}:
+        # Membership/session updates need SQLite reads, not intake discovery.
+        items = intake_inventory or intake_items
+        for item in items:
+            last = rom_catalog.db.execute('SELECT * FROM sessions WHERE hash=? ORDER BY created DESC LIMIT 1',
+                                          (item['hash'],)).fetchone()
+            item['last_session'] = dict(last) if last else None
+            item.pop('_detail_lines', None)
+        admitted = {h for r in rom_catalog.membership_records() if r['enabled']
+                    for h in (r['hash'], r['artifact_hash'])}
+        apply_library(rom_catalog.playable(verify=False), items)
+        return
+    if catalog_jobs:
+        if catalog_jobs.thread.ident is None:
+            catalog_jobs.thread.start()
+        catalog_jobs.request(discover, reason=reason)
+        return
+    try:
+        if discover:
+            rom_catalog.discover()
+        apply_library(rom_catalog.playable(verify=False), rom_catalog.queue(include_set_aside=True))
+    except Exception as exc:
+        message = 'Intake unavailable: ' + str(exc)
+
+
+def enter_intake():
+    global intake_items, message
+    if intake_inventory or intake_items:
+        refresh_library(reason='mutation')  # Refilter the stored inventory for the requested view.
+        return
+    cached = rom_catalog.cached_intake()
+    if cached is not None:
+        intake_items = cached
+        refresh_library(reason='mutation')
+    else:
+        refresh_library()  # One initial scan only when no stored intake exists.
+        message = 'Initial intake inventory requested; Xbox navigation remains available.'
+
+
+class CatalogRefreshWorker:
+    """One evidence-cached refresh; active requests are covered by that pass.
+
+    Only an explicit authority mutation or discovery upgrade can queue one
+    follow-up. Periodic/operator requests cannot perpetuate active work.
+    """
+    def __init__(self, factory, output, max_seconds=60):
+        self.factory, self.output = factory, output
+        self.max_seconds = max_seconds
+        self.pending = threading.Event()
+        self.shutdown = threading.Event()
+        self.guard = threading.Lock()
+        self.discover_requested = False
+        self.active_discover = None
+        self.busy = False
+        self.progress = ''
+        self.catalog = None
+        self.stats = {'requests': 0, 'coalesced': 0, 'passes': 0, 'completed': 0,
+                      'suppressed': 0,
+                      'cache_hits': 0, 'failures': 0, 'phase': 'idle',
+                      'last_seconds': 0, 'last_cpu_seconds': 0, 'last_error': None}
+        self.thread = threading.Thread(target=self.run, daemon=True)
+
+    def request(self, discover=True, reason='operator'):
+        with self.guard:
+            if self.shutdown.is_set() or self.stats['phase'] == 'stopped':
+                return False
+            self.stats['requests'] += 1
+            if reason == 'periodic' and self.stats['last_error']:
+                self.stats['suppressed'] += 1
+                return False  # A persistent failure requires deliberate retry.
+            if self.busy:
+                self.stats['coalesced'] += 1
+                if self.active_discover is None or reason == 'mutation' or (discover and self.active_discover is False):
+                    self.discover_requested |= discover
+                    self.pending.set()
+                return False
+            self.discover_requested |= discover
+            self.busy = True
+            self.progress = 'Refreshing catalog in background'
+            self.pending.set()
+            return True
+
+    def _status(self):
+        if not self.catalog:
+            return
+        record = dict(self.stats, busy=self.busy, progress=self.progress,
+                      observed_at=time.time(), metrics=dict(self.catalog.metrics))
+        target = self.catalog.state / 'refresh-status.json'
+        temp = target.with_name('refresh-status.' + str(os.getpid()) + '.tmp')
+        try:
+            temp.write_text(json.dumps(record, indent=2))
+            os.replace(temp, target)
+        except OSError:
+            pass  # Instrumentation failure cannot change catalog authority.
+
+    def _phase(self, text):
+        self.progress = text
+        phase = text.split(' ', 1)[0]
+        if phase != self.stats['phase']:
+            self.stats['phase'] = phase
+            self._status()
+
+    def run(self):
+        cat = None
+        try:
+            cat = self.factory()
+            self.catalog = cat
+            cat.db.execute('PRAGMA busy_timeout=250')
+            self._status()
+            while not self.shutdown.is_set():
+                if not self.pending.wait(0.2):
+                    continue
+                if self.shutdown.is_set():
+                    break
+                with self.guard:
+                    discover = self.discover_requested
+                    self.discover_requested = False
+                    self.pending.clear()
+                    self.active_discover = discover
+                    self.stats['passes'] += 1
+                started, cpu = time.monotonic(), time.thread_time()
+                heartbeat = started
+                def check():
+                    nonlocal heartbeat
+                    now = time.monotonic()
+                    if self.shutdown.is_set():
+                        raise CatalogWorkStopped('Refresh cancelled for shutdown; no verdict or admission')
+                    if now - started > self.max_seconds:
+                        raise CatalogWorkStopped('Refresh exceeded work budget in ' + self.progress + '; inspect refresh-status.json')
+                    if now - heartbeat >= 5:
+                        self.stats['last_seconds'] = now - started
+                        self.stats['last_cpu_seconds'] = time.thread_time() - cpu
+                        self._status()
+                        heartbeat = now
+                cat._work_check = check
+                try:
+                    (games, items), cached = cat.refresh(discover, progress=self._phase)
+                    check()
+                    self._phase('Updating intake list')
+                    for item in items:
+                        check()
+                        candidate_detail_lines(item)
+                    cat.store_intake(items)
+                    self.output.put(('CATALOG', games, items, None))
+                    self.stats['completed'] += 1
+                    self.stats['cache_hits'] += int(cached)
+                    self.stats['last_error'] = None
+                except Exception as exc:
+                    self.stats['failures'] += 1
+                    self.stats['last_error'] = str(exc)
+                    if not self.shutdown.is_set():
+                        self.output.put(('CATALOG', [], [], str(exc)))
+                finally:
+                    cat._work_check = None
+                    self.stats['last_seconds'] = time.monotonic() - started
+                    self.stats['last_cpu_seconds'] = time.thread_time() - cpu
+                    with self.guard:
+                        self.active_discover = None
+                        self.busy = self.pending.is_set()
+                    self.stats['phase'] = 'pending' if self.busy else 'idle'
+                    self._status()
+        except Exception as exc:
+            self.busy = False
+            self.stats['failures'] += 1
+            self.stats['last_error'] = str(exc)
+            self.output.put(('CATALOG', [], [], str(exc)))
+        finally:
+            self.busy = False
+            self.stats['phase'] = 'stopped'
+            self._status()
+            if cat:
+                cat.close()
+
+    def close(self):
+        self.shutdown.set()
+        self.pending.set()
+        if self.thread.ident is not None:
+            self.thread.join(timeout=2)
+        return not self.thread.is_alive()
+
+
+# ============================================================
+# Keyboard input
+# ============================================================
+
+def keyboard_worker():
+    """
+    Convert physical tty1 keyboard input into launcher actions.
+
+    Keyboard controls are for the human/operator interface only.
+    """
+
+    fd = sys.stdin.fileno()
+
+    while True:
+        old_settings = termios.tcgetattr(fd)
+
+        try:
+            tty.setcbreak(fd)
+            key = sys.stdin.read(1)
+
+            # While a game is running, Ctrl-C / keyboard handling
+            # belongs outside this worker. Ignore normal menu keys.
+            if game_running.is_set():
+                continue
+
+            if key == "\x1b":
+                second = sys.stdin.read(1)
+
+                if second == "[":
+                    third = sys.stdin.read(1)
+
+                    if third == "A":
+                        action_queue.put("UP")
+
+                    elif third == "B":
+                        action_queue.put("DOWN")
+
+                else:
+                    action_queue.put("BACK")
+
+            elif key in ("\r", "\n"):
+                action_queue.put("SELECT")
+
+            elif key.lower() == "w":
+                action_queue.put("UP")
+
+            elif key.lower() == "s":
+                action_queue.put("DOWN")
+
+            elif key.lower() in {'i', 'r', 'q', 'p', 'f'}:
+                action_queue.put({'i': 'INTAKE', 'r': 'RESCAN',
+                                  'q': 'QUALIFY', 'p': 'PASS', 'f': 'FAIL'}[key.lower()])
+
+        except Exception:
+            time.sleep(0.1)
+
+        finally:
+            try:
+                termios.tcsetattr(
+                    fd,
+                    termios.TCSADRAIN,
+                    old_settings
+                )
+            except Exception:
+                pass
+
+
+# ============================================================
+# RetroArch player selection
+# ============================================================
+
+def set_retroarch_player():
+    """
+    Select the operator for the next game launch.
+
+    Proven RetroArch enumeration on Grandpa:
+      joypad index 0 = physical Xbox
+      joypad index 1 = Charlie Virtual Controller
+
+    ALEX:    Xbox is P1, Charlie is P2
+    CHARLIE: Charlie is P1, Xbox is P2
+
+    We intentionally do not hide/grab either Linux device.
+    """
+    cfg = HOME / ".config" / "retroarch" / "retroarch.cfg"
+
+    try:
+        text = cfg.read_text()
+    except OSError:
+        return False
+
+    if player_mode == "CHARLIE":
+        p1, p2 = "1", "0"
+    else:
+        p1, p2 = "0", "1"
+
+    lines = text.splitlines()
+    found_p1 = False
+    found_p2 = False
+
+    for i, line in enumerate(lines):
+        if line.startswith("input_player1_joypad_index = "):
+            lines[i] = f'input_player1_joypad_index = "{p1}"'
+            found_p1 = True
+        elif line.startswith("input_player2_joypad_index = "):
+            lines[i] = f'input_player2_joypad_index = "{p2}"'
+            found_p2 = True
+
+    if not (found_p1 and found_p2):
+        return False
+
+    try:
+        cfg.write_text("\n".join(lines) + "\n")
+    except OSError:
+        return False
+
+    return True
+
+
+# ============================================================
+# RetroArch lifecycle
+# ============================================================
+
+def stop_game():
+    """
+    Stop the active RetroArch process and return to the menu.
+
+    This is a machine-level action, not a virtual controller
+    button.
+    """
+
+    global retroarch_process
+    global message
+    global active_session, active_normal_game, active_log
+
+    with state_lock:
+        process = retroarch_process
+
+        if process is None:
+            return False
+
+        if process.poll() is not None:
+            complete_game(process)
+            retroarch_process = None
+            game_running.clear()
+            return False
+
+        try:
+            process.terminate()
+
+            try:
+                process.wait(timeout=3)
+
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=2)
+
+        except Exception:
+            pass
+
+        finally:
+            if process.poll() is None:
+                message = 'Could not confirm emulator stopped; controls remain guarded.'
+                try:
+                    charlie_controller.neutral()
+                except Exception:
+                    pass
+                return False
+            complete_game(process, operator_stop=True)
+            retroarch_process = None
+            game_running.clear()
+
+            try:
+                charlie_controller.neutral()
+            except Exception:
+                pass
+
+            if not intake_view:
+                message = "Returned to arcade menu."
+
+    render()
+    return True
+
+
+def complete_game(process, operator_stop=False):
+    """Caller owns state_lock; serialize catalog access with the main loop."""
+    global active_session, active_normal_game, active_log, message
+    global ui_epoch, intake_action_selected
+    qualified_trial = bool(active_session)
+    if display_control:
+        display_control.refresh()  # Read only after RetroArch returns; never gameplay writes.
+    ui_epoch += 1
+    if active_session:
+        rom_catalog.finish(active_session, returncode=process.poll(), operator_stop=operator_stop)
+        message = "Trial ended. KEEP IN ARCADE / TRY AGAIN / DON'T KEEP. Legacy PASS or FAIL is in evidence details."
+        active_session = None
+    elif active_normal_game:
+        game = active_normal_game
+        h = game['hash']
+        name = Path(game['rom']).stem
+        rom_catalog._event(h, 'launch-health', {'normal_game_exit': process.poll(),
+                                     'operator_stop': operator_stop})
+        if process.poll() and not operator_stop:
+            message = 'Game startup/runtime failed; membership retained; inspect launch health.'
+        active_normal_game = None
+    if active_log:
+        active_log.close()
+        active_log = None
+    refresh_library(discover=False, reason='mutation')
+    if qualified_trial and intake_items:
+        set_intake_page('actions')
+        intake_action_selected = 11 if keep_possible(intake_items[intake_selected]) else 12
+
+
+def game_watch_worker(process, game_name):
+    """
+    Wait for RetroArch to exit naturally.
+
+    Because this runs in its own thread, the launcher remains alive
+    and can continue accepting Charlie commands while the game runs.
+    """
+
+    global retroarch_process
+    global message
+
+    process.wait()
+
+    with state_lock:
+        # stop_game() may already have cleaned this process up.
+        if retroarch_process is process:
+            complete_game(process)
+            retroarch_process = None
+            game_running.clear()
+
+            try:
+                charlie_controller.neutral()
+            except Exception:
+                pass
+
+            if not intake_view:
+                message = f"Returned from {game_name}. {message}"
+
+            render()
+
+
+@blocking_operation('Preparing game...')
+def launch_game(game):
+    global retroarch_process
+    global message
+    global active_normal_game, active_log
+    global ui_epoch
+
+    if game_running.is_set():
+        return
+
+    try:
+        if not rom_catalog:
+            raise ValueError('Library unavailable')
+        rom = rom_catalog.check_launch(game)
+        game['status'] = ''  # A fresh successful check clears an earlier observed health failure.
+    except (OSError, ValueError) as exc:
+        message = 'Launch refused: ' + str(exc)
+        game['status'] = 'UNAVAILABLE'
+        return
+
+
+    if not RETROARCH.exists():
+        message = (
+            "ERROR: RetroArch executable not found."
+        )
+        return
+
+    if not CORE.exists():
+        message = (
+            "ERROR: MAME2000 core not found."
+        )
+        return
+
+    if not rom.exists():
+        message = (
+            f"ERROR: {game['rom']} not found."
+        )
+        return
+
+    try:
+        charlie_controller.neutral()
+
+        if not set_retroarch_player():
+            message = "ERROR: Could not select ALEX/CHARLIE controller."
+            return
+
+        clear_screen()
+
+        print("========================================")
+        print("            CHARLIE ARCADE")
+        print("========================================")
+        print()
+        print(
+            f" Starting {game['name']} as {player_mode}..."
+        )
+        print()
+        print(
+            " Xbox: GUIDE + BACK returns to menu"
+        )
+        print(flush=True)
+
+        logs = rom_catalog.state / 'normal-logs'
+        logs.mkdir(exist_ok=True)
+        active_log = (logs / (str(time.time_ns()) + '.log')).open('wb')
+        launch = rom_catalog.playable_launch(Path(game['rom']).stem)
+        args = [str(RETROARCH), '-L', str(CORE), str(rom)]
+        options = dict(stdout=active_log, stderr=subprocess.STDOUT)
+        if launch:
+            cfg = Path(launch['config_path'])
+            base = (rom_catalog.config / 'retroarch.cfg').read_text()
+            text = cfg.read_text()
+            for key in ('input_player1_joypad_index', 'input_player2_joypad_index'):
+                values = re.findall(r'(?m)^' + key + r'\s*=\s*"([0-9]+)"', base)
+                if values:
+                    text = re.sub(r'(?m)^' + key + r'\s*=.*$', key + ' = "' + values[-1] + '"', text)
+            cfg.write_text(text)
+            args[1:1] = ['--config', str(cfg)]
+            runtime = cfg.parents[1]
+            options.update(cwd=runtime, env=dict(os.environ, HOME=str(runtime / 'home'),
+                XDG_CONFIG_HOME=str(runtime / 'home/.config'), XDG_CACHE_HOME=str(runtime / 'home/.cache'),
+                XDG_DATA_HOME=str(runtime / 'home/.local/share')))
+        process = subprocess.Popen(args, **options)
+
+        with state_lock:
+            retroarch_process = process
+            active_normal_game = dict(game)
+            game_running.set()
+            ui_epoch += 1
+
+        watcher = threading.Thread(
+            target=game_watch_worker,
+            args=(process, game["name"]),
+            daemon=True
+        )
+
+        watcher.start()
+
+    except Exception as exc:
+        if active_log:
+            active_log.close()
+            active_log = None
+        retroarch_process = None
+        game_running.clear()
+
+        message = f"Launch failed: {exc}"
+        rom_catalog._event(game['hash'], 'launch-health',
+                           {'normal_launch_failed': str(exc)})
+
+        try:
+            charlie_controller.neutral()
+        except Exception:
+            pass
+
+
+# ============================================================
+# Menu actions
+# ============================================================
+
+OBSERVATIONS = ('boot', 'attract', 'gameplay', 'controls_ok', 'audio_ok', 'speed_ok',
+                'rejected', 'missing_parent_bios', 'core_load_failure', 'crash', 'not_observed')
+
+
+@blocking_operation('Preparing game...')
+def launch_qualification(item, target=None, diagnostic=False, attempt=False, selector=None):
+    global retroarch_process, active_session, active_log, message
+    global ui_epoch
+    if game_running.is_set():
+        return
+    session = None
+    process = None
+    try:
+        message = 'Preparing isolated game; originals preserved.'
+        render()
+        session = (rom_catalog.begin_attempt(item['hash'], getpass.getuser(), selector=selector) if attempt else
+                   rom_catalog.begin(item['hash'], target=target, diagnostic=diagnostic,
+                                     operator=getpass.getuser()))
+        # Isolate qualification settings, saves and core configuration. Never
+        # rewrite the existing RetroArch settings or Robotron experimental files.
+        folder = session['folder']
+        config = rom_catalog.qualification_config(session)
+        charlie_controller.neutral()
+        clear_screen()
+        print('TRY IN RETROARCH — decide Keep after returning' if attempt else
+              'TRY REVIEWED TARGET — decide Keep after returning' if diagnostic else 'SUPERVISED ROM QUALIFICATION AS ALEX')
+        print('Check gameplay, controls, audio and acceptable speed.')
+        print('GUIDE + BACK stops the trial; verdict is recorded afterward.', flush=True)
+        active_log = session['log'].open('wb')
+        process = subprocess.Popen([
+            str(RETROARCH), '--config', str(config),
+            '-L', str(CORE), str(session['rom'])
+        ], cwd=folder, stdout=active_log, stderr=subprocess.STDOUT,
+            env=dict(os.environ, HOME=str(folder / 'home'),
+                     XDG_CONFIG_HOME=str(folder / 'home/.config'),
+                     XDG_CACHE_HOME=str(folder / 'home/.cache'),
+                     XDG_DATA_HOME=str(folder / 'home/.local/share')))
+        rom_catalog.mark_trial_launched(session['id'], config)
+        active_session = session['id']
+        retroarch_process = process
+        game_running.set()
+        ui_epoch += 1
+        threading.Thread(target=game_watch_worker, args=(process, 'qualification'), daemon=True).start()
+    except Exception as exc:
+        # Popen may have succeeded before durable bookkeeping/watch startup
+        # failed. Never leave an untracked emulator owning the appliance.
+        if process is not None and process.poll() is None:
+            try:
+                process.terminate()
+                process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=2)
+        if active_log:
+            active_log.close()
+            active_log = None
+        if session:
+            rom_catalog.finish(session['id'], error=str(exc))
+        active_session = None
+        retroarch_process = None
+        game_running.clear()
+        message = 'Qualification launch failed: ' + str(exc)
+        refresh_library(discover=False, reason='mutation')
+
+
+def record_human_verdict(verdict, session=None):
+    global message
+    if not intake_items:
+        message = 'No selected intake item.'
+        return
+    last = intake_items[intake_selected].get('last_session')
+    if session is not None and (not last or last['id'] != session):
+        message = 'Trial changed; inspect and confirm the intended session again.'
+        return
+    row = rom_catalog.db.execute('SELECT * FROM sessions WHERE id=? AND hash=?',
+                                (session or (last or {}).get('id'), intake_items[intake_selected]['hash'])).fetchone()
+    if not row or row['status'] != 'finished':
+        message = 'Complete a supervised qualification session first.'
+        return
+    notes = ('Operator confirmed gameplay, controls, audio and acceptable speed'
+             if verdict == 'pass' else 'Operator rejected playability; inspect session log and retry')
+    try:
+        message = rom_catalog.verdict(row['id'], verdict, getpass.getuser(), notes)
+    except (ValueError, OSError) as exc:
+        message = 'Verdict/admission: ' + str(exc)
+    refresh_library(reason='mutation')
+
+def handle_action(action, physical=True):
+    global selected
+    global message
+    global player_mode
+    global intake_view, intake_selected, intake_reviewed
+    global intake_action_selected, identity_selected, identity_purpose, detail_offset
+
+    # Menu actions do nothing while RetroArch owns the display.
+    if operator_busy:
+        return
+    if game_running.is_set():
+        return
+
+    if not physical and (library_view or intake_view or action in {'KEEP','TRY','DONT_KEEP','LIBRARY','REMOVE','RESTORE','BLOCK','UNBLOCK','INTAKE','QUALIFY','PASS','FAIL','BIOS','RESOLVE','IDENTITIES','TRIAL_TARGETS','TRIAL_TARGET','NORMALIZE','DIAGNOSTIC','ATTEMPT','RECOVER','OBSERVATIONS','OBSERVE'}):
+        return  # Legacy network menu actions cannot reach the human queue.
+
+    if physical and action == 'LIBRARY' and not intake_view:
+        open_library_management()
+        return
+    if library_view:
+        handle_library_management(action)
+        return
+
+    if physical and action == 'INTAKE':
+        intake_view = not intake_view
+        if intake_view:
+            intake_reviewed = False
+        set_intake_page('queue')
+        enter_intake()
+        message = 'Human ROM intake.' if intake_view else 'Ready.'
+        return
+
+    if intake_view:
+        if not physical:
+            return
+        if action == 'LIBRARY' and intake_page == 'queue':
+            intake_reviewed = not intake_reviewed
+            apply_library(GAMES, intake_inventory or intake_items)
+            set_intake_page('queue')
+            return
+        if intake_page == 'confirm':
+            if action in {'UP', 'DOWN'}:
+                confirmation['choice'] = 1 - confirmation['choice']
+            elif action == 'SELECT':
+                if confirmation['choice'] == 1:
+                    execute_confirmation()
+                else:
+                    set_intake_page('actions')
+                    message = 'Cancelled; no consequential action performed.'
+            elif action == 'BACK':
+                set_intake_page('actions')
+            return
+        if action == 'RESCAN' or (action == 'RIGHT' and intake_page == 'queue'):
+            refresh_library()
+            message = 'Refreshing Intake Folder; navigation remains available.'
+            return
+        if action in {'QUALIFY', 'PASS', 'FAIL', 'BIOS'}:
+            request_confirmation(action)
+            return
+        if not intake_items:
+            if action == 'SELECT':
+                refresh_library()
+            elif action == 'BACK':
+                intake_view = False
+                set_intake_page('queue')
+            return
+        item = intake_items[intake_selected]
+        delta = -1 if action == 'UP' else 1
+        if intake_page == 'queue':
+            if action in {'UP', 'DOWN'}:
+                intake_selected = (intake_selected + delta) % len(intake_items)
+            elif action == 'SELECT':
+                set_intake_page('detail')
+            elif action == 'BACK':
+                intake_view = False
+                set_intake_page('queue')
+        elif intake_page == 'detail':
+            if action in {'UP', 'DOWN', 'LEFT', 'RIGHT'}:
+                step = delta if action in {'UP','DOWN'} else (-10 if action == 'LEFT' else 10)
+                detail_offset = min(max(0, detail_offset + step), max(0, len(candidate_detail_lines(item)) - 10))
+            elif action == 'SELECT':
+                last = item.get('last_session') or {}
+                intake_action_selected = 15 if intake_reviewed else 14 if item.get('bios') or protected_candidate(item) else 11 if keep_possible(item) else 12 if last else 0
+                set_intake_page('actions')
+            elif action == 'BACK':
+                set_intake_page('queue')
+        elif intake_page == 'identities':
+            candidates = ([p['shortname'] for p in item.get('trial_options', [])]
+                          if identity_purpose == 'trial' else item['identity']['candidates'])
+            if action in {'UP','DOWN'} and candidates:
+                identity_selected = (identity_selected + delta) % len(candidates)
+            elif action == 'SELECT' and candidates:
+                request_confirmation('TRIAL_TARGET' if identity_purpose == 'trial' else 'RESOLVE', candidates[identity_selected])
+            elif action == 'BACK':
+                set_intake_page('actions')
+        elif intake_page == 'observations':
+            if action in {'UP', 'DOWN'}:
+                identity_selected = (identity_selected + delta) % len(OBSERVATIONS)
+            elif action == 'SELECT':
+                request_confirmation('OBSERVE', OBSERVATIONS[identity_selected])
+            elif action == 'BACK':
+                set_intake_page('actions')
+        elif intake_page in {'actions', 'technical'}:
+            actions = candidate_actions(item)
+            indices = action_indices(item)
+            if action in {'UP','DOWN'}:
+                position = indices.index(intake_action_selected) if intake_action_selected in indices else 0
+                intake_action_selected = indices[(position + delta) % len(indices)]
+            elif action == 'SELECT':
+                _, chosen, enabled = actions[intake_action_selected]
+                if not enabled:
+                    message = 'Keep requires a completed successful trial; Details explains failures.' if chosen == 'KEEP' else '; '.join(item.get('trial_reasons', ['Inspect diagnosis first']))
+                elif chosen == 'MORE':
+                    intake_action_selected = 3
+                    set_intake_page('technical')
+                elif chosen == 'IDENTITIES':
+                    identity_selected = 0
+                    identity_purpose = 'resolve'
+                    set_intake_page('identities')
+                elif chosen == 'TRIAL_TARGETS':
+                    identity_selected = 0
+                    identity_purpose = 'trial'
+                    set_intake_page('identities')
+                elif chosen == 'RESCAN':
+                    refresh_library()
+                    set_intake_page('detail')
+                elif chosen == 'OBSERVATIONS':
+                    identity_selected = 0
+                    set_intake_page('observations')
+                elif chosen == 'QUEUE':
+                    set_intake_page('queue')
+                else:
+                    request_confirmation(chosen)
+            elif action == 'BACK':
+                set_intake_page('detail')
+        return
+
+    if action == 'SELECT' and selected == len(GAMES) + 1:
+        if physical and display_control:
+            display_control.select()
+            message = display_control.message
+        return
+
+    if action == 'SELECT' and selected == len(GAMES):
+        if physical:
+            intake_view = True
+            intake_reviewed = False
+            set_intake_page('queue')
+            enter_intake()
+            message = 'ROM qualification queue; playable library is separate.'
+        return
+
+    if action == "UP":
+        count = len(GAMES) + (2 if physical else 0)
+        selected = (selected - 1) % count if count else 0
+
+        message = "Selection moved."
+
+    elif action == "DOWN":
+        count = len(GAMES) + (2 if physical else 0)
+        selected = (selected + 1) % count if count else 0
+
+        message = "Selection moved."
+
+    elif action == "SELECT":
+        if selected < len(GAMES):
+            launch_game(GAMES[selected])
+
+    elif action == "BACK":
+        message = "Back."
+
+    elif action in {"TOGGLE_PLAYER", 'LEFT', 'RIGHT'}:
+        try:
+            charlie_controller.neutral()
+        except Exception:
+            pass
+
+        player_mode = (
+            "CHARLIE" if player_mode == "ALEX" else "ALEX"
+        )
+        message = f"Player: {player_mode}."
+
+    elif action.startswith("PLAYER:"):
+        requested = action.split(":", 1)[1]
+
+        if requested in PLAYER_MODES:
+            try:
+                charlie_controller.neutral()
+            except Exception:
+                pass
+
+            player_mode = requested
+            message = f"Player: {player_mode}."
+
+
+# ============================================================
+# Physical Xbox discovery
+# ============================================================
+
+def joystick_name(device):
+    """
+    Return the Linux joystick name from sysfs.
+
+    This lets us distinguish the physical Xbox from
+    'Charlie Virtual Controller' regardless of js0/js1 numbering.
+    """
+
+    try:
+        js_name = os.path.basename(device)
+
+        path = (
+            Path("/sys/class/input")
+            / js_name
+            / "device"
+            / "name"
+        )
+
+        return (
+            path.read_text()
+            .strip()
+        )
+
+    except Exception:
+        return ""
+
+
+def find_physical_xbox():
+    """
+    Find the real Xbox controller by device name.
+
+    Never treat Charlie Virtual Controller as the human Xbox.
+    """
+
+    for device in sorted(
+        glob.glob("/dev/input/js*")
+    ):
+        name = joystick_name(device)
+
+        if not name:
+            continue
+
+        lowered = name.lower()
+
+        if "charlie virtual controller" in lowered:
+            continue
+
+        if "xbox" in lowered:
+            return device
+
+    return None
+
+
+# ============================================================
+# Physical Xbox worker
+# ============================================================
+
+class XboxInput:
+    """Decode the established Linux Xbox joystick events without hardware I/O.
+
+    A/B and the observed axis/button indices are unchanged. Initialization and
+    repeated button-down events cannot act as fresh confirmation presses.
+    """
+    def __init__(self):
+        self.buttons = set()
+        self.axes = {1: 0, 6: 0, 7: 0}
+        self.vertical = 0
+        self.horizontal = 0
+
+    def feed(self, data, game_active=False):
+        _, value, event_type, number = struct.unpack('IhBB', data)
+        initial = bool(event_type & 0x80)
+        event_type &= ~0x80
+        actions = []
+        if event_type == 1:
+            pressed = value == 1
+            was_pressed = number in self.buttons
+            if pressed:
+                self.buttons.add(number)
+            else:
+                self.buttons.discard(number)
+            if initial or not pressed or was_pressed:
+                return []
+            if game_active:
+                if {6, 8} <= self.buttons:
+                    return ['STOP_GAME']
+                return []
+            if number == 0:
+                return ['SELECT']
+            if number == 1:
+                return ['BACK']
+            if number == 2:
+                return ['LIBRARY']
+        elif event_type == 2 and number in self.axes:
+            self.axes[number] = value
+            horizontal = -1 if self.axes[6] < -16000 else (1 if self.axes[6] > 16000 else 0)
+            y = self.axes[7] if abs(self.axes[7]) > 16000 else self.axes[1]
+            vertical = -1 if y < -16000 else (1 if y > 16000 else 0)
+            if not initial and not game_active:
+                if horizontal and horizontal != self.horizontal:
+                    actions.append('LEFT' if horizontal < 0 else 'RIGHT')
+                if vertical and vertical != self.vertical:
+                    actions.append('UP' if vertical < 0 else 'DOWN')
+            self.horizontal, self.vertical = horizontal, vertical
+        return actions
+
+
+def dispatch_action(action):
+    """Only events from the physical pathway may use the human intake UI."""
+    if isinstance(action, tuple):
+        source = action[0]
+        if source == 'CATALOG':
+            if action[3]:
+                global message
+                message = 'Catalog refresh failed; previous list retained. Launch rechecks remain required. ' + action[3]
+            else:
+                apply_library(action[1], action[2])
+        elif source == 'NETWORK':
+            handle_action(action[1], physical=False)
+        elif source == 'XBOX' and len(action) == 3 and action[2] == ui_epoch:
+            handle_action(action[1], physical=True)
+    else:
+        handle_action(action, physical=True)  # Optional local keyboard compatibility.
+
+
+def xbox_worker():
+    """Existing physical Xbox discovery/read loop; no virtual controller is accepted."""
+    while True:
+        device = find_physical_xbox()
+        if device is None:
+            time.sleep(1)
+            continue
+        try:
+            with open(device, 'rb', buffering=0) as js:
+                inputs = XboxInput()
+                while True:
+                    data = js.read(8)
+                    if len(data) != 8:
+                        break
+                    for action in inputs.feed(data, game_running.is_set()):
+                        if action == 'STOP_GAME':
+                            stop_game()  # Existing GUIDE + BACK escape.
+                        else:
+                            action_queue.put(('XBOX', action, ui_epoch))
+        except (FileNotFoundError, PermissionError, OSError):
+            time.sleep(1)
+
+
+# ============================================================
+# Charlie network protocol: unchanged vocabulary and wire replies
+# ============================================================
+
+def handle_network_command(command):
+    global player_mode
+    global message
+
+    """
+    Route one network command.
+
+    Charlie gets only OK or ERROR.
+
+    No menu position, controller state, game state, score,
+    collision information, or other feedback is returned.
+    """
+
+    command = (
+        command
+        .strip()
+        .upper()
+    )
+
+    if not command:
+        return False
+
+    # --------------------------------------------------------
+    # Arcade-machine command
+    # --------------------------------------------------------
+
+    if command == "QUIT":
+        stop_game()
+        return True
+
+    # Qualification is supervised by the physical operator. Keep the same
+    # vocabulary and OK/ERROR replies; expose no intake commands or state.
+    if active_session:
+        if command == 'NEUTRAL':
+            charlie_controller.neutral()
+            return True
+        return False
+
+    # --------------------------------------------------------
+    # V1 operator selection
+    # --------------------------------------------------------
+
+    if command in ("PLAYER_ALEX", "PLAYER_CHARLIE"):
+        requested = command.split("_", 1)[1]
+
+        # Do not change operator underneath a running game.
+        if game_running.is_set():
+            return False
+
+        action_queue.put(('NETWORK', f"PLAYER:{requested}"))
+        return True
+
+    # --------------------------------------------------------
+    # Fail-safe controller release
+    # --------------------------------------------------------
+
+    if command == "NEUTRAL":
+        charlie_controller.neutral()
+        return True
+
+    # --------------------------------------------------------
+    # Charlie virtual controller commands
+    # --------------------------------------------------------
+
+    if player_mode == "CHARLIE":
+        try:
+            charlie_controller.command(
+                command
+            )
+            return True
+
+        except ValueError:
+            pass
+
+    # --------------------------------------------------------
+    # Legacy menu commands
+    #
+    # Keep these temporarily so our existing manual tests still
+    # work. Charlie's learning system should ultimately use the
+    # controller vocabulary rather than semantic menu commands.
+    # --------------------------------------------------------
+
+    if (
+        not game_running.is_set()
+        and command in {
+            "UP",
+            "DOWN",
+            "SELECT",
+            "BACK",
+        }
+    ):
+        action_queue.put(
+            ('NETWORK', command)
+        )
+        return True
+
+    return False
+
+
+def network_connection_worker(connection):
+    """
+    Handle one TCP client.
+
+    Commands are newline-delimited.
+
+    A persistent connection may therefore send:
+
+        LS_RIGHT_DOWN
+        RS_UP_DOWN
+        RS_UP_UP
+        LS_RIGHT_UP
+
+    without reconnecting for every action.
+
+    On disconnect, Charlie's controller is neutralized.
+    """
+
+    try:
+        with connection:
+            file = connection.makefile(
+                "r",
+                encoding="ascii",
+                errors="ignore",
+                newline="\n"
+            )
+
+            try:
+                for line in file:
+                    command = (
+                        line
+                        .strip()
+                        .upper()
+                    )
+
+                    if not command:
+                        continue
+
+                    try:
+                        ok = handle_network_command(
+                            command
+                        )
+
+                    except Exception:
+                        ok = False
+
+                    if ok:
+                        connection.sendall(
+                            b"OK\n"
+                        )
+
+                    else:
+                        connection.sendall(
+                            b"ERROR\n"
+                        )
+
+            finally:
+                try:
+                    file.close()
+                except Exception:
+                    pass
+
+    finally:
+        # Critical safety rule:
+        # a lost Charlie connection can never leave a control held.
+        try:
+            charlie_controller.neutral()
+        except Exception:
+            pass
+
+
+def network_worker():
+    """
+    Charlie control server.
+
+    Multiple connections are accepted, but each connection
+    receives no information beyond OK/ERROR acknowledgement.
+    """
+
+    with socket.socket(
+        socket.AF_INET,
+        socket.SOCK_STREAM
+    ) as server:
+
+        server.setsockopt(
+            socket.SOL_SOCKET,
+            socket.SO_REUSEADDR,
+            1
+        )
+
+        server.bind(
+            (HOST, PORT)
+        )
+
+        server.listen(5)
+
+        while True:
+            connection, address = (
+                server.accept()
+            )
+
+            worker = threading.Thread(
+                target=network_connection_worker,
+                args=(connection,),
+                daemon=True
+            )
+
+            worker.start()
+
+
+# ============================================================
+# Main
+# ============================================================
+
+def main():
+    global message
+    global rom_catalog
+    global catalog_jobs
+    global display_control
+
+    display_control = DisplayControl(HOME / 'arcade/display-size.json')
+    display_control.startup()
+    message = display_control.message
+    rom_catalog = Catalog(HOME / 'arcade', RETROARCH, lazy_metadata=True)
+    load_startup_library()
+    render()  # SQLite membership only, before metadata/scan/worker startup.
+    rom_catalog.recover()
+    catalog_jobs = CatalogRefreshWorker(
+        lambda: Catalog(HOME / 'arcade', RETROARCH, timeout=0.25, lazy_metadata=True), action_queue)
+
+    # Create Charlie's virtual controller before starting
+    # network service or accepting commands.
+    charlie_controller.create()
+
+    message = display_control.message
+
+    network_thread = threading.Thread(
+        target=network_worker,
+        daemon=True
+    )
+
+    xbox_thread = threading.Thread(
+        target=xbox_worker,
+        daemon=True
+    )
+
+    network_thread.start()
+    xbox_thread.start()
+
+    render()
+
+    last_progress = ''
+
+    while True:
+        try:
+            action = action_queue.get(timeout=0.2)
+        except queue.Empty:
+            with state_lock:
+                if not game_running.is_set():
+                    progress = catalog_jobs.progress if catalog_jobs.busy else ''
+                    if progress != last_progress:
+                        render()
+                        last_progress = progress
+            continue
+
+        with state_lock:
+            dispatch_action(action)
+
+        # launch_game() gives RetroArch the display.
+        # Don't overwrite it with the menu.
+        if not game_running.is_set():
+            render()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+
+    except KeyboardInterrupt:
+        pass
+
+    finally:
+        try:
+            stop_game()
+        except Exception:
+            pass
+
+        try:
+            charlie_controller.close()
+        except Exception:
+            pass
+
+        if catalog_jobs:
+            catalog_jobs.close()
+        if rom_catalog:
+            rom_catalog.close()
+
+        clear_screen()
+        print(
+            "Charlie Arcade launcher stopped."
+        )
+
+
+SOURCE /home/five/arcade/controller.py symlink= False
+SHA256 344e9886848b5bc437f257a272f08b0df9d6b49fe844dae8b7368dd527cadc8d
+#!/usr/bin/env python3
+"""
+Charlie Virtual Controller
+
+Zero-side actuator for Charlie Arcade.
+
+This module deliberately knows nothing about games, menus, scores,
+player position, or the meaning of any control. It exposes only
+controller-like actions.
+
+Charlie may:
+    press a control
+    release a control
+    release everything
+
+The arcade launcher separately owns machine-level actions such as QUIT.
+"""
+
+import os
+import struct
+import fcntl
+import time
+import threading
+
+
+# ---------------------------------------------------------------------
+# Linux input/uinput constants
+# ---------------------------------------------------------------------
+
+UINPUT = "/dev/uinput"
+
+EV_SYN = 0x00
+EV_KEY = 0x01
+EV_ABS = 0x03
+SYN_REPORT = 0x00
+
+UI_SET_EVBIT   = 0x40045564
+UI_SET_KEYBIT  = 0x40045565
+UI_SET_ABSBIT  = 0x40045567
+UI_DEV_CREATE  = 0x5501
+UI_DEV_DESTROY = 0x5502
+
+BUS_USB = 0x03
+
+
+# Xbox-style buttons
+BTN_A      = 0x130
+BTN_B      = 0x131
+BTN_X      = 0x133
+BTN_Y      = 0x134
+
+BTN_TL     = 0x136
+BTN_TR     = 0x137
+
+BTN_SELECT = 0x13A
+BTN_START  = 0x13B
+BTN_MODE   = 0x13C
+
+BTN_THUMBL = 0x13D
+BTN_THUMBR = 0x13E
+
+
+# Axes
+ABS_X     = 0x00
+ABS_Y     = 0x01
+
+# Triggers are represented as Z and RZ.
+ABS_Z     = 0x02
+
+ABS_RX    = 0x03
+ABS_RY    = 0x04
+ABS_RZ    = 0x05
+
+ABS_HAT0X = 0x10
+ABS_HAT0Y = 0x11
+
+
+# Full digital stick deflection.
+NEG = -32767
+POS = 32767
+CENTER = 0
+
+TRIGGER_RELEASED = 0
+TRIGGER_PRESSED = 32767
+
+
+BUTTONS = {
+    "A": BTN_A,
+    "B": BTN_B,
+    "X": BTN_X,
+    "Y": BTN_Y,
+
+    "LB": BTN_TL,
+    "RB": BTN_TR,
+
+    "BACK": BTN_SELECT,
+    "START": BTN_START,
+    "GUIDE": BTN_MODE,
+
+    "LS_CLICK": BTN_THUMBL,
+    "RS_CLICK": BTN_THUMBR,
+}
+
+
+DIRECTION_CONTROLS = {
+    "LS_UP",
+    "LS_DOWN",
+    "LS_LEFT",
+    "LS_RIGHT",
+
+    "RS_UP",
+    "RS_DOWN",
+    "RS_LEFT",
+    "RS_RIGHT",
+
+    "DPAD_UP",
+    "DPAD_DOWN",
+    "DPAD_LEFT",
+    "DPAD_RIGHT",
+}
+
+
+TRIGGERS = {
+    "LT": ABS_Z,
+    "RT": ABS_RZ,
+}
+
+
+ALL_CONTROLS = (
+    set(BUTTONS.keys())
+    | DIRECTION_CONTROLS
+    | set(TRIGGERS.keys())
+)
+
+
+class CharlieController:
+    """
+    A stateful virtual game controller.
+
+    Important design rule:
+    this class provides ACTUATION only.
+
+    It never reports game state back to Charlie.
+    """
+
+    def __init__(self):
+        self.fd = None
+        self.lock = threading.RLock()
+        self.created = False
+
+        # Whether each logical control is currently held.
+        self.held = {
+            name: False
+            for name in ALL_CONTROLS
+        }
+
+
+    # -----------------------------------------------------------------
+    # Device creation
+    # -----------------------------------------------------------------
+
+    def create(self):
+        with self.lock:
+            if self.created:
+                return
+
+            self.fd = os.open(
+                UINPUT,
+                os.O_WRONLY | os.O_NONBLOCK
+            )
+
+            fcntl.ioctl(self.fd, UI_SET_EVBIT, EV_KEY)
+            fcntl.ioctl(self.fd, UI_SET_EVBIT, EV_ABS)
+
+            for code in BUTTONS.values():
+                fcntl.ioctl(
+                    self.fd,
+                    UI_SET_KEYBIT,
+                    code
+                )
+
+            axes = (
+                ABS_X,
+                ABS_Y,
+                ABS_Z,
+                ABS_RX,
+                ABS_RY,
+                ABS_RZ,
+                ABS_HAT0X,
+                ABS_HAT0Y,
+            )
+
+            for axis in axes:
+                fcntl.ioctl(
+                    self.fd,
+                    UI_SET_ABSBIT,
+                    axis
+                )
+
+            name = b"Charlie Virtual Controller"
+            name += b"\0" * (80 - len(name))
+
+            setup = struct.pack(
+                "80sHHHHI",
+                name,
+                BUS_USB,
+
+                # Arbitrary IDs belonging to our virtual device.
+                0x1209,
+                0x4348,
+                0x0001,
+
+                0
+            )
+
+            absmax = [0] * 64
+            absmin = [0] * 64
+            absfuzz = [0] * 64
+            absflat = [0] * 64
+
+            # Two digitalized analog sticks.
+            for axis in (
+                ABS_X,
+                ABS_Y,
+                ABS_RX,
+                ABS_RY,
+            ):
+                absmin[axis] = NEG
+                absmax[axis] = POS
+
+            # Digitalized analog triggers.
+            for axis in (
+                ABS_Z,
+                ABS_RZ,
+            ):
+                absmin[axis] = TRIGGER_RELEASED
+                absmax[axis] = TRIGGER_PRESSED
+
+            # D-pad hats.
+            for axis in (
+                ABS_HAT0X,
+                ABS_HAT0Y,
+            ):
+                absmin[axis] = -1
+                absmax[axis] = 1
+
+            for values in (
+                absmax,
+                absmin,
+                absfuzz,
+                absflat,
+            ):
+                setup += struct.pack(
+                    "64i",
+                    *values
+                )
+
+            os.write(self.fd, setup)
+            fcntl.ioctl(
+                self.fd,
+                UI_DEV_CREATE
+            )
+
+            self.created = True
+
+            # Give Linux time to create the event/js nodes.
+            time.sleep(0.5)
+
+            self.neutral()
+
+
+    # -----------------------------------------------------------------
+    # Low-level event output
+    # -----------------------------------------------------------------
+
+    def _emit(self, event_type, code, value):
+        if not self.created:
+            raise RuntimeError(
+                "Charlie controller has not been created"
+            )
+
+        event = struct.pack(
+            "llHHi",
+            0,
+            0,
+            event_type,
+            code,
+            value
+        )
+
+        os.write(self.fd, event)
+
+
+    def _sync(self):
+        self._emit(
+            EV_SYN,
+            SYN_REPORT,
+            0
+        )
+
+
+    def _axis(self, code, value):
+        self._emit(
+            EV_ABS,
+            code,
+            value
+        )
+        self._sync()
+
+
+    def _button(self, code, pressed):
+        self._emit(
+            EV_KEY,
+            code,
+            1 if pressed else 0
+        )
+        self._sync()
+
+
+    # -----------------------------------------------------------------
+    # Direction calculation
+    # -----------------------------------------------------------------
+
+    def _update_axis_pair(
+        self,
+        negative_name,
+        positive_name,
+        axis,
+        magnitude
+    ):
+        negative = self.held[negative_name]
+        positive = self.held[positive_name]
+
+        if negative and not positive:
+            value = -magnitude
+
+        elif positive and not negative:
+            value = magnitude
+
+        else:
+            # Both held or neither held = neutral.
+            value = 0
+
+        self._axis(axis, value)
+
+
+    def _update_direction(self, control):
+        if control in ("LS_UP", "LS_DOWN"):
+            self._update_axis_pair(
+                "LS_UP",
+                "LS_DOWN",
+                ABS_Y,
+                32767
+            )
+
+        elif control in ("LS_LEFT", "LS_RIGHT"):
+            self._update_axis_pair(
+                "LS_LEFT",
+                "LS_RIGHT",
+                ABS_X,
+                32767
+            )
+
+        elif control in ("RS_UP", "RS_DOWN"):
+            self._update_axis_pair(
+                "RS_UP",
+                "RS_DOWN",
+                ABS_RY,
+                32767
+            )
+
+        elif control in ("RS_LEFT", "RS_RIGHT"):
+            self._update_axis_pair(
+                "RS_LEFT",
+                "RS_RIGHT",
+                ABS_RX,
+                32767
+            )
+
+        elif control in ("DPAD_UP", "DPAD_DOWN"):
+            self._update_axis_pair(
+                "DPAD_UP",
+                "DPAD_DOWN",
+                ABS_HAT0Y,
+                1
+            )
+
+        elif control in ("DPAD_LEFT", "DPAD_RIGHT"):
+            self._update_axis_pair(
+                "DPAD_LEFT",
+                "DPAD_RIGHT",
+                ABS_HAT0X,
+                1
+            )
+
+
+    # -----------------------------------------------------------------
+    # Public controller interface
+    # -----------------------------------------------------------------
+
+    def press(self, control):
+        """
+        Hold a logical controller control.
+        """
+
+        control = control.upper()
+
+        with self.lock:
+            if control not in ALL_CONTROLS:
+                raise ValueError(
+                    f"Unknown control: {control}"
+                )
+
+            # Repeated DOWN commands are harmless.
+            if self.held[control]:
+                return
+
+            self.held[control] = True
+
+            if control in DIRECTION_CONTROLS:
+                self._update_direction(control)
+
+            elif control in BUTTONS:
+                self._button(
+                    BUTTONS[control],
+                    True
+                )
+
+            elif control in TRIGGERS:
+                self._axis(
+                    TRIGGERS[control],
+                    TRIGGER_PRESSED
+                )
+
+
+    def release(self, control):
+        """
+        Release a logical controller control.
+        """
+
+        control = control.upper()
+
+        with self.lock:
+            if control not in ALL_CONTROLS:
+                raise ValueError(
+                    f"Unknown control: {control}"
+                )
+
+            # Repeated UP commands are harmless.
+            if not self.held[control]:
+                return
+
+            self.held[control] = False
+
+            if control in DIRECTION_CONTROLS:
+                self._update_direction(control)
+
+            elif control in BUTTONS:
+                self._button(
+                    BUTTONS[control],
+                    False
+                )
+
+            elif control in TRIGGERS:
+                self._axis(
+                    TRIGGERS[control],
+                    TRIGGER_RELEASED
+                )
+
+
+    def _set_position(self, device, position):
+        """
+        Set a stick or D-pad to an absolute logical position.
+
+        Position remains active until another position command,
+        CENTER, or NEUTRAL is received.
+        """
+        positions = {
+            "CENTER":     (0, 0),
+            "UP":         (0, -1),
+            "UP_RIGHT":   (1, -1),
+            "RIGHT":      (1, 0),
+            "DOWN_RIGHT": (1, 1),
+            "DOWN":       (0, 1),
+            "DOWN_LEFT":  (-1, 1),
+            "LEFT":       (-1, 0),
+            "UP_LEFT":    (-1, -1),
+        }
+
+        if position not in positions:
+            raise ValueError(f"Unknown position: {position}")
+
+        x, y = positions[position]
+
+        with self.lock:
+            if device == "LS":
+                # Keep legacy held-state bookkeeping consistent.
+                self.held["LS_LEFT"] = x < 0
+                self.held["LS_RIGHT"] = x > 0
+                self.held["LS_UP"] = y < 0
+                self.held["LS_DOWN"] = y > 0
+
+                self._axis(ABS_X, x * 32767)
+                self._axis(ABS_Y, y * 32767)
+
+            elif device == "RS":
+                self.held["RS_LEFT"] = x < 0
+                self.held["RS_RIGHT"] = x > 0
+                self.held["RS_UP"] = y < 0
+                self.held["RS_DOWN"] = y > 0
+
+                self._axis(ABS_RX, x * 32767)
+                self._axis(ABS_RY, y * 32767)
+
+            elif device == "DPAD":
+                self.held["DPAD_LEFT"] = x < 0
+                self.held["DPAD_RIGHT"] = x > 0
+                self.held["DPAD_UP"] = y < 0
+                self.held["DPAD_DOWN"] = y > 0
+
+                self._axis(ABS_HAT0X, x)
+                self._axis(ABS_HAT0Y, y)
+
+            else:
+                raise ValueError(f"Unknown positional device: {device}")
+
+
+    def tap(self, control, duration=0.10):
+        """
+        Briefly press and release a button or trigger.
+        """
+        control = control.upper()
+
+        if control not in BUTTONS and control not in TRIGGERS:
+            raise ValueError(f"Cannot tap control: {control}")
+
+        self.press(control)
+        time.sleep(duration)
+        self.release(control)
+
+
+    def command(self, command):
+        """
+        Execute one Charlie controller command.
+
+        Preferred v2 forms:
+
+            LS_UP
+            LS_UP_RIGHT
+            LS_CENTER
+            RS_LEFT
+            RS_CENTER
+            DPAD_DOWN
+            DPAD_CENTER
+
+            A
+            B
+            START
+            BACK
+            LT
+            RT
+
+            NEUTRAL
+
+        Buttons and triggers without a suffix are momentary taps.
+
+        Legacy explicit hold/release commands remain supported:
+
+            A_DOWN
+            A_UP
+            LS_LEFT_DOWN
+            LS_LEFT_UP
+
+        Returns only:
+            OK
+
+        Deliberately returns no controller or game state.
+        """
+
+        command = command.strip().upper()
+
+        if command == "NEUTRAL":
+            self.neutral()
+            return "OK"
+
+        # Absolute stick/D-pad positions.
+        for device in ("LS", "RS", "DPAD"):
+            prefix = device + "_"
+
+            if command.startswith(prefix):
+                position = command[len(prefix):]
+
+                if position in {
+                    "CENTER",
+                    "UP",
+                    "UP_RIGHT",
+                    "RIGHT",
+                    "DOWN_RIGHT",
+                    "DOWN",
+                    "DOWN_LEFT",
+                    "LEFT",
+                    "UP_LEFT",
+                }:
+                    self._set_position(device, position)
+                    return "OK"
+
+        # Ordinary controller buttons/triggers are momentary taps.
+        if command in BUTTONS or command in TRIGGERS:
+            self.tap(command)
+            return "OK"
+
+        # Backwards-compatible explicit press/release.
+        if command.endswith("_DOWN"):
+            control = command[:-5]
+            self.press(control)
+            return "OK"
+
+        if command.endswith("_UP"):
+            control = command[:-3]
+            self.release(control)
+            return "OK"
+
+        raise ValueError(
+            f"Unknown command: {command}"
+        )
+
+
+    def neutral(self):
+        """
+        Release every control.
+
+        This is also the fail-safe operation used when Charlie
+        disconnects or a game exits.
+        """
+
+        with self.lock:
+            for name in self.held:
+                self.held[name] = False
+
+            # Sticks
+            self._axis(ABS_X, CENTER)
+            self._axis(ABS_Y, CENTER)
+            self._axis(ABS_RX, CENTER)
+            self._axis(ABS_RY, CENTER)
+
+            # Triggers
+            self._axis(
+                ABS_Z,
+                TRIGGER_RELEASED
+            )
+
+            self._axis(
+                ABS_RZ,
+                TRIGGER_RELEASED
+            )
+
+            # D-pad
+            self._axis(ABS_HAT0X, 0)
+            self._axis(ABS_HAT0Y, 0)
+
+            # Buttons
+            for code in BUTTONS.values():
+                self._button(
+                    code,
+                    False
+                )
+
+
+    # -----------------------------------------------------------------
+    # Shutdown
+    # -----------------------------------------------------------------
+
+    def close(self):
+        with self.lock:
+            if not self.created:
+                return
+
+            try:
+                self.neutral()
+                time.sleep(0.05)
+
+                fcntl.ioctl(
+                    self.fd,
+                    UI_DEV_DESTROY
+                )
+
+            finally:
+                os.close(self.fd)
+                self.fd = None
+                self.created = False
+
+
+    def __enter__(self):
+        self.create()
+        return self
+
+
+    def __exit__(
+        self,
+        exc_type,
+        exc_value,
+        traceback
+    ):
+        self.close()
+
+
+# ---------------------------------------------------------------------
+# Standalone diagnostic mode
+# ---------------------------------------------------------------------
+
+if __name__ == "__main__":
+
+    print("Creating Charlie Virtual Controller...")
+
+    controller = CharlieController()
+
+    try:
+        controller.create()
+
+        print("READY")
+        print()
+        print("Enter controller commands.")
+        print("Examples:")
+        print("  LS_LEFT")
+        print("  LS_UP_RIGHT")
+        print("  LS_CENTER")
+        print("  RS_UP")
+        print("  RS_CENTER")
+        print("  DPAD_LEFT")
+        print("  DPAD_CENTER")
+        print("  A")
+        print("  START")
+        print("  LT")
+        print("  A_DOWN       # explicit hold")
+        print("  A_UP         # explicit release")
+        print("  NEUTRAL      # release/center everything")
+        print()
+        print("Type EXIT to stop.")
+        print()
+
+        while True:
+            command = input("> ").strip()
+
+            if not command:
+                continue
+
+            if command.upper() == "EXIT":
+                break
+
+            try:
+                result = controller.command(
+                    command
+                )
+                print(result)
+
+            except ValueError:
+                print("ERROR")
+
+    except KeyboardInterrupt:
+        print()
+
+    finally:
+        controller.close()
+        print(
+            "Charlie Virtual Controller removed."
+        )
+
+
+SOURCE /home/five/arcade/controller_lease.py symlink= False
+
+SOURCE /home/five/arcade/rom_intake.py symlink= False
+SHA256 f53b06abacf2f3a3436452e79f1b7fe9562050a120b8d4cd501a47d12f0ea98c
+
+SOURCE /home/five/arcade/display_control.py symlink= False
+SHA256 77d6e36ea066d5dc230f59f495bf4e6c67a1f8295e52328d7678bbf044e99016
+
+INPUT DEVICES
+I: Bus=001e Vendor=0000 Product=0000 Version=0001
+N: Name="vc4-hdmi"
+P: Phys=vc4-hdmi/input0
+S: Sysfs=/devices/platform/soc/20902000.hdmi/rc/rc0/input0
+U: Uniq=
+H: Handlers=kbd event0 
+B: PROP=20
+B: EV=100017
+B: KEY=ffffc0 0 0 3ff 0 0 400000 320fc200 40830c9 0 0 0 0 210300 49d2 c040ec00 1e3780 0 80100000 10000000
+B: REL=3
+B: MSC=10
+
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="vc4-hdmi HDMI Jack"
+P: Phys=ALSA
+S: Sysfs=/devices/platform/soc/20902000.hdmi/sound/card0/input1
+U: Uniq=
+H: Handlers=event1 
+B: PROP=0
+B: EV=21
+B: SW=40
+
+I: Bus=0003 Vendor=1209 Product=4348 Version=0001
+N: Name="Charlie Virtual Controller"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input2
+U: Uniq=
+H: Handlers=event2 js0 
+B: PROP=0
+B: EV=b
+B: KEY=7cdb0000 0 0 0 0 0 0 0 0 0
+B: ABS=3003f
+
+

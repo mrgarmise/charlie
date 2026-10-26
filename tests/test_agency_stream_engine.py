@@ -80,6 +80,9 @@ def test_capture_includes_before_during_and_after_synchronous_execute():
                 self.last_execution['pulse_finished_at']=time.monotonic()
                 emit()
                 self.last_execution['release_completed_at']=time.monotonic()
+                # A later independent exposure closes the declared interval;
+                # it is ordinary history rather than protected evidence.
+                timer=threading.Timer(.03,emit);timer.daemon=True;timer.start()
         c=Controller()
         execution,frames,status=capture_window(source,c,Action('STAY','E'),60,post_seconds=.01)
         assert any(p.at<status['submitted_at'] for p in frames)
@@ -87,6 +90,7 @@ def test_capture_includes_before_during_and_after_synchronous_execute():
         assert any(p.at>execution['pulse_finished_at'] for p in frames)
         assert len(frames)==4 and not c.closed and len(thread_ids)==1
         assert thread_ids!={threading.get_ident()}
+        frames.close(replayed=True)
     finally:stream.close()
     assert not stream.thread.is_alive()
 

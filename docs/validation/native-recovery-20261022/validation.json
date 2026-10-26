@@ -1,0 +1,28 @@
+{
+  "base": "bb77fb681965cd32e23456c45b1e86d94724ffba",
+  "python": "3.13.5",
+  "machine": "aarch64",
+  "focused": {
+    "passed": 78,
+    "failed": 0,
+    "errors": 0,
+    "seconds": 23.83,
+    "receipt": "focused.xml"
+  },
+  "related": {
+    "passed": 79,
+    "errors": 4,
+    "seconds": 17.93,
+    "reason": "sandbox denied loopback socket creation",
+    "receipt": "related.xml"
+  },
+  "compileall": "passed",
+  "git_diff_check": "passed",
+  "physical_gameplay": false,
+  "source_sha256": {
+    "experiments/ppal/preflight.py": "4b473fe051eb7f6af0d0254e7b99e683acb6f40a9573798e6bb7e2659101a19e",
+    "experiments/ppal/marathon_robotron.py": "d17e46745a9652724ab1ce50f847c3afa78faeb73e3455eb9975f9ec8fbcefd7",
+    "tests/test_final_image_recovery.py": "e261641a72af4c62ac132cd014da1ff881c4d917baa585e059ab30ec6de61562",
+    "tests/test_recovery_entrypoint.py": "a62b484356079b0c4bcce989fb0d9f96e4cb1cd0a4247874b1953ad333011f43"
+  }
+}

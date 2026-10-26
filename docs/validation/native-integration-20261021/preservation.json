@@ -1,0 +1,50 @@
+{
+  "original_notebook_sha256": "7c942b2a5977142ba093bfe2b2238d8d37573438e55b9c8cab5f566bb44ae6ae",
+  "original_notebook_matches_previous": true,
+  "worktrees": [
+    {
+      "path": "/home/five/Projects/charlie",
+      "head": "bb40d02d3a128706e204cfd8e636fb1a9c5fd21b",
+      "status": "?? head2_sessions/\n?? robotron-evidence/\n",
+      "unfinished_patch_matches_recovery_backup": true
+    },
+    {
+      "path": "/home/five/charlie-agency-recovery",
+      "head": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+      "status": " M experiments/ppal/play_robotron.py\n M experiments/ppal/preflight.py\n M experiments/ppal/robotron_agency.py\n M tests/test_ppal_agency.py\n M tests/test_robotron_agency_integration.py\n?? tests/test_agency_recovery_boundaries.py\n",
+      "unfinished_patch_matches_recovery_backup": true
+    },
+    {
+      "path": "/home/five/charlie-camera-calibration",
+      "head": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+      "status": " M experiments/ppal/preflight.py\n?? experiments/ppal/preflight.py.before-fixed-focus\n",
+      "unfinished_patch_matches_recovery_backup": true
+    },
+    {
+      "path": "/home/five/charlie-fast-self-validation",
+      "head": "73169db9ad2648ca7e4088979d22905900052c6a",
+      "status": ""
+    },
+    {
+      "path": "/home/five/charlie-score-sampler",
+      "head": "d45cce134e10d342f64a4d33f8baf9fcc1a41b01",
+      "status": ""
+    },
+    {
+      "path": "/home/five/charlie-ala2-recovery-20261019",
+      "head": "365bc84ca7f2b02cde94a3f604b2f957bb66a6f9",
+      "status": ""
+    },
+    {
+      "path": "/home/five/charlie-marathon-audit-20261020",
+      "head": "f43bb2be17d8d687683f35edda86d0b8734f7f59",
+      "status": "",
+      "unfinished_patch_matches_recovery_backup": true
+    },
+    {
+      "path": "/home/five/charlie-active-vision",
+      "head": "87779558b78aeb5b36d4c3bc1eceed7831201e95",
+      "status": "?? recovery/\n"
+    }
+  ]
+}

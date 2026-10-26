@@ -1,0 +1,49 @@
+{
+  "control": "6000 controlled unreadable 4x4 images per arm; mocked HUD; actual background worker and append-only output; ABBA; not authentic perception or gameplay throughput",
+  "rows": [
+    {
+      "variant": "before",
+      "samples": 6000,
+      "wall_seconds": 2.458265649000168,
+      "cpu_seconds": 2.491592982,
+      "python_current_bytes": 406456,
+      "python_peak_bytes": 414597,
+      "timing_samples_retained": 6000,
+      "errors": 0,
+      "dropped": 0
+    },
+    {
+      "variant": "after",
+      "samples": 6000,
+      "wall_seconds": 2.375636260000647,
+      "cpu_seconds": 2.4066970069999996,
+      "python_current_bytes": 243235,
+      "python_peak_bytes": 251496,
+      "timing_samples_retained": 2048,
+      "errors": 0,
+      "dropped": 0
+    },
+    {
+      "variant": "after",
+      "samples": 6000,
+      "wall_seconds": 2.458120852999855,
+      "cpu_seconds": 2.485341632,
+      "python_current_bytes": 242527,
+      "python_peak_bytes": 250788,
+      "timing_samples_retained": 2048,
+      "errors": 0,
+      "dropped": 0
+    },
+    {
+      "variant": "before",
+      "samples": 6000,
+      "wall_seconds": 2.4932019500001843,
+      "cpu_seconds": 2.458020992,
+      "python_current_bytes": 373335,
+      "python_peak_bytes": 381476,
+      "timing_samples_retained": 6000,
+      "errors": 0,
+      "dropped": 0
+    }
+  ]
+}

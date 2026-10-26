@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-24",
+  "starting_remote_head": "0b40569ee3d282907ce7d077d30dcd058cc1fa1b",
+  "starting_tree": "412f9ec9a0548abba96a0c970dfce54d131a7b91",
+  "source_sha256": {
+    "experiments/ppal/marathon_robotron.py": "e7eb863940480fef0014a8c600e707e19e7458cb1caac51a0ac124c7a9bfe768",
+    "experiments/ppal/preflight.py": "4b473fe051eb7f6af0d0254e7b99e683acb6f40a9573798e6bb7e2659101a19e",
+    "tests/test_recovery_entrypoint.py": "71a0c377b53b6619e4dc8a7c83348e198008724da7e63c054e2129152ffe2c4a",
+    "tests/test_final_image_recovery.py": "e261641a72af4c62ac132cd014da1ff881c4d917baa585e059ab30ec6de61562"
+  },
+  "archived_failure": {
+    "root": "/home/five/charlie-native-trials/learning-20261022-025334",
+    "report": "/home/five/charlie-native-trials/learning-20261022-025334/development-20261022-025335/game-01/report.json",
+    "report_sha256": "da4d00694102d2c864867a9ddeb61d0b73da8d0e765746cbb5a74534eb773900",
+    "result": "ERROR: ValueError: No complete game border found; include all corners and aim more squarely at TV",
+    "action_steps": 0,
+    "terminal_confirmed": false,
+    "policy_identity": {
+      "kind": "baseline",
+      "code_revision": "d6ef07b0b5a5959feedf50ef7f53a7fa026e29c6",
+      "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8",
+      "bootstrap_body_fire": true
+    },
+    "fixture_verification": {
+      "sensory-preflight.json": {
+        "source_sha256": "b734eb7f4f516913a8c2645c8db8c8196b38a21ed56a9240e48e3efba75b9182",
+        "fixture_sha256": "b734eb7f4f516913a8c2645c8db8c8196b38a21ed56a9240e48e3efba75b9182",
+        "verified": true
+      },
+      "sensory-failed.png": {
+        "source_sha256": "ab4b70ad5089fd675c9eee0f7e64a4343d3bf868e6d2ab9d29f43a779a5a9b23",
+        "fixture_sha256": "ab4b70ad5089fd675c9eee0f7e64a4343d3bf868e6d2ab9d29f43a779a5a9b23",
+        "verified": true
+      },
+      "exposure-ev-3.png": {
+        "source_sha256": "420c610897f45b5f538b165c7cff12c3e0ffc570b1205d7668baefeaf177c17f",
+        "fixture_sha256": "420c610897f45b5f538b165c7cff12c3e0ffc570b1205d7668baefeaf177c17f",
+        "verified": true
+      }
+    }
+  },
+  "camera": {
+    "root": "/home/five/charlie-final-admission-6gYsJjHl",
+    "file_sha256": {
+      "host.txt": "73a32c48509968d4c0fb03831ac8de5ce41861c8fa8a22a39510b4cc5003d68d",
+      "ownership-review.txt": "cc618eff1a1f968952daf60fb41455feab34ca97ed99db798729f3bd6264e114",
+      "camera.json": "ccc6abe74f26d0518588358d2faa7957089a12d3095b72bb9b4650f2a6454bb8",
+      "robotron.jpg": "b383cd3aa0faead5b94ded9199a3982971c4e6f1157cff710db5c9286e167272",
+      "owners-before.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "lens_position": 2.0,
+    "focus_fom": 8069,
+    "af_state": 0,
+    "scope": "Historical October 22 evidence, not current native admission"
+  },
+  "controller": {
+    "source": "charlie-arcade:/home/five/controller-final-kFwHl9pA/controller.jsonl",
+    "operator_reported_neutralization_seconds": 0.92,
+    "operator_confirmation_date": "2026-10-24",
+    "same_existing_test": true,
+    "raw_inspected_by_codex": false,
+    "raw_sha256": null,
+    "access_limit": "normal SSH config rejected; explicit-config socket creation denied",
+    "repeat_required_for_this_correction": false
+  },
+  "verification": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "84",
+    "time": "61.955",
+    "timestamp": "2026-10-24T21:20:55.908775+01:00",
+    "hostname": "charlie",
+    "receipt": "resume-20261024-focused.xml",
+    "receipt_sha256": "2a3ac1f4ef9065335520ce494085b13b16b2d88135efb369600f076594f57f03"
+  },
+  "physical_actions_this_continuation": 0,
+  "new_learning_acceptance": false
+}

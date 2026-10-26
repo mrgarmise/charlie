@@ -10,8 +10,8 @@ from .score_tracker import VisualScoreTracker, DualScoreTracker
 
 class RobotronScoreSystem:
     def __init__(self, calibration, *, log_path: Path | None = None,
-                 self_channel: int | None = 1, confirm_baseline: bool = False) -> None:
-        self.reader = RobotronHUDReader(calibration)
+                 self_channel: int | None = 1, confirm_baseline: bool = False, reader=None) -> None:
+        self.reader = reader if reader is not None else RobotronHUDReader(calibration)
         self.tracker = VisualScoreTracker(self.reader, DualScoreTracker(self_channel=self_channel,
                                                 confirm_baseline=confirm_baseline))
         self.log = ScoreEventLog(log_path) if log_path is not None else None
@@ -24,7 +24,9 @@ class RobotronScoreSystem:
     def set_self_channel(self, player: int | None) -> None:
         self.tracker.set_self_channel(player)
 
-    def observe(self, raw_frame, *, t: float):
+    def observe(self, raw_frame, *, t: float, source=None):
+        if hasattr(self.reader, "bind_source"):
+            self.reader.bind_source(t=t, source=source)
         self.latest = self.tracker.observe(raw_frame)
         if self.log is not None:
             self.log.append(t=t, channels=self.latest)
@@ -36,10 +38,16 @@ class RobotronScoreSystem:
                 "p1_score": None, "p2_score": None, "self_channel": None,
                 "self_score": None, "status": "unmeasured",
             }
+        observed=self.latest.for_player(self.latest.self_channel) if self.latest.self_channel else None
+        supported=(observed is not None and observed.observed_score==observed.score
+            and observed.status in ('baseline','changed','stable'))
         return {
             "p1_score": self.latest.player1.score,
             "p2_score": self.latest.player2.score,
             "self_channel": self.latest.self_channel,
             "self_score": self.latest.self_score,
-            "status": "measured" if self.latest.self_score is not None else "unresolved",
+            "status": ("measured" if supported else "held_unverified") if self.latest.self_score is not None else "unresolved",
+            "latest_observed_score": observed.observed_score if observed else None,
+            "latest_observation_status": observed.status if observed else 'unresolved',
+            "qualification": "temporal reader belief; independent complete-game score still required",
         }

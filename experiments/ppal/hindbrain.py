@@ -32,7 +32,7 @@ def distance_to_segment(point: Position, start: Position, end: Position) -> floa
 class Hindbrain:
     def __init__(self, panic_radius: float = 9, route_width: float = 9,
                  shot_model: "ShotModel | None" = None, explore_fire: bool = False, policy=None,
-                 tactical_learning: bool = False) -> None:
+                 tactical_learning: bool = False, tactical_memory=None) -> None:
         self.explore_fire = explore_fire
         self.fire_explorations = 0
         self.panic_radius = panic_radius
@@ -47,6 +47,7 @@ class Hindbrain:
         self.last_panic_hold_tick: int | None = None
         self.last_open_move: str | None = None
         self.tactical_learning=tactical_learning
+        self.tactical_memory=tactical_memory
         self.tactical_plan={}
         self.tactical_outcome=None
         self._tactical_pending=None
@@ -109,7 +110,31 @@ class Hindbrain:
             selected=dict(move=selected.move,fire=selected.fire),
             disposition='mandatory current-observation override' if mandatory else
                 'revise after qualified contradiction' if contradicted else 'test or repeat current option',
-            uncertainty='session-local diagnostic hypothesis; no verified score effect or persistent policy deployment')
+            uncertainty='session-local tactic; stored diagnostic outcomes cannot authorize live policy activation')
+        if self.tactical_memory is not None:
+            # Read-only shadow valuation: no learned physical action is applied.
+            # Unlike fixed geometric heuristics, this field changes after a
+            # validated outcome is retained, and survives a process restart.
+            remembered=[(a,self.tactical_memory.summary(a.move,a.fire)) for a in options]
+            def preference(entry):
+                action,evidence=entry
+                # Session origins are not independent game certificates; require
+                # repeated outcomes before displaying a provisional preference.
+                if evidence['episode_origins'] < 2:
+                    return (0.0, 0, -options.index(action))
+                rate=(evidence['supported']-evidence['contradicted'])/max(1,evidence['samples'])
+                return (rate,evidence['samples'],-options.index(action))
+            best=max(remembered,key=preference) if remembered else None
+            self.tactical_plan['retained_diagnostic']=dict(
+                baseline=self.tactical_memory.summary(baseline.move,baseline.fire),
+                shadow_preference=dict(move=best[0].move,fire=best[0].fire) if best else None,
+                alternatives=[dict(move=a.move,fire=a.fire,**e,
+                    valuation=dict(signed_support=preference((a,e))[0],
+                                   samples_used=preference((a,e))[1])) for a,e in remembered],
+                applied_to_physical_action=False,
+                qualified_positioning_policy=(self.policy.trace(self._applied)
+                    if self.policy and getattr(self.policy, 'tactical_memory', None) is self.tactical_memory else None),
+                interpretation='retained response valuation, not a qualified tactical or score policy')
         return intent,selected
 
     def align_tactical_action(self,action):
@@ -156,7 +181,9 @@ class Hindbrain:
                'contradicted' if eligible and action.move in MOVE_VECTORS else 'unresolved'
         outcome=dict(prediction_id=p['prediction_id'],tactical_id=p['plan'].get('id'),
             origin_at=p['timestamp'],observed_at=timestamp,track_id=track_id,identity_status=identity_status,
-            eligible=eligible,result=result,displacement=[dx,dy] if eligible else None,
+            eligible=eligible,result=result,
+            actual_action=dict(move=action.move,fire=action.fire),
+            displacement=[dx,dy] if eligible else None,
             along=along if eligible else None,scene_changed=eligible and result=='supported',
             resolved_result=result,reason='same qualified track and completed causal response window' if eligible else
                 'missing, late, ambiguous identity or incomplete response; no negative evidence',

@@ -1,0 +1,134 @@
+{
+  "upstream_repository": "mrgarmise/charlie-arcade",
+  "upstream_commit": "0825f596dc9397e1c6721dc2a38249a0420cde61",
+  "source_method": "GitHub connector blob-verified reconstruction; no authenticated clone",
+  "arcade_sources": {
+    "docs/controller-lease.md": {
+      "upstream_blob": null,
+      "candidate_sha256": "0080998ca9366d5da20278a2bd19a57578276e63c4f0390426ad8f28d937e56f"
+    },
+    "install.sh": {
+      "upstream_blob": "d9b9b96050d57460f1858d146568449bbdde2fbb",
+      "candidate_sha256": "4a2a5a85d7dc8eea334b053735ed6b4897ef587b12b9b363a02a4ddd9a792ddb"
+    },
+    "scripts/install_rom_intake.py": {
+      "upstream_blob": "9b60b5aa1fc9f177e073bdef3716d6c26470a302",
+      "candidate_sha256": "fab153f212c33397b6236a6d918ef206dd09cbd9facdfbb39a6173259340083b"
+    },
+    "scripts/preflight_playable_library.py": {
+      "upstream_blob": "e510a460c21d574058d480e2417a95ac54c4f736",
+      "candidate_sha256": "11c437b88e35138568ba09655691dd117337113a9b61bca44ca4a7e3796d8866"
+    },
+    "src/controller_lease.py": {
+      "upstream_blob": null,
+      "candidate_sha256": "dd9d82c0ce85e22e3064eec91377b0fc783389d1c17b89fb1ca9b6cf57f24cc5"
+    },
+    "src/launcher.py": {
+      "upstream_blob": "ec599b292e6d1af7d600a8fdc479e0b554aff344",
+      "candidate_sha256": "0a2b86501e620b26495450d10d8409e8890f487a51e0acac6148865d5277880f"
+    },
+    "tests/test_callable_intake.py": {
+      "upstream_blob": "9694fb89347567f9a000141d4137e070c05b04b7",
+      "candidate_sha256": "95082c17320d1467fb8462df05f226af4eb6f1f0c8c86774c6dd96bb569005e3"
+    },
+    "tests/test_controller_lease.py": {
+      "upstream_blob": null,
+      "candidate_sha256": "439151c41b0b2b1d9d13f38a29eaea665fcbc95b7ff84daa3d54647362b2797e"
+    },
+    "tests/test_install_rom_intake.py": {
+      "upstream_blob": "5f4c4de1534d74e83cb8400b1478b6578831410f",
+      "candidate_sha256": "00ca08a2e768c5436ec44b2c01d2788284b7d513074a7bb9bb6e336ef1eaf321"
+    },
+    "tests/test_launcher_intake.py": {
+      "upstream_blob": "6fb1f985ffd56838ad1f3b7a20cab8a47c7949a4",
+      "candidate_sha256": "73563a05828b91874974b831d84a25393a56539256630772d395c74c1bfc39e0"
+    }
+  },
+  "charlie_sources": {
+    "experiments/ppal/arcade_transport.py": "ab76fc07a4c71481ce735f1aece992695453c851abbfde499f6dd230c902e015",
+    "tools/native_robotron_trial.py": "d4d7a45c63c2c001a6377290458f3d4a74fa8f8e8872ce712f4377a835f26252",
+    "tests/test_arcade_controller_lease_client.py": "ac5c28bed1efacb1d8ce257319d85ae9adb9126a21c1bdd97fab0b9f2666c79d",
+    "tests/test_native_robotron_trial.py": "d04593d94568d5e5a2e5f8b9d35b77781b781ab132cd2606d17648d7c1aa989a"
+  },
+  "charlie_base_revision": "71892612069018998de98fe4b303f0ed202472cc",
+  "patch_sha256": "933f208c33920fbeac089e9b8003d326981c3f40f0974a5ee160d1c16f976e1b",
+  "receipts": {
+    "arcade-tests.xml": {
+      "sha256": "da72d41a95c12bab3a79da13b80bcee487359272fcac5b1237a74c74728556e0",
+      "suite": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "262",
+        "time": "9.594",
+        "timestamp": "2026-10-22T00:24:18.594190+01:00",
+        "hostname": "charlie"
+      }
+    },
+    "charlie-tests.xml": {
+      "sha256": "99b1e90603b90a4cc32cfa72e1d641a5e88bfcb25bcb8bf59e2956b2bba8d355",
+      "suite": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "97",
+        "time": "11.809",
+        "timestamp": "2026-10-22T00:20:33.460772+01:00",
+        "hostname": "charlie"
+      }
+    }
+  },
+  "hardware_activated": false,
+  "deployed": false,
+  "physical_acceptance": "PENDING",
+  "armv6_validation": "PENDING",
+  "arcade_authentication": "ordinary-terminal supplied authentic inspection; no agent live-service action",
+  "publication": {
+    "arcade_commit": "5ed9cc6fdf66cb22b93ba1587170e8280bc6a417",
+    "arcade_pr": "https://github.com/mrgarmise/charlie-arcade/pull/4",
+    "charlie_runtime_commit": "d6ef07b0b5a5959feedf50ef7f53a7fa026e29c6",
+    "charlie_parent": "aaf36ac708b8af422a7ffbdfb4f63e0d92bb9774",
+    "arcade_sources": {
+      "docs/controller-lease.md": "0080998ca9366d5da20278a2bd19a57578276e63c4f0390426ad8f28d937e56f",
+      "install.sh": "4a2a5a85d7dc8eea334b053735ed6b4897ef587b12b9b363a02a4ddd9a792ddb",
+      "scripts/install_rom_intake.py": "efb30bd8b246500ff8e9ba9e2404b05f68f45cae4af428d9d77b993c97a655ff",
+      "scripts/preflight_playable_library.py": "f95e220dfebc0a9aa4fc7a20870f4b1ca0debf8273bbef5cc781c0627f24d642",
+      "src/controller_lease.py": "dd9d82c0ce85e22e3064eec91377b0fc783389d1c17b89fb1ca9b6cf57f24cc5",
+      "src/launcher.py": "0a2b86501e620b26495450d10d8409e8890f487a51e0acac6148865d5277880f",
+      "tests/test_callable_intake.py": "95082c17320d1467fb8462df05f226af4eb6f1f0c8c86774c6dd96bb569005e3",
+      "tests/test_controller_lease.py": "439151c41b0b2b1d9d13f38a29eaea665fcbc95b7ff84daa3d54647362b2797e",
+      "tests/test_install_rom_intake.py": "06250445455af4c7fd51e0e0b353c3dc0989d7ee90237030b243b8afe554af94",
+      "tests/test_launcher_intake.py": "73563a05828b91874974b831d84a25393a56539256630772d395c74c1bfc39e0"
+    },
+    "receipts": {
+      "arcade-initial-sandbox-failures.xml": "c38b461e4422de2432d9be19b5b8fe40c41a09c8bf6d0acb8a2c22af7146795f",
+      "arcade-tests-final.xml": "e2d44084b8afe1fed6ccc49d87c7bf59dc5f852555686b5f930e268fdec9616d",
+      "arcade-unittest-final.txt": "60fe36b9a35fb6d44c5e39fec045572a759466d742e382198e6440969a8c8137",
+      "charlie-tests-native-sockets.xml": "c37d84c2d0743c36cfe02f8a7dad2e06f5afcb0c624c4bdafd52c7329441419d",
+      "charlie-arcade.patch": "933f208c33920fbeac089e9b8003d326981c3f40f0974a5ee160d1c16f976e1b",
+      "arcade-inspection.txt": "2a76440e63e59518d51855baa86f4bf56f35d398b111177de3fa660b3f716819",
+      "charlie-native-prerequisites.xml": "dea644e63063719b2d2f49f127a2ae18985ad2ecc3c9f560ceb0b0de8e541665",
+      "arcade-tests-release.xml": "686d7628bbd4c65b5765118ade4e42870641f29e99d9d4a2264d597299a59eae",
+      "charlie-tests.xml": "99b1e90603b90a4cc32cfa72e1d641a5e88bfcb25bcb8bf59e2956b2bba8d355",
+      "arcade-tests-native-sockets.xml": "913fa2580fc766c20d82c14c45b726ce819d3ec14eb75b62911e22f78407fb4e",
+      "charlie-tests-release.xml": "b0474543c51594d4fb75fd4b63c59e9606b2cf935aba6a23e73ac45fc73fadd3",
+      "arcade-tests.xml": "da72d41a95c12bab3a79da13b80bcee487359272fcac5b1237a74c74728556e0",
+      "baseline-qualification.patch": "b552d1ea84d784148f638092d441cea2bdedf6aaff1636f9b2d2502ae9bdc056"
+    },
+    "installed_reconciliation": "reconciliation.json",
+    "armv6_validation": "PENDING",
+    "physical_acceptance": "PENDING",
+    "deployed": false,
+    "verification": {
+      "arcade_pytest": "256 passed, 7 subtests passed",
+      "arcade_unittest": "256 tests, OK, no skips",
+      "charlie_scoped": "97 passed",
+      "charlie_native_prerequisites": "153 passed; overlaps scoped selection",
+      "remote_arcade_tree": "exactly ten changed blobs verified; all other base blobs retained",
+      "original_patch_plus_amendment": "all ten source files reproduced exactly",
+      "static_checks": "compileall, shell syntax, diff whitespace passed"
+    }
+  }
+}

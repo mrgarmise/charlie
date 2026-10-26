@@ -1,0 +1,37 @@
+{
+  "scope": "Codex namespace access audit, not host hardware acceptance",
+  "at": 1792619500.0477293,
+  "mechanisms_inspected": {
+    "eyes_launcher": "setup/charlie_eyes_launcher.py: Mint SSH/browser lifetime for passive viewer; no gameplay admission",
+    "offline_service": "release/charlie-offline.service.example: placeholders; offline Executive only",
+    "native_gameplay": "experiments.ppal.marathon_robotron foreground CLI, with existing process supervision",
+    "host_user_systemd": "endpoint exists but connection denied",
+    "host_tmux": "endpoint connection denied"
+  },
+  "user_systemd": {
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "Failed to connect to user scope bus via local transport: Operation not permitted (consider using --machine=<user>@.host --user to connect to bus of other user)\n"
+  },
+  "system_systemd": {
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "Failed to connect to system scope bus via local transport: Operation not permitted (consider using --machine=<user>@.host --user to connect to bus of other user)\n"
+  },
+  "tmux": {
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "error connecting to /tmp/tmux-1000/default (Operation not permitted)\n"
+  },
+  "socket_creation": {
+    "AF_INET": "[Errno 1] Operation not permitted",
+    "AF_UNIX": "available (does not establish permission to connect)"
+  },
+  "saved_preview": {
+    "producer_pid": 3364,
+    "file_age_seconds": 1799.9943344593048,
+    "identity_status": "unknown",
+    "qualification": "stale saved preview; not proof of current owner, current frame or SELF"
+  },
+  "conclusion": "No verified Codex-accessible host-side gameplay launcher. Foreground host procedure prepared; no sandbox bypass or elevated invocation attempted."
+}

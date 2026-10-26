@@ -1,0 +1,354 @@
+........................FFF......................F............FF.......  [100%]
+=================================== FAILURES ===================================
+_ test_real_sensory_path_persists_then_reuses_same_camera_without_reoptimization _
+
+tmp_path = PosixPath('/work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_real_sensory_path_persist0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fff7ac959d0>
+
+    def test_real_sensory_path_persists_then_reuses_same_camera_without_reoptimization(tmp_path, monkeypatch):
+        from experiments.ppal import preflight
+        from experiments.ppal.eyes import visual_readiness
+        monkeypatch.setenv('XDG_DATA_HOME',str(tmp_path/'state'))
+        _,image=qualified()
+        source=Replay([image]*60)
+>       calibration,initial=preflight.sensory_preflight(source,tmp_path/'first',seed_position=2.)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_visual_readiness.py:226: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/preflight.py:114: in sensory_preflight
+    atomic_json(default_view_path(),record)
+learning/foundry.py:19: in atomic_json
+    with tmp.open('w') as stream:
+         ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_real_sensory_path_persist0/state/charlie/vision/robotron-view.tmp')
+mode = 'w', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_real_sensory_path_persist0/state/charlie/vision/robotron-view.tmp'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+_____________ test_explicit_active_vision_lock_is_not_overwritten ______________
+
+tmp_path = PosixPath('/work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_explicit_active_vision_lo0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fff7aa7cd50>
+
+    def test_explicit_active_vision_lock_is_not_overwritten(tmp_path,monkeypatch):
+        from experiments.ppal.preflight import sensory_preflight
+        monkeypatch.setenv('XDG_DATA_HOME',str(tmp_path/'state'))
+        calibration,image=qualified()
+        # Synthetic producer envelope, authentic pixels. No physical CAL is asserted.
+        record=record_view(calibration,dict(lens_position=2.),image,origin=OCT24,observations=[])
+        record.update(schema='charlie-active-vision-v1',state='LOCKED',resources_released=True,simulated=False)
+        path=tmp_path/'active-vision/view.json';path.parent.mkdir();path.write_text(json.dumps(record))
+        original=path.read_bytes()
+>       _,report=sensory_preflight(Replay([image]*12),tmp_path/'episode',viewpoint_path=path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_visual_readiness.py:252: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/preflight.py:81: in sensory_preflight
+    atomic_json(default_view_path(), record)
+learning/foundry.py:19: in atomic_json
+    with tmp.open('w') as stream:
+         ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_explicit_active_vision_lo0/state/charlie/vision/robotron-view.tmp')
+mode = 'w', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_explicit_active_vision_lo0/state/charlie/vision/robotron-view.tmp'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+_____ test_active_vision_degradation_hysteresis_is_consumed_without_motion _____
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fff7aa7d250>
+
+    def test_active_vision_degradation_hysteresis_is_consumed_without_motion(monkeypatch):
+        from experiments.ppal.live_view import LiveViewMonitor
+        from experiments.ppal.eyes import settle
+        calibration,image=qualified()
+        monitor=LiveViewMonitor(calibration.apply(image))
+        points=np.asarray(calibration.corners)*image.size+[45,0]
+        monkeypatch.setattr(settle,'locate',lambda *a,**kw:points)
+        for at in range(4):
+            assert monitor.observe(calibration.apply(image),{'state':'gameplay'},at,raw=image,calibration=calibration) is None
+        result=monitor.observe(calibration.apply(image),{'state':'gameplay'},4,raw=image,calibration=calibration)
+>       assert result['active_vision_decision']=='request_permission' and result['physical_authorization'] is False
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'NoneType' object is not subscriptable
+
+tests/test_visual_readiness.py:267: TypeError
+___________ test_actual_sensory_preflight_bounded_optics_and_quality ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fff7aa4b3e0>
+tmp_path = PosixPath('/work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_actual_sensory_preflight_0')
+
+    def test_actual_sensory_preflight_bounded_optics_and_quality(monkeypatch,tmp_path):
+        from experiments.ppal import preflight as p
+        from tests.test_robotron_preflight import _synthetic_robotron_border
+        from PIL import ImageDraw
+        image=_synthetic_robotron_border();ImageDraw.Draw(image).text((200,200),'OBSERVED DETAIL',fill='white')
+        class Source:
+            capture={}
+            position = 2.4
+            state = 2
+            sequence = 0
+            def read(self):
+                self.sequence += 1
+                self.capture = dict(lens_position=self.position, af_state=self.state,
+                                    sensor_timestamp_ns=self.sequence*100_000_000)
+                return image
+            def read_fresh(self):return self.read()
+            def focus_limits(self):return (0.,10.)
+            def set_autofocus(self):self.state=2
+            def lens_position(self):return self.position
+            def set_manual_focus(self,n):self.focus=n;self.position=n;self.state=0
+            def lock_white_balance(self,c):return False
+        # Existing physical geometry/focus algorithms remain real; no controller,
+        # camera hardware or motion interface is created.
+>       source=Source();c,report=p.sensory_preflight(source,tmp_path,timeout=60)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_sensory_recording.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/preflight.py:114: in sensory_preflight
+    atomic_json(default_view_path(),record)
+learning/foundry.py:19: in atomic_json
+    with tmp.open('w') as stream:
+         ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/work/run-BQcbF1/home/.local/share/charlie/vision/robotron-view.tmp')
+mode = 'w', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/work/run-BQcbF1/home/.local/share/charlie/vision/robotron-view.tmp'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+__ test_real_player_starts_two_simulated_playable_games_on_one_camera[False] ___
+
+tmp_path = PosixPath('/work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_real_player_starts_two_si0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fff7949cad0>
+camera_failure = False, terminal_pages = False, terminal_delay = False
+
+    @pytest.mark.parametrize('camera_failure',[False,True])
+    def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False,terminal_delay=False):
+        """Real player + marathon; simulated pixels/controls, not Pi acceptance."""
+        import time
+        from experiments.ppal import marathon_robotron as m,play_robotron as play
+        from experiments.ppal.eyes.detectors import Detection
+        from experiments.ppal.robotron_agency import VECTORS
+        from test_experiment_return import gateway
+        from test_marathon_deferred import args
+        real_sleep=time.sleep
+        # This accelerated, synthetic clock tests episode transitions, not writer
+        # throughput. Finish prior durable work before advancing an exposure so
+        # host scheduling cannot randomly turn it into a backpressure test. Real
+        # recorder limits/fail-closed overflow have separate dedicated regressions.
+        from experiments.ppal import progress_evidence
+        real_recorder=progress_evidence.CaptureEvidence
+        recorders=[]
+        def recorder(*values,**options):
+            value=real_recorder(*values,**options);recorders.append(value);return value
+        monkeypatch.setattr(progress_evidence,'CaptureEvidence',recorder)
+        clock=[0.];starts=[];preflights=[];closed=[];points=[(25.,25.),(50.,50.)]
+        world={'game':0,'reads':0}
+        class Camera:
+            def __init__(self):closed.append('opened')
+            def read(self):
+                if recorders and not recorders[-1]._closed:recorders[-1].flush()
+                real_sleep(.01);clock[0]+=.05
+                if world['game']:world['reads']+=1
+                if terminal_delay and world['reads']==102:clock[0]+=25.
+                if camera_failure and world['game']==2 and world['reads']>65:
+                    raise RuntimeError('simulated capture disconnected')
+                return Image.new('RGB',(100,100))
+            def close(self):closed.append('camera_closed')
+        class Controller:
+            def __init__(self,*a,**kw):self.last_execution=None
+            def _command(self,command):
+                self.last_command=dict(command=command,write_started_at=clock[0],write_completed_at=clock[0],ack_at=clock[0])
+                if command=='START':
+                    world['game']+=1;world['reads']=0;points[0]=(25.,25.);starts.append(world['game'])
+            def execute(self,action,ms):
+                if terminal_pages:assert world['reads']<100 # no postgame/demo agency probes
+                self.last_execution=dict(started_at=clock[0],move=action.move,fire=action.fire,duration_ms=ms)
+                clock[0]+=ms/1000
+                if world['reads']<100:
+                    u=VECTORS[action.move];points[0]=(points[0][0]+u[0],points[0][1]+u[1])
+            def close(self):closed.append('controller_closed')
+        class Recognizer:
+            def detect(self,frame):
+                if world['reads']>=100:return []
+                return [(Detection('unknown',p,(1,1,10,20),100),{'class_scores':{}}) for p in points]
+        def screen(frame):
+            if terminal_pages and world['game']:
+                if 100<=world['reads']<104:return dict(state='not_gameplay',phase='terminal',reason='recorded_heroes_headings',label_scores={'heroes':.9,'all-time':.9})
+                if 104<=world['reads']<107 or 131<=world['reads']<134 or world['reads']>=146:return dict(state='not_gameplay',phase='title',title_reference={'matched':True,'sha256':'a'*64})
+                if world['reads']>=107:return dict(state='gameplay',phase='gameplay') # autonomous demonstration
+            if not world['game'] or world['reads']>=106:return dict(state='not_gameplay',phase='startable')
+            if world['reads']>=100:return dict(state='not_gameplay',phase='terminal')
+            return dict(state='gameplay',phase='gameplay')
+        def sensory(source,output,**kw):
+            preflights.append(world['game'])
+            assert world['game']==0
+            return SimpleNamespace(apply=lambda f:f),dict(status='usable',physical_motion=False,fixture=True)
+        monkeypatch.setattr(play,'PiCameraSource',Camera)
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play,'classify_screen_state',screen)
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        monkeypatch.setattr(time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(time,'sleep',lambda t:None)
+        monkeypatch.setattr(m,'reflect_marathon',lambda *v,**kw:{'phase':'checkpointed'})
+        a=args(tmp_path);a.focus=None;a.max_games=2
+        doc=m.developmental_marathon(a,gateway=gateway(tmp_path))
+>       assert starts==[1,2] and preflights==[0]
+E       assert ([1] == [1, 2]
+E         
+E         Right contains one more item: 2
+E         Use -v to get more diff)
+
+tests/test_marathon_camera_session.py:220: AssertionError
+----------------------------- Captured stdout call -----------------------------
+RUNTIME FEATURES: {"camera": "continuous owner; fresh geometry; manual focus 2.0", "controller_lease": "not required by environment", "executive_experiments": true, "executive_projects": true, "learning_acceptance": "E1/P1/I1 not established by this launch", "neural_score_hailo": "inactive: no qualified reader wired into this player", "offline_ala_investigation": false, "ppal_policy": "existing policy; qualified retained-policy manifest absent", "projectile_self": false, "score": "fixed reader; independent outcome verification required", "self": "temporal visual and causal discovery; physical acceptance pending", "semantics": "inactive unless separately authorized qualified manifest supplied", "terminal_restart": "independent completion and restart evidence required"}
+DEVELOPMENT GAME 1/2: no justified experiment yet; existing policy only
+Evidence: /work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_real_player_starts_two_si0/runs/development-20261024-223553/game-01/report.json
+EPISODE FAILED: AttributeError: 'types.SimpleNamespace' object has no attribute 'corners'
+GAME 1: score evidence=None; SELF={}; experiment attempted=False; prediction=NONE; resolution=no prediction; memory=UNKNOWN->UNKNOWN (UNKNOWN); belief=none
+PROJECT: NONE; goal=UNKNOWN; status=UNKNOWN; selection=no feasible authorized project; no justified experiment yet; progress=UNKNOWN; next=no justified experiment yet
+DEVELOPMENT STOP: no confirmed game-over evidence; no further START
+DEVELOPMENT COMPLETE: unverified_episode_boundary; attempts=1; qualified=0; invalid=0; unverified=1; target_met=False; /work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_real_player_starts_two_si0/runs/development-20261024-223553
+___ test_real_player_starts_two_simulated_playable_games_on_one_camera[True] ___
+
+tmp_path = PosixPath('/work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_real_player_starts_two_si1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fff79521a90>
+camera_failure = True, terminal_pages = False, terminal_delay = False
+
+    @pytest.mark.parametrize('camera_failure',[False,True])
+    def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False,terminal_delay=False):
+        """Real player + marathon; simulated pixels/controls, not Pi acceptance."""
+        import time
+        from experiments.ppal import marathon_robotron as m,play_robotron as play
+        from experiments.ppal.eyes.detectors import Detection
+        from experiments.ppal.robotron_agency import VECTORS
+        from test_experiment_return import gateway
+        from test_marathon_deferred import args
+        real_sleep=time.sleep
+        # This accelerated, synthetic clock tests episode transitions, not writer
+        # throughput. Finish prior durable work before advancing an exposure so
+        # host scheduling cannot randomly turn it into a backpressure test. Real
+        # recorder limits/fail-closed overflow have separate dedicated regressions.
+        from experiments.ppal import progress_evidence
+        real_recorder=progress_evidence.CaptureEvidence
+        recorders=[]
+        def recorder(*values,**options):
+            value=real_recorder(*values,**options);recorders.append(value);return value
+        monkeypatch.setattr(progress_evidence,'CaptureEvidence',recorder)
+        clock=[0.];starts=[];preflights=[];closed=[];points=[(25.,25.),(50.,50.)]
+        world={'game':0,'reads':0}
+        class Camera:
+            def __init__(self):closed.append('opened')
+            def read(self):
+                if recorders and not recorders[-1]._closed:recorders[-1].flush()
+                real_sleep(.01);clock[0]+=.05
+                if world['game']:world['reads']+=1
+                if terminal_delay and world['reads']==102:clock[0]+=25.
+                if camera_failure and world['game']==2 and world['reads']>65:
+                    raise RuntimeError('simulated capture disconnected')
+                return Image.new('RGB',(100,100))
+            def close(self):closed.append('camera_closed')
+        class Controller:
+            def __init__(self,*a,**kw):self.last_execution=None
+            def _command(self,command):
+                self.last_command=dict(command=command,write_started_at=clock[0],write_completed_at=clock[0],ack_at=clock[0])
+                if command=='START':
+                    world['game']+=1;world['reads']=0;points[0]=(25.,25.);starts.append(world['game'])
+            def execute(self,action,ms):
+                if terminal_pages:assert world['reads']<100 # no postgame/demo agency probes
+                self.last_execution=dict(started_at=clock[0],move=action.move,fire=action.fire,duration_ms=ms)
+                clock[0]+=ms/1000
+                if world['reads']<100:
+                    u=VECTORS[action.move];points[0]=(points[0][0]+u[0],points[0][1]+u[1])
+            def close(self):closed.append('controller_closed')
+        class Recognizer:
+            def detect(self,frame):
+                if world['reads']>=100:return []
+                return [(Detection('unknown',p,(1,1,10,20),100),{'class_scores':{}}) for p in points]
+        def screen(frame):
+            if terminal_pages and world['game']:
+                if 100<=world['reads']<104:return dict(state='not_gameplay',phase='terminal',reason='recorded_heroes_headings',label_scores={'heroes':.9,'all-time':.9})
+                if 104<=world['reads']<107 or 131<=world['reads']<134 or world['reads']>=146:return dict(state='not_gameplay',phase='title',title_reference={'matched':True,'sha256':'a'*64})
+                if world['reads']>=107:return dict(state='gameplay',phase='gameplay') # autonomous demonstration
+            if not world['game'] or world['reads']>=106:return dict(state='not_gameplay',phase='startable')
+            if world['reads']>=100:return dict(state='not_gameplay',phase='terminal')
+            return dict(state='gameplay',phase='gameplay')
+        def sensory(source,output,**kw):
+            preflights.append(world['game'])
+            assert world['game']==0
+            return SimpleNamespace(apply=lambda f:f),dict(status='usable',physical_motion=False,fixture=True)
+        monkeypatch.setattr(play,'PiCameraSource',Camera)
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play,'classify_screen_state',screen)
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        monkeypatch.setattr(time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(time,'sleep',lambda t:None)
+        monkeypatch.setattr(m,'reflect_marathon',lambda *v,**kw:{'phase':'checkpointed'})
+        a=args(tmp_path);a.focus=None;a.max_games=2
+        doc=m.developmental_marathon(a,gateway=gateway(tmp_path))
+>       assert starts==[1,2] and preflights==[0]
+E       assert ([1] == [1, 2]
+E         
+E         Right contains one more item: 2
+E         Use -v to get more diff)
+
+tests/test_marathon_camera_session.py:220: AssertionError
+----------------------------- Captured stdout call -----------------------------
+RUNTIME FEATURES: {"camera": "continuous owner; fresh geometry; manual focus 2.0", "controller_lease": "not required by environment", "executive_experiments": true, "executive_projects": true, "learning_acceptance": "E1/P1/I1 not established by this launch", "neural_score_hailo": "inactive: no qualified reader wired into this player", "offline_ala_investigation": false, "ppal_policy": "existing policy; qualified retained-policy manifest absent", "projectile_self": false, "score": "fixed reader; independent outcome verification required", "self": "temporal visual and causal discovery; physical acceptance pending", "semantics": "inactive unless separately authorized qualified manifest supplied", "terminal_restart": "independent completion and restart evidence required"}
+DEVELOPMENT GAME 1/2: no justified experiment yet; existing policy only
+Evidence: /work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_real_player_starts_two_si1/runs/development-20261024-223554/game-01/report.json
+EPISODE FAILED: AttributeError: 'types.SimpleNamespace' object has no attribute 'corners'
+GAME 1: score evidence=None; SELF={}; experiment attempted=False; prediction=NONE; resolution=no prediction; memory=UNKNOWN->UNKNOWN (UNKNOWN); belief=none
+PROJECT: NONE; goal=UNKNOWN; status=UNKNOWN; selection=no feasible authorized project; no justified experiment yet; progress=UNKNOWN; next=no justified experiment yet
+DEVELOPMENT STOP: no confirmed game-over evidence; no further START
+DEVELOPMENT COMPLETE: unverified_episode_boundary; attempts=1; qualified=0; invalid=0; unverified=1; target_met=False; /work/run-BQcbF1/tmp/pytest-of-five/pytest-0/test_real_player_starts_two_si1/runs/development-20261024-223554
+=========================== short test summary info ============================
+FAILED tests/test_visual_readiness.py::test_real_sensory_path_persists_then_reuses_same_camera_without_reoptimization
+FAILED tests/test_visual_readiness.py::test_explicit_active_vision_lock_is_not_overwritten
+FAILED tests/test_visual_readiness.py::test_active_vision_degradation_hysteresis_is_consumed_without_motion
+FAILED tests/test_sensory_recording.py::test_actual_sensory_preflight_bounded_optics_and_quality
+FAILED tests/test_marathon_camera_session.py::test_real_player_starts_two_simulated_playable_games_on_one_camera[False]
+FAILED tests/test_marathon_camera_session.py::test_real_player_starts_two_simulated_playable_games_on_one_camera[True]
+6 failed, 65 passed in 36.70s

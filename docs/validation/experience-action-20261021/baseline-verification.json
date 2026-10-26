@@ -1,0 +1,90 @@
+[
+  {
+    "status": "fulfilled",
+    "value": {
+      "path": "docs/validation/native-integration-20261021/OPERATOR.md",
+      "baseline_blob": "52405a66e50bc92ef1e8bfda5b57609578b596dc",
+      "baseline_sha256": "5b5f50755f8b37b65cd5ddfa894e8afc3148d15a8864979529176e4930ecdbf2",
+      "frozen_manifest_match": null,
+      "remote_blob": "52405a66e50bc92ef1e8bfda5b57609578b596dc",
+      "remote_matches_local_baseline": true
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "path": "experiments/ppal/hindbrain.py",
+      "baseline_blob": "88d91890f41f6c648d4a59f54211f8c447005214",
+      "baseline_sha256": "264aaef555dd59c31073bc6eedde040ad2857a0152ff3ed8a6c2cb05c12c102c",
+      "frozen_manifest_match": true,
+      "remote_blob": "88d91890f41f6c648d4a59f54211f8c447005214",
+      "remote_matches_local_baseline": true
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "path": "experiments/ppal/play_robotron.py",
+      "baseline_blob": "8cca5a091e455f9026bf5f677ff37bc06bbed3d8",
+      "baseline_sha256": "68b153ce20606fcd0d7b7339b61337ccf4a220e1d7ec7d265dd7ba7320aca2b9",
+      "frozen_manifest_match": true,
+      "remote_blob": "8cca5a091e455f9026bf5f677ff37bc06bbed3d8",
+      "remote_matches_local_baseline": true
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "path": "experiments/ppal/qualified_policy.py",
+      "baseline_blob": "9e221fcd1f22b9eb914ab68cdb4cc0b1181c383a",
+      "baseline_sha256": "f315750354304a97c229a6c05a21fe17f1acd441d46c5fea73fff9c0930235cf",
+      "frozen_manifest_match": true,
+      "remote_blob": "9e221fcd1f22b9eb914ab68cdb4cc0b1181c383a",
+      "remote_matches_local_baseline": true
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "path": "experiments/ppal/tactical_memory.py",
+      "baseline_blob": "30793bf79166b06505b9a5ae3d701de7050c1dec",
+      "baseline_sha256": "24b0d5399ef196d0c8621a64e55dcf81ed0f1acf59b1420f33f5b970e0ff2efa",
+      "frozen_manifest_match": true,
+      "remote_blob": "30793bf79166b06505b9a5ae3d701de7050c1dec",
+      "remote_matches_local_baseline": true
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "path": "learning/policy.py",
+      "baseline_blob": "e3a2a661a1db742bc0e0578c6f3f86b621884fb2",
+      "baseline_sha256": "2540d90184cdb457abf6767c6e5430b44c4a8c5e7d8dc125a1d2add3c13ade0b",
+      "frozen_manifest_match": true,
+      "remote_blob": "e3a2a661a1db742bc0e0578c6f3f86b621884fb2",
+      "remote_matches_local_baseline": true
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "path": "tests/test_qualified_ppal_policy.py",
+      "baseline_blob": "a23fec637ea61a1f81a1e307344fa10bfa017840",
+      "baseline_sha256": "914c887afb59a3146477034a87aceec1a768e40e0d92b27b7f4c0c6d17b17fb5",
+      "frozen_manifest_match": true,
+      "remote_blob": "a23fec637ea61a1f81a1e307344fa10bfa017840",
+      "remote_matches_local_baseline": true
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "path": "tools/replay_retained_tactics.py",
+      "baseline_blob": "e0c564180d0403b4a03393a33c5b9a576e3acc6a",
+      "baseline_sha256": "34c598f6f3da25a767ebef8d2bf8bd00b872124e132f0ff0a97bcbc69d579b1a",
+      "frozen_manifest_match": true,
+      "remote_blob": "e0c564180d0403b4a03393a33c5b9a576e3acc6a",
+      "remote_matches_local_baseline": true
+    }
+  }
+]

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="4" failures="0" skipped="0" tests="83" time="17.900" timestamp="2026-10-22T03:16:52.642747+01:00" hostname="charlie"><testcase classname="tests.test_arcade_controller_lease_client" name="test_each_progressing_action_renews_even_when_positions_unchanged" time="0.001"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">@pytest.fixture
+    def server():
+&gt;       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</error></testcase><testcase classname="tests.test_arcade_controller_lease_client" name="test_unsupported_lease_fails_closed_without_gameplay" time="0.001"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">@pytest.fixture
+    def server():
+&gt;       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</error></testcase><testcase classname="tests.test_arcade_controller_lease_client" name="test_expired_renewal_closes_connection" time="0.000"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">@pytest.fixture
+    def server():
+&gt;       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</error></testcase><testcase classname="tests.test_arcade_controller_lease_client" name="test_old_local_timer_cannot_interrupt_renewed_hold" time="0.000"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">@pytest.fixture
+    def server():
+&gt;       with LegacyServer(('127.0.0.1', 0)) as instance:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_arcade_controller_lease_client.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</error></testcase><testcase classname="tests.test_robotron_episode_end" name="test_self_loss_alone_can_never_confirm_game_over" time="0.000" /><testcase classname="tests.test_robotron_episode_end" name="test_failed_agency_alone_can_never_confirm_game_over" time="0.000" /><testcase classname="tests.test_robotron_episode_end" name="test_not_gameplay_alone_is_not_enough" time="0.000" /><testcase classname="tests.test_robotron_episode_end" name="test_single_not_gameplay_frame_is_not_enough" time="0.000" /><testcase classname="tests.test_robotron_episode_end" name="test_unknown_breaks_not_gameplay_streak" time="0.000" /><testcase classname="tests.test_robotron_episode_end" name="test_gameplay_breaks_not_gameplay_streak" time="0.000" /><testcase classname="tests.test_robotron_episode_end" name="test_persistent_not_gameplay_plus_failed_agency_confirms" time="0.000" /><testcase classname="tests.test_robotron_episode_end" name="test_confirmed_agency_clears_failed_agency_evidence" time="0.000" /><testcase classname="tests.test_robotron_episode_end" name="test_self_reacquisition_clears_all_terminal_suspicion" time="0.000" /><testcase classname="tests.test_restart_discovery_evidence" name="test_unrecognized_stripes_accumulate_but_never_authorize_restart" time="0.000" /><testcase classname="tests.test_restart_discovery_evidence" name="test_incomplete_invalid_or_positive_probes_never_become_negative_evidence[change0]" time="0.000" /><testcase classname="tests.test_restart_discovery_evidence" name="test_incomplete_invalid_or_positive_probes_never_become_negative_evidence[change1]" time="0.001" /><testcase classname="tests.test_restart_discovery_evidence" name="test_incomplete_invalid_or_positive_probes_never_become_negative_evidence[change2]" time="0.000" /><testcase classname="tests.test_restart_discovery_evidence" name="test_incomplete_invalid_or_positive_probes_never_become_negative_evidence[change3]" time="0.000" /><testcase classname="tests.test_restart_discovery_evidence" name="test_incomplete_invalid_or_positive_probes_never_become_negative_evidence[change4]" time="0.000" /><testcase classname="tests.test_restart_discovery_evidence" name="test_incomplete_invalid_or_positive_probes_never_become_negative_evidence[change5]" time="0.000" /><testcase classname="tests.test_restart_discovery_evidence" name="test_duplicate_probe_receipt_is_not_independent_failure" time="0.000" /><testcase classname="tests.test_restart_discovery_evidence" name="test_death_respawn_and_attract_demo_cannot_be_ended_by_no_self_budget" time="0.001" /><testcase classname="tests.test_restart_discovery_evidence" name="test_empty_regions_still_produce_a_qualified_bounded_probe_receipt" time="0.001" /><testcase classname="tests.test_restart_discovery_evidence" name="test_autonomous_attract_sprite_never_becomes_causal_self" time="0.002" /><testcase classname="tests.test_restart_discovery_evidence" name="test_qualified_boundary_progresses_to_game_two_and_three_before_offline_handoff" time="0.180" /><testcase classname="tests.test_prompt_terminal_restart" name="test_actual_observed_sequence_latches_before_demo_or_false_reacquisition" time="0.001" /><testcase classname="tests.test_prompt_terminal_restart" name="test_prompt_three_fresh_strong_pages_do_not_wait_eight_frames_or_deadline[terminal]" time="0.001" /><testcase classname="tests.test_prompt_terminal_restart" name="test_prompt_three_fresh_strong_pages_do_not_wait_eight_frames_or_deadline[title]" time="0.000" /><testcase classname="tests.test_prompt_terminal_restart" name="test_pregame_and_one_unsupported_or_duplicate_page_never_end_game" time="0.000" /><testcase classname="tests.test_prompt_terminal_restart" name="test_native_recorded_high_scores_and_complete_logo_are_recognized" time="0.635" /><testcase classname="tests.test_prompt_terminal_restart" name="test_demo_never_attaches_or_sends_start_then_one_fresh_authorized_start" time="0.001" /><testcase classname="tests.test_prompt_terminal_restart" name="test_unrecognized_demo_or_stale_permission_never_starts" time="0.001" /><testcase classname="tests.test_prompt_terminal_restart" name="test_start_acknowledgement_without_gameplay_is_not_success_or_retried" time="0.000" /><testcase classname="tests.test_prompt_terminal_restart" name="test_gameplay_score_freezes_1100_and_keeps_1300_attract_separate" time="0.002" /><testcase classname="tests.test_prompt_terminal_restart" name="test_two_real_player_episodes_reject_intervening_demo_with_shared_camera" time="6.795" /><testcase classname="tests.test_prompt_terminal_restart" name="test_demo_visual_transition_without_actual_entry_never_qualifies_completion" time="0.000" /><testcase classname="tests.test_prompt_terminal_restart" name="test_completed_evidence_is_durable_even_when_restart_permission_missing" time="0.032" /><testcase classname="tests.test_learning_projects" name="test_cumulative_completion_persists_and_conclusion_uses_existing_memory" time="0.042" /><testcase classname="tests.test_learning_projects" name="test_interruption_restart_completion_and_resumption_preserve_original_history" time="0.051" /><testcase classname="tests.test_learning_projects" name="test_sticky_project_dependencies_and_execution_authority_are_separate" time="0.030" /><testcase classname="tests.test_learning_projects" name="test_failures_and_unknown_do_not_fake_completion[contradicted]" time="0.027" /><testcase classname="tests.test_learning_projects" name="test_failures_and_unknown_do_not_fake_completion[unresolved]" time="0.027" /><testcase classname="tests.test_learning_projects" name="test_repeated_negative_evidence_can_be_sufficiently_explored_without_achievement" time="0.036" /><testcase classname="tests.test_learning_projects" name="test_same_episode_replication_contradiction_and_proposal_idempotence" time="0.036" /><testcase classname="tests.test_learning_projects" name="test_real_origin_existing_chooser_three_game_campaign_completion_and_next_project" time="0.211" /><testcase classname="tests.test_learning_projects" name="test_persistent_project_recall_survives_memory_recent_window" time="0.126" /><testcase classname="tests.test_learning_projects" name="test_opt_in_runner_manages_campaign_and_unchanged_terminal_guard" time="0.285" /><testcase classname="tests.test_learning_projects" name="test_invalid_criteria_and_non_reflection_origins_rejected" time="0.016" /><testcase classname="tests.test_learning_projects" name="test_dependency_requires_achievement_and_abandoned_project_is_remembered" time="0.034" /><testcase classname="tests.test_learning_projects" name="test_restart_recovers_assessment_and_existing_memory_handoff" time="0.044" /><testcase classname="tests.test_learning_projects" name="test_four_game_runner_discovers_competing_project_and_switches_after_completion" time="0.398" /><testcase classname="tests.test_qualified_ppal_policy" name="test_qualified_motion_restart_rollback_and_charlie_fixture_origin" time="0.079" /><testcase classname="tests.test_qualified_ppal_policy" name="test_strategic_influence_and_immediate_override" time="0.079" /><testcase classname="tests.test_qualified_ppal_policy" name="test_tactical_fire_shot_model_and_deterministic_reason" time="0.083" /><testcase classname="tests.test_qualified_ppal_policy" name="test_missing_corrupt_version_unqualified_and_domain_rejected" time="0.060" /><testcase classname="tests.test_qualified_ppal_policy" name="test_runtime_has_no_learning_journal_or_controller_calls" time="0.078" /><testcase classname="tests.test_qualified_ppal_policy" name="test_latency_and_normal_entry_point_persistence" time="0.726" /><testcase classname="tests.test_qualified_ppal_policy" name="test_motion_policy_preserves_observed_immediate_threat_and_unresolved_space" time="0.071" /><testcase classname="tests.test_qualified_ppal_policy" name="test_rejected_evaluation_and_unauthorized_domain_cannot_activate" time="0.093" /><testcase classname="tests.test_qualified_ppal_policy" name="test_runtime_mismatch_and_legacy_activation_do_not_silently_requalify" time="0.058" /><testcase classname="tests.test_qualified_ppal_policy" name="test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart" time="4.340" /><testcase classname="tests.test_qualified_ppal_policy" name="test_retained_response_candidate_reaches_actual_policy_and_rollback" time="0.105" /><testcase classname="tests.test_qualified_ppal_policy" name="test_retained_values_cannot_be_replaced_or_duplicated" time="0.002" /><testcase classname="tests.test_ppal_policy_continuity" name="test_previous_qualified_version_restores_its_original_grant" time="0.123" /><testcase classname="tests.test_ppal_policy_continuity" name="test_changed_narrow_grant_cannot_reuse_old_activation" time="0.080" /><testcase classname="tests.test_ppal_policy_continuity" name="test_changed_physical_request_cannot_reuse_offline_permission" time="0.086" /><testcase classname="tests.test_ppal_policy_continuity" name="test_normal_synthetic_entry_discovers_persisted_policy_and_restarts" time="0.635" /><testcase classname="tests.test_ppal_policy_continuity" name="test_startup_rejects_corrupt_notebook_and_explicit_path_wins" time="0.079" /><testcase classname="tests.test_ppal_policy_continuity" name="test_valid_changed_grant_is_qualified_once" time="0.110" /><testcase classname="tests.test_ppal_policy_continuity" name="test_reused_runtime_mismatch_blocks_without_replacing_manifest" time="0.076" /><testcase classname="tests.test_episode_evidence" name="test_immutable_unknown_provenance_reload" time="0.003" /><testcase classname="tests.test_episode_evidence" name="test_prospective_resolution_and_hindsight[supported]" time="0.003" /><testcase classname="tests.test_episode_evidence" name="test_prospective_resolution_and_hindsight[contradicted]" time="0.003" /><testcase classname="tests.test_episode_evidence" name="test_prospective_resolution_and_hindsight[unresolved]" time="0.003" /><testcase classname="tests.test_episode_evidence" name="test_reinterpretation_memory_and_source_tamper" time="0.031" /><testcase classname="tests.test_episode_evidence" name="test_failed_episode_no_identity_invention" time="0.006" /><testcase classname="tests.test_episode_evidence" name="test_real_tracking_fixture_no_second_association" time="0.258" /><testcase classname="tests.test_episode_evidence" name="test_offline_failure_preserves_sources_and_live_has_no_dependency" time="0.052" /><testcase classname="tests.test_episode_evidence" name="test_existing_session_diary_retains_absolute_phase_time" time="0.007" /><testcase classname="tests.test_episode_evidence" name="test_interrupted_replay_resumes_exact_forecasts" time="0.015" /><testcase classname="tests.test_episode_evidence" name="test_failed_atomic_unit_rolls_back" time="0.002" /><testcase classname="tests.test_episode_evidence" name="test_productive_budget_yields_then_retries" time="0.037" /><testcase classname="tests.test_episode_evidence" name="test_external_observations_preserve_capture_ids_and_do_not_adjudicate" time="0.023" /></testsuite></testsuites>

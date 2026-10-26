@@ -1,0 +1,26 @@
+{
+  "base": "0825f596dc9397e1c6721dc2a38249a0420cde61",
+  "inspection_sha256": "2a76440e63e59518d51855baa86f4bf56f35d398b111177de3fa660b3f716819",
+  "modules": {
+    "launcher.py": {
+      "installed_sha256": "b528b5e751fdd9fd4f39d2e0b282b7e669cbaa5b0133e7bc8c04450feed8a3c2",
+      "upstream_sha256": "b528b5e751fdd9fd4f39d2e0b282b7e669cbaa5b0133e7bc8c04450feed8a3c2",
+      "match": true
+    },
+    "controller.py": {
+      "installed_sha256": "344e9886848b5bc437f257a272f08b0df9d6b49fe844dae8b7368dd527cadc8d",
+      "upstream_sha256": "344e9886848b5bc437f257a272f08b0df9d6b49fe844dae8b7368dd527cadc8d",
+      "match": true
+    },
+    "rom_intake.py": {
+      "installed_sha256": "f53b06abacf2f3a3436452e79f1b7fe9562050a120b8d4cd501a47d12f0ea98c",
+      "upstream_sha256": "f53b06abacf2f3a3436452e79f1b7fe9562050a120b8d4cd501a47d12f0ea98c",
+      "match": true
+    },
+    "display_control.py": {
+      "installed_sha256": "77d6e36ea066d5dc230f59f495bf4e6c67a1f8295e52328d7678bbf044e99016",
+      "upstream_sha256": "77d6e36ea066d5dc230f59f495bf4e6c67a1f8295e52328d7678bbf044e99016",
+      "match": true
+    }
+  }
+}

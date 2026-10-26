@@ -1,0 +1,1727 @@
+{
+  "status": "failed",
+  "started_at": 1585.27179017,
+  "physical_motion": false,
+  "color_fidelity": "unqualified without an independent color reference",
+  "stage": "geometry and playfield fine focus",
+  "initial_focus": {
+    "status": "stable manual starting point; image quality pending",
+    "started_at": 1585.271823004,
+    "mode": "manual diagnostic",
+    "image_sharpness": "unqualified until playfield refinement and final quality gates",
+    "hardware_limits": [
+      0.0,
+      15.0
+    ],
+    "selected_position": 2.0,
+    "lock_samples": [
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 1585.352460906,
+        "completed_at": 1585.478613033,
+        "capture_seconds": 0.1261521270000685,
+        "sensor_timestamp_ns": 1585459444000,
+        "exposure_time_us": 62197,
+        "first_pixel_exposure_at": 1585.397247,
+        "frame_duration_us": 62649,
+        "lens_position": 1.0,
+        "af_state": 1,
+        "analogue_gain": 4.0,
+        "digital_gain": 1.000091791152954,
+        "colour_gains": [
+          1.8810187578201294,
+          1.812299132347107
+        ],
+        "colour_temperature": 4617,
+        "ae_locked": null,
+        "rejection": "manual mode not confirmed"
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 1585.484946173,
+        "completed_at": 1585.601981647,
+        "capture_seconds": 0.1170354739999766,
+        "sensor_timestamp_ns": 1585584718000,
+        "exposure_time_us": 62197,
+        "first_pixel_exposure_at": 1585.522521,
+        "frame_duration_us": 62649,
+        "lens_position": 0.0,
+        "af_state": 1,
+        "analogue_gain": 4.0,
+        "digital_gain": 1.000091791152954,
+        "colour_gains": [
+          1.8819247484207153,
+          1.8114304542541504
+        ],
+        "colour_temperature": 4620,
+        "ae_locked": null,
+        "rejection": "manual mode not confirmed"
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 1585.606023424,
+        "completed_at": 1585.727289473,
+        "capture_seconds": 0.1212660489998143,
+        "sensor_timestamp_ns": 1585709998000,
+        "exposure_time_us": 59048,
+        "first_pixel_exposure_at": 1585.65095,
+        "frame_duration_us": 59499,
+        "lens_position": 0.0,
+        "af_state": 1,
+        "analogue_gain": 4.0,
+        "digital_gain": 1.000091791152954,
+        "colour_gains": [
+          1.8827425241470337,
+          1.8106465339660645
+        ],
+        "colour_temperature": 4623,
+        "ae_locked": null,
+        "rejection": "manual mode not confirmed"
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 1585.733305408,
+        "completed_at": 1585.844857431,
+        "capture_seconds": 0.1115520230000584,
+        "sensor_timestamp_ns": 1585827541000,
+        "exposure_time_us": 56875,
+        "first_pixel_exposure_at": 1585.7706660000001,
+        "frame_duration_us": 57326,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 4.0,
+        "digital_gain": 1.0000381469726562,
+        "colour_gains": [
+          1.883480429649353,
+          1.8099391460418701
+        ],
+        "colour_temperature": 4625,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 1585.851305738,
+        "completed_at": 1585.95992786,
+        "capture_seconds": 0.10862212200004251,
+        "sensor_timestamp_ns": 1585941465000,
+        "exposure_time_us": 55383,
+        "first_pixel_exposure_at": 1585.8860820000002,
+        "frame_duration_us": 55825,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 4.0,
+        "digital_gain": 1.0000866651535034,
+        "colour_gains": [
+          1.8823829889297485,
+          1.81099271774292
+        ],
+        "colour_temperature": 4622,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 1585.973440088,
+        "completed_at": 1586.070618141,
+        "capture_seconds": 0.09717805300010696,
+        "sensor_timestamp_ns": 1586053115000,
+        "exposure_time_us": 55383,
+        "first_pixel_exposure_at": 1585.997732,
+        "frame_duration_us": 59554,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 4.0,
+        "digital_gain": 1.0001214742660522,
+        "colour_gains": [
+          1.8813925981521606,
+          1.8119436502456665
+        ],
+        "colour_temperature": 4618,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 1586.09690939,
+        "completed_at": 1586.193967516,
+        "capture_seconds": 0.0970581259998653,
+        "sensor_timestamp_ns": 1586175575000,
+        "exposure_time_us": 62474,
+        "first_pixel_exposure_at": 1586.113101,
+        "frame_duration_us": 65080,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 4.0,
+        "digital_gain": 1.0001174211502075,
+        "colour_gains": [
+          1.8804987668991089,
+          1.8128019571304321
+        ],
+        "colour_temperature": 4615,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 1586.225459159,
+        "completed_at": 1586.324336219,
+        "capture_seconds": 0.09887706000017715,
+        "sensor_timestamp_ns": 1586306970000,
+        "exposure_time_us": 65881,
+        "first_pixel_exposure_at": 1586.241089,
+        "frame_duration_us": 67106,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 4.0,
+        "digital_gain": 1.000079870223999,
+        "colour_gains": [
+          1.8796919584274292,
+          1.8135764598846436
+        ],
+        "colour_temperature": 4613,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 1586.356375753,
+        "completed_at": 1586.458921182,
+        "capture_seconds": 0.10254542899997432,
+        "sensor_timestamp_ns": 1586441163000,
+        "exposure_time_us": 66655,
+        "first_pixel_exposure_at": 1586.3745079999999,
+        "frame_duration_us": 67106,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 4.031496047973633,
+        "digital_gain": 1.0013459920883179,
+        "colour_gains": [
+          1.8789639472961426,
+          1.8142755031585693
+        ],
+        "colour_temperature": 4610,
+        "ae_locked": null
+      }
+    ],
+    "locked_position": 2.0,
+    "finished_at": 1586.490438566
+  },
+  "exposure": {
+    "status": "selected",
+    "samples": [
+      {
+        "ev": 0.0,
+        "frame": "exposure-ev-0.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 1587.270733875,
+          "completed_at": 1587.398401494,
+          "capture_seconds": 0.12766761900002166,
+          "sensor_timestamp_ns": 1587380517000,
+          "exposure_time_us": 66655,
+          "first_pixel_exposure_at": 1587.313862,
+          "frame_duration_us": 67106,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 4.079681396484375,
+          "digital_gain": 1.0008447170257568,
+          "colour_gains": [
+            1.8769723176956177,
+            1.8161777257919312
+          ],
+          "colour_temperature": 4604,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 666,
+            "edge_or_endpoint_support": 300
+          },
+          "candidate_checks": 990,
+          "accepted": 24,
+          "hough_lines": 85,
+          "selected_lines": [
+            12,
+            6
+          ],
+          "best_candidate_support": [
+            0.92,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              183.03277983140683,
+              158.9451518055637
+            ],
+            [
+              1069.5446200374852,
+              111.86486198670983
+            ],
+            [
+              1080.0943396226414,
+              671.0
+            ],
+            [
+              200.79190751445086,
+              671.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            0.98,
+            0.92,
+            0.98
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            0.9
+          ]
+        },
+        "corners": [
+          [
+            188.95232890698117,
+            158.6307802727366
+          ],
+          [
+            1065.9647641056054,
+            112.05497862941982
+          ],
+          [
+            1076.090579710145,
+            671.0
+          ],
+          [
+            206.79110251450678,
+            671.0
+          ]
+        ],
+        "detail_pixels": 14761,
+        "clipped_channel_fraction": 0.6296321387439875,
+        "clipped_white_fraction": 0.5662895467786735,
+        "colored_fraction": 0.0132104870943703
+      },
+      {
+        "ev": -1.0,
+        "frame": "exposure-ev-1.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 1589.750280254,
+          "completed_at": 1589.869550653,
+          "capture_seconds": 0.11927039900001546,
+          "sensor_timestamp_ns": 1589852041000,
+          "exposure_time_us": 53799,
+          "first_pixel_exposure_at": 1589.798242,
+          "frame_duration_us": 54250,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 4.0,
+          "digital_gain": 1.0000263452529907,
+          "colour_gains": [
+            1.8768807649612427,
+            1.816256046295166
+          ],
+          "colour_temperature": 4603,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 450,
+            "edge_or_endpoint_support": 192
+          },
+          "candidate_checks": 660,
+          "accepted": 18,
+          "hough_lines": 83,
+          "selected_lines": [
+            12,
+            5
+          ],
+          "best_candidate_support": [
+            0.94,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              188.02520540556998,
+              158.6871789518553
+            ],
+            [
+              1057.9826433451897,
+              113.52008849449354
+            ],
+            [
+              1078.1446654611211,
+              671.0
+            ],
+            [
+              206.8166023166023,
+              671.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            1.0,
+            0.94,
+            1.0
+          ],
+          "best_endpoint_support": [
+            1.0,
+            1.0,
+            0.9,
+            1.0
+          ]
+        },
+        "corners": [
+          [
+            188.02520540556998,
+            158.6871789518553
+          ],
+          [
+            1057.9826433451897,
+            113.52008849449354
+          ],
+          [
+            1078.1446654611211,
+            671.0
+          ],
+          [
+            206.8166023166023,
+            671.0
+          ]
+        ],
+        "detail_pixels": 13685,
+        "clipped_channel_fraction": 0.5751552795031056,
+        "clipped_white_fraction": 0.5168432590427475,
+        "colored_fraction": 0.01329923273657289
+      },
+      {
+        "ev": -2.0,
+        "frame": "exposure-ev-2.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 1591.723107956,
+          "completed_at": 1591.756872075,
+          "capture_seconds": 0.03376411900012499,
+          "sensor_timestamp_ns": 1591739841000,
+          "exposure_time_us": 10185,
+          "first_pixel_exposure_at": 1591.729656,
+          "frame_duration_us": 10636,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0005178451538086,
+          "colour_gains": [
+            1.8335082530975342,
+            1.8622634410858154
+          ],
+          "colour_temperature": 4462,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {},
+          "candidate_checks": 0,
+          "accepted": 0,
+          "hough_lines": 254,
+          "selected_lines": [
+            12,
+            1
+          ]
+        },
+        "reason": "No complete game border found; include all corners and aim more squarely at TV"
+      },
+      {
+        "ev": -2.0,
+        "frame": "exposure-ev-2-retry-1.png",
+        "attempt": 1,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 1592.585385374,
+          "completed_at": 1592.627372958,
+          "capture_seconds": 0.04198758400002589,
+          "sensor_timestamp_ns": 1592610211000,
+          "exposure_time_us": 15305,
+          "first_pixel_exposure_at": 1592.594906,
+          "frame_duration_us": 15747,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007909536361694,
+          "colour_gains": [
+            1.8404451608657837,
+            1.8539804220199585
+          ],
+          "colour_temperature": 4486,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 4059,
+            "edge_or_endpoint_support": 169
+          },
+          "candidate_checks": 4356,
+          "accepted": 128,
+          "hough_lines": 191,
+          "selected_lines": [
+            12,
+            12
+          ],
+          "best_candidate_support": [
+            0.86,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              236.989266833983,
+              134.15145689823962
+            ],
+            [
+              1028.9086955984633,
+              93.12860360638591
+            ],
+            [
+              1087.4669117647059,
+              652.0
+            ],
+            [
+              200.29133858267716,
+              652.0
+            ]
+          ],
+          "best_edge_support": [
+            0.99,
+            0.9,
+            0.97,
+            0.86
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            0.9
+          ]
+        },
+        "corners": [
+          [
+            234.42152626186126,
+            170.38512941595758
+          ],
+          [
+            1026.6754617204588,
+            129.29867955001004
+          ],
+          [
+            1036.2645502645503,
+            673.0
+          ],
+          [
+            198.8031496062992,
+            673.0
+          ]
+        ],
+        "detail_pixels": 12223,
+        "clipped_channel_fraction": 0.1280373067168453,
+        "clipped_white_fraction": 0.0,
+        "colored_fraction": 0.9437944858054488
+      },
+      {
+        "ev": -3.0,
+        "frame": "exposure-ev-3.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 1595.090420719,
+          "completed_at": 1595.122068275,
+          "capture_seconds": 0.031647556000052646,
+          "sensor_timestamp_ns": 1595104751000,
+          "exposure_time_us": 9982,
+          "first_pixel_exposure_at": 1595.094769,
+          "frame_duration_us": 10433,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.426183819770813,
+          "digital_gain": 1.0015493631362915,
+          "colour_gains": [
+            1.8349432945251465,
+            1.8584578037261963
+          ],
+          "colour_temperature": 4470,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 3384,
+            "edge_or_endpoint_support": 598
+          },
+          "candidate_checks": 4356,
+          "accepted": 374,
+          "hough_lines": 185,
+          "selected_lines": [
+            12,
+            12
+          ],
+          "best_candidate_support": [
+            0.97,
+            0.8
+          ],
+          "best_support_corners": [
+            [
+              189.10615321965508,
+              168.72913182694833
+            ],
+            [
+              1060.5986191895831,
+              122.49871884660224
+            ],
+            [
+              1086.7605803264496,
+              637.986249395228
+            ],
+            [
+              206.02068876922024,
+              653.9092304855283
+            ]
+          ],
+          "best_edge_support": [
+            0.97,
+            0.98,
+            0.98,
+            0.97
+          ],
+          "best_endpoint_support": [
+            0.8,
+            0.8,
+            0.9,
+            1.0
+          ]
+        },
+        "corners": [
+          [
+            226.20915807210176,
+            169.81102449682447
+          ],
+          [
+            1060.8031539167157,
+            126.52881050713763
+          ],
+          [
+            1088.892857142857,
+            680.0
+          ],
+          [
+            243.93053016453382,
+            680.0
+          ]
+        ],
+        "detail_pixels": 15176,
+        "clipped_channel_fraction": 0.012783342119135477,
+        "clipped_white_fraction": 0.0,
+        "colored_fraction": 0.9303505535055351
+      }
+    ],
+    "selected_ev": -3.0,
+    "awb": "unchanged; original RGB retained",
+    "reference_ev": 0.0,
+    "exposure_locked": true,
+    "selected_capture": {
+      "mode": "fresh_exposure",
+      "requested_at": 1599.339917288,
+      "completed_at": 1599.376039108,
+      "capture_seconds": 0.036121820000062144,
+      "sensor_timestamp_ns": 1599359150000,
+      "exposure_time_us": 9853,
+      "first_pixel_exposure_at": 1599.349297,
+      "frame_duration_us": 10304,
+      "lens_position": 2.0,
+      "af_state": 0,
+      "analogue_gain": 1.1228070259094238,
+      "digital_gain": 1.0007996559143066,
+      "colour_gains": [
+        1.7865370512008667,
+        1.9122945070266724
+      ],
+      "colour_temperature": 4310,
+      "ae_locked": null
+    },
+    "processing_seconds": 12.889831357000048
+  },
+  "geometry_attempts": [
+    {
+      "rejections": {
+        "area": 3411,
+        "edge_or_endpoint_support": 358
+      },
+      "candidate_checks": 4356,
+      "accepted": 587,
+      "hough_lines": 163,
+      "selected_lines": [
+        12,
+        12
+      ],
+      "best_candidate_support": [
+        0.98,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          225.05744868737054,
+          164.86834916521553
+        ],
+        [
+          1027.5370846968126,
+          123.2046208848156
+        ],
+        [
+          1036.5697074010327,
+          648.0
+        ],
+        [
+          242.75457875457874,
+          648.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        1.0,
+        1.0,
+        0.98
+      ],
+      "best_endpoint_support": [
+        0.9,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "corners": [
+        [
+          225.05744868737054,
+          164.86834916521553
+        ],
+        [
+          1027.5370846968126,
+          123.2046208848156
+        ],
+        [
+          1036.5697074010327,
+          648.0
+        ],
+        [
+          242.75457875457874,
+          648.0
+        ]
+      ],
+      "stable_views": 1,
+      "jitter_pixels": 0.0
+    },
+    {
+      "rejections": {
+        "area": 82,
+        "edge_or_endpoint_support": 40
+      },
+      "candidate_checks": 126,
+      "accepted": 4,
+      "hough_lines": 43,
+      "selected_lines": [
+        7,
+        4
+      ],
+      "best_candidate_support": [
+        0.98,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          186.06421152030217,
+          161.84073024866225
+        ],
+        [
+          1059.0890837709683,
+          116.4631662672717
+        ],
+        [
+          1079.108499095841,
+          670.0
+        ],
+        [
+          203.7906976744186,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        0.98,
+        0.98,
+        0.99
+      ],
+      "best_endpoint_support": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "corners": [
+        [
+          190.1261251845368,
+          161.62960253278115
+        ],
+        [
+          1064.1513528891778,
+          116.2000426746868
+        ],
+        [
+          1084.1081081081081,
+          670.0
+        ],
+        [
+          207.79150579150578,
+          670.0
+        ]
+      ],
+      "stable_views": 2,
+      "jitter_pixels": 26.19112226397759
+    },
+    {
+      "rejections": {
+        "area": 62,
+        "edge_or_endpoint_support": 48
+      },
+      "candidate_checks": 126,
+      "accepted": 16,
+      "hough_lines": 38,
+      "selected_lines": [
+        7,
+        4
+      ],
+      "best_candidate_support": [
+        0.99,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          191.51941303824873,
+          159.60827519846043
+        ],
+        [
+          1058.0747780597826,
+          114.46496059937712
+        ],
+        [
+          1077.0686274509803,
+          668.0
+        ],
+        [
+          207.74468085106383,
+          668.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        0.99,
+        0.99,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          191.51941303824873,
+          159.60827519846043
+        ],
+        [
+          1058.0747780597826,
+          114.46496059937712
+        ],
+        [
+          1077.0686274509803,
+          668.0
+        ],
+        [
+          207.74468085106383,
+          668.0
+        ]
+      ],
+      "stable_views": 2,
+      "jitter_pixels": 3.659039762085116
+    },
+    {
+      "rejections": {
+        "area": 88,
+        "edge_or_endpoint_support": 64
+      },
+      "candidate_checks": 168,
+      "accepted": 16,
+      "hough_lines": 42,
+      "selected_lines": [
+        8,
+        4
+      ],
+      "best_candidate_support": [
+        0.99,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          186.03105232892466,
+          159.8918918918919
+        ],
+        [
+          1064.0057536694944,
+          113.15937664499859
+        ],
+        [
+          1084.0361010830325,
+          668.0
+        ],
+        [
+          203.72147001934235,
+          668.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        0.99,
+        0.99,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          189.98887998002076,
+          159.68122609392867
+        ],
+        [
+          1064.0057536694944,
+          113.15937664499859
+        ],
+        [
+          1084.0361010830325,
+          668.0
+        ],
+        [
+          207.72093023255815,
+          668.0
+        ]
+      ],
+      "stable_views": 3,
+      "jitter_pixels": 6.967473632052133
+    },
+    {
+      "rejections": {
+        "area": 171,
+        "edge_or_endpoint_support": 108
+      },
+      "candidate_checks": 315,
+      "accepted": 36,
+      "hough_lines": 43,
+      "selected_lines": [
+        7,
+        6
+      ],
+      "best_candidate_support": [
+        0.99,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          183.80034669882423,
+          159.01040096472715
+        ],
+        [
+          1057.9976104458508,
+          113.46898065627505
+        ],
+        [
+          1077.1031746031747,
+          669.0
+        ],
+        [
+          200.8,
+          669.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        0.99,
+        0.99,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          183.80034669882423,
+          159.01040096472715
+        ],
+        [
+          1066.808149289643,
+          113.00999448774226
+        ],
+        [
+          1084.6156583629893,
+          669.0
+        ],
+        [
+          200.8,
+          669.0
+        ]
+      ],
+      "stable_views": 4,
+      "jitter_pixels": 7.021302736301321
+    },
+    {
+      "rejections": {
+        "area": 54,
+        "edge_or_endpoint_support": 32
+      },
+      "candidate_checks": 90,
+      "accepted": 4,
+      "hough_lines": 42,
+      "selected_lines": [
+        6,
+        4
+      ],
+      "best_candidate_support": [
+        0.97,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          188.0968565037815,
+          161.78193402528004
+        ],
+        [
+          1059.087406808917,
+          115.42116860699988
+        ],
+        [
+          1079.1444043321299,
+          671.0
+        ],
+        [
+          205.82591876208897,
+          671.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        0.99,
+        0.97,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          188.0968565037815,
+          161.78193402528004
+        ],
+        [
+          1059.087406808917,
+          115.42116860699988
+        ],
+        [
+          1079.1444043321299,
+          671.0
+        ],
+        [
+          205.82591876208897,
+          671.0
+        ]
+      ],
+      "stable_views": 5,
+      "jitter_pixels": 7.038869853416935
+    },
+    {
+      "rejections": {
+        "area": 70,
+        "edge_or_endpoint_support": 48
+      },
+      "candidate_checks": 126,
+      "accepted": 8,
+      "hough_lines": 40,
+      "selected_lines": [
+        7,
+        4
+      ],
+      "best_candidate_support": [
+        0.98,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          184.0366802584256,
+          159.99808913716015
+        ],
+        [
+          1059.0510505976306,
+          114.41410155437032
+        ],
+        [
+          1079.1083032490974,
+          670.0
+        ],
+        [
+          202.77949709864603,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        0.99,
+        0.98,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          184.0366802584256,
+          159.99808913716015
+        ],
+        [
+          1059.0510505976306,
+          114.41410155437032
+        ],
+        [
+          1079.1083032490974,
+          670.0
+        ],
+        [
+          202.77949709864603,
+          670.0
+        ]
+      ],
+      "stable_views": 6,
+      "jitter_pixels": 5.994313991210762
+    },
+    {
+      "rejections": {
+        "area": 203,
+        "edge_or_endpoint_support": 100
+      },
+      "candidate_checks": 315,
+      "accepted": 12,
+      "hough_lines": 40,
+      "selected_lines": [
+        7,
+        6
+      ],
+      "best_candidate_support": [
+        0.97,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          184.0347286977448,
+          159.94498614389818
+        ],
+        [
+          1065.420506014708,
+          113.08397762138996
+        ],
+        [
+          1083.466307277628,
+          671.0
+        ],
+        [
+          202.81624758220502,
+          671.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        0.99,
+        0.97,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          184.0347286977448,
+          159.94498614389818
+        ],
+        [
+          1065.420506014708,
+          113.08397762138996
+        ],
+        [
+          1083.466307277628,
+          671.0
+        ],
+        [
+          202.81624758220502,
+          671.0
+        ]
+      ],
+      "stable_views": 1,
+      "jitter_pixels": 0.0
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 0,
+      "reason": "No game border found; show active Robotron and all four corners"
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 0,
+      "reason": "No game border found; show active Robotron and all four corners"
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 0,
+      "reason": "No game border found; show active Robotron and all four corners"
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 0,
+      "reason": "No game border found; show active Robotron and all four corners"
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 8,
+      "selected_lines": [
+        4,
+        0
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 11,
+      "selected_lines": [
+        4,
+        0
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 12,
+      "selected_lines": [
+        3,
+        0
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 13,
+      "selected_lines": [
+        5,
+        0
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 50,
+      "selected_lines": [
+        12,
+        0
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {},
+      "candidate_checks": 0,
+      "accepted": 0,
+      "hough_lines": 41,
+      "selected_lines": [
+        11,
+        0
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {
+        "area": 4356
+      },
+      "candidate_checks": 4356,
+      "accepted": 0,
+      "hough_lines": 83,
+      "selected_lines": [
+        12,
+        12
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {
+        "area": 3131,
+        "edge_or_endpoint_support": 1225
+      },
+      "candidate_checks": 4356,
+      "accepted": 0,
+      "hough_lines": 164,
+      "selected_lines": [
+        12,
+        12
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {
+        "area": 3384,
+        "edge_or_endpoint_support": 972
+      },
+      "candidate_checks": 4356,
+      "accepted": 0,
+      "hough_lines": 165,
+      "selected_lines": [
+        12,
+        12
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {
+        "area": 3131,
+        "edge_or_endpoint_support": 1225
+      },
+      "candidate_checks": 4356,
+      "accepted": 0,
+      "hough_lines": 137,
+      "selected_lines": [
+        12,
+        12
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {
+        "area": 2235,
+        "edge_or_endpoint_support": 735
+      },
+      "candidate_checks": 2970,
+      "accepted": 0,
+      "hough_lines": 144,
+      "selected_lines": [
+        12,
+        10
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {
+        "area": 3204,
+        "edge_or_endpoint_support": 1152
+      },
+      "candidate_checks": 4356,
+      "accepted": 0,
+      "hough_lines": 157,
+      "selected_lines": [
+        12,
+        12
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {
+        "area": 1176,
+        "edge_or_endpoint_support": 210
+      },
+      "candidate_checks": 1386,
+      "accepted": 0,
+      "hough_lines": 140,
+      "selected_lines": [
+        12,
+        7
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {
+        "area": 3310,
+        "edge_or_endpoint_support": 320
+      },
+      "candidate_checks": 3630,
+      "accepted": 0,
+      "hough_lines": 142,
+      "selected_lines": [
+        12,
+        11
+      ],
+      "reason": "No complete game border found; include all corners and aim more squarely at TV"
+    },
+    {
+      "rejections": {
+        "area": 10
+      },
+      "candidate_checks": 18,
+      "accepted": 8,
+      "hough_lines": 31,
+      "selected_lines": [
+        3,
+        4
+      ],
+      "best_candidate_support": [
+        0.97,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          190.02389037453617,
+          159.68618464640016
+        ],
+        [
+          1060.0125068227396,
+          114.3640143671053
+        ],
+        [
+          1079.1030741410489,
+          670.0
+        ],
+        [
+          207.79110251450678,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        0.98,
+        0.97,
+        0.99
+      ],
+      "best_endpoint_support": [
+        1.0,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "corners": [
+        [
+          190.19742549260278,
+          164.6704988708684
+        ],
+        [
+          1060.1517687776293,
+          118.41727021204913
+        ],
+        [
+          1079.1030741410489,
+          670.0
+        ],
+        [
+          207.79110251450678,
+          670.0
+        ]
+      ],
+      "stable_views": 1,
+      "jitter_pixels": 0.0
+    },
+    {
+      "rejections": {
+        "area": 120,
+        "edge_or_endpoint_support": 18
+      },
+      "candidate_checks": 150,
+      "accepted": 12,
+      "hough_lines": 41,
+      "selected_lines": [
+        6,
+        5
+      ],
+      "best_candidate_support": [
+        0.96,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          184.96148111767906,
+          159.89793197803934
+        ],
+        [
+          1071.751000398427,
+          113.75277599736691
+        ],
+        [
+          1080.2758620689656,
+          670.0
+        ],
+        [
+          202.79029126213592,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        0.99,
+        0.96,
+        1.0
+      ],
+      "best_endpoint_support": [
+        0.9,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          184.96148111767906,
+          159.89793197803934
+        ],
+        [
+          1062.9851439971137,
+          114.20891784630403
+        ],
+        [
+          1073.4225352112676,
+          670.0
+        ],
+        [
+          202.79029126213592,
+          670.0
+        ]
+      ],
+      "stable_views": 2,
+      "jitter_pixels": 3.542333561503756
+    },
+    {
+      "rejections": {
+        "area": 120,
+        "edge_or_endpoint_support": 18
+      },
+      "candidate_checks": 150,
+      "accepted": 12,
+      "hough_lines": 45,
+      "selected_lines": [
+        6,
+        5
+      ],
+      "best_candidate_support": [
+        0.86,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          183.29831898318983,
+          159.98447661399692
+        ],
+        [
+          1063.8284868638273,
+          114.16503348898637
+        ],
+        [
+          1084.1462140992166,
+          670.0
+        ],
+        [
+          201.81843575418995,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        0.86,
+        0.96,
+        0.87
+      ],
+      "best_endpoint_support": [
+        0.9,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          183.4451824518245,
+          164.02887059639826
+        ],
+        [
+          1066.0200550692475,
+          118.10302880861381
+        ],
+        [
+          1076.0545454545454,
+          670.0
+        ],
+        [
+          201.81843575418995,
+          670.0
+        ]
+      ],
+      "stable_views": 3,
+      "jitter_pixels": 5.275111405448692
+    },
+    {
+      "rejections": {
+        "area": 43,
+        "edge_or_endpoint_support": 12
+      },
+      "candidate_checks": 63,
+      "accepted": 8,
+      "hough_lines": 44,
+      "selected_lines": [
+        7,
+        3
+      ],
+      "best_candidate_support": [
+        0.96,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          188.02571114062064,
+          159.73848109449258
+        ],
+        [
+          1060.0466211184673,
+          114.36182740786256
+        ],
+        [
+          1078.9657657657658,
+          667.0
+        ],
+        [
+          205.68665377176015,
+          667.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        0.99,
+        0.96,
+        1.0
+      ],
+      "best_endpoint_support": [
+        0.9,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          188.02571114062064,
+          159.73848109449258
+        ],
+        [
+          1060.0466211184673,
+          114.36182740786256
+        ],
+        [
+          1078.9657657657658,
+          667.0
+        ],
+        [
+          205.68665377176015,
+          667.0
+        ]
+      ],
+      "stable_views": 4,
+      "jitter_pixels": 4.8286517584856
+    },
+    {
+      "rejections": {
+        "area": 258,
+        "edge_or_endpoint_support": 56
+      },
+      "candidate_checks": 330,
+      "accepted": 16,
+      "hough_lines": 51,
+      "selected_lines": [
+        11,
+        4
+      ],
+      "best_candidate_support": [
+        0.98,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          187.99074377995143,
+          159.73465502527407
+        ],
+        [
+          1058.3151317117342,
+          113.46175204700054
+        ],
+        [
+          1077.2367149758454,
+          673.0
+        ],
+        [
+          205.8953488372093,
+          673.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        1.0,
+        0.98,
+        0.99
+      ],
+      "best_endpoint_support": [
+        0.9,
+        1.0,
+        0.9,
+        0.9
+      ],
+      "corners": [
+        [
+          187.99074377995143,
+          159.73465502527407
+        ],
+        [
+          1058.3151317117342,
+          113.46175204700054
+        ],
+        [
+          1077.2367149758454,
+          673.0
+        ],
+        [
+          205.8953488372093,
+          673.0
+        ]
+      ],
+      "stable_views": 5,
+      "jitter_pixels": 6.9594088772953695
+    }
+  ],
+  "reason": "No complete game border found; include all corners and aim more squarely at TV; preflight could not establish stable Robotron geometry",
+  "finished_at": 1625.033273274,
+  "request": "restore a complete readable display view"
+}

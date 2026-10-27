@@ -41,6 +41,7 @@ def parser():
     mobile.add_argument('--mobile-observe',action='store_true',help='unarmed car-camera perception only; no Deck or mobile actuator initialization')
     mobile.add_argument('--pet-abilities',action='store_true',help='normal AttentionManager/Executive pet abilities using existing mobile sensing')
     mobile.add_argument('--pet-follow',action='store_true',help='same abilities; physical follow still requires independent current activation')
+    p.add_argument('--elegoo-face-track',action='store_true',help='subscribe original ELEGOO face tracker; motion remains independently gated')
     p.add_argument('--list-capabilities',action='store_true',help='inspect normal ability catalog without initializing any devices')
     p.add_argument('--mobile-zone',default='unqualified',help='independently inspected zone identity')
     p.add_argument('--mobile-hardware-id',default='unverified',help='verified physical car identity')
@@ -99,6 +100,22 @@ def application_camera_feeders(args, *, selected=('pi', 'elegoo'), pi_role='prim
         yield frame_bus
 
 
+@contextmanager
+def application_mobile_actuators(frame_bus, *, authority=None):
+    from motion.mobile_base import MobileBase
+    from motion.elegoo_executor import (QualifiedElegooExecutor,
+        install_application_executor, remove_application_executor)
+    from hardware.elegoo_telemetry import ElegooTelemetry
+    with ExitStack() as owners:
+        executor = QualifiedElegooExecutor(MobileBase(), bus=frame_bus, authority=authority)
+        owners.callback(executor.close)
+        install_application_executor(executor)
+        owners.callback(remove_application_executor, executor)
+        telemetry = ElegooTelemetry(executor)
+        owners.callback(telemetry.close)
+        yield executor, telemetry
+
+
 def main(argv=None):
     arguments = list(sys.argv[1:] if argv is None else argv)
     args=parser().parse_args(arguments)
@@ -106,7 +123,7 @@ def main(argv=None):
         from learning.capabilities import default_registry
         print(json.dumps(default_registry().describe(),indent=2));return
     if args.object_recognition:
-        if args.offline or args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow or args.object_label_replay:
+        if args.offline or args.mobile_replay or args.mobile_observe or args.object_label_replay:
             raise ValueError('Object Recognition requires explicit --hardware and application camera feeders')
         import math
         if (args.object_frames is not None and (not 1<=args.object_frames<=10000)
@@ -142,14 +159,15 @@ def main(argv=None):
     if args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow:
         if args.pet_follow and args.offline:
             raise ValueError('physical pet following requires explicit --hardware; --offline never actuates')
-        if not args.pet_follow and not args.offline:
+        if not args.pet_follow and not args.offline and not (args.pet_abilities and args.object_recognition):
             raise ValueError('mobile observation entry point cannot combine with --hardware')
         from learning.mobile_runtime import run_mobile
         # A capability command subscribes to the already-running application's
         # publication. It never starts another camera feeder.
-        if args.pet_follow:
+        if args.pet_follow or (args.pet_abilities and args.object_recognition):
             with application_camera_feeders(args,selected=('elegoo',)) as frame_bus:
-                run_mobile(args,resources,frame_bus)
+                with application_mobile_actuators(frame_bus) as (executor, telemetry):
+                    run_mobile(args,resources,frame_bus,actuator_executor=executor)
         else:
             run_mobile(args,resources)
         return
@@ -196,11 +214,14 @@ def main(argv=None):
             from attention.object_display_runtime import attach
             labels,label_owned=attach(args.object_label_display,clock=time.monotonic,body=deck.body)
             if label_owned is not None:lifecycle.callback(label_owned.close)
+            frame_bus=lifecycle.enter_context(application_camera_feeders(args))
+            executor, telemetry=lifecycle.enter_context(application_mobile_actuators(frame_bus))
+            from motion.rp2040_requests import RP2040Requests
+            deck.actuator_gateway=RP2040Requests(deck.body,neck,frame_bus)
             attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1',object_labels=labels)
             lifecycle.callback(attention.close)
             keyboard=KeyboardStimulus(bus)
             lifecycle.callback(keyboard.close)
-            frame_bus=lifecycle.enter_context(application_camera_feeders(args))
             sources=CameraSubscription(frame_bus)
             lifecycle.callback(sources.close)
             sources.switch(args.camera_source)
@@ -210,11 +231,21 @@ def main(argv=None):
                 from vision.detector import FaceDetector
                 detector=FaceDetector(Path(__file__).resolve().parent/'face_detection_yunet.onnx')
             vision=VisionStimulus(camera,detector,bus,frame_observer=deck.observe_frame)
+            face_runtime=None
+            if args.elegoo_face_track:
+                from behaviors.mobile_face_runtime import MobileFaceRuntime
+                face_runtime=MobileFaceRuntime(frame_bus,bus,executor)
+                lifecycle.callback(face_runtime.close)
+            last_telemetry=0.
             bus.emit('idle')
             attention.update(deck)
             previous=None
             while True:
                 vision.update()
+                if face_runtime is not None:face_runtime.observe()
+                if time.monotonic()-last_telemetry>=.1:
+                    telemetry.poll()
+                    last_telemetry=time.monotonic()
                 attention.update(deck)
                 # Existing status surface: console, plus consumable status JSON.
                 path=args.learning_state/'development-status.json'

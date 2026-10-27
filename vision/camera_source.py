@@ -136,12 +136,14 @@ class TrackingCamera:
     """Legacy RGB tracking view of a subscription, with unchanged coordinates."""
     def __init__(self, subscription):
         self.subscription = subscription
+        self.last_frame = None
 
     def read(self):
         import cv2
         frame = self.subscription.read()
         if frame is None:
             return None
+        self.last_frame = frame
         # Preserve the established primary VisionStimulus byte contract. Object
         # inference always consumes the canonical BGR frame directly.
         rgb = frame.image.copy() if frame.source == 'pi-primary' else frame.image[:, :, ::-1].copy()

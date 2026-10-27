@@ -38,7 +38,7 @@ class ReplayModel(FixtureModel):
         return super().infer(frame)
 
 
-def run_mobile(args, resources, frame_bus=None):
+def run_mobile(args, resources, frame_bus=None, actuator_executor=None):
     if not 1<=args.mobile_frames<=10000:raise ValueError('mobile frames must be 1..10000')
     state=args.learning_state.resolve();state.mkdir(parents=True,exist_ok=True)
     revision=subprocess.run(['git','rev-parse','HEAD'],cwd=Path(__file__).resolve().parents[1],
@@ -54,7 +54,7 @@ def run_mobile(args, resources, frame_bus=None):
         config=json.loads(args.mobile_manifest.read_text())
         if config.get('schema')!='charlie.mobile.models.v1':raise ValueError('model manifest required')
         objects=dict(config['objects'])
-        if getattr(args,'object_label_display','off')!='off':objects['include_all']=True
+        if getattr(args,'object_label_display','off')!='off' or getattr(args,'object_recognition',False):objects['include_all']=True
         detector=HailoObjects(**objects);depth=HailoRelativeDepth(**config['depth']) if config.get('depth') else UnavailableDepth()
         # Only a camera transport is initialized, never MobileBase/Deck/face behavior.
         from vision.camera_source import CameraSubscription
@@ -98,14 +98,24 @@ def run_mobile(args, resources, frame_bus=None):
                 hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.mobile_safety_feed,clock=clock)
         if context is not None:context.health_check=lambda:guard.check(force=True)
         from motion.mobile_base import MobileBase
-        behavior.bind_attention(attention,lifecycle.executive,default_registry(),context=context,base_factory=MobileBase)
+        behavior.bind_attention(attention,lifecycle.executive,default_registry(),context=context,base_factory=MobileBase,shared_executor=actuator_executor)
         behavior.before_attention=lambda:lifecycle.journal.merge_from(journal)
         behavior.executive_resources={'offline-slot','context-evidence','model-evaluation','meditation-evidence'}
+        face_runtime=None
+        if getattr(args,'elegoo_face_track',False):
+            if actuator_executor is None or frame_bus is None:
+                raise ValueError('face integration requires application-owned executor and feeders')
+            from behaviors.mobile_face_runtime import MobileFaceRuntime
+            face_runtime=MobileFaceRuntime(frame_bus,bus,actuator_executor)
+            owners.callback(face_runtime.close)
         from .mobile_review import labeled_pairs
         if labeled_pairs(lifecycle.journal):behavior.executive_resources.add('native-labeled-mobile-evidence')
         # Existing face/body activity can preempt on this same bus; no legacy conversion.
         status_at=[None]
         def between_steps():
+            if face_runtime is not None:
+                face_runtime.observe()
+                attention.update(None)
             if status_at[0] is None or clock()-status_at[0]>=2:
                 from .foundry import atomic_json
                 atomic_json(state/'pet-ability-status.json',dict(abilities=default_registry().describe(behavior.readiness()),

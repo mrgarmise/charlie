@@ -21,6 +21,9 @@ class VisionStimulus:
             return
         self.last_frame_at=time.monotonic()
         target = self.detector.detect(frame)
+        source_frame = getattr(self.camera, "last_frame", None)
+        if source_frame is not None:
+            self.bus.emit("vision_source_frame", source_frame)
 
         if self.frame_observer is not None:
             corrected = self.frame_observer(frame, target)

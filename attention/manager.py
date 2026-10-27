@@ -65,6 +65,17 @@ class AttentionManager:
         service.accept_attention(result,decision)
 
     def handle_event(self, event, data):
+        if event == 'vision_source_frame':
+            mobile=self._ensure_mobile() if data.source == 'elegoo-v4' else None
+            if mobile is not None:mobile.mobile.bind_frame(data)
+            return
+        if event == 'elegoo_face_observation':
+            service = data['service']
+            if self.priority > 1 or (self.pet_service is not None and self.pet_service.intent == 'follow'):
+                service.yield_attention()
+            else:
+                service.attend(data)
+            return
         if event in ('object_attention','object_observation','object_observation_fault'):
             try:self._handle_object_event(event,data)
             except Exception as exc:self.object_display_error=type(exc).__name__+': '+str(exc)[:128]

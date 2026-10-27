@@ -87,8 +87,9 @@ class MobileObserveBehavior:
                     for model in (self.perception.detector,self.perception.depth):
                         if hasattr(model,'close'):model.close()
 
-    def bind_attention(self,attention,executive,registry,*,context=None,base_factory=None):
+    def bind_attention(self,attention,executive,registry,*,context=None,base_factory=None,shared_executor=None):
         self.attention=attention;self.context=context;self.base_factory=base_factory
+        self.shared_executor=shared_executor
         self.executive_resources=set();self.last_decision=None;self.last_attention_key=None;self.decision_at=None
         self.last_execution=None;self.intent='observe';self.executor=None;self.base=None
         attention.attach_pet_service(self,executive,registry)
@@ -118,8 +119,14 @@ class MobileObserveBehavior:
                     raise ValueError('planner safety veto; no actuator connection')
                 if self.executor is None:
                     # No transport is even constructed until independent admission.
-                    self.base=self.base_factory();self.base.connect()
-                    self.executor=QualifiedMobileExecutor(self.base,self.context,clock=self.perception.clock)
+                    if self.shared_executor is not None:
+                        self.executor=self.shared_executor
+                        self.executor.attach_pet_context(self.context)
+                    else:
+                        # Standalone test/calibration compatibility only. Normal
+                        # application always supplies its single executor.
+                        self.base=self.base_factory();self.base.connect()
+                        self.executor=QualifiedMobileExecutor(self.base,self.context,clock=self.perception.clock)
                     self.gate=MobileExecutionGate(backend=self.executor,clock=self.perception.clock,
                         boot_id=self.context.boot_id,safety_check=self.context.safe)
                 expires=min(active['authorization']['expires_at'],self.perception.clock()+.4)

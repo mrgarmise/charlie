@@ -83,6 +83,11 @@ class ElegooMobileBase:
     # --------------------------------------------------
 
     def connect(self):
+        # Normal application consumers cannot create a parallel command owner.
+        # Standalone calibration tools retain their explicit native workflow.
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None and _application_executor.base.car is not self:
+            raise PermissionError('ELEGOO transport belongs to the application executor')
         if (
             self.sock is not None
             and self._running
@@ -282,7 +287,7 @@ class ElegooMobileBase:
     # COMMAND TRANSPORT
     # --------------------------------------------------
 
-    def _send_raw(self, raw):
+    def _send_raw(self, raw, *, preflight=None):
         sock = self.sock
 
         if (
@@ -294,6 +299,8 @@ class ElegooMobileBase:
             )
 
         with self._send_lock:
+            if preflight is not None and preflight() is not True:
+                raise InterruptedError("command cancelled before wire dispatch")
             sock.sendall(raw)
 
     def _next_id(self, prefix="cmd"):
@@ -308,6 +315,7 @@ class ElegooMobileBase:
         expected_id=None,
         timeout=None,
         retry=True,
+        preflight=None,
     ):
         if retry:self.connect()
         elif not self.connected:raise ConnectionError("qualified command requires existing live connection")
@@ -333,7 +341,10 @@ class ElegooMobileBase:
             ).encode()
 
             try:
-                self._send_raw(raw)
+                if preflight is None:
+                    self._send_raw(raw)
+                else:
+                    self._send_raw(raw, preflight=preflight)
 
             except (
                 OSError,
@@ -344,7 +355,10 @@ class ElegooMobileBase:
                 if not retry:raise  # Never replay an ambiguous motor start.
                 self.close()
                 self.connect()
-                self._send_raw(raw)
+                if preflight is None:
+                    self._send_raw(raw)
+                else:
+                    self._send_raw(raw, preflight=preflight)
 
             if pending is None:
                 return {
@@ -574,7 +588,8 @@ class ElegooMobileBase:
             started=clock()
             # A bounded start must not wait a full legacy one-second ACK timeout.
             result['sent']=None  # A failed write/ACK has ambiguous physical delivery.
-            response=self._send(payload,expected_id=ident,timeout=min(.05,seconds),retry=False)
+            response=self._send(payload,expected_id=ident,timeout=min(.05,seconds),retry=False,
+                preflight=lambda:(cancel is None or not cancel.is_set()) and safety_check() is True)
             result.update(sent=True,acknowledged=response['ok'])
             if not response['ok']:raise TimeoutError('ambiguous motion ACK')
             while clock()-started<seconds:
@@ -586,6 +601,19 @@ class ElegooMobileBase:
             result['stop']=self.stop_verified()
             self.last_pulse=result
         return result
+
+    def pan_qualified(self, degrees, *, safety_check):
+        # Same proven N5 position command, with no reconnect/replay. Independent
+        # authority must verify physical servo bounds and cancellation behavior.
+        if type(degrees) not in (int, float) or not math.isfinite(degrees) or not 20 <= degrees <= 160:
+            raise ValueError('bounded pan position required')
+        degrees = int(round(degrees))
+        ident = self._next_id('qualifiedpan')
+        response = self._send({'N':5,'H':ident,'D1':1,'D2':degrees},
+            expected_id=ident,timeout=.05,retry=False,preflight=safety_check)
+        if response.get('ok') is not True:
+            raise TimeoutError('pan acknowledgement unknown')
+        return degrees
 
     def read_ultrasonic(self, *, protocol, clock=time.monotonic):
         """Only an installed-source-verified query; does not prove target range/FOV."""

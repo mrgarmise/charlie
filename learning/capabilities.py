@@ -33,6 +33,8 @@ class CapabilityRegistry:
         capability=self.get(identifier)
         if identifier not in authorized or set(capability.inputs)-set(resources):
             raise ValueError('available inputs and separate method authorization required')
+        if identifier in ('elegoo-actuator-request', 'rp2040-actuator-request'):
+            return inputs['service'].request(inputs['request'])
         if identifier in ('mobile-observe','pet_observe'):
             from .mobile import observe_capability
             return observe_capability(**inputs)
@@ -72,6 +74,14 @@ class CapabilityRegistry:
 def default_registry():
     registry=CapabilityRegistry()
     for item in (
+        Capability('elegoo-actuator-request','Request independently qualified chassis or camera-pan movement',
+          ('actuator-service','source-observation'),('command-receipt','actuator-state'),.1,
+          ('discovery is not physical authorization','receipt is not measured movement'),
+          'source binding, independent group admission, native stopping and parity',execution='guarded-physical',body='ELEGOO'),
+        Capability('rp2040-actuator-request','Request motion through existing RP2040 controller and CAL-1',
+          ('actuator-service','source-observation'),('command-receipt',),.1,
+          ('firmware CAL-1 remains authoritative','discovery grants no motion'),
+          'firmware status and independent calibration',execution='guarded-physical',body='RP2040'),
         Capability('pet_observe','Electively inspect animal hypotheses with existing camera and Executive',
           ('mobile-camera','mobile-models'),('mobile-observation','attention-decision'),.3,
           ('class hypothesis is not identity','no physical authority'), 'immutable observations and independent review',

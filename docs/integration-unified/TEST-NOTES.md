@@ -1,0 +1,3 @@
+# Test provenance
+
+Device-free host: Python 3.12, x86_64. Dependencies installed from `requirements.txt` and pytest; no Pi devices used. `focused-initial.txt` records the obsolete camera-wrapper ownership assertion failing: the merged public wrapper is a subscriber, so the preserved exclusive-acquisition test now targets `_ElegooCameraDevice`. `focused-second.txt` records the newly added combined-event test expecting the wrong `ObjectLabels.observe` signature; the assertion was corrected to include the selected target argument. `focused-final.txt` records 132 passing focused tests, including the corrected ownership test. `combined-tests.txt` records all three combined behavior tests passing. Simulated fixtures do not qualify hardware or physical behavior.

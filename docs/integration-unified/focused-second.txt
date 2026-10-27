@@ -1,0 +1,66 @@
+F....................................................................... [ 54%]
+............................................................             [100%]
+=================================== FAILURES ===================================
+___________ test_one_attention_manager_routes_pet_and_object_events ____________
+
+    def test_one_attention_manager_routes_pet_and_object_events():
+        bus = StimulusBus()
+        labels = Mock()
+        manager = AttentionManager(bus, mobile_enabled=False, object_labels=labels)
+        pet = Mock()
+        pet.perception.clock.return_value = 1.0
+        pet.readiness.return_value = {'pet_observe': {'available': True}, 'pet_follow': {'available': False}}
+        pet.executive_resources = set()
+        executive = Mock()
+        executive.projects.return_value = {'p': {'method': 'pet_observe'}}
+        executive.consider_mobile_attention.return_value = {'intent': 'observe'}
+        registry = Mock()
+        registry.describe.return_value = [{'id': 'pet_observe'}]
+        manager.attach_pet_service(pet, executive, registry)
+        result = {'tracking': {'target': {'id': 'cat'}}, 'evidence_id': 'fixture'}
+        manager.handle_event('mobile_opportunity', result)
+        pet.accept_attention.assert_called_once_with(result, {'intent': 'observe'})
+        packet = {'schema': 'charlie.object-observation.v1', 'source': 'elegoo', 'frame_id': '1',
+                  'at': 1., 'clock_domain': 'pi-monotonic', 'objects': []}
+        manager.handle_event('object_observation', packet)
+>       labels.observe.assert_called_once_with(packet)
+
+tests/test_unified_reconciliation.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py:961: in assert_called_once_with
+    return self.assert_called_with(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Mock name='mock.observe' id='140694662137760'>
+args = ({'schema': 'charlie.object-observation.v1', 'source': 'elegoo', 'frame_id': '1', 'at': 1.0, ...},)
+kwargs = {}
+
+    def assert_called_with(self, /, *args, **kwargs):
+        """assert that the last call was made with the specified arguments.
+    
+        Raises an AssertionError if the args and keyword args passed in are
+        different to the last call to the mock."""
+        if self.call_args is None:
+            expected = self._format_mock_call_signature(args, kwargs)
+            actual = 'not called.'
+            error_message = ('expected call not found.\nExpected: %s\n  Actual: %s'
+                    % (expected, actual))
+            raise AssertionError(error_message)
+    
+        def _error_message():
+            msg = self._format_mock_failure_message(args, kwargs)
+            return msg
+        expected = self._call_matcher(_Call((args, kwargs), two=True))
+        actual = self._call_matcher(self.call_args)
+        if actual != expected:
+            cause = expected if isinstance(expected, Exception) else None
+>           raise AssertionError(_error_message()) from cause
+E           AssertionError: expected call not found.
+E           Expected: observe({'schema': 'charlie.object-observation.v1', 'source': 'elegoo', 'frame_id': '1', 'at': 1.0, 'clock_domain': 'pi-monotonic', 'objects': []})
+E             Actual: observe({'schema': 'charlie.object-observation.v1', 'source': 'elegoo', 'frame_id': '1', 'at': 1.0, 'clock_domain': 'pi-monotonic', 'objects': []}, None)
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py:949: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_unified_reconciliation.py::test_one_attention_manager_routes_pet_and_object_events
+1 failed, 131 passed in 8.50s

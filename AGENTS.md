@@ -1,0 +1,5 @@
+# Charlie integration guidance
+
+Read `docs/CHARLIE_ARCHITECTURE.md` and `docs/architecture/RESOURCE_OWNERSHIP.md`, `CONNECTIVITY_AND_DEPLOYMENT.md`, and `CONFORMANCE.md` before changing hardware, sensing, learning or control paths. `docs/integration-unified/RECONCILIATION.md` records current integration gaps; do not treat a desired invariant as proof it is already implemented.
+
+Each physical sensor needs one acquisition owner; interpretation uses shared subscriptions. Each actuator group needs one independently qualified executor and exclusive authority. Registration, attention, perception and learning never grant motion. Use the existing AttentionManager, Learning Executive, PPAL and device controllers; do not add a second chooser or a competing hardware writer. Preserve original evidence and qualification provenance. Protect face tracking, CAL-1, Robotron and RP2040 display behavior; keep native and physical acceptance separate from software tests. Do not flash or move hardware without applicable authorization and independent safety gates.

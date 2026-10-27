@@ -2,6 +2,7 @@
 from dataclasses import dataclass, asdict
 import math
 import time
+import threading
 from uuid import uuid4
 
 
@@ -172,8 +173,44 @@ class QualifiedMobileExecutor:
         self.last_attempt=None
         self.car_local_qualified=True;self.used=set();self.last_stop=None
         self.stop_uncertain=False
+        self._request_lock=threading.Lock()
+        self._state_lock=threading.Lock()
+        self._active_cancel=None
+        self._stop_at=None
+        self._stop_inflight=0
 
     def execute_bounded(self,proposal,*,lease):
+        # A second caller must never queue an old motion command behind another.
+        if not self._request_lock.acquire(blocking=False):
+            raise ValueError('another actuator request is active')
+        local_cancel=threading.Event()
+        try:
+            with self._state_lock:
+                at=proposal.get('at')
+                if self._stop_inflight or (self._stop_at is not None and
+                        (not finite(at) or at<=self._stop_at)):
+                    raise ValueError('request predates STOP or STOP is pending')
+                self._active_cancel=local_cancel
+            return self._execute_exclusive(proposal,lease=lease,local_cancel=local_cancel)
+        finally:
+            with self._state_lock:
+                if self._active_cancel is local_cancel:self._active_cancel=None
+            self._request_lock.release()
+
+    def _execute_exclusive(self,proposal,*,lease,local_cancel):
+        now=self.clock()
+        proposal_age=age(now,proposal.get('at'))
+        if (not finite(proposal_age) or not 0<=proposal_age<=.1
+                or proposal.get('action') not in ('stop','turn','advance')
+                or proposal.get('reasons') or not finite(proposal.get('duration'))
+                or not 0<=proposal['duration']<=.2 or not finite(proposal.get('speed'))
+                or not 0<=proposal['speed']<=.15
+                or not isinstance(proposal.get('id'),str) or not proposal['id']
+                or (proposal.get('action')!='stop' and (proposal['speed']<=0 or proposal['duration']<=0))
+                or (proposal.get('action')=='turn' and proposal.get('direction') not in ('LEFT','RIGHT'))):
+            raise ValueError('invalid, stale or vetoed actuator request')
+        if local_cancel.is_set() or (self.cancel is not None and self.cancel.is_set()):
+            raise InterruptedError('actuator request cancelled')
         active,report=self.context.activation()
         if self.stop_uncertain or (self.last_stop is not None and self.last_stop.get('acknowledged') is not True):
             raise ValueError('uncertain previous STOP; revoke/requalify before further movement')
@@ -189,18 +226,22 @@ class QualifiedMobileExecutor:
         envelope=report['direction_envelopes'][direction]
         pwm=max(1,int(envelope['max_pwm']*proposal['speed']/.15))
         self.last_attempt=dict(wire_delivery='unknown until independent response',proposal_id=proposal['id'])
+        class CombinedCancel:
+            def is_set(inner):
+                return local_cancel.is_set() or (self.cancel is not None and self.cancel.is_set())
         try:
             result=self.base.pulse(direction,pwm=pwm,seconds=min(proposal['duration'],envelope['max_duration']),
                 lease=lease,boot_id=self.context.boot_id,envelope=envelope,
-                safety_check=lambda:self.context.safe(proposal),cancel=self.cancel)
+                safety_check=lambda:self.context.safe(proposal),cancel=CombinedCancel())
         except BaseException:
             # A raised start/STOP exchange can leave physical delivery unknown.
             # A subsequent ACK must not silently clear this session fault.
             self.stop_uncertain=True
             raise
-        self.last_stop=result.get('stop')
-        if not isinstance(self.last_stop,dict) or self.last_stop.get('acknowledged') is not True:
-            self.stop_uncertain=True
+        with self._state_lock:
+            self.last_stop=result.get('stop')
+            if not isinstance(self.last_stop,dict) or self.last_stop.get('acknowledged') is not True:
+                self.stop_uncertain=True
         return dict(acknowledged=result['acknowledged'],executed=None,bounded_complete=True,
                     wire=result.get('command'),stop=result.get('stop'),physically_observed=None)
 
@@ -211,14 +252,24 @@ class QualifiedMobileExecutor:
             target=context['tracking']['target'],activation=context['activation']['activation_key']))
 
     def stop(self):
+        # Never wait for the motion request lock. STOP preempts the pulse and
+        # invalidates proposals issued before it; physical delivery is separate.
+        with self._state_lock:
+            self._stop_at=self.clock()
+            self._stop_inflight+=1
+            if self._active_cancel is not None:self._active_cancel.set()
         try:
-            self.last_stop=self.base.stop_verified()
+            result=self.base.stop_verified()
+            with self._state_lock:
+                self.last_stop=result
+                if not isinstance(result,dict) or result.get('acknowledged') is not True:
+                    self.stop_uncertain=True
+            return result
         except BaseException:
-            self.stop_uncertain=True
+            with self._state_lock:self.stop_uncertain=True
             raise
-        if not isinstance(self.last_stop,dict) or self.last_stop.get('acknowledged') is not True:
-            self.stop_uncertain=True
-        return self.last_stop
+        finally:
+            with self._state_lock:self._stop_inflight-=1
 
     def close(self):
         try:self.stop()

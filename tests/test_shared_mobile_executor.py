@@ -75,3 +75,24 @@ def test_executor_direct_admission_rejects_stale_or_unbounded_requests():
         with pytest.raises(ValueError,match='invalid, stale or vetoed'):
             ex.execute_bounded(proposal,lease=lease)
     base.pulse.assert_not_called()
+
+
+def test_one_executor_per_transport_and_fault_cannot_be_cleared_by_recreation():
+    ex,base,lease,request=setup_executor(lambda:1.)
+    with pytest.raises(ValueError,match='already has a qualified executor'):
+        QualifiedMobileExecutor(base,ex.context,clock=lambda:1.)
+    base.pulse.return_value={'acknowledged':True,'stop':{'sent':None,'acknowledged':False}}
+    ex.execute_bounded(request('one',1.),lease=lease)
+    assert ex.stop_uncertain
+    ex.close()  # Later STOP acknowledgement is not evidence clearing the latch.
+    with pytest.raises(ValueError,match='already has a qualified executor'):
+        QualifiedMobileExecutor(base,ex.context,clock=lambda:1.)
+
+
+def test_cleanly_closed_executor_releases_facade_for_new_owner():
+    ex,base,lease,request=setup_executor(lambda:1.)
+    ex.close()
+    next_owner=QualifiedMobileExecutor(base,ex.context,clock=lambda:1.)
+    assert next_owner is not ex
+    with pytest.raises(ValueError,match='STOP'):
+        ex.execute_bounded(request('old',1.1),lease=lease)

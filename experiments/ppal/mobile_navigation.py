@@ -168,7 +168,15 @@ class QualifiedMobileExecutor:
 
     No direct detector motor calls. No device opens until deployment validates.
     """
+    _owner_lock=threading.Lock()
+
     def __init__(self,base,context,*,clock=time.monotonic,cancel=None):
+        # The same live transport facade must not acquire two independent
+        # arbiters. A faulted owner remains attached for this facade lifetime.
+        with self._owner_lock:
+            if base.__dict__.get('_charlie_qualified_executor') is not None:
+                raise ValueError('transport already has a qualified executor')
+            base.__dict__['_charlie_qualified_executor']=self
         self.base,self.context,self.clock,self.cancel=base,context,clock,cancel
         self.last_attempt=None
         self.car_local_qualified=True;self.used=set();self.last_stop=None
@@ -178,6 +186,7 @@ class QualifiedMobileExecutor:
         self._active_cancel=None
         self._stop_at=None
         self._stop_inflight=0
+        self._closed=False
 
     def execute_bounded(self,proposal,*,lease):
         # A second caller must never queue an old motion command behind another.
@@ -187,7 +196,7 @@ class QualifiedMobileExecutor:
         try:
             with self._state_lock:
                 at=proposal.get('at')
-                if self._stop_inflight or (self._stop_at is not None and
+                if self._closed or self._stop_inflight or (self._stop_at is not None and
                         (not finite(at) or at<=self._stop_at)):
                     raise ValueError('request predates STOP or STOP is pending')
                 self._active_cancel=local_cancel
@@ -272,5 +281,18 @@ class QualifiedMobileExecutor:
             with self._state_lock:self._stop_inflight-=1
 
     def close(self):
-        try:self.stop()
-        finally:self.base.close()
+        with self._state_lock:self._closed=True
+        stopped=False
+        try:
+            result=self.stop()
+            stopped=isinstance(result,dict) and result.get('acknowledged') is True
+        finally:
+            self.base.close()
+        # An outstanding request or ambiguous stop retains the owner: creating
+        # another executor on this facade cannot erase the uncertainty.
+        if stopped and not self.stop_uncertain and self._request_lock.acquire(blocking=False):
+            try:
+                with self._owner_lock:
+                    if self.base.__dict__.get('_charlie_qualified_executor') is self:
+                        del self.base.__dict__['_charlie_qualified_executor']
+            finally:self._request_lock.release()

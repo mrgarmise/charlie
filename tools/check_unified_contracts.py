@@ -5,6 +5,7 @@ import sys
 
 TESTS = [
     'tests/test_unified_reconciliation.py',
+    'tests/test_legacy_motion_boundary.py',
     'tests/test_camera_sources.py',
     'tests/test_sensory_history.py',
     'tests/test_pet_completion.py::test_uncertain_stop_latches_executor_and_prevents_next_start',

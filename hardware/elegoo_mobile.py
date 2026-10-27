@@ -3,6 +3,8 @@ import socket
 import threading
 import time
 import itertools
+import math
+import hashlib
 from dataclasses import dataclass
 
 
@@ -63,6 +65,7 @@ class ElegooMobileBase:
         self.min_pan_step = min_pan_step
 
         self.sock = None
+        self._body_lease = None
         self._rx_buffer = ""
         self._counter = itertools.count(1)
 
@@ -88,10 +91,15 @@ class ElegooMobileBase:
 
         self.close()
 
-        self.sock = socket.create_connection(
-            (self.host, self.port),
-            timeout=5,
-        )
+        from hardware.hailo_session import accelerator_lease
+        key=hashlib.sha256(f'{self.host}:{self.port}'.encode()).hexdigest()[:16]
+        lease=accelerator_lease(f'/tmp/charlie-elegoo-body-{key}.lock')
+        lease.__enter__()
+        self._body_lease=lease
+        try:
+            self.sock = socket.create_connection((self.host,self.port),timeout=5)
+        except BaseException:
+            self.close();raise
         self.sock.settimeout(0.25)
 
         self._running = True
@@ -135,6 +143,8 @@ class ElegooMobileBase:
             self._pending.clear()
 
         self._rx_buffer = ""
+        lease,self._body_lease=self._body_lease,None
+        if lease is not None:lease.__exit__(None,None,None)
 
     def __enter__(self):
         self.connect()
@@ -297,8 +307,10 @@ class ElegooMobileBase:
         payload,
         expected_id=None,
         timeout=None,
+        retry=True,
     ):
-        self.connect()
+        if retry:self.connect()
+        elif not self.connected:raise ConnectionError("qualified command requires existing live connection")
 
         pending = None
 
@@ -329,6 +341,7 @@ class ElegooMobileBase:
             ):
                 # One reconnect/retry is useful because the
                 # ESP32 may close an idle TCP connection.
+                if not retry:raise  # Never replay an ambiguous motor start.
                 self.close()
                 self.connect()
                 self._send_raw(raw)
@@ -525,6 +538,65 @@ class ElegooMobileBase:
                 pass
 
         self.align.active = False
+
+    def stop_verified(self):
+        """No reconnect/concealed fallback; even an ACK is not measured stopping."""
+        ident=self._next_id('safestop')
+        try:
+            result=self._send({'N':1,'H':ident,'D1':0,'D2':0,'D3':0},
+                              expected_id=ident,timeout=.05,retry=False)
+            return dict(sent=True,acknowledged=result['ok'],physically_stopped=None)
+        except Exception as exc:
+            return dict(sent=None,acknowledged=False,physically_stopped=None,error=type(exc).__name__)
+        finally:self.align.active=False
+
+    def pulse(self, direction, *, pwm, seconds, lease, boot_id, envelope, safety_check,
+              cancel=None, clock=time.monotonic, wait=time.sleep):
+        """Qualified N3 timer pulse; local expiry MUST be proven before use.
+
+        This method never connects/retries a start. Caller owns independent proof.
+        Safety is rechecked every <=20ms; every exit requests STOP. ACK != motion.
+        """
+        if (direction not in ('LEFT','RIGHT','FORWARD','REVERSE') or type(pwm) is not int
+                or not 1<=pwm<=min(35,envelope['max_pwm']) or type(seconds) not in (int,float)
+                or not math.isfinite(seconds) or not 0<seconds<=min(.2,envelope['max_duration'])
+                or not lease.valid(clock(),boot_id) or clock()+seconds>lease.expires_at):
+            raise ValueError('finite qualified direction/speed/duration/lease required')
+        result=dict(sent=False,acknowledged=False,executed=None,physically_observed=None)
+        ident=self._next_id('pulse')
+        try:
+            if (cancel is not None and cancel.is_set()) or safety_check() is not True:
+                raise InterruptedError('independent motion veto')
+            # Timer is defense in depth only for an independently verified firmware.
+            payload={'N':3,'H':ident,'D1':{'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}[direction],
+                     'D2':pwm,'T':max(1,int(seconds*1000))}
+            result['command']=payload
+            started=clock()
+            # A bounded start must not wait a full legacy one-second ACK timeout.
+            result['sent']=None  # A failed write/ACK has ambiguous physical delivery.
+            response=self._send(payload,expected_id=ident,timeout=min(.05,seconds),retry=False)
+            result.update(sent=True,acknowledged=response['ok'])
+            if not response['ok']:raise TimeoutError('ambiguous motion ACK')
+            while clock()-started<seconds:
+                if (not lease.valid(clock(),boot_id) or not self.connected
+                        or (cancel is not None and cancel.is_set()) or safety_check() is not True):
+                    raise InterruptedError('pulse safety condition changed')
+                wait(min(.02,max(0,seconds-(clock()-started))))
+        finally:
+            result['stop']=self.stop_verified()
+            self.last_pulse=result
+        return result
+
+    def read_ultrasonic(self, *, protocol, clock=time.monotonic):
+        """Only an installed-source-verified query; does not prove target range/FOV."""
+        if protocol.get('ultrasonic_read_only') is not True or protocol.get('ultrasonic')!={'N':21,'D1':2}:
+            raise ValueError('installed query side effects/reply not verified')
+        ident=self._next_id('range');started=clock()
+        response=self._send(dict(protocol['ultrasonic'],H=ident),expected_id=ident,timeout=.1,retry=False)
+        value=float(response['value'])
+        if not math.isfinite(value) or not 0<value<=1000:raise ValueError('invalid ultrasonic cm')
+        return dict(meters=value/100,at=started,received_at=clock(),valid=True,source='car-qualified',
+                    kind='obstacle-only',field_of_view_verified=False,target_association=False)
 
     # --------------------------------------------------
     # COORDINATED ATTENTION ALIGNMENT

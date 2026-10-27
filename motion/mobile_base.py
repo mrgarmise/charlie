@@ -55,3 +55,12 @@ class MobileBase:
         return self.car.cancel_attention_align(
             reason
         )
+
+    def pulse(self, direction, **kwargs):
+        return self.car.pulse(direction, **kwargs)
+
+    def stop_verified(self):
+        return self.car.stop_verified()
+
+    def read_ultrasonic(self, **kwargs):
+        return self.car.read_ultrasonic(**kwargs)

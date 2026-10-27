@@ -12,6 +12,7 @@ class MobileEvidenceAdapter:
         if not episode or not revision:raise ValueError('episode/revision required')
         self.journal,self.episode,self.revision=journal,episode,revision
         self.gateway,self.executive=gateway,executive
+        self.opportunity_keys=set()
 
     def record(self, observation, tracking, proposal, execution):
         payload=dict(category='mobile_perception',observation=observation,tracking=tracking,
@@ -46,11 +47,19 @@ class MobileEvidenceAdapter:
         if not o['frame']['authentic']:return []
         target=p['tracking']['target']
         if target is None:return []
+        key=(o['frame']['source'],target['id'],o['frame'].get('pan_deg'),o.get('grounded_animal',False),o.get('grounded_proxy',False))
+        if key in self.opportunity_keys or len(self.opportunity_keys)>=256:return []
+        self.opportunity_keys.add(key)
         hypotheses=[dict(method='mobile-observe',scope=dict(body=o['frame']['source'],category=target.get('kind',target['label'])),
             expected='detector animal candidates and species uncertainty persist across independent observation conditions',
             evidence_ids=[row.id],conditions=[dict(view='centered'),dict(view='off-axis'),dict(view='pose-unknown')],
             observed_conditions=[dict(view='centered' if o['frame'].get('pan_deg')==90 else 'pose-unknown' if o['frame'].get('pan_deg') is None else 'off-axis')],
             requires=['mobile-camera','mobile-models'])]
+        if o.get('grounded_animal') is True or o.get('grounded_proxy') is True:
+            hypotheses.append(dict(method='pet_follow',scope=dict(body=o['frame']['source'],kind='animal' if o.get('grounded_animal') else 'nonliving-proxy'),
+                expected='bounded changes of viewpoint improve continued target observation without reducing safe separation',
+                evidence_ids=[row.id],conditions=[dict(view='far'),dict(view='stand-off'),dict(view='yield')],
+                observed_conditions=[dict(view='far')],requires=['mobile-camera','mobile-models','qualified-car-local-controller','motion-lease']))
         proposals=reflect_project_opportunities(self.journal,self.episode,hypotheses)
         return [self.executive.propose(x['proposal'],self.journal,[x['evidence_id']]) for x in proposals]
 
@@ -75,6 +84,20 @@ class MobileEvidenceAdapter:
             observation_id=observation_id,outcome='observation acquired; learning not demonstrated'),
             episode=request.data['episode'],sources=[request_id],producer='mobile-acquisition',version=self.revision,
             provenance=dict(observation_episode=row.data['episode'],cross_episode_link='verified immutable observation ID'))
+
+    def attention_outcome(self, result, decision, execution, *, phase):
+        payload=dict(category='mobile_attention_episode',observation_id=result['evidence_id'],
+            frame=result['observation']['frame'],model=result['observation'].get('model'),
+            software_revision=self.revision,tracking=result['tracking'],proposal=result['proposal'],
+            sensors=result['observation'].get('sensors',{}),resources=result['observation'].get('resources',{}),
+            decision=decision,execution=execution,phase=phase,
+            consequence='unobserved; requires independent displacement and animal-reaction measurements',
+            learning='no learned improvement or individual identity established')
+        event=self.journal.append('event',payload,episode=self.episode,producer='AttentionManager',
+            version=self.revision,provenance=dict(authentic=result['observation']['frame']['authentic']))
+        from memory.evaluator import MemoryEvaluator
+        MemoryEvaluator.evaluate_mobile_attention(self.journal,event.id)
+        return event
 
 
 def observe_capability(*, service, request_id=None):

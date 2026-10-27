@@ -39,6 +39,12 @@ def parser():
     mobile=p.add_mutually_exclusive_group()
     mobile.add_argument('--mobile-replay',type=Path,help='unarmed offline mobile fixture replay')
     mobile.add_argument('--mobile-observe',action='store_true',help='unarmed car-camera perception only; no Deck or mobile actuator initialization')
+    mobile.add_argument('--pet-abilities',action='store_true',help='normal AttentionManager/Executive pet abilities using existing mobile sensing')
+    mobile.add_argument('--pet-follow',action='store_true',help='same abilities; physical follow still requires independent current activation')
+    p.add_argument('--list-capabilities',action='store_true',help='inspect normal ability catalog without initializing any devices')
+    p.add_argument('--mobile-zone',default='unqualified',help='independently inspected zone identity')
+    p.add_argument('--mobile-hardware-id',default='unverified',help='verified physical car identity')
+    p.add_argument('--mobile-safety-feed',type=Path,help='independently qualified, frame-bound sensor snapshots; absent fails closed')
     p.add_argument('--mobile-manifest',type=Path,help='hash-bound Hailo-8L object/depth export contracts')
     p.add_argument('--mobile-frames',type=int,default=10000)
     p.add_argument('--mobile-seconds',type=float,default=300.)
@@ -67,7 +73,7 @@ def application_camera_feeders(args, *, selected=('pi', 'elegoo'), pi_role='prim
     frame_bus = StimulusBus()
     from stimulus.bus import install_application_frames, remove_application_frames
     stream_url = args.elegoo_stream_url
-    manifest = args.mobile_manifest if args.mobile_observe else args.object_model_manifest
+    manifest = args.mobile_manifest if (args.mobile_observe or args.pet_abilities or args.pet_follow) else args.object_model_manifest
     if stream_url is None and manifest is not None and manifest.is_file():
         stream_url = json.loads(manifest.read_text()).get('stream_url')
     stream_url = stream_url or 'http://192.168.4.1:81/stream'
@@ -96,8 +102,11 @@ def application_camera_feeders(args, *, selected=('pi', 'elegoo'), pi_role='prim
 def main(argv=None):
     arguments = list(sys.argv[1:] if argv is None else argv)
     args=parser().parse_args(arguments)
+    if args.list_capabilities:
+        from learning.capabilities import default_registry
+        print(json.dumps(default_registry().describe(),indent=2));return
     if args.object_recognition:
-        if args.offline or args.mobile_replay or args.mobile_observe or args.object_label_replay:
+        if args.offline or args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow or args.object_label_replay:
             raise ValueError('Object Recognition requires explicit --hardware and application camera feeders')
         import math
         if (args.object_frames is not None and (not 1<=args.object_frames<=10000)
@@ -130,13 +139,19 @@ def main(argv=None):
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
                 turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources,
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
-    if args.mobile_replay or args.mobile_observe:
-        if not args.offline:
+    if args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow:
+        if args.pet_follow and args.offline:
+            raise ValueError('physical pet following requires explicit --hardware; --offline never actuates')
+        if not args.pet_follow and not args.offline:
             raise ValueError('mobile observation entry point cannot combine with --hardware')
         from learning.mobile_runtime import run_mobile
         # A capability command subscribes to the already-running application's
         # publication. It never starts another camera feeder.
-        run_mobile(args,resources)
+        if args.pet_follow:
+            with application_camera_feeders(args,selected=('elegoo',)) as frame_bus:
+                run_mobile(args,resources,frame_bus)
+        else:
+            run_mobile(args,resources)
         return
     if args.offline:
         run(args.learning_state,roots,**kwargs)

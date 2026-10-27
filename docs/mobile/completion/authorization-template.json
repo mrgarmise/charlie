@@ -1,0 +1,13 @@
+{
+  "target": "mobile-pet-follow",
+  "qualification_id": null,
+  "execution": "physical",
+  "source": null,
+  "boot_id": null,
+  "mode": "supervised_trial",
+  "purpose": "proxy",
+  "hardware_id": null,
+  "zone": null,
+  "issued_at": null,
+  "expires_at": null
+}

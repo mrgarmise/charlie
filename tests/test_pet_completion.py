@@ -400,3 +400,39 @@ def test_proxy_authority_cannot_admit_a_live_pet(tmp_path):
     out=c.bind(o,t)
     assert out['grounded_proxy'] and not out['grounded_animal']
     j.close()
+
+
+def test_uncertain_stop_is_not_cleared_by_later_acknowledgement():
+    from experiments.ppal.mobile_navigation import QualifiedMobileExecutor, MobileExecutionGate
+    c=Mock(); c.boot_id='boot'; c.safe.return_value=True
+    c.activation.return_value=({'activation_key':'grant'},{'direction_envelopes':{'FORWARD':{'max_pwm':35,'max_duration':.1}}})
+    c.current={'observation':{'frame':{'id':'frame'},'sensors':{}},'tracking':{'target':{'id':'animal'}},'activation':{'activation_key':'grant'}}
+    base=Mock()
+    base.pulse.return_value={'acknowledged':True,'stop':{'sent':None,'acknowledged':False}}
+    base.stop_verified.return_value={'sent':True,'acknowledged':True,'physically_stopped':None}
+    executor=QualifiedMobileExecutor(base,c,clock=lambda:1)
+    gate=MobileExecutionGate(backend=executor,clock=lambda:1,boot_id='boot',safety_check=c.safe)
+    gate.lease=MotionLease('supervised_trial',2,'grant','boot')
+    proposal=dict(id='one',frame_id='frame',at=1,action='advance',speed=.15,duration=.1,reasons=[],binding=executor.binding(c.current))
+    assert gate.execute(proposal)['physical_uncertainty']
+    executor.stop()  # An ACK is not physical proof and does not clear the fault.
+    proposal['id']='two'
+    assert not gate.execute(proposal)['approved']
+    assert base.pulse.call_count==1
+
+
+def test_ambiguous_start_exception_latches_even_if_later_stop_acks():
+    from experiments.ppal.mobile_navigation import QualifiedMobileExecutor, MobileExecutionGate
+    c=Mock(); c.boot_id='boot'; c.safe.return_value=True
+    c.activation.return_value=({'activation_key':'grant'},{'direction_envelopes':{'FORWARD':{'max_pwm':35,'max_duration':.1}}})
+    c.current={'observation':{'frame':{'id':'frame'},'sensors':{}},'tracking':{'target':{'id':'animal'}},'activation':{'activation_key':'grant'}}
+    base=Mock(); base.pulse.side_effect=TimeoutError('ambiguous wire delivery')
+    base.stop_verified.return_value={'sent':True,'acknowledged':True,'physically_stopped':None}
+    executor=QualifiedMobileExecutor(base,c,clock=lambda:1)
+    gate=MobileExecutionGate(backend=executor,clock=lambda:1,boot_id='boot',safety_check=c.safe)
+    gate.lease=MotionLease('supervised_trial',2,'grant','boot')
+    proposal=dict(id='one',frame_id='frame',at=1,action='advance',speed=.15,duration=.1,reasons=[],binding=executor.binding(c.current))
+    assert gate.execute(proposal)['physical_uncertainty']
+    proposal['id']='two'
+    assert not gate.execute(proposal)['approved']
+    assert base.pulse.call_count==1

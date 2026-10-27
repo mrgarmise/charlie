@@ -171,10 +171,11 @@ class QualifiedMobileExecutor:
         self.base,self.context,self.clock,self.cancel=base,context,clock,cancel
         self.last_attempt=None
         self.car_local_qualified=True;self.used=set();self.last_stop=None
+        self.stop_uncertain=False
 
     def execute_bounded(self,proposal,*,lease):
         active,report=self.context.activation()
-        if self.last_stop is not None and self.last_stop.get('acknowledged') is not True:
+        if self.stop_uncertain or (self.last_stop is not None and self.last_stop.get('acknowledged') is not True):
             raise ValueError('uncertain previous STOP; revoke/requalify before further movement')
         c=self.context.current
         if (c is None or proposal['id'] in self.used or not self.context.safe(proposal)
@@ -188,10 +189,18 @@ class QualifiedMobileExecutor:
         envelope=report['direction_envelopes'][direction]
         pwm=max(1,int(envelope['max_pwm']*proposal['speed']/.15))
         self.last_attempt=dict(wire_delivery='unknown until independent response',proposal_id=proposal['id'])
-        result=self.base.pulse(direction,pwm=pwm,seconds=min(proposal['duration'],envelope['max_duration']),
-            lease=lease,boot_id=self.context.boot_id,envelope=envelope,
-            safety_check=lambda:self.context.safe(proposal),cancel=self.cancel)
+        try:
+            result=self.base.pulse(direction,pwm=pwm,seconds=min(proposal['duration'],envelope['max_duration']),
+                lease=lease,boot_id=self.context.boot_id,envelope=envelope,
+                safety_check=lambda:self.context.safe(proposal),cancel=self.cancel)
+        except BaseException:
+            # A raised start/STOP exchange can leave physical delivery unknown.
+            # A subsequent ACK must not silently clear this session fault.
+            self.stop_uncertain=True
+            raise
         self.last_stop=result.get('stop')
+        if not isinstance(self.last_stop,dict) or self.last_stop.get('acknowledged') is not True:
+            self.stop_uncertain=True
         return dict(acknowledged=result['acknowledged'],executed=None,bounded_complete=True,
                     wire=result.get('command'),stop=result.get('stop'),physically_observed=None)
 
@@ -202,7 +211,13 @@ class QualifiedMobileExecutor:
             target=context['tracking']['target'],activation=context['activation']['activation_key']))
 
     def stop(self):
-        self.last_stop=self.base.stop_verified()
+        try:
+            self.last_stop=self.base.stop_verified()
+        except BaseException:
+            self.stop_uncertain=True
+            raise
+        if not isinstance(self.last_stop,dict) or self.last_stop.get('acknowledged') is not True:
+            self.stop_uncertain=True
         return self.last_stop
 
     def close(self):

@@ -235,8 +235,10 @@ def main(argv=None):
             executor, telemetry=lifecycle.enter_context(application_mobile_actuators(frame_bus,
                 state=args.learning_state,hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.actuator_safety_feed))
             from motion.rp2040_requests import RP2040Requests
-            deck.actuator_gateway=RP2040Requests(deck.body,neck,frame_bus)
-            attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1',object_labels=labels)
+            deck.actuator_gateway=RP2040Requests(deck.body,neck,frame_bus,
+                fault_path=args.learning_state/'rp2040-uncertain-motion.lock')
+            attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1',object_labels=labels,
+                emergency_stop=executor.emergency_stop)
             lifecycle.callback(attention.close)
             keyboard=KeyboardStimulus(bus)
             lifecycle.callback(keyboard.close)

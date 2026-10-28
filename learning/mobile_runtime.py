@@ -85,7 +85,8 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
         from attention.object_display_runtime import attach
         labels,display_owned=attach(mode,clock=clock,port=args.object_label_port)
         if display_owned is not None:owners.callback(display_owned.close)
-        bus=StimulusBus();attention=AttentionManager(bus,mobile_enabled=False,object_labels=labels)
+        bus=StimulusBus();attention=AttentionManager(bus,mobile_enabled=False,object_labels=labels,
+            emergency_stop=actuator_executor.emergency_stop if actuator_executor is not None else None)
         behavior=MobileObserveBehavior(source,perception,adapter,tracker=PetTracker(loss_seconds=2.),bus=bus)
         context=None
         if getattr(args,'pet_follow',False):

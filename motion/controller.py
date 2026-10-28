@@ -12,6 +12,7 @@ class Deck:
 
         self.body = body if body is not None else RP2040Controller()
         self.calibration = calibration
+        self.actuator_gateway = None
 
     def request_calibration(self, reason, evidence):
         if self.calibration is None:
@@ -24,6 +25,8 @@ class Deck:
 
     def observe_frame(self, frame, target=None):
         if self.calibration is not None:
+            if self.actuator_gateway is not None:
+                return self.actuator_gateway.observe_frame(frame, target)
             return self.calibration.observe_frame(frame, target)
 
     def brain_calibration(self, *, confirm=False):
@@ -75,11 +78,15 @@ class Deck:
 
     def scan(self):
         if self.calibration is not None and self.calibration.brain is not None:
+            if self.actuator_gateway is not None:
+                return self.actuator_gateway.request_search()
             return self.calibration.brain.request_search()
         self.body.scan()
 
     def stop(self):
-        self.body.stop()
+        if self.actuator_gateway is not None:
+            return self.actuator_gateway.stop()
+        return self.body.stop()
 
     # --------------------------------------------------
     # DISPLAY STATE

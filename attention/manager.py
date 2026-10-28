@@ -1,7 +1,8 @@
 class AttentionManager:
 
-    def __init__(self, bus, *, mobile_enabled=True, object_labels=None):
+    def __init__(self, bus, *, mobile_enabled=True, object_labels=None, emergency_stop=None):
         self.bus = bus
+        self.deck = None
         self.object_labels = object_labels
         self.object_attention = None
         self.visual_target = None
@@ -9,6 +10,9 @@ class AttentionManager:
         self.priority = 0
         self.pending = None
         self.pet_service = None
+        self.emergency_stopped = False
+        self.emergency_stop_callback = emergency_stop
+        self.face_service = None
 
         # Independent Elegoo mobile-attention sidecar.
         # This does not replace or modify the RP2040 TrackBehavior.
@@ -37,6 +41,9 @@ class AttentionManager:
     def _consider_pet(self, result):
         service=self.pet_service
         if service is None:return
+        if self.emergency_stopped:
+            service.yield_attention('emergency_stop_latched',result)
+            return
         opportunity=result['tracking'].get('target')
         if opportunity is None:
             service.yield_attention('target_lost_or_ambiguous',result)
@@ -71,7 +78,8 @@ class AttentionManager:
             return
         if event == 'elegoo_face_observation':
             service = data['service']
-            if self.priority > 1 or (self.pet_service is not None and self.pet_service.intent == 'follow'):
+            self.face_service = service
+            if self.emergency_stopped or self.priority > 1 or (self.pet_service is not None and self.pet_service.intent == 'follow'):
                 service.yield_attention()
             else:
                 service.attend(data)
@@ -83,10 +91,21 @@ class AttentionManager:
         if event == 'mobile_opportunity':
             self._consider_pet(data)
             return
-        if self.pet_service is not None and event in ('scan','vision_target','calibrate_neck','confirm_neck_start','emergency_stop','pet_yield'):
+        if event == 'emergency_stop':
+            self.emergency_stopped = True
+            if self.emergency_stop_callback is not None:
+                try:self.emergency_stop_callback()
+                except Exception:pass
+            if self.deck is not None:
+                try:self.deck.stop()
+                except Exception:pass
+            if self.face_service is not None:self.face_service.yield_attention()
+            if self.pet_service is not None:self.pet_service.yield_attention('emergency_stop')
+            return
+        if self.pet_service is not None and event in ('scan','vision_target','calibrate_neck','confirm_neck_start','pet_yield'):
             self.pet_choice_key=None
             self.pet_service.yield_attention(event)
-        if event in ('emergency_stop','pet_yield'):return
+        if event == 'pet_yield':return
         if event in ('calibrate_neck', 'confirm_neck_start'):
             self.deck.brain_calibration(confirm=event == 'confirm_neck_start')
 
@@ -184,9 +203,13 @@ class AttentionManager:
     def update(self, deck):
         self.deck = deck
 
-        # Process stimuli first.
-        for event, data in self.bus.get_all():
-            self.handle_event(event, data)
+        # STOP preempts other already queued intents in this update. It is a
+        # session latch; a later attention or registry event cannot clear it.
+        events = self.bus.get_all()
+        for event, data in events:
+            if event == 'emergency_stop':self.handle_event(event, data)
+        for event, data in events:
+            if event != 'emergency_stop':self.handle_event(event, data)
 
         if self.object_labels is not None:
             try:self.object_labels.tick()

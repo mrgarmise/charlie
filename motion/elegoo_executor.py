@@ -35,6 +35,7 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
         self.bus, self.authority = bus, authority
         self.boot_id = uuid4().hex
         self._connected = False
+        self._safety_stopped = False
         self._receipts = 0
         self._receipt_lock = threading.Lock()
         self._generation = uuid4().hex
@@ -81,6 +82,8 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
         self.context = context
 
     def _execute_exclusive(self, proposal, *, lease, local_cancel):
+        if self._safety_stopped:
+            raise PermissionError('emergency STOP latched')
         if self.context is None:
             raise PermissionError('pet context unavailable')
         self.context.activation()
@@ -129,7 +132,7 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
         attempted = False
         try:
             with self._state_lock:
-                if (self._closed or self.stop_uncertain or self._stop_inflight
+                if (self._closed or self._safety_stopped or self.stop_uncertain or self._stop_inflight
                         or (self._stop_at is not None and request.at <= self._stop_at)):
                     raise ValueError('stopped, closed or uncertain executor')
                 self._active_cancel = cancel
@@ -207,6 +210,12 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
                 if self._active_cancel is cancel:
                     self._active_cancel = None
             self._request_lock.release()
+
+    def emergency_stop(self):
+        # Independent safety stops revoke all requesters for this lifetime.
+        with self._state_lock:
+            self._safety_stopped = True
+        return self.stop()
 
     def stop(self):
         try:

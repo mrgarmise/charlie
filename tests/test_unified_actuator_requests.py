@@ -161,7 +161,7 @@ def test_rp2040_gateway_rejects_unqualified_and_stale_without_serial_motion():
     bus=StimulusBus();owner=object();bus.claim_frames('pi-primary',owner)
     pixels=np.zeros((4,4,3),dtype=np.uint8);pixels.flags.writeable=False
     bus.publish_frame('pi-primary',owner,CameraFrame('f',pixels,10.,source='pi-primary'))
-    controller=Mock();calibration=SimpleNamespace(brain=SimpleNamespace(authorized=False,blocked=False),health=SimpleNamespace(quarantined=False))
+    controller=Mock(spec=['stop']);calibration=SimpleNamespace(brain=SimpleNamespace(authorized=False,blocked=False),health=SimpleNamespace(quarantined=False))
     service=RP2040Requests(controller,calibration,bus,clock=lambda:10.)
     req=ActuatorRequest('id','attention','rp2040-head','track-target',10.,'pi-primary','f',{'target':{'x':1,'y':1}})
     with pytest.raises(PermissionError):service.request(req)
@@ -224,3 +224,27 @@ def test_legacy_motor_calls_cannot_bypass_application_executor():
         with pytest.raises(PermissionError):legacy.car.start_pivot('LEFT')
         with pytest.raises(PermissionError):legacy.car.pan_qualified(90,safety_check=lambda:True)
     finally:remove_application_executor(e)
+
+
+def test_attention_emergency_stop_preempts_queued_face_and_pet_intents():
+    from attention.manager import AttentionManager
+    bus=StimulusBus();attention=AttentionManager(bus,mobile_enabled=False)
+    face=Mock();pet=Mock();pet.intent='follow';attention.pet_service=pet
+    bus.emit('elegoo_face_observation',dict(service=face,frame=None,face=None))
+    bus.emit('emergency_stop')
+    attention.update(None)
+    face.attend.assert_not_called();face.yield_attention.assert_called()
+    pet.yield_attention.assert_called()
+    bus.emit('elegoo_face_observation',dict(service=face,frame=None,face=None))
+    attention.update(None)
+    face.attend.assert_not_called()
+    assert attention.emergency_stopped
+
+
+def test_emergency_stop_revokes_all_future_behavior_requests():
+    e,b,_,_,now=setup();e.emergency_stop()
+    now[0]=10.01
+    fresh=ActuatorRequest('fresh','another-behavior','chassis','pulse',10.01,'vision','g:1',
+        {'direction':'LEFT','pwm':20,'seconds':.1})
+    with pytest.raises(ValueError):e.request(fresh)
+    assert e._safety_stopped and b.pulse.call_count==0

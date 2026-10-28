@@ -3,6 +3,7 @@ import time
 import threading
 import json
 import uuid
+from contextlib import contextmanager
 
 
 class RP2040Controller:
@@ -19,6 +20,13 @@ class RP2040Controller:
     PING is only transmitted after a quiet period.
     """
 
+    def __new__(cls, *args, **kwargs):
+        instance = super().__new__(cls)
+        instance._motion_fence_lock = threading.Lock()
+        instance._motion_generation = 0
+        instance._motion_scope = threading.local()
+        return instance
+
     HEARTBEAT_INTERVAL = 3.0
     RECONNECT_INTERVAL = 3.0
 
@@ -33,6 +41,9 @@ class RP2040Controller:
 
         self.serial = None
         self.lock = threading.Lock()
+        self._motion_fence_lock = threading.Lock()
+        self._motion_generation = 0
+        self._motion_scope = threading.local()
 
         self.connected = False
 
@@ -123,6 +134,40 @@ class RP2040Controller:
     # SEND
     # --------------------------------------------------
 
+    @contextmanager
+    def motion_scope(self):
+        # A gateway request is bound to this STOP generation. The firmware
+        # session/epoch and CAL-1 checks still independently govern motion.
+        previous = getattr(self._motion_scope, 'generation', None)
+        with self._motion_fence_lock:
+            generation = self._motion_generation if previous is None else previous
+        self._motion_scope.generation = generation
+        try:
+            yield
+        finally:
+            if previous is None:
+                del self._motion_scope.generation
+            else:
+                self._motion_scope.generation = previous
+
+    def _scope_allows(self, command):
+        if command == 'STOP':
+            return True
+        generation = getattr(self._motion_scope, 'generation', None)
+        return generation is None or generation == self._motion_generation
+
+    def motion_scope_valid(self):
+        with self._motion_fence_lock:
+            return self._scope_allows('MOTION_INTENT')
+
+    def apply_motion_intent(self, callback):
+        # Scheduling a future movement must be ordered with STOP too.
+        with self._motion_fence_lock:
+            if not self._scope_allows('MOTION_INTENT'):
+                return False
+            callback()
+            return True
+
     def send(self, command):
 
         if not self.connected:
@@ -131,13 +176,10 @@ class RP2040Controller:
         try:
 
             with self.lock:
-
-                self.serial.write(
-                    (
-                        command
-                        + "\n"
-                    ).encode()
-                )
+                with self._motion_fence_lock:
+                    if not self._scope_allows(command):
+                        return False
+                    self.serial.write((command + "\n").encode())
 
             # Every real transmission proves the Pi is alive.
             #
@@ -217,6 +259,10 @@ class RP2040Controller:
         )
 
     def stop(self):
+        # Invalidate in-flight request scopes before waiting for the serial
+        # lock. STOP itself remains available outside the motion scope.
+        with self._motion_fence_lock:
+            self._motion_generation += 1
         self.motion_epoch = self.motion_owner = None
         return self.send("STOP")
 
@@ -277,7 +323,10 @@ class RP2040Controller:
         if not self.connected:return None
         try:
             with self.lock:
-                self.serial.write((command + "\n").encode())
+                with self._motion_fence_lock:
+                    if not self._scope_allows(command):
+                        return None
+                    self.serial.write((command + "\n").encode())
                 self.last_tx = time.monotonic()
                 deadline = self.last_tx + timeout
                 old_timeout = self.serial.timeout

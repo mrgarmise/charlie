@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 from memory.evidence import digest
 
-RUNTIME_FILES=('learning/actuator_safety.py','motion/rp2040_requests.py','behaviors/mobile_face_runtime.py','behaviors/mobile_face_track.py','vision/mobile_face.py','motion/elegoo_executor.py','motion/mobile_requests.py','hardware/elegoo_telemetry.py','stimulus/bus.py','hardware/elegoo_camera.py','hardware/hailo_session.py','hardware/elegoo_mobile.py','motion/mobile_base.py','experiments/ppal/mobile_navigation.py',
+RUNTIME_FILES=('hardware/rp2040_controller.py','motion/controller.py','learning/actuator_safety.py','motion/rp2040_requests.py','behaviors/mobile_face_runtime.py','behaviors/mobile_face_track.py','vision/mobile_face.py','motion/elegoo_executor.py','motion/mobile_requests.py','hardware/elegoo_telemetry.py','stimulus/bus.py','hardware/elegoo_camera.py','hardware/hailo_session.py','hardware/elegoo_mobile.py','motion/mobile_base.py','experiments/ppal/mobile_navigation.py',
  'attention/manager.py','behaviors/mobile_observe.py','learning/mobile.py','learning/mobile_runtime.py',
  'learning/mobile_safety.py','learning/capabilities.py','learning/deployment.py','main.py',
  'memory/learning_projects.py','memory/evaluator.py','learning/resources.py',

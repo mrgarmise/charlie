@@ -88,9 +88,13 @@ executed through Charlie's ordinary Executive. Native measurements are absent.
   requires separate protocol and telemetry qualification. Captured measurement
   time, sensor field of view and pan pose remain unknown unless provided by a
   separately qualified source. A receipt is not independent movement feedback.
-- The RP2040 gateway is an adapter for existing CAL-1 but existing Deck, Active
-  Vision and calibration call sites are not all migrated through it. Its
-  STOP-versus-in-flight-CAL-1 race and durable uncertainty need conformance work.
+- The RP2040 gateway wraps the normal Deck frame/search/STOP path and retains
+  CAL-1 as the actuator controller. Request scopes are invalidated on STOP
+  before serial-lock acquisition; stale scoped writes and deferred search intents
+  are rejected. A durable marker preserves interrupted or ambiguous gateway
+  operations across restart. Existing standalone Active Vision and calibration
+  call sites remain compatible, but are not all routed through this gateway.
+  Serial-lock waiting and actual physical STOP latency remain unmeasured.
 - The legacy standalone head scripts have not been migrated to an installed
   application executor. Preserve the old checkout for rollback; do not run the
   old direct-motion scripts concurrently with the integrated app.
@@ -100,3 +104,26 @@ executed through Charlie's ordinary Executive. Native measurements are absent.
 - Publication of safety state and pose is partial: range/yaw query data and
   command receipts exist, but independently observed actuator outcomes and
   qualified full pose still require an actual source and native validation.
+
+## RP2040 host-only STOP fence
+
+Normal Deck observation uses the CAL-1 service inside a request scope on the
+existing RP2040Controller. STOP invalidates all earlier scoped requests before
+waiting for serial; a request checks its generation while holding the serial
+write lock, and a stale search cannot be scheduled after STOP. The firmware's
+existing session, arm, electrical, envelope, watchdog and CAL-1 decisions remain
+unchanged. An interrupted request or unsuccessful STOP leaves
+`rp2040-uncertain-motion.lock` in the learning state directory. Recovery needs
+independent physical isolation and separately reviewed evidence; no restart or
+STOP call clears it. This host fence does not demonstrate serial response time,
+servo stopping, safe calibration, or cross-process exclusion.
+
+## Emergency attention stop
+
+The existing AttentionManager processes emergency STOP before other queued
+intentions and keeps an in-session latch. Its application-installed callback
+latches the shared ELEGOO executor before requesting STOP, so face, pet and
+future requests cannot resume merely because a newer observation arrives.
+The normal Deck is stopped independently. This is a software arbitration test;
+serial/socket scheduling, power cutoff and physical stopping remain native
+acceptance items. A STOP or restart does not clear an uncertainty marker.

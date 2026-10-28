@@ -128,6 +128,10 @@ class HumanInteractionGateway:
         return dict(asked=True, question_id=row.id)
 
     def transition(self, question_id, status, reason):
+        with self.journal.batch():
+            return self._transition(question_id, status, reason)
+
+    def _transition(self, question_id, status, reason):
         if status not in {'dismissed', 'expired', 'superseded', 'failed', 'pending'} or not bounded(reason, 1024):
             raise ValueError('invalid transition')
         q = self.questions()[question_id]

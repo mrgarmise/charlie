@@ -144,3 +144,36 @@ def test_executive_review_intake_is_atomic_and_idempotent(env,kind,owner,value):
     assert not reviews[0].data['payload']['model_update']
     assert e.receive_human_answers(g,owner)==[]
     assert g.results(owner)==[]
+
+
+def test_concurrent_answers_never_apply_twice(env):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+    j,g,e=env;q=ask(e,g,fixture_record(j))['question_id'];barrier=Barrier(2)
+    def worker(value):
+        own=EvidenceJournal(j.path);service=HumanInteractionGateway(own)
+        try:
+            barrier.wait(timeout=5)
+            try:
+                return service.answer(q,value=value,operator='fixture',request_id='concurrent-'+value).id
+            except (ValueError,sqlite3.OperationalError):
+                return None  # contention is retryable, never duplicate success
+        finally:own.close()
+    with ThreadPoolExecutor(2) as pool:
+        answers=list(pool.map(worker,['cat','dog']))
+    assert sum(a is not None for a in answers)==1
+    assert len(g.results('pet_observe'))==1
+
+
+def test_review_receipt_failure_rolls_back_and_recovers(env,monkeypatch):
+    j,g,e=env;q=ask(e,g,fixture_record(j))['question_id']
+    g.answer(q,value='cat',operator='fixture',request_id='crash-recovery')
+    original=g.acknowledge
+    def failed(*args):raise RuntimeError('simulated interruption before receipt')
+    monkeypatch.setattr(g,'acknowledge',failed)
+    with pytest.raises(RuntimeError):e.receive_human_answers(g,'pet_observe')
+    assert not j.category_records('observation','human_answer_review')
+    assert len(g.results('pet_observe'))==1
+    monkeypatch.setattr(g,'acknowledge',original)
+    assert len(e.receive_human_answers(g,'pet_observe'))==1
+    assert not e.receive_human_answers(g,'pet_observe')

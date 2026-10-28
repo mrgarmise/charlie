@@ -97,9 +97,10 @@ executed through Charlie's ordinary Executive. Native measurements are absent.
   Serial-lock waiting and actual physical STOP latency remain unmeasured.
 - The original `run_elegoo_head2.py` entry point now attaches the shared feeder,
   AttentionManager and application executor, with explicit `--hardware`; no
-  registration grants motion. The separate legacy diagnostic script remains
-  unmigrated. Preserve the old checkout for rollback; do not run old
-  direct-motion scripts concurrently with the integrated app.
+  registration grants motion. The separate CSV diagnostic also attaches the
+  shared feeder, AttentionManager and executor, and creates a unique log file.
+  Preserve the old checkout for rollback; do not run old direct-motion scripts
+  concurrently with the integrated app.
 - Independently test simultaneous normal-app object, pet and face operation,
   full parity, temporal STOP priority at the real socket/serial transport and
   native throughput. Tests with synthetic qualification records are fixtures.
@@ -203,5 +204,5 @@ yet share this lifecycle gateway; full behavioral parity remains unaccepted.
 The standalone Head 2 entry point remains an application-owned capability: it
 uses the existing face algorithm, shared camera feeder, AttentionManager,
 executor and search-memory gateway. The independent qualification and measured
-pose gates still apply. The older CSV diagnostic has not been migrated and must
-not be treated as an alternate motion owner.
+pose gates still apply. The CSV diagnostic also uses that ownership path and remains subject to the
+same independent authorization and native parity gates.

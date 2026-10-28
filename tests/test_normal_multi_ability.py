@@ -223,3 +223,52 @@ def test_legacy_head_entry_uses_application_owners_and_attention(monkeypatch,tmp
     assert calls==['feeder','executor','attention','face','face closed']
     with pytest.raises(ValueError,match='--hardware'):
         run_elegoo_head2.main([])
+
+
+def test_legacy_diagnostic_uses_application_feeder_and_executor(monkeypatch,tmp_path):
+    import run_elegoo_head2_diagnostic as diagnostic
+    from contextlib import contextmanager
+    calls=[];frames=object();executor=object();telemetry=object()
+    @contextmanager
+    def feeders(args,**kw):calls.append('feeder');yield frames
+    @contextmanager
+    def actuators(bus,**kw):assert bus is frames;calls.append('executor');yield executor,telemetry
+    monkeypatch.setattr(app,'application_camera_feeders',feeders)
+    monkeypatch.setattr(app,'application_mobile_actuators',actuators)
+    monkeypatch.setattr(diagnostic,'run_diagnostic',lambda *args:calls.append(args))
+    diagnostic.main(['--hardware','--learning-state',str(tmp_path)])
+    assert calls==['feeder','executor',(frames,executor,telemetry)]
+    with pytest.raises(ValueError,match='--hardware'):
+        diagnostic.main([])
+
+
+def test_legacy_diagnostic_retains_csv_rows_with_fake_shared_frames(monkeypatch,tmp_path):
+    import csv
+    import numpy as np
+    from types import SimpleNamespace
+    import run_elegoo_head2_diagnostic as diagnostic
+    import stimulus.keyboard
+    monkeypatch.chdir(tmp_path)
+    pixels=np.zeros((12,12,3),dtype=np.uint8)
+    class Camera:
+        def __init__(self):self.count=0;self._last_frame=None
+        def __enter__(self):return self
+        def __exit__(self,*args):self.close()
+        def read(self):
+            self.count+=1
+            if self.count>1:raise KeyboardInterrupt
+            self._last_frame=SimpleNamespace(source='elegoo-v4',id='fixture',authentic=False)
+            return pixels
+        def close(self):pass
+    monkeypatch.setattr(diagnostic,'ElegooCamera',Camera)
+    detector=Mock();detector.detect.return_value=None
+    monkeypatch.setattr(diagnostic,'MobileFaceDetector',lambda **kw:detector)
+    monkeypatch.setattr(stimulus.keyboard,'KeyboardStimulus',lambda *args,**kw:Mock())
+    executor=Mock();executor.bus=StimulusBus();executor.stop.return_value={'acknowledged':True}
+    diagnostic.run_diagnostic(StimulusBus(),executor,Mock())
+    files=list((tmp_path/'head2_sessions').glob('head2_*.csv'))
+    assert len(files)==1
+    with files[0].open() as stream:
+        rows=list(csv.DictReader(stream))
+    assert len(rows)==1 and rows[0]['state']=='LOST_HOLD'
+    assert 'camera_wait_ms' in rows[0] and 'yaw_delta' in rows[0]

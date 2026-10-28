@@ -115,3 +115,32 @@ def test_schema_forgery_and_churn(env):
     # New session track never inherits a human label; no identity aliasing.
     changed=replace(need,subject='different-session:1')
     assert g.consider(changed)['question_id']!=q
+
+
+def test_pr13_real_tracker_adapter_contract(env):
+    tracking = pytest.importorskip('vision.mobile_tracking', reason='PR #13 contract not merged into master')
+    mobile = pytest.importorskip('learning.mobile')
+    j,g,e=env;tracker=tracking.PetTracker()
+    adapter=mobile.MobileEvidenceAdapter(j,episode='synthetic-adapter',revision='fixture-v1')
+    for at,label in [(10.,'cat'),(10.1,'dog')]:
+        observation=dict(frame=dict(source='synthetic',received_at=at,pan_deg=None,yaw_deg=None,authentic=False),
+            qualification='synthetic',objects=[dict(label=label,confidence=.6,box=(0,0,100,100))])
+        tracked=tracker.update(observation)
+        record=adapter.record(observation,tracked,{},dict(dispatched=False))
+    q=ask(e,g,record)['question_id']
+    answer=g.answer(q,value='cat',operator='fixture-human',request_id='tracker-answer')
+    assert g.results('pet_observe')[0]['evidence_id']==answer.id
+    assert j.get(q).data['sources']==[record.id]
+    assert not j.get(record.id).data['payload']['execution']['dispatched']
+
+
+@pytest.mark.parametrize('kind,owner,value',[('pet','pet_observe','dog'),('robotron','robotron',None)])
+def test_executive_review_intake_is_atomic_and_idempotent(env,kind,owner,value):
+    j,g,e=env;q=ask(e,g,fixture_record(j,kind))['question_id']
+    a=g.answer(q,value=value,operator='fixture',request_id='review-intake-answer')
+    reviews=e.receive_human_answers(g,owner)
+    assert len(reviews)==1 and reviews[0].data['sources']==[a.id]
+    assert reviews[0].data['payload']['status']=='pending_independent_review'
+    assert not reviews[0].data['payload']['model_update']
+    assert e.receive_human_answers(g,owner)==[]
+    assert g.results(owner)==[]

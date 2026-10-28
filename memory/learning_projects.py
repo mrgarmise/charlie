@@ -97,6 +97,12 @@ class LearningExecutive:
             consequence=consequence, priority=priority, alternative_available=alternative_available)
         return service.consider(need) if need else dict(asked=False, reason='no_supported_information_need')
 
+    def receive_human_answers(self, service, owner):
+        """Existing Executive receives fallible evidence, never activates policy."""
+        if service.journal is not self.journal:
+            raise ValueError('Executive and gateway must share evidence ownership')
+        return service.receive(owner)
+
     def request_neck_calibration(self, service, reason, evidence, *, profile_id=None):
         """Evidence-backed request only; this has no actuator/qualification API."""
         return service.request(reason, evidence, profile_id=profile_id)

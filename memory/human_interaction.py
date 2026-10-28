@@ -173,6 +173,26 @@ class HumanInteractionGateway:
                 for q in self.questions().values() if q['need']['owner'] == owner
                 and 'answer_id' in q and q['answer_id'] not in consumed]
 
+    def receive(self, owner):
+        """Atomically route new answers to a requester-owned review observation.
+
+        Durable review inbox only: downstream algorithms must independently review
+        it. External side effects are deliberately excluded from this transaction.
+        """
+        delivered = []
+        with self.journal.batch():
+            for result in self.results(owner):
+                answer = self.journal.get(result['evidence_id'])
+                review = self.journal.append('observation', dict(category='human_answer_review',
+                    owner=owner, question_id=result['question_id'], answer_id=answer.id,
+                    answer=result['answer'], status='pending_independent_review',
+                    physical_authorization=False, model_update=False),
+                    episode=answer.data['episode'], sources=[answer.id],
+                    producer=owner+':human-review-intake', version=VERSION)
+                self.acknowledge(owner, answer.id)
+                delivered.append(review)
+        return delivered
+
     def acknowledge(self, owner, answer_id):
         row = self.journal.get(answer_id); p = row.data['payload']
         if p.get('category') != CATEGORY or p.get('op') != 'answer':

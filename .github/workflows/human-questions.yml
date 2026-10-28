@@ -1,0 +1,28 @@
+name: Human question browser and security validation
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest playwright
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m pytest tests/test_human_interaction.py tests/test_human_questions_http.py tests/test_human_questions_browser.py -q --junitxml=human-questions.xml
+        env:
+          CHARLIE_BROWSER_TESTS: '1'
+          CHARLIE_BROWSER_ARTIFACTS: browser-artifacts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: human-question-validation
+          path: |
+            human-questions.xml
+            browser-artifacts

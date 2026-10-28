@@ -4,7 +4,7 @@ from motion.mobile_requests import MobileRequests
 
 
 class MobileFaceRuntime:
-    def __init__(self, frame_bus, event_bus, executor, *, detector=None):
+    def __init__(self, frame_bus, event_bus, executor, *, detector=None, memory_gateway=None):
         if detector is None:
             from vision.mobile_face import MobileFaceDetector
             detector = MobileFaceDetector()
@@ -12,6 +12,10 @@ class MobileFaceRuntime:
         self.subscription = frame_bus.subscribe_frames('elegoo-v4', max_age=.25)
         self.mobile = MobileRequests(executor=executor)
         self.behavior = MobileFaceTrackBehavior(mobile=self.mobile)
+        self.search_memory = None
+        if memory_gateway is not None:
+            from memory.head_search import HeadSearchMemory
+            self.search_memory = HeadSearchMemory(memory_gateway)
         self.last_status = None
 
     def observe(self):
@@ -30,6 +34,11 @@ class MobileFaceRuntime:
         self.mobile.bind_frame(observation['frame'])
         try:
             self.last_status = self.behavior.update_face(observation['face'])
+            if self.search_memory is not None and observation['frame'].authentic is True:
+                try:self.search_memory.observe(self.behavior,observation['face'],self.last_status)
+                except Exception as exc:
+                    # Memory availability must not conceal or change motion.
+                    self.memory_error = type(exc).__name__
         except (PermissionError,ValueError,RuntimeError,OSError) as exc:
             self.mobile.stop()
             self.last_status = dict(state='MOTION_UNAVAILABLE',reason=str(exc),physical_qualification=False)

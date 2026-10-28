@@ -147,7 +147,7 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
             if actuator_executor is None or frame_bus is None:
                 raise ValueError('face integration requires application-owned executor and feeders')
             from behaviors.mobile_face_runtime import MobileFaceRuntime
-            face_runtime=MobileFaceRuntime(frame_bus,bus,actuator_executor)
+            face_runtime=MobileFaceRuntime(frame_bus,bus,actuator_executor,memory_gateway=lifecycle.gateway)
             owners.callback(face_runtime.close)
         from .mobile_review import labeled_pairs
         if labeled_pairs(lifecycle.journal):behavior.executive_resources.add('native-labeled-mobile-evidence')

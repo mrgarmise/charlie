@@ -190,3 +190,10 @@ The RP2040 gateway avoids creating a durable motion-attempt marker on every
 explicitly disarmed, session-free observation. If authorization or calibration
 session state is unknown, it retains the conservative marker behavior. This
 reduces passive filesystem churn without treating passive observation as a grant.
+
+In the combined mobile runtime, face-search outcomes reuse the existing
+`HeadSearchMemory` and the lifecycle-owned memory gateway. Only authentic source
+frames are eligible; fixture frames do not create search outcomes. Memory errors
+are kept separate from motion decisions. The standalone script's historical
+remote-recall search preference is not yet wired into every application mode;
+this remains part of parity validation, not a physical acceptance claim.

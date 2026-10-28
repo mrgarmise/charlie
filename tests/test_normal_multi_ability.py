@@ -128,6 +128,15 @@ def test_one_live_fixture_runtime_handles_primary_pet_objects_and_face(tmp_path,
     for source,owner in owners.items():
         frame_bus.claim_frames(source,owner)
         frame_bus.publish_frame(source,owner,CameraFrame(source+':1',pixels,time.monotonic(),source=source,sequence=1))
+    # Model a running feeder: publish a new frame at the actual watcher start,
+    # not before lifecycle construction, which may exceed freshness under load.
+    import learning.mobile_runtime as mobile_runtime
+    original_watch=mobile_runtime.watch
+    def watch_with_fresh_frames(*args,**kwargs):
+        for source,owner in owners.items():
+            frame_bus.publish_frame(source,owner,CameraFrame(source+':2',pixels,time.monotonic(),source=source,sequence=2))
+        return original_watch(*args,**kwargs)
+    monkeypatch.setattr(mobile_runtime,'watch',watch_with_fresh_frames)
     executor=Mock();executor.stop.return_value={'acknowledged':True}
     result=run_mobile(args,DevelopmentResources(),frame_bus,actuator_executor=executor)
     assert result['records']==1 and result['motion_authorized'] is False
@@ -149,4 +158,17 @@ def test_idle_face_yields_to_pet_without_stopping_shared_executor():
     service.behavior._sentry_turn_state=(0,0,'LEFT')
     manager.handle_event('elegoo_face_observation',{'service':service,'frame':None,'face':None})
     executor.stop.assert_called_once()
+    service.close()
+
+
+def test_search_memory_uses_existing_gateway_and_never_promotes_fixture_frames():
+    from types import SimpleNamespace
+    from behaviors.mobile_face_runtime import MobileFaceRuntime
+    frame_bus=StimulusBus();events=StimulusBus();executor=Mock();gateway=Mock()
+    service=MobileFaceRuntime(frame_bus,events,executor,detector=Mock(),memory_gateway=gateway)
+    service.search_memory.observe=Mock()
+    service.behavior.update_face=Mock(return_value={'state':'CENTERED'})
+    for authentic in (False,True):
+        service.attend({'frame':SimpleNamespace(source='elegoo-v4',id='f',authentic=authentic),'face':{'normalized_x':.5}})
+    service.search_memory.observe.assert_called_once()
     service.close()

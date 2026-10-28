@@ -27,3 +27,9 @@ were updated to accept keyword parameters. The original assertions were kept.
 The affected calibration and primary-application suites then passed 66 tests.
 The broad run was still in progress when this receipt was written; its final
 result and independent CI remain authoritative for that exact revision.
+
+During face-memory testing, the combined no-device runtime fixture once lost
+its only prerecorded frame to the real freshness limit while lifecycle startup
+was under load. The fixture now publishes a new frame at watcher start, modeling
+its existing running feeder. The affected suite subsequently passed; the
+production freshness checks were not relaxed.

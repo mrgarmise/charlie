@@ -95,9 +95,11 @@ executed through Charlie's ordinary Executive. Native measurements are absent.
   operations across restart. Existing standalone Active Vision and calibration
   call sites remain compatible, but are not all routed through this gateway.
   Serial-lock waiting and actual physical STOP latency remain unmeasured.
-- The legacy standalone head scripts have not been migrated to an installed
-  application executor. Preserve the old checkout for rollback; do not run the
-  old direct-motion scripts concurrently with the integrated app.
+- The original `run_elegoo_head2.py` entry point now attaches the shared feeder,
+  AttentionManager and application executor, with explicit `--hardware`; no
+  registration grants motion. The separate legacy diagnostic script remains
+  unmigrated. Preserve the old checkout for rollback; do not run old
+  direct-motion scripts concurrently with the integrated app.
 - Independently test simultaneous normal-app object, pet and face operation,
   full parity, temporal STOP priority at the real socket/serial transport and
   native throughput. Tests with synthetic qualification records are fixtures.
@@ -197,3 +199,9 @@ frames are eligible; fixture frames do not create search outcomes. Memory errors
 are kept separate from motion decisions. The original remote-recall search preference is consulted at the authentic
 sentry decision in the combined mobile runtime. Other application modes do not
 yet share this lifecycle gateway; full behavioral parity remains unaccepted.
+
+The standalone Head 2 entry point remains an application-owned capability: it
+uses the existing face algorithm, shared camera feeder, AttentionManager,
+executor and search-memory gateway. The independent qualification and measured
+pose gates still apply. The older CSV diagnostic has not been migrated and must
+not be treated as an alternate motion owner.

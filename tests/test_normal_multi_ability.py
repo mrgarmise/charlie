@@ -190,3 +190,36 @@ def test_original_search_preference_is_recalled_only_for_authentic_sentry(monkey
     recall.assert_called_once()
     assert service.behavior.search_preference=='RIGHT'
     service.close()
+
+
+def test_legacy_head_entry_uses_application_owners_and_attention(monkeypatch,tmp_path):
+    import run_elegoo_head2
+    from contextlib import contextmanager
+    import attention.manager
+    import behaviors.mobile_face_runtime
+    import stimulus.keyboard
+    import memory.gateway
+    calls=[];executor=Mock();telemetry=Mock();frame_bus=object()
+    @contextmanager
+    def feeders(args,**kw):calls.append('feeder');yield frame_bus
+    @contextmanager
+    def actuators(bus,**kw):assert bus is frame_bus;calls.append('executor');yield executor,telemetry
+    class Face:
+        last_status=None
+        def __init__(self,bus,events,shared,**kw):
+            assert bus is frame_bus and shared is executor
+            calls.append('face')
+        def observe(self):raise KeyboardInterrupt
+        def close(self):calls.append('face closed')
+    original=attention.manager.AttentionManager
+    def manager(*args,**kw):calls.append('attention');return original(*args,**kw)
+    monkeypatch.setattr(app,'application_camera_feeders',feeders)
+    monkeypatch.setattr(app,'application_mobile_actuators',actuators)
+    monkeypatch.setattr(behaviors.mobile_face_runtime,'MobileFaceRuntime',Face)
+    monkeypatch.setattr(attention.manager,'AttentionManager',manager)
+    monkeypatch.setattr(stimulus.keyboard,'KeyboardStimulus',lambda *a,**kw:Mock())
+    monkeypatch.setattr(memory.gateway,'MemoryGateway',lambda:Mock())
+    run_elegoo_head2.main(['--hardware','--learning-state',str(tmp_path)])
+    assert calls==['feeder','executor','attention','face','face closed']
+    with pytest.raises(ValueError,match='--hardware'):
+        run_elegoo_head2.main([])

@@ -87,6 +87,16 @@ class LearningExecutive:
         self.journal, self.gateway = journal, gateway
         self.consolidate()
 
+    def consider_human_question(self, service, evidence_id, *, reason, consequence,
+                                priority, alternative_available=False):
+        """Opt-in evidence-derived uncertainty review, never actuator authority."""
+        from .human_interaction import detect_need
+        if service.journal is not self.journal:
+            raise ValueError('Executive and gateway must share evidence ownership')
+        need = detect_need(self.journal, evidence_id, now=service.clock(), reason=reason,
+            consequence=consequence, priority=priority, alternative_available=alternative_available)
+        return service.consider(need) if need else dict(asked=False, reason='no_supported_information_need')
+
     def request_neck_calibration(self, service, reason, evidence, *, profile_id=None):
         """Evidence-backed request only; this has no actuator/qualification API."""
         return service.request(reason, evidence, profile_id=profile_id)

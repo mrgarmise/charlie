@@ -33,6 +33,16 @@ the existing Executive, journal, resource lifecycle and deployment owner. It
 registers a different perception-task artifact format rather than misrepresenting
 existing reconstruction/CNN artifacts as screen-state classifiers.
 
+The source inventory additionally found 8,969 image files across 44 top-level
+origins in the old Robotron-runs tree: 137 raw_* files, 122 review JPEGs and
+6,519 tracking crops (these counts overlap categories and do not assert unique
+original exposures). A one-recording historical file has 37 human track-identity
+labels, including one player and flagged mixed/bad-box cases. Its hash and label
+counts are retained in `source-inventory.json`; it supplies neither phase truth
+nor independently verified localization boxes. `localization-proposals.json`
+reuses the existing saved blob proposals on eight rectified frames (138 boxes),
+retains UNKNOWN semantics and makes no detector/track accuracy claim.
+
 The mission's PR #8 private score corpus/HEF and PR #6/Vision Lab detector work
 are independent. No score labels, ONNX/HEF, Hailo admission, motion firmware,
 controller leases or model defaults were changed. No camera, serial, RP2040,

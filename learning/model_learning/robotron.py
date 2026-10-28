@@ -73,3 +73,31 @@ def localization_annotation(*,frame_sha256,session,objects,reviewer):
         if not 0<=obj['uncertainty']<=1: raise ValueError('bounded uncertainty required')
     return dict(schema='robotron-localization-v1',frame_sha256=frame_sha256,session=session,objects=objects,reviewer=reviewer,
                 track_identity='session-local only; annotation does not establish physical identity')
+
+
+def localization_proposals(recording,*,max_frames=8):
+    """Reuse saved PPAL blob proposals on authentic rectified frames, no detector training.
+
+    Machine boxes and historical track names are not independently annotated
+    ground truth. Keep their semantic labels UNKNOWN until separately reviewed.
+    """
+    if type(max_frames) is not int or not 1<=max_frames<=32:raise ValueError('bounded replay required')
+    root=Path(recording);source=root/'detections.json'
+    if source.stat().st_size>16*1024**2:raise ValueError('recording metadata too large')
+    original=json.loads(source.read_text());result=[]
+    for row in original['frames'][:max_frames]:
+        tick=row['tick'];image=root/'tracking/playfields'/('playfield_'+format(tick,'03d')+'.jpg')
+        if not image.is_file():continue
+        with Image.open(image) as im:w,h=im.size
+        objects=[]
+        for detection in row['detections'][:128]:
+            x0,y0,x1,y1=detection['box']
+            if not 0<=x0<x1<=w or not 0<=y0<y1<=h:continue
+            objects.append(dict(**{'class':'unknown'},box=[x0/w,y0/h,x1/w,y1/h],uncertainty=1.,
+                candidate_kind=detection['kind'],track_id=None))
+        annotation=localization_annotation(frame_sha256=sha(image),session=root.name,objects=objects,reviewer='unreviewed-existing-PPAL-proposals')
+        result.append(dict(annotation,source_metadata_sha256=sha(source),captured_at_seconds=row.get('captured_at_seconds'),
+            tick=tick,coordinates='rectified saved playfield',truth=False))
+    return dict(schema='robotron-localization-proposals-v1',frames=result,semantic_accuracy=None,
+        localization_accuracy=None,source='existing saved PPAL proposals, no new inference or capture',
+        limitations=['machine boxes unverified','no object identity inheritance','single recording is not independent holdout'])

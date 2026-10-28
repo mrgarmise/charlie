@@ -40,6 +40,8 @@ class DatasetStore:
     def add(self,path,*,session,provenance,authentic,partition=None,calibration=None,task='robotron.screen_state'):
         if not session or not provenance or type(authentic) is not bool or partition not in (None,'train','validation','test'):
             raise ValueError('source session, provenance, authenticity and explicit partition required')
+        if len(json.dumps(provenance,allow_nan=False).encode())>16*1024:raise ValueError("provenance byte budget exceeded")
+        if not isinstance(session,str) or len(session)>256:raise ValueError("bounded session required")
         if task!="robotron.screen_state": raise ValueError("task adapter not registered")
         path=Path(path)
         if path.stat().st_size>8*1024**2: raise ValueError("image byte budget exceeded")

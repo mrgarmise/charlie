@@ -17,7 +17,7 @@ def approve(service,qualification_id,*,operator,reason,answer_id=None,reviewer=N
         raise ValueError('qualification/answer linkage required')
     from .qualification import reasons
     evaluation=service.journal.get(payload['decision']['evaluation_id'])
-    if reasons(evaluation.data['payload']['metrics'],payload['gates']): raise ValueError('independent qualification gates failed')
+    if reasons(evaluation.data['payload']['metrics'],payload['gates']) or reasons(evaluation.data['payload']['metrics'],service.gates): raise ValueError('independent qualification gates failed')
     candidate=payload['decision']['candidate_id'];service.candidate(candidate)
     return service.data.append('model_approval',dict(qualification_id=qualification_id,candidate_id=candidate,
         operator=operator,reason=reason,target=TARGET,answer_id=answer_id,reviewer=reviewer),sources=[qualification_id]+([answer_id] if answer_id else []),producer='operator-model-review')
@@ -34,7 +34,7 @@ def activate(deployment,service,approval_id):
     if evaluation.data['producer']!='independent-model-evaluator' or not measured['metrics']['authentic'] or not measured['metrics']['fresh_holdout']:
         raise ValueError('independent authentic qualification required')
     from .qualification import reasons
-    if reasons(measured['metrics'],q['gates']): raise ValueError('independent qualification gates failed')
+    if reasons(measured['metrics'],q['gates']) or reasons(measured['metrics'],service.gates): raise ValueError('independent qualification gates failed')
     candidate=service.candidate(p['candidate_id'])
     if measured['candidate_id']!=p['candidate_id']: raise ValueError('evaluation candidate mismatch')
     key=digest(dict(approval=approval_id,target=TARGET))

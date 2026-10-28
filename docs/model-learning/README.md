@@ -158,7 +158,11 @@ session, normalized boxes, player/enemy/projectile/obstacle/unknown vocabulary,
 uncertainty and session-local track identity. Whole-screen predictions never
 provide coordinates. Existing PPAL sprite proposal/tracking and observation-only
 Hailo paths should supply the baseline; zero verified object-box annotations
-were admitted here, so no detector was trained or accuracy claimed. Pet error
+were admitted here. The bounded `localization_proposals(recording)` adapter reuses
+existing saved PPAL boxes; `localization-proposals.json` replays eight authentic
+rectified frames with 138 unverified proposals, all semantic labels UNKNOWN.
+This is a proposal-format prototype, not detector accuracy or object identity.
+No detector was trained. Pet error
 review can reuse the workflow after registering its separate task adapter.
 
 Retained pixels stay local; no automatic public upload is performed. Use a

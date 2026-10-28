@@ -308,3 +308,17 @@ def test_rollback_restores_previous_known_good_version(setup,tmp_path):
     assert service.active()['candidate_id']==candidate.id
     deployment.rollback_perception_shadow(service,operator='controlled-human',reason='SIMULATED candidate drift')
     assert service.active()['candidate_id']==result['candidate_id']
+
+
+def test_localization_reuses_machine_boxes_without_inventing_semantics(tmp_path):
+    from learning.model_learning.robotron import localization_proposals
+    playfields=tmp_path/'tracking/playfields';playfields.mkdir(parents=True)
+    Image.new('RGB',(640,480)).save(playfields/'playfield_000.jpg')
+    (tmp_path/'detections.json').write_text(json.dumps(dict(frames=[dict(tick=0,captured_at_seconds=.1,
+        detections=[dict(kind='threat',box=[10,20,30,40])])])))
+    result=localization_proposals(tmp_path)
+    row=result['frames'][0]
+    assert row['truth'] is False and row['objects'][0]['class']=='unknown'
+    assert row['objects'][0]['box']==[10/640,20/480,30/640,40/480]
+    assert row['objects'][0]['track_id'] is None
+    assert result['localization_accuracy'] is None

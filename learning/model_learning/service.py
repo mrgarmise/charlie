@@ -35,14 +35,16 @@ class ModelLearningService:
     def gaps(self, on_progress=None):
         """Durable uncertainty/errors only, including incumbent unknown observations."""
         result=[]
-        cached={r.data['payload']['observation_id']:r.data['payload']['label'] for r in self.data.events('model_incumbent')}
+        incumbent_sha=sha(Path(__file__).resolve().parents[2]/'experiments/ppal/robotron_screen_state.py')
+        cached={r.data['payload']['observation_id']:r.data['payload']['label'] for r in self.data.events('model_incumbent')
+                if r.data['payload'].get('implementation_sha256')==incumbent_sha}
         for row in self.data.rows():
             if row['task']!='robotron.screen_state': continue
             if on_progress:on_progress()
             phase=cached.get(row['observation_id'])
             if phase is None:
                 phase=incumbent(frame(row))
-                self.data.append('model_incumbent',dict(observation_id=row['observation_id'],label=phase,adapter='existing-screen-state-v1'),sources=[row['observation_id']])
+                self.data.append('model_incumbent',dict(observation_id=row['observation_id'],label=phase,adapter='existing-screen-state-v1',implementation_sha256=incumbent_sha),sources=[row['observation_id']])
             if phase=='unknown' or (row['label'] is not None and phase!=row['label']): result.append(row['observation_id'])
         # Registered shadow uncertainty is eligible evidence, never action authority.
         for row in self.data.events('model_shadow'):
@@ -96,7 +98,7 @@ class ModelLearningService:
             authorized_methods=methods,inspect=True)
         if not choice['project'] or choice['project']['id']!=project_id:
             return dict(status='DEFERRED',reason='Executive selected another project',alternatives=choice['alternatives'])
-        executive._event(dict(op='selected',project_id=project_id,alternatives=choice['alternatives'],
+        selection=executive._event(dict(op='selected',project_id=project_id,input_signature=signature,alternatives=choice['alternatives'],
             interrupted_projects=[],reason='evidenced perception gap; bounded offline alternative chosen'))
         if report['status']!='READY':
             from .questions import review_requests
@@ -104,7 +106,7 @@ class ModelLearningService:
             result=dict(status='NEEDS_LABELS',reason=report['issues'],review_queue=self.data.review_queue())
         else:
             snapshot=self.data.freeze(allow_synthetic=self.allow_synthetic)
-            result=self.train(rec.id,snapshot.id,on_progress=on_progress)
+            result=self.train(rec.id,snapshot.id,selection_id=selection.id,on_progress=on_progress)
         event=self.data.append('model_turn',dict(need_id=rec.id,project_id=project_id,signature=signature,result=result),sources=[rec.id],producer='LearningExecutive')
         executive._event(dict(op='assessment',project_id=project_id,changes=dict(status='paused',hold=True,
             next_direction='Await changed labels/data or new error evidence',completion_rationale=result['status'])))
@@ -116,12 +118,14 @@ class ModelLearningService:
         atomic_json(self.root/'status.json',self.status())
         return result
 
-    def train(self,need_id,dataset_id,*,on_progress=None):
+    def train(self,need_id,dataset_id,*,selection_id=None,on_progress=None):
         need=self.journal.get(need_id)
         if need.data['payload'].get('category')!='model_need': raise ValueError('persisted need required')
         projects=[r for r in self.journal.records('event') if r.data['producer']=='LearningExecutive' and r.data['payload'].get('op')=='selected']
         selected=projects[-1].data['payload']['project_id'] if projects else None
         proposals=[r.data['payload']['project'] for r in self.journal.records('event') if r.data['payload'].get('op')=='proposed']
+        if not selection_id or not projects or projects[-1].id!=selection_id:
+            raise ValueError('Executive selection for this need required')
         if not any(p['id']==selected and p['method']=='perception-model-learning' and p['scope'].get('need_id')==need_id for p in proposals):
             raise ValueError('Executive selection for this need required')
         snapshot_record=self.journal.get(dataset_id)
@@ -133,7 +137,7 @@ class ModelLearningService:
         if not prior and any(r.data['payload']['proposal']['dataset_id']==dataset_id for r in self.data.events('model_proposal')):
             return dict(status='DEFERRED',reason='same reviewed corpus already attempted; no model proliferation')
         proposal=TrainingProposal(need_id,dataset_id,wall_seconds=self.wall_seconds)
-        prop=prior[0] if prior else self.data.append('model_proposal',dict(proposal=document(proposal),need_id=need_id),sources=[need_id,dataset_id],producer='LearningExecutive')
+        prop=prior[0] if prior else self.data.append('model_proposal',dict(proposal=document(proposal),need_id=need_id,executive_selection_id=selection_id),sources=[need_id,dataset_id],producer='LearningExecutive')
         if prop.data['payload']['proposal']!=document(proposal):
             return dict(status='DEFERRED',reason='proposal budget/dataset version changed; explicit new evidenced need required')
         try:
@@ -188,6 +192,7 @@ class ModelLearningService:
         with tempfile.TemporaryDirectory(prefix='training-',dir=self.root) as temp:
             work=Path(temp); config=work/'config.json'
             atomic_json(config,dict(proposal=asdict(proposal),dataset=training,dataset_digest=dataset['dataset_digest']))
+            if sum(p.stat().st_size for p in work.iterdir())>proposal.disk_mb*1024**2:raise ValueError('worker scratch disk budget exceeded')
             with (work/'worker.log').open('wb') as log:
                 process=subprocess.Popen([sys.executable,'-m','learning.model_learning.worker',str(config)],cwd=work,env=env,
                     stdout=log,stderr=log,start_new_session=True)
@@ -195,12 +200,14 @@ class ModelLearningService:
                 try:
                     while process.poll() is None:
                         if on_progress: on_progress()
+                        if sum(p.stat().st_size for p in work.iterdir())>proposal.disk_mb*1024**2:raise InterruptedError('worker scratch disk budget exceeded')
                         if time.monotonic()-start>proposal.wall_seconds: raise InterruptedError('worker wall budget exceeded')
                         time.sleep(.02)
                     if process.returncode!=0: raise RuntimeError('bounded worker failed (returncode '+str(process.returncode)+'): '+(work/'worker.log').read_text()[-1000:])
                 finally:
                     if process.poll() is None: os.killpg(process.pid,signal.SIGKILL)
                     process.wait()
+            if sum(p.stat().st_size for p in work.iterdir())>proposal.disk_mb*1024**2:raise ValueError('worker scratch disk budget exceeded')
             artifact=work/'model.json'
             if not artifact.is_file() or artifact.stat().st_size>proposal.disk_mb*1024**2: raise ValueError('missing/oversize model')
             destination=self.root/'models'/sha(artifact);destination.mkdir(parents=True,exist_ok=True)

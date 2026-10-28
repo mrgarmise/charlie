@@ -1,0 +1,230 @@
+{
+  "candidate": {
+    "schema": "model-learning-v1",
+    "artifact": "/tmp/pytest-of-five/pytest-13/test_real_worker_e2e_synthetic0/learning/models/d2c1a9e01e7e95a7648eb905562911db2dedd126b1f8f3892c711c14a148184b/model.json",
+    "sha256": "d2c1a9e01e7e95a7648eb905562911db2dedd126b1f8f3892c711c14a148184b",
+    "dataset_id": "4241a532ce608f6412d06bf2d357ccacc6ebb73010538a88efd108e9d590e430",
+    "proposal_id": "71a4e6b874ffcf1fc83fa5be260c4f21c4e90a781c3362ad600f61ce36f41966",
+    "labels": [
+      "title_menu",
+      "gameplay",
+      "terminal",
+      "unknown"
+    ],
+    "preprocessing": "rgb-spatial-16x12-v1",
+    "runtime": "numpy-cpu-json-v1",
+    "mode": "shadow",
+    "implementation_sha256": "d6ce0cada1d45fe84801f3e1db698b1f6a48c8898034dce6e0b4a089c934c274"
+  },
+  "metrics": {
+    "candidate": {
+      "confusion": {
+        "title_menu": {
+          "title_menu": 1,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 0
+        },
+        "gameplay": {
+          "title_menu": 0,
+          "gameplay": 1,
+          "terminal": 0,
+          "unknown": 0
+        },
+        "terminal": {
+          "title_menu": 0,
+          "gameplay": 0,
+          "terminal": 1,
+          "unknown": 0
+        },
+        "unknown": {
+          "title_menu": 0,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 1
+        }
+      },
+      "per_class": {
+        "title_menu": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1
+        },
+        "gameplay": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1
+        },
+        "terminal": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1
+        },
+        "unknown": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1
+        }
+      },
+      "macro_recall": 1.0,
+      "accuracy": 1.0,
+      "abstention": 0.25,
+      "false_positives": 0
+    },
+    "incumbent": {
+      "confusion": {
+        "title_menu": {
+          "title_menu": 0,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 1
+        },
+        "gameplay": {
+          "title_menu": 0,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 1
+        },
+        "terminal": {
+          "title_menu": 0,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 1
+        },
+        "unknown": {
+          "title_menu": 0,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 1
+        }
+      },
+      "per_class": {
+        "title_menu": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 1
+        },
+        "gameplay": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 1
+        },
+        "terminal": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 1
+        },
+        "unknown": {
+          "precision": 0.25,
+          "recall": 1.0,
+          "support": 1
+        }
+      },
+      "macro_recall": 0.25,
+      "accuracy": 0.25,
+      "abstention": 1.0,
+      "false_positives": 0
+    },
+    "non_ml_majority": {
+      "confusion": {
+        "title_menu": {
+          "title_menu": 1,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 0
+        },
+        "gameplay": {
+          "title_menu": 1,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 0
+        },
+        "terminal": {
+          "title_menu": 1,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 0
+        },
+        "unknown": {
+          "title_menu": 1,
+          "gameplay": 0,
+          "terminal": 0,
+          "unknown": 0
+        }
+      },
+      "per_class": {
+        "title_menu": {
+          "precision": 0.25,
+          "recall": 1.0,
+          "support": 1
+        },
+        "gameplay": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 1
+        },
+        "terminal": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 1
+        },
+        "unknown": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 1
+        }
+      },
+      "macro_recall": 0.25,
+      "accuracy": 0.25,
+      "abstention": 0.0,
+      "false_positives": 3
+    },
+    "failures": [],
+    "latency_ms": {
+      "median": 2.525408000110474,
+      "maximum": 2.554944999701547
+    },
+    "test_observations": [
+      "f4e8d82b0538ab590c7c9e3031bb1f12313d59c8e14c51ee48a73885d30caf07",
+      "507d2724d3a7be86a2246e7751477179892a6d3c7568b1a7540b4d96b1bb3b04",
+      "67b6036f59065f328c08ea1d8d5efa9cb77c4cc87c8b2b0c5feaddd2c1239afe",
+      "1ae9f4d526e9c282d73c6252acbf145c74fa211b688e6cb66a585992c66cd2d1"
+    ],
+    "test_sessions": [
+      "test"
+    ],
+    "authentic": false,
+    "hardware": "host CPU only",
+    "calibration": "not established; distances are not probabilities",
+    "transitions": "not measured: independent still frames lack complete timed sequences",
+    "resources": {
+      "worker": {
+        "cpu_seconds": 0.21070699999999998,
+        "peak_rss_kib": 187680,
+        "address_space_limit_bytes": 536870912,
+        "cpu_limit_seconds": 5,
+        "file_limit_bytes": 16777216
+      },
+      "native": "not measured"
+    },
+    "fresh_holdout": true
+  },
+  "decision": {
+    "schema": "model-learning-v1",
+    "candidate_id": "92d948e0a9620c11fd338432fb7332c73728ac315c92b1da4681c87058817c56",
+    "evaluation_id": "f59cdd255da38cb25fdfa7db4063bf163dc8170231af64ae84fbe9b09e25f7ab",
+    "accepted": false,
+    "reasons": [
+      "synthetic plumbing only",
+      "insufficient per-class heldout support"
+    ],
+    "approval": "required"
+  },
+  "limitations": [
+    "host only",
+    "no timed transition qualification",
+    "no object coordinates",
+    "human approval required"
+  ],
+  "evidence_kind": "EXPLICITLY SYNTHETIC plumbing test, not Robotron performance"
+}

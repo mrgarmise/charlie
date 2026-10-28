@@ -1,0 +1,26 @@
+{
+  "root": "/home/five/Projects/charlie/robotron-runs",
+  "image_file_count": 8969,
+  "full_camera_raw_files": 137,
+  "review_jpeg_files": 122,
+  "tracking_crop_files": 6519,
+  "top_level_origins": 44,
+  "unique_pixel_count": "not audited; counts include derived files/crops/duplicates",
+  "semantic_phase_labels": "no separate screen-state annotation manifest found by filename inventory",
+  "human_track_labels": {
+    "count": 37,
+    "sha256": "cc6d2f467e295fad9cf9edaf240883c91f963dc5e1e0663dc1ceccfa696bfbe1",
+    "classes": {
+      "mine": 13,
+      "grunt": 11,
+      "hulk": 5,
+      "dad": 1,
+      "kid": 2,
+      "red_circle_enemy": 2,
+      "player": 1,
+      "mom": 1,
+      "mixed": 1
+    },
+    "scope": "one recording; historical track identity labels, not verified boxes or phase labels"
+  }
+}

@@ -10,7 +10,8 @@ from memory.evidence import EvidenceJournal
 from memory.learning_projects import LearningExecutive
 from learning.model_learning.service import ModelLearningService
 from learning.model_learning.contracts import TrainingProposal
-from learning.model_learning.data import LABELS,sha
+from learning.model_learning.data import sha
+from learning.model_learning.robotron import SCREEN_STATE_LABELS as LABELS
 from learning.model_learning.robotron import import_fixtures,predict,localization_annotation
 from learning.model_learning.subscriber import ShadowSubscriber
 from learning.model_learning.deployment import approve
@@ -338,3 +339,23 @@ def test_integration_resolver_refuses_named_existing_branches(tmp_path):
     assert result.returncode!=0 and 'only a disposable detached CI checkout' in result.stderr
     assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=checkout)==before
     assert subprocess.check_output(['git','status','--porcelain'],cwd=checkout)==b''
+
+
+def test_reusable_data_core_keeps_pet_and_robotron_labels_separate(setup,tmp_path):
+    from learning.model_learning.data import DatasetStore
+    from learning.model_learning.adapters import get_adapter
+    service,_,_=setup
+    path=REPO/'tests/fixtures/robotron-screen-states/terminal.jpg'
+    observation=service.data.add(path,session='shared-original',provenance={'fixture':'authentic repository photo'},authentic=True)
+    # Controlled alternate label space demonstrates the reusable data contract;
+    # this does NOT claim the arcade image depicts a pet or train a pet model.
+    pet=DatasetStore(service.journal,tmp_path/'alternate-task',task='controlled.pet_labels',labels=('cat','dog','unknown'))
+    other=pet.add(path,session='shared-original',provenance={'fixture':'controlled label-space plumbing only'},authentic=False)
+    pet.label(other.id,'cat',reviewer='controlled-test',reason='synthetic semantics, not authentic pet evidence')
+    service.data.label(observation.id,'terminal',reviewer='controlled-test',reason='existing regression fixture')
+    assert [r['label'] for r in service.data.rows()]==['terminal']
+    assert [r['label'] for r in pet.rows()]==['cat']
+    with pytest.raises(ValueError):service.data.label(other.id,'cat',reviewer='test',reason='must reject cross-task review')
+    with pytest.raises(ValueError):pet.label(observation.id,'terminal',reviewer='test',reason='must reject cross-task review')
+    with pytest.raises(ValueError,match='not registered'):get_adapter('controlled.pet_labels')
+    assert not service.data.events('model_proposal')

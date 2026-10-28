@@ -6,7 +6,9 @@ from PIL import Image
 from experiments.ppal.eyes.calibration import Calibration
 from .data import sha
 
+SCREEN_STATE_LABELS=('title_menu','gameplay','terminal','unknown')
 PREPROCESSING='rgb-spatial-16x12-v1'
+INCUMBENT_FILE=str(Path(__file__).resolve().parents[2]/'experiments/ppal/robotron_screen_state.py')
 
 
 def frame(row):

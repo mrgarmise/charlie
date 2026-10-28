@@ -12,9 +12,9 @@ def review_requests(service,*,limit=8):
         record=prior.get(row['observation_id'])
         if record is None:
             record=service.data.append('model_review_request',dict(observation_id=row['observation_id'],
-                task=row['task'],session=row['session'],kind='screen_state_label',
-                candidates=['title_menu','gameplay','terminal','unknown'],
-                reason='Existing perception cannot resolve screen state; a reviewed label may enable an offline comparison',
+                task=row['task'],session=row['session'],kind='perception_label',
+                candidates=list(service.data.labels),
+                reason='Existing perception cannot resolve the task label; a reviewed label may enable an offline comparison',
                 status='pending-adapter',deferrable=True,approval_authority=False),sources=[row['observation_id']],producer='LearningExecutive')
         pending.append(dict(request_id=record.id,**record.data['payload']))
         if len(pending)>=limit:break

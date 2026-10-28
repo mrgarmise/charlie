@@ -8,7 +8,7 @@ from memory.evidence import digest
 from .contracts import DatasetCandidate, document
 
 SCOPE='model-learning-v1'
-LABELS=('title_menu','gameplay','terminal','unknown')
+from .adapters import get_adapter
 
 
 def sha(path):
@@ -27,22 +27,27 @@ def fingerprints(path):
 
 
 class DatasetStore:
-    def __init__(self,journal,root):
+    def __init__(self,journal,root,*,task='robotron.screen_state',labels=None):
+        self.task=task
+        self.labels=tuple(labels) if labels is not None else get_adapter(task).labels
+        if not task or not 2<=len(self.labels)<=12 or len(set(self.labels))!=len(self.labels) or 'unknown' not in self.labels:
+            raise ValueError('separate bounded vocabulary with unknown abstention required')
         self.journal=journal; self.root=Path(root).resolve(); self.root.mkdir(parents=True,exist_ok=True)
 
     def events(self,category):
-        return [r for r in self.journal.records() if r.data['episode']==SCOPE and r.data['payload'].get('category')==category]
+        return [r for r in self.journal.records() if r.data['episode']==SCOPE and r.data['payload'].get('category')==category and r.data['payload'].get('task','robotron.screen_state')==self.task]
 
     def append(self,category,payload,*,sources=(),producer='model-learning'):
-        return self.journal.append('event',dict(category=category,**payload),episode=SCOPE,
+        return self.journal.append('event',dict(payload,category=category,task=self.task),episode=SCOPE,
             sources=sources,producer=producer,version=SCOPE)
 
-    def add(self,path,*,session,provenance,authentic,partition=None,calibration=None,task='robotron.screen_state'):
+    def add(self,path,*,session,provenance,authentic,partition=None,calibration=None,task=None):
+        task=self.task if task is None else task
         if not session or not provenance or type(authentic) is not bool or partition not in (None,'train','validation','test'):
             raise ValueError('source session, provenance, authenticity and explicit partition required')
         if len(json.dumps(provenance,allow_nan=False).encode())>16*1024:raise ValueError("provenance byte budget exceeded")
         if not isinstance(session,str) or len(session)>256:raise ValueError("bounded session required")
-        if task!="robotron.screen_state": raise ValueError("task adapter not registered")
+        if task!=self.task: raise ValueError("observation escaped task vocabulary")
         path=Path(path)
         if path.stat().st_size>8*1024**2: raise ValueError("image byte budget exceeded")
         raw=sha(path); pixels,near=fingerprints(path)
@@ -68,7 +73,7 @@ class DatasetStore:
 
     def label(self,observation_id,label,*,reviewer,reason,supersedes=None):
         row=self.journal.get(observation_id)
-        if row.data['payload'].get('category')!='model_observation' or label not in LABELS or not reviewer or not reason:
+        if row.data['payload'].get('category')!='model_observation' or row.data['payload'].get('task','robotron.screen_state')!=self.task or label not in self.labels or not reviewer or not reason:
             raise ValueError('typed attributed review required')
         prior=[r for r in self.events('model_label') if r.data['payload']['observation_id']==observation_id]
         if prior and prior[-1].id!=supersedes: raise ValueError('explicit supersession required')
@@ -109,7 +114,7 @@ class DatasetStore:
             if row['label'] is None or row['partition'] is None: issues.append('missing labels or session partition')
         for partition in ('train','validation','test'):
             present={r['label'] for r in rows if r['partition']==partition}
-            if not set(LABELS[:-1])<=present: issues.append(partition+' needs every known class')
+            if not (set(self.labels)-{'unknown'})<=present: issues.append(partition+' needs every known class')
         if not any(r['label']=='unknown' and r['partition']=='test' for r in rows): issues.append('test needs authentic unknown/OOD examples')
         for i,left in enumerate(rows):
             for right in rows[i+1:]:
@@ -123,7 +128,7 @@ class DatasetStore:
     def freeze(self,*,allow_synthetic=False):
         report=self.inspect(allow_synthetic=allow_synthetic)
         if report['status']!='READY': raise ValueError('NEEDS_LABELS: '+str(report['issues']))
-        payload=document(DatasetCandidate('robotron.screen_state',tuple(report['rows']),LABELS))
+        payload=document(DatasetCandidate(self.task,tuple(report['rows']),self.labels))
         # Exact same split/version is reused on restart, rather than renewed holdout.
         key=digest(payload)
         prior=next((r for r in self.events('model_dataset') if r.data['payload']['dataset_digest']==key),None)

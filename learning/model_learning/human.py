@@ -11,7 +11,7 @@ class ModelHumanGateway:
         from .questions import review_requests
         requests=review_requests(self.service)
         items=[(r['request_id'],'label',r['observation_id'],tuple(r['candidates']),
-                'Review the historical screen-state frame from session '+r['session']) for r in requests]
+                'Review the historical perception frame from session '+r['session']) for r in requests]
         for record in self.service.data.events('model_qualification'):
             decision=record.data['payload']['decision']
             if decision['accepted']:

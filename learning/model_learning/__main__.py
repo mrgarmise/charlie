@@ -6,6 +6,7 @@ from pathlib import Path
 from memory.evidence import EvidenceJournal
 from .service import ModelLearningService
 from .robotron import import_fixtures
+from .adapters import get_adapter
 
 
 def main(argv=None):
@@ -15,7 +16,7 @@ def main(argv=None):
     sub.add_parser('status')
     sub.add_parser('baseline')
     sub.add_parser('import-fixtures')
-    label=sub.add_parser('label');label.add_argument('observation_id');label.add_argument('label',choices=['title_menu','gameplay','terminal','unknown'])
+    label=sub.add_parser('label');label.add_argument('observation_id');label.add_argument('label',choices=get_adapter().labels)
     label.add_argument('--reviewer',required=True);label.add_argument('--reason',required=True);label.add_argument('--supersedes')
     split=sub.add_parser('partition');split.add_argument('session');split.add_argument('partition',choices=['train','validation','test']);split.add_argument('--reviewer',required=True)
     intake=sub.add_parser('ingest');intake.add_argument('manifest',type=Path,help='local JSON with source frame path, session, provenance, authentic, calibration and optional partition')

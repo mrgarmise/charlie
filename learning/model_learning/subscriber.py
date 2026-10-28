@@ -28,7 +28,7 @@ class RegisteredShadowPerception:
         self.observation_type=observation_type;self.sequence=0
         self.worker=ShadowSubscriber(service,candidate_id)
         self.subscription=bus.subscribe_observations(bookmark_source,max_age=.25,clock=self.clock)
-        bus.claim_observations(output_source,self,metadata=dict(modality='perception',mode='shadow',authority='none',task='robotron.screen_state'))
+        bus.claim_observations(output_source,self,metadata=dict(modality='perception',mode='shadow',authority='none',task=service.adapter.task))
 
     def poll(self):
         import uuid

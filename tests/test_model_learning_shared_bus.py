@@ -22,7 +22,7 @@ def test_registered_subscription_preserves_other_subscriber(tmp_path,monkeypatch
     try:
         original=Path(__file__).resolve().parent/'fixtures/robotron-screen-states/terminal.jpg'
         row=data.add(original,session='controlled-bookmark',provenance=dict(source='camera/bookmarks',generation='g'),authentic=True)
-        fake=SimpleNamespace(journal=journal)
+        fake=SimpleNamespace(journal=journal,adapter=SimpleNamespace(task='robotron.screen_state'))
         # Candidate generation tested in the independent real-worker tests.
         class Consumer:
             def __init__(self,*args):pass

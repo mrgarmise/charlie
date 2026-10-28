@@ -18,14 +18,16 @@ def run(config_path):
     resource.setrlimit(resource.RLIMIT_NOFILE,(32,32))
     if hasattr(os,'sched_getaffinity'):
         os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
-    from .robotron import frame,features,predict,PREPROCESSING
+    from .adapters import get_adapter
+    adapter=get_adapter(config["dataset"]["task"])
+    frame,features=adapter.frame,adapter.features
     import numpy as np
     rows=config['dataset']['rows']
     if len(rows)>budget['max_frames']: raise ValueError('frame budget exceeded')
     train=[r for r in rows if r['partition']=='train' and r['label']!='unknown']
     centers={label:np.mean([features(frame(r)) for r in train if r['label']==label],axis=0).tolist()
              for label in config['dataset']['labels'] if label!='unknown'}
-    model=dict(schema='model-learning-v1',preprocessing=PREPROCESSING,runtime='numpy-cpu-json-v1',centroids=centers,
+    model=dict(schema='model-learning-v1',preprocessing=adapter.preprocessing,runtime=adapter.runtime,centroids=centers,
                radius=.3,margin=.01,dataset_digest=config['dataset_digest'])
     # A single predefined validation-only radius, no holdout-driven tuning.
     validation=[r for r in rows if r['partition']=='validation' and r['label']!='unknown']

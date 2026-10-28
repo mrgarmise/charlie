@@ -12,15 +12,16 @@ from memory.evidence import digest
 from memory.former import Experience
 from .contracts import LearningNeed,TrainingProposal,ModelCandidate,QualificationDecision,document
 from .data import DatasetStore,sha,SCOPE
-from .robotron import frame,incumbent,predict
+from .adapters import get_adapter
 from .evaluation import evaluate
 from learning.foundry import atomic_json
 
 
 class ModelLearningService:
-    def __init__(self,journal,root,*,wall_seconds=10.,allow_synthetic=False,qualification_gates=None):
+    def __init__(self,journal,root,*,wall_seconds=10.,allow_synthetic=False,qualification_gates=None,task='robotron.screen_state'):
         self.journal=journal;self.root=Path(root).resolve();self.root.mkdir(parents=True,exist_ok=True)
-        self.data=DatasetStore(journal,self.root/'observations')
+        self.adapter=get_adapter(task)
+        self.data=DatasetStore(journal,self.root/'observations',task=self.adapter.task,labels=self.adapter.labels)
         self.wall_seconds=wall_seconds;self.allow_synthetic=allow_synthetic
         # Policy is supplied by the human/application, never by the candidate.
         from .qualification import gates
@@ -35,16 +36,16 @@ class ModelLearningService:
     def gaps(self, on_progress=None):
         """Durable uncertainty/errors only, including incumbent unknown observations."""
         result=[]
-        incumbent_sha=sha(Path(__file__).resolve().parents[2]/'experiments/ppal/robotron_screen_state.py')
+        incumbent_sha=digest([sha(self.adapter.implementation_file),sha(self.adapter.incumbent_file)])
         cached={r.data['payload']['observation_id']:r.data['payload']['label'] for r in self.data.events('model_incumbent')
                 if r.data['payload'].get('implementation_sha256')==incumbent_sha}
         for row in self.data.rows():
-            if row['task']!='robotron.screen_state': continue
+            if row['task']!=self.adapter.task: continue
             if on_progress:on_progress()
             phase=cached.get(row['observation_id'])
             if phase is None:
-                phase=incumbent(frame(row))
-                self.data.append('model_incumbent',dict(observation_id=row['observation_id'],label=phase,adapter='existing-screen-state-v1',implementation_sha256=incumbent_sha),sources=[row['observation_id']])
+                phase=self.adapter.incumbent(self.adapter.frame(row))
+                self.data.append('model_incumbent',dict(observation_id=row['observation_id'],label=phase,adapter=self.adapter.task,implementation_sha256=incumbent_sha),sources=[row['observation_id']])
             if phase=='unknown' or (row['label'] is not None and phase!=row['label']): result.append(row['observation_id'])
         # Registered shadow uncertainty is eligible evidence, never action authority.
         for row in self.data.events('model_shadow'):
@@ -66,7 +67,7 @@ class ModelLearningService:
         if gameplay_active(): return dict(status='DEFERRED',reason='primary gameplay owner')
         sources=self.gaps(on_progress)
         if not sources: return dict(status='NO_NEED',reason='no durable perception gap')
-        need=LearningNeed('robotron.screen_state','incumbent unknown or disagrees with attributed evidence',tuple(sources))
+        need=LearningNeed(self.adapter.task,'incumbent unknown or disagrees with attributed evidence',tuple(sources))
         key=digest(document(need))
         rec=next((r for r in self.data.events('model_need') if r.data['payload']['need_key']==key),None)
         rec=rec or self.data.append('model_need',dict(need=document(need),need_key=key),sources=sources,producer='Reflection')
@@ -79,7 +80,7 @@ class ModelLearningService:
             return prior.data['payload']['result']
         from memory.learning_projects import reflect_project_opportunities
         reflected=reflect_project_opportunities(self.journal,SCOPE,[dict(method='perception-model-learning',
-            scope=dict(task=need.task,need_id=rec.id),expected='independent screen-state diagnostic improvement',
+            scope=dict(task=need.task,need_id=rec.id),expected='independent '+self.adapter.task+' diagnostic improvement',
             conditions=[dict(partition='validation'),dict(partition='test')],observed_conditions=[dict(partition='validation')],
             evidence_ids=[rec.id],requires=['offline-slot'])])[0]
         project_id=executive.propose(reflected['proposal'],self.journal,[reflected['evidence_id']])
@@ -150,7 +151,7 @@ class ModelLearningService:
                 if prior and not receipt.exists():
                     return dict(status='DEFERRED',reason='interrupted worker has no completed receipt; budget consumed, no automatic retraining')
                 artifact=self._worker(proposal,snapshot_record,on_progress)
-                candidate=document(ModelCandidate(str(artifact),sha(artifact),dataset_id,prop.id,tuple(snapshot['labels']),implementation_sha256=sha(Path(__file__).with_name('robotron.py'))))
+                candidate=document(ModelCandidate(str(artifact),sha(artifact),dataset_id,prop.id,tuple(snapshot['labels']),preprocessing=self.adapter.preprocessing,runtime=self.adapter.runtime,implementation_sha256=sha(self.adapter.implementation_file)))
                 record=self.data.append('model_candidate',dict(candidate=candidate,training_metadata=dict(algorithm=proposal.algorithm,
                     limits=asdict(proposal),dataset_digest=snapshot_record.data['payload']['dataset_digest'],
                     trainer_sha256=sha(Path(__file__).with_name('worker.py')),operator='Executive-commissioned fixed worker')),sources=[prop.id])
@@ -222,14 +223,16 @@ class ModelLearningService:
         p=self.journal.get(identifier).data['payload']
         if p.get('category')!='model_candidate': raise ValueError('registered candidate required')
         candidate=p['candidate']
+        snapshot=self.journal.get(candidate['dataset_id']).data['payload']['dataset']
+        if snapshot['task']!=self.adapter.task:raise ValueError('candidate belongs to another task')
         if sha(candidate['artifact'])!=candidate['sha256']: raise ValueError('model artifact changed')
-        if candidate.get('implementation_sha256')!=sha(Path(__file__).with_name('robotron.py')):raise ValueError('inference implementation changed; requalification required')
+        if candidate.get('implementation_sha256')!=sha(self.adapter.implementation_file):raise ValueError('inference implementation changed; requalification required')
         return candidate
 
     def shadow(self,candidate_id,observation_id):
         model=json.loads(Path(self.candidate(candidate_id)['artifact']).read_text())
         row=next(r for r in self.data.rows() if r['observation_id']==observation_id)
-        prediction=predict(model,frame(row))
+        prediction=self.adapter.predict(model,self.adapter.frame(row))
         return self.data.append('model_shadow',dict(candidate_id=candidate_id,observation_id=observation_id,prediction=prediction),sources=[candidate_id,observation_id])
 
     def active(self):

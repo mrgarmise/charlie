@@ -87,3 +87,19 @@ skips/failures, 74.33 seconds. A subsequent protected-named-branch refusal test
 passed separately (1 passed); its log/XML are retained. Runtime/test identities
 are in `increment-4-source-sha256.json`. New independent broad and combined-stack
 CI must still complete; final statuses belong in the PR handoff.
+
+Reusable-task refinement removes Robotron vocabulary/feature assumptions from the
+data store, training worker and evaluator. Trusted PerceptionTask adapters own
+labels, preprocessing, incumbent and predictions. Data observations, labels and
+frozen datasets are scoped by task. Controlled pet-label-space tests reject
+cross-task labels on the same pixels; arbitrary task IDs cannot load training
+code. Robotron is still the only registered training task.
+
+Expanded host command (same five test files and exact-source environment as the
+previous expanded run), with `--junitxml=/tmp/charlie-model-learning-adapters.xml`:
+**58 passed**, zero skips/failures, 74.39 seconds. Both module import orders and
+the normal inspection CLI also passed. Final inspection retains six authentic
+observations, five labels, three sessions, NEEDS_LABELS, activation None. The
+registered-adapter source identities and compressed log/XML are retained here.
+Independent CI on this refinement is pending at publication; the PR handoff must
+report its observed final status. No authentic training-cycle acceptance changed.

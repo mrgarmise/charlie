@@ -16,8 +16,14 @@ no competing Executive, camera owner, notebook scheduler or actuator route.
 TrainingProposal, ModelCandidate and QualificationDecision. Data, worker,
 evaluation, qualification, human and subscriber adapters are separate modules.
 Robotron vocabulary, calibration and incumbent screen logic live in the domain
-adapter. Additional tasks must register their own vocabulary, preprocessing and
-measurement adapter; task IDs do not automatically make another task supported.
+adapter. `adapters.PerceptionTask` supplies task-owned labels, feature extraction,
+prediction, incumbent and runtime/preprocessing identity to the reusable worker
+and evaluator. DatasetStore scopes all observations, labels, session partitions
+and snapshots by task; separate pet and Robotron label spaces are tested even
+when they refer to the same original pixels. Additional tasks must register
+trusted source adapters before training; an arbitrary task ID never loads code.
+Robotron remains the only registered training task. The alternate pet-label
+space test is controlled plumbing, not a pet model or pet accuracy claim.
 
 ## Inspect and label
 

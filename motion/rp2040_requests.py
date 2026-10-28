@@ -146,6 +146,17 @@ class RP2040Requests:
         self.calibration.brain.request_search()
         return True
 
+    def request_home(self):
+        # Legacy HOME lacks a source/session-bound CAL-1 trajectory. The
+        # qualified brain can choose an observed trajectory in its own lifecycle;
+        # the gateway must not turn an unscoped shortcut into physical authority.
+        return False
+
+    def request_unscoped_angles(self, pan, tilt):
+        # Existing primary tracking is driven by observed frames through CAL-1.
+        # Bare angles do not provide target or independent scene evidence.
+        return False
+
     def request_search(self):
         if self.uncertain or self.calibration.brain is None:
             return False

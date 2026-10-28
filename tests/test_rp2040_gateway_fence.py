@@ -134,3 +134,16 @@ def test_status_publication_is_fresh_source_bound_and_not_measured_pose():
     import pytest
     with pytest.raises(OSError):first.read()
     gateway.close()
+
+
+def test_normal_deck_legacy_shortcuts_cannot_bypass_gateway():
+    controller=host();calls=[]
+    brain=SimpleNamespace(search_remaining=0,request_search=lambda:calls.append('search'))
+    calibration=SimpleNamespace(brain=brain,observe_frame=lambda frame,target:None,
+                                health=SimpleNamespace(quarantined=False))
+    gateway=RP2040Requests(controller,calibration,StimulusBus())
+    deck=Deck(body=controller,calibration=calibration);deck.actuator_gateway=gateway
+    assert deck.home() is False and deck.center() is False
+    assert deck.track(100,90) is False
+    deck.move_to(100,90);deck.set_all(100,90)
+    assert controller.serial.writes==[]

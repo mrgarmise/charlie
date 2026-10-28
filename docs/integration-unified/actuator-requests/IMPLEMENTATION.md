@@ -173,3 +173,11 @@ before a command write, so a stalled evidence check cannot itself hold up a STOP
 write. Safety state can change between an evidence check and the wire write;
 car-local expiry, independent local stops, sensor timing and measured braking
 remain mandatory, and host tests do not establish worst-case physical latency.
+
+The normal Deck's frame-driven tracking and search use the gateway and existing
+CAL-1 logic. Legacy absolute-angle, HOME and compatibility shortcuts cannot
+write around it: unscoped requests return unavailable while a gateway is
+attached. The reviewed RP2040 firmware already requires scoped session/epoch
+commands. Standalone controller use without the application gateway retains its
+original behavior; Active Vision and calibration still rely on their existing
+firmware/lease gates and need further gateway migration and native acceptance.

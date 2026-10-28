@@ -1,6 +1,7 @@
 """Unarmed mobile acquisition through main.py; Executive remains lifecycle-owned."""
 from pathlib import Path
 import json
+import os
 import subprocess
 import time
 import threading
@@ -80,16 +81,48 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
         guard=ResourceGuard(resources)
         perception=MobilePerception(detector,depth,resources=guard,revision=revision,clock=clock)
         from vision.mobile_tracking import PetTracker
+        bus=StimulusBus()
+        deck = primary_vision = None
+        if getattr(args,'primary_vision',False):
+            if args.offline or frame_bus is None or actuator_executor is None:
+                raise ValueError('primary vision requires application hardware owners')
+            from motion.controller import Deck
+            from motion.rp2040_requests import RP2040Requests
+            from hardware.calibration_service import CalibrationService
+            from vision.camera_source import CameraSubscription, TrackingCamera
+            from vision.detector import ColorDetector, FaceDetector
+            from vision.stimulus import VisionStimulus
+            deck=Deck()
+            owners.callback(deck.body.close)
+            owners.callback(deck.stop)
+            neck=CalibrationService.open(deck.body,Path(os.environ.get('CHARLIE_NECK_STATE',str(Path.home()/'.local/share/charlie/neck'))))
+            owners.callback(neck.close)
+            deck.calibration=neck
+            neck.refresh()
+            neck.attach_brain(authorized=os.environ.get('CHARLIE_NECK_MOTION_AUTHORIZED')=='1',
+                              supervised=os.environ.get('CHARLIE_NECK_SUPERVISED')=='1')
+            deck.actuator_gateway=RP2040Requests(deck.body,neck,frame_bus,
+                fault_path=state/'rp2040-uncertain-motion.lock')
+            pi_source=CameraSubscription(frame_bus)
+            owners.callback(pi_source.close)
+            pi_source.switch('pi')
+            primary_detector=ColorDetector(lower=[105,150,70],upper=[125,255,160])
+            if os.environ.get('CHARLIE_VISION_TARGET')=='face':
+                primary_detector=FaceDetector(Path(__file__).resolve().parents[1]/'face_detection_yunet.onnx')
+            primary_vision=VisionStimulus(TrackingCamera(pi_source),primary_detector,bus,frame_observer=deck.observe_frame)
         mode=getattr(args,'object_label_display','off')
         if args.mobile_replay and mode=='rp2040':raise ValueError('fixture replay cannot activate physical display')
         from attention.object_display_runtime import attach
-        labels,display_owned=attach(mode,clock=clock,port=args.object_label_port)
+        labels,display_owned=attach(mode,clock=clock,port=args.object_label_port,body=deck.body if deck else None)
         if display_owned is not None:owners.callback(display_owned.close)
-        bus=StimulusBus()
         if not args.offline:
             from stimulus.keyboard import KeyboardStimulus
-            keyboard=KeyboardStimulus(bus,emergency_only=True,
-                on_emergency=actuator_executor.emergency_stop if actuator_executor is not None else None)
+            def emergency_stop_now():
+                try:
+                    if actuator_executor is not None:actuator_executor.emergency_stop()
+                finally:
+                    if deck is not None:deck.stop()
+            keyboard=KeyboardStimulus(bus,emergency_only=deck is None,on_emergency=emergency_stop_now)
             owners.callback(keyboard.close)
         attention=AttentionManager(bus,mobile_enabled=False,object_labels=labels,
             emergency_stop=actuator_executor.emergency_stop if actuator_executor is not None else None)
@@ -105,7 +138,7 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
                 hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.mobile_safety_feed,clock=clock)
         if context is not None:context.health_check=lambda:guard.check(force=True)
         from motion.mobile_base import MobileBase
-        behavior.bind_attention(attention,lifecycle.executive,default_registry(),context=context,base_factory=MobileBase,shared_executor=actuator_executor)
+        behavior.bind_attention(attention,lifecycle.executive,default_registry(),context=context,base_factory=MobileBase,shared_executor=actuator_executor,deck=deck)
         behavior.before_attention=lambda:lifecycle.journal.merge_from(journal)
         behavior.executive_resources={'offline-slot','context-evidence','model-evaluation','meditation-evidence'}
         face_runtime=None
@@ -121,12 +154,15 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
         status_at=[None]
         telemetry_at=[None]
         def between_steps():
+            if primary_vision is not None:
+                primary_vision.update()
+                attention.update(deck)
             if telemetry is not None and (telemetry_at[0] is None or clock()-telemetry_at[0]>=.1):
                 telemetry.poll()
                 telemetry_at[0]=clock()
             if face_runtime is not None:
                 face_runtime.observe()
-                attention.update(None)
+                attention.update(deck)
             if status_at[0] is None or clock()-status_at[0]>=2:
                 from .foundry import atomic_json
                 atomic_json(state/'pet-ability-status.json',dict(abilities=default_registry().describe(behavior.readiness()),
@@ -181,7 +217,7 @@ def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,
         for _ in range(frames):
             if cancel.is_set() or clock()-started>=seconds:break
             counts['polls']+=1
-            if getattr(behavior, "attention", None) is not None:behavior.attention.update(None)
+            if getattr(behavior, "attention", None) is not None:behavior.attention.update(getattr(behavior,"deck",None))
             try:result=behavior.step()
             except StopIteration:break
             except (TimeoutError,EOFError,OSError,InterruptedError) as exc:

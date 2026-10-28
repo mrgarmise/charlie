@@ -137,5 +137,7 @@ can also attach that face tracker. Those combinations remain independently
 motion-gated. `x` attempts an emergency STOP on the input thread and then sends
 the latched attention event, including while a bounded request is in progress.
 The keyboard command is not a replacement for an independently qualified
-physical emergency stop. The combined pet/object watcher does not yet run the
-full Pi primary Deck/vision loop alongside these abilities.
+physical emergency stop. Add `--primary-vision` to attach the existing Pi primary vision, Deck and
+CAL-1 service to that same AttentionManager and application feeders. A host
+fixture exercises primary vision, face, pet and object observations together;
+it does not qualify native timing, tracking, physical motion or animal following.

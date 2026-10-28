@@ -80,3 +80,58 @@ def test_face_and_object_events_share_attention_and_camera_without_second_owner(
     assert request.source=='elegoo-v4' and request.observation_id=='fixture-frame'
     assert (request.group,request.action)==('camera-pan','pan')
     face.close();another.close()
+
+
+def test_one_live_fixture_runtime_handles_primary_pet_objects_and_face(tmp_path,monkeypatch):
+    import json
+    import time
+    import numpy as np
+    from types import SimpleNamespace
+    from vision.camera_source import CameraFrame
+    from vision.mobile_models import FixtureModel
+    from learning.mobile_runtime import run_mobile
+    from learning.resources import DevelopmentResources
+    import attention.manager
+    import motion.controller
+    import hardware.calibration_service
+    import motion.rp2040_requests
+    import vision.detector
+    import vision.mobile_face
+    import vision.mobile_models
+    import learning.resources
+    import stimulus.keyboard
+
+    monkeypatch.setattr('learning.cycle.gameplay_active',lambda:False)
+    monkeypatch.setattr('learning.mobile_runtime.ResourceGuard',lambda *a:SimpleNamespace(check=lambda **kw:None))
+    cat=FixtureModel([dict(label='cat',box=[1,1,10,10],confidence=.9)])
+    monkeypatch.setattr('learning.mobile_runtime.HailoObjects',lambda **kw:cat)
+    deck=Mock();deck.body=Mock();deck.observe_frame.return_value=None
+    monkeypatch.setattr(motion.controller,'Deck',lambda:deck)
+    neck=Mock();monkeypatch.setattr(hardware.calibration_service.CalibrationService,'open',lambda *a,**kw:neck)
+    monkeypatch.setattr(motion.rp2040_requests,'RP2040Requests',lambda *a,**kw:Mock())
+    primary_detector=Mock();primary_detector.detect.return_value=None
+    monkeypatch.setattr(vision.detector,'ColorDetector',lambda **kw:primary_detector)
+    face_detector=Mock();face_detector.detect.return_value=None
+    monkeypatch.setattr(vision.mobile_face,'MobileFaceDetector',lambda:face_detector)
+    monkeypatch.setattr(stimulus.keyboard,'KeyboardStimulus',lambda *a,**kw:SimpleNamespace(close=lambda:None))
+    managers=[];original=attention.manager.AttentionManager
+    def create_manager(*a,**kw):
+        result=original(*a,**kw);managers.append(result);return result
+    monkeypatch.setattr(attention.manager,'AttentionManager',create_manager)
+    manifest=tmp_path/'models.json'
+    manifest.write_text(json.dumps({'schema':'charlie.mobile.models.v1','objects':{}}))
+    args=app.parser().parse_args(['--hardware','--pet-abilities','--object-recognition','--primary-vision',
+        '--elegoo-face-track','--object-label-display','dry-run','--mobile-frames','1',
+        '--mobile-seconds','3','--mobile-manifest',str(manifest),'--learning-state',str(tmp_path/'state')])
+    frame_bus=StimulusBus();owners={s:object() for s in ('pi-primary','elegoo-v4')}
+    pixels=np.zeros((30,40,3),dtype=np.uint8);pixels.flags.writeable=False
+    for source,owner in owners.items():
+        frame_bus.claim_frames(source,owner)
+        frame_bus.publish_frame(source,owner,CameraFrame(source+':1',pixels,time.monotonic(),source=source,sequence=1))
+    executor=Mock();executor.stop.return_value={'acknowledged':True}
+    result=run_mobile(args,DevelopmentResources(),frame_bus,actuator_executor=executor)
+    assert result['records']==1 and result['motion_authorized'] is False
+    assert len(managers)==1 and managers[0].pet_service is not None and managers[0].object_labels is not None
+    assert primary_detector.detect.call_count==1 and face_detector.detect.call_count==1
+    deck.observe_frame.assert_called_once()
+    assert frame_bus.frame_owners==owners

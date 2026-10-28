@@ -41,6 +41,7 @@ def parser():
     mobile.add_argument('--mobile-observe',action='store_true',help='unarmed car-camera perception only; no Deck or mobile actuator initialization')
     mobile.add_argument('--pet-abilities',action='store_true',help='normal AttentionManager/Executive pet abilities using existing mobile sensing')
     mobile.add_argument('--pet-follow',action='store_true',help='same abilities; physical follow still requires independent current activation')
+    p.add_argument('--primary-vision',action='store_true',help='run existing Pi Deck and vision alongside mobile abilities; hardware gates remain required')
     p.add_argument('--elegoo-face-track',action='store_true',help='subscribe original ELEGOO face tracker; motion remains independently gated')
     p.add_argument('--list-capabilities',action='store_true',help='inspect normal ability catalog without initializing any devices')
     p.add_argument('--mobile-zone',default='unqualified',help='independently inspected zone identity')
@@ -156,6 +157,8 @@ def main(argv=None):
         from attention.object_display_runtime import replay
         replay(args.object_label_replay)
         return
+    if args.primary_vision and (args.offline or args.mobile_replay):
+        raise ValueError('primary vision with mobile abilities requires --hardware')
     if args.mobile_replay and args.object_label_display=='rp2040':
         raise ValueError('fixture replay cannot activate a physical display')
     if args.object_label_display!='off' and args.offline and not (args.mobile_replay or args.mobile_observe):
@@ -181,7 +184,7 @@ def main(argv=None):
         # A capability command subscribes to the already-running application's
         # publication. It never starts another camera feeder.
         if not args.offline:
-            with application_camera_feeders(args,selected=('elegoo',)) as frame_bus:
+            with application_camera_feeders(args,selected=('pi','elegoo') if args.primary_vision else ('elegoo',)) as frame_bus:
                 with application_mobile_actuators(frame_bus,state=args.learning_state,hardware_id=args.mobile_hardware_id,
                         zone=args.mobile_zone,feed=args.actuator_safety_feed) as (executor, telemetry):
                     run_mobile(args,resources,frame_bus,actuator_executor=executor,telemetry=telemetry)

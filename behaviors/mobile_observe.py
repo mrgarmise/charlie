@@ -26,7 +26,7 @@ class MobileObserveBehavior:
         if self.bus is not None:
             self.bus.emit('mobile_observation',dict(target=None,target_lost=True,reason='acquisition_fault'))
             self.bus.emit('object_observation_fault',None)
-            if self.attention is not None:self.attention.update(None)
+            if self.attention is not None:self.attention.update(getattr(self,'deck',None))
             elif self.display_attention is not None:self.display_attention.update(None)
 
     def step(self):
@@ -61,7 +61,7 @@ class MobileObserveBehavior:
             result=dict(observation=observation,tracking=tracking,proposal=proposal,execution=execution,evidence_id=row.id)
             if self.attention is not None:
                 self.bus.emit('mobile_opportunity',result)
-                self.attention.update(None)
+                self.attention.update(getattr(self,'deck',None))
             elif self.display_attention is not None:
                 self.display_attention.update(None)
             return result
@@ -87,9 +87,9 @@ class MobileObserveBehavior:
                     for model in (self.perception.detector,self.perception.depth):
                         if hasattr(model,'close'):model.close()
 
-    def bind_attention(self,attention,executive,registry,*,context=None,base_factory=None,shared_executor=None):
+    def bind_attention(self,attention,executive,registry,*,context=None,base_factory=None,shared_executor=None,deck=None):
         self.attention=attention;self.context=context;self.base_factory=base_factory
-        self.shared_executor=shared_executor
+        self.shared_executor=shared_executor;self.deck=deck
         self.executive_resources=set();self.last_decision=None;self.last_attention_key=None;self.decision_at=None
         self.last_execution=None;self.intent='observe';self.executor=None;self.base=None
         attention.attach_pet_service(self,executive,registry)

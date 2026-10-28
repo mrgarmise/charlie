@@ -159,3 +159,9 @@ yield cancels that face-owned work. Emergency STOP remains global and latched.
 `tools/check_unified_contracts.py` includes the shared actuator admission,
 source ownership, RP2040 fencing and simultaneous-ability host tests; passing
 it still does not qualify hardware.
+
+Freshness validation includes both the producer-reported capture age at the
+snapshot and elapsed host-monotonic time since that snapshot. Neither an old
+feed nor an aged exposure can be made fresh merely by combining two individually
+acceptable values. This applies to both face/pan admission and the existing pet
+safety context; the actual exposure clock and producer remain native evidence.

@@ -94,3 +94,20 @@ def test_frame_and_independent_feed_are_rechecked_for_each_request(tmp_path):
     assert not authority.safe(request,grant)
     with pytest.raises(PermissionError):authority.admit(request,frame,boot_id='boot')
     journal.close()
+
+
+def test_feed_capture_age_includes_time_since_feed_was_written(tmp_path):
+    report=fixture_report(tmp_path,'camera-pan');ref=write(tmp_path/'report.json',report)
+    journal=EvidenceJournal(tmp_path/'journal.db');row=evaluate_actuator(journal,ref);deployment=CapabilityDeployment(journal)
+    deployment.activate_actuator(row.id,authorization=dict(target='elegoo-camera-pan',qualification_id=row.id,
+        source='fixture',boot_id='boot',hardware_id='fixture',zone='fixture',mode='supervised_trial',
+        execution='physical',issued_at=1.,expires_at=20.))
+    feed=dict(schema='charlie.actuator.safety.v1',boot_id='boot',hardware_id='fixture',zone='fixture',
+        source='elegoo-v4',observation_id='f',firmware_sha256='a'*64,producer_sha256='c'*64,at=9.85,
+        capture_timing_verified=True,capture_age_seconds=.2,frame_sha256='pixels',power_ok=True,human_clear=True,
+        animal_clear=True,stop_available=True,zone_inspected=True,pan_clear=True,pan_pose_known=True,pan_degrees=90.)
+    path=tmp_path/'feed.json';write(path,feed)
+    authority=ActuatorSafetyAuthority(deployment,hardware_id='fixture',zone='fixture',feed=path,clock=lambda:10.)
+    request=ActuatorRequest('r','face','camera-pan','pan',10.,'elegoo-v4','f',{'degrees':100,'expected_pan_degrees':90})
+    with pytest.raises(PermissionError):authority.admit(request,SimpleNamespace(authentic=True,metadata=lambda:{'sha256':'pixels'}),boot_id='boot')
+    journal.close()

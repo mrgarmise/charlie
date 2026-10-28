@@ -436,3 +436,11 @@ def test_ambiguous_start_exception_latches_even_if_later_stop_acks():
     proposal['id']='two'
     assert not gate.execute(proposal)['approved']
     assert base.pulse.call_count==1
+
+
+def test_pet_feed_capture_age_includes_time_since_snapshot(tmp_path):
+    j,c,o,t,feed,path=safety_control(tmp_path)
+    feed['at']=.8;feed['capture_age_seconds']=.4
+    path.write_text(json.dumps(feed))
+    assert c.bind(o,t)['qualification']=='unqualified' and c.current is None
+    j.close()

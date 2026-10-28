@@ -3,8 +3,7 @@
 This is a validation plan, not evidence of hardware acceptance. The PR is draft;
 do not deploy, merge, flash, move an actuator or alter calibration until the
 operator and independent safety gates for that particular step are satisfied.
-At creation the last code head was `5e174a3b16c19f4e75dc80f0e08ea6970ff1638d`;
-always verify the current head and its CI before choosing a candidate. PR #10,
+Always verify the current PR head and its CI before choosing a candidate. PR #10,
 #11, #12, the current native checkout and all evidence remain rollback sources.
 
 ## 1. Read-only native inventory

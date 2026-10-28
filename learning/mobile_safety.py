@@ -166,7 +166,8 @@ class MobileSafetyContext:
                     or feed.get('scene')!=('proxy-grounded' if active['authorization'].get('purpose')=='proxy' else 'live-animal-grounded')
                     or feed.get('capture_timing_verified') is not True
                     or not finite(feed.get('capture_age_seconds')) or not 0<=feed['capture_age_seconds']<=.5
-                    or not finite(feed.get('at')) or not 0<=now-feed['at']<=.25):
+                    or not finite(feed.get('at')) or not 0<=now-feed['at']<=.25
+                    or feed['capture_age_seconds']+now-feed['at']>.5):
                 raise ValueError('frame-bound animal/sensor/capture provenance unavailable')
             models=out.get('model',[])
             if not any(m.get('sha256')==report['model_sha256'] for m in models):raise ValueError('model differs from qualification')

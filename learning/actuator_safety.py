@@ -169,7 +169,8 @@ class ActuatorSafetyAuthority:
                 or not report.get('sensor_producer_sha256') or not finite(feed.get('at'))
                 or not 0 <= self.clock()-feed['at'] <= .25
                 or feed.get('capture_timing_verified') is not True
-                or not finite(feed.get('capture_age_seconds')) or not 0 <= feed['capture_age_seconds'] <= .25):
+                or not finite(feed.get('capture_age_seconds')) or not 0 <= feed['capture_age_seconds'] <= .25
+                or feed['capture_age_seconds'] + self.clock()-feed['at'] > .25):
             raise PermissionError('fresh source/firmware-bound independent safety measurements required')
         required = ('power_ok','human_clear','animal_clear','stop_available','zone_inspected')
         required += ('floor_clear','blind_spots_clear','lateral_clear') if request.group == 'chassis' else ('pan_clear','pan_pose_known')

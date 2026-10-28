@@ -125,11 +125,17 @@ class RP2040Requests:
             if not self.lock.acquire(blocking=False):
                 return None
             try:
-                self._reserve()
+                brain = self.calibration.brain
+                # Explicitly passive monitoring has no motor attempt to reserve.
+                # Unknown state or an existing calibration session remains
+                # conservative and receives the durable wire-attempt marker.
+                passive = brain is None or (getattr(brain,'authorized',None) is False
+                                             and getattr(brain,'session',None) is None)
+                if not passive:self._reserve()
                 result = self.calibration.observe_frame(frame,target)
                 if not self._completed_safely():
                     self._latch()
-                else:
+                elif not passive:
                     self._complete()
                 return result
             except BaseException:

@@ -147,3 +147,13 @@ def test_normal_deck_legacy_shortcuts_cannot_bypass_gateway():
     assert deck.track(100,90) is False
     deck.move_to(100,90);deck.set_all(100,90)
     assert controller.serial.writes==[]
+
+
+def test_explicitly_disarmed_monitoring_does_not_write_motion_marker(tmp_path):
+    controller=host();marker=tmp_path/'uncertain';calls=[]
+    brain=SimpleNamespace(authorized=False,session=None,blocked=False)
+    calibration=SimpleNamespace(brain=brain,observe_frame=lambda frame,target:calls.append(frame),
+                                health=SimpleNamespace(quarantined=False))
+    gateway=RP2040Requests(controller,calibration,StimulusBus(),fault_path=marker)
+    gateway.observe_frame('frame')
+    assert calls==['frame'] and not marker.exists() and not gateway.uncertain

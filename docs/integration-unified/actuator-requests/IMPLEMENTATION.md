@@ -185,3 +185,8 @@ firmware/lease gates and need further gateway migration and native acceptance.
 The pet safety context retains the producer-reported capture age and rechecks
 total age on each continuing pulse safety check, including elapsed time since
 the snapshot. A stale capture is a veto even if its snapshot was recent.
+
+The RP2040 gateway avoids creating a durable motion-attempt marker on every
+explicitly disarmed, session-free observation. If authorization or calibration
+session state is unknown, it retains the conservative marker behavior. This
+reduces passive filesystem churn without treating passive observation as a grant.

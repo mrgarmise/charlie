@@ -19,6 +19,7 @@ def parser():
     mode.add_argument('--offline',dest='offline',action='store_true',help='no camera, motion, firmware or game transport (default)')
     mode.add_argument('--hardware',dest='offline',action='store_false',help='explicit separately authorized hardware startup; CAL-1 gates still apply')
     p.set_defaults(offline=True)
+    p.add_argument('--model-learning',action='store_true',help='opt in to guarded Executive perception investigations; candidates stay shadow')
     p.add_argument('--learning-state',type=Path,default=Path.home()/'.local/share/charlie/development')
     p.add_argument('--episode-root',type=Path,action='append',default=[])
     p.add_argument('--history-root',type=Path,action='append',default=[],help='preserve and additively restore an existing notebook')
@@ -55,6 +56,8 @@ def main(argv=None):
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
                 turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources,
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
+    if args.model_learning:
+        kwargs["model_learning"]=True
     if args.offline:
         run(args.learning_state,roots,**kwargs)
         return

@@ -804,6 +804,10 @@ class LearningExecutive:
             execution='staged only; existing physical gates must receive separate experiment-specific authorization'),
             [self._reference(self.journal,i).id for i in (search.id,evaluation.id,finding.id,project['developmental_bookmark']['evidence_id'])])
 
+    def consider_model_learning(self, service, *, on_progress=None):
+        """Use the shared portfolio for evidence-backed perception investigations."""
+        return service.consider(self,on_progress=on_progress)
+
     def develop(self, lifecycle):
         """One normal-operation turn, owned by this Executive, no second scheduler.
 
@@ -816,6 +820,9 @@ class LearningExecutive:
         if gameplay_active():
             lifecycle._phase('experiencing')
             return
+        if getattr(lifecycle,"model_learning",None) is not None:
+            lifecycle.model_learning_result=self.consider_model_learning(
+                lifecycle.model_learning,on_progress=lifecycle.yield_for_primary)
         self.commission_evidence_searches()
         changed=lifecycle.acquire()
         self.receive_evidence_searches()

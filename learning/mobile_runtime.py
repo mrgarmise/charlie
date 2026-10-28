@@ -102,7 +102,7 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
             neck.attach_brain(authorized=os.environ.get('CHARLIE_NECK_MOTION_AUTHORIZED')=='1',
                               supervised=os.environ.get('CHARLIE_NECK_SUPERVISED')=='1')
             deck.actuator_gateway=RP2040Requests(deck.body,neck,frame_bus,
-                fault_path=state/'rp2040-uncertain-motion.lock')
+                fault_path=Path(os.environ.get('CHARLIE_NECK_STATE',str(Path.home()/'.local/share/charlie/neck')))/'rp2040-uncertain-motion.lock')
             owners.callback(deck.actuator_gateway.close)
             pi_source=CameraSubscription(frame_bus)
             owners.callback(pi_source.close)

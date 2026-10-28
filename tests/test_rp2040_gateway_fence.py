@@ -157,3 +157,67 @@ def test_explicitly_disarmed_monitoring_does_not_write_motion_marker(tmp_path):
     gateway=RP2040Requests(controller,calibration,StimulusBus(),fault_path=marker)
     gateway.observe_frame('frame')
     assert calls==['frame'] and not marker.exists() and not gateway.uncertain
+
+
+def active_vision_fixture():
+    import numpy as np
+    from unittest.mock import Mock
+    from vision.camera_source import CameraFrame
+    bus=StimulusBus();owner=object();bus.claim_frames('pi-primary',owner)
+    pixels=np.zeros((5,5,3),dtype=np.uint8);pixels.flags.writeable=False
+    frame=CameraFrame('f',pixels,10.,source='pi-primary',sequence=1,authentic=True)
+    bus.publish_frame('pi-primary',owner,frame)
+    envelope=dict(calibration_id='qualified',independently_qualified=True,max_step=2.,max_rate=5.,
+                  pan={'min':80.,'max':100.},tilt={'min':80.,'max':100.})
+    status=dict(session='session',owner='ACTIVE_VISION',armed=True,electrical_gate_cleared=True,
+                profile_invalid=False,pan=90.,tilt=90.,envelope=envelope)
+    controller=Mock(spec=['motion_status','look','stop','connected','link_session'])
+    controller.connected=True;controller.link_session='session';controller.motion_status.return_value=status
+    controller.look.return_value=True;controller.stop.return_value=True
+    profile=dict(calibration_id='qualified',clearance_polygon=[[80,80],[100,80],[100,100],[80,100]],clearance_margin=0.)
+    calibration=SimpleNamespace(brain=None,health=SimpleNamespace(quarantined=False),refresh=lambda:profile)
+    gateway=RP2040Requests(controller,calibration,bus,clock=lambda:10.)
+    return gateway,controller,frame,status
+
+
+def test_active_vision_uses_shared_frame_and_existing_firmware_gateway():
+    gateway,controller,frame,_=active_vision_fixture();adapter=gateway.active_vision_adapter(authorization=dict(source='fixture',execution='physical',purpose='active-vision',session='session',issued_at=9.,expires_at=20.))
+    adapter.frame_provider=lambda:frame
+    assert adapter.look(91,90,rate=2.)
+    controller.look.assert_called_once_with(91,90,rate=2.)
+    import pytest
+    with pytest.raises(PermissionError):adapter.look(91,90,rate=2.)
+    assert adapter.stop() is True
+
+
+def test_active_vision_rejects_unbound_stale_or_outside_envelope():
+    import pytest
+    gateway,controller,frame,status=active_vision_fixture();adapter=gateway.active_vision_adapter(authorization=dict(source='fixture',execution='physical',purpose='active-vision',session='session',issued_at=9.,expires_at=20.))
+    with pytest.raises(PermissionError):adapter.look(91,90,rate=2.)
+    adapter.frame_provider=lambda:frame
+    with pytest.raises(PermissionError):adapter.look(95,90,rate=2.)
+    status['electrical_gate_cleared']=False
+    with pytest.raises(PermissionError):adapter.look(91,90,rate=2.)
+    controller.look.assert_not_called()
+
+
+def test_active_vision_requires_separate_live_session_bound_authorization():
+    import pytest
+    gateway,controller,frame,_=active_vision_fixture()
+    with pytest.raises(PermissionError):gateway.active_vision_adapter(authorization={})
+    auth=dict(source='fixture',execution='physical',purpose='active-vision',session='session',issued_at=9.,expires_at=10.1)
+    adapter=gateway.active_vision_adapter(authorization=auth);adapter.frame_provider=lambda:frame
+    gateway.clock=lambda:10.2
+    with pytest.raises(PermissionError):adapter.look(91,90,rate=2.)
+    controller.look.assert_not_called()
+
+
+def test_active_vision_uncertain_start_latches_and_attempts_stop(tmp_path):
+    import pytest
+    gateway,controller,frame,_=active_vision_fixture();gateway.fault_path=tmp_path/'uncertain'
+    adapter=gateway.active_vision_adapter(authorization=dict(source='fixture',execution='physical',purpose='active-vision',session='session',issued_at=9.,expires_at=20.))
+    adapter.frame_provider=lambda:frame
+    controller.look.side_effect=PermissionError('ambiguous write')
+    with pytest.raises(PermissionError):adapter.look(91,90,rate=2.)
+    assert gateway.uncertain and gateway.fault_path.exists()
+    controller.stop.assert_called_once()

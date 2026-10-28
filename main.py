@@ -245,7 +245,7 @@ def main(argv=None):
                 state=args.learning_state,hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.actuator_safety_feed))
             from motion.rp2040_requests import RP2040Requests
             deck.actuator_gateway=RP2040Requests(deck.body,neck,frame_bus,
-                fault_path=args.learning_state/'rp2040-uncertain-motion.lock')
+                fault_path=Path(os.environ.get('CHARLIE_NECK_STATE',str(Path.home()/'.local/share/charlie/neck')))/'rp2040-uncertain-motion.lock')
             lifecycle.callback(deck.actuator_gateway.close)
             attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1',object_labels=labels,
                 emergency_stop=executor.emergency_stop)

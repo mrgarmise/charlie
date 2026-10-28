@@ -146,13 +146,15 @@ class RP2040Controller:
     # --------------------------------------------------
 
     @contextmanager
-    def motion_scope(self):
+    def motion_scope(self, guard=None):
         # A gateway request is bound to this STOP generation. The firmware
         # session/epoch and CAL-1 checks still independently govern motion.
         previous = getattr(self._motion_scope, 'generation', None)
+        previous_guard = getattr(self._motion_scope, 'guard', None)
         with self._motion_fence_lock:
             generation = self._motion_generation if previous is None else previous
         self._motion_scope.generation = generation
+        self._motion_scope.guard = (lambda: previous_guard() and guard()) if previous_guard and guard else (previous_guard or guard)
         try:
             yield
         finally:
@@ -160,12 +162,17 @@ class RP2040Controller:
                 del self._motion_scope.generation
             else:
                 self._motion_scope.generation = previous
+            if previous is None:
+                if hasattr(self._motion_scope, 'guard'):del self._motion_scope.guard
+            else:
+                self._motion_scope.guard = previous_guard
 
     def _scope_allows(self, command):
         if command == 'STOP':
             return True
         generation = getattr(self._motion_scope, 'generation', None)
-        return generation is None or generation == self._motion_generation
+        guard = getattr(self._motion_scope, 'guard', None)
+        return (generation is None or generation == self._motion_generation) and (guard is None or guard() is True)
 
     def motion_scope_valid(self):
         with self._motion_fence_lock:

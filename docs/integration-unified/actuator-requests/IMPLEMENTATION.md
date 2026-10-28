@@ -206,3 +206,12 @@ uses the existing face algorithm, shared camera feeder, AttentionManager,
 executor and search-memory gateway. The independent qualification and measured
 pose gates still apply. The CSV diagnostic also uses that ownership path and remains subject to the
 same independent authorization and native parity gates.
+
+The standalone Active Vision entry now obtains an RP2040 gateway adapter over
+its existing controller and CAL-1 service. Each move requires a fresh unused
+shared Pi frame, an explicit session-bound expiring operator authorization,
+and agreement with the independently qualified firmware profile and envelope.
+The optimizer's existing acquisition, visual health, settling and evaluation
+algorithms remain intact. Normal and standalone paths use the same neck-state
+uncertainty marker. Calibration commissioning remains under its existing
+separate supervised CAL-1 workflow. Native Active Vision parity is unverified.

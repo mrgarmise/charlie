@@ -11,7 +11,7 @@ from uuid import uuid4
 from copy import deepcopy
 from contextlib import nullcontext
 from motion.elegoo_executor import ActuatorRequest
-from experiments.ppal.mobile_navigation import age
+from experiments.ppal.mobile_navigation import age, finite
 
 
 class RP2040Requests:
@@ -27,6 +27,7 @@ class RP2040Requests:
         self.fault_path = Path(fault_path) if fault_path is not None else None
         self.uncertain = self.fault_path is not None and self.fault_path.exists()
         self.stopped_at = None
+        self._active_last_frame = None
         self.generation, self.sequence = uuid4().hex, 0
         self.bus.claim_observations('rp2040-motion-state',self,metadata={
             'body':'RP2040','modality':'controller-state','clock':'host-monotonic receipt',
@@ -114,9 +115,10 @@ class RP2040Requests:
             if brain is not None:
                 brain.search_remaining = 0
 
-    def _scope(self):
+    def _scope(self, guard=None):
         scope = getattr(self.controller, 'motion_scope', None)
-        return scope() if callable(scope) else nullcontext()
+        if not callable(scope):return nullcontext()
+        return scope(guard=guard) if guard is not None else scope()
 
     def observe_frame(self, frame, target=None):
         if self.uncertain:
@@ -151,6 +153,85 @@ class RP2040Requests:
             return intent(self.calibration.brain.request_search)
         self.calibration.brain.request_search()
         return True
+
+    def active_vision_adapter(self, *, authorization):
+        authorization = deepcopy(authorization)
+        if not self._active_authorized(authorization):
+            raise PermissionError('separate current Active Vision authorization required')
+        return _ActiveVisionAdapter(self,authorization)
+
+    def _active_authorized(self, authorization):
+        now=self.clock()
+        return (isinstance(authorization,dict) and authorization.get('source')
+                and authorization.get('execution') == 'physical'
+                and authorization.get('purpose') == 'active-vision'
+                and authorization.get('session') == self.controller.link_session
+                and finite(authorization.get('issued_at')) and finite(authorization.get('expires_at'))
+                and authorization['issued_at'] <= now < authorization['expires_at']
+                and authorization['expires_at']-authorization['issued_at'] <= 600)
+
+    def active_vision_move(self, authorization, frame, pan, tilt, rate):
+        # Active Vision retains its planner, visual health and firmware gates;
+        # this gateway independently binds each move to the shared Pi frame and
+        # the existing firmware session/profile/envelope.
+        if self.uncertain or not self.lock.acquire(blocking=False):
+            raise ValueError('RP2040 unavailable or uncertain')
+        attempted=False
+        try:
+            if not self._active_authorized(authorization):
+                raise PermissionError('active-vision authorization expired')
+            with self._scope(guard=lambda:self._active_authorized(authorization) and not self.uncertain):
+                if (frame is None or getattr(frame,'source',None) != 'pi-primary'
+                        or getattr(frame,'authentic',False) is not True):
+                    raise PermissionError('authentic primary-camera observation required')
+                latest=self.bus.latest_frame('pi-primary',max_age=.5,clock=self.clock)
+                if (latest is None or latest.id != frame.id or latest.authentic is not True
+                        or latest.id == self._active_last_frame):
+                    raise PermissionError('fresh, unused shared primary frame required')
+                if not all(finite(x) for x in (pan,tilt,rate)) or rate <= 0:
+                    raise ValueError('finite bounded active-vision move required')
+                status=self.controller.motion_status()
+                profile=self.calibration.refresh()
+                envelope=(status or {}).get('envelope') or {}
+                if (not status or status.get('session') != self.controller.link_session
+                        or status.get('owner') != 'ACTIVE_VISION' or not status.get('armed')
+                        or not status.get('electrical_gate_cleared') or status.get('profile_invalid')
+                        or self.calibration.health.quarantined or profile is None
+                        or envelope.get('independently_qualified') is not True
+                        or profile.get('calibration_id') != envelope.get('calibration_id')
+                        or not all(finite(status.get(k)) for k in ('pan','tilt'))
+                        or not finite(envelope.get('max_step')) or not finite(envelope.get('max_rate'))
+                        or envelope['max_rate'] <= 0 or envelope['max_step'] <= 0
+                        or rate > envelope['max_rate']
+                        or abs(pan-status['pan'])+abs(tilt-status['tilt']) > envelope['max_step']):
+                    raise PermissionError('current qualified RP2040 profile/envelope required')
+                from rp2040.motion_geometry import contains
+                for axis,value in (('pan',pan),('tilt',tilt)):
+                    bounds=envelope.get(axis,{})
+                    if (not finite(bounds.get('min')) or not finite(bounds.get('max'))
+                            or not bounds['min'] <= value <= bounds['max']):
+                        raise ValueError('active-vision target exceeds qualified axis limits')
+                if not contains(profile['clearance_polygon'],[pan,tilt],profile['clearance_margin']):
+                    raise ValueError('active-vision target outside qualified clearance')
+                # The original firmware verifies polygon and rate/step limits
+                # again; a host status is not an independently measured pose.
+                self._active_last_frame=latest.id
+                self._reserve()
+                attempted=True
+                accepted=self.controller.look(pan,tilt,rate=rate)
+                if accepted is not True or not self._completed_safely():
+                    self._latch()
+                    self.stop()
+                    return False
+                self._complete()
+                return True
+        except BaseException:
+            if attempted:
+                self._latch()
+                self.stop()
+            raise
+        finally:
+            self.lock.release()
 
     def request_home(self):
         # Legacy HOME lacks a source/session-bound CAL-1 trajectory. The
@@ -220,3 +301,29 @@ class RP2040Requests:
             raise
         finally:
             self.lock.release()
+
+
+class _ActiveVisionAdapter:
+    """Scoped compatibility view; the existing optimizer keeps its algorithm."""
+    def __init__(self, gateway, authorization):
+        self.gateway = gateway
+        self.authorization = authorization
+        self.frame_provider = lambda: None
+
+    def __getattr__(self, name):
+        return getattr(self.gateway.controller,name)
+
+    def look(self, pan, tilt, *, rate=None):
+        return self.gateway.active_vision_move(self.authorization,self.frame_provider(),pan,tilt,rate)
+
+    def request_active_vision(self, transition='INITIAL'):
+        if not self.gateway._active_authorized(self.authorization):return False
+        with self.gateway._scope(guard=lambda:self.gateway._active_authorized(self.authorization) and not self.gateway.uncertain):
+            return self.gateway.controller.request_active_vision(transition)
+
+    def primary_ownership(self):
+        with self.gateway._scope():
+            return self.gateway.controller.primary_ownership()
+
+    def stop(self):
+        return self.gateway.stop().get('sent') is True

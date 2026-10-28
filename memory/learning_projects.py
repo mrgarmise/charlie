@@ -820,9 +820,12 @@ class LearningExecutive:
         if gameplay_active():
             lifecycle._phase('experiencing')
             return
+        model_progress=False
         if getattr(lifecycle,"model_learning",None) is not None:
+            before_model=len(lifecycle.model_learning.data.events("model_turn"))
             lifecycle.model_learning_result=self.consider_model_learning(
                 lifecycle.model_learning,on_progress=lifecycle.yield_for_primary)
+            model_progress=len(lifecycle.model_learning.data.events("model_turn"))>before_model
         self.commission_evidence_searches()
         changed=lifecycle.acquire()
         self.receive_evidence_searches()
@@ -876,7 +879,9 @@ class LearningExecutive:
             if r.data['payload'].get('op')=='developmental_wait'),None)
         if previous and previous['inputs']==signature and not lifecycle.pending_work():
             lifecycle.operational_feedback()
-            lifecycle.last_turn=dict(progress_occurred=False,runnable_work_remaining=False,reason='No eligible work; retained dependencies unchanged',next_direction=previous['next_direction'],meditation=meditation_outcome)
+            lifecycle.last_turn=dict(progress_occurred=model_progress,runnable_work_remaining=False,
+                reason='Perception investigation checkpoint retained; other dependencies unchanged' if model_progress else 'No eligible work; retained dependencies unchanged',
+                next_direction=previous['next_direction'],meditation=meditation_outcome)
             lifecycle.current_activity=dict(kind='waiting',reason=lifecycle.last_turn['reason'])
             lifecycle._phase('waiting for evidence')
             return
@@ -892,7 +897,7 @@ class LearningExecutive:
         lifecycle.operational_feedback()
         projects=self.projects()
         pending=lifecycle.pending_work()
-        progressed=meditation_advanced or any(r['result']['status'] in ('resolved','already_resolved') or r['result'].get('developmental_progress',{}).get('progress_occurred',False) for r in report['results'])
+        progressed=model_progress or meditation_advanced or any(r['result']['status'] in ('resolved','already_resolved') or r['result'].get('developmental_progress',{}).get('progress_occurred',False) for r in report['results'])
         lifecycle.last_turn=dict(progress_occurred=progressed,runnable_work_remaining=pending,
             reason='Committed developmental checkpoint or conclusion advanced' if progressed else 'No justified executable investigation under current evidence and capabilities',
             next_direction='Resume checkpointed work' if pending else 'Await qualified evidence or capability/dependency change',

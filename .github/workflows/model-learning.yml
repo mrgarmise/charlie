@@ -57,7 +57,10 @@ jobs:
             git show 4bb3bffecffea0d6e294485132f42f5e96f4c506:docs/CHARLIE_ARCHITECTURE.md | sed -n '/^## Asynchronous human information interface (draft)/,$p' >> docs/CHARLIE_ARCHITECTURE.md
             git add docs/CHARLIE_ARCHITECTURE.md
           fi
-          git apply --3way "$RUNNER_TEMP/model-learning.patch"
+          if ! git apply --3way "$RUNNER_TEMP/model-learning.patch"; then
+            git show "$FEATURE_SHA":tools/resolve_model_learning_integration.py > "$RUNNER_TEMP/resolve-model-learning.py"
+            python "$RUNNER_TEMP/resolve-model-learning.py" "$FEATURE_SHA"
+          fi
           git -c user.name='Software validation' -c user.email=validation@localhost commit -m 'Disposable combined stack software validation'
           git log -1 --format='%H %T'
       - run: python -m pip install -r requirements.txt pytest

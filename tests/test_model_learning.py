@@ -239,6 +239,9 @@ def test_real_application_executes_need_and_preserves_status(tmp_path):
         assert status['model_learning_result']['status']=='NEEDS_LABELS'
         assert status['model_learning']['activation'] is None
         assert status['physical_authorization'] is False
+        assert status['turn_outcome']['progress_occurred'] is True
+        lifecycle.turn()
+        assert lifecycle.last_turn['progress_occurred'] is False
     finally:lifecycle.close()
 
 
@@ -322,3 +325,16 @@ def test_localization_reuses_machine_boxes_without_inventing_semantics(tmp_path)
     assert row['objects'][0]['box']==[10/640,20/480,30/640,40/480]
     assert row['objects'][0]['track_id'] is None
     assert result['localization_accuracy'] is None
+
+
+def test_integration_resolver_refuses_named_existing_branches(tmp_path):
+    import os,subprocess,sys
+    subprocess.run(['git','init','--initial-branch=protected-existing-feature',str(tmp_path/'protected')],check=True,capture_output=True)
+    checkout=tmp_path/'protected'
+    subprocess.run(['git','-c','user.name=Controlled test','-c','user.email=test@localhost','commit','--allow-empty','-m','Controlled branch preservation test'],cwd=checkout,check=True,capture_output=True)
+    before=subprocess.check_output(['git','rev-parse','HEAD'],cwd=checkout)
+    result=subprocess.run([sys.executable,str(REPO/'tools/resolve_model_learning_integration.py'),'HEAD'],
+        cwd=checkout,env=dict(os.environ,GITHUB_ACTIONS='true'),capture_output=True,text=True)
+    assert result.returncode!=0 and 'only a disposable detached CI checkout' in result.stderr
+    assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=checkout)==before
+    assert subprocess.check_output(['git','status','--porcelain'],cwd=checkout)==b''

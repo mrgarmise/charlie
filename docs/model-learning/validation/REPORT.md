@@ -67,3 +67,23 @@ A workflow-only correction now permits exactly that documented conflict, retains
 #13's canonical architecture and appends #14's human-interface section. Any other
 conflict still fails. No active PR branch is modified. Combined testing must
 complete successfully before software integration can be called validated.
+
+After the architecture conflict was resolved, the second disposable attempt
+exposed additive main.py/deployment conflicts. The runner-only resolver retains
+#13's complete files and inserts only the opt-in model-learning flag/argument
+forwarding and two shadow deployment methods. Manual checks against the exact
+pinned #13 source confirmed that removing these additions restores each original
+file byte-for-byte, and both resulting modules compile. The resolver refuses
+named branches and any unexpected conflict. Active PR branches remain untouched.
+
+Final runtime refinement counts a newly retained model investigation in normal
+Executive progress; unchanged polling is not repeatedly counted. Expanded host
+command: same exact bus/gateway environment, then `python -m pytest
+tests/test_model_learning.py tests/test_model_learning_shared_bus.py
+tests/test_model_learning_shared_gateway.py tests/test_learning_projects.py
+tests/test_normal_learning_lifecycle.py -q -p no:cacheprovider
+--junitxml=/tmp/charlie-model-learning-increment-4.xml`: **56 passed**, zero
+skips/failures, 74.33 seconds. A subsequent protected-named-branch refusal test
+passed separately (1 passed); its log/XML are retained. Runtime/test identities
+are in `increment-4-source-sha256.json`. New independent broad and combined-stack
+CI must still complete; final statuses belong in the PR handoff.

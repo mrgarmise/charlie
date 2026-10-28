@@ -43,3 +43,17 @@ episodes can later be promoted to durable memory.
 
 This boundary lets us replace a vision model, LLM, PPAL version, chassis, or
 controller without replacing Charlie's accumulated history.
+
+## Asynchronous human information interface (draft)
+
+The existing `memory.learning_projects.LearningExecutive` can submit typed,
+evidence-derived information needs through `HumanInteractionGateway`.
+Question lifecycle, human answers and requester review observations are additive
+records in the existing `EvidenceJournal`; no second Executive, memory store,
+scheduler or actuator authority is created. The loopback web service renders
+those records and accepts schema-validated, source-attributed, fallible answers.
+Normal producer/consumer attachment and native acceptance remain pending.
+See [contract and operator runbook](human-interaction/README.md) and
+[acceptance receipts](human-interaction/ACCEPTANCE.md). PR #13's newer canonical
+sensory ownership architecture must be preserved when this focused branch is
+reconciled; this addition does not replace that unmerged architecture.

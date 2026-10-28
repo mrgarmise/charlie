@@ -19,3 +19,11 @@ The later correction handles target loss first while retaining the latched stop;
 focused tests cover both loss semantics and the inability to resume movement.
 The clean broad output is preserved in broad-9aeee.txt. CI on the corrected head
 must still pass before software qualification is asserted.
+
+A clean broad host run on 5e174a3 exposed existing native-application test
+doubles that still used the old KeyboardStimulus constructor. The new emergency
+callback is a compatible optional production parameter; the affected test doubles
+were updated to accept keyword parameters. The original assertions were kept.
+The affected calibration and primary-application suites then passed 66 tests.
+The broad run was still in progress when this receipt was written; its final
+result and independent CI remain authoritative for that exact revision.

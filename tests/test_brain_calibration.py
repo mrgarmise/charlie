@@ -234,7 +234,7 @@ def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, mo
     attach = f.s.attach_brain
     monkeypatch.setattr(f.s, 'attach_brain', lambda **options: attach(**options, simulated=True, maximum_steps=8))
     bus_ref = []
-    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus: (bus_ref.append(bus) or SimpleNamespace(close=lambda:None))))
+    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus, **kwargs: (bus_ref.append(bus) or SimpleNamespace(close=lambda:None))))
     monkeypatch.setattr(vision.detector, 'ColorDetector', lambda **options:
         SimpleNamespace(detect=lambda frame: dict(x=460, y=180, width=10, height=10)
                         if f.s.brain.session is None and f.s.brain.responses else None))
@@ -364,7 +364,7 @@ def test_normal_application_startup_failure_releases_transport_and_camera(integr
     monkeypatch.setattr(f.host, 'close', lambda: calls.append('transport closed'))
     monkeypatch.setattr(f.host, 'stop', lambda: calls.append('STOP'))
     monkeypatch.setattr(CalibrationService, 'open', classmethod(lambda cls, *args: f.s))
-    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus: SimpleNamespace(close=lambda:None)))
+    monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus, **kwargs: SimpleNamespace(close=lambda:None)))
     monkeypatch.setenv('CHARLIE_VISION_TARGET', 'face')
     monkeypatch.setattr(vision.detector, 'FaceDetector', unavailable)
     with pytest.raises(RuntimeError, match='startup failure'):

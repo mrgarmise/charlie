@@ -263,7 +263,7 @@ def test_normal_attention_lifecycle_survives_worker_interruption(tmp_path,monkey
         'motion.controller':dict(Deck=lambda:SimpleNamespace(body=SimpleNamespace(close=lambda:None),stop=lambda:None,observe_frame=lambda *a:None)),
         'hardware.calibration_service':dict(CalibrationService=SimpleNamespace(open=lambda *a:SimpleNamespace(close=lambda:None,refresh=lambda:None,attach_brain=lambda **kw:None))),
         'attention.manager':dict(AttentionManager=Attention),
-        'stimulus.keyboard':dict(KeyboardStimulus=lambda bus:SimpleNamespace(close=lambda:None)),
+        'stimulus.keyboard':dict(KeyboardStimulus=lambda bus, **kwargs:SimpleNamespace(close=lambda:None)),
         'vision.camera':dict(Camera=Camera),
         'vision.detector':dict(ColorDetector=lambda **kw:object()),
         'vision.stimulus':dict(VisionStimulus=Vision)}

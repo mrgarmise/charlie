@@ -45,7 +45,7 @@ class ObjectRecognition:
                 self.select_camera(data)
             elif event == 'object_recognition_stop':
                 self.stopped = True
-            elif event == 'object_attention':
+            elif event in ('object_attention','emergency_stop'):
                 self.attention.handle_event(event, data)
         self.attention.update(None)
 

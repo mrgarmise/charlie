@@ -7,7 +7,7 @@ import time
 from uuid import uuid4
 
 
-def run_objects(args, resources, frame_bus, *, supervise=lambda: None):
+def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_executor=None, telemetry=None):
     from attention.object_display_runtime import attach
     from learning.mobile import MobileEvidenceAdapter
     from learning.resources import ResourceGuard
@@ -41,13 +41,28 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None):
         recognition = ObjectRecognition(frame_bus, perception, evidence, bus, labels)
         lifecycle.callback(recognition.close)
         recognition.select_camera(args.camera_source)
-        keyboard = KeyboardStimulus(bus, object_mode=True)
+        face_runtime = None
+        if actuator_executor is not None:
+            from behaviors.mobile_face_runtime import MobileFaceRuntime
+            face_runtime = MobileFaceRuntime(frame_bus,recognition.attention_bus,actuator_executor)
+            lifecycle.callback(face_runtime.close)
+            recognition.attention.emergency_stop_callback = actuator_executor.emergency_stop
+        telemetry_at = 0.
+        keyboard = KeyboardStimulus(bus, object_mode=True,
+            on_emergency=actuator_executor.emergency_stop if actuator_executor is not None else None)
         lifecycle.callback(keyboard.close)
         count = 0
         started = time.monotonic()
         try:
             while not recognition.stopped:
                 supervise()
+                recognition.controls()
+                if recognition.stopped:break
+                if telemetry is not None and time.monotonic()-telemetry_at >= .1:
+                    telemetry.poll();telemetry_at=time.monotonic()
+                if face_runtime is not None:
+                    face_runtime.observe()
+                    recognition.attention.update(None)
                 if args.object_frames is not None and count >= args.object_frames:
                     break
                 if args.object_seconds is not None and time.monotonic()-started >= args.object_seconds:

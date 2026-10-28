@@ -139,7 +139,7 @@ def main(argv=None):
         from learning.capabilities import default_registry
         print(json.dumps(default_registry().describe(),indent=2));return
     if args.object_recognition:
-        if args.offline or args.mobile_replay or args.mobile_observe or args.object_label_replay:
+        if args.offline or args.mobile_replay or args.object_label_replay:
             raise ValueError('Object Recognition requires explicit --hardware and application camera feeders')
         import math
         if (args.object_frames is not None and (not 1<=args.object_frames<=10000)
@@ -175,12 +175,12 @@ def main(argv=None):
     if args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow:
         if args.pet_follow and args.offline:
             raise ValueError('physical pet following requires explicit --hardware; --offline never actuates')
-        if not args.pet_follow and not args.offline and not (args.pet_abilities and args.object_recognition):
-            raise ValueError('mobile observation entry point cannot combine with --hardware')
+        if args.mobile_replay and not args.offline:
+            raise ValueError('fixture replay cannot run with hardware')
         from learning.mobile_runtime import run_mobile
         # A capability command subscribes to the already-running application's
         # publication. It never starts another camera feeder.
-        if args.pet_follow or (args.pet_abilities and args.object_recognition):
+        if not args.offline:
             with application_camera_feeders(args,selected=('elegoo',)) as frame_bus:
                 with application_mobile_actuators(frame_bus,state=args.learning_state,hardware_id=args.mobile_hardware_id,
                         zone=args.mobile_zone,feed=args.actuator_safety_feed) as (executor, telemetry):
@@ -207,7 +207,13 @@ def main(argv=None):
         if args.object_recognition:
             from learning.object_runtime import run_objects
             with application_camera_feeders(args) as frame_bus:
-                run_objects(args,resources,frame_bus,supervise=supervise_development)
+                if args.elegoo_face_track:
+                    with application_mobile_actuators(frame_bus,state=args.learning_state,hardware_id=args.mobile_hardware_id,
+                            zone=args.mobile_zone,feed=args.actuator_safety_feed) as (executor,telemetry):
+                        run_objects(args,resources,frame_bus,supervise=supervise_development,
+                                    actuator_executor=executor,telemetry=telemetry)
+                else:
+                    run_objects(args,resources,frame_bus,supervise=supervise_development)
             return
         with ExitStack() as lifecycle:
             from motion.controller import Deck
@@ -240,7 +246,10 @@ def main(argv=None):
             attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1',object_labels=labels,
                 emergency_stop=executor.emergency_stop)
             lifecycle.callback(attention.close)
-            keyboard=KeyboardStimulus(bus)
+            def emergency_stop_now():
+                try:executor.emergency_stop()
+                finally:deck.stop()
+            keyboard=KeyboardStimulus(bus,on_emergency=emergency_stop_now)
             lifecycle.callback(keyboard.close)
             sources=CameraSubscription(frame_bus)
             lifecycle.callback(sources.close)

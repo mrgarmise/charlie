@@ -127,3 +127,15 @@ future requests cannot resume merely because a newer observation arrives.
 The normal Deck is stopped independently. This is a software arbitration test;
 serial/socket scheduling, power cutoff and physical stopping remain native
 acceptance items. A STOP or restart does not clear an uncertainty marker.
+
+## Normal application routing
+
+With explicit `--hardware`, pet observation can run with or without Object
+Recognition; adding `--elegoo-face-track` subscribes the existing face detector
+to the same application-owned camera bus and actuator executor. Object-only mode
+can also attach that face tracker. Those combinations remain independently
+motion-gated. `x` attempts an emergency STOP on the input thread and then sends
+the latched attention event, including while a bounded request is in progress.
+The keyboard command is not a replacement for an independently qualified
+physical emergency stop. The combined pet/object watcher does not yet run the
+full Pi primary Deck/vision loop alongside these abilities.

@@ -115,7 +115,7 @@ def test_motion_events_are_never_forwarded_by_object_mode(tmp_path,monkeypatch):
 
 def test_main_refuses_device_mode_without_explicit_hardware_and_excludes_replays():
     from main import main
-    for args in (['--object-recognition'],['--object-recognition','--hardware','--mobile-observe'],
+    for args in (['--object-recognition'],
                  ['--object-recognition','--hardware','--object-label-replay','unused'],
                  ['--object-recognition','--hardware','--object-seconds','nan']):
         with pytest.raises(ValueError):main(args)

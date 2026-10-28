@@ -85,7 +85,13 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
         from attention.object_display_runtime import attach
         labels,display_owned=attach(mode,clock=clock,port=args.object_label_port)
         if display_owned is not None:owners.callback(display_owned.close)
-        bus=StimulusBus();attention=AttentionManager(bus,mobile_enabled=False,object_labels=labels,
+        bus=StimulusBus()
+        if not args.offline:
+            from stimulus.keyboard import KeyboardStimulus
+            keyboard=KeyboardStimulus(bus,emergency_only=True,
+                on_emergency=actuator_executor.emergency_stop if actuator_executor is not None else None)
+            owners.callback(keyboard.close)
+        attention=AttentionManager(bus,mobile_enabled=False,object_labels=labels,
             emergency_stop=actuator_executor.emergency_stop if actuator_executor is not None else None)
         behavior=MobileObserveBehavior(source,perception,adapter,tracker=PetTracker(loss_seconds=2.),bus=bus)
         context=None
@@ -175,6 +181,7 @@ def watch(behavior,*,frames,seconds,max_faults,clock=time.monotonic,cancel=None,
         for _ in range(frames):
             if cancel.is_set() or clock()-started>=seconds:break
             counts['polls']+=1
+            if getattr(behavior, "attention", None) is not None:behavior.attention.update(None)
             try:result=behavior.step()
             except StopIteration:break
             except (TimeoutError,EOFError,OSError,InterruptedError) as exc:

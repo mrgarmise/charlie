@@ -45,6 +45,7 @@ def parser():
     p.add_argument('--list-capabilities',action='store_true',help='inspect normal ability catalog without initializing any devices')
     p.add_argument('--mobile-zone',default='unqualified',help='independently inspected zone identity')
     p.add_argument('--mobile-hardware-id',default='unverified',help='verified physical car identity')
+    p.add_argument('--actuator-safety-feed',type=Path,help='independent face/pan safety observations; never grants authority')
     p.add_argument('--mobile-safety-feed',type=Path,help='independently qualified, frame-bound sensor snapshots; absent fails closed')
     p.add_argument('--mobile-manifest',type=Path,help='hash-bound Hailo-8L object/depth export contracts')
     p.add_argument('--mobile-frames',type=int,default=10000)
@@ -101,13 +102,28 @@ def application_camera_feeders(args, *, selected=('pi', 'elegoo'), pi_role='prim
 
 
 @contextmanager
-def application_mobile_actuators(frame_bus, *, authority=None):
+def application_mobile_actuators(frame_bus, *, state=None, hardware_id='unverified', zone='unqualified', feed=None, authority=None):
     from motion.mobile_base import MobileBase
     from motion.elegoo_executor import (QualifiedElegooExecutor,
         install_application_executor, remove_application_executor)
     from hardware.elegoo_telemetry import ElegooTelemetry
     with ExitStack() as owners:
-        executor = QualifiedElegooExecutor(MobileBase(), bus=frame_bus, authority=authority)
+        fault_path = None
+        if state is not None:
+            from memory.evidence import EvidenceJournal
+            from learning.deployment import CapabilityDeployment
+            from learning.actuator_safety import ActuatorSafetyAuthority
+            state = state.resolve()
+            state.mkdir(parents=True, exist_ok=True)
+            journal = EvidenceJournal(state/'actuator-evidence.sqlite3')
+            owners.callback(journal.close)
+            if authority is None:
+                authority = ActuatorSafetyAuthority(CapabilityDeployment(journal),
+                    hardware_id=hardware_id,zone=zone,feed=feed)
+            fault_path = state/'elegoo-uncertain-motion.lock'
+        executor = QualifiedElegooExecutor(MobileBase(), bus=frame_bus, authority=authority, fault_path=fault_path)
+        print(json.dumps(dict(elegoo_executor_boot_id=executor.boot_id,
+            physical_authorization=False,uncertain=executor.stop_uncertain)),flush=True)
         owners.callback(executor.close)
         install_application_executor(executor)
         owners.callback(remove_application_executor, executor)
@@ -166,8 +182,9 @@ def main(argv=None):
         # publication. It never starts another camera feeder.
         if args.pet_follow or (args.pet_abilities and args.object_recognition):
             with application_camera_feeders(args,selected=('elegoo',)) as frame_bus:
-                with application_mobile_actuators(frame_bus) as (executor, telemetry):
-                    run_mobile(args,resources,frame_bus,actuator_executor=executor)
+                with application_mobile_actuators(frame_bus,state=args.learning_state,hardware_id=args.mobile_hardware_id,
+                        zone=args.mobile_zone,feed=args.actuator_safety_feed) as (executor, telemetry):
+                    run_mobile(args,resources,frame_bus,actuator_executor=executor,telemetry=telemetry)
         else:
             run_mobile(args,resources)
         return
@@ -215,7 +232,8 @@ def main(argv=None):
             labels,label_owned=attach(args.object_label_display,clock=time.monotonic,body=deck.body)
             if label_owned is not None:lifecycle.callback(label_owned.close)
             frame_bus=lifecycle.enter_context(application_camera_feeders(args))
-            executor, telemetry=lifecycle.enter_context(application_mobile_actuators(frame_bus))
+            executor, telemetry=lifecycle.enter_context(application_mobile_actuators(frame_bus,
+                state=args.learning_state,hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.actuator_safety_feed))
             from motion.rp2040_requests import RP2040Requests
             deck.actuator_gateway=RP2040Requests(deck.body,neck,frame_bus)
             attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1',object_labels=labels)

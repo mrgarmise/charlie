@@ -234,13 +234,15 @@ class QualifiedMobileExecutor:
         direction=proposal['direction'] if proposal['action']=='turn' else 'FORWARD'
         envelope=report['direction_envelopes'][direction]
         pwm=max(1,int(envelope['max_pwm']*proposal['speed']/.15))
+        reserve = getattr(self, '_reserve_wire_attempt', None)
+        if reserve is not None:reserve(proposal['id'])
         self.last_attempt=dict(wire_delivery='unknown until independent response',proposal_id=proposal['id'])
         class CombinedCancel:
             def is_set(inner):
                 return local_cancel.is_set() or (self.cancel is not None and self.cancel.is_set())
         try:
             result=self.base.pulse(direction,pwm=pwm,seconds=min(proposal['duration'],envelope['max_duration']),
-                lease=lease,boot_id=self.context.boot_id,envelope=envelope,
+                lease=lease,boot_id=self.context.boot_id,envelope=envelope,_executor=self,
                 safety_check=lambda:self.context.safe(proposal),cancel=CombinedCancel())
         except BaseException:
             # A raised start/STOP exchange can leave physical delivery unknown.
@@ -251,6 +253,9 @@ class QualifiedMobileExecutor:
             self.last_stop=result.get('stop')
             if not isinstance(self.last_stop,dict) or self.last_stop.get('acknowledged') is not True:
                 self.stop_uncertain=True
+        if not self.stop_uncertain:
+            complete = getattr(self, '_complete_wire_attempt', None)
+            if complete is not None:complete()
         return dict(acknowledged=result['acknowledged'],executed=None,bounded_complete=True,
                     wire=result.get('command'),stop=result.get('stop'),physically_observed=None)
 

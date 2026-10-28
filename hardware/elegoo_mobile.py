@@ -437,6 +437,9 @@ class ElegooMobileBase:
             ) from exc
 
     def pan(self, degrees):
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None:
+            raise PermissionError('legacy pan cannot bypass the application executor')
         degrees = max(
             self.PAN_MIN,
             min(
@@ -476,6 +479,9 @@ class ElegooMobileBase:
         direction,
         speed=None,
     ):
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None:
+            raise PermissionError('legacy pivot cannot bypass the application executor')
         speed = (
             speed
             if speed is not None
@@ -565,12 +571,15 @@ class ElegooMobileBase:
         finally:self.align.active=False
 
     def pulse(self, direction, *, pwm, seconds, lease, boot_id, envelope, safety_check,
-              cancel=None, clock=time.monotonic, wait=time.sleep):
+              cancel=None, clock=time.monotonic, wait=time.sleep, _executor=None):
         """Qualified N3 timer pulse; local expiry MUST be proven before use.
 
         This method never connects/retries a start. Caller owns independent proof.
         Safety is rechecked every <=20ms; every exit requests STOP. ACK != motion.
         """
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None and _executor is not _application_executor:
+            raise PermissionError('chassis pulse requires application executor')
         if (direction not in ('LEFT','RIGHT','FORWARD','REVERSE') or type(pwm) is not int
                 or not 1<=pwm<=min(35,envelope['max_pwm']) or type(seconds) not in (int,float)
                 or not math.isfinite(seconds) or not 0<seconds<=min(.2,envelope['max_duration'])
@@ -602,9 +611,12 @@ class ElegooMobileBase:
             self.last_pulse=result
         return result
 
-    def pan_qualified(self, degrees, *, safety_check):
+    def pan_qualified(self, degrees, *, safety_check, _executor=None):
         # Same proven N5 position command, with no reconnect/replay. Independent
         # authority must verify physical servo bounds and cancellation behavior.
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None and _executor is not _application_executor:
+            raise PermissionError('pan requires application executor')
         if type(degrees) not in (int, float) or not math.isfinite(degrees) or not 20 <= degrees <= 160:
             raise ValueError('bounded pan position required')
         degrees = int(round(degrees))

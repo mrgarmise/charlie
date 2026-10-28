@@ -11,6 +11,7 @@ class MobileRequests:
         self.requester, self.clock = requester, clock
         self.source = self.observation_id = None
         self.align = AttentionAlignState()
+        self.pan_assumed = 90
 
     def bind_frame(self, frame):
         self.source = frame.source
@@ -21,16 +22,17 @@ class MobileRequests:
             group, action, self.clock(), self.source, self.observation_id, parameters))
 
     def pan(self, degrees):
-        result = self._request('camera-pan', 'pan', degrees=degrees)
+        result = self._request('camera-pan', 'pan', degrees=degrees, expected_pan_degrees=self.pan_assumed)
         if result.get('acknowledged') is not True:
             raise RuntimeError('pan not acknowledged')
-        return result['commanded_degrees']
+        self.pan_assumed = result['commanded_degrees']
+        return self.pan_assumed
 
     def pivot(self, direction, speed=None):
         # This engineering cap is not qualification. Independent admission may
         # only reduce it and must certify local expiration before dispatch.
         return self._request('chassis', 'pulse', direction=direction,
-                             pwm=20 if speed is None else speed, seconds=.1)
+                             pwm=20 if speed is None else speed, seconds=.1, expected_pan_degrees=self.pan_assumed)
 
     def yaw(self):
         value = self.executor.bus.latest_observation('elegoo-pose', max_age=.25, clock=self.clock)

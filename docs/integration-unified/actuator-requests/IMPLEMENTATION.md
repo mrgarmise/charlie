@@ -8,10 +8,13 @@ This increment adds an application-owned ELEGOO executor above the existing
 controller. Pet dispatch can use its existing context and serialized executor;
 face pan and chassis requests use separate independent admission envelopes.
 Both share the transport, stop cutoff, cancellation and sticky uncertainty.
-Normal application registration does not install a face/pan admission authority.
-Thus this code is disarmed pending independent native qualification, not restored
-physical face-tracker acceptance. The authority interface remains dependency
-injected; native artifact ingestion for face/pan is still outstanding software.
+The normal application now attaches the existing CapabilityDeployment journal to
+separate chassis, camera-pan and read-only telemetry admission records. Source
+frames, independent feed, boot, hardware, zone, runtime and measured trials are
+rechecked. An installed registry or safety-feed path grants no authority. No
+qualification or grant is included: physical operation remains disarmed until
+independent native evidence and supervised activation. The evaluator can check
+records and hashes, not attest that a witness or measurement is authentic.
 
 The original face detector and face choice are unchanged. Proportional look,
 hysteresis, predictive reacquisition, local search, yaw counter-rotation and
@@ -49,8 +52,8 @@ needs independent end-to-end tests and performance qualification.
 2. Independently verify installed ELEGOO N3 timer expiry and N5 servo command,
    N1 STOP effects, N24 yaw, and N21/D1=2 read-only semantics. Record firmware and
    bridge hashes and raw responses; do not enable a guessed query.
-3. Complete/review face/pan authority artifact validation before installing an
-   authority. Qualify pan envelope separately from chassis directions, local
+3. Review the face/pan authority artifact validator and independently build its
+   qualification records before requesting a supervised activation. Qualify pan envelope separately from chassis directions, local
    expiry, cancellation/STOP, connection loss, electrical/power safety, floor,
    blind spots, human/animal exclusion and stopping distances.
 4. Once separately admitted, start stationary sensing. Count one MJPEG owner
@@ -64,9 +67,36 @@ needs independent end-to-end tests and performance qualification.
 6. RP2040 checks retain original CAL-1, electrical gate, servo envelopes, local
    arm, watchdog, display and heartbeat. Do not flash or alter original profiles.
 7. On ambiguous motion: independently cut power/stop as qualified; revoke grants;
-   retain all logs. Do not recreate an executor to erase uncertainty. After safe
+   retain all logs. A durable `elegoo-uncertain-motion.lock` marker is written
+   before dispatch. After a crash or ambiguous result it blocks new attempts;
+   STOP does not erase it. Preserve the marker as incident evidence and only
+   clear it after separately authorized inspection, proven physical isolation,
+   reconciliation of the incident, and a fresh boot-bound qualification grant. After safe
    isolation, use preserved deployed checkout/launcher configuration to roll back;
    never reset/delete unrelated worktrees or firmware/evidence.
 
 Real-cat following remains open until safe witnessed following is selected and
 executed through Charlie's ordinary Executive. Native measurements are absent.
+
+## Open software and acceptance boundaries
+
+- `ActuatorSafetyAuthority` requires external, frame-bound, independently
+  measured environment and current pan data. No qualified producer or actual
+  deployment record exists in this environment. Hash/record checks do not
+  authenticate a witness or certify the physical setup.
+- The telemetry producer is polled by the application; read-only activation
+  requires separate protocol and telemetry qualification. Captured measurement
+  time, sensor field of view and pan pose remain unknown unless provided by a
+  separately qualified source. A receipt is not independent movement feedback.
+- The RP2040 gateway is an adapter for existing CAL-1 but existing Deck, Active
+  Vision and calibration call sites are not all migrated through it. Its
+  STOP-versus-in-flight-CAL-1 race and durable uncertainty need conformance work.
+- The legacy standalone head scripts have not been migrated to an installed
+  application executor. Preserve the old checkout for rollback; do not run the
+  old direct-motion scripts concurrently with the integrated app.
+- Independently test simultaneous normal-app object, pet and face operation,
+  full parity, temporal STOP priority at the real socket/serial transport and
+  native throughput. Tests with synthetic qualification records are fixtures.
+- Publication of safety state and pose is partial: range/yaw query data and
+  command receipts exist, but independently observed actuator outcomes and
+  qualified full pose still require an actual source and native validation.

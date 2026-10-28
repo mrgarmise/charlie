@@ -53,6 +53,12 @@ class MobileBase:
         )
 
     def pulse(self, direction, **kwargs):
+        from motion.elegoo_executor import _application_executor
+        authority = kwargs.pop('_executor', None)
+        if _application_executor is not None and authority is not _application_executor:
+            raise PermissionError('motion requests require the application executor')
+        if authority is not None:
+            kwargs['_executor'] = authority
         return self.car.pulse(direction, **kwargs)
 
     def stop_verified(self):

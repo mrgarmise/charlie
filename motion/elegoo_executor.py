@@ -6,6 +6,8 @@ registry flag. Without it no transport is opened. Command receipts are not pose.
 from copy import deepcopy
 from dataclasses import dataclass
 import threading
+import os
+from pathlib import Path
 import time
 from uuid import uuid4
 
@@ -25,17 +27,53 @@ class ActuatorRequest:
 
 
 class QualifiedElegooExecutor(QualifiedMobileExecutor):
-    def __init__(self, base, *, bus, authority=None, clock=time.monotonic):
+    def __init__(self, base, *, bus, authority=None, clock=time.monotonic, fault_path=None):
         super().__init__(base, None, clock=clock)
+        self.fault_path = Path(fault_path) if fault_path is not None else None
+        if self.fault_path is not None and self.fault_path.exists():
+            self.stop_uncertain = True
         self.bus, self.authority = bus, authority
         self.boot_id = uuid4().hex
         self._connected = False
         self._receipts = 0
+        self._receipt_lock = threading.Lock()
         self._generation = uuid4().hex
         bus.claim_observations('elegoo-actuator-state', self, metadata={
             'body': 'ELEGOO', 'modality': 'command-state',
             'clock': 'host-monotonic', 'physical_pose': 'unknown',
             'acquisition': 'executor receipts; not independently observed movement'})
+
+    def _reserve_wire_attempt(self, request_id):
+        # A crash after this durable marker cannot silently rearm a new process.
+        # A leftover marker has no automatic clear path; independent recovery is
+        # outside the executor and must preserve the original incident evidence.
+        if self.fault_path is None:
+            return
+        self.fault_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            fd = os.open(self.fault_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(fd, 'w') as stream:
+                stream.write(str(request_id)[:128]+'\n')
+                stream.flush()
+                os.fsync(stream.fileno())
+            directory = os.open(self.fault_path.parent, os.O_RDONLY)
+            try: os.fsync(directory)
+            finally: os.close(directory)
+        except BaseException:
+            self.stop_uncertain = True
+            raise
+
+    def _complete_wire_attempt(self):
+        if self.fault_path is None:
+            return
+        try:
+            self.fault_path.unlink()
+            directory = os.open(self.fault_path.parent, os.O_RDONLY)
+            try: os.fsync(directory)
+            finally: os.close(directory)
+        except BaseException:
+            self.stop_uncertain = True
+            raise
 
     def attach_pet_context(self, context):
         if self.context is not None and self.context is not context:
@@ -59,12 +97,13 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
 
     def _publish(self, request, result):
         from stimulus.bus import Observation
-        self._receipts += 1
-        self.bus.publish_observation('elegoo-actuator-state', self, Observation(
-            'elegoo-actuator-state', self._receipts, self.clock(),
-            dict(request_id=request.id, requester=request.requester,
-                 group=request.group, action=request.action, **result),
-            {'physical_outcome': 'unknown', 'boot_id': self.boot_id}, self._generation))
+        with self._receipt_lock:
+            self._receipts += 1
+            self.bus.publish_observation('elegoo-actuator-state', self, Observation(
+                'elegoo-actuator-state', self._receipts, self.clock(),
+                dict(request_id=request.id, requester=request.requester,
+                     group=request.group, action=request.action, **result),
+                {'physical_outcome': 'unknown', 'boot_id': self.boot_id}, self._generation))
 
     def _source(self, request):
         frame = self.bus.latest_frame(request.source, max_age=.25, clock=self.clock)
@@ -136,20 +175,23 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
                 self._connected = True
             if not safe():
                 raise PermissionError('admission changed during connection')
+            self._reserve_wire_attempt(request.id)
             attempted = True
             if request.group == 'chassis':
                 result = self.base.pulse(direction, pwm=pwm, seconds=duration,
-                    lease=lease, boot_id=self.boot_id, envelope=envelope,
+                    lease=lease, boot_id=self.boot_id, envelope=envelope, _executor=self,
                     safety_check=safe, cancel=cancel)
                 if result.get('stop', {}).get('acknowledged') is not True:
                     self.stop_uncertain = True
             else:
                 # Existing servo protocol and rounding; never start legacy pivot.
-                angle = self.base.car.pan_qualified(degrees, safety_check=safe)
+                angle = self.base.car.pan_qualified(degrees, safety_check=safe, _executor=self)
                 result = dict(acknowledged=True, commanded_degrees=angle)
                 if not safe():
                     self.stop_uncertain = True
                     raise InterruptedError('pan admission changed during execution')
+            if not self.stop_uncertain:
+                self._complete_wire_attempt()
             result = dict(result, executed=None, physically_observed=None)
             self._publish(request, result)
             return result
@@ -167,14 +209,25 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
             self._request_lock.release()
 
     def stop(self):
-        if self._connected:
-            return super().stop()
-        with self._state_lock:
-            self._stop_at = self.clock()
-            if self._active_cancel is not None:
-                self._active_cancel.set()
-        return dict(sent=False, acknowledged=False, physically_stopped=None,
-                    reason='transport not opened; no physical claim')
+        try:
+            if self._connected:
+                result = super().stop()
+            else:
+                with self._state_lock:
+                    self._stop_at = self.clock()
+                    if self._active_cancel is not None:
+                        self._active_cancel.set()
+                result = dict(sent=False, acknowledged=False, physically_stopped=None,
+                              reason='transport not opened; no physical claim')
+            return result
+        finally:
+            # Publishing must never prevent or delay attempting STOP.
+            try:
+                receipt = ActuatorRequest(uuid4().hex,'stop','chassis','stop',self.clock(),'', '', {})
+                self._publish(receipt,dict(acknowledged=locals().get('result',{}).get('acknowledged'),
+                                           uncertain=self.stop_uncertain,physically_observed=None))
+            except Exception:
+                pass
 
     def close(self):
         try:

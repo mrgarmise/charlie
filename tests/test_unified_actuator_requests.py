@@ -170,3 +170,57 @@ def test_rp2040_gateway_rejects_unqualified_and_stale_without_serial_motion():
     calibration.brain.authorized=True
     with pytest.raises(ValueError):service.request(req)
     assert service.uncertain
+
+
+def test_durable_uncertainty_survives_new_facade(tmp_path):
+    from pathlib import Path
+    e,b,bus,owner,now=setup()
+    marker=tmp_path/'uncertain';e.fault_path=marker
+    b.pulse.side_effect=TimeoutError('unknown start')
+    with pytest.raises(TimeoutError):e.request(request())
+    assert marker.read_text().strip()=='r'
+    fresh=SimpleNamespace(connect=Mock(),close=Mock(),stop_verified=Mock(return_value={'acknowledged':True}),
+        pulse=Mock(),car=SimpleNamespace(pan_qualified=Mock()))
+    new=QualifiedElegooExecutor(fresh,bus=StimulusBus(),authority=e.authority,clock=lambda:10.,fault_path=marker)
+    assert new.stop_uncertain
+    with pytest.raises(ValueError):new.request(request('fresh'))
+    assert marker.exists()
+
+
+def test_durable_marker_removed_only_after_acknowledged_completion(tmp_path):
+    e,b,_,_,_=setup();e.fault_path=tmp_path/'uncertain'
+    result=e.request(request())
+    assert result['acknowledged'] and not e.fault_path.exists()
+    assert e.bus.latest_observation('elegoo-actuator-state',clock=lambda:10.).values['physically_observed'] is None
+
+
+def test_app_owner_constructs_disarmed_without_opening_hardware(tmp_path,monkeypatch):
+    from main import application_mobile_actuators
+    from hardware.elegoo_mobile import ElegooMobileBase
+    connect=Mock(side_effect=AssertionError('must not connect'))
+    monkeypatch.setattr(ElegooMobileBase,'connect',connect)
+    with application_mobile_actuators(StimulusBus(),state=tmp_path) as (executor,telemetry):
+        assert executor.authority is not None
+        assert not telemetry.poll()
+        assert not executor._connected
+        connect.assert_not_called()
+
+
+def test_stop_is_published_but_is_not_measured_stopping():
+    e,b,bus,_,_=setup();e._connected=True
+    result=e.stop();assert result['acknowledged']
+    state=bus.latest_observation('elegoo-actuator-state',clock=lambda:10.)
+    assert state.values['action']=='stop' and state.values['physically_observed'] is None
+
+
+def test_legacy_motor_calls_cannot_bypass_application_executor():
+    from motion.elegoo_executor import install_application_executor,remove_application_executor
+    from motion.mobile_base import MobileBase
+    e,b,_,_,_=setup();install_application_executor(e)
+    try:
+        legacy=MobileBase()
+        with pytest.raises(PermissionError):legacy.pulse('LEFT')
+        with pytest.raises(PermissionError):legacy.car.pan(90)
+        with pytest.raises(PermissionError):legacy.car.start_pivot('LEFT')
+        with pytest.raises(PermissionError):legacy.car.pan_qualified(90,safety_check=lambda:True)
+    finally:remove_application_executor(e)

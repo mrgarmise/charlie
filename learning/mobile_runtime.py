@@ -38,7 +38,7 @@ class ReplayModel(FixtureModel):
         return super().infer(frame)
 
 
-def run_mobile(args, resources, frame_bus=None, actuator_executor=None):
+def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetry=None):
     if not 1<=args.mobile_frames<=10000:raise ValueError('mobile frames must be 1..10000')
     state=args.learning_state.resolve();state.mkdir(parents=True,exist_ok=True)
     revision=subprocess.run(['git','rev-parse','HEAD'],cwd=Path(__file__).resolve().parents[1],
@@ -92,7 +92,7 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None):
             from learning.mobile_safety import MobileSafetyContext
             from learning.deployment import CapabilityDeployment
             # Boot ID is emitted, never restored. Prior process grants cannot revive motion.
-            boot_id=uuid4().hex
+            boot_id=actuator_executor.boot_id if actuator_executor is not None else uuid4().hex
             print(json.dumps(dict(mobile_boot_id=boot_id,motion_authorized=False)),flush=True)
             context=MobileSafetyContext(CapabilityDeployment(lifecycle.journal),boot_id=boot_id,
                 hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.mobile_safety_feed,clock=clock)
@@ -112,7 +112,11 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None):
         if labeled_pairs(lifecycle.journal):behavior.executive_resources.add('native-labeled-mobile-evidence')
         # Existing face/body activity can preempt on this same bus; no legacy conversion.
         status_at=[None]
+        telemetry_at=[None]
         def between_steps():
+            if telemetry is not None and (telemetry_at[0] is None or clock()-telemetry_at[0]>=.1):
+                telemetry.poll()
+                telemetry_at[0]=clock()
             if face_runtime is not None:
                 face_runtime.observe()
                 attention.update(None)

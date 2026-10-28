@@ -248,3 +248,25 @@ def test_emergency_stop_revokes_all_future_behavior_requests():
         {'direction':'LEFT','pwm':20,'seconds':.1})
     with pytest.raises(ValueError):e.request(fresh)
     assert e._safety_stopped and b.pulse.call_count==0
+
+
+def test_slow_pan_admission_does_not_hold_socket_write_lock():
+    import threading
+    from hardware.elegoo_mobile import ElegooMobileBase
+    car=ElegooMobileBase();car.sock=Mock();car._running=True
+    entered=threading.Event();release=threading.Event();outcome=[]
+    def safety():
+        entered.set();assert release.wait(2);return False
+    def motion():
+        try:car.pan_qualified(100,safety_check=safety)
+        except BaseException as exc:outcome.append(exc)
+    thread=threading.Thread(target=motion);thread.start()
+    try:
+        assert entered.wait(2)
+        # A separate STOP-path write can take the socket lock while safety I/O
+        # is suspended. This is software ordering, not physical STOP latency.
+        car._send_raw(b'stop-fixture')
+        assert car.sock.sendall.call_args.args==(b'stop-fixture',)
+    finally:
+        release.set();thread.join(2)
+    assert isinstance(outcome[0],InterruptedError)

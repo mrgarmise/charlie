@@ -188,7 +188,9 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
                     self.stop_uncertain = True
             else:
                 # Existing servo protocol and rounding; never start legacy pivot.
-                angle = self.base.car.pan_qualified(degrees, safety_check=safe, _executor=self)
+                angle = self.base.car.pan_qualified(degrees, safety_check=safe,
+                    wire_guard=lambda:not cancel.is_set() and not self.stop_uncertain
+                        and lease.valid(self.clock(),self.boot_id), _executor=self)
                 result = dict(acknowledged=True, commanded_degrees=angle)
                 if not safe():
                     self.stop_uncertain = True

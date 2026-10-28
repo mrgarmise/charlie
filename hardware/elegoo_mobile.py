@@ -598,7 +598,10 @@ class ElegooMobileBase:
             # A bounded start must not wait a full legacy one-second ACK timeout.
             result['sent']=None  # A failed write/ACK has ambiguous physical delivery.
             response=self._send(payload,expected_id=ident,timeout=min(.05,seconds),retry=False,
-                preflight=lambda:(cancel is None or not cancel.is_set()) and safety_check() is True)
+                # STOP cancellation and lease expiry are cheap and checked
+                # under the send lock. The independent safety check above and
+                # in the pulse loop may perform I/O; never hold this lock for it.
+                preflight=lambda:(cancel is None or not cancel.is_set()) and lease.valid(clock(),boot_id))
             result.update(sent=True,acknowledged=response['ok'])
             if not response['ok']:raise TimeoutError('ambiguous motion ACK')
             while clock()-started<seconds:
@@ -611,7 +614,7 @@ class ElegooMobileBase:
             self.last_pulse=result
         return result
 
-    def pan_qualified(self, degrees, *, safety_check, _executor=None):
+    def pan_qualified(self, degrees, *, safety_check, wire_guard=None, _executor=None):
         # Same proven N5 position command, with no reconnect/replay. Independent
         # authority must verify physical servo bounds and cancellation behavior.
         from motion.elegoo_executor import _application_executor
@@ -620,9 +623,11 @@ class ElegooMobileBase:
         if type(degrees) not in (int, float) or not math.isfinite(degrees) or not 20 <= degrees <= 160:
             raise ValueError('bounded pan position required')
         degrees = int(round(degrees))
+        if safety_check() is not True:
+            raise InterruptedError('independent pan safety veto')
         ident = self._next_id('qualifiedpan')
         response = self._send({'N':5,'H':ident,'D1':1,'D2':degrees},
-            expected_id=ident,timeout=.05,retry=False,preflight=safety_check)
+            expected_id=ident,timeout=.05,retry=False,preflight=wire_guard)
         if response.get('ok') is not True:
             raise TimeoutError('pan acknowledgement unknown')
         return degrees

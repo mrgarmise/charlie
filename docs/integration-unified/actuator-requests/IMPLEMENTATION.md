@@ -165,3 +165,11 @@ snapshot and elapsed host-monotonic time since that snapshot. Neither an old
 feed nor an aged exposure can be made fresh merely by combining two individually
 acceptable values. This applies to both face/pan admission and the existing pet
 safety context; the actual exposure clock and producer remain native evidence.
+
+Independent safety evidence may involve filesystem I/O. It is checked before
+dispatch and during bounded chassis pulses, outside the socket write lock.
+Cancellation and lease expiry are checked again under that lock immediately
+before a command write, so a stalled evidence check cannot itself hold up a STOP
+write. Safety state can change between an evidence check and the wire write;
+car-local expiry, independent local stops, sensor timing and measured braking
+remain mandatory, and host tests do not establish worst-case physical latency.

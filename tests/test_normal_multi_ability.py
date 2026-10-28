@@ -135,3 +135,18 @@ def test_one_live_fixture_runtime_handles_primary_pet_objects_and_face(tmp_path,
     assert primary_detector.detect.call_count==1 and face_detector.detect.call_count==1
     deck.observe_frame.assert_called_once()
     assert frame_bus.frame_owners==owners
+
+
+def test_idle_face_yields_to_pet_without_stopping_shared_executor():
+    from behaviors.mobile_face_runtime import MobileFaceRuntime
+    from attention.manager import AttentionManager
+    frame_bus=StimulusBus();events=StimulusBus();executor=Mock()
+    service=MobileFaceRuntime(frame_bus,events,executor,detector=Mock())
+    manager=AttentionManager(events,mobile_enabled=False)
+    manager.pet_service=Mock(intent='follow')
+    manager.handle_event('elegoo_face_observation',{'service':service,'frame':None,'face':None})
+    executor.stop.assert_not_called()
+    service.behavior._sentry_turn_state=(0,0,'LEFT')
+    manager.handle_event('elegoo_face_observation',{'service':service,'frame':None,'face':None})
+    executor.stop.assert_called_once()
+    service.close()

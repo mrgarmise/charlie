@@ -152,3 +152,10 @@ prove that two different device aliases name the same physical controller.
 `rp2040-motion-state` publishes session-checked firmware MOTION_STATUS through
 the shared bus; pan/tilt remain commanded estimates and measured position is
 unknown. Publication and controller registration never confer motion authority.
+
+An idle face observer yields to a selected pet behavior without repeatedly
+issuing a global chassis STOP. If it owns an active alignment or sentry search,
+yield cancels that face-owned work. Emergency STOP remains global and latched.
+`tools/check_unified_contracts.py` includes the shared actuator admission,
+source ownership, RP2040 fencing and simultaneous-ability host tests; passing
+it still does not qualify hardware.

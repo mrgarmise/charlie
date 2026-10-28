@@ -36,8 +36,12 @@ class MobileFaceRuntime:
         return self.last_status
 
     def yield_attention(self):
+        # Do not issue a global STOP merely because an idle face observer yields
+        # to a selected pet behavior. Cancel only face-owned alignment/search.
         self.behavior.face_lost()
-        self.mobile.stop()
+        if getattr(self.behavior, '_sentry_turn_state', None) is not None:
+            self.mobile.stop()
+            self.behavior._sentry_turn_state = None
 
     def close(self):
         try:

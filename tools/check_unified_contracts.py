@@ -6,6 +6,10 @@ import sys
 TESTS = [
     'tests/test_unified_reconciliation.py',
     'tests/test_shared_mobile_executor.py',
+    'tests/test_unified_actuator_requests.py',
+    'tests/test_actuator_authority.py',
+    'tests/test_rp2040_gateway_fence.py',
+    'tests/test_normal_multi_ability.py',
     'tests/test_legacy_motion_boundary.py',
     'tests/test_camera_sources.py',
     'tests/test_sensory_history.py',

@@ -41,12 +41,12 @@ class AttentionManager:
     def _consider_pet(self, result):
         service=self.pet_service
         if service is None:return
-        if self.emergency_stopped:
-            service.yield_attention('emergency_stop_latched',result)
-            return
         opportunity=result['tracking'].get('target')
         if opportunity is None:
             service.yield_attention('target_lost_or_ambiguous',result)
+            return
+        if self.emergency_stopped:
+            service.yield_attention('emergency_stop_latched',result)
             return
         readiness=service.readiness()
         resources={'mobile-camera','mobile-models'} if readiness['pet_observe']['available'] else set()

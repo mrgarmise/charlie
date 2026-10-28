@@ -83,6 +83,54 @@ def test_unexpected_gateway_failure_latches_across_restart(tmp_path):
     gateway=RP2040Requests(controller,calibration,StimulusBus(),fault_path=marker)
     with pytest.raises(TimeoutError):gateway.observe_frame('frame')
     assert gateway.uncertain and marker.exists()
-    restarted=RP2040Requests(controller,calibration,StimulusBus(),fault_path=marker)
+    restarted=RP2040Requests(host(),calibration,StimulusBus(),fault_path=marker)
     assert restarted.uncertain and restarted.observe_frame('frame') is None
     restarted.stop();assert marker.exists()
+
+
+def test_two_gateways_cannot_own_one_controller():
+    import pytest
+    controller=host();calibration=SimpleNamespace(brain=None,health=SimpleNamespace(quarantined=False))
+    RP2040Requests(controller,calibration,StimulusBus())
+    with pytest.raises(ValueError,match='already has'):
+        RP2040Requests(controller,calibration,StimulusBus())
+
+
+def test_serial_lease_blocks_another_cooperating_controller(monkeypatch,tmp_path):
+    import hashlib
+    import os
+    from hardware.hailo_session import accelerator_lease
+    import hardware.rp2040_controller as module
+    controller=host();controller.port=str(tmp_path/'serial-fixture');controller.baud=115200
+    controller.serial=None;controller._accepted=lambda *a:True
+    monkeypatch.setattr(module.time,'sleep',lambda _:None)
+    serial_open=MockSerial=[]
+    def create(*a,**kw):
+        MockSerial.append((a,kw));return Wire()
+    monkeypatch.setattr(module.serial,'Serial',create)
+    key=hashlib.sha256(os.path.realpath(controller.port).encode()).hexdigest()[:20]
+    lock='/tmp/charlie-rp2040-'+key+'.lock'
+    with accelerator_lease(lock):
+        assert controller.connect() is False
+        assert not serial_open
+    assert controller.connect() is True
+    assert len(serial_open)==1
+    controller.close()
+
+
+def test_status_publication_is_fresh_source_bound_and_not_measured_pose():
+    controller=host();controller.link_session='fixture-session'
+    controller.motion_status=lambda:dict(schema='charlie-motion-authority-v1',session='fixture-session',
+        armed=False,moving=False,pan=90,tilt=90,pose_source='commanded_estimate',measured_position=None)
+    calibration=SimpleNamespace(brain=None,health=SimpleNamespace(quarantined=False))
+    bus=StimulusBus();gateway=RP2040Requests(controller,calibration,bus,clock=lambda:5.)
+    first=bus.subscribe_observations('rp2040-motion-state',clock=lambda:5.)
+    second=bus.subscribe_observations('rp2040-motion-state',clock=lambda:5.)
+    assert gateway.poll()
+    assert first.read().values['measured_position'] is None
+    assert second.read().provenance['physical_pose']=='unknown'
+    controller.motion_status=lambda:None
+    assert not gateway.poll()
+    import pytest
+    with pytest.raises(OSError):first.read()
+    gateway.close()

@@ -1,0 +1,60 @@
+........................................................................ [  4%]
+..............................ss.ss.ss................s..sssss.ss..ssss. [  9%]
+........................................................................ [ 14%]
+........................................................................ [ 19%]
+........................................................................ [ 24%]
+....................................................................s... [ 28%]
+........................................................................ [ 33%]
+........................................................................ [ 38%]
+........................................................................ [ 43%]
+........................................................................ [ 48%]
+........................................................................ [ 52%]
+.............................................................F.......... [ 57%]
+........................................................................ [ 62%]
+........................................................................ [ 67%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+............................................s........................... [ 86%]
+........................................................................ [ 91%]
+........................................................................ [ 96%]
+..........................................................               [100%]
+=================================== FAILURES ===================================
+___________ test_attention_uses_executive_and_debounces_species_flip ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f823c346120>
+
+    def test_attention_uses_executive_and_debounces_species_flip(monkeypatch):
+        from attention.manager import AttentionManager
+        from stimulus.bus import StimulusBus
+        from learning.capabilities import default_registry
+        monkeypatch.setattr('learning.cycle.gameplay_active',lambda:False)
+        a=AttentionManager(StimulusBus(),mobile_enabled=True);s=Mock()
+        s.readiness.return_value={'pet_observe':{'available':True},'pet_follow':{'available':False}}
+        s.executive_resources=set();s.perception.clock.return_value=1.
+        e=Mock();e.projects.return_value={'x':{'method':'mobile-observe'}}
+        e.consider_mobile_attention.return_value={'intent':'observe','project_id':'x'}
+        a.attach_pet_service(s,e,default_registry())
+        result=dict(tracking={'target':{'id':'animal-1','label':'cat'}},evidence_id='event')
+        a.handle_event('mobile_opportunity',result)
+        result['tracking']['target']['label']='dog';a.handle_event('mobile_opportunity',result)
+        assert e.consider_mobile_attention.call_count==1 and s.accept_attention.call_count==2
+        assert a._ensure_mobile() is None
+        a.handle_event('emergency_stop',None);s.yield_attention.assert_called_with('emergency_stop')
+        a.handle_event('mobile_opportunity',{'tracking':{'target':None}})
+>       assert s.yield_attention.call_args.args[0]=='target_lost_or_ambiguous'
+E       AssertionError: assert 'emergency_stop_latched' == 'target_lost_or_ambiguous'
+E         
+E         - target_lost_or_ambiguous
+E         + emergency_stop_latched
+
+tests/test_pet_completion.py:150: AssertionError
+=============================== warnings summary ===============================
+tests/test_thermal_recovery.py::test_restart_retains_same_investigation_checkpoint_and_no_duplicates
+  tests/test_thermal_recovery.py:127: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    def test_restart_retains_same_investigation_checkpoint_and_no_duplicates(tmp_path,monkeypatch,record_property):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_pet_completion.py::test_attention_uses_executive_and_debounces_species_flip
+1 failed, 1477 passed, 21 skipped, 1 warning in 341.50s (0:05:41)

@@ -11,3 +11,11 @@ was modified. Independent CI is required on the final published commit.
 A contract run overlapped that isolated gameplay test and failed one attention
 assertion because the real gameplay resource lock was held. Its sequential rerun
 passed. These observed environmental conflicts are not silently discarded.
+
+Clean host run on remote commit 9aeee4916a3563fb17f22c716b566ea124bbb3e1:
+1477 passed, 21 skipped, one failure. Independent CI on that commit also failed
+all three workflows on the same test: lost-target reason after an emergency stop.
+The later correction handles target loss first while retaining the latched stop;
+focused tests cover both loss semantics and the inability to resume movement.
+The clean broad output is preserved in broad-9aeee.txt. CI on the corrected head
+must still pass before software qualification is asserted.

@@ -7,6 +7,7 @@ import threading
 import time
 import os
 from pathlib import Path
+from uuid import uuid4
 from copy import deepcopy
 from contextlib import nullcontext
 from motion.elegoo_executor import ActuatorRequest
@@ -14,13 +15,49 @@ from experiments.ppal.mobile_navigation import age
 
 
 class RP2040Requests:
+    _owner_lock = threading.Lock()
     def __init__(self, controller, calibration, bus, *, clock=time.monotonic, fault_path=None):
+        with self._owner_lock:
+            if controller.__dict__.get('_charlie_rp2040_gateway') is not None:
+                raise ValueError('RP2040 controller already has an actuator gateway')
+            controller.__dict__['_charlie_rp2040_gateway'] = self
         self.controller, self.calibration, self.bus, self.clock = controller, calibration, bus, clock
         self.lock = threading.Lock()
         self.used = set()
         self.fault_path = Path(fault_path) if fault_path is not None else None
         self.uncertain = self.fault_path is not None and self.fault_path.exists()
         self.stopped_at = None
+        self.generation, self.sequence = uuid4().hex, 0
+        self.bus.claim_observations('rp2040-motion-state',self,metadata={
+            'body':'RP2040','modality':'controller-state','clock':'host-monotonic receipt',
+            'acquisition':'existing RP2040 controller MOTION_STATUS',
+            'physical_pose':'not measured; firmware reports commanded estimates'})
+
+    def poll(self):
+        from stimulus.bus import Observation
+        if not self.lock.acquire(blocking=False):
+            return False
+        try:
+            started = self.clock()
+            status = self.controller.motion_status()
+            if (not isinstance(status,dict) or status.get('schema') != 'charlie-motion-authority-v1'
+                    or not getattr(self.controller,'link_session',None)
+                    or status.get('session') != self.controller.link_session):
+                raise ValueError('current controller status unavailable')
+            self.sequence += 1
+            self.bus.publish_observation('rp2040-motion-state',self,Observation(
+                'rp2040-motion-state',self.sequence,self.clock(),status,
+                {'query_started_at':started,'physical_pose':'unknown',
+                 'position_provenance':'firmware commanded estimate'},self.generation))
+            return True
+        except Exception as exc:
+            self.bus.observation_fault('rp2040-motion-state',self,str(exc))
+            return False
+        finally:
+            self.lock.release()
+
+    def close(self):
+        self.bus.release_observations('rp2040-motion-state',self)
 
     def _reserve(self):
         if self.fault_path is None:

@@ -103,6 +103,7 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
                               supervised=os.environ.get('CHARLIE_NECK_SUPERVISED')=='1')
             deck.actuator_gateway=RP2040Requests(deck.body,neck,frame_bus,
                 fault_path=state/'rp2040-uncertain-motion.lock')
+            owners.callback(deck.actuator_gateway.close)
             pi_source=CameraSubscription(frame_bus)
             owners.callback(pi_source.close)
             pi_source.switch('pi')
@@ -153,7 +154,11 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
         # Existing face/body activity can preempt on this same bus; no legacy conversion.
         status_at=[None]
         telemetry_at=[None]
+        neck_telemetry_at=[None]
         def between_steps():
+            if deck is not None and (neck_telemetry_at[0] is None or clock()-neck_telemetry_at[0]>=1.):
+                deck.actuator_gateway.poll()
+                neck_telemetry_at[0]=clock()
             if primary_vision is not None:
                 primary_vision.update()
                 attention.update(deck)

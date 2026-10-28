@@ -3,6 +3,8 @@ import time
 import threading
 import json
 import uuid
+import os
+import hashlib
 from contextlib import contextmanager
 
 
@@ -25,6 +27,7 @@ class RP2040Controller:
         instance._motion_fence_lock = threading.Lock()
         instance._motion_generation = 0
         instance._motion_scope = threading.local()
+        instance._serial_lease = None
         return instance
 
     HEARTBEAT_INTERVAL = 3.0
@@ -71,6 +74,14 @@ class RP2040Controller:
         try:
 
             with self.lock:
+                if getattr(self, 'running', True) is False:
+                    return False
+                if self._serial_lease is None:
+                    from hardware.hailo_session import accelerator_lease
+                    key=hashlib.sha256(os.path.realpath(self.port).encode()).hexdigest()[:20]
+                    lease=accelerator_lease('/tmp/charlie-rp2040-'+key+'.lock')
+                    lease.__enter__()
+                    self._serial_lease=lease
 
                 if self.serial:
 
@@ -530,5 +541,7 @@ class RP2040Controller:
 
             except Exception:
                 pass
-
-        self.connected = False
+            self.connected = False
+            if self._serial_lease is not None:
+                lease,self._serial_lease=self._serial_lease,None
+                lease.__exit__(None,None,None)

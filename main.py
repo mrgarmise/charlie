@@ -246,6 +246,7 @@ def main(argv=None):
             from motion.rp2040_requests import RP2040Requests
             deck.actuator_gateway=RP2040Requests(deck.body,neck,frame_bus,
                 fault_path=args.learning_state/'rp2040-uncertain-motion.lock')
+            lifecycle.callback(deck.actuator_gateway.close)
             attention=AttentionManager(bus,mobile_enabled=os.environ.get('CHARLIE_MOBILE_ENABLED')=='1',object_labels=labels,
                 emergency_stop=executor.emergency_stop)
             lifecycle.callback(attention.close)
@@ -269,6 +270,7 @@ def main(argv=None):
                 face_runtime=MobileFaceRuntime(frame_bus,bus,executor)
                 lifecycle.callback(face_runtime.close)
             last_telemetry=0.
+            last_neck_telemetry=0.
             bus.emit('idle')
             attention.update(deck)
             previous=None
@@ -278,6 +280,9 @@ def main(argv=None):
                 if time.monotonic()-last_telemetry>=.1:
                     telemetry.poll()
                     last_telemetry=time.monotonic()
+                if time.monotonic()-last_neck_telemetry>=1.:
+                    deck.actuator_gateway.poll()
+                    last_neck_telemetry=time.monotonic()
                 attention.update(deck)
                 # Existing status surface: console, plus consumable status JSON.
                 path=args.learning_state/'development-status.json'

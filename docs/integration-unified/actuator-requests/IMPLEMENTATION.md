@@ -141,3 +141,14 @@ physical emergency stop. Add `--primary-vision` to attach the existing Pi primar
 CAL-1 service to that same AttentionManager and application feeders. A host
 fixture exercises primary vision, face, pet and object observations together;
 it does not qualify native timing, tracking, physical motion or animal following.
+
+## RP2040 serial ownership and observed status
+
+The existing RP2040Controller holds a cooperative, device-path-based file lease
+for its serial connection lifetime, including reconnects. A second gateway on
+the same controller is rejected; a second cooperating process cannot open that
+port while the lease is held. This does not constrain noncooperating programs or
+prove that two different device aliases name the same physical controller.
+`rp2040-motion-state` publishes session-checked firmware MOTION_STATUS through
+the shared bus; pan/tilt remain commanded estimates and measured position is
+unknown. Publication and controller registration never confer motion authority.

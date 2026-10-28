@@ -1,0 +1,8 @@
+{
+  "memory/human_interaction.py": "960502641abb52e89d760f4e21829231e1f6420211d2d08dfb68f955f089d634",
+  "memory/learning_projects.py": "1b04ed75a5628ed749e5f059ea171040064f8883b10aff91756692b056fbe467",
+  "ui/human_questions.py": "810d62cd8a3db32331f44abc523c449814513ef287ddd6974a8d267b9c51dfae",
+  "tests/test_human_interaction.py": "7b44bc3e27e0431d204440f6d8b273a98c151de5242d5975b5a3eb40e0710ba1",
+  "tests/test_human_questions_http.py": "99640a310adfb5dbf55cf86d0e39b3a376dafe273c1db9f68b54efda4cdf0419",
+  "tests/test_human_questions_browser.py": "685530a439a1571c68ae076aa58cd1fb691896bb9bf391013630482750190bbd"
+}

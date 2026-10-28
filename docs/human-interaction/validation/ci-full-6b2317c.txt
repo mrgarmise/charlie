@@ -1,0 +1,416 @@
+﻿2026-10-28T19:35:53.0693257Z Current runner version: '2.338.0'
+2026-10-28T19:35:53.0730550Z ##[group]Runner Image Provisioner
+2026-10-28T19:35:53.0731841Z Hosted Compute Agent
+2026-10-28T19:35:53.0732975Z Version: 20261021.618
+2026-10-28T19:35:53.0734070Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-28T19:35:53.0735427Z Build Date: 2026-10-21T00:45:21Z
+2026-10-28T19:35:53.0736622Z Worker ID: {d64b60ea-2402-45af-a65e-bf6d11f13df1}
+2026-10-28T19:35:53.0737863Z Region: eastus
+2026-10-28T19:35:53.0738997Z Cloud: Azure
+2026-10-28T19:35:53.0740197Z ##[endgroup]
+2026-10-28T19:35:53.0742855Z ##[group]Operating System
+2026-10-28T19:35:53.0743978Z Ubuntu
+2026-10-28T19:35:53.0744945Z 26.04.1
+2026-10-28T19:35:53.0745881Z LTS
+2026-10-28T19:35:53.0746724Z ##[endgroup]
+2026-10-28T19:35:53.0747673Z ##[group]Runner Image
+2026-10-28T19:35:53.0748705Z Image: ubuntu-26.04
+2026-10-28T19:35:53.0750082Z Version: 20261025.179.1
+2026-10-28T19:35:53.0752279Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261025.179/images/ubuntu/Ubuntu2604-Readme.md
+2026-10-28T19:35:53.0755131Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261025.179
+2026-10-28T19:35:53.0756906Z ##[endgroup]
+2026-10-28T19:35:53.0758779Z ##[group]GITHUB_TOKEN Permissions
+2026-10-28T19:35:53.0761836Z Contents: read
+2026-10-28T19:35:53.0762837Z Metadata: read
+2026-10-28T19:35:53.0763897Z ##[endgroup]
+2026-10-28T19:35:53.0767628Z Secret source: Actions
+2026-10-28T19:35:53.0769271Z Cache mode: write
+2026-10-28T19:35:53.0771099Z Prepare workflow directory
+2026-10-28T19:35:53.1274944Z Prepare all required actions
+2026-10-28T19:35:53.1348971Z Getting action download info
+2026-10-28T19:35:53.2936174Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-28T19:35:53.4014302Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-28T19:35:53.4607334Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-28T19:35:53.6553000Z Complete job name: software
+2026-10-28T19:35:53.7440845Z ##[group]Run actions/checkout@v4
+2026-10-28T19:35:53.7441736Z with:
+2026-10-28T19:35:53.7442258Z   fetch-depth: 0
+2026-10-28T19:35:53.7442745Z   repository: mrgarmise/charlie
+2026-10-28T19:35:53.7446783Z   token: ***
+2026-10-28T19:35:53.7447234Z   ssh-strict: true
+2026-10-28T19:35:53.7447687Z   ssh-user: git
+2026-10-28T19:35:53.7448154Z   persist-credentials: true
+2026-10-28T19:35:53.7448657Z   clean: true
+2026-10-28T19:35:53.7449107Z   sparse-checkout-cone-mode: true
+2026-10-28T19:35:53.7449833Z   fetch-tags: false
+2026-10-28T19:35:53.7450304Z   show-progress: true
+2026-10-28T19:35:53.7450763Z   lfs: false
+2026-10-28T19:35:53.7451187Z   submodules: false
+2026-10-28T19:35:53.7451649Z   set-safe-directory: true
+2026-10-28T19:35:53.7452172Z   allow-unsafe-pr-checkout: false
+2026-10-28T19:35:53.7452965Z ##[endgroup]
+2026-10-28T19:35:54.0553597Z Syncing repository: mrgarmise/charlie
+2026-10-28T19:35:54.0556947Z ##[group]Getting Git version info
+2026-10-28T19:35:54.0558570Z Working directory is '/home/runner/work/charlie/charlie'
+2026-10-28T19:35:54.0561062Z [command]/usr/bin/git version
+2026-10-28T19:35:54.0580932Z git version 2.56.0
+2026-10-28T19:35:54.0633283Z ##[endgroup]
+2026-10-28T19:35:54.0640725Z Temporarily overriding HOME='/home/runner/work/_temp/e7a7ccb7-6e1b-4909-ac4b-d0440f3bbe87' before making global git config changes
+2026-10-28T19:35:54.0643973Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-28T19:35:54.0646438Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/charlie/charlie
+2026-10-28T19:35:54.0720700Z Deleting the contents of '/home/runner/work/charlie/charlie'
+2026-10-28T19:35:54.0722409Z ##[group]Initializing the repository
+2026-10-28T19:35:54.0725612Z [command]/usr/bin/git init /home/runner/work/charlie/charlie
+2026-10-28T19:35:54.0882308Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-28T19:35:54.0885123Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-28T19:35:54.0886570Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-28T19:35:54.0887827Z hint: call:
+2026-10-28T19:35:54.0888711Z hint:
+2026-10-28T19:35:54.0889836Z hint: 	git config --global init.defaultBranch <name>
+2026-10-28T19:35:54.0890939Z hint:
+2026-10-28T19:35:54.0892357Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-28T19:35:54.0893829Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-28T19:35:54.0895049Z hint:
+2026-10-28T19:35:54.0895980Z hint: 	git branch -m <name>
+2026-10-28T19:35:54.0896812Z hint:
+2026-10-28T19:35:54.0897763Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-28T19:35:54.0905408Z Initialized empty Git repository in /home/runner/work/charlie/charlie/.git/
+2026-10-28T19:35:54.0921624Z [command]/usr/bin/git remote add origin https://github.com/mrgarmise/charlie
+2026-10-28T19:35:54.0983004Z ##[endgroup]
+2026-10-28T19:35:54.0985124Z ##[group]Disabling automatic garbage collection
+2026-10-28T19:35:54.0986871Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-28T19:35:54.1027334Z ##[endgroup]
+2026-10-28T19:35:54.1029424Z ##[group]Setting up auth
+2026-10-28T19:35:54.1035215Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T19:35:54.1075738Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T19:35:54.1700363Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T19:35:54.1744368Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T19:35:54.2015554Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T19:35:54.2050800Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T19:35:54.2315747Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-28T19:35:54.2355066Z ##[endgroup]
+2026-10-28T19:35:54.2365305Z ##[group]Fetching the repository
+2026-10-28T19:35:54.2367154Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +431e4757958d0e93339a0891703365ebfd478243:refs/remotes/pull/14/merge
+2026-10-28T19:36:00.4714761Z From https://github.com/mrgarmise/charlie
+2026-10-28T19:36:00.4717846Z  * [new branch]      audit/shared-sensory-contracts           -> origin/audit/shared-sensory-contracts
+2026-10-28T19:36:00.4720654Z  * [new branch]      feature/active-vision                    -> origin/feature/active-vision
+2026-10-28T19:36:00.4722835Z  * [new branch]      feature/agency-first-self                -> origin/feature/agency-first-self
+2026-10-28T19:36:00.4724977Z  * [new branch]      feature/ala2-causal-acceptance           -> origin/feature/ala2-causal-acceptance
+2026-10-28T19:36:00.4727578Z  * [new branch]      feature/ala2-experience-to-decision-recovery -> origin/feature/ala2-experience-to-decision-recovery
+2026-10-28T19:36:00.4730833Z  * [new branch]      feature/ala2-thermal-recovery            -> origin/feature/ala2-thermal-recovery
+2026-10-28T19:36:00.4733579Z  * [new branch]      feature/asynchronous-human-questions     -> origin/feature/asynchronous-human-questions
+2026-10-28T19:36:00.4736175Z  * [new branch]      feature/autonomous-camera-calibration    -> origin/feature/autonomous-camera-calibration
+2026-10-28T19:36:00.4739226Z  * [new branch]      feature/best-of-charlie-consolidation    -> origin/feature/best-of-charlie-consolidation
+2026-10-28T19:36:00.4742692Z  * [new branch]      feature/charlie-memory                   -> origin/feature/charlie-memory
+2026-10-28T19:36:00.4745069Z  * [new branch]      feature/charlie-vision-lab               -> origin/feature/charlie-vision-lab
+2026-10-28T19:36:00.4747931Z  * [new branch]      feature/closed-loop-gameplay             -> origin/feature/closed-loop-gameplay
+2026-10-28T19:36:00.4751220Z  * [new branch]      feature/e1-information-yield-shadow      -> origin/feature/e1-information-yield-shadow
+2026-10-28T19:36:00.4754404Z  * [new branch]      feature/e1-native-causal-probe           -> origin/feature/e1-native-causal-probe
+2026-10-28T19:36:00.4757464Z  * [new branch]      feature/fast-projectile-self             -> origin/feature/fast-projectile-self
+2026-10-28T19:36:00.4760852Z  * [new branch]      feature/hailo-observation-bridge         -> origin/feature/hailo-observation-bridge
+2026-10-28T19:36:00.4763753Z  * [new branch]      feature/hailo-score-reader               -> origin/feature/hailo-score-reader
+2026-10-28T19:36:00.4766699Z  * [new branch]      feature/marathon-boundary-recovery       -> origin/feature/marathon-boundary-recovery
+2026-10-28T19:36:00.4770284Z  * [new branch]      feature/marathon-camera-lifecycle        -> origin/feature/marathon-camera-lifecycle
+2026-10-28T19:36:00.4774021Z  * [new branch]      feature/mobile-perception-pet-following  -> origin/feature/mobile-perception-pet-following
+2026-10-28T19:36:00.4777447Z  * [new branch]      feature/native-marathon-restart          -> origin/feature/native-marathon-restart
+2026-10-28T19:36:00.4781031Z  * [new branch]      feature/native-terminal-forensics        -> origin/feature/native-terminal-forensics
+2026-10-28T19:36:00.4785109Z  * [new branch]      feature/object-label-picoed-display      -> origin/feature/object-label-picoed-display
+2026-10-28T19:36:00.4789474Z  * [new branch]      feature/persistent-agency-recovery       -> origin/feature/persistent-agency-recovery
+2026-10-28T19:36:00.4793352Z  * [new branch]      feature/ppal-integration                 -> origin/feature/ppal-integration
+2026-10-28T19:36:00.4796548Z  * [new branch]      feature/ppal-vision-focus                -> origin/feature/ppal-vision-focus
+2026-10-28T19:36:00.4799994Z  * [new branch]      feature/progress-aware-marathon-watchdog -> origin/feature/progress-aware-marathon-watchdog
+2026-10-28T19:36:00.4803356Z  * [new branch]      feature/prompt-terminal-restart          -> origin/feature/prompt-terminal-restart
+2026-10-28T19:36:00.4807156Z  * [new branch]      feature/robotron-score-tracker           -> origin/feature/robotron-score-tracker
+2026-10-28T19:36:00.4812658Z  * [new branch]      feature/score-feedback-master-integration -> origin/feature/score-feedback-master-integration
+2026-10-28T19:36:00.4816630Z  * [new branch]      fix/robotron-learning-readiness          -> origin/fix/robotron-learning-readiness
+2026-10-28T19:36:00.4820666Z  * [new branch]      integration/native-marathon-20261020     -> origin/integration/native-marathon-20261020
+2026-10-28T19:36:00.4824786Z  * [new branch]      integration/unified-sensory-motion-20261026 -> origin/integration/unified-sensory-motion-20261026
+2026-10-28T19:36:00.4827618Z  * [new branch]      master                                   -> origin/master
+2026-10-28T19:36:00.4830186Z  * [new tag]         best-of-charlie-v0.1.0                   -> best-of-charlie-v0.1.0
+2026-10-28T19:36:00.4832516Z  * [new ref]         431e4757958d0e93339a0891703365ebfd478243 -> pull/14/merge
+2026-10-28T19:36:00.4836512Z ##[endgroup]
+2026-10-28T19:36:00.4838329Z ##[group]Determining the checkout info
+2026-10-28T19:36:00.4841261Z ##[endgroup]
+2026-10-28T19:36:00.4842392Z [command]/usr/bin/git sparse-checkout disable
+2026-10-28T19:36:00.4845501Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-28T19:36:00.4849080Z ##[group]Checking out the ref
+2026-10-28T19:36:00.4925003Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/14/merge
+2026-10-28T19:36:00.6612435Z Note: switching to 'refs/remotes/pull/14/merge'.
+2026-10-28T19:36:00.6614071Z 
+2026-10-28T19:36:00.6614976Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-28T19:36:00.6617181Z changes and commit them, and you can discard any commits you make in this
+2026-10-28T19:36:00.6619358Z state without impacting any branches by switching back to a branch.
+2026-10-28T19:36:00.6620971Z 
+2026-10-28T19:36:00.6621816Z If you want to create a new branch to retain commits you create, you may
+2026-10-28T19:36:00.6623865Z do so (now or later) by using -c with the switch command. Example:
+2026-10-28T19:36:00.6625034Z 
+2026-10-28T19:36:00.6625490Z   git switch -c <new-branch-name>
+2026-10-28T19:36:00.6626253Z 
+2026-10-28T19:36:00.6626691Z Or undo this operation with:
+2026-10-28T19:36:00.6627386Z 
+2026-10-28T19:36:00.6627770Z   git switch -
+2026-10-28T19:36:00.6628275Z 
+2026-10-28T19:36:00.6629216Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-28T19:36:00.6630833Z 
+2026-10-28T19:36:00.6632521Z HEAD is now at 431e475 Merge 6b2317c1f9889da57aebe0450333c398099c146d into bcf8082f6319c63c4bd6bcceeab5faea37241654
+2026-10-28T19:36:00.6637550Z ##[endgroup]
+2026-10-28T19:36:00.6686304Z [command]/usr/bin/git log -1 --format=%H
+2026-10-28T19:36:00.6711889Z 431e4757958d0e93339a0891703365ebfd478243
+2026-10-28T19:36:00.7141656Z ##[group]Run actions/setup-python@v5
+2026-10-28T19:36:00.7143088Z with:
+2026-10-28T19:36:00.7144133Z   python-version: 3.12
+2026-10-28T19:36:00.7145323Z   check-latest: false
+2026-10-28T19:36:00.7160470Z   token: ***
+2026-10-28T19:36:00.7161579Z   update-environment: true
+2026-10-28T19:36:00.7162872Z   allow-prereleases: false
+2026-10-28T19:36:00.7164145Z   freethreaded: false
+2026-10-28T19:36:00.7165284Z ##[endgroup]
+2026-10-28T19:36:00.8568934Z ##[group]Installed versions
+2026-10-28T19:36:00.8740947Z (node:2381) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T19:36:00.8744385Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T19:36:00.8746871Z Successfully set up CPython (3.12.15)
+2026-10-28T19:36:00.8749934Z ##[endgroup]
+2026-10-28T19:36:00.8950609Z ##[group]Run python -m pip install -r requirements.txt pytest
+2026-10-28T19:36:00.8953459Z [36;1mpython -m pip install -r requirements.txt pytest[0m
+2026-10-28T19:36:00.9020846Z shell: /usr/bin/bash -e {0}
+2026-10-28T19:36:00.9021863Z env:
+2026-10-28T19:36:00.9022894Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:36:00.9024675Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-28T19:36:00.9026411Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:36:00.9027982Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:36:00.9029796Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:36:00.9031733Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-28T19:36:00.9033100Z ##[endgroup]
+2026-10-28T19:36:01.8362366Z Collecting pytest
+2026-10-28T19:36:01.8767514Z   Downloading pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+2026-10-28T19:36:01.9012903Z Collecting pyserial==3.5 (from -r requirements.txt (line 2))
+2026-10-28T19:36:01.9102441Z   Downloading pyserial-3.5-py2.py3-none-any.whl.metadata (1.6 kB)
+2026-10-28T19:36:02.1455087Z Collecting numpy<3,>=1.26 (from -r requirements.txt (line 3))
+2026-10-28T19:36:02.1547160Z   Downloading numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+2026-10-28T19:36:02.3236724Z Collecting Pillow<13,>=10 (from -r requirements.txt (line 4))
+2026-10-28T19:36:02.3329176Z   Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.1 kB)
+2026-10-28T19:36:02.3989513Z Collecting opencv-python-headless<6,>=4.8 (from -r requirements.txt (line 5))
+2026-10-28T19:36:02.4077137Z   Downloading opencv_python_headless-5.0.0.93-cp37-abi3-manylinux_2_28_x86_64.whl.metadata (19 kB)
+2026-10-28T19:36:02.4346839Z Collecting mpremote<2,>=1.24 (from -r requirements.txt (line 7))
+2026-10-28T19:36:02.4449873Z   Downloading mpremote-1.29.0-py3-none-any.whl.metadata (4.3 kB)
+2026-10-28T19:36:02.4791794Z Collecting platformdirs>=4.3.7 (from mpremote<2,>=1.24->-r requirements.txt (line 7))
+2026-10-28T19:36:02.4881614Z   Downloading platformdirs-4.14.0-py3-none-any.whl.metadata (5.4 kB)
+2026-10-28T19:36:02.5118997Z Collecting iniconfig>=2 (from pytest)
+2026-10-28T19:36:02.5206568Z   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+2026-10-28T19:36:02.5469713Z Collecting packaging>=24 (from pytest)
+2026-10-28T19:36:02.5567023Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-28T19:36:02.5954233Z Collecting pluggy<2,>=1.6 (from pytest)
+2026-10-28T19:36:02.6045479Z   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+2026-10-28T19:36:02.6327894Z Collecting pygments>=2.15 (from pytest)
+2026-10-28T19:36:02.6413498Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-28T19:36:02.6544839Z Downloading pyserial-3.5-py2.py3-none-any.whl (90 kB)
+2026-10-28T19:36:02.6729068Z Downloading numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+2026-10-28T19:36:02.7483108Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 250.4 MB/s  0:00:00
+2026-10-28T19:36:02.7572028Z Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.9 MB)
+2026-10-28T19:36:02.7801294Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.9/6.9 MB 327.0 MB/s  0:00:00
+2026-10-28T19:36:02.7894270Z Downloading opencv_python_headless-5.0.0.93-cp37-abi3-manylinux_2_28_x86_64.whl (61.2 MB)
+2026-10-28T19:36:02.9840224Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.2/61.2 MB 317.5 MB/s  0:00:00
+2026-10-28T19:36:02.9985389Z Downloading mpremote-1.29.0-py3-none-any.whl (38 kB)
+2026-10-28T19:36:03.0100996Z Downloading pytest-9.2.0-py3-none-any.whl (411 kB)
+2026-10-28T19:36:03.0221831Z Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+2026-10-28T19:36:03.0331136Z Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+2026-10-28T19:36:03.0438775Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-28T19:36:03.0732436Z Downloading platformdirs-4.14.0-py3-none-any.whl (35 kB)
+2026-10-28T19:36:03.0841832Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-10-28T19:36:03.0917193Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 196.2 MB/s  0:00:00
+2026-10-28T19:36:03.2426039Z Installing collected packages: pyserial, pygments, pluggy, platformdirs, Pillow, packaging, numpy, iniconfig, pytest, opencv-python-headless, mpremote
+2026-10-28T19:36:07.4241298Z 
+2026-10-28T19:36:07.4257926Z Successfully installed Pillow-12.3.0 iniconfig-2.3.1 mpremote-1.29.0 numpy-2.5.4 opencv-python-headless-5.0.0.93 packaging-26.3 platformdirs-4.14.0 pluggy-1.7.0 pygments-2.21.0 pyserial-3.5 pytest-9.2.0
+2026-10-28T19:36:07.4875324Z ##[group]Run python -m pytest tests -q --junitxml=software-tests.xml
+2026-10-28T19:36:07.4875855Z [36;1mpython -m pytest tests -q --junitxml=software-tests.xml[0m
+2026-10-28T19:36:07.4907666Z shell: /usr/bin/bash -e {0}
+2026-10-28T19:36:07.4907923Z env:
+2026-10-28T19:36:07.4908196Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:36:07.4908642Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-28T19:36:07.4909069Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:36:07.4909457Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:36:07.4910117Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:36:07.4910516Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-28T19:36:07.4910847Z ##[endgroup]
+2026-10-28T19:36:47.0951054Z ........................................................................ [  5%]
+2026-10-28T19:36:55.1008829Z .........................ss.ss.ss................s..sssss.ss..ssss...... [ 11%]
+2026-10-28T19:37:00.8161173Z ........................................................................ [ 16%]
+2026-10-28T19:37:10.4883526Z ........................................................................ [ 22%]
+2026-10-28T19:37:18.3772348Z ........................................................................ [ 27%]
+2026-10-28T19:38:15.0334797Z ...................................................s.................... [ 33%]
+2026-10-28T19:38:19.9899498Z ........................s..ss........................................... [ 38%]
+2026-10-28T19:38:45.1172601Z ..F..................................................................... [ 44%]
+2026-10-28T19:38:59.6332780Z ........................................................................ [ 49%]
+2026-10-28T19:39:21.9786904Z ........................................................................ [ 55%]
+2026-10-28T19:39:28.4265040Z ........................................................................ [ 60%]
+2026-10-28T19:39:35.3719899Z ........................................................................ [ 66%]
+2026-10-28T19:40:01.2196898Z ........................................................................ [ 72%]
+2026-10-28T19:40:30.6747543Z ........................................................................ [ 77%]
+2026-10-28T19:41:43.5583330Z ........................................................................ [ 83%]
+2026-10-28T19:42:15.7557220Z ..............................s......................................... [ 88%]
+2026-10-28T19:42:20.3586168Z ........................................................................ [ 94%]
+2026-10-28T19:42:25.8774594Z ........................................................................ [ 99%]
+2026-10-28T19:42:25.9580391Z ...                                                                      [100%]
+2026-10-28T19:42:25.9581074Z =================================== FAILURES ===================================
+2026-10-28T19:42:25.9581884Z ___ test_real_player_starts_two_simulated_playable_games_on_one_camera[True] ___
+2026-10-28T19:42:25.9582466Z 
+2026-10-28T19:42:25.9582919Z tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_real_player_starts_two_si1')
+2026-10-28T19:42:25.9583914Z monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7336487c93a0>
+2026-10-28T19:42:25.9584733Z camera_failure = True, terminal_pages = False, terminal_delay = False
+2026-10-28T19:42:25.9585200Z 
+2026-10-28T19:42:25.9585470Z     @pytest.mark.parametrize('camera_failure',[False,True])
+2026-10-28T19:42:25.9586646Z     def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False,terminal_delay=False):
+2026-10-28T19:42:25.9587921Z         """Real player + marathon; simulated pixels/controls, not Pi acceptance."""
+2026-10-28T19:42:25.9588547Z         import time
+2026-10-28T19:42:25.9589089Z         from experiments.ppal import marathon_robotron as m,play_robotron as play
+2026-10-28T19:42:25.9590604Z         from experiments.ppal.eyes.detectors import Detection
+2026-10-28T19:42:25.9591250Z         from experiments.ppal.robotron_agency import VECTORS
+2026-10-28T19:42:25.9591834Z         from test_experiment_return import gateway
+2026-10-28T19:42:25.9592345Z         from test_marathon_deferred import args
+2026-10-28T19:42:25.9592804Z         real_sleep=time.sleep
+2026-10-28T19:42:25.9593317Z         clock=[0.];starts=[];preflights=[];closed=[];points=[(25.,25.),(50.,50.)]
+2026-10-28T19:42:25.9593944Z         world={'game':0,'reads':0}
+2026-10-28T19:42:25.9594327Z         class Camera:
+2026-10-28T19:42:25.9594710Z             def __init__(self):closed.append('opened')
+2026-10-28T19:42:25.9595167Z             def read(self):
+2026-10-28T19:42:25.9595538Z                 real_sleep(.01);clock[0]+=.05
+2026-10-28T19:42:25.9595993Z                 if world['game']:world['reads']+=1
+2026-10-28T19:42:25.9596519Z                 if terminal_delay and world['reads']==102:clock[0]+=25.
+2026-10-28T19:42:25.9597177Z                 if camera_failure and world['game']==2 and world['reads']>65:
+2026-10-28T19:42:25.9597838Z                     raise RuntimeError('simulated capture disconnected')
+2026-10-28T19:42:25.9598605Z                 return Image.new('RGB',(100,100))
+2026-10-28T19:42:25.9599085Z             def close(self):closed.append('camera_closed')
+2026-10-28T19:42:25.9599770Z         class Controller:
+2026-10-28T19:42:25.9600244Z             def __init__(self,*a,**kw):self.last_execution=None
+2026-10-28T19:42:25.9600745Z             def _command(self,command):
+2026-10-28T19:42:25.9601565Z                 self.last_command=dict(command=command,write_started_at=clock[0],write_completed_at=clock[0],ack_at=clock[0])
+2026-10-28T19:42:25.9602443Z                 if command=='START':
+2026-10-28T19:42:25.9603077Z                     world['game']+=1;world['reads']=0;points[0]=(25.,25.);starts.append(world['game'])
+2026-10-28T19:42:25.9603755Z             def execute(self,action,ms):
+2026-10-28T19:42:25.9604399Z                 if terminal_pages:assert world['reads']<100 # no postgame/demo agency probes
+2026-10-28T19:42:25.9605433Z                 self.last_execution=dict(started_at=clock[0],move=action.move,fire=action.fire,duration_ms=ms)
+2026-10-28T19:42:25.9606218Z                 clock[0]+=ms/1000
+2026-10-28T19:42:25.9606598Z                 if world['reads']<100:
+2026-10-28T19:42:25.9607169Z                     u=VECTORS[action.move];points[0]=(points[0][0]+u[0],points[0][1]+u[1])
+2026-10-28T19:42:25.9607852Z             def close(self):closed.append('controller_closed')
+2026-10-28T19:42:25.9608336Z         class Recognizer:
+2026-10-28T19:42:25.9608679Z             def detect(self,frame):
+2026-10-28T19:42:25.9609083Z                 if world['reads']>=100:return []
+2026-10-28T19:42:25.9610483Z                 return [(Detection('unknown',p,(1,1,10,20),100),{'class_scores':{}}) for p in points]
+2026-10-28T19:42:25.9611146Z         def screen(frame):
+2026-10-28T19:42:25.9611545Z             if terminal_pages and world['game']:
+2026-10-28T19:42:25.9612572Z                 if 100<=world['reads']<104:return dict(state='not_gameplay',phase='terminal',reason='recorded_heroes_headings',label_scores={'heroes':.9,'all-time':.9})
+2026-10-28T19:42:25.9614217Z                 if 104<=world['reads']<107 or 131<=world['reads']<134 or world['reads']>=146:return dict(state='not_gameplay',phase='title',title_reference={'matched':True,'sha256':'a'*64})
+2026-10-28T19:42:25.9615544Z                 if world['reads']>=107:return dict(state='gameplay',phase='gameplay') # autonomous demonstration
+2026-10-28T19:42:25.9616520Z             if not world['game'] or world['reads']>=106:return dict(state='not_gameplay',phase='startable')
+2026-10-28T19:42:25.9617362Z             if world['reads']>=100:return dict(state='not_gameplay',phase='terminal')
+2026-10-28T19:42:25.9618001Z             return dict(state='gameplay',phase='gameplay')
+2026-10-28T19:42:25.9618484Z         def sensory(source,output,**kw):
+2026-10-28T19:42:25.9619299Z             preflights.append(world['game'])
+2026-10-28T19:42:25.9619962Z             assert world['game']==0
+2026-10-28T19:42:25.9620686Z             return SimpleNamespace(apply=lambda f:f),dict(status='usable',physical_motion=False,fixture=True)
+2026-10-28T19:42:25.9621510Z         monkeypatch.setattr(play,'PiCameraSource',Camera)
+2026-10-28T19:42:25.9622093Z         monkeypatch.setattr(play,'ArcadeController',Controller)
+2026-10-28T19:42:25.9622815Z         monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+2026-10-28T19:42:25.9623544Z         monkeypatch.setattr(play,'classify_screen_state',screen)
+2026-10-28T19:42:25.9624142Z         monkeypatch.setattr(play,'sensory_preflight',sensory)
+2026-10-28T19:42:25.9624726Z         monkeypatch.setattr(time,'monotonic',lambda:clock[0])
+2026-10-28T19:42:25.9625278Z         monkeypatch.setattr(time,'sleep',lambda t:None)
+2026-10-28T19:42:25.9625990Z         monkeypatch.setattr(m,'reflect_marathon',lambda *v,**kw:{'phase':'checkpointed'})
+2026-10-28T19:42:25.9626747Z         a=args(tmp_path);a.focus=None;a.max_games=2
+2026-10-28T19:42:25.9627296Z         doc=m.developmental_marathon(a,gateway=gateway(tmp_path))
+2026-10-28T19:42:25.9628027Z         assert starts==[1,2] and preflights==[0]
+2026-10-28T19:42:25.9628593Z         assert closed.count('opened')==closed.count('camera_closed')==1
+2026-10-28T19:42:25.9629431Z         assert doc['completion_counts']==({'completed':1,'invalid':1} if camera_failure else {'completed':2})
+2026-10-28T19:42:25.9630548Z         reports=[json.loads((Path(g['path'])/'report.json').read_text()) for g in doc['games']]
+2026-10-28T19:42:25.9631219Z         assert reports[0]['result']=='GAME OVER'
+2026-10-28T19:42:25.9631640Z         if camera_failure:
+2026-10-28T19:42:25.9632085Z >           assert reports[1]['cal_recovery']['status']=='unavailable'
+2026-10-28T19:42:25.9632607Z                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-28T19:42:25.9633090Z E           TypeError: 'NoneType' object is not subscriptable
+2026-10-28T19:42:25.9633446Z 
+2026-10-28T19:42:25.9633640Z tests/test_marathon_camera_session.py:215: TypeError
+2026-10-28T19:42:25.9634237Z ----------------------------- Captured stdout call -----------------------------
+2026-10-28T19:42:25.9634960Z DEVELOPMENT GAME 1/2: no justified experiment yet; existing policy only
+2026-10-28T19:42:25.9635716Z GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+2026-10-28T19:42:25.9636344Z DISCOVERING SELF: short movement/neutral probes over all visual candidates
+2026-10-28T19:42:25.9637009Z SELF PROVISIONAL: hypothesis=1; FIRE outcomes unconfirmed
+2026-10-28T19:42:25.9637590Z PLAYER HYPOTHESIS (provisional_body_agency) x=25.00 y=25.00
+2026-10-28T19:42:25.9638091Z SELF TRACK SEEDED: track=1
+2026-10-28T19:42:25.9638648Z CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state
+2026-10-28T19:42:25.9639381Z AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+2026-10-28T19:42:25.9640217Z AGENCY LOST: self=None candidate=1 confidence=0.50 runner=0.00
+2026-10-28T19:42:25.9640925Z GAME OVER CONFIRMED: persistent non-gameplay appearance + no controllable SELF
+2026-10-28T19:42:25.9641554Z RUN COMPLETE: GAME OVER; ticks=43
+2026-10-28T19:42:25.9642373Z Evidence: /tmp/pytest-of-runner/pytest-0/test_real_player_starts_two_si1/runs/development-20261028-193826/game-01/report.json
+2026-10-28T19:42:25.9643968Z GAME 1: score evidence=None; SELF={'provisional': 1, 'confirmed': 42}; experiment attempted=False; prediction=NONE; resolution=no prediction; memory=UNKNOWN->UNKNOWN (UNKNOWN); belief=none
+2026-10-28T19:42:25.9645769Z PROJECT: NONE; goal=UNKNOWN; status=UNKNOWN; selection=no feasible authorized project; no justified experiment yet; progress=UNKNOWN; next=no justified experiment yet
+2026-10-28T19:42:25.9647015Z DEVELOPMENT GAME 2/2: no justified experiment yet; existing policy only
+2026-10-28T19:42:25.9647645Z GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+2026-10-28T19:42:25.9648475Z DISCOVERING SELF: short movement/neutral probes over all visual candidates
+2026-10-28T19:42:25.9649170Z SELF PROVISIONAL: hypothesis=1; FIRE outcomes unconfirmed
+2026-10-28T19:42:25.9649947Z PLAYER HYPOTHESIS (provisional_body_agency) x=25.00 y=25.00
+2026-10-28T19:42:25.9650464Z SELF TRACK SEEDED: track=1
+2026-10-28T19:42:25.9651029Z CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state
+2026-10-28T19:42:25.9651784Z AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+2026-10-28T19:42:25.9652780Z Evidence: /tmp/pytest-of-runner/pytest-0/test_real_player_starts_two_si1/runs/development-20261028-193826/game-02/report.json
+2026-10-28T19:42:25.9654128Z EPISODE FAILED: ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained
+2026-10-28T19:42:25.9655766Z GAME 2: score evidence=None; SELF={'provisional': 1, 'confirmed': 7}; experiment attempted=False; prediction=NONE; resolution=no prediction; memory=UNKNOWN->UNKNOWN (UNKNOWN); belief=none
+2026-10-28T19:42:25.9657656Z PROJECT: NONE; goal=UNKNOWN; status=UNKNOWN; selection=no feasible authorized project; no justified experiment yet; progress=UNKNOWN; next=no justified experiment yet
+2026-10-28T19:42:25.9660083Z DEVELOPMENT COMPLETE: unverified_episode_boundary; attempts=2; qualified=1; invalid=1; unverified=0; target_met=False; /tmp/pytest-of-runner/pytest-0/test_real_player_starts_two_si1/runs/development-20261028-193826
+2026-10-28T19:42:25.9686528Z =============================== warnings summary ===============================
+2026-10-28T19:42:25.9687506Z tests/test_thermal_recovery.py::test_restart_retains_same_investigation_checkpoint_and_no_duplicates
+2026-10-28T19:42:25.9688744Z   tests/test_thermal_recovery.py:127: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+2026-10-28T19:42:25.9690349Z     def test_restart_retains_same_investigation_checkpoint_and_no_duplicates(tmp_path,monkeypatch,record_property):
+2026-10-28T19:42:25.9691042Z 
+2026-10-28T19:42:25.9691403Z -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2026-10-28T19:42:26.0294201Z =========================== short test summary info ============================
+2026-10-28T19:42:26.0295712Z FAILED tests/test_marathon_camera_session.py::test_real_player_starts_two_simulated_playable_games_on_one_camera[True] - TypeError: 'NoneType' object is not subscriptable
+2026-10-28T19:42:26.0297023Z 1 failed, 1275 passed, 24 skipped, 1 warning in 378.16s (0:06:18)
+2026-10-28T19:42:26.1592354Z ##[error]Process completed with exit code 1.
+2026-10-28T19:42:26.1676891Z ##[group]Run actions/upload-artifact@v4
+2026-10-28T19:42:26.1677192Z with:
+2026-10-28T19:42:26.1677396Z   name: software-tests
+2026-10-28T19:42:26.1677627Z   path: software-tests.xml
+2026-10-28T19:42:26.1677877Z   if-no-files-found: warn
+2026-10-28T19:42:26.1678108Z   compression-level: 6
+2026-10-28T19:42:26.1678325Z   overwrite: false
+2026-10-28T19:42:26.1678546Z   include-hidden-files: false
+2026-10-28T19:42:26.1678781Z env:
+2026-10-28T19:42:26.1679037Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:42:26.1679468Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-28T19:42:26.1680205Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:42:26.1680592Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:42:26.1680984Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-28T19:42:26.1681371Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-28T19:42:26.1681735Z ##[endgroup]
+2026-10-28T19:42:26.3484386Z (node:4348) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-28T19:42:26.3485720Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-28T19:42:26.3571396Z With the provided path, there will be 1 file uploaded
+2026-10-28T19:42:26.3613018Z Artifact name is valid!
+2026-10-28T19:42:26.3616401Z Root directory input is valid!
+2026-10-28T19:42:26.5700379Z Beginning upload of artifact content to blob storage
+2026-10-28T19:42:26.6074121Z (node:4348) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-28T19:42:26.6429789Z Uploaded bytes 30538
+2026-10-28T19:42:26.6605691Z Finished uploading artifact content to blob storage!
+2026-10-28T19:42:26.6606784Z SHA256 digest of uploaded artifact zip is fc93dee110d62f5a4ee5f6623002b8780b8381852af21ec854a914e52f802e20
+2026-10-28T19:42:26.6609485Z Finalizing artifact upload
+2026-10-28T19:42:27.0922001Z Artifact software-tests.zip successfully finalized. Artifact ID 12845423939
+2026-10-28T19:42:27.0923281Z Artifact software-tests has been successfully uploaded! Final size is 30538 bytes. Artifact ID is 12845423939
+2026-10-28T19:42:27.0930653Z Artifact download URL: https://github.com/mrgarmise/charlie/actions/runs/40755715064/artifacts/12845423939
+2026-10-28T19:42:27.1165856Z Post job cleanup.
+2026-10-28T19:42:27.2068709Z [command]/usr/bin/git version
+2026-10-28T19:42:27.2118675Z git version 2.56.0
+2026-10-28T19:42:27.2163962Z Temporarily overriding HOME='/home/runner/work/_temp/3e54a995-f6bd-4576-90fe-135828c26333' before making global git config changes
+2026-10-28T19:42:27.2165590Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-28T19:42:27.2170004Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/charlie/charlie
+2026-10-28T19:42:27.2211468Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-28T19:42:27.2249442Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-28T19:42:27.2578562Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-28T19:42:27.2610418Z http.https://github.com/.extraheader
+2026-10-28T19:42:27.2622969Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-28T19:42:27.2665473Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-28T19:42:27.2996396Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-28T19:42:27.3035340Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-28T19:42:27.3550813Z Cleaning up orphan processes
+2026-10-28T19:42:27.3926611Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

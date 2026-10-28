@@ -181,3 +181,7 @@ attached. The reviewed RP2040 firmware already requires scoped session/epoch
 commands. Standalone controller use without the application gateway retains its
 original behavior; Active Vision and calibration still rely on their existing
 firmware/lease gates and need further gateway migration and native acceptance.
+
+The pet safety context retains the producer-reported capture age and rechecks
+total age on each continuing pulse safety check, including elapsed time since
+the snapshot. A stale capture is a veto even if its snapshot was recent.

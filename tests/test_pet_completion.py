@@ -444,3 +444,16 @@ def test_pet_feed_capture_age_includes_time_since_snapshot(tmp_path):
     path.write_text(json.dumps(feed))
     assert c.bind(o,t)['qualification']=='unqualified' and c.current is None
     j.close()
+
+
+def test_continuing_pet_pulse_rechecks_total_capture_age(tmp_path):
+    from experiments.ppal.mobile_navigation import MobileNavigator
+    j,c,o,t,feed,path=safety_control(tmp_path)
+    feed['capture_age_seconds']=.4;path.write_text(json.dumps(feed))
+    now=[1.];c.clock=lambda:now[0]
+    out=c.bind(o,t)
+    proposal=MobileNavigator(clock=lambda:now[0]).propose(out,t,out['sensors'])
+    assert proposal['action']=='advance' and c.safe(proposal)
+    now[0]=1.11
+    assert not c.safe(proposal)
+    j.close()

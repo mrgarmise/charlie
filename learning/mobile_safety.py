@@ -181,7 +181,8 @@ class MobileSafetyContext:
                 grounded_animal=feed['scene']=='live-animal-grounded',grounded_proxy=feed['scene']=='proxy-grounded')
             out['safety_provenance']=dict(qualification_id=active['qualification_id'],firmware_sha256=report['firmware_sha256'],
                 bridge_sha256=report['bridge_sha256'],sensor_producer_sha256=report['sensor_producer_sha256'])
-            self.current=dict(observation=out,tracking=tracking,activation=active,report=report,at=feed['at'],feed_digest=digest(feed))
+            self.current=dict(observation=out,tracking=tracking,activation=active,report=report,at=feed['at'],
+                              capture_age_seconds=feed['capture_age_seconds'],feed_digest=digest(feed))
             self.failure=None
         except (KeyError,TypeError,ValueError,OSError) as exc:self.failure=str(exc)
         return out
@@ -193,7 +194,9 @@ class MobileSafetyContext:
         active,report=self.activation();c=self.current
         if self.feed is None or self.feed.stat().st_size>256*1024:return False
         if digest(json.loads(self.feed.read_text()))!=c['feed_digest']:return False
-        if active['activation_key']!=c['activation']['activation_key'] or self.clock()-c['at']>.25:return False
+        feed_age=self.clock()-c['at']
+        if (active['activation_key']!=c['activation']['activation_key'] or not finite(feed_age)
+                or not 0<=feed_age<=.25 or c['capture_age_seconds']+feed_age>.5):return False
         from experiments.ppal.mobile_navigation import MobileLimits
         limits=MobileLimits(stand_off_m=report['envelope']['stand_off_m']+report['envelope']['margin_m'],
             max_duration=min(.2,report['envelope']['max_duration']))

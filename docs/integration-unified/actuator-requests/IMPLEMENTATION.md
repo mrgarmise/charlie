@@ -194,6 +194,6 @@ reduces passive filesystem churn without treating passive observation as a grant
 In the combined mobile runtime, face-search outcomes reuse the existing
 `HeadSearchMemory` and the lifecycle-owned memory gateway. Only authentic source
 frames are eligible; fixture frames do not create search outcomes. Memory errors
-are kept separate from motion decisions. The standalone script's historical
-remote-recall search preference is not yet wired into every application mode;
-this remains part of parity validation, not a physical acceptance claim.
+are kept separate from motion decisions. The original remote-recall search preference is consulted at the authentic
+sentry decision in the combined mobile runtime. Other application modes do not
+yet share this lifecycle gateway; full behavioral parity remains unaccepted.

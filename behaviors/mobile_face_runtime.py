@@ -13,6 +13,8 @@ class MobileFaceRuntime:
         self.mobile = MobileRequests(executor=executor)
         self.behavior = MobileFaceTrackBehavior(mobile=self.mobile)
         self.search_memory = None
+        self.memory_gateway = memory_gateway
+        self.preference_loaded = False
         if memory_gateway is not None:
             from memory.head_search import HeadSearchMemory
             self.search_memory = HeadSearchMemory(memory_gateway)
@@ -33,6 +35,20 @@ class MobileFaceRuntime:
     def attend(self, observation):
         self.mobile.bind_frame(observation['frame'])
         try:
+            # Preserve the original search-memory preference only when the
+            # real local sweep has reached its sentry decision. No memory
+            # access grants physical authority or runs on the producer thread.
+            if (self.memory_gateway is not None and not self.preference_loaded
+                    and observation['frame'].authentic is True and observation['face'] is None
+                    and self.behavior.search_mode == 'DONE'):
+                self.preference_loaded = True
+                try:
+                    from memory.head_search import preferred_direction
+                    from uuid import uuid4
+                    self.behavior.search_preference = preferred_direction(
+                        self.memory_gateway, decision_id='head:'+uuid4().hex)
+                except Exception as exc:
+                    self.memory_error = type(exc).__name__
             self.last_status = self.behavior.update_face(observation['face'])
             if self.search_memory is not None and observation['frame'].authentic is True:
                 try:self.search_memory.observe(self.behavior,observation['face'],self.last_status)

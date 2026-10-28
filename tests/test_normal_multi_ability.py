@@ -172,3 +172,21 @@ def test_search_memory_uses_existing_gateway_and_never_promotes_fixture_frames()
         service.attend({'frame':SimpleNamespace(source='elegoo-v4',id='f',authentic=authentic),'face':{'normalized_x':.5}})
     service.search_memory.observe.assert_called_once()
     service.close()
+
+
+def test_original_search_preference_is_recalled_only_for_authentic_sentry(monkeypatch):
+    from types import SimpleNamespace
+    from behaviors.mobile_face_runtime import MobileFaceRuntime
+    import memory.head_search
+    recall=Mock(return_value='RIGHT')
+    monkeypatch.setattr(memory.head_search,'preferred_direction',recall)
+    service=MobileFaceRuntime(StimulusBus(),StimulusBus(),Mock(),detector=Mock(),memory_gateway=Mock())
+    service.search_memory.observe=Mock()
+    service.behavior.search_mode='DONE'
+    service.behavior.update_face=Mock(return_value={'state':'SENTRY_TURN'})
+    service.attend({'frame':SimpleNamespace(source='elegoo-v4',id='fixture',authentic=False),'face':None})
+    recall.assert_not_called()
+    service.attend({'frame':SimpleNamespace(source='elegoo-v4',id='real',authentic=True),'face':None})
+    recall.assert_called_once()
+    assert service.behavior.search_preference=='RIGHT'
+    service.close()

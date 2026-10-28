@@ -28,8 +28,9 @@ Initial runtime: local 1cf0fb9f70bd84aa1ef217caabd0b294b317bd03 and published
   compatibility, actual training worker and two-version rollback were exercised.
   Artifact: https://github.com/mrgarmise/charlie/actions/runs/40783733776/artifacts/12858138073 .
 - Initial broad independent CI:
-  https://github.com/mrgarmise/charlie/actions/runs/40783733556 — status was still
-  RUNNING when this receipt was written; do not count as passing.
+  https://github.com/mrgarmise/charlie/actions/runs/40783733556 — completed successfully:
+  **1,278 passed, 24 skipped, zero failures**, 371.65 seconds. Full CI log is
+  retained as `ci-initial-full.log.gz`.
 
 The second increment binds commissions to the actual Executive selection,
 invalidates cached incumbent interpretations when source changes, rechecks
@@ -56,3 +57,13 @@ No authentic candidate was trained. The reused incumbent is 5/5 on existing
 regression labels; independent generalization, real unknown recall, transition
 quality, complete Executive-originated authentic training, gameplay benefit and
 Pi/Hailo acceptance remain unestablished.
+
+The first disposable combined-stack job on second increment b0b1e131 failed at
+patch application, before tests: both active drafts change the canonical
+architecture document. Runtime `memory/learning_projects.py` applied cleanly.
+The original job log is preserved as `ci-combined-conflict.log.gz` and the failed
+run remains https://github.com/mrgarmise/charlie/actions/runs/40784593186 .
+A workflow-only correction now permits exactly that documented conflict, retains
+#13's canonical architecture and appends #14's human-interface section. Any other
+conflict still fails. No active PR branch is modified. Combined testing must
+complete successfully before software integration can be called validated.

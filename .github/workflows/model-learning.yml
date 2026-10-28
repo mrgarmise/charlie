@@ -50,7 +50,13 @@ jobs:
           git diff bcf8082f6319c63c4bd6bcceeab5faea37241654 "$FEATURE_SHA" --binary > "$RUNNER_TEMP/model-learning.patch"
           git diff bcf8082f6319c63c4bd6bcceeab5faea37241654 4bb3bffecffea0d6e294485132f42f5e96f4c506 --binary > "$RUNNER_TEMP/model-learning-human.patch"
           git checkout --detach 08ae83f7a6f54a7b0acefc4f240df784f176573e
-          git apply --3way "$RUNNER_TEMP/model-learning-human.patch"
+          if ! git apply --3way "$RUNNER_TEMP/model-learning-human.patch"; then
+            test "$(git diff --name-only --diff-filter=U)" = 'docs/CHARLIE_ARCHITECTURE.md'
+            git checkout --ours -- docs/CHARLIE_ARCHITECTURE.md
+            python -c 'from pathlib import Path; p=Path("docs/CHARLIE_ARCHITECTURE.md"); p.write_text(p.read_text()+"\n")'
+            git show 4bb3bffecffea0d6e294485132f42f5e96f4c506:docs/CHARLIE_ARCHITECTURE.md | sed -n '/^## Asynchronous human information interface (draft)/,$p' >> docs/CHARLIE_ARCHITECTURE.md
+            git add docs/CHARLIE_ARCHITECTURE.md
+          fi
           git apply --3way "$RUNNER_TEMP/model-learning.patch"
           git -c user.name='Software validation' -c user.email=validation@localhost commit -m 'Disposable combined stack software validation'
           git log -1 --format='%H %T'

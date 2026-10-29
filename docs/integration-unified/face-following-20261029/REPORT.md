@@ -188,7 +188,7 @@ a missing journal and respects an existing uncertain-motion marker.
 
 Local expanded selection before STOP integration: 112 tests passed; final combined
 STOP/face/executor/authority/recording selection: **127 passed** in 2.41 s.
-The final receipt-compatibility expansion passed **186 tests** in 3.31 s.
+The final receipt-compatibility/concurrent-diagnostic expansion passed **187 tests**.
 Canonical conformance: **129 passed**.
 An initial new test used a mutable fake frame and correctly failed the existing
 immutable-publisher check (110 passed, one failed); only that fixture was corrected.

@@ -1,7 +1,7 @@
 {
   "base_local": "7707c53a397d61971b47bda59471f82d679e958d",
   "base_published": "95a7cd583ea8a6a568bdfb274de21638bc1c604c",
-  "runtime_sha256": "542c07a351e177f426aea5a344cdf84525f3e483fee3bcc5aca15c12bab2a2de",
+  "runtime_sha256": "1747c826b5f680c76469b0e608d0c6817a1484fade1fdea7cb6ef8035197a309",
   "unchanged": {
     "vision/mobile_face.py": true,
     "behaviors/mobile_face_track.py": true,

@@ -627,10 +627,11 @@ class ElegooMobileBase:
             self.align.active=False
             # Preserve the established receipt API; diagnostics are a separate
             # observation, never an extra physical claim or a repaired outcome.
-            self.last_stop_diagnostic=dict(command=command,expected_response=expected,
+            diagnostic=dict(command=command,expected_response=expected,
                 ack_timeout_seconds=.150,elapsed_seconds=time.monotonic()-started,
                 error_message=error_message,result=deepcopy(receipt))
-            self._wire_event('stop_result',**self.last_stop_diagnostic)
+            self.last_stop_diagnostic=diagnostic
+            self._wire_event('stop_result',**diagnostic)
         return receipt
 
     def pulse(self, direction, *, pwm, seconds, lease, boot_id, envelope, safety_check,

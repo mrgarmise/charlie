@@ -181,3 +181,20 @@ def test_receive_disconnect_has_evidence_instead_of_silent_ack_absence():
     car._receive_loop()
     assert not car._running
     assert car.wire_history()['events'][-1]['kind']=='rx_eof'
+
+
+def test_overlapping_stop_diagnostics_keep_each_command_and_reply():
+    class InterleavedCar(ElegooMobileBase):
+        def __setattr__(self,name,value):
+            object.__setattr__(self,name,value)
+            # Reproduce an overlapping STOP completing between assignment of
+            # the latest snapshot and enqueue of the first call's trace.
+            if name=='last_stop_diagnostic' and not self.interleaved:
+                self.interleaved=True;self.stop_verified()
+    car=InterleavedCar();car.interleaved=False
+    car._send=Mock(side_effect=lambda p,**kw:dict(ok=True,response='{'+p['H']+'_ok}'))
+    receipt=car.stop_verified()
+    events=[r for r in car.wire_history()['events'] if r['kind']=='stop_result']
+    assert {r['command']['H'] for r in events}=={'safestop1','safestop2'}
+    assert all(r['result']['response']=='{'+r['command']['H']+'_ok}' for r in events)
+    assert receipt['response']=='{safestop1_ok}'

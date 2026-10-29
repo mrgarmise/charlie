@@ -47,6 +47,27 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
             face_runtime = MobileFaceRuntime(frame_bus,recognition.attention_bus,actuator_executor)
             lifecycle.callback(face_runtime.close)
             recognition.attention.emergency_stop_callback = actuator_executor.emergency_stop
+        from ui.dashboard import attach_dashboard
+        def borrow_recognition(execution_id):
+            previous=recognition.sources.name or args.camera_source
+            previous_episode=evidence.episode
+            previous_store=getattr(recognition,'artifact_store',None)
+            from vision.mobile_perception import FrameArtifactStore
+            recognition.artifact_store=FrameArtifactStore(state/'operator-demo-frames')
+            evidence.episode='operator-demo:'+execution_id
+            recognition.invalidate('operator demonstration start')
+            recognition.select_camera('pi')
+            recognition.output_allowed=lambda: demonstration.running and not demonstration.cancel_requested and time.monotonic()-demonstration.started<15
+            class Borrow:
+                def step(self):return recognition.step()
+                def close(self):
+                    recognition.output_allowed=lambda:True
+                    evidence.episode=previous_episode
+                    recognition.artifact_store=previous_store
+                    recognition.invalidate('operator demonstration end')
+                    recognition.select_camera(previous)
+            return Borrow()
+        demonstration=attach_dashboard(args,resources,frame_bus,recognition.attention,lifecycle,factory=borrow_recognition)
         telemetry_at = 0.
         keyboard = KeyboardStimulus(bus, object_mode=True,
             on_emergency=actuator_executor.emergency_stop if actuator_executor is not None else None)
@@ -57,6 +78,11 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
             while not recognition.stopped:
                 supervise()
                 recognition.controls()
+                if demonstration is not None:
+                    demonstration.tick()
+                    if demonstration.active is not None:
+                        time.sleep(.02)
+                        continue
                 if recognition.stopped:break
                 if telemetry is not None and time.monotonic()-telemetry_at >= .1:
                     telemetry.poll();telemetry_at=time.monotonic()

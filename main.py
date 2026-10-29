@@ -66,6 +66,9 @@ def parser():
     p.add_argument('--object-label-display',choices=['off','dry-run','rp2040'],default='off',help='opt-in stabilized object labels; rp2040 needs reviewed firmware and separately authorized hardware use')
     p.add_argument('--object-label-port',default='/dev/ttyACM0')
     p.add_argument('--object-label-replay',type=Path,help='no-device JSONL event-to-display diagnostic')
+    p.add_argument('--abilities-dashboard',action='store_true',help='authenticated in-process operator ability endpoint; explicit hardware required')
+    p.add_argument('--abilities-port',type=int,default=8768)
+    p.add_argument('--abilities-origin',default='https://charlie-project-dashboard.garmiseprojects.chatgpt.site')
     return p
 
 
@@ -149,6 +152,14 @@ def main(argv=None):
     if args.list_capabilities:
         from learning.capabilities import default_registry
         print(json.dumps(default_registry().describe(),indent=2));return
+    if args.abilities_dashboard:
+        if args.offline or args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow or args.elegoo_face_track:
+            raise ValueError('operator demonstration requires normal primary or stationary object runtime; active body services have no safe interruption contract')
+        if args.object_label_display != 'rp2040':
+            raise ValueError('operator demonstration requires existing RP2040 object-label display')
+        if not 1 <= args.abilities_port <= 65535:raise ValueError('invalid dashboard port')
+        token=os.environ.get('CHARLIE_OPERATOR_TOKEN','')
+        if len(token)<32 or any(c.isspace() for c in token):raise ValueError('strong CHARLIE_OPERATOR_TOKEN required before hardware startup')
     standalone_face = args.elegoo_face_track and not any((args.object_recognition,
         args.mobile_replay,args.mobile_observe,args.pet_abilities,args.pet_follow,args.primary_vision))
     if standalone_face:
@@ -302,13 +313,15 @@ def main(argv=None):
                 from behaviors.mobile_face_runtime import MobileFaceRuntime
                 face_runtime=MobileFaceRuntime(frame_bus,bus,executor)
                 lifecycle.callback(face_runtime.close)
+            from ui.dashboard import attach_dashboard
+            demonstration=attach_dashboard(args,resources,frame_bus,attention,lifecycle)
             last_telemetry=0.
             last_neck_telemetry=0.
             bus.emit('idle')
             attention.update(deck)
             previous=None
             while True:
-                vision.update()
+                if demonstration is None or not demonstration.running:vision.update()
                 if face_runtime is not None:face_runtime.observe()
                 if time.monotonic()-last_telemetry>=.1:
                     telemetry.poll()
@@ -317,6 +330,7 @@ def main(argv=None):
                     deck.actuator_gateway.poll()
                     last_neck_telemetry=time.monotonic()
                 attention.update(deck)
+                if demonstration is not None:demonstration.tick()
                 # Existing status surface: console, plus consumable status JSON.
                 path=args.learning_state/'development-status.json'
                 try:

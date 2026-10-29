@@ -13,6 +13,7 @@ class AttentionManager:
         self.emergency_stopped = False
         self.emergency_stop_callback = emergency_stop
         self.face_service = None
+        self.demonstration = None
 
         # Independent Elegoo mobile-attention sidecar.
         # This does not replace or modify the RP2040 TrackBehavior.
@@ -71,7 +72,25 @@ class AttentionManager:
         self.pet_choice_key=key;self.pet_choice_at=at;self.pet_choice=decision
         service.accept_attention(result,decision)
 
+    def demonstration_unavailable(self):
+        if self.emergency_stopped:return 'emergency_stop_latched'
+        if self.pending or self.priority > 0:return 'current_attention_cannot_be_interrupted'
+        if self.mobile is not None or self.face_service is not None or self.pet_service is not None:
+            return 'active_body_service_cannot_be_interrupted'
+        if self.active is not None:
+            from behaviors.idle import IdleBehavior
+            if not isinstance(self.active, IdleBehavior):return 'activity_has_no_safe_resume_contract'
+        return None
+
     def handle_event(self, event, data):
+        if event == 'operator_demonstration':
+            if self.demonstration is not None:self.demonstration.begin(data)
+            return
+        if self.demonstration is not None and self.demonstration.running and event in (
+                'emergency_stop','scan','track','vision_target','calibrate_neck','confirm_neck_start',
+                'elegoo_face_observation','mobile_opportunity','idle'):
+            self.demonstration.finish('cancelled', 'preempted:'+event)
+
         if event == 'vision_source_frame':
             mobile=self._ensure_mobile() if data.source == 'elegoo-v4' else None
             if mobile is not None:mobile.mobile.bind_frame(data)
@@ -214,6 +233,10 @@ class AttentionManager:
         if self.object_labels is not None:
             try:self.object_labels.tick()
             except Exception as exc:self.object_display_error=type(exc).__name__+': '+str(exc)[:128]
+
+        # Preserve the existing behavior instance/bookmark; no enter/exit, chooser
+        # or movement update while the stationary operator ability has attention.
+        if self.demonstration is not None and self.demonstration.running:return
 
         # Apply pending RP2040 behavior switch second.
         if self.pending:

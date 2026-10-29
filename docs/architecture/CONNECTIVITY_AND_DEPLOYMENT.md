@@ -106,3 +106,13 @@ checking a clean isolated worktree. No firmware/device rollback is required by
 this mission because no hardware state was changed. Before native use, reconcile
 latest PR #10 safety changes and PR #11 subscriber changes; preserve both histories
 and rerun the acceptance matrix in [CONFORMANCE.md](CONFORMANCE.md).
+
+## Operator object-demonstration endpoint (opt-in)
+
+`main.py --abilities-dashboard` extends the normal primary/stationary object
+application with an authenticated loopback HTTP adapter on port 8768. The existing
+project dashboard uses an SSH forward to that adapter; the Site alone is not a
+robot command channel. It admits only the fixed 15-second stationary Pi-camera
+ability through the existing AttentionManager. Active body services without safe
+interruption are rejected. No new motion authority or firmware deployment is granted.
+See [implementation, authentication, evidence and native acceptance](../integration-unified/object-demo/README.md).

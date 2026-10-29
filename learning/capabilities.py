@@ -33,6 +33,8 @@ class CapabilityRegistry:
         capability=self.get(identifier)
         if identifier not in authorized or set(capability.inputs)-set(resources):
             raise ValueError('available inputs and separate method authorization required')
+        if identifier == 'demonstrate-object-identification':
+            return inputs['service'].submit(inputs['request'])
         if identifier in ('elegoo-actuator-request', 'rp2040-actuator-request'):
             return inputs['service'].request(inputs['request'])
         if identifier in ('mobile-observe','pet_observe'):
@@ -74,6 +76,12 @@ class CapabilityRegistry:
 def default_registry():
     registry=CapabilityRegistry()
     for item in (
+        Capability('demonstrate-object-identification','Show the operator current Pi-camera object hypotheses for 15 seconds',
+          ('operator-request','pi-primary','object-model','object-label-display'),
+          ('demonstration-session','object-evidence','display-receipt'),.3,
+          ('no motion authority','ACK is not witnessed output','busy attention rejects interruption'),
+          'authentic camera and physical display observation required', execution='unarmed-perception',body='Pi/RP2040',
+          lifecycle='request/admit/bounded observation/release; no replay after restart'),
         Capability('elegoo-actuator-request','Request independently qualified chassis or camera-pan movement',
           ('actuator-service','source-observation'),('command-receipt','actuator-state'),.1,
           ('discovery is not physical authorization','receipt is not measured movement'),

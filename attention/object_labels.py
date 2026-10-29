@@ -21,6 +21,7 @@ class ObjectLabels:
         self.candidate=None;self.hits=0;self.candidate_since=None
         self.current=None;self.current_since=None;self.last_seen=None;self.last_tx=None
         self.pending=None;self.suppressed=False;self.times={};self.generation=getattr(transport,'link_session',None)
+        self.last_delivery=None
         self.last_attempt=None
         self.stats=dict(observations=0,shown=0,cleared=0,rejected=0)
 
@@ -69,7 +70,9 @@ class ObjectLabels:
             self.generation=generation;self.current=None;self.last_seen=None;self.last_tx=None
             self.candidate=None;self.pending=None;self.hits=0;self.last_attempt=None
         if self.current and (self.suppressed or self.last_seen is None or now-self.last_seen>self.max_age):
-            if self.transport.clear_object_label():self.stats['cleared']+=1
+            ack=self.transport.clear_object_label()
+            self.last_delivery=dict(command='OBJECT_CLEAR',at=now,acknowledged=bool(ack),physical_output='unobserved')
+            if ack:self.stats['cleared']+=1
             self.current=None;self.current_since=None;self.last_tx=None
         if self.suppressed:return
         if self.pending:
@@ -79,10 +82,14 @@ class ObjectLabels:
             if key!=self.current or self.last_tx is None or now-self.last_tx>=self.refresh_seconds:
                 if self.last_attempt is not None and now-self.last_attempt<.5:return
                 self.last_attempt=now
-                if self.transport.show_object_label(key[1],self.ttl_ms,self.step_ms):
+                ack=self.transport.show_object_label(key[1],self.ttl_ms,self.step_ms)
+                self.last_delivery=dict(command='OBJECT_LABEL',label=key[1],at=now,acknowledged=bool(ack),physical_output='unobserved')
+                if ack:
                     if key!=self.current:self.current_since=now
                     self.current=key;self.last_seen=seen;self.last_tx=now;self.stats['shown']+=1
 
     def close(self):
-        if self.current:self.transport.clear_object_label()
+        if self.current:
+            ack=self.transport.clear_object_label()
+            self.last_delivery=dict(command='OBJECT_CLEAR',at=self.clock(),acknowledged=bool(ack),physical_output='unobserved')
         self.current=None;self.pending=None

@@ -6,11 +6,12 @@ from vision.object_observation import object_observation
 
 
 class ObjectRecognition:
-    def __init__(self, frame_bus, perception, evidence, bus, labels=None):
+    def __init__(self, frame_bus, perception, evidence, bus, labels=None, *, attention=None):
         self.perception, self.evidence, self.bus = perception, evidence, bus
         from stimulus.bus import StimulusBus
-        self.attention_bus = StimulusBus()
-        self.attention = AttentionManager(self.attention_bus, mobile_enabled=False, object_labels=labels)
+        self.owns_attention = attention is None
+        self.attention_bus = StimulusBus() if attention is None else attention.bus
+        self.attention = attention or AttentionManager(self.attention_bus, mobile_enabled=False, object_labels=labels)
         self.tracker = PetTracker()
         self.sources = CameraSubscription(frame_bus, on_change=self._source_changed, clock=perception.clock)
         self.stopped = self.closed = False
@@ -19,8 +20,8 @@ class ObjectRecognition:
     def invalidate(self, reason):
         self.attention.object_attention = None
         self.attention.visual_target = None
-        self.attention_bus.emit('object_observation_fault', None)
-        self.attention.update(None)
+        self.attention.handle_event('object_observation_fault', None)
+        if self.attention.object_labels is not None:self.attention.object_labels.tick()
         # Tracking associations never survive camera/stream changes.
         self.tracker = PetTracker()
         self.perception.last_at = self.perception.last_id = None
@@ -47,7 +48,7 @@ class ObjectRecognition:
                 self.stopped = True
             elif event in ('object_attention','emergency_stop'):
                 self.attention.handle_event(event, data)
-        self.attention.update(None)
+        if self.owns_attention:self.attention.update(None)
 
     def step(self):
         if self.closed:
@@ -63,6 +64,8 @@ class ObjectRecognition:
             if self.generation is not None and generation != self.generation:
                 self.invalidate('camera stream changed')
             self.generation = generation
+            if getattr(self, 'artifact_store', None) is not None:
+                frame = self.artifact_store.retain(frame)
             observation = self.perception.observe(frame)
             if observation is None:
                 return None
@@ -73,9 +76,10 @@ class ObjectRecognition:
             row = self.evidence.record(observation, tracking, proposal, execution)
             self.evidence.opportunities(row.id)
             packet = object_observation(observation)
-            self.attention_bus.emit('object_observation', packet)
-            self.attention.update(None)
-            return dict(observation=packet, evidence_id=row.id, motion_authorized=False)
+            if getattr(self, 'output_allowed', lambda: True)():
+                self.attention.handle_event('object_observation', packet)
+                if self.attention.object_labels is not None:self.attention.object_labels.tick()
+            return dict(observation=packet, evidence_id=row.id, provenance=observation, motion_authorized=False)
         except BaseException as exc:
             self.acquisition_fault(exc)
             raise
@@ -85,7 +89,10 @@ class ObjectRecognition:
             return
         self.stopped = True
         try:
-            self.attention.close()
+            if self.owns_attention:self.attention.close()
+            elif self.attention.object_labels is not None:
+                self.attention.object_labels.invalidate()
+                self.attention.object_labels.tick()
         finally:
             try:
                 self.sources.close()

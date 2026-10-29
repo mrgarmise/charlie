@@ -77,7 +77,12 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
         try:
             while not recognition.stopped:
                 supervise()
+                if args.object_frames is not None and count >= args.object_frames:
+                    break
+                if args.object_seconds is not None and time.monotonic()-started >= args.object_seconds:
+                    break
                 recognition.controls()
+                if recognition.stopped:break
                 if demonstration is not None:
                     demonstration.tick()
                     if demonstration.active is not None:
@@ -89,10 +94,6 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
                 if face_runtime is not None:
                     face_runtime.observe()
                     recognition.attention.update(None)
-                if args.object_frames is not None and count >= args.object_frames:
-                    break
-                if args.object_seconds is not None and time.monotonic()-started >= args.object_seconds:
-                    break
                 try:
                     result = recognition.step()
                 except (OSError, ValueError) as exc:

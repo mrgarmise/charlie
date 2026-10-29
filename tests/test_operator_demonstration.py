@@ -268,7 +268,8 @@ def test_competing_application_cannot_cancel_existing_session(tmp_path):
     finally:close(s)
 
 
-def test_normal_object_application_repeats_demo_with_same_inference_owner(tmp_path,monkeypatch):
+@pytest.mark.parametrize('seconds,expected_sessions,expected_state',[(34,2,'completed'),(2,1,'cancelled')])
+def test_normal_object_application_repeats_demo_with_same_inference_owner(tmp_path,monkeypatch,seconds,expected_sessions,expected_state):
     import time
     from main import parser
     from learning.object_runtime import run_objects
@@ -292,7 +293,7 @@ def test_normal_object_application_repeats_demo_with_same_inference_owner(tmp_pa
     monkeypatch.setattr('vision.mobile_models.HailoObjects',detector)
     manifest=tmp_path/'models.json';manifest.write_text(json.dumps({'schema':'charlie.mobile.models.v1','objects':{}}))
     args=parser().parse_args(['--hardware','--object-recognition','--abilities-dashboard',
-        '--object-label-display','dry-run','--object-model-manifest',str(manifest),'--object-seconds','34',
+        '--object-label-display','dry-run','--object-model-manifest',str(manifest),'--object-seconds',str(seconds),
         '--learning-state',str(tmp_path/'state')])
     frames=StimulusBus();owner=object();frames.claim_frames('pi-primary',owner)
     requests=[];sequence=[0]
@@ -305,8 +306,10 @@ def test_normal_object_application_repeats_demo_with_same_inference_owner(tmp_pa
     import sqlite3
     with sqlite3.connect(tmp_path/'state/operator-demonstrations.sqlite3') as db:
         rows=[json.loads(x[0]) for x in db.execute('SELECT body FROM sessions')]
-    assert len(models)==1 and len(rows)==2
-    assert all(r['state']=='completed' and 15<=r['elapsed_seconds']<15.3 for r in rows)
+    assert len(models)==1 and len(rows)==expected_sessions
+    assert all(r['state']==expected_state for r in rows)
+    if expected_state=='completed':assert all(15<=r['elapsed_seconds']<15.3 for r in rows)
+    else:assert all(r['elapsed_seconds']<2.3 for r in rows)
     assert all(r['display_acknowledgments']>0 for r in rows)
     assert frames.frame_owners=={'pi-primary':owner}
     assert list((tmp_path/'state/operator-demo-frames').glob('*.png'))
@@ -321,4 +324,18 @@ def test_cleanup_still_runs_if_evidence_storage_fails(tmp_path):
         assert s.session.sources.closed and s.service.pipeline is None
         assert s.service.status()['session']['state']=='failed'
         with pytest.raises(ValueError,match='persistence'):s.service.submit(request(s.service))
+    finally:close(s)
+
+
+def test_attention_update_cannot_refresh_label_after_deadline(tmp_path):
+    s=fixture(tmp_path)
+    try:
+        start(s)
+        for i,at in enumerate((1.,1.11,1.22)):feed(s,at,i)
+        shown=sum(x.startswith('OBJECT_LABEL') for x in s.transport.commands)
+        s.now[0]=16.
+        s.session.attention.update(None)
+        assert s.service.status()['session']['state']=='completed'
+        assert sum(x.startswith('OBJECT_LABEL') for x in s.transport.commands)==shown
+        assert s.transport.commands[-1]=='OBJECT_CLEAR'
     finally:close(s)

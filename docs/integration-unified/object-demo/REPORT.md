@@ -76,3 +76,19 @@ native inference/serial/disk calls and cleanup must be measured. No native deadl
 or STOP latency is claimed. Active face/pet/tracking/calibration work without a safe
 resume contract is rejected, not falsely advertised as interruptible. The Executive
 continues its existing durable notebook and developmental priorities.
+
+## Published implementation and deadline correction
+
+Initial implementation published as `23d2b07f494b48988181790ad5a0e52818cefd4d`
+(local `58cda83`, identical tree `ec1d40b6409447f672619f68a8fc6de444249eba`).
+Clean checkout: 86 focused passed / 129 conformance passed, before publication.
+The existing branch was advanced with an exact expected-head check through GitHub's
+Git-data API because shell Git has no push credential. Original ancestry is retained.
+
+A subsequent review found two bounded-lifecycle edges: an active demonstration
+could defer the existing whole-application `--object-seconds` shutdown, and attention
+could tick a pending label immediately before the demonstration's deadline check.
+The correction keeps application shutdown/quit ahead of demo work and checks demo
+cancellation/expiry before label refresh. New tests cover both, alongside the repeat
+normal-app test. Corrected focused selection: 88 passed, 2.96 s
+(`validation/bounds-focused.txt`). Native timing remains unqualified.

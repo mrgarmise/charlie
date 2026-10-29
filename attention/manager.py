@@ -230,6 +230,10 @@ class AttentionManager:
         for event, data in events:
             if event != 'emergency_stop':self.handle_event(event, data)
 
+        if self.demonstration is not None and self.demonstration.running:
+            demo=self.demonstration
+            if demo.cancel_requested or demo.clock()-demo.started>=15:demo.tick()
+
         if self.object_labels is not None:
             try:self.object_labels.tick()
             except Exception as exc:self.object_display_error=type(exc).__name__+': '+str(exc)[:128]

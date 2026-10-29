@@ -5,6 +5,8 @@ import time
 import itertools
 import math
 import hashlib
+from collections import deque
+from copy import deepcopy
 from dataclasses import dataclass
 
 
@@ -76,6 +78,9 @@ class ElegooMobileBase:
         self._pending_lock = threading.Lock()
         self._pending = {}
 
+        self._wire_history = deque(maxlen=512)
+        self._wire_history_lock = threading.Lock()
+        self._wire_sequence = 0
         self.align = AttentionAlignState()
 
     # --------------------------------------------------
@@ -167,6 +172,19 @@ class ElegooMobileBase:
     # BACKGROUND RECEIVE / HEARTBEAT
     # --------------------------------------------------
 
+    def _wire_event(self, kind, **details):
+        # In-memory diagnostics only. Never disk I/O on the RX/send-lock path.
+        with self._wire_history_lock:
+            self._wire_sequence += 1
+            self._wire_history.append(dict(sequence=self._wire_sequence,
+                at=time.monotonic(), kind=kind, **details))
+
+    def wire_history(self, after=0):
+        with self._wire_history_lock:
+            rows = [deepcopy(r) for r in self._wire_history if r['sequence'] > after]
+            lost = bool(self._wire_history and after < self._wire_history[0]['sequence']-1)
+            return dict(events=rows, evicted=lost, latest=self._wire_sequence)
+
     def _receive_loop(self):
         while (
             self._running
@@ -176,6 +194,7 @@ class ElegooMobileBase:
                 data = self.sock.recv(4096)
 
                 if not data:
+                    self._wire_event('rx_eof')
                     break
 
                 self._rx_buffer += (
@@ -189,7 +208,8 @@ class ElegooMobileBase:
             except socket.timeout:
                 continue
 
-            except OSError:
+            except OSError as exc:
+                self._wire_event('rx_error',error=type(exc).__name__,message=str(exc)[:256])
                 break
 
         self._running = False
@@ -230,6 +250,7 @@ class ElegooMobileBase:
             self._handle_frame(frame)
 
     def _handle_frame(self, frame):
+        self._wire_event("rx", frame=frame[:512], truncated=len(frame)>512)
         if frame == "{Heartbeat}":
             try:
                 self._send_raw(
@@ -306,7 +327,13 @@ class ElegooMobileBase:
         with self._send_lock:
             if preflight is not None and preflight() is not True:
                 raise InterruptedError("command cancelled before wire dispatch")
-            sock.sendall(raw)
+            self._wire_event('tx_attempt', raw=raw[:512].decode(errors='replace'), bytes=len(raw))
+            try:
+                sock.sendall(raw)
+            except BaseException as exc:
+                self._wire_event('tx_error', error=type(exc).__name__, delivery='unknown')
+                raise
+            self._wire_event('tx_complete', bytes=len(raw))
 
     def _next_id(self, prefix="cmd"):
         return (
@@ -400,6 +427,8 @@ class ElegooMobileBase:
                     pending["event"].wait(min(.02, remaining))
                 wait_check()  # Cancellation/expiry wins a simultaneous ACK race.
             if not ready:
+                self._wire_event('ack_timeout', expected_id=expected_id,
+                    expected_response=expected_response, wait_seconds=wait_time)
                 raise TimeoutError(f"timeout waiting for {expected_id}")
 
             return {
@@ -583,13 +612,19 @@ class ElegooMobileBase:
     def stop_verified(self):
         """No reconnect/concealed fallback; even an ACK is not measured stopping."""
         ident=self._next_id('safestop')
+        started=time.monotonic()
+        command={'N':1,'H':ident,'D1':0,'D2':0,'D3':0}
+        expected='{'+ident+'_ok}'
+        detail=dict(command=command,expected_response=expected,ack_timeout_seconds=.150)
         try:
-            result=self._send({'N':1,'H':ident,'D1':0,'D2':0,'D3':0},
+            result=self._send(command,
                               expected_id=ident,timeout=.150,retry=False,expected_response='{'+ident+'_ok}')
             return dict(sent=True,acknowledged=result['ok'] is True and result.get('response')=='{'+ident+'_ok}',
-                        response=result.get('response'),physically_stopped=None)
+                        response=result.get('response'),physically_stopped=None,
+                        elapsed_seconds=time.monotonic()-started,**detail)
         except Exception as exc:
-            return dict(sent=None,acknowledged=False,physically_stopped=None,error=type(exc).__name__)
+            return dict(sent=None,acknowledged=False,physically_stopped=None,error=type(exc).__name__,
+                        error_message=str(exc)[:256],elapsed_seconds=time.monotonic()-started,**detail)
         finally:self.align.active=False
 
     def pulse(self, direction, *, pwm, seconds, lease, boot_id, envelope, safety_check,
@@ -672,8 +707,12 @@ class ElegooMobileBase:
         if safety_check() is not True:
             raise InterruptedError('independent pan safety veto')
         ident = self._next_id('qualifiedpan')
+        def check():
+            if safety_check() is not True or (wire_guard is not None and wire_guard() is not True):
+                raise InterruptedError('pan safety or lease changed while awaiting ACK')
         response = self._send({'N':5,'H':ident,'D1':1,'D2':degrees},
-            expected_id=ident,timeout=.05,retry=False,preflight=wire_guard)
+            expected_id=ident,timeout=.05,retry=False,preflight=wire_guard,
+            expected_response='{'+ident+'_ok}',wait_check=check)
         if response.get('ok') is not True:
             raise TimeoutError('pan acknowledgement unknown')
         return degrees

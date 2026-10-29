@@ -131,3 +131,10 @@ reset or delete worktrees, overwrite original evidence or calibration, change
 firmware, or treat a software rollback as proof of physical safety. Firmware
 rollback/flash requires its own explicit approval and independently preserved
 verified image; this handoff does not authorize it.
+
+## October 29 face-following preparation
+
+See [the evidence-led face trial report](../face-following-20261029/REPORT.md)
+and [exact conditional operator procedure](../face-following-20261029/OPERATOR-TRIAL.md).
+Physical admission remains blocked by missing verified pan/exposure-age producers;
+software tests and historical replay are not physical face-following acceptance.

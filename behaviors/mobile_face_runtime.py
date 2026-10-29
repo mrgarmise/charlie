@@ -4,7 +4,7 @@ from motion.mobile_requests import MobileRequests
 
 
 class MobileFaceRuntime:
-    def __init__(self, frame_bus, event_bus, executor, *, detector=None, memory_gateway=None):
+    def __init__(self, frame_bus, event_bus, executor, *, detector=None, memory_gateway=None, observation_callback=None):
         if detector is None:
             from vision.mobile_face import MobileFaceDetector
             detector = MobileFaceDetector()
@@ -19,6 +19,8 @@ class MobileFaceRuntime:
             from memory.head_search import HeadSearchMemory
             self.search_memory = HeadSearchMemory(memory_gateway)
         self.last_status = None
+        self.observation_callback = observation_callback
+        self.last_observation = None
 
     def observe(self):
         try:
@@ -26,6 +28,9 @@ class MobileFaceRuntime:
             if frame is None:
                 return
             face = self.detector.detect(frame.image)
+            self.last_observation = dict(frame=frame,face=face)
+            if self.observation_callback is not None:
+                self.observation_callback(frame,face)
             self.bus.emit('elegoo_face_observation', dict(service=self,frame=frame,face=face))
         except (OSError,ValueError) as exc:
             self.behavior.face_lost()

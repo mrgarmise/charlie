@@ -1,0 +1,25 @@
+{
+  "base_local": "7707c53a397d61971b47bda59471f82d679e958d",
+  "base_published": "95a7cd583ea8a6a568bdfb274de21638bc1c604c",
+  "runtime_sha256": "894e13906246024faa9d7e63dc81a088aa5257a4e2089d49d62160ce7c03b2fa",
+  "unchanged": {
+    "vision/mobile_face.py": true,
+    "behaviors/mobile_face_track.py": true,
+    "hardware/elegoo_telemetry.py": true
+  },
+  "ultrasonic_method_unchanged": true,
+  "physical_operations": 0,
+  "original_motion_records": {
+    "20261025T154446341045Z-floor-reverse.json": "843a539b3ce97eeddb8114f7c0b793aa1e3af49a0a5e3878330242999bfeff71",
+    "20261025T154418511983Z-floor-forward.json": "776f0680511df502e1cef5b3461d8d735004528600263ce1ed384539381ac06b",
+    "20261025T154336645883Z-wheels-forward.json": "026dd233d6be8b5e9ee4aadbaa36c509b34deffbf9604778af5f060c790544b7",
+    "20261025T154353143112Z-wheels-reverse.json": "2e63ec4fd5f09605bb7975a27e3f2ae5f02e3d71fb9ee98653ea7220a19b1c52",
+    "20261025T154432146437Z-floor-reverse.json": "a29853f0a3edb6c07eb6c8c669a9f74bc016e5aa1997237eb52fe350a01da89d"
+  },
+  "archive_sha256": "7dcec7d028a99978061f1fba7d610c07bcce80c93c45eba623da646ef0441a34",
+  "operator_receipt_sha256": "c3f3c2aa2c91dd60ff3c2fa48e7a939c6e45835a3baa551d5c4dae623aa2a2f5",
+  "tracker_sha256": "5338494bd9ceb47189d691da0fcaacfc86d5016dfc00de2cac255a40d9b25ac1",
+  "detector_sha256": "1ab0711c8d39180f359ba607f3ef93d45ff9a118195e8bd940488724ba078d52",
+  "model_sha256": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4",
+  "minimal_stop_commit": "f2a879ab37c6055c1e53e45a55509548a6dd03c1"
+}

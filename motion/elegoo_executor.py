@@ -105,7 +105,9 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
             self.bus.publish_observation('elegoo-actuator-state', self, Observation(
                 'elegoo-actuator-state', self._receipts, self.clock(),
                 dict(request_id=request.id, requester=request.requester,
-                     group=request.group, action=request.action, **result),
+                     group=request.group, action=request.action, source=request.source,
+                     observation_id=request.observation_id, requested_at=request.at,
+                     parameters=deepcopy(request.parameters), **result),
                 {'physical_outcome': 'unknown', 'boot_id': self.boot_id}, self._generation))
 
     def _source(self, request):

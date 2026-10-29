@@ -3,10 +3,11 @@ import sys
 
 class KeyboardStimulus:
 
-    def __init__(self, bus, *, object_mode=False, emergency_only=False, on_emergency=None):
+    def __init__(self, bus, *, object_mode=False, emergency_only=False, on_emergency=None, stop_on_eof=False):
         self.object_mode = object_mode
         self.emergency_only = emergency_only
         self.on_emergency = on_emergency
+        self.stop_on_eof = stop_on_eof
         self.bus = bus
         self.running = True
 
@@ -24,6 +25,7 @@ class KeyboardStimulus:
         while self.running:
             key = sys.stdin.read(1)
             if not key:
+                if self.stop_on_eof:self.emergency_stop()
                 return
             if self.emergency_only:
                 if key == 'x':self.emergency_stop()

@@ -42,6 +42,9 @@ def parser():
     mobile.add_argument('--pet-abilities',action='store_true',help='normal AttentionManager/Executive pet abilities using existing mobile sensing')
     mobile.add_argument('--pet-follow',action='store_true',help='same abilities; physical follow still requires independent current activation')
     p.add_argument('--primary-vision',action='store_true',help='run existing Pi Deck and vision alongside mobile abilities; hardware gates remain required')
+    p.add_argument('--face-trial-seconds',type=float,default=60.,help='bounded supervised face session, 1..120 seconds')
+    p.add_argument('--face-authorization-wait',type=float,default=120.,help='startup admission wait, 1..300 seconds; no commands while waiting')
+    p.add_argument('--face-evidence-dir',type=Path,help='new private directory for bounded authentic face trial evidence')
     p.add_argument('--elegoo-face-track',action='store_true',help='subscribe original ELEGOO face tracker; motion remains independently gated')
     p.add_argument('--list-capabilities',action='store_true',help='inspect normal ability catalog without initializing any devices')
     p.add_argument('--mobile-zone',default='unqualified',help='independently inspected zone identity')
@@ -103,7 +106,7 @@ def application_camera_feeders(args, *, selected=('pi', 'elegoo'), pi_role='prim
 
 
 @contextmanager
-def application_mobile_actuators(frame_bus, *, state=None, hardware_id='unverified', zone='unqualified', feed=None, authority=None):
+def application_mobile_actuators(frame_bus, *, state=None, hardware_id='unverified', zone='unqualified', feed=None, authority=None, wire_output=None):
     from motion.mobile_base import MobileBase
     from motion.elegoo_executor import (QualifiedElegooExecutor,
         install_application_executor, remove_application_executor)
@@ -125,6 +128,13 @@ def application_mobile_actuators(frame_bus, *, state=None, hardware_id='unverifi
         executor = QualifiedElegooExecutor(MobileBase(), bus=frame_bus, authority=authority, fault_path=fault_path)
         print(json.dumps(dict(elegoo_executor_boot_id=executor.boot_id,
             physical_authorization=False,uncertain=executor.stop_uncertain)),flush=True)
+        if wire_output is not None:
+            def save_wire():
+                path=Path(wire_output);path.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
+                with path.open('x') as out:
+                    json.dump(dict(executor.base.car.wire_history(),boot_id=executor.boot_id,
+                        stop_uncertain=executor.stop_uncertain,physical_outcome='unknown'),out)
+            owners.callback(save_wire)
         owners.callback(executor.close)
         install_application_executor(executor)
         owners.callback(remove_application_executor, executor)
@@ -139,6 +149,21 @@ def main(argv=None):
     if args.list_capabilities:
         from learning.capabilities import default_registry
         print(json.dumps(default_registry().describe(),indent=2));return
+    standalone_face = args.elegoo_face_track and not any((args.object_recognition,
+        args.mobile_replay,args.mobile_observe,args.pet_abilities,args.pet_follow,args.primary_vision))
+    if standalone_face:
+        import math
+        if args.offline:raise ValueError('complete ELEGOO face following requires explicit --hardware')
+        if not math.isfinite(args.face_trial_seconds) or not 1<=args.face_trial_seconds<=120:
+            raise ValueError('face session must be 1..120 seconds')
+        if not math.isfinite(args.face_authorization_wait) or not 1<=args.face_authorization_wait<=300:
+            raise ValueError('face admission wait must be 1..300 seconds')
+        if args.face_evidence_dir is None:
+            from uuid import uuid4
+            args.face_evidence_dir=args.learning_state/'face-trials'/uuid4().hex
+        if args.face_evidence_dir.exists():raise ValueError('new face evidence directory required; preserve previous trials')
+    elif args.face_evidence_dir is not None:
+        raise ValueError('face evidence session requires the dedicated normal ELEGOO face entry')
     if args.object_recognition:
         if args.offline or args.mobile_replay or args.object_label_replay:
             raise ValueError('Object Recognition requires explicit --hardware and application camera feeders')
@@ -207,6 +232,14 @@ def main(argv=None):
             process.start()
             next_worker_restart=time.monotonic()+5.
     try:
+        if standalone_face:
+            from learning.face_trial import run_face
+            with application_camera_feeders(args,selected=('elegoo',)) as frame_bus:
+                with application_mobile_actuators(frame_bus,state=args.learning_state,
+                        hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.actuator_safety_feed,
+                        wire_output=args.face_evidence_dir/'driver-wire-final.json') as (executor,telemetry):
+                    run_face(args,resources,frame_bus,executor,telemetry,supervise=supervise_development)
+            return
         if args.object_recognition:
             from learning.object_runtime import run_objects
             with application_camera_feeders(args) as frame_bus:

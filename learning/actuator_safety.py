@@ -209,3 +209,44 @@ class ActuatorSafetyAuthority:
         activation,report = self.active('telemetry',boot_id)
         return dict(artifact(report['protocol_artifact']),read_only_connection_authorized=True,
                     evidence_id=activation['qualification_id'],firmware_identity=report['firmware_sha256'])
+
+
+def main(argv=None):
+    """Inspect/evaluate/install EXTERNAL evidence and authority; never device I/O."""
+    import argparse
+    from memory.evidence import EvidenceJournal
+    from learning.deployment import CapabilityDeployment
+    p=argparse.ArgumentParser(description=main.__doc__)
+    p.add_argument('--journal',type=Path,required=True)
+    sub=p.add_subparsers(dest='action',required=True)
+    status=sub.add_parser('status');status.add_argument('--boot-id',required=True)
+    status.add_argument('--hardware-id',required=True);status.add_argument('--zone',required=True)
+    evaluate=sub.add_parser('evaluate');evaluate.add_argument('report',type=Path)
+    activate=sub.add_parser('activate');activate.add_argument('qualification');activate.add_argument('authorization',type=Path)
+    revoke=sub.add_parser('revoke');revoke.add_argument('target',choices=GROUPS.values());revoke.add_argument('--reason',required=True);revoke.add_argument('--source',required=True)
+    args=p.parse_args(argv)
+    if args.action=='status' and not args.journal.exists():
+        print(json.dumps(dict(status='NEEDS_QUALIFICATION',device_connections=0)));return
+    journal=EvidenceJournal(args.journal,read_only=args.action=='status')
+    try:
+        deployment=CapabilityDeployment(journal)
+        if args.action=='status':
+            authority=ActuatorSafetyAuthority(deployment,hardware_id=args.hardware_id,zone=args.zone)
+            from learning.face_trial import authorization_status
+            from types import SimpleNamespace
+            result=authorization_status(SimpleNamespace(authority=authority,boot_id=args.boot_id,stop_uncertain=(args.journal.parent/'elegoo-uncertain-motion.lock').exists()))
+        elif args.action=='evaluate':
+            row=evaluate_actuator(journal,dict(path=str(args.report.resolve()),sha256=hashlib.sha256(args.report.read_bytes()).hexdigest()))
+            result=dict(record_id=row.id)
+        elif args.action=='activate':
+            if args.authorization.stat().st_size>65536:raise ValueError('bounded external authorization required')
+            row=deployment.activate_actuator(args.qualification,authorization=json.loads(args.authorization.read_text()))
+            result=dict(record_id=row.id)
+        else:
+            row=deployment.revoke_actuator(args.target,reason=args.reason,authorization={'source':args.source})
+            result=dict(record_id=row.id)
+        print(json.dumps(dict(result,device_connections=0)))
+    finally:journal.close()
+
+
+if __name__=='__main__':main()

@@ -585,7 +585,7 @@ class ElegooMobileBase:
         ident=self._next_id('safestop')
         try:
             result=self._send({'N':1,'H':ident,'D1':0,'D2':0,'D3':0},
-                              expected_id=ident,timeout=.05,retry=False,expected_response='{'+ident+'_ok}')
+                              expected_id=ident,timeout=.150,retry=False,expected_response='{'+ident+'_ok}')
             return dict(sent=True,acknowledged=result['ok'] is True and result.get('response')=='{'+ident+'_ok}',
                         response=result.get('response'),physically_stopped=None)
         except Exception as exc:

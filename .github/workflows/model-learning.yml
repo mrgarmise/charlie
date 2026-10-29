@@ -1,0 +1,73 @@
+name: Guarded model learning
+on:
+  pull_request:
+    branches: [master]
+permissions:
+  contents: read
+jobs:
+  model-learning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest
+      - name: Obtain exact shared sensory contract without merging active PR
+        run: |
+          git fetch origin 08ae83f7a6f54a7b0acefc4f240df784f176573e
+          git show 08ae83f7a6f54a7b0acefc4f240df784f176573e:stimulus/bus.py > "$RUNNER_TEMP/model-learning-bus.py"
+      - name: Obtain exact asynchronous gateway without merging active PR
+        run: |
+          git fetch origin 4bb3bffecffea0d6e294485132f42f5e96f4c506
+          git show 4bb3bffecffea0d6e294485132f42f5e96f4c506:memory/human_interaction.py > "$RUNNER_TEMP/model-learning-gateway.py"
+      - name: Independently run worker, Executive, safety and subscription checks
+        env:
+          CHARLIE_MODEL_LEARNING_SHARED_GATEWAY: ${{ runner.temp }}/model-learning-gateway.py
+          CHARLIE_MODEL_LEARNING_SHARED_BUS: ${{ runner.temp }}/model-learning-bus.py
+        run: python -m pytest tests/test_model_learning.py tests/test_model_learning_review.py tests/test_model_learning_shared_bus.py tests/test_model_learning_shared_gateway.py -q --junitxml=model-learning-tests.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: model-learning-tests
+          path: model-learning-tests.xml
+  combined-stack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply changes to disposable pinned sensory and human stack
+        env:
+          FEATURE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch origin "$FEATURE_SHA" 08ae83f7a6f54a7b0acefc4f240df784f176573e 4bb3bffecffea0d6e294485132f42f5e96f4c506
+          git diff bcf8082f6319c63c4bd6bcceeab5faea37241654 "$FEATURE_SHA" --binary > "$RUNNER_TEMP/model-learning.patch"
+          git diff bcf8082f6319c63c4bd6bcceeab5faea37241654 4bb3bffecffea0d6e294485132f42f5e96f4c506 --binary > "$RUNNER_TEMP/model-learning-human.patch"
+          git checkout --detach 08ae83f7a6f54a7b0acefc4f240df784f176573e
+          if ! git apply --3way "$RUNNER_TEMP/model-learning-human.patch"; then
+            test "$(git diff --name-only --diff-filter=U)" = 'docs/CHARLIE_ARCHITECTURE.md'
+            git checkout --ours -- docs/CHARLIE_ARCHITECTURE.md
+            python -c 'from pathlib import Path; p=Path("docs/CHARLIE_ARCHITECTURE.md"); p.write_text(p.read_text()+"\n")'
+            git show 4bb3bffecffea0d6e294485132f42f5e96f4c506:docs/CHARLIE_ARCHITECTURE.md | sed -n '/^## Asynchronous human information interface (draft)/,$p' >> docs/CHARLIE_ARCHITECTURE.md
+            git add docs/CHARLIE_ARCHITECTURE.md
+          fi
+          if ! git apply --3way "$RUNNER_TEMP/model-learning.patch"; then
+            git show "$FEATURE_SHA":tools/resolve_model_learning_integration.py > "$RUNNER_TEMP/resolve-model-learning.py"
+            python "$RUNNER_TEMP/resolve-model-learning.py" "$FEATURE_SHA"
+          fi
+          git -c user.name='Software validation' -c user.email=validation@localhost commit -m 'Disposable combined stack software validation'
+          git log -1 --format='%H %T'
+      - run: python -m pip install -r requirements.txt pytest
+      - name: Run combined application, human gateway and perception regressions
+        run: python -m pytest tests -q --junitxml=model-learning-combined.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: model-learning-combined
+          path: model-learning-combined.xml

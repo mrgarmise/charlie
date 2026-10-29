@@ -4,6 +4,14 @@ from .datasets import SCOPE, sha
 
 class CapabilityDeployment:
     def __init__(self,journal): self.journal=journal
+    def activate_perception_shadow(self, service, approval_id):
+        from .model_learning.deployment import activate
+        return activate(self,service,approval_id)
+
+    def rollback_perception_shadow(self, service, *, operator, reason):
+        from .model_learning.deployment import rollback
+        return rollback(self,service,operator=operator,reason=reason)
+
     def active(self,target):
         active=None
         for row in self.journal.records('event'):

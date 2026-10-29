@@ -1,0 +1,1783 @@
+{
+  "schema": "robotron-localization-proposals-v1",
+  "frames": [
+    {
+      "schema": "robotron-localization-v1",
+      "frame_sha256": "ad24bbcc527e3f74aaa12f6bb8a680f1b0e6824b1d0bccbe7744694e90f93e10",
+      "session": "live-observation-03",
+      "objects": [
+        {
+          "class": "unknown",
+          "box": [
+            0.4265625,
+            0.010416666666666666,
+            0.45625,
+            0.07083333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.790625,
+            0.010416666666666666,
+            0.821875,
+            0.08125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.8890625,
+            0.010416666666666666,
+            0.9921875,
+            0.29375
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.015625,
+            0.020833333333333332,
+            0.0515625,
+            0.04791666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.046875,
+            0.07916666666666666,
+            0.0515625,
+            0.11041666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3984375,
+            0.10208333333333333,
+            0.4484375,
+            0.17291666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5296875,
+            0.23958333333333334,
+            0.56875,
+            0.425
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.915625,
+            0.24375,
+            0.9296875,
+            0.275
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.0625,
+            0.325,
+            0.0859375,
+            0.4125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.359375,
+            0.47708333333333336,
+            0.409375,
+            0.55625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5484375,
+            0.8229166666666666,
+            0.5828125,
+            0.8666666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.6140625,
+            0.8604166666666667,
+            0.646875,
+            0.9041666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3671875,
+            0.8729166666666667,
+            0.3828125,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2515625,
+            0.8916666666666667,
+            0.284375,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2,
+            0.90625,
+            0.2328125,
+            0.95
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        }
+      ],
+      "reviewer": "unreviewed-existing-PPAL-proposals",
+      "track_identity": "session-local only; annotation does not establish physical identity",
+      "source_metadata_sha256": "480a1434230ba0428c76e293d1bdd564fb9d75e142192c456ce938f16ee55a17",
+      "captured_at_seconds": 0.026247601000250143,
+      "tick": 0,
+      "coordinates": "rectified saved playfield",
+      "truth": false
+    },
+    {
+      "schema": "robotron-localization-v1",
+      "frame_sha256": "4aa36229727cca103ea9f2e392dfbf43b1030835080b526f85698a4adde9a836",
+      "session": "live-observation-03",
+      "objects": [
+        {
+          "class": "unknown",
+          "box": [
+            0.4265625,
+            0.010416666666666666,
+            0.475,
+            0.07083333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.7921875,
+            0.010416666666666666,
+            0.8421875,
+            0.08125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.9046875,
+            0.010416666666666666,
+            0.95,
+            0.016666666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.890625,
+            0.010416666666666666,
+            0.9921875,
+            0.29583333333333334
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.015625,
+            0.020833333333333332,
+            0.0515625,
+            0.04791666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3984375,
+            0.09583333333333334,
+            0.4484375,
+            0.17083333333333334
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.075,
+            0.15416666666666667,
+            0.08125,
+            0.21458333333333332
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.51875,
+            0.24166666666666667,
+            0.56875,
+            0.4395833333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.15625,
+            0.2604166666666667,
+            0.2015625,
+            0.31875
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.0796875,
+            0.3854166666666667,
+            0.1078125,
+            0.44166666666666665
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.359375,
+            0.46875,
+            0.409375,
+            0.5541666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5484375,
+            0.8229166666666666,
+            0.5828125,
+            0.8666666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.6140625,
+            0.8604166666666667,
+            0.646875,
+            0.9041666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3625,
+            0.8729166666666667,
+            0.3890625,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2515625,
+            0.8916666666666667,
+            0.284375,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2,
+            0.90625,
+            0.2328125,
+            0.95
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        }
+      ],
+      "reviewer": "unreviewed-existing-PPAL-proposals",
+      "track_identity": "session-local only; annotation does not establish physical identity",
+      "source_metadata_sha256": "480a1434230ba0428c76e293d1bdd564fb9d75e142192c456ce938f16ee55a17",
+      "captured_at_seconds": 0.1386077919996751,
+      "tick": 1,
+      "coordinates": "rectified saved playfield",
+      "truth": false
+    },
+    {
+      "schema": "robotron-localization-v1",
+      "frame_sha256": "321b4cd8aefbb20a0a56ba26d5f837321e8148cfaded47c0d74c5eadea84a79f",
+      "session": "live-observation-03",
+      "objects": [
+        {
+          "class": "unknown",
+          "box": [
+            0.4359375,
+            0.010416666666666666,
+            0.4796875,
+            0.07291666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.8015625,
+            0.010416666666666666,
+            0.846875,
+            0.08125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.884375,
+            0.010416666666666666,
+            0.9921875,
+            0.3020833333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.015625,
+            0.020833333333333332,
+            0.0515625,
+            0.04791666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.075,
+            0.07708333333333334,
+            0.08125,
+            0.15625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.9140625,
+            0.08333333333333333,
+            0.9203125,
+            0.09791666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3984375,
+            0.09375,
+            0.45,
+            0.1625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.259375,
+            0.17708333333333334,
+            0.2671875,
+            0.18541666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.215625,
+            0.20625,
+            0.24375,
+            0.24375
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5296875,
+            0.24166666666666667,
+            0.5671875,
+            0.36041666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.51875,
+            0.37916666666666665,
+            0.553125,
+            0.4395833333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.0796875,
+            0.3958333333333333,
+            0.1078125,
+            0.45416666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.1140625,
+            0.41041666666666665,
+            0.1234375,
+            0.4166666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.1359375,
+            0.41041666666666665,
+            0.159375,
+            0.41875
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.359375,
+            0.46875,
+            0.409375,
+            0.5375
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5484375,
+            0.8229166666666666,
+            0.5828125,
+            0.8666666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.6140625,
+            0.8604166666666667,
+            0.646875,
+            0.9041666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3625,
+            0.8729166666666667,
+            0.3890625,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2515625,
+            0.8916666666666667,
+            0.284375,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2,
+            0.90625,
+            0.2328125,
+            0.95
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        }
+      ],
+      "reviewer": "unreviewed-existing-PPAL-proposals",
+      "track_identity": "session-local only; annotation does not establish physical identity",
+      "source_metadata_sha256": "480a1434230ba0428c76e293d1bdd564fb9d75e142192c456ce938f16ee55a17",
+      "captured_at_seconds": 0.20926845299982233,
+      "tick": 2,
+      "coordinates": "rectified saved playfield",
+      "truth": false
+    },
+    {
+      "schema": "robotron-localization-v1",
+      "frame_sha256": "ca1728c003ef9fe614661eaa0d46b40d6f9bb625533d2cc1e5e5bdb2b75b8c7f",
+      "session": "live-observation-03",
+      "objects": [
+        {
+          "class": "unknown",
+          "box": [
+            0.4359375,
+            0.010416666666666666,
+            0.48125,
+            0.07291666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.8,
+            0.010416666666666666,
+            0.846875,
+            0.08125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.8859375,
+            0.010416666666666666,
+            0.9921875,
+            0.3020833333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.075,
+            0.016666666666666666,
+            0.08125,
+            0.0375
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.0140625,
+            0.022916666666666665,
+            0.0515625,
+            0.04791666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.309375,
+            0.09166666666666666,
+            0.33125,
+            0.12291666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3984375,
+            0.09375,
+            0.4484375,
+            0.1625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.90625,
+            0.12291666666666666,
+            0.9109375,
+            0.13333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.88125,
+            0.2,
+            0.8984375,
+            0.2125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5296875,
+            0.24166666666666667,
+            0.5671875,
+            0.36041666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.0921875,
+            0.40208333333333335,
+            0.1140625,
+            0.45416666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5046875,
+            0.4,
+            0.5390625,
+            0.4625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.221875,
+            0.41041666666666665,
+            0.2671875,
+            0.41875
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.134375,
+            0.41875,
+            0.1578125,
+            0.4270833333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.359375,
+            0.46875,
+            0.409375,
+            0.5375
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5484375,
+            0.8229166666666666,
+            0.5828125,
+            0.8666666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.6140625,
+            0.8604166666666667,
+            0.646875,
+            0.9041666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.375,
+            0.8729166666666667,
+            0.39375,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2515625,
+            0.8916666666666667,
+            0.284375,
+            0.9354166666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2,
+            0.9041666666666667,
+            0.2328125,
+            0.95
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        }
+      ],
+      "reviewer": "unreviewed-existing-PPAL-proposals",
+      "track_identity": "session-local only; annotation does not establish physical identity",
+      "source_metadata_sha256": "480a1434230ba0428c76e293d1bdd564fb9d75e142192c456ce938f16ee55a17",
+      "captured_at_seconds": 0.28102606199990987,
+      "tick": 3,
+      "coordinates": "rectified saved playfield",
+      "truth": false
+    },
+    {
+      "schema": "robotron-localization-v1",
+      "frame_sha256": "04ef217146980cb71d07a896a821f14e8e05938cc90ced19894a44699264c7ae",
+      "session": "live-observation-03",
+      "objects": [
+        {
+          "class": "unknown",
+          "box": [
+            0.3734375,
+            0.010416666666666666,
+            0.396875,
+            0.03958333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.4515625,
+            0.010416666666666666,
+            0.48125,
+            0.07291666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.815625,
+            0.010416666666666666,
+            0.846875,
+            0.08125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.9046875,
+            0.010416666666666666,
+            0.9515625,
+            0.016666666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.884375,
+            0.010416666666666666,
+            0.9921875,
+            0.3020833333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.0140625,
+            0.022916666666666665,
+            0.0515625,
+            0.04791666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3984375,
+            0.08125,
+            0.4484375,
+            0.1625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5296875,
+            0.24166666666666667,
+            0.5671875,
+            0.36041666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.1078125,
+            0.4,
+            0.1296875,
+            0.45416666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5046875,
+            0.4,
+            0.5390625,
+            0.4625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3078125,
+            0.41041666666666665,
+            0.334375,
+            0.41875
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2,
+            0.42083333333333334,
+            0.228125,
+            0.4270833333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3578125,
+            0.4583333333333333,
+            0.409375,
+            0.5375
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.546875,
+            0.8229166666666666,
+            0.5828125,
+            0.8666666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.6140625,
+            0.8604166666666667,
+            0.646875,
+            0.9041666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.375,
+            0.8729166666666667,
+            0.39375,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2515625,
+            0.8916666666666667,
+            0.284375,
+            0.9354166666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2,
+            0.90625,
+            0.2328125,
+            0.9479166666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        }
+      ],
+      "reviewer": "unreviewed-existing-PPAL-proposals",
+      "track_identity": "session-local only; annotation does not establish physical identity",
+      "source_metadata_sha256": "480a1434230ba0428c76e293d1bdd564fb9d75e142192c456ce938f16ee55a17",
+      "captured_at_seconds": 0.35244798399980937,
+      "tick": 4,
+      "coordinates": "rectified saved playfield",
+      "truth": false
+    },
+    {
+      "schema": "robotron-localization-v1",
+      "frame_sha256": "6a26a207864924cc1e0da7f8b42d7e56cdff420ac6e1d904e2b3ce97a0518b22",
+      "session": "live-observation-03",
+      "objects": [
+        {
+          "class": "unknown",
+          "box": [
+            0.4515625,
+            0.010416666666666666,
+            0.48125,
+            0.07291666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.815625,
+            0.010416666666666666,
+            0.846875,
+            0.08125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.9046875,
+            0.010416666666666666,
+            0.95,
+            0.016666666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.8875,
+            0.010416666666666666,
+            0.9921875,
+            0.3020833333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.0140625,
+            0.020833333333333332,
+            0.0515625,
+            0.04791666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3984375,
+            0.08125,
+            0.4484375,
+            0.1625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5296875,
+            0.23958333333333334,
+            0.5671875,
+            0.3625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.1203125,
+            0.39375,
+            0.1453125,
+            0.45416666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5046875,
+            0.4,
+            0.5390625,
+            0.4625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.375,
+            0.4125,
+            0.440625,
+            0.41875
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2671875,
+            0.42083333333333334,
+            0.33125,
+            0.4270833333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3578125,
+            0.4583333333333333,
+            0.409375,
+            0.5375
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5484375,
+            0.8229166666666666,
+            0.5828125,
+            0.8666666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.6140625,
+            0.8604166666666667,
+            0.646875,
+            0.9041666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3765625,
+            0.8729166666666667,
+            0.4046875,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2515625,
+            0.8916666666666667,
+            0.284375,
+            0.9354166666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2,
+            0.90625,
+            0.2328125,
+            0.9479166666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        }
+      ],
+      "reviewer": "unreviewed-existing-PPAL-proposals",
+      "track_identity": "session-local only; annotation does not establish physical identity",
+      "source_metadata_sha256": "480a1434230ba0428c76e293d1bdd564fb9d75e142192c456ce938f16ee55a17",
+      "captured_at_seconds": 0.42346294300023146,
+      "tick": 5,
+      "coordinates": "rectified saved playfield",
+      "truth": false
+    },
+    {
+      "schema": "robotron-localization-v1",
+      "frame_sha256": "dc093b93b5c77a365c2c4de47bf890634f79d1b30eab02dbb1949a3e50e3ce65",
+      "session": "live-observation-03",
+      "objects": [
+        {
+          "class": "unknown",
+          "box": [
+            0.453125,
+            0.010416666666666666,
+            0.503125,
+            0.07291666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.81875,
+            0.010416666666666666,
+            0.8703125,
+            0.08125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.890625,
+            0.010416666666666666,
+            0.9921875,
+            0.29375
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.0140625,
+            0.020833333333333332,
+            0.0515625,
+            0.04791666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3984375,
+            0.07291666666666667,
+            0.45,
+            0.16041666666666668
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.9234375,
+            0.08125,
+            0.928125,
+            0.08958333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5296875,
+            0.24166666666666667,
+            0.5671875,
+            0.3625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.1375,
+            0.3729166666666667,
+            0.1625,
+            0.43125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.4828125,
+            0.4,
+            0.5390625,
+            0.4625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2296875,
+            0.4083333333333333,
+            0.2734375,
+            0.41875
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.375,
+            0.42083333333333334,
+            0.41875,
+            0.42916666666666664
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3578125,
+            0.45,
+            0.409375,
+            0.51875
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5484375,
+            0.8229166666666666,
+            0.5828125,
+            0.8666666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.6140625,
+            0.8604166666666667,
+            0.646875,
+            0.9041666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.378125,
+            0.8729166666666667,
+            0.4046875,
+            0.93125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2515625,
+            0.8916666666666667,
+            0.284375,
+            0.9354166666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2,
+            0.90625,
+            0.2328125,
+            0.95
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        }
+      ],
+      "reviewer": "unreviewed-existing-PPAL-proposals",
+      "track_identity": "session-local only; annotation does not establish physical identity",
+      "source_metadata_sha256": "480a1434230ba0428c76e293d1bdd564fb9d75e142192c456ce938f16ee55a17",
+      "captured_at_seconds": 0.49403382499986037,
+      "tick": 6,
+      "coordinates": "rectified saved playfield",
+      "truth": false
+    },
+    {
+      "schema": "robotron-localization-v1",
+      "frame_sha256": "895affe574279f3c63dfd2e6a7123ed85084de5ef0ba67edaa38fee41070dfc0",
+      "session": "live-observation-03",
+      "objects": [
+        {
+          "class": "unknown",
+          "box": [
+            0.4609375,
+            0.010416666666666666,
+            0.503125,
+            0.07291666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.0140625,
+            0.020833333333333332,
+            0.0515625,
+            0.04791666666666667
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "threat",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.8953125,
+            0.03958333333333333,
+            0.9921875,
+            0.2708333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3984375,
+            0.07291666666666667,
+            0.4484375,
+            0.14375
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.89375,
+            0.14583333333333334,
+            0.903125,
+            0.1625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5296875,
+            0.24166666666666667,
+            0.565625,
+            0.3625
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.1453125,
+            0.36666666666666664,
+            0.1671875,
+            0.42291666666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5046875,
+            0.38958333333333334,
+            0.5390625,
+            0.5104166666666666
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.25,
+            0.4083333333333333,
+            0.2734375,
+            0.41875
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3953125,
+            0.42083333333333334,
+            0.4203125,
+            0.42916666666666664
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3578125,
+            0.45,
+            0.409375,
+            0.51875
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.5484375,
+            0.8270833333333333,
+            0.5578125,
+            0.8583333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.3875,
+            0.8729166666666667,
+            0.4046875,
+            0.93125
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2515625,
+            0.8916666666666667,
+            0.284375,
+            0.9333333333333333
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        },
+        {
+          "class": "unknown",
+          "box": [
+            0.2,
+            0.90625,
+            0.2328125,
+            0.95
+          ],
+          "uncertainty": 1.0,
+          "candidate_kind": "unknown",
+          "track_id": null
+        }
+      ],
+      "reviewer": "unreviewed-existing-PPAL-proposals",
+      "track_identity": "session-local only; annotation does not establish physical identity",
+      "source_metadata_sha256": "480a1434230ba0428c76e293d1bdd564fb9d75e142192c456ce938f16ee55a17",
+      "captured_at_seconds": 0.5640645390003556,
+      "tick": 7,
+      "coordinates": "rectified saved playfield",
+      "truth": false
+    }
+  ],
+  "semantic_accuracy": null,
+  "localization_accuracy": null,
+  "source": "existing saved PPAL proposals, no new inference or capture",
+  "limitations": [
+    "machine boxes unverified",
+    "no object identity inheritance",
+    "single recording is not independent holdout"
+  ],
+  "frame_count": 8,
+  "proposal_count": 138
+}

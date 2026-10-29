@@ -1,0 +1,110 @@
+{
+  "original_records_preserved": 12,
+  "labels_preserved": 6,
+  "attract_incumbent_unknown_preserved": true,
+  "counts": {
+    "total": 70,
+    "authentic": 70,
+    "labeled": 6,
+    "sessions": 13
+  },
+  "active": null,
+  "model_result": "NEEDS_LABELS",
+  "reason": [
+    "missing labels or session partition",
+    "test needs authentic unknown/OOD examples",
+    "test needs every known class",
+    "train needs every known class",
+    "validation needs every known class"
+  ],
+  "resources": {
+    "cpu_cores": 2,
+    "memory_budget_mb": 768,
+    "temperature_limit_c": 75.0,
+    "ownership_poll_seconds": 0.05,
+    "temperature_c": 56.2,
+    "thermal_sensor_available": true,
+    "thermal_telemetry_required": true,
+    "ownership_checks": 72,
+    "resident_bytes": 170409984,
+    "owned_worker_count": 0,
+    "peak_rss_bytes": 178896896,
+    "peak_owned_resident_bytes": 171933696,
+    "cpu_seconds": 23.102923
+  },
+  "elapsed_seconds": 24.56416966500001,
+  "controller_writes": 0,
+  "physical_authorization": false,
+  "categories": {
+    "model_need": 1,
+    "model_turn": 1,
+    "model_proposal": 0,
+    "model_dataset": 0,
+    "model_candidate": 0,
+    "model_evaluation": 0,
+    "model_incumbent": 70
+  },
+  "class_by_session": {
+    "S01": {
+      "title_menu": 1,
+      "terminal": 1,
+      "gameplay": 1
+    },
+    "S02": {
+      "unreviewed": 8
+    },
+    "S03": {
+      "unreviewed": 7
+    },
+    "S04": {
+      "unreviewed": 6
+    },
+    "S05": {
+      "unreviewed": 3
+    },
+    "S06": {
+      "unreviewed": 8
+    },
+    "S07": {
+      "unreviewed": 7
+    },
+    "S08": {
+      "unreviewed": 3
+    },
+    "S09": {
+      "unreviewed": 7
+    },
+    "S10": {
+      "unreviewed": 7
+    },
+    "S11": {
+      "unreviewed": 8
+    },
+    "S12": {
+      "title_menu": 1
+    },
+    "S13": {
+      "title_menu": 1,
+      "gameplay": 1
+    }
+  },
+  "partitions": {
+    "unassigned": 70
+  },
+  "near_duplicate_pairs": 0,
+  "retained_image_bytes": 34869557,
+  "new_intake": {
+    "repository_developmental_photographs": 25,
+    "native_manifest_verified": 22,
+    "archive_manifest_verified": 17,
+    "all_unreviewed": 64,
+    "candidate_frames_considered": 71,
+    "duplicate_candidates_excluded": 7
+  },
+  "limitations": [
+    "No authentic training/evaluation cycle; NEEDS_LABELS",
+    "No independent accuracy estimate",
+    "No camera or Hailo execution; device nodes unavailable",
+    "Original private reviews and photographs excluded from Git"
+  ]
+}

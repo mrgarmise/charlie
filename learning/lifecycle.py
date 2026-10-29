@@ -23,7 +23,7 @@ class MeditationYield(Exception):
 
 
 class DevelopmentLifecycle:
-    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None, resource_guard=None):
+    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None, resource_guard=None, model_learning=False):
         from .resources import ResourceGuard
         self.resources=resource_guard or ResourceGuard(resources)
         self._stage_cache={}
@@ -62,6 +62,10 @@ class DevelopmentLifecycle:
         self.gateway = MemoryGateway(store=JsonlStore(self.output/'memory.jsonl'),
             evaluator=MemoryEvaluator(self.output/'evaluator.sqlite3'))
         self.executive = LearningExecutive(self.journal, self.gateway)
+        self.model_learning = None
+        if model_learning:
+            from .model_learning.service import ModelLearningService
+            self.model_learning=ModelLearningService(self.journal,self.output/"model-learning",wall_seconds=budget_seconds)
         self.budget = budget_seconds
         self.authority = offline_authority
         import subprocess
@@ -135,6 +139,8 @@ class DevelopmentLifecycle:
             current_activity=getattr(self,'current_activity',None),
             evidence_requests=requests+[r.data['payload'] for r in rows if r.data['payload'].get('category')=='learning_evidence_request'
                 and r.id not in satisfied and work.get(r.data['payload'].get('work_id'),{}).get('status')!='completed'], identity_conflicts=current_conflicts(self.journal), activation=active,
+            model_learning=self.model_learning.status() if self.model_learning else None,
+            model_learning_result=getattr(self,'model_learning_result',None),
             physical_authorization=False, physical_score_improvement='UNKNOWN', error=self.error,
             provenance=self.provenance,
             resources=self.resources.sample,operational=self.operational,
@@ -654,7 +660,7 @@ class DevelopmentLifecycle:
 
 def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None,
         history_roots=(), resources=None, wall_seconds=None, cooldown_seconds=None,
-        clock=None, sleep=None, lifecycle_factory=None):
+        clock=None, sleep=None, lifecycle_factory=None, model_learning=False):
     """One existing Executive, with resource polling rather than a second scheduler.
 
     ``turns`` bounds nonthermal attempt slots (including other resource refusals),
@@ -695,6 +701,9 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
         factory=lifecycle_factory or DevelopmentLifecycle
         lifecycle=factory(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,
             history_roots=history_roots,resources=resources)
+        if model_learning:
+            from .model_learning.service import ModelLearningService
+            lifecycle.model_learning=ModelLearningService(lifecycle.journal,lifecycle.output/"model-learning",wall_seconds=budget_seconds)
         lifecycle.resources.interruption_check=interrupt
         while turns is None or counters['nonthermal_attempt_slots']<turns:
             try:interrupt()

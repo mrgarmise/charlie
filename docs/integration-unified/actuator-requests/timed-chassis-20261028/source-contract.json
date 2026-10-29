@@ -1,0 +1,53 @@
+{
+  "classic": {
+    "repository": "elegooofficial/ELEGOO-Smart-Robot-Car-Kit-V4.0",
+    "archive": "SmartRobotCarV4.0_V0_20210104.zip",
+    "archive_git_blob": "086ce4eb37adc9a9a135319df981cc7e2e8cc473",
+    "archive_sha256": "7a4ab175a8b36df76c8ab981899bd2c6cc923b5c3ed4bd253cf0481342fa10a9",
+    "member": "SmartRobotCarV4.0_V0_20210104/SmartRobotCarV4.0_V0_20210104/ApplicationFunctionSet_xxx0.cpp",
+    "member_sha256": "1ba1c11268f3c320090bf9d7bb56bd86c0403fa71b3f90a91781a895903e61ac",
+    "dispatch_lines": [
+      1797,
+      1828
+    ],
+    "timed_handler_lines": [
+      1179,
+      1223
+    ],
+    "timer_type": "uint32_t",
+    "zero_timer": "does not expire",
+    "commit": "096094e07dc7e5eea8c986986158e2d9111dab64"
+  },
+  "newer": {
+    "repository": "elegooofficial/ELEGOO-Smart-Robot-Car-Kit-V4.0-New",
+    "commit": "76d82704b20b8b38d3eb874afd865b349cbc1a48",
+    "path": "ApplicationFunctionSet.cpp",
+    "git_blob": "d8fd782cc385e04b5757478c80b70901e054754a",
+    "sha256": "3d7c74c60ee874fe69c5b5bb7da0437ef0c0751337b7c3c664b3f6abc3f3579f",
+    "handler_lines": [
+      513,
+      526
+    ],
+    "timer_lines": [
+      618,
+      641
+    ]
+  },
+  "verified_contract": {
+    "N": 2,
+    "T_unit": "milliseconds",
+    "T_min": 1,
+    "T_max": 200,
+    "completion_ack": "tagged_ok_after_local_stop",
+    "physical_stop_verified": false
+  },
+  "installed_firmware_match": false,
+  "hardware_accessed": false,
+  "firmware_flashed": false,
+  "preserved_source_copy": "/home/five/charlie-pr13-timed-validation-20261028",
+  "limitations": [
+    "manufacturer source is not installed-byte or physical qualification",
+    "firmware global command tag requires serialized requests",
+    "N1 ACK is not independently measured stopping"
+  ]
+}

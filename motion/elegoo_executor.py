@@ -205,7 +205,9 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
                 self.stop_uncertain = True
                 self.stop()
             self._publish(request, dict(acknowledged=False, error=type(exc).__name__,
-                                       uncertain=self.stop_uncertain, physically_observed=None))
+                                       uncertain=self.stop_uncertain, physically_observed=None,
+                                       wire_attempt=deepcopy(getattr(getattr(self.base,'car',None),'last_pulse',None))
+                                       if isinstance(getattr(getattr(self.base,'car',None),'last_pulse',None),dict) else None))
             raise
         finally:
             with self._state_lock:

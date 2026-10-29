@@ -1,0 +1,11 @@
+{
+  "hardware/elegoo_mobile.py": "e84c79adac0a51f3b6c08b77819c573c0ee23b0ba9329a35926a1a68f0acbe88",
+  "motion/elegoo_executor.py": "e54d04ad1f36fbf9fff38c72d0c97b12da0f47505d993dcb5daf0bb076716085",
+  "experiments/ppal/mobile_navigation.py": "16580261abf4fd13f25c2d995b368c21175dba3de1fb838d104bbb5d589ede37",
+  "learning/mobile_safety.py": "44e3d0e1a46187af980a5929224ef1b4f68704ccfe0127b7d9b2c82c2f2661a0",
+  "learning/actuator_safety.py": "47fbf3b75da6d2d5ccf18ac9f204e8ea39a78bc1b64302f507d407561e3bb1b0",
+  "tests/test_elegoo_timed_pulse.py": "7f521d13a5e5fbdbf21035bc8e1615d7f5455edb4bd66002d1a8495e14c46081",
+  "tests/test_pet_completion.py": "c9846e63855d07ba3827390331b8b8c18599db38935509b966d25aeb3ec25f30",
+  "tests/test_actuator_authority.py": "27039beb11c5caf517a17a67bdad9ec8bdd8ffc79754ae47e152394548304d45",
+  "tools/check_unified_contracts.py": "86ff917238ffd45828023cb5fc4949a8daac699729e8b62fa471dcde6c9dc3d4"
+}

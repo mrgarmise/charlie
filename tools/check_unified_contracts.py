@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 TESTS = [
+    'tests/test_elegoo_timed_pulse.py',
     'tests/test_unified_reconciliation.py',
     'tests/test_shared_mobile_executor.py',
     'tests/test_unified_actuator_requests.py',

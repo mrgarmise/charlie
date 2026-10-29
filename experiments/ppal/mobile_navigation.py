@@ -248,6 +248,10 @@ class QualifiedMobileExecutor:
             # A raised start/STOP exchange can leave physical delivery unknown.
             # A subsequent ACK must not silently clear this session fault.
             self.stop_uncertain=True
+            attempt=getattr(getattr(self.base,'car',None),'last_pulse',None)
+            if isinstance(attempt,dict):
+                from copy import deepcopy
+                self.last_attempt['wire_result']=deepcopy(attempt)
             raise
         with self._state_lock:
             self.last_stop=result.get('stop')

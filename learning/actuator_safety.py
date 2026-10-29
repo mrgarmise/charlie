@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import time
 from memory.evidence import digest
-from learning.mobile_safety import artifact, finite, runtime_hash
+from learning.mobile_safety import artifact, finite, runtime_hash, require_timed_motion
 from experiments.ppal.mobile_navigation import MotionLease
 
 GROUPS = {'chassis': 'elegoo-chassis', 'camera-pan': 'elegoo-camera-pan', 'telemetry': 'elegoo-telemetry'}
@@ -36,6 +36,7 @@ def validate_actuator_report(report):
         raise ValueError('installed firmware/bridge match not established')
     envelope = report['envelope']
     if group == 'chassis':
+        require_timed_motion(protocol)
         if (protocol.get('local_expiry_verified') is not True
                 or protocol.get('motion') != {'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}
                 or set(envelope.get('directions',[])) != {'LEFT','RIGHT'}

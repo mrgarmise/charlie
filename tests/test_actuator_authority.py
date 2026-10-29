@@ -20,6 +20,7 @@ def write(path, value):
 def fixture_report(tmp_path, group):
     firmware='a'*64; bridge='b'*64
     protocol=dict(firmware_sha256=firmware,bridge_sha256=bridge,installed_match=True,
+        timed_motion=dict(N=2,T_unit='milliseconds',completion_ack='tagged_ok_after_local_stop',zero_duration='forbidden'),
         local_expiry_verified=True,motion={'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4},
         pan={'N':5,'D1':1},pan_stop_verified=True,ultrasonic_read_only=True,ultrasonic={'N':21,'D1':2},
         yaw_read_only=True,yaw={'N':24})

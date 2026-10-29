@@ -253,6 +253,9 @@ class ElegooMobileBase:
                         self._pending[ident]
                     )
 
+                    # Qualified motion/STOP require their exact tagged reply.
+                    if item.get("expected_response") is not None:
+                        return
                     item["response"] = (
                         frame
                     )
@@ -277,6 +280,8 @@ class ElegooMobileBase:
             )
 
             if item is not None:
+                if item.get("expected_response") not in (None, frame):
+                    return
                 item["response"] = (
                     frame
                 )
@@ -316,6 +321,8 @@ class ElegooMobileBase:
         timeout=None,
         retry=True,
         preflight=None,
+        expected_response=None,
+        wait_check=None,
     ):
         if retry:self.connect()
         elif not self.connected:raise ConnectionError("qualified command requires existing live connection")
@@ -327,6 +334,7 @@ class ElegooMobileBase:
                 "event": threading.Event(),
                 "response": None,
                 "value": None,
+                "expected_response": expected_response,
             }
 
             with self._pending_lock:
@@ -373,13 +381,26 @@ class ElegooMobileBase:
                 else self.timeout
             )
 
-            if not pending[
-                "event"
-            ].wait(wait_time):
-                raise TimeoutError(
-                    f"timeout waiting for "
-                    f"{expected_id}"
-                )
+            if wait_check is None:
+                ready = pending["event"].wait(wait_time)
+            else:
+                # Only qualified timed commands opt in. Legacy sensor/servo
+                # response semantics remain unchanged. Never hold the send lock
+                # while checking independent safety or awaiting completion.
+                deadline = time.monotonic() + wait_time
+                while True:
+                    wait_check()
+                    if pending["event"].is_set():
+                        ready = True
+                        break
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        ready = False
+                        break
+                    pending["event"].wait(min(.02, remaining))
+                wait_check()  # Cancellation/expiry wins a simultaneous ACK race.
+            if not ready:
+                raise TimeoutError(f"timeout waiting for {expected_id}")
 
             return {
                 "ok": (
@@ -564,19 +585,22 @@ class ElegooMobileBase:
         ident=self._next_id('safestop')
         try:
             result=self._send({'N':1,'H':ident,'D1':0,'D2':0,'D3':0},
-                              expected_id=ident,timeout=.05,retry=False)
-            return dict(sent=True,acknowledged=result['ok'],physically_stopped=None)
+                              expected_id=ident,timeout=.05,retry=False,expected_response='{'+ident+'_ok}')
+            return dict(sent=True,acknowledged=result['ok'] is True and result.get('response')=='{'+ident+'_ok}',
+                        response=result.get('response'),physically_stopped=None)
         except Exception as exc:
             return dict(sent=None,acknowledged=False,physically_stopped=None,error=type(exc).__name__)
         finally:self.align.active=False
 
     def pulse(self, direction, *, pwm, seconds, lease, boot_id, envelope, safety_check,
               cancel=None, clock=time.monotonic, wait=time.sleep, _executor=None):
-        """Qualified N3 timer pulse; local expiry MUST be proven before use.
+        """N2 milliseconds, completion ACK after firmware requests local STOP.
 
-        This method never connects/retries a start. Caller owns independent proof.
-        Safety is rechecked every <=20ms; every exit requests STOP. ACK != motion.
+        The callback is protocol evidence, never measured physical stopping.
+        No retry/reconnect; safety checks continue while awaiting completion.
+        Every attempted pulse exits through an independent explicit STOP.
         """
+        self.last_pulse = None
         from motion.elegoo_executor import _application_executor
         if _application_executor is not None and _executor is not _application_executor:
             raise PermissionError('chassis pulse requires application executor')
@@ -585,33 +609,55 @@ class ElegooMobileBase:
                 or not math.isfinite(seconds) or not 0<seconds<=min(.2,envelope['max_duration'])
                 or not lease.valid(clock(),boot_id) or clock()+seconds>lease.expires_at):
             raise ValueError('finite qualified direction/speed/duration/lease required')
-        result=dict(sent=False,acknowledged=False,executed=None,physically_observed=None)
+        milliseconds = int(seconds * 1000)  # Round DOWN; never extend the grant.
+        if not 1 <= milliseconds <= 200:
+            raise ValueError('timed motion requires at least one whole millisecond')
+        duration = milliseconds / 1000.
+        result=dict(sent=False,acknowledged=False,executed=None,physically_observed=None,
+                    timed_completion=False)
         ident=self._next_id('pulse')
+        expected='{'+ident+'_ok}'
+        def check():
+            if (not self.connected or not lease.valid(clock(),boot_id)
+                    or (cancel is not None and cancel.is_set()) or safety_check() is not True):
+                raise InterruptedError('pulse safety condition changed')
+            if result.get('wire_started_at') is not None and clock()>result['wire_started_at']+duration+.05:
+                raise TimeoutError('timed completion deadline exceeded')
+        def preflight():
+            # Cheap cancellation/horizon check under the existing wire lock;
+            # independent safety I/O is checked outside that lock.
+            now=clock()
+            if ((cancel is not None and cancel.is_set()) or not lease.valid(now,boot_id)
+                    or now+duration>lease.expires_at):
+                return False
+            result['wire_started_at']=now
+            return True
+        def awaiting_completion():
+            result['sent']=True  # _send has returned from its single sendall.
+            check()
         try:
-            if (cancel is not None and cancel.is_set()) or safety_check() is not True:
-                raise InterruptedError('independent motion veto')
-            # Timer is defense in depth only for an independently verified firmware.
-            payload={'N':3,'H':ident,'D1':{'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}[direction],
-                     'D2':pwm,'T':max(1,int(seconds*1000))}
+            check()
+            payload={'N':2,'H':ident,'D1':{'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}[direction],
+                     'D2':pwm,'T':milliseconds}
             result['command']=payload
-            started=clock()
-            # A bounded start must not wait a full legacy one-second ACK timeout.
-            result['sent']=None  # A failed write/ACK has ambiguous physical delivery.
-            response=self._send(payload,expected_id=ident,timeout=min(.05,seconds),retry=False,
-                # STOP cancellation and lease expiry are cheap and checked
-                # under the send lock. The independent safety check above and
-                # in the pulse loop may perform I/O; never hold this lock for it.
-                preflight=lambda:(cancel is None or not cancel.is_set()) and lease.valid(clock(),boot_id))
-            result.update(sent=True,acknowledged=response['ok'])
-            if not response['ok']:raise TimeoutError('ambiguous motion ACK')
-            while clock()-started<seconds:
-                if (not lease.valid(clock(),boot_id) or not self.connected
-                        or (cancel is not None and cancel.is_set()) or safety_check() is not True):
-                    raise InterruptedError('pulse safety condition changed')
-                wait(min(.02,max(0,seconds-(clock()-started))))
+            result['sent']=None  # Delivery stays ambiguous if the write fails.
+            response=self._send(payload,expected_id=ident,timeout=duration+.05,retry=False,
+                preflight=preflight,expected_response=expected,wait_check=awaiting_completion)
+            result['completion_response']=response.get('response')
+            check()
+            if (response.get('ok') is not True or response.get('response')!=expected
+                    or result.get('wire_started_at') is None
+                    or clock()-result['wire_started_at'] < duration-1e-9):
+                raise TimeoutError('missing, invalid or premature timed completion ACK')
+            result.update(sent=True,acknowledged=True,timed_completion=True)
+        except BaseException as exc:
+            result.update(error=type(exc).__name__,reason=str(exc))
+            raise
         finally:
-            result['stop']=self.stop_verified()
+            # Preserve the attempted wire command even if STOP itself raises.
+            result['stop']=dict(sent=None,acknowledged=False,physically_stopped=None)
             self.last_pulse=result
+            result['stop']=self.stop_verified()
         return result
 
     def pan_qualified(self, degrees, *, safety_check, wire_guard=None, _executor=None):

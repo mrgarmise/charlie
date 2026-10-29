@@ -16,6 +16,14 @@ def car_fixture():
 
 def pulse(c,**kwargs):
     now=[1.]
+    if c._send.side_effect is None:
+        def completed(payload,**options):
+            if options.get('preflight') and not options['preflight']():
+                raise InterruptedError('fixture wire veto')
+            now[0]+=payload['T']/1000.+.001
+            options['wait_check']()
+            return {'ok':True,'response':'{'+payload['H']+'_ok}'}
+        c._send.side_effect=completed
     return c.pulse(kwargs.pop('direction','FORWARD'),pwm=kwargs.pop('pwm',30),seconds=kwargs.pop('seconds',.1),
         lease=kwargs.pop('lease',MotionLease('supervised_trial',2,'fixture','boot')),boot_id='boot',
         envelope={'max_pwm':35,'max_duration':.2},safety_check=kwargs.pop('safety_check',lambda:True),
@@ -26,7 +34,7 @@ def pulse(c,**kwargs):
 def test_bounded_directions_and_stop(direction,d1):
     c=car_fixture();result=pulse(c,direction=direction)
     payload=c._send.call_args.args[0]
-    assert payload['D1']==d1 and payload['T']==100 and c._send.call_args.kwargs['retry'] is False
+    assert payload['N']==2 and payload['D1']==d1 and payload['T']==100 and c._send.call_args.kwargs['retry'] is False
     assert result['executed'] is None and result['physically_observed'] is None
     c.stop_verified.assert_called_once()
 
@@ -200,7 +208,8 @@ def qualification_control(tmp_path):
         p=tmp_path/name;p.write_text(json.dumps(value,sort_keys=True))
         return {'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
     protocol=write('protocol.json',dict(firmware_sha256='a'*64,bridge_sha256='b'*64,installed_match=True,
-        motion={'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4},local_expiry_verified=True))
+        motion={'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4},local_expiry_verified=True,
+        timed_motion=dict(N=2,T_unit='milliseconds',completion_ack='tagged_ok_after_local_stop',zero_duration='forbidden')))
     report=dict(schema='charlie.mobile.qualification.v1',authentic=True,runtime_sha256=runtime_hash(),
         witness='SOFTWARE CONTROL ONLY',zone='fixture-bench',hardware_id='fictional-car',measured_utc='fixture-not-native',
         firmware_sha256='a'*64,bridge_sha256='b'*64,model_sha256='c'*64,sensor_producer_sha256='d'*64,

@@ -33,6 +33,15 @@ def artifact(ref):
     return json.loads(raw)
 
 
+TIMED_MOTION_PROTOCOL = dict(N=2, T_unit='milliseconds',
+    completion_ack='tagged_ok_after_local_stop', zero_duration='forbidden')
+
+
+def require_timed_motion(protocol):
+    if protocol.get('timed_motion') != TIMED_MOTION_PROTOCOL:
+        raise ValueError('installed N2 millisecond completion protocol not qualified')
+
+
 def validate_report(report, *, autonomous=False, live_pet=False):
     """Require measured trials, identities, margins and retained original files.
 
@@ -50,6 +59,7 @@ def validate_report(report, *, autonomous=False, live_pet=False):
     if (protocol.get('firmware_sha256')!=report['firmware_sha256'] or protocol.get('bridge_sha256')!=report['bridge_sha256']
             or protocol.get('installed_match') is not True or protocol.get('motion')!={'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}
             or protocol.get('local_expiry_verified') is not True):raise ValueError('installed bounded protocol not qualified')
+    require_timed_motion(protocol)
     env=report['envelope']
     if (type(env.get('max_pwm')) is not int or not 1<=env['max_pwm']<=35
             or not finite(env.get('max_duration')) or not 0<env['max_duration']<=.2
@@ -224,6 +234,7 @@ def calibration_trial(journal, trial_ref, *, execute=False, base_factory=None):
             or protocol.get('motion')!={'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}
             or protocol.get('local_expiry_source_verified') is not True):
         raise ValueError('installed source-bound timer protocol required before first motor trial')
+    require_timed_motion(protocol)
     if trial['stage']=='wheels_up' and trial.get('wheels_clear') is not True:raise ValueError('wheels must be raised')
     if trial['stage']=='empty_floor':
         safety=artifact(trial['local_safety_artifact'])

@@ -15,6 +15,9 @@ def main(argv=None):
     sub=p.add_subparsers(dest='command',required=True)
     sub.add_parser('status')
     sub.add_parser('baseline')
+    sub.add_parser('coverage')
+    gallery=sub.add_parser('review-gallery');gallery.add_argument('output',type=Path)
+    reviews=sub.add_parser('review-import');reviews.add_argument('packet',type=Path)
     sub.add_parser('import-fixtures')
     label=sub.add_parser('label');label.add_argument('observation_id');label.add_argument('label',choices=get_adapter().labels)
     label.add_argument('--reviewer',required=True);label.add_argument('--reason',required=True);label.add_argument('--supersedes')
@@ -26,6 +29,14 @@ def main(argv=None):
         journal=EvidenceJournal(args.state/'learning-evidence.sqlite3')
         try:
             service=ModelLearningService(journal,args.state/'model-learning')
+            if args.command in ('review-gallery','review-import','coverage'):
+                from .review import export_gallery, import_reviews, coverage
+                from learning.resources import DevelopmentResources, ResourceGuard
+                guard=ResourceGuard()
+                if args.command=='review-gallery':
+                    DevelopmentResources().apply();guard.check(force=True)
+                result = export_gallery(service.data,args.output,on_progress=guard.check) if args.command=='review-gallery' else import_reviews(service.data,args.packet) if args.command=='review-import' else coverage(service.data)
+                print(json.dumps(result,indent=2)); return
             if args.command=='import-fixtures': import_fixtures(service.data,Path(__file__).resolve().parents[2])
             if args.command=='label': service.data.label(args.observation_id,args.label,reviewer=args.reviewer,reason=args.reason,supersedes=args.supersedes)
             if args.command=='partition': service.data.partition(args.session,args.partition,reviewer=args.reviewer)
@@ -36,20 +47,24 @@ def main(argv=None):
                     service.data.add(row['path'],session=row['session'],provenance=row['provenance'],authentic=row['authentic'],
                         calibration=row.get('calibration'),partition=row.get('partition'))
             if args.command=='baseline':
-                import time
+                import time, platform
+                from learning.resources import DevelopmentResources, ResourceGuard
+                DevelopmentResources().apply()
+                guard=ResourceGuard();guard.check(force=True)
                 from .robotron import frame,incumbent
                 from .evaluation import metrics
                 rows=service.data.rows();predictions=[];truth=[];latency=[];observations=[]
                 for row in rows:
+                    guard.check()
                     start=time.perf_counter();prediction=incumbent(frame(row));latency.append((time.perf_counter()-start)*1000)
                     observations.append(dict(observation_id=row['observation_id'],sha256=row['sha256'],provenance=row['provenance'],
                         session=row['session'],label=row['label'],incumbent=prediction))
                     if row['label'] is not None:truth.append(row['label']);predictions.append(prediction)
                 report=dict(schema='model-learning-baseline-v1',counts=service.data.inspect()['counts'],
                     incumbent=metrics(truth,predictions),observations=observations,
-                    latency_ms_including_image_load=latency,hardware='host CPU only',candidate=None,
-                    independence='reused regression fixtures; NOT an independent accuracy estimate',
-                    transitions='not measured',unknown_recall='not measured: no reviewed unknown labels',status='NEEDS_LABELS')
+                    latency_ms_including_image_load=latency,resources=guard.sample,hardware=dict(runtime='CPU only',architecture=platform.machine(),system=platform.system()),candidate=None,
+                    independence='descriptive replay of retained labels; NOT an independent accuracy estimate',
+                    transitions='not measured',unknown_recall='see incumbent metrics' if 'unknown' in truth else 'not measured: no reviewed unknown labels',status=service.data.inspect()['status'])
                 print(json.dumps(report,indent=2))
             else: print(json.dumps(service.status(),indent=2))
         finally:journal.close()

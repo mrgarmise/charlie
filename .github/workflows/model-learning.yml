@@ -26,7 +26,7 @@ jobs:
         env:
           CHARLIE_MODEL_LEARNING_SHARED_GATEWAY: ${{ runner.temp }}/model-learning-gateway.py
           CHARLIE_MODEL_LEARNING_SHARED_BUS: ${{ runner.temp }}/model-learning-bus.py
-        run: python -m pytest tests/test_model_learning.py tests/test_model_learning_shared_bus.py tests/test_model_learning_shared_gateway.py -q --junitxml=model-learning-tests.xml
+        run: python -m pytest tests/test_model_learning.py tests/test_model_learning_review.py tests/test_model_learning_shared_bus.py tests/test_model_learning_shared_gateway.py -q --junitxml=model-learning-tests.xml
       - uses: actions/upload-artifact@v4
         if: always()
         with:

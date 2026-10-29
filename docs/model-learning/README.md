@@ -178,3 +178,39 @@ to remove it from future datasets while preserving its historical references.
 Default retention is until explicit operator purge. Before deleting bytes,
 archive the notebook and manifests and check candidate/rollback dependencies;
 missing bytes fail integrity checks rather than fabricating successful replay.
+
+### Offline batch image review
+
+The existing notebook supports portable review without a server or a gateway
+installation. With the application stopped, export a **new** HTML filename:
+
+```bash
+python -m learning.model_learning --state /path/to/persistent-state review-gallery /path/to/review.html
+```
+
+Copy/open that single file on another machine (SFTP works). It embeds thumbnails,
+observation IDs, capture-session identity and source provenance. Confirmed truth
+and fallible incumbent proposals are separate. Select only visually supported
+labels, enter your own attribution, and download `reviews.json`. Uncertain images
+stay unreviewed. Existing labels change only when explicitly selected again;
+the packet carries the exact review being superseded. Final-test rows are hidden
+and cannot be labeled through this interface.
+
+Copy the downloaded JSON back and import the batch through the same notebook:
+
+```bash
+python -m learning.model_learning --state /path/to/persistent-state review-import /path/to/reviews.json
+python -m learning.model_learning --state /path/to/persistent-state coverage
+```
+
+Import validates the entire batch, observation hashes, evidence-set binding and
+current review IDs before appending labels through `DatasetStore.label`. A
+failure rolls back the whole journal transaction. Identical packet replay returns
+its original receipt; stale or different-evidence packets require a fresh gallery.
+It cannot partition sessions, commission training, approve a model or activate a
+shadow pointer. Keep galleries/answers private: they contain photographs and
+local provenance. Gallery generation and CPU baseline replay use the existing
+resource/thermal guard; CLI writes retain the application's notebook lock.
+
+See [native authentic-data preparation](AUTHENTIC-DATA-20261029.md) for the current
+Pi evidence, exact review handoff and honest qualification boundary.

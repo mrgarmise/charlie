@@ -110,11 +110,12 @@ def test_stop_timeout_retains_command_and_does_not_retry():
     car=ElegooMobileBase();car._running=True;sent=[]
     car.sock=SimpleNamespace(sendall=sent.append)
     result=car.stop_verified()
-    assert len(sent)==1 and json.loads(sent[0])==result['command']
-    assert result['error']=='TimeoutError' and result['ack_timeout_seconds']==.150
+    diagnostic=car.last_stop_diagnostic
+    assert len(sent)==1 and json.loads(sent[0])==diagnostic['command']
+    assert result['error']=='TimeoutError' and diagnostic['ack_timeout_seconds']==.150
     assert result['acknowledged'] is False and result['physically_stopped'] is None
-    assert [r['kind'] for r in car.wire_history()['events']]==['tx_attempt','tx_complete','ack_timeout']
-    car._handle_frame('{'+result['command']['H']+'_ok}')
+    assert [r['kind'] for r in car.wire_history()['events']]==['tx_attempt','tx_complete','ack_timeout','stop_result']
+    car._handle_frame('{'+diagnostic['command']['H']+'_ok}')
     assert result['acknowledged'] is False
 
 

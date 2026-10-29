@@ -86,8 +86,9 @@ N2 or issue an unlimited N3 start to investigate STOP.
 The existing driver's new **512-event bounded in-memory** trace records raw
 bounded TX attempts/completion/errors, all brace-framed RX including unmatched
 late replies, ACK deadlines, sequence and host monotonic time. It performs no
-disk I/O on RX/send-lock paths. STOP receipts additionally retain exact command,
-expected reply, unchanged timeout, elapsed time and exception detail. A late
+disk I/O on RX/send-lock paths. The separate STOP diagnostic record retains exact command,
+expected reply, bounded timeout, elapsed time, exception detail and original
+receipt. The established STOP receipt dictionary shape remains unchanged. A late
 reply never retroactively converts a failed STOP into success or clears a latch.
 The face session drains this trace through the existing recorder; trace overruns
 make the trial inconclusive and stop it. Application teardown preserves a final
@@ -187,10 +188,14 @@ a missing journal and respects an existing uncertain-motion marker.
 
 Local expanded selection before STOP integration: 112 tests passed; final combined
 STOP/face/executor/authority/recording selection: **127 passed** in 2.41 s.
+The final receipt-compatibility expansion passed **186 tests** in 3.31 s.
 Canonical conformance: **129 passed**.
 An initial new test used a mutable fake frame and correctly failed the existing
 immutable-publisher check (110 passed, one failed); only that fixture was corrected.
-Original failure logs remain private. Independent full CI and exact published
+Original failure logs remain private. The first independent combined-head CI
+found one existing exact-receipt compatibility assertion failing (1,564 passed,
+21 skipped). Diagnostic fields were moved out of the established receipt into
+a separate record; the original compatibility assertion was retained unchanged. Independent full CI and exact published
 commit are reported on PR #13 after publication. Tests and archived replay are
 software preparation only, not the requested demonstration.
 

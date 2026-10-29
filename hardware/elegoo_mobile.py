@@ -615,17 +615,23 @@ class ElegooMobileBase:
         started=time.monotonic()
         command={'N':1,'H':ident,'D1':0,'D2':0,'D3':0}
         expected='{'+ident+'_ok}'
-        detail=dict(command=command,expected_response=expected,ack_timeout_seconds=.150)
+        receipt=None;error_message=None
         try:
-            result=self._send(command,
-                              expected_id=ident,timeout=.150,retry=False,expected_response='{'+ident+'_ok}')
-            return dict(sent=True,acknowledged=result['ok'] is True and result.get('response')=='{'+ident+'_ok}',
-                        response=result.get('response'),physically_stopped=None,
-                        elapsed_seconds=time.monotonic()-started,**detail)
+            result=self._send(command,expected_id=ident,timeout=.150,retry=False,expected_response=expected)
+            receipt=dict(sent=True,acknowledged=result['ok'] is True and result.get('response')==expected,
+                         response=result.get('response'),physically_stopped=None)
         except Exception as exc:
-            return dict(sent=None,acknowledged=False,physically_stopped=None,error=type(exc).__name__,
-                        error_message=str(exc)[:256],elapsed_seconds=time.monotonic()-started,**detail)
-        finally:self.align.active=False
+            receipt=dict(sent=None,acknowledged=False,physically_stopped=None,error=type(exc).__name__)
+            error_message=str(exc)[:256]
+        finally:
+            self.align.active=False
+            # Preserve the established receipt API; diagnostics are a separate
+            # observation, never an extra physical claim or a repaired outcome.
+            self.last_stop_diagnostic=dict(command=command,expected_response=expected,
+                ack_timeout_seconds=.150,elapsed_seconds=time.monotonic()-started,
+                error_message=error_message,result=deepcopy(receipt))
+            self._wire_event('stop_result',**self.last_stop_diagnostic)
+        return receipt
 
     def pulse(self, direction, *, pwm, seconds, lease, boot_id, envelope, safety_check,
               cancel=None, clock=time.monotonic, wait=time.sleep, _executor=None):

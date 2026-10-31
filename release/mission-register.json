@@ -1,0 +1,504 @@
+{
+  "schema": "charlie.master-campaign.v1",
+  "observed_utc": "2026-10-31T17:26:49.282246+00:00",
+  "master": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+  "mission": {
+    "filename": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+    "sha256": "efc4ab2600c9f68b3ffc4a60e60aa2d678bdec1a32ee1ac9ed1d438a444e855f",
+    "path": "docs/master-campaign/Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md"
+  },
+  "claims_policy": "Code, CI, integration, master publication, installation, operation, physical qualification and autonomous benefit are independent.",
+  "capabilities": [
+    {
+      "id": "charlie-pr-3",
+      "description": "Recover Robotron score reviews and add bounded feedback consumption",
+      "priority": 4,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/3",
+      "linear_url": null,
+      "base": "c322658586074462ffbded5ccd9db11f96448b0a",
+      "head": "b1d1ef14fd9100a34a94519305db802c2b75d66e",
+      "target": "master",
+      "source_tree": "3a26a169986787421655b1291f4916523835802c",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "MERGE BLOCKER: The October 10 original review store /home/five/.local/share/charlie/score-review/learning-evidence.sqlite3 and hash-bound reviewed photographs are unavailable here. The historical handoff reports 16 status records and 8 annotations, not verified distinct images. The examined October 11 uploaded archive contains zero human annotations. Exact accepted/corrected rows, finalization, prior consumption, authentic before/after feedback effect, held-out recognition and native Pi cost remain unverified. User merge authorization is conditional on acceptance; do not bypass this evidence requirement. Leave master unchanged until valid original feedback and authentic retained-state controls are independently examined and remaining checks satisfied."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/3"
+      ],
+      "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-5",
+      "description": "Continuous capture and agency-first Robotron gameplay",
+      "priority": 4,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/5",
+      "linear_url": null,
+      "base": "d74d7a620c39104ce58fb2c9551381543a66b5f2",
+      "head": "7dcea80cd6a6448a7c13f8b83179435c049d7b3c",
+      "target": "feature/closed-loop-gameplay",
+      "source_tree": "fe445569ec7cb7e64cc2a294cd42fdfb8b750b45",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "Native 8\u201312 meaningful updates/s, camera/controller/display latency, projectile shape discrimination, individual-life sensing and complete-game tactical success remain NOT YET DEMONSTRATED. The original archive/notebook are unchanged; no new gameplay or learning evidence is fabricated. No physical gameplay, controller activation, servos, firmware deployment or learned-policy activation was performed. E1, P1 and I1 remain independently open. Keep this PR draft; no merge to main is authorized."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/5"
+      ],
+      "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-6",
+      "description": "Add observation-only Hailo-8L detector bridge and Vision Lab export path",
+      "priority": 4,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/6",
+      "linear_url": null,
+      "base": "8c96db003b87246ee6b0f9dc9918cb42af726370",
+      "head": "ab58a3d3d3f83a44e77184d329f0e28c1f9cbda8",
+      "target": "feature/fast-projectile-self",
+      "source_tree": "0adf6ea3fec25da666a53ffc507519d0836bce12",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/6"
+      ],
+      "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-7",
+      "description": "ALA-2: recover experience-to-decision feedback and retained tactical diagnostics",
+      "priority": 2,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/7",
+      "linear_url": null,
+      "base": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+      "head": "83112b4b9d20f97178a6494f09f48713d4210344",
+      "target": "master",
+      "source_tree": "93846db3ac9641414396724b567effb480211fb4",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/7"
+      ],
+      "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-8",
+      "description": "Add neural Robotron score proposals with CPU and Hailo-8L adapters",
+      "priority": 4,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/8",
+      "linear_url": null,
+      "base": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+      "head": "b4f258853964edbc3e442f9332675d5ebd7007e9",
+      "target": "master",
+      "source_tree": "495ed7a126ed917c6d41800f63070c59f42858a0",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "Keep PR #8 **draft**. E1, P1 and I1 are independently **NOT YET DEMONSTRATED**. Authentic recognition benefit and model qualification remain open. This change performed no physical gameplay, camera activation, controller/servo operation, firmware/Pi package change, live policy activation, main/master merge or original-notebook rewrite. Mint-local uncommitted work was not accessed or overwritten."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/8"
+      ],
+      "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-9",
+      "description": "Restore 3 / meditation / 3 Robotron campaign with consolidated native preflight",
+      "priority": 4,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/9",
+      "linear_url": null,
+      "base": "7dcea80cd6a6448a7c13f8b83179435c049d7b3c",
+      "head": "9ba60e2e9c645c43f71072de413118dd5373e8c6",
+      "target": "feature/fast-projectile-self",
+      "source_tree": "6dd4632c525d87027f917f55a05cfe61cd680412",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "The restored local notebook's read-only historical priority ablation is retained as diagnostic evidence, not new marathon learning or gate closure. No physical gameplay, camera/controller activation, servo movement, firmware deployment, learned-policy activation, service operation or merge was performed. Existing hardware safety, leases, original notebooks, historical observations and authorization boundaries remain in force. **Keep draft.** The October 25 software mission grants no physical execution or activation authority."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/9"
+      ],
+      "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-10",
+      "description": "Integrate elective pet abilities with Charlie attention, Executive and qualified ELEGOO execution",
+      "priority": 4,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/10",
+      "linear_url": null,
+      "base": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+      "head": "9c1319d2800749d19cd5086f34ba4643276d90a7",
+      "target": "master",
+      "source_tree": "8a14e48b9d23ede92a0bc2a3a93550182c40af26",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "[Current native audit, failures and exact remaining requirements](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/REPORT.md) \u00b7 [Artifact hashes and machine audit](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/audit.json) \u00b7 [Existing staged acceptance interfaces](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/completion/RUNBOOK.md). The older runbook's native-file access limitation is superseded by the new file audit only; hardware remains inaccessible. Original evidence, acceptance checkout, main Robotron checkout and separate motivational work are preserved. No merge or installation overwrite. Tracks CHA-15."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/10"
+      ],
+      "ancestor_of_pr13": true
+    },
+    {
+      "id": "charlie-pr-11",
+      "description": "Add subscription-only shared camera feeders and normal Hailo Object Recognition with pico:ed labels",
+      "priority": 4,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/11",
+      "linear_url": null,
+      "base": "96e651373e513d24b4163b87c5f85bdd5549cf1d",
+      "head": "a19c90822687739f79f69587302006a1bd6364d4",
+      "target": "feature/mobile-perception-pet-following",
+      "source_tree": "e3a7a0682149df0dc6cb8144686e70afdbc2c91b",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "No physical camera activation, serial connection, firmware flash, servo/motor movement, navigation or policy activation was performed. Installed model bytes were inspected read-only and match the existing 80-class manifest; no new native inference/display/accuracy/thermal qualification is claimed. Firmware and motion implementations are unchanged by this continuation. **Keep draft.** Stacked on PR #10."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/11"
+      ],
+      "ancestor_of_pr13": true
+    },
+    {
+      "id": "charlie-pr-12",
+      "description": "Establish canonical sensory contracts and bounded shared frame history",
+      "priority": 4,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/12",
+      "linear_url": null,
+      "base": "a19c90822687739f79f69587302006a1bd6364d4",
+      "head": "ae09f52d1a1f65de2bcb923cb7d112d666fb5798",
+      "target": "feature/object-label-picoed-display",
+      "source_tree": "1596c50700936285c72fbb25870a5a5e4e743401",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/12"
+      ],
+      "ancestor_of_pr13": true
+    },
+    {
+      "id": "charlie-pr-13",
+      "description": "Reconcile shared sensory publication with pet Executive integration",
+      "priority": 1,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/13",
+      "linear_url": null,
+      "base": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+      "head": "097f110fd0c6d321d24024c399d79f0a427bf23c",
+      "target": "master",
+      "source_tree": "6523dc59f4392cca16434f0a3c67ac1b041f4266",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "**Draft; native acceptance pending.** The Pi was unreachable. Installed runtime/model/firmware identity, physical labels, two real demonstrations and native deadline/cancel timing remain unverified. The dashboard needs the opt-in Charlie endpoint and operator SSH forward. No merge or qualified physical release is claimed.",
+        "The working `read_ultrasonic()` method is byte-identical; telemetry reader/scheduling files are unchanged. All five original October 25 motion JSON files retain their original hashes and unverified outcomes. No device connection, firmware flash, hardware motion, deployment or merge occurred. Installed MCU/ESP32 identity, physical expiry/STOP/braking, loss/preemption timing, independent cutoff and fresh native qualification remain mandatory. Keep draft and motion disarmed until qualified; do not roll back to the unsafe N3 pulse to regain movement.",
+        "Reconciles PR #10 (`9c1319d`) with the PR #11/#12 shared sensory stack (`ae09f52`), retaining the original branches and evidence. This PR remains draft and must not be deployed or merged before integration and native qualification."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/13"
+      ],
+      "ancestor_of_pr13": true
+    },
+    {
+      "id": "charlie-pr-14",
+      "description": "Add asynchronous human information gateway for Executive review",
+      "priority": 2,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/14",
+      "linear_url": null,
+      "base": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+      "head": "4bb3bffecffea0d6e294485132f42f5e96f4c506",
+      "target": "master",
+      "source_tree": "3657ef2354ef4af31bfdb54a8c842421b9519f2e",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "Keep draft. Normal live producer/consumer attachment is pending: PR #13's MobileEvidenceAdapter.opportunities needs an opt-in Executive call with actual decision context; Robotron source journals need reviewed lineage/freshness-preserving consolidation to the application notebook. Callable APIs and deterministic E2E are implemented, not a deployed autonomous loop. Pi service access, approved phone tunnel, physical Safari and image-preview authorization remain pending.",
+        "No original evidence, active PR head, deployment, firmware, GPIO, camera ownership, controller or motor restriction changed. No merge/rebase, Pi access, motion or live policy activation."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/14"
+      ],
+      "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-15",
+      "description": "Add reusable Executive-owned perception learning with guarded Robotron qualification",
+      "priority": 2,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/15",
+      "linear_url": null,
+      "base": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+      "head": "d36051481475084dc0e2c11627f49699c594f3dd",
+      "target": "master",
+      "source_tree": "258fb4de194ff2441664ba2a667ea9bdc90b4209",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "Keep draft. No PR merge or model activation. Exact native commands, sanitized matrix, remaining evidence/operator/device/qualification conditions and retrieval instructions: docs/model-learning/AUTHENTIC-DATA-20261029.md; reusable operator commands: docs/model-learning/README.md. Private artifacts/backup/test and native receipts: /home/five/charlie-dataset-qualification-20261029."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/15"
+      ],
+      "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-16",
+      "description": "Add Mobile Body console through shared sensing and qualified manual leases",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "UNKNOWN/PENDING EXPORT",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/16",
+      "linear_url": null,
+      "base": "097f110fd0c6d321d24024c399d79f0a427bf23c",
+      "head": "9c4d899ff6e60f4e17d8c21cb43f8101fbda6b56",
+      "target": "integration/unified-sensory-motion-20261026",
+      "source_tree": "04cfe0f3d0898e9756be1544bf9a76639956e13f",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "historical receipts; fresh campaign pending",
+        "integrated": "candidate; see original PR acceptance",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": null,
+      "dependencies": [],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-10-31",
+      "blockers": [
+        "**Keep draft; mission completion and physical acceptance remain pending.** Existing local dashboard navigation is integrated. Hosted Sites navigation/publication is not completed: actual source helper requires unavailable Node and inaccessible Git/DNS/network; the existing Site and owner audience are unchanged. This session exposes no camera/Hailo/serial nodes and denies socket creation. Actual offline console startup was attempted with a generated memory-only monitoring credential and no drive credential; it failed PermissionError before opening any device. Receipt: /home/five/charlie-mobile-console-evidence-20261031/native-offline-service-startup.json."
+      ],
+      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/16"
+      ],
+      "ancestor_of_pr13": false
+    }
+  ]
+}

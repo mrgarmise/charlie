@@ -185,6 +185,26 @@ class ActuatorSafetyAuthority:
             raise PermissionError('independently measured pan disagrees with tracker')
         return feed
 
+    def measured_pan(self, evidence, *, boot_id):
+        """Read existing independent feed; command receipts never supply pose.
+
+        This is an interpretation of an already produced snapshot, not a sensor
+        acquisition or motion grant. Actual admit/safe repeat all checks.
+        """
+        from types import SimpleNamespace
+        _, report = self.active('chassis',boot_id)
+        if getattr(evidence,'authentic',False) is not True or evidence.source!='elegoo-v4':
+            raise PermissionError('authentic source required')
+        if self.feed is None or self.feed.stat().st_size>256*1024:
+            raise PermissionError('independent safety feed absent')
+        candidate=json.loads(self.feed.read_text()).get('pan_degrees')
+        request=SimpleNamespace(source=evidence.source,observation_id=evidence.id,group='chassis',
+                                parameters={'expected_pan_degrees':candidate})
+        snapshot=self._snapshot(request,report,boot_id)
+        if snapshot.get('frame_sha256')!=evidence.metadata()['sha256']:
+            raise PermissionError('independent pose not bound to decision pixels')
+        return snapshot['pan_degrees']
+
     def admit(self, request, evidence, *, boot_id):
         activation, report = self.active(request.group,boot_id)
         if getattr(evidence,'authentic',False) is not True or request.source != 'elegoo-v4':

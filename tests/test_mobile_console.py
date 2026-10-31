@@ -123,7 +123,8 @@ def test_replay_is_rejected_and_hardware_admission_failure_never_becomes_success
 def test_pan_and_source_requirements_are_independent_not_filled_from_commanded_state():
     s=fixture();s.c.acquire();s.now[0]+=.001
     s.bus.observation_fault('elegoo-pose',s.bus.observation_owners['elegoo-pose'],'no measured pan')
-    with pytest.raises(OSError):s.c.control(command(s))
+    s.e.authority.measured_pan.side_effect=PermissionError('no qualified independent feed')
+    with pytest.raises(PermissionError):s.c.control(command(s))
     s.base.pulse.assert_not_called();s.c.close()
 
 
@@ -190,3 +191,55 @@ def test_software_configuration_fails_before_hardware(monkeypatch):
     import main
     monkeypatch.delenv('CHARLIE_MONITOR_TOKEN',raising=False)
     with pytest.raises(ValueError):main.main(['--hardware','--mobile-dashboard'])
+
+
+def test_overlay_transport_uses_exact_retained_decision_pixels_when_camera_has_advanced():
+    s=fixture();s.c.status();pub=DetectionPublication(s.bus)
+    packet=dict(source='elegoo-v4',frame_id='f1',stream_generation='g',geometry=[30,30],at=10.,objects=[])
+    pub.publish(packet);s.now[0]=10.1
+    s.bus.publish_frame('elegoo-v4',s.producer,replace(s.frame,id='f2',sequence=2,received_at=10.1))
+    _,meta=s.c.image(overlays=True)
+    assert meta['frame_id']=='f1' and meta['detections']['frame_id']=='f1'
+    assert meta['age_seconds']==pytest.approx(.1)
+    _,meta=s.c.image();assert meta['frame_id']=='f2' and meta['detections'] is None
+    s.now[0]=10.6
+    _,meta=s.c.image(overlays=True);assert meta['frame_id']=='f2' and meta['detections'] is None
+    pub.close();s.c.close()
+
+
+def test_watchdog_worker_stops_expired_owner_without_http_or_an_application_loop():
+    import time
+    s=fixture();s.c.acquire();s.c.start();s.now[0]+=.401
+    deadline=time.monotonic()+1
+    while s.c.lease is not None and time.monotonic()<deadline:time.sleep(.005)
+    assert s.c.lease is None and s.e._manual_owner is None
+    assert s.c.command['state']=='watchdog STOP'
+    s.c.close()
+
+
+def test_slow_encoding_and_monitoring_cannot_hold_control_stop_lock(monkeypatch):
+    from PIL import Image
+    s=fixture();s.c.acquire();entered=threading.Event();finish=threading.Event()
+    original=Image.Image.save
+    def slow(image,*args,**kwargs):
+        entered.set();assert finish.wait(1);return original(image,*args,**kwargs)
+    monkeypatch.setattr(Image.Image,'save',slow)
+    worker=threading.Thread(target=s.c.image);worker.start();assert entered.wait(1)
+    try:
+        result=s.c.control({'action':'emergency'})
+        assert s.e._safety_stopped and result['sent'] is False
+    finally:finish.set();worker.join(1);s.c.close()
+
+
+def test_persistent_manual_sequence_does_not_fill_autonomous_replay_budget_and_cannot_replay():
+    s=fixture();s.c.acquire()
+    for index in range(300):
+        s.now[0]+=.0001
+        s.c.control(command(s))
+    assert s.base.pulse.call_count==300 and not s.e.used
+    old=s.e.authority.admit.call_args.args[0]
+    with pytest.raises(ValueError):s.e.request_manual(s.c.owner,old,sequence=s.c.sequence)
+    with pytest.raises(PermissionError):s.e.request(old)
+    s.c.control(command(s,'release'));s.now[0]+=.0001;s.c.acquire()
+    with pytest.raises(PermissionError):s.e.request_manual(object(),old,sequence=1000)
+    s.c.close()

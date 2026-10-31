@@ -82,3 +82,33 @@ preserved; travel directions require additional measured per-direction trials.
 
 Manufacturer-family features are not proof of this car's installed sensors.
 No speculative query packets, firmware updates or guessed registrations added.
+
+## Tested increment updates
+
+First published increment `35378337d50b0c4c923e2d553dfa7d26ccac7fcd`,
+local `1ca0bd8`, tree `94b546a8265c949f47acaa5d008195dfa14f4072`.
+Independent actual Chromium/HTTP/control validation: **26 passed**, 7.29 seconds,
+job 124577256122 in run 41214888498; screenshots retained in mobile-browser
+artifact 13047214911. This uses synthetic shared pixels and fake actuator wire.
+The independent sensory workflow 41214888490 completed successfully on this head.
+Full regression results are recorded separately when complete.
+
+During publication, #13 advanced to `097f110fd0c6d321d24024c399d79f0a427bf23c`
+with preserved validation documents only (nine files, no runtime changes).
+PR #16 remains stacked and mergeable. No active PR was overwritten; the
+implementation keeps its pinned runtime baseline and original ancestry.
+
+Second increment prepares exact retained decision-frame overlays, independently
+validated pan reads from the existing source/pixel-bound safety feed, and
+bounded persistent manual replay protection using boot+opaque lease epoch+
+strict monotonic sequence. It does not reset autonomous replay protections or
+clear STOP uncertainty. Additional tests cover more than 256 manual requests,
+actual watchdog worker operation, STOP during stalled encoding, missing forward/
+reverse evidence, and stale/mismatched independent pan measurements. Focused
+**82 passed** / canonical conformance **131 passed** on the second increment.
+
+A native synthetic PNG baseline used 20 random 640×480 BGR frames, with median
+51.0 ms and p95 56.2 ms encoding, mean 923,407 encoded bytes, about 18.9 encoding
+operations/second on this Pi 5. This is NOT camera FPS or HTTP/exposure latency;
+no transport/encoding optimization or achieved-live-target claim is made.
+The complete machine-readable record is in validation/synthetic-png-baseline.json.

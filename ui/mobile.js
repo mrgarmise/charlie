@@ -17,7 +17,7 @@ window.mountCharlieMobile=function(root){
   async function api(path='/api/mobile',body,driveAuth=false,timeout=1500){
     const r=await fetch(endpoint+path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+(driveAuth?drive:monitor),...(body?{'Content-Type':'application/json'}:{})},
       body:body?JSON.stringify(body):undefined,credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer',signal:AbortSignal.timeout(timeout),keepalive:body?.action==='release'});
-    if(!r.ok){let v=await r.json();throw Error(v.error||'Connection failed');}return path.endsWith('/frame')?r:r.json();
+    if(!r.ok){let v=await r.json();throw Error(v.error||'Connection failed');}return path.startsWith('/api/mobile/frame')?r:r.json();
   }
   function render(){
     const live=connected&&status&&performance.now()-lastStatusAt<1000;
@@ -35,7 +35,7 @@ window.mountCharlieMobile=function(root){
   function draw(){
     if(!lastImage||!lastMeta)return;
     const canvas=el('canvas'),ctx=canvas.getContext('2d');canvas.width=lastImage.width;canvas.height=lastImage.height;ctx.drawImage(lastImage,0,0);
-    const p=status?.detections;
+    const p=lastMeta.detections||status?.detections;
     const current=p&&p.source===lastMeta.source&&p.frame_id===lastMeta.frame_id&&p.stream_generation===lastMeta.generation&&p.geometry[0]===canvas.width&&p.geometry[1]===canvas.height;
     text('detections',current?p.objects.map(o=>`${o.label} ${(o.confidence*100).toFixed(0)}% · ${o.id}`).join(' / ')||'No objects on this frame':'Recognition unavailable or stale for this frame');
     if(current&&el('overlay').checked){ctx.strokeStyle='#85f4b0';ctx.fillStyle='#85f4b0';ctx.lineWidth=Math.max(2,canvas.width/400);ctx.font=`${Math.max(14,canvas.width/45)}px system-ui`;
@@ -43,7 +43,7 @@ window.mountCharlieMobile=function(root){
   }
   async function frames(g){
     const start=performance.now();
-    try{const r=await api('/api/mobile/frame'),meta=JSON.parse(r.headers.get('X-Charlie-Frame')),blob=await r.blob(),img=await createImageBitmap(blob);
+    try{const r=await api('/api/mobile/frame'+(el('overlay').checked?'?overlays=1':'')),meta=JSON.parse(r.headers.get('X-Charlie-Frame')),blob=await r.blob(),img=await createImageBitmap(blob);
       if(g!==generation||!connected){img.close();return;}
       if(meta.age_seconds+(performance.now()-start)/1000>.5){img.close();stale('Frame stale in transit');}
       else{lastImage?.close();lastImage=img;lastMeta=meta;lastDisplayed=performance.now();if(displayedId!==meta.frame_id){displayed.push(lastDisplayed);displayedId=meta.frame_id;}displayed=displayed.filter(t=>lastDisplayed-t<5000);draw();el('stale').hidden=true;el('screenshot').disabled=false;text('health','/ receiving');

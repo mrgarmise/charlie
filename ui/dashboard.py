@@ -8,7 +8,7 @@ import hmac
 import json
 from pathlib import Path
 import threading
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs
 from learning.capabilities import default_registry
 from learning.demonstration import ABILITY
 
@@ -87,15 +87,24 @@ def start_dashboard(service, token, *, port=8768, origin=DEFAULT_ORIGIN, mobile=
             if not self.authorized():return
             if mobile is not None and self.path=='/api/mobile':
                 self.reply(200,mobile.status());return
-            if mobile is not None and self.path=='/api/mobile/frame':
+            if mobile is not None and urlsplit(self.path).path=='/api/mobile/frame':
                 try:
-                    raw,metadata=mobile.image()
+                    raw,metadata=mobile.image(overlays=parse_qs(urlsplit(self.path).query).get('overlays')==['1'])
                     self.send_response(200)
                     self.send_header('Content-Type','image/png')
                     self.send_header('Content-Length',str(len(raw)))
                     self.send_header('Cache-Control','no-store')
                     self.send_header('X-Content-Type-Options','nosniff')
-                    self.send_header('X-Charlie-Frame',json.dumps(metadata,allow_nan=False))
+                    if metadata.get('detections'):
+                        metadata['detections']['objects']=metadata['detections']['objects'][:24]
+                    encoded=json.dumps(metadata,allow_nan=False,separators=(',',':'))
+                    while len(encoded.encode())>6144 and metadata.get('detections') and metadata['detections']['objects']:
+                        metadata['detections']['objects'].pop()
+                        encoded=json.dumps(metadata,allow_nan=False,separators=(',',':'))
+                    if len(encoded.encode())>6144:
+                        metadata['detections']=None
+                        encoded=json.dumps(metadata,allow_nan=False,separators=(',',':'))
+                    self.send_header('X-Charlie-Frame',encoded)
                     if self.headers.get('Origin')==origin:
                         self.send_header('Access-Control-Allow-Origin',origin)
                         self.send_header('Access-Control-Expose-Headers','X-Charlie-Frame')

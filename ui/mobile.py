@@ -133,13 +133,16 @@ class MobileConsole:
                 frame = self.bus.latest_frame('elegoo-v4', max_age=.25, clock=self.clock)
                 if frame is None:raise PermissionError('fresh source-bound frame unavailable')
                 # Pan is an independent measurement, never the last commanded angle.
-                feed = self.bus.latest_observation('elegoo-pose', max_age=.25, clock=self.clock)
+                try:feed = self.bus.latest_observation('elegoo-pose', max_age=.25, clock=self.clock)
+                except OSError:feed = None
                 pan = feed.values.get('pan_degrees') if feed else None
+                if pan is None and hasattr(self.executor.authority,'measured_pan'):
+                    pan=self.executor.authority.measured_pan(frame,boot_id=self.executor.boot_id)
                 if type(pan) not in (int,float) or not math.isfinite(pan):
                     raise PermissionError('independently measured camera pan unavailable')
                 request = ActuatorRequest(uuid4().hex, 'mobile-operator', 'chassis', 'pulse', self.clock(),
                     'elegoo-v4', frame.id, dict(direction=direction,pwm=pwm,seconds=.1,expected_pan_degrees=pan))
-                result = self.executor.request_manual(owner, request)
+                result = self.executor.request_manual(owner, request, sequence=body['sequence'])
             with self.lock:
                 self.command = {'state': action, 'receipt': deepcopy(result), 'physical_outcome': 'unobserved'}
             return result
@@ -159,7 +162,7 @@ class MobileConsole:
         except (OSError,TimeoutError) as exc:
             self.frame, self.png, self.png_id = None, None, None
             self.receipts.clear()
-            self.frame_error = str(exc)
+            self.frame_error = str(exc)[:256]
         f = self.frame
         age = self.clock()-f.received_at if f else None
         fresh = age is not None and 0 <= age <= self.freshness
@@ -171,17 +174,34 @@ class MobileConsole:
             exposure_latency_seconds=None, latency_note='receipt age only; exposure clock unknown',
             encoding='lossless PNG baseline', encode_seconds=self.encode_seconds)
 
-    def image(self):
+    def image(self, *, overlays=False):
         with self.camera_lock:
             camera = self._camera()
             if not camera['available']:raise TimeoutError('camera frame unavailable or stale')
-            if self.png_id != self.frame.id:
+            selected=self.frame
+            camera['detections']=None
+            if overlays:
+                try:
+                    observation=self.bus.latest_observation('object-detections:elegoo-v4',max_age=.5,clock=self.clock)
+                    if observation:
+                        packet=observation.values
+                        for candidate in self.bus.recent_frames('elegoo-v4',max_age=.5,clock=self.clock):
+                            if (candidate.id==packet.get('frame_id') and candidate.stream_generation==packet.get('stream_generation')
+                                    and [candidate.image.shape[1],candidate.image.shape[0]]==packet.get('geometry')):
+                                selected=candidate
+                                camera.update(frame_id=selected.id,generation=selected.stream_generation,
+                                    geometry=packet['geometry'],age_seconds=self.clock()-selected.received_at,detections=deepcopy(packet))
+                                break
+                except OSError:pass
+            if self.png_id != (selected.id,selected.stream_generation):
                 from PIL import Image
                 start = time.perf_counter()
                 buffer = io.BytesIO()
-                Image.fromarray(self.frame.image[:,:,::-1]).save(buffer, format='PNG')
-                self.png, self.png_id = buffer.getvalue(), self.frame.id
+                Image.fromarray(selected.image[:,:,::-1]).save(buffer, format='PNG')
+                self.png, self.png_id = buffer.getvalue(), (selected.id,selected.stream_generation)
                 self.encode_seconds = time.perf_counter()-start
+            camera['age_seconds']=self.clock()-selected.received_at
+            if not 0<=camera['age_seconds']<=self.freshness:raise TimeoutError('frame expired during encoding')
             return self.png, camera
 
     def status(self):

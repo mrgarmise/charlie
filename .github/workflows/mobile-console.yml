@@ -1,0 +1,43 @@
+name: Mobile Body independent software validation
+on:
+  push:
+    branches: [feature/mobile-body-console-20261031]
+  pull_request:
+    paths: ['ui/**', 'motion/elegoo_executor.py', 'tests/test_mobile*', '.github/workflows/mobile-console.yml']
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest
+      - run: python tools/check_unified_contracts.py
+      - run: python -m pytest tests -q --junitxml=mobile-full.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-regression
+          path: mobile-full.xml
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest playwright
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m pytest tests/test_mobile_console.py tests/test_mobile_http.py tests/test_mobile_browser.py -q --junitxml=mobile-browser.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-browser
+          path: |
+            mobile-browser.xml
+            mobile-*.png

@@ -39,7 +39,7 @@ def validate_actuator_report(report):
         require_timed_motion(protocol)
         if (protocol.get('local_expiry_verified') is not True
                 or protocol.get('motion') != {'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}
-                or set(envelope.get('directions',[])) != {'LEFT','RIGHT'}
+                or not {'LEFT','RIGHT'} <= set(envelope.get('directions',[])) <= {'LEFT','RIGHT','FORWARD','REVERSE'}
                 or type(envelope.get('max_pwm')) is not int or not 1 <= envelope['max_pwm'] <= 35
                 or not finite(envelope.get('max_duration')) or not 0 < envelope['max_duration'] <= .2
                 or not finite(envelope.get('max_stop_seconds')) or not 0 < envelope['max_stop_seconds'] <= .5
@@ -67,7 +67,7 @@ def validate_actuator_report(report):
         trials = report.get('trials',{}).get(stage,[])
         if len(trials) < 3:
             raise ValueError('three independent trials required: '+stage)
-        direction_counts = {'LEFT': 0, 'RIGHT': 0}
+        direction_counts = {direction: 0 for direction in envelope.get('directions',[])} if group=='chassis' else {}
         for ref in trials:
             trial = artifact(ref)
             if (trial.get('authentic') is not True or trial.get('passed') is not True

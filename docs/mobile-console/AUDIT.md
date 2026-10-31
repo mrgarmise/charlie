@@ -112,3 +112,24 @@ A native synthetic PNG baseline used 20 random 640×480 BGR frames, with median
 operations/second on this Pi 5. This is NOT camera FPS or HTTP/exposure latency;
 no transport/encoding optimization or achieved-live-target claim is made.
 The complete machine-readable record is in validation/synthetic-png-baseline.json.
+
+The first increment's independent full regression job 124577256250 completed:
+**1,624 passed / 22 skipped / zero failures**, 435.29 s, one existing JUnit warning
+(run 41214888498). The browser selection separately passed 26 tests; selections
+may overlap and are not summed. The sensory job also succeeded.
+
+A broad development-tree run in the restricted native session retained **1,584
+passed / 35 failed / 27 skipped**, 442.80 s. All 35 failure messages are
+`PermissionError: [Errno 1] Operation not permitted` at socket creation, including
+unchanged memory/controller/HTTP fixtures. The complete original log, JUnit and
+per-node summary are preserved. Source edits continued during that broad run;
+it is diagnostic, not a clean final-revision certificate and not an all-green
+native claim. No socket test or timeout was weakened to obtain a pass.
+
+Second published increment `8f2a4b183bcae7ea01a08c16ec7c17fd409c0e48`,
+local `edd2928`, identical tree `5537da74ea0e2d01c5c62acbd494688ffebbabf6`.
+The final browser expiry correction accounts for the original Pi receipt age
+plus a conservative HTTP/decode interval, rather than giving each received
+image an extra 500 ms. A real-browser regression stalls subsequent frames and
+checks expiry of a frame already 350 ms old. Final independent CI is authoritative
+for this browser-only correction; local Chromium remains unavailable.

@@ -58,3 +58,31 @@ def test_browser_hold_release_touch_focus_disconnect_emergency_and_monitoring(vi
             browser.close()
     finally:
         stop.set();worker.join(2);server.close()
+
+
+def test_display_expiry_includes_original_frame_age_not_only_time_since_browser_receive():
+    try:
+        probe=socket.socket();probe.close()
+    except PermissionError:pytest.skip('session denies loopback sockets')
+    s=fixture();server=start_dashboard(None,'m'*40,mobile=s.c,port=0)
+    try:
+        with pw.sync_playwright() as p:
+            browser=p.chromium.launch();page=browser.new_page()
+            page.goto(f'http://127.0.0.1:{server.address[1]}/mobile')
+            page.evaluate('''() => {
+              const original=window.fetch;let frames=0;
+              window.fetch=(url,options)=>{
+                if(url.includes('/api/mobile/frame')){
+                  if(++frames>1)return new Promise(()=>{});
+                  return original(url,options).then(async r=>new Response(await r.blob(),{status:200,
+                    headers:{'X-Charlie-Frame':JSON.stringify({...JSON.parse(r.headers.get('X-Charlie-Frame')),age_seconds:.35})}}));
+                }
+                return original(url,options);
+              };
+            }''')
+            page.locator('#mc-monitor').fill('m'*40);page.locator('#mc-connect button').first.click()
+            page.wait_for_function("document.querySelector('#mc-stale').hidden")
+            page.wait_for_function("!document.querySelector('#mc-stale').hidden",timeout=400)
+            assert page.locator('#mc-screenshot').is_disabled()
+            browser.close()
+    finally:server.close()

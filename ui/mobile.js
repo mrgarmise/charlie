@@ -10,7 +10,7 @@ window.mountCharlieMobile=function(root){
   <details open><summary>Private connection</summary><form id="mc-connect"><label>Charlie endpoint<input id="mc-endpoint" type="url" value="http://127.0.0.1:8768" required></label><label>Monitoring token<input id="mc-monitor" type="password" autocomplete="off" minlength="32" required></label><label>Drive token (optional)<input id="mc-drive" type="password" autocomplete="off"></label><button>Connect</button> <button id="mc-disconnect" type="button">Disconnect</button></form><p>Use Charlie’s existing loopback service through an SSH tunnel, or authenticated private HTTPS. Tokens stay in page memory. A control lease never replaces hardware qualification.</p><p>If browser local-network access is blocked, open <a class="mobile-link" href="http://127.0.0.1:8768/mobile" target="_blank" rel="noopener noreferrer">Mobile Body through your tunnel</a>.</p></details></section>`;
   const el=id=>root.querySelector('#mc-'+id),pads=[...root.querySelectorAll('[data-dir]')];
   let endpoint='',monitor='',drive='',lease=null,boot=null,seq=0,status=null,connected=false,stopped=false;
-  let generation=0,pollTimer,driveTimer,frameTimer,staleTimer,busy=false,held=new Set(),pointer=new Map(),turn=0,lastImage=null,lastMeta=null,lastDisplayed=0;
+  let generation=0,pollTimer,driveTimer,frameTimer,staleTimer,busy=false,held=new Set(),pointer=new Map(),turn=0,lastImage=null,lastMeta=null,lastDisplayed=0,frameDeadline=0;
   let displayed=[],displayedId=null,lastStatusAt=0;
   const events=new AbortController();
   const text=(id,value)=>{if(el(id))el(id).textContent=value;};
@@ -23,8 +23,8 @@ window.mountCharlieMobile=function(root){
     const live=connected&&status&&performance.now()-lastStatusAt<1000;
     el('acquire').disabled=!live||!drive||!!lease||!status.control.available;
     el('release').disabled=!lease;el('emergency').disabled=!connected||!drive;
-    el('stop').disabled=!lease;pads.forEach(p=>p.disabled=!lease);
-    if(live){text('control',(lease?'You hold control':status.control.owned?'Another operator owns control':'Monitoring')+' · '+status.control.reason);
+    el('stop').disabled=!lease;pads.forEach(p=>p.disabled=!lease||!status||p.dataset.dir.split(',').some(d=>!status.control.directions.includes(d)));
+    if(live){el('speed').max=status.control.max_pwm;el('speed').value=Math.min(Number(el('speed').value),status.control.max_pwm);text('speed-value',el('speed').value);text('control',(lease?'You hold control':status.control.owned?'Another operator owns control':'Monitoring')+' · transport '+(status.control.transport_connected?'connected':'not opened')+' · '+status.control.reason);
       text('command',JSON.stringify(status.control.command,null,2));
       const u=status.sensors['elegoo-ultrasonic'];text('distance',u?.available&&u.centimeters!=null?u.centimeters.toFixed(1)+' cm':'— cm');
       text('range-status',u?.available?`${u.hz?.toFixed(1)??'—'} Hz · ${(u.age_seconds*1000).toFixed(0)} ms old · ${u.values.valid===false?'invalid':'reported valid; accuracy unqualified'}`:'Ultrasonic stale or unavailable · '+(u?.error||u?.health||'no producer'));
@@ -46,7 +46,7 @@ window.mountCharlieMobile=function(root){
     try{const r=await api('/api/mobile/frame'+(el('overlay').checked?'?overlays=1':'')),meta=JSON.parse(r.headers.get('X-Charlie-Frame')),blob=await r.blob(),img=await createImageBitmap(blob);
       if(g!==generation||!connected){img.close();return;}
       if(meta.age_seconds+(performance.now()-start)/1000>.5){img.close();stale('Frame stale in transit');}
-      else{lastImage?.close();lastImage=img;lastMeta=meta;lastDisplayed=performance.now();if(displayedId!==meta.frame_id){displayed.push(lastDisplayed);displayedId=meta.frame_id;}displayed=displayed.filter(t=>lastDisplayed-t<5000);draw();el('stale').hidden=true;el('screenshot').disabled=false;text('health','/ receiving');
+      else{lastImage?.close();lastImage=img;lastMeta=meta;lastDisplayed=performance.now();frameDeadline=lastDisplayed+Math.max(0,.5-meta.age_seconds-(performance.now()-start)/1000)*1000;if(displayedId!==meta.frame_id){displayed.push(lastDisplayed);displayedId=meta.frame_id;}displayed=displayed.filter(t=>lastDisplayed-t<5000);draw();el('stale').hidden=true;el('screenshot').disabled=false;text('health','/ receiving');
         const fps=displayed.length>1?(displayed.length-1)*1000/(displayed.at(-1)-displayed[0]):null;
         text('metrics',`${fps?.toFixed(1)??'—'} displayed FPS · ${meta.subscriber_fps?.toFixed(1)??'—'} subscriber FPS · ${(meta.age_seconds*1000).toFixed(0)} ms receipt age · ${(performance.now()-start).toFixed(0)} ms HTTP/decode · exposure latency unknown`);}
     }catch(e){if(g===generation)stale(e.message);}
@@ -101,7 +101,7 @@ window.mountCharlieMobile=function(root){
   el('speed').oninput=()=>text('speed-value',el('speed').value);el('overlay').onchange=draw;
   el('fullscreen').onclick=()=>el('view').requestFullscreen?.();
   el('screenshot').onclick=()=>{const a=document.createElement('a');a.download=`charlie-${lastMeta?.frame_id?.replace(/[^a-zA-Z0-9_-]/g,'_')||'frame'}.png`;a.href=el('canvas').toDataURL('image/png');a.click();};
-  staleTimer=setInterval(()=>{if(performance.now()-lastDisplayed>500)stale('No current frame · waiting for shared camera');if(connected&&lastStatusAt&&performance.now()-lastStatusAt>1000)lose('Status connection stale');},100);
+  staleTimer=setInterval(()=>{if(performance.now()>frameDeadline)stale('No current frame · waiting for shared camera');if(connected&&lastStatusAt&&performance.now()-lastStatusAt>1000)lose('Status connection stale');},100);
   window.stopCharlieMobile=()=>{if(stopped)return;release('Page left');stopped=true;generation++;connected=false;clearTimeout(pollTimer);clearTimeout(frameTimer);clearTimeout(driveTimer);clearInterval(staleTimer);events.abort();lastImage?.close();monitor=drive='';};
   if(location.protocol==='http:'&&['localhost','127.0.0.1'].includes(location.hostname))el('endpoint').value=location.origin;
   tick();

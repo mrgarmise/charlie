@@ -25,6 +25,7 @@ def fixture():
         pulse=Mock(return_value={'acknowledged':True,'stop':{'acknowledged':True}}))
     authority=Mock()
     authority.safe.return_value=True
+    authority.active.return_value=({}, {'envelope':dict(max_pwm=35,directions=['LEFT','RIGHT','FORWARD','REVERSE'])})
     def admit(request,evidence,boot_id):
         return dict(group='chassis',request_id=request.id,
             lease=MotionLease('supervised_trial',now[0]+.4,'test',boot_id),
@@ -242,4 +243,12 @@ def test_persistent_manual_sequence_does_not_fill_autonomous_replay_budget_and_c
     with pytest.raises(PermissionError):s.e.request(old)
     s.c.control(command(s,'release'));s.now[0]+=.0001;s.c.acquire()
     with pytest.raises(PermissionError):s.e.request_manual(object(),old,sequence=1000)
+    s.c.close()
+
+
+def test_status_distinguishes_transport_from_qualification_and_reports_actual_direction_limits():
+    s=fixture();s.e.authority.active.return_value=({}, {'envelope':{'max_pwm':22,'directions':['LEFT','RIGHT']}})
+    v=s.c.status()['control']
+    assert v['available'] and v['max_pwm']==22 and v['directions']==['LEFT','RIGHT']
+    assert not v['transport_connected'] and v['executor_boot_id']==s.e.boot_id
     s.c.close()

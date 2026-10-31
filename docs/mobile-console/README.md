@@ -162,3 +162,13 @@ the previously preserved qualified checkout/startup configuration; do not reset
 another worktree, delete motion incident records, revoke unrelated learning state
 or flash firmware. Revert feature commits for software rollback. Monitoring can
 remain available with no drive credential or executor.
+
+A non-installed user-unit template is provided at
+`setup/charlie-mobile-console.service.example`. Its default is offline monitoring
+with the existing Executive and `Restart=no`; it never enables hardware or firmware
+maintenance by itself. Review paths, the existing application service and state,
+then use the established user-service deployment procedure. The private
+`~/.config/charlie/mobile-console.env` must be mode 0600 and contain the reviewed
+monitoring credential plus an optional distinct drive credential. Do not run this
+unit alongside another physical Charlie application. SIGINT allows context cleanup;
+process loss still requires the independently measured device-local expiry/cutoff.

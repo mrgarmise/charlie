@@ -236,18 +236,22 @@ class MobileConsole:
                             and p.get('geometry')==camera['geometry']):detections=deepcopy(p)
             except OSError:pass
             e=self.executor
-            ready=False;reason='qualified executor unavailable'
+            ready=False;reason='qualified executor unavailable';envelope={}
             if e:
                 try:
                     if e.stop_uncertain or e._safety_stopped:raise PermissionError('STOP latch or uncertain physical state')
                     if e.authority is None:raise PermissionError('independent actuator authority absent')
-                    e.authority.active('chassis',e.boot_id)
+                    _,report=e.authority.active('chassis',e.boot_id)
+                    envelope=report['envelope']
                     ready=True;reason='per-command source and safety admission still required'
                 except Exception as exc:reason=str(exc)[:256]
             return dict(boot=self.boot,camera=camera,sensors=sensors,detections=detections,
                 control=dict(available=ready,reason=reason,owned=self.lease is not None,
                     expires_in=max(0,self.expires-self.clock()) if self.lease else 0,
-                    max_pwm=35, pulse_seconds=.1, command=deepcopy(self.command)),
+                    max_pwm=min(35,envelope.get('max_pwm',35)), directions=list(envelope.get('directions',[])),
+                    transport_connected=bool(e and e._connected),executor_boot_id=e.boot_id if e else None,
+                    stop_uncertain=bool(e and e.stop_uncertain),emergency_latched=bool(e and e._safety_stopped),
+                    pulse_seconds=.1, command=deepcopy(self.command)),
                 deferred_sensors=['battery voltage','line tracking','raw IMU: installed driver/protocol unqualified'])
 
     def close(self):

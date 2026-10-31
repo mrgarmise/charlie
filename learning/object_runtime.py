@@ -52,8 +52,8 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
             previous=recognition.sources.name or args.camera_source
             previous_episode=evidence.episode
             previous_store=getattr(recognition,'artifact_store',None)
-            from vision.mobile_perception import FrameArtifactStore
-            recognition.artifact_store=FrameArtifactStore(state/'operator-demo-frames')
+            from vision.mobile_perception import FrameArtifactStore, SelectiveFrameArtifacts
+            recognition.artifact_store=SelectiveFrameArtifacts(FrameArtifactStore(state/'operator-demo-frames'))
             evidence.episode='operator-demo:'+execution_id
             recognition.invalidate('operator demonstration start')
             recognition.select_camera('pi')

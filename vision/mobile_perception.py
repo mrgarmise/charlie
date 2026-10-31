@@ -170,6 +170,10 @@ class MobilePerception:
                     scheduling=dict(self.stats, effective_cadence_seconds=self.effective_cadence))
 
 
+class PixelBudgetExhausted(OSError):
+    """The configured evidence budget is full; existing evidence is preserved."""
+
+
 class FrameArtifactStore:
     """Bounded content-addressed authentic pixels for later independent replay."""
     def __init__(self, directory, *, max_bytes=64*1024*1024):
@@ -187,10 +191,50 @@ class FrameArtifactStore:
         raw=encoded.tobytes();digest=hashlib.sha256(raw).hexdigest()
         path=self.directory/(digest+'.png')
         if not path.exists():
-            if self.used+len(raw)>self.max_bytes:raise OSError('mobile pixel budget exhausted; acquisition paused')
+            if self.used+len(raw)>self.max_bytes:raise PixelBudgetExhausted('mobile pixel budget exhausted; acquisition paused')
             with path.open('xb') as out:out.write(raw)
             self.used+=len(raw)
         return replace(frame,artifact=dict(path=str(path.resolve()),sha256=digest,encoding='PNG',bytes=len(raw)))
+
+
+class SelectiveFrameArtifacts:
+    """Select exact decision pixels without making full storage a sensing fault.
+
+    Each session selects its first decision, changed class sets and periodic
+    context, bounded by count and the existing cumulative byte cap. Every
+    unretained decision has an explicit receipt. Existing pixels are never evicted.
+    Disk/encoding errors still propagate; only the known capacity limit is handled.
+    """
+    def __init__(self, store, *, interval=5., max_samples=4):
+        if not finite(interval) or interval <= 0 or type(max_samples) is not int or max_samples <= 0:
+            raise ValueError('positive selective evidence bounds required')
+        self.store, self.interval, self.max_samples = store, interval, max_samples
+        self.last_at = self.last_labels = None
+        self.samples = 0
+
+    def retain_observation(self, frame, observation):
+        labels = tuple(sorted({r['label'] for r in observation['objects']}))
+        reason = ('first_decision' if self.last_at is None else
+                  'class_set_changed' if labels != self.last_labels else
+                  'periodic_context' if frame.received_at-self.last_at >= self.interval else None)
+        receipt = dict(status='not_selected', reason='within_sampling_interval',
+                       source=frame.source, frame_id=frame.id,
+                       stream_generation=getattr(frame,'stream_generation',None),
+                       pixel_sha256=observation['frame']['sha256'])
+        if reason is not None:
+            if self.samples >= self.max_samples:
+                receipt.update(status='not_retained', reason='session_sample_limit')
+            else:
+                try:
+                    selected = self.store.retain(frame)
+                except PixelBudgetExhausted:
+                    receipt.update(status='not_retained', reason='cumulative_pixel_budget_exhausted')
+                else:
+                    receipt.update(status='retained', reason=reason, artifact=selected.artifact)
+                    self.samples += 1
+                    self.last_at = frame.received_at
+        self.last_labels = labels
+        return receipt
 
 
 class RecordingFrameSource:

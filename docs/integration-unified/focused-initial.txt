@@ -1,0 +1,22 @@
+...................................................F.................... [ 55%]
+..........................................................               [100%]
+=================================== FAILURES ===================================
+______ test_existing_camera_lease_excludes_second_and_cleans_failed_open _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe6895c5010>
+
+    def test_existing_camera_lease_excludes_second_and_cleans_failed_open(monkeypatch):
+        from hardware.elegoo_camera import ElegooCamera
+        from uuid import uuid4
+        response=Mock();response.read.return_value=b''
+        monkeypatch.setattr('hardware.elegoo_camera.urllib.request.urlopen',Mock(return_value=response))
+        key='http://fixture-'+uuid4().hex+'/stream';a=ElegooCamera(key);b=ElegooCamera(key)
+        a.open()
+>       with pytest.raises(BlockingIOError):b.open()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE BlockingIOError
+
+tests/test_pet_completion.py:350: Failed
+=========================== short test summary info ============================
+FAILED tests/test_pet_completion.py::test_existing_camera_lease_excludes_second_and_cleans_failed_open
+1 failed, 129 passed in 7.90s

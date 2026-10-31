@@ -1,0 +1,402 @@
+{
+  "archive_sha256": "7dcec7d028a99978061f1fba7d610c07bcce80c93c45eba623da646ef0441a34",
+  "sessions": {
+    "20260913_160458": {
+      "telemetry_rows": 183,
+      "annotated_frames": 18,
+      "duration_logged_seconds": 3.7410000000000005,
+      "states": {
+        "TRACK_CENTERED": 178,
+        "LOST_HOLD": 5
+      },
+      "decisions": {},
+      "command_calls": 2,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 0,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 60.4476309963502,
+        "median": 83.31730400095694,
+        "max": 106.18697700556368,
+        "above_50ms": 2,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 18,
+        "detected": 7,
+        "matched_telemetry": 18,
+        "presence_agreement": 7,
+        "median_detection_ms": 6.396415497874841,
+        "max_detection_ms": 11.175396997714415,
+        "not_independent_accuracy": true
+      }
+    },
+    "20260913_160652": {
+      "telemetry_rows": 962,
+      "annotated_frames": 133,
+      "duration_logged_seconds": 32.009,
+      "states": {
+        "TRACK_CENTERED": 636,
+        "TRACK_HEAD": 134,
+        "LOST_HOLD": 151,
+        "LOCAL_SEARCH": 30,
+        "BODY_ASSIST": 11
+      },
+      "decisions": {
+        "head_pan": 29,
+        "body_right": 3
+      },
+      "command_calls": 37,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 0,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 51.47471799864434,
+        "median": 136.82413499918766,
+        "max": 354.83716599992476,
+        "above_50ms": 37,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 133,
+        "detected": 105,
+        "matched_telemetry": 133,
+        "presence_agreement": 120,
+        "median_detection_ms": 6.426211002690252,
+        "max_detection_ms": 7.545863998529967,
+        "not_independent_accuracy": true
+      }
+    },
+    "20260913_161240": {
+      "telemetry_rows": 632,
+      "annotated_frames": 119,
+      "duration_logged_seconds": 28.051,
+      "states": {
+        "TRACK_CENTERED": 215,
+        "LOST_HOLD": 124,
+        "TRACK_HEAD": 142,
+        "DAMPING_HOLD": 4,
+        "LOCAL_SEARCH": 147
+      },
+      "decisions": {
+        "head_pan": 36,
+        "damping_hold": 1,
+        "local_search_pan": 1
+      },
+      "command_calls": 39,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 0,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 48.60544699477032,
+        "median": 168.33538201171905,
+        "max": 271.62697399035096,
+        "above_50ms": 38,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 119,
+        "detected": 69,
+        "matched_telemetry": 119,
+        "presence_agreement": 94,
+        "median_detection_ms": 6.374525997671299,
+        "max_detection_ms": 7.378326998150442,
+        "not_independent_accuracy": true
+      }
+    },
+    "20260913_161316": {
+      "telemetry_rows": 2372,
+      "annotated_frames": 330,
+      "duration_logged_seconds": 79.755,
+      "states": {
+        "TRACK_CENTERED": 222,
+        "TRACK_HEAD": 228,
+        "LOST_HOLD": 305,
+        "BODY_ASSIST": 32,
+        "DAMPING_HOLD": 23,
+        "LOCAL_SEARCH": 1562
+      },
+      "decisions": {
+        "head_pan": 56,
+        "body_right": 6,
+        "damping_hold": 6,
+        "local_search_pan": 16,
+        "body_left": 2
+      },
+      "command_calls": 90,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 0,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 51.132824999513105,
+        "median": 163.00756149576046,
+        "max": 380.0711610238068,
+        "above_50ms": 90,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 330,
+        "detected": 123,
+        "matched_telemetry": 330,
+        "presence_agreement": 301,
+        "median_detection_ms": 6.412581500626402,
+        "max_detection_ms": 7.485549002012704,
+        "not_independent_accuracy": true
+      }
+    },
+    "20260913_162037": {
+      "telemetry_rows": 312,
+      "annotated_frames": 53,
+      "duration_logged_seconds": 12.095,
+      "states": {
+        "TRACK_CENTERED": 261,
+        "TRACK_HEAD": 47,
+        "LOST_HOLD": 4
+      },
+      "decisions": {
+        "head_pan": 13
+      },
+      "command_calls": 15,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 0,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 50.767818989697844,
+        "median": 170.3287510026712,
+        "max": 184.26169600570574,
+        "above_50ms": 15,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 53,
+        "detected": 24,
+        "matched_telemetry": 53,
+        "presence_agreement": 25,
+        "median_detection_ms": 6.396008000592701,
+        "max_detection_ms": 7.28115899983095,
+        "not_independent_accuracy": true
+      }
+    },
+    "20260913_162309": {
+      "telemetry_rows": 2270,
+      "annotated_frames": 317,
+      "duration_logged_seconds": 75.21700000000001,
+      "states": {
+        "TRACK_CENTERED": 324,
+        "TRACK_HEAD": 607,
+        "LOST_HOLD": 261,
+        "BODY_ASSIST": 16,
+        "LOCAL_SEARCH": 1062
+      },
+      "decisions": {
+        "head_pan": 54,
+        "body_right": 4,
+        "local_search_pan": 20
+      },
+      "command_calls": 84,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 0,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 50.99982500541955,
+        "median": 166.13387598772533,
+        "max": 455.94416800304316,
+        "above_50ms": 84,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 317,
+        "detected": 153,
+        "matched_telemetry": 317,
+        "presence_agreement": 286,
+        "median_detection_ms": 6.408155997633003,
+        "max_detection_ms": 7.620031006808858,
+        "not_independent_accuracy": true
+      }
+    },
+    "20260913_162903": {
+      "telemetry_rows": 2140,
+      "annotated_frames": 258,
+      "duration_logged_seconds": 60.065000000000005,
+      "states": {
+        "TRACK_CENTERED": 726,
+        "TRACK_HEAD": 152,
+        "EVALUATE": 193,
+        "EVAL_UNCLEAR": 56,
+        "EVAL_WORSENING": 14,
+        "DAMPING_HOLD": 24,
+        "BODY_ASSIST": 2,
+        "LOST_HOLD": 239,
+        "LOCAL_SEARCH": 554,
+        "FULL_SWEEP": 180
+      },
+      "decisions": {
+        "head_pan": 38,
+        "body_right": 2,
+        "local_search_pan": 11,
+        "full_sweep_pan": 3
+      },
+      "command_calls": 58,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 0,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 50.37133299629204,
+        "median": 60.18445049994625,
+        "max": 263.1757680210285,
+        "above_50ms": 58,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 258,
+        "detected": 104,
+        "matched_telemetry": 258,
+        "presence_agreement": 204,
+        "median_detection_ms": 6.42322050043731,
+        "max_detection_ms": 7.50836400402477,
+        "not_independent_accuracy": true
+      }
+    },
+    "20260913_163815": {
+      "telemetry_rows": 1291,
+      "annotated_frames": 158,
+      "duration_logged_seconds": 35.539,
+      "states": {
+        "TRACK_CENTERED": 832,
+        "TRACK_HEAD": 25,
+        "EVALUATE": 98,
+        "EVAL_WORSENING": 12,
+        "LOST_HOLD": 238,
+        "EVAL_UNCLEAR": 21,
+        "DAMPING_HOLD": 8,
+        "LOCAL_SEARCH": 57
+      },
+      "decisions": {
+        "head_pan": 25,
+        "local_search_pan": 2
+      },
+      "command_calls": 29,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 0,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 50.734897988149896,
+        "median": 62.27315400610678,
+        "max": 385.46557299559936,
+        "above_50ms": 29,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 158,
+        "detected": 16,
+        "matched_telemetry": 158,
+        "presence_agreement": 40,
+        "median_detection_ms": 6.350026000291109,
+        "max_detection_ms": 7.350863997999113,
+        "not_independent_accuracy": true
+      }
+    },
+    "20260913_164458": {
+      "telemetry_rows": 77,
+      "annotated_frames": 21,
+      "duration_logged_seconds": 14.472000000000001,
+      "states": {
+        "TRACK_HEAD": 11,
+        "LOST_HOLD": 66
+      },
+      "decisions": {
+        "head_pan": 11,
+        "wait_toward_center": 10,
+        "wait_fast_motion": 7
+      },
+      "command_calls": 19,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 1,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 49.89930402371101,
+        "median": 54.34593101381324,
+        "max": 258.69267698726617,
+        "above_50ms": 18,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 21,
+        "detected": 8,
+        "matched_telemetry": 21,
+        "presence_agreement": 16,
+        "median_detection_ms": 6.534860003739595,
+        "max_detection_ms": 7.15749200026039,
+        "not_independent_accuracy": true
+      }
+    },
+    "20260913_164531": {
+      "telemetry_rows": 611,
+      "annotated_frames": 86,
+      "duration_logged_seconds": 40.205,
+      "states": {
+        "TRACK_HEAD": 19,
+        "LOST_HOLD": 336,
+        "LOCAL_SEARCH": 256
+      },
+      "decisions": {
+        "head_pan": 19,
+        "wait_toward_center": 16,
+        "wait_fast_motion": 6,
+        "local_search_pan": 6
+      },
+      "command_calls": 41,
+      "logged_command_failures": 0,
+      "attention_aligned_events": 4,
+      "yaw_field_present": false,
+      "command_call_elapsed_ms": {
+        "min": 49.17519900482148,
+        "median": 54.156096011865884,
+        "max": 351.65459400741383,
+        "above_50ms": 40,
+        "not_claimed_as_wire_rtt": true
+      },
+      "diagnostic_replay": {
+        "samples": 86,
+        "detected": 13,
+        "matched_telemetry": 86,
+        "presence_agreement": 76,
+        "median_detection_ms": 6.516155997815076,
+        "max_detection_ms": 7.58699399739271,
+        "not_independent_accuracy": true
+      }
+    }
+  },
+  "physical_acceptance": false,
+  "baseline_binding": "No Git checkout or per-session source snapshots. Do not infer latest file is successful baseline.",
+  "image_limitation": "Historical JPEGs are annotated screenshots, not raw exposures; replay is diagnostic, not recognition accuracy or physical parity.",
+  "resources": {
+    "cpu_cores": 2,
+    "memory_budget_mb": 768,
+    "temperature_limit_c": 75.0,
+    "ownership_poll_seconds": 0.05,
+    "temperature_c": 57.85,
+    "thermal_sensor_available": true,
+    "thermal_telemetry_required": true,
+    "ownership_checks": 221,
+    "resident_bytes": 180551680,
+    "owned_worker_count": 0,
+    "peak_rss_bytes": 181878784,
+    "peak_owned_resident_bytes": 181813248,
+    "cpu_seconds": 21.733007
+  },
+  "source_hashes": {
+    "face_mobile_track_orig.py": "17498098f0e0a1e8c1ced1b1b5ec21279c2781757e73105feecca74e6a27c8a3",
+    "coordinated_attention_python_v3.py": "b9d677545d65e63e98fc6b91c3f6c9238ae5c74d85de051d3be8ee0c1c5cadfe",
+    "face_mobile_track.py": "c48915fd34b23ec072f520a5e3b459ba96ccc39b917d02612158849f2621242e"
+  },
+  "replay_identity": {
+    "model_sha256": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4",
+    "detector_sha256": "1ab0711c8d39180f359ba607f3ef93d45ff9a118195e8bd940488724ba078d52",
+    "min_score": 0.8,
+    "match_max_distance": 0.35,
+    "architecture": "aarch64",
+    "device": "Raspberry Pi 5 Model B Rev 1.0",
+    "runner_sha256": "15f16322d509e68ef160b3e0c364723df717faa8683ea5a3f96d2248bc0f9ecb"
+  }
+}

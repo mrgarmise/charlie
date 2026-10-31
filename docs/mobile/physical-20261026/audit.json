@@ -1,0 +1,103 @@
+{
+  "schema": "charlie.mobile.read-only-audit.v1",
+  "date": "2026-10-26",
+  "base_commit": "cafe21aa3f6c68080c12a1a5613a92516fdb7167",
+  "runtime_sha256": "ed35e389b498658c0341987c5b49b994c5720abc7b996a522d748c903257eec5",
+  "machine": "aarch64",
+  "python": "3.13.5",
+  "device_tree_model": "Raspberry Pi 5 Model B Rev 1.0",
+  "model_sha256": "90e2cdad2875f23fb436ecdba88b4789de3bd8112cdf6b34beb1c8aa9fd7eed1",
+  "model_manifest_sha256": "6d1dade7558269e3f9a0964cecb86742c128ffad99a956915d8f372658b6353a",
+  "historical_motion": [
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154336645883Z-wheels-forward.json",
+      "sha256": "026dd233d6be8b5e9ee4aadbaa36c509b34deffbf9604778af5f060c790544b7",
+      "stage": "wheels",
+      "direction": "forward",
+      "command": {
+        "N": 3,
+        "H": "qual2",
+        "D1": 3,
+        "D2": 35
+      },
+      "reported_host_interval_seconds": 0.25583759499932057,
+      "physical_motion_verified": false,
+      "physical_stop_verified": false,
+      "firmware_revision": "unverified"
+    },
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154353143112Z-wheels-reverse.json",
+      "sha256": "2e63ec4fd5f09605bb7975a27e3f2ae5f02e3d71fb9ee98653ea7220a19b1c52",
+      "stage": "wheels",
+      "direction": "reverse",
+      "command": {
+        "N": 3,
+        "H": "qual2",
+        "D1": 4,
+        "D2": 35
+      },
+      "reported_host_interval_seconds": 0.253580418000638,
+      "physical_motion_verified": false,
+      "physical_stop_verified": false,
+      "firmware_revision": "unverified"
+    },
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154418511983Z-floor-forward.json",
+      "sha256": "776f0680511df502e1cef5b3461d8d735004528600263ce1ed384539381ac06b",
+      "stage": "floor",
+      "direction": "forward",
+      "command": {
+        "N": 3,
+        "H": "qual2",
+        "D1": 3,
+        "D2": 35
+      },
+      "reported_host_interval_seconds": 0.2621128079999835,
+      "physical_motion_verified": false,
+      "physical_stop_verified": false,
+      "firmware_revision": "unverified"
+    },
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154432146437Z-floor-reverse.json",
+      "sha256": "a29853f0a3edb6c07eb6c8c669a9f74bc016e5aa1997237eb52fe350a01da89d",
+      "stage": "floor",
+      "direction": "reverse",
+      "command": {
+        "N": 3,
+        "H": "qual2",
+        "D1": 4,
+        "D2": 35
+      },
+      "reported_host_interval_seconds": 0.2559070930001326,
+      "physical_motion_verified": false,
+      "physical_stop_verified": false,
+      "firmware_revision": "unverified"
+    },
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154446341045Z-floor-reverse.json",
+      "sha256": "843a539b3ce97eeddb8114f7c0b793aa1e3af49a0a5e3878330242999bfeff71",
+      "stage": "floor",
+      "direction": "reverse",
+      "command": {
+        "N": 3,
+        "H": "qual2",
+        "D1": 4,
+        "D2": 35
+      },
+      "reported_host_interval_seconds": 0.25546848000067257,
+      "physical_motion_verified": false,
+      "physical_stop_verified": false,
+      "firmware_revision": "unverified"
+    }
+  ],
+  "access": {
+    "inet_socket": "PermissionError: [Errno 1] Operation not permitted",
+    "netlink_route": "Operation not permitted",
+    "exposed_camera": false,
+    "exposed_hailo": false,
+    "exposed_serial": false
+  },
+  "physical_tests_performed": false,
+  "motor_commands_sent": 0,
+  "physical_acceptance": false
+}

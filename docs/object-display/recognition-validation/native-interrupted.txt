@@ -1,0 +1,5 @@
+......................
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! KeyboardInterrupt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/usr/lib/python3/dist-packages/PIL/Image.py:817: KeyboardInterrupt
+(to show a full traceback on KeyboardInterrupt use --full-trace)
+22 passed, 1 skipped in 39.57s

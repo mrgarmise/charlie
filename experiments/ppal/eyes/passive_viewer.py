@@ -62,7 +62,6 @@ class Viewer:
                     else:
                         from vision.camera import Camera
                         self.preview=Camera(purpose='preview')
-                        self.preview.autofocus()
                 # No tracker, crop, exposure optimizer or identity inference here.
                 from PIL import Image
                 raw=Image.fromarray(self.preview.read()[...,::-1].copy())

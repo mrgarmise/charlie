@@ -1,7 +1,7 @@
 import time
 
 from behaviors.base import Behavior
-from motion.mobile_base import MobileBase
+from motion.mobile_requests import MobileRequests as MobileBase
 from vision.mapping import pixel_to_angle
 
 

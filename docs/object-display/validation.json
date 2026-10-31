@@ -1,0 +1,83 @@
+{
+  "source_commit": "19a12fcd27c6173c2809212534c78354eeffa359",
+  "base_commit": "96e651373e513d24b4163b87c5f85bdd5549cf1d",
+  "environment": {
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "pytest": "9.1.1"
+  },
+  "protected_files_byte_identical": [
+    "rp2040/servos.py",
+    "rp2040/calibration.py",
+    "rp2040/motion_profile.py",
+    "rp2040/main.py",
+    "rp2040/boot.py",
+    "rp2040/lib/Pico_ed.py",
+    "tools/sync_rp2040.py",
+    "hardware/elegoo_mobile.py",
+    "hardware/elegoo_camera.py",
+    "behaviors/mobile_face_track.py",
+    "behaviors/mobile_track.py",
+    "motion/controller.py",
+    "vision/mobile_face.py",
+    "vision/camera.py",
+    "learning/lifecycle.py",
+    "memory/learning_projects.py"
+  ],
+  "source_sha256": {
+    "attention/manager.py": "d781df8993efb8ceaf66ddf3ee5b07b5524130aa4fc00cadadcc7e065a4216a5",
+    "attention/object_display_runtime.py": "7086c71054f03d9ad91bf64bc6fe9c199ba270ae4493c1021ce316dfab993c3d",
+    "attention/object_labels.py": "787f7adf1bbc6ccfc6dd3e3dc799d2f45092fdd4b1d66317bad74c281a331b93",
+    "behaviors/mobile_observe.py": "7db6711d9bcff20f23ab529c2fe40f84758a90be094775ab41bbd305241c7b75",
+    "docs/object-display/AUDIT.md": "5ad8d40c6b0d86237950f5c15328db2cb03316d1cf0502e6c596981eeb4a510b",
+    "hardware/rp2040_controller.py": "14f461038073e2b18afce2bd480f06756b376b8c66938bcfa6329e396b502c55",
+    "learning/mobile_runtime.py": "fea127d3e3746e1a39c18c866fcfcdb4729da1981b6598b8b0d61a8e67e0db14",
+    "main.py": "e3a1fe483a7f2ffae8e52271eef90f3ce26a8731213355165e76754f2f76e936",
+    "rp2040/commands.py": "1bd2eb0d498584076b79b5994b2e15ac28fc7d53408009fbd34017bc540e7d34",
+    "rp2040/display.py": "17a867f5aeba51d5c22ab7805de062dbaeaddffb775db43a36f5b38a1ea5a6aa",
+    "rp2040/object_label.py": "96884a224f7d7608914103511cfe37f3204a7c3bd19607ce024b86ace63badf3",
+    "rp2040/protocol.py": "f3fd4b019b394a93775590b63131d860fbc4f3a30bba07a62a59a025f84d6263",
+    "tests/fixtures/object-display/cat-dog.jsonl": "251e77fc5a231ddaf5642e2a8e30799396551fbc23ec0442313b1675ac8c1285",
+    "tests/test_object_display.py": "97dd183cd2349e556a590bba9d2854550eab79dddb44d7d9025dfce9ed0b6a44",
+    "vision/mobile_models.py": "88a9a00ad96e92e59370e6a35df3f8338359182f9e594a4d71b01a88f2bfd77a",
+    "vision/mobile_perception.py": "d342fba13eea14a7e1925a81e5334e9e2b3d0d0598b77f2b0af974be87ddbdcb",
+    "vision/object_observation.py": "432cc913e1e484c3ac95db76f4555351e9edd65bea75668b279226e0ad4e33fa"
+  },
+  "focused": {
+    "passed": 146,
+    "command": "python -m pytest tests/test_object_display.py tests/test_active_vision_firmware.py tests/test_calibration_integration.py tests/test_mobile_integration.py tests/test_brain_calibration.py -q"
+  },
+  "broad": {
+    "status": "passed",
+    "passed": 1344,
+    "skipped": 21,
+    "warnings": 1,
+    "seconds": 326.56,
+    "command": "python -m pytest tests -q --disable-warnings --junitxml=/tmp/object-display-full.xml",
+    "clean_checkout": true
+  },
+  "native": {
+    "pi_validated": false,
+    "led_device_validated": false,
+    "flashed": false,
+    "servo_actions": 0,
+    "chassis_actions": 0,
+    "policy_activations": 0,
+    "physical_serial_connections": 0
+  },
+  "model": {
+    "reused": "existing PR10 HailoBackend / HailoObjects class output; optional full class exposure",
+    "new_models": 0,
+    "new_inference_passes": 0
+  },
+  "ci": {
+    "status": "success",
+    "passed": 1344,
+    "skipped": 21,
+    "warnings": 1,
+    "seconds": 362.08,
+    "commit": "469a10ffa11dd1d15e773bd9ac6ff5f6306b9770",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/40206127789",
+    "checkout_history": "full; existing rollback regression retained"
+  }
+}

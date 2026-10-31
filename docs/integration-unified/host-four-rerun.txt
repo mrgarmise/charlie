@@ -1,0 +1,386 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+__ test_real_player_starts_two_simulated_playable_games_on_one_camera[False] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_real_player_starts_two_si0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff795ea99d0>
+camera_failure = False, terminal_pages = False, terminal_delay = False
+
+    @pytest.mark.parametrize('camera_failure',[False,True])
+    def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False,terminal_delay=False):
+        """Real player + marathon; simulated pixels/controls, not Pi acceptance."""
+        import time
+        from experiments.ppal import marathon_robotron as m,play_robotron as play
+        from experiments.ppal.eyes.detectors import Detection
+        from experiments.ppal.robotron_agency import VECTORS
+        from test_experiment_return import gateway
+        from test_marathon_deferred import args
+        real_sleep=time.sleep
+        clock=[0.];starts=[];preflights=[];closed=[];points=[(25.,25.),(50.,50.)]
+        world={'game':0,'reads':0}
+        class Camera:
+            def __init__(self):closed.append('opened')
+            def read(self):
+                real_sleep(.01);clock[0]+=.05
+                if world['game']:world['reads']+=1
+                if terminal_delay and world['reads']==102:clock[0]+=25.
+                if camera_failure and world['game']==2 and world['reads']>65:
+                    raise RuntimeError('simulated capture disconnected')
+                return Image.new('RGB',(100,100))
+            def close(self):closed.append('camera_closed')
+        class Controller:
+            def __init__(self,*a,**kw):self.last_execution=None
+            def _command(self,command):
+                self.last_command=dict(command=command,write_started_at=clock[0],write_completed_at=clock[0],ack_at=clock[0])
+                if command=='START':
+                    world['game']+=1;world['reads']=0;points[0]=(25.,25.);starts.append(world['game'])
+            def execute(self,action,ms):
+                if terminal_pages:assert world['reads']<100 # no postgame/demo agency probes
+                self.last_execution=dict(started_at=clock[0],move=action.move,fire=action.fire,duration_ms=ms)
+                clock[0]+=ms/1000
+                if world['reads']<100:
+                    u=VECTORS[action.move];points[0]=(points[0][0]+u[0],points[0][1]+u[1])
+            def close(self):closed.append('controller_closed')
+        class Recognizer:
+            def detect(self,frame):
+                if world['reads']>=100:return []
+                return [(Detection('unknown',p,(1,1,10,20),100),{'class_scores':{}}) for p in points]
+        def screen(frame):
+            if terminal_pages and world['game']:
+                if 100<=world['reads']<104:return dict(state='not_gameplay',phase='terminal',reason='recorded_heroes_headings',label_scores={'heroes':.9,'all-time':.9})
+                if 104<=world['reads']<107 or 131<=world['reads']<134 or world['reads']>=146:return dict(state='not_gameplay',phase='title',title_reference={'matched':True,'sha256':'a'*64})
+                if world['reads']>=107:return dict(state='gameplay',phase='gameplay') # autonomous demonstration
+            if not world['game'] or world['reads']>=106:return dict(state='not_gameplay',phase='startable')
+            if world['reads']>=100:return dict(state='not_gameplay',phase='terminal')
+            return dict(state='gameplay',phase='gameplay')
+        def sensory(source,output,**kw):
+            preflights.append(world['game'])
+            assert world['game']==0
+            return SimpleNamespace(apply=lambda f:f),dict(status='usable',physical_motion=False,fixture=True)
+        monkeypatch.setattr(play,'PiCameraSource',Camera)
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play,'classify_screen_state',screen)
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        monkeypatch.setattr(time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(time,'sleep',lambda t:None)
+        monkeypatch.setattr(m,'reflect_marathon',lambda *v,**kw:{'phase':'checkpointed'})
+        a=args(tmp_path);a.focus=None;a.max_games=2
+        doc=m.developmental_marathon(a,gateway=gateway(tmp_path))
+>       assert starts==[1,2] and preflights==[0]
+E       assert ([1] == [1, 2]
+E         
+E         Right contains one more item: 2
+E         Use -v to get more diff)
+
+tests/test_marathon_camera_session.py:209: AssertionError
+----------------------------- Captured stdout call -----------------------------
+DEVELOPMENT GAME 1/2: no justified experiment yet; existing policy only
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+SELF PROVISIONAL: hypothesis=1; FIRE outcomes unconfirmed
+PLAYER HYPOTHESIS (provisional_body_agency) x=25.00 y=25.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+Evidence: /tmp/pytest-of-root/pytest-8/test_real_player_starts_two_si0/runs/development-20261027-111203/game-01/report.json
+EPISODE FAILED: ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained
+GAME 1: score evidence=None; SELF={'provisional': 1, 'confirmed': 23}; experiment attempted=False; prediction=NONE; resolution=no prediction; memory=UNKNOWN->UNKNOWN (UNKNOWN); belief=none
+PROJECT: NONE; goal=UNKNOWN; status=UNKNOWN; selection=no feasible authorized project; no justified experiment yet; progress=UNKNOWN; next=no justified experiment yet
+DEVELOPMENT STOP: no confirmed game-over evidence; no further START
+DEVELOPMENT COMPLETE: unverified_episode_boundary; attempts=1; qualified=0; invalid=1; unverified=0; target_met=False; /tmp/pytest-of-root/pytest-8/test_real_player_starts_two_si0/runs/development-20261027-111203
+___ test_real_player_starts_two_simulated_playable_games_on_one_camera[True] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_real_player_starts_two_si1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff7671e7080>
+camera_failure = True, terminal_pages = False, terminal_delay = False
+
+    @pytest.mark.parametrize('camera_failure',[False,True])
+    def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False,terminal_delay=False):
+        """Real player + marathon; simulated pixels/controls, not Pi acceptance."""
+        import time
+        from experiments.ppal import marathon_robotron as m,play_robotron as play
+        from experiments.ppal.eyes.detectors import Detection
+        from experiments.ppal.robotron_agency import VECTORS
+        from test_experiment_return import gateway
+        from test_marathon_deferred import args
+        real_sleep=time.sleep
+        clock=[0.];starts=[];preflights=[];closed=[];points=[(25.,25.),(50.,50.)]
+        world={'game':0,'reads':0}
+        class Camera:
+            def __init__(self):closed.append('opened')
+            def read(self):
+                real_sleep(.01);clock[0]+=.05
+                if world['game']:world['reads']+=1
+                if terminal_delay and world['reads']==102:clock[0]+=25.
+                if camera_failure and world['game']==2 and world['reads']>65:
+                    raise RuntimeError('simulated capture disconnected')
+                return Image.new('RGB',(100,100))
+            def close(self):closed.append('camera_closed')
+        class Controller:
+            def __init__(self,*a,**kw):self.last_execution=None
+            def _command(self,command):
+                self.last_command=dict(command=command,write_started_at=clock[0],write_completed_at=clock[0],ack_at=clock[0])
+                if command=='START':
+                    world['game']+=1;world['reads']=0;points[0]=(25.,25.);starts.append(world['game'])
+            def execute(self,action,ms):
+                if terminal_pages:assert world['reads']<100 # no postgame/demo agency probes
+                self.last_execution=dict(started_at=clock[0],move=action.move,fire=action.fire,duration_ms=ms)
+                clock[0]+=ms/1000
+                if world['reads']<100:
+                    u=VECTORS[action.move];points[0]=(points[0][0]+u[0],points[0][1]+u[1])
+            def close(self):closed.append('controller_closed')
+        class Recognizer:
+            def detect(self,frame):
+                if world['reads']>=100:return []
+                return [(Detection('unknown',p,(1,1,10,20),100),{'class_scores':{}}) for p in points]
+        def screen(frame):
+            if terminal_pages and world['game']:
+                if 100<=world['reads']<104:return dict(state='not_gameplay',phase='terminal',reason='recorded_heroes_headings',label_scores={'heroes':.9,'all-time':.9})
+                if 104<=world['reads']<107 or 131<=world['reads']<134 or world['reads']>=146:return dict(state='not_gameplay',phase='title',title_reference={'matched':True,'sha256':'a'*64})
+                if world['reads']>=107:return dict(state='gameplay',phase='gameplay') # autonomous demonstration
+            if not world['game'] or world['reads']>=106:return dict(state='not_gameplay',phase='startable')
+            if world['reads']>=100:return dict(state='not_gameplay',phase='terminal')
+            return dict(state='gameplay',phase='gameplay')
+        def sensory(source,output,**kw):
+            preflights.append(world['game'])
+            assert world['game']==0
+            return SimpleNamespace(apply=lambda f:f),dict(status='usable',physical_motion=False,fixture=True)
+        monkeypatch.setattr(play,'PiCameraSource',Camera)
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play,'classify_screen_state',screen)
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        monkeypatch.setattr(time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(time,'sleep',lambda t:None)
+        monkeypatch.setattr(m,'reflect_marathon',lambda *v,**kw:{'phase':'checkpointed'})
+        a=args(tmp_path);a.focus=None;a.max_games=2
+        doc=m.developmental_marathon(a,gateway=gateway(tmp_path))
+>       assert starts==[1,2] and preflights==[0]
+E       assert ([1] == [1, 2]
+E         
+E         Right contains one more item: 2
+E         Use -v to get more diff)
+
+tests/test_marathon_camera_session.py:209: AssertionError
+----------------------------- Captured stdout call -----------------------------
+DEVELOPMENT GAME 1/2: no justified experiment yet; existing policy only
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+SELF PROVISIONAL: hypothesis=1; FIRE outcomes unconfirmed
+PLAYER HYPOTHESIS (provisional_body_agency) x=25.00 y=25.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+Evidence: /tmp/pytest-of-root/pytest-8/test_real_player_starts_two_si1/runs/development-20261027-111207/game-01/report.json
+EPISODE FAILED: ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained
+GAME 1: score evidence=None; SELF={'provisional': 1, 'confirmed': 20}; experiment attempted=False; prediction=NONE; resolution=no prediction; memory=UNKNOWN->UNKNOWN (UNKNOWN); belief=none
+PROJECT: NONE; goal=UNKNOWN; status=UNKNOWN; selection=no feasible authorized project; no justified experiment yet; progress=UNKNOWN; next=no justified experiment yet
+DEVELOPMENT STOP: no confirmed game-over evidence; no further START
+DEVELOPMENT COMPLETE: unverified_episode_boundary; attempts=1; qualified=0; invalid=1; unverified=0; target_met=False; /tmp/pytest-of-root/pytest-8/test_real_player_starts_two_si1/runs/development-20261027-111207
+____ test_terminal_confirmation_inside_batch_wins_over_processing_deadline _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_terminal_confirmation_ins0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff771b7d340>
+
+    def test_terminal_confirmation_inside_batch_wins_over_processing_deadline(tmp_path,monkeypatch):
+        from test_marathon_camera_session import test_real_player_starts_two_simulated_playable_games_on_one_camera
+>       test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,False,
+            terminal_pages=True,terminal_delay=True)
+
+tests/test_native_terminal_forensics.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_terminal_confirmation_ins0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff771b7d340>
+camera_failure = False, terminal_pages = True, terminal_delay = True
+
+    @pytest.mark.parametrize('camera_failure',[False,True])
+    def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False,terminal_delay=False):
+        """Real player + marathon; simulated pixels/controls, not Pi acceptance."""
+        import time
+        from experiments.ppal import marathon_robotron as m,play_robotron as play
+        from experiments.ppal.eyes.detectors import Detection
+        from experiments.ppal.robotron_agency import VECTORS
+        from test_experiment_return import gateway
+        from test_marathon_deferred import args
+        real_sleep=time.sleep
+        clock=[0.];starts=[];preflights=[];closed=[];points=[(25.,25.),(50.,50.)]
+        world={'game':0,'reads':0}
+        class Camera:
+            def __init__(self):closed.append('opened')
+            def read(self):
+                real_sleep(.01);clock[0]+=.05
+                if world['game']:world['reads']+=1
+                if terminal_delay and world['reads']==102:clock[0]+=25.
+                if camera_failure and world['game']==2 and world['reads']>65:
+                    raise RuntimeError('simulated capture disconnected')
+                return Image.new('RGB',(100,100))
+            def close(self):closed.append('camera_closed')
+        class Controller:
+            def __init__(self,*a,**kw):self.last_execution=None
+            def _command(self,command):
+                self.last_command=dict(command=command,write_started_at=clock[0],write_completed_at=clock[0],ack_at=clock[0])
+                if command=='START':
+                    world['game']+=1;world['reads']=0;points[0]=(25.,25.);starts.append(world['game'])
+            def execute(self,action,ms):
+                if terminal_pages:assert world['reads']<100 # no postgame/demo agency probes
+                self.last_execution=dict(started_at=clock[0],move=action.move,fire=action.fire,duration_ms=ms)
+                clock[0]+=ms/1000
+                if world['reads']<100:
+                    u=VECTORS[action.move];points[0]=(points[0][0]+u[0],points[0][1]+u[1])
+            def close(self):closed.append('controller_closed')
+        class Recognizer:
+            def detect(self,frame):
+                if world['reads']>=100:return []
+                return [(Detection('unknown',p,(1,1,10,20),100),{'class_scores':{}}) for p in points]
+        def screen(frame):
+            if terminal_pages and world['game']:
+                if 100<=world['reads']<104:return dict(state='not_gameplay',phase='terminal',reason='recorded_heroes_headings',label_scores={'heroes':.9,'all-time':.9})
+                if 104<=world['reads']<107 or 131<=world['reads']<134 or world['reads']>=146:return dict(state='not_gameplay',phase='title',title_reference={'matched':True,'sha256':'a'*64})
+                if world['reads']>=107:return dict(state='gameplay',phase='gameplay') # autonomous demonstration
+            if not world['game'] or world['reads']>=106:return dict(state='not_gameplay',phase='startable')
+            if world['reads']>=100:return dict(state='not_gameplay',phase='terminal')
+            return dict(state='gameplay',phase='gameplay')
+        def sensory(source,output,**kw):
+            preflights.append(world['game'])
+            assert world['game']==0
+            return SimpleNamespace(apply=lambda f:f),dict(status='usable',physical_motion=False,fixture=True)
+        monkeypatch.setattr(play,'PiCameraSource',Camera)
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play,'classify_screen_state',screen)
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        monkeypatch.setattr(time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(time,'sleep',lambda t:None)
+        monkeypatch.setattr(m,'reflect_marathon',lambda *v,**kw:{'phase':'checkpointed'})
+        a=args(tmp_path);a.focus=None;a.max_games=2
+        doc=m.developmental_marathon(a,gateway=gateway(tmp_path))
+>       assert starts==[1,2] and preflights==[0]
+E       assert ([1] == [1, 2]
+E         
+E         Right contains one more item: 2
+E         Use -v to get more diff)
+
+tests/test_marathon_camera_session.py:209: AssertionError
+----------------------------- Captured stdout call -----------------------------
+DEVELOPMENT GAME 1/2: no justified experiment yet; existing policy only
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+SELF PROVISIONAL: hypothesis=1; FIRE outcomes unconfirmed
+PLAYER HYPOTHESIS (provisional_body_agency) x=25.00 y=25.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+Evidence: /tmp/pytest-of-root/pytest-8/test_terminal_confirmation_ins0/runs/development-20261027-111210/game-01/report.json
+EPISODE FAILED: ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained
+GAME 1: score evidence=None; SELF={'provisional': 1, 'confirmed': 15}; experiment attempted=False; prediction=NONE; resolution=no prediction; memory=UNKNOWN->UNKNOWN (UNKNOWN); belief=none
+PROJECT: NONE; goal=UNKNOWN; status=UNKNOWN; selection=no feasible authorized project; no justified experiment yet; progress=UNKNOWN; next=no justified experiment yet
+DEVELOPMENT STOP: no confirmed game-over evidence; no further START
+DEVELOPMENT COMPLETE: unverified_episode_boundary; attempts=1; qualified=0; invalid=1; unverified=0; target_met=False; /tmp/pytest-of-root/pytest-8/test_terminal_confirmation_ins0/runs/development-20261027-111210
+___ test_terminal_diagnostics_are_durable_and_bound_to_original_observation ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_terminal_diagnostics_are_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff7717abce0>
+
+    def test_terminal_diagnostics_are_durable_and_bound_to_original_observation(tmp_path,monkeypatch):
+        from test_marathon_camera_session import test_real_player_starts_two_simulated_playable_games_on_one_camera
+        from memory.evidence import EvidenceJournal
+>       test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,False,terminal_pages=True)
+
+tests/test_native_terminal_forensics.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_terminal_diagnostics_are_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff7717abce0>
+camera_failure = False, terminal_pages = True, terminal_delay = False
+
+    @pytest.mark.parametrize('camera_failure',[False,True])
+    def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,monkeypatch,camera_failure,terminal_pages=False,terminal_delay=False):
+        """Real player + marathon; simulated pixels/controls, not Pi acceptance."""
+        import time
+        from experiments.ppal import marathon_robotron as m,play_robotron as play
+        from experiments.ppal.eyes.detectors import Detection
+        from experiments.ppal.robotron_agency import VECTORS
+        from test_experiment_return import gateway
+        from test_marathon_deferred import args
+        real_sleep=time.sleep
+        clock=[0.];starts=[];preflights=[];closed=[];points=[(25.,25.),(50.,50.)]
+        world={'game':0,'reads':0}
+        class Camera:
+            def __init__(self):closed.append('opened')
+            def read(self):
+                real_sleep(.01);clock[0]+=.05
+                if world['game']:world['reads']+=1
+                if terminal_delay and world['reads']==102:clock[0]+=25.
+                if camera_failure and world['game']==2 and world['reads']>65:
+                    raise RuntimeError('simulated capture disconnected')
+                return Image.new('RGB',(100,100))
+            def close(self):closed.append('camera_closed')
+        class Controller:
+            def __init__(self,*a,**kw):self.last_execution=None
+            def _command(self,command):
+                self.last_command=dict(command=command,write_started_at=clock[0],write_completed_at=clock[0],ack_at=clock[0])
+                if command=='START':
+                    world['game']+=1;world['reads']=0;points[0]=(25.,25.);starts.append(world['game'])
+            def execute(self,action,ms):
+                if terminal_pages:assert world['reads']<100 # no postgame/demo agency probes
+                self.last_execution=dict(started_at=clock[0],move=action.move,fire=action.fire,duration_ms=ms)
+                clock[0]+=ms/1000
+                if world['reads']<100:
+                    u=VECTORS[action.move];points[0]=(points[0][0]+u[0],points[0][1]+u[1])
+            def close(self):closed.append('controller_closed')
+        class Recognizer:
+            def detect(self,frame):
+                if world['reads']>=100:return []
+                return [(Detection('unknown',p,(1,1,10,20),100),{'class_scores':{}}) for p in points]
+        def screen(frame):
+            if terminal_pages and world['game']:
+                if 100<=world['reads']<104:return dict(state='not_gameplay',phase='terminal',reason='recorded_heroes_headings',label_scores={'heroes':.9,'all-time':.9})
+                if 104<=world['reads']<107 or 131<=world['reads']<134 or world['reads']>=146:return dict(state='not_gameplay',phase='title',title_reference={'matched':True,'sha256':'a'*64})
+                if world['reads']>=107:return dict(state='gameplay',phase='gameplay') # autonomous demonstration
+            if not world['game'] or world['reads']>=106:return dict(state='not_gameplay',phase='startable')
+            if world['reads']>=100:return dict(state='not_gameplay',phase='terminal')
+            return dict(state='gameplay',phase='gameplay')
+        def sensory(source,output,**kw):
+            preflights.append(world['game'])
+            assert world['game']==0
+            return SimpleNamespace(apply=lambda f:f),dict(status='usable',physical_motion=False,fixture=True)
+        monkeypatch.setattr(play,'PiCameraSource',Camera)
+        monkeypatch.setattr(play,'ArcadeController',Controller)
+        monkeypatch.setattr(play.TaughtRecognizer,'load',lambda *a:Recognizer())
+        monkeypatch.setattr(play,'classify_screen_state',screen)
+        monkeypatch.setattr(play,'sensory_preflight',sensory)
+        monkeypatch.setattr(time,'monotonic',lambda:clock[0])
+        monkeypatch.setattr(time,'sleep',lambda t:None)
+        monkeypatch.setattr(m,'reflect_marathon',lambda *v,**kw:{'phase':'checkpointed'})
+        a=args(tmp_path);a.focus=None;a.max_games=2
+        doc=m.developmental_marathon(a,gateway=gateway(tmp_path))
+>       assert starts==[1,2] and preflights==[0]
+E       assert ([1] == [1, 2]
+E         
+E         Right contains one more item: 2
+E         Use -v to get more diff)
+
+tests/test_marathon_camera_session.py:209: AssertionError
+----------------------------- Captured stdout call -----------------------------
+DEVELOPMENT GAME 1/2: no justified experiment yet; existing policy only
+GAMEPLAY VISUAL CANDIDATES detected at watch frame 0
+DISCOVERING SELF: short movement/neutral probes over all visual candidates
+SELF PROVISIONAL: hypothesis=1; FIRE outcomes unconfirmed
+PLAYER HYPOTHESIS (provisional_body_agency) x=25.00 y=25.00
+SELF TRACK SEEDED: track=1
+CHARLIE LOOSE: progress supervised; waiting for confirmed Robotron terminal state
+AGENCY ACQUIRED: self=1 candidate=1 confidence=0.74 runner=0.00
+Evidence: /tmp/pytest-of-root/pytest-8/test_terminal_diagnostics_are_0/runs/development-20261027-111213/game-01/report.json
+EPISODE FAILED: ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained
+GAME 1: score evidence=None; SELF={'provisional': 1, 'confirmed': 21}; experiment attempted=False; prediction=NONE; resolution=no prediction; memory=UNKNOWN->UNKNOWN (UNKNOWN); belief=none
+PROJECT: NONE; goal=UNKNOWN; status=UNKNOWN; selection=no feasible authorized project; no justified experiment yet; progress=UNKNOWN; next=no justified experiment yet
+DEVELOPMENT STOP: no confirmed game-over evidence; no further START
+DEVELOPMENT COMPLETE: unverified_episode_boundary; attempts=1; qualified=0; invalid=1; unverified=0; target_met=False; /tmp/pytest-of-root/pytest-8/test_terminal_diagnostics_are_0/runs/development-20261027-111213
+=========================== short test summary info ============================
+FAILED tests/test_marathon_camera_session.py::test_real_player_starts_two_simulated_playable_games_on_one_camera[False]
+FAILED tests/test_marathon_camera_session.py::test_real_player_starts_two_simulated_playable_games_on_one_camera[True]
+FAILED tests/test_native_terminal_forensics.py::test_terminal_confirmation_inside_batch_wins_over_processing_deadline
+FAILED tests/test_native_terminal_forensics.py::test_terminal_diagnostics_are_durable_and_bound_to_original_observation
+4 failed in 12.68s

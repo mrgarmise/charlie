@@ -1,0 +1,1 @@
+Abilities UI: authentication memory, request/receipt distinction, cancellation, network failure, route cleanup and endpoint validation passed (DOM double).

@@ -1,0 +1,166 @@
+{
+  "schema": "charlie.object-recognition.validation.v1",
+  "qualification": "software fixtures only; no native camera/inference/display or physical motion acceptance",
+  "artifacts": {
+    "shared-camera-initial.xml": {
+      "path": "docs/object-display/recognition-validation/shared-camera-initial.xml.gz",
+      "original_sha256": "ad2887640c71306f48b4fec6b33ba84af4b692ba6a2a9e24b07a22fbe182fea0",
+      "compressed_sha256": "1bf9a7b37b25a8c9d63d63ce1449b31edc1e72f0e2192182cb036be5e8c832d1",
+      "cases": 69,
+      "failure": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    "shared-camera-final.xml": {
+      "path": "docs/object-display/recognition-validation/shared-camera-final.xml.gz",
+      "original_sha256": "3686e19472008b6ab7f2c01226a343a74cc6ebab3f83808e28f749eada8c042b",
+      "compressed_sha256": "6292af116d569b9b01bfdcb56e10c94d4d99b176b8fb2be0772ea97738889e97",
+      "cases": 58,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "subscriptions.xml": {
+      "path": "docs/object-display/recognition-validation/subscriptions.xml.gz",
+      "original_sha256": "5a218e60e0d1e6c87cf320a1dfc3c23753ff262b80d9d9821539b39f22d81baa",
+      "compressed_sha256": "73e9d475444cedfbcd64b14e96ee9c2aeefaa19b096018f55d43e088cd86f572",
+      "cases": 71,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "architecture.xml": {
+      "path": "docs/object-display/recognition-validation/architecture.xml.gz",
+      "original_sha256": "b45110a982decba04d62412256bbb809bd5cce12a044122f2e82c731677ba371",
+      "compressed_sha256": "d8c821a422d72deeda6a890a51cb49a5d99b2d363c84e9d82b4f117db82d69ca",
+      "cases": 24,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "focused-final.xml": {
+      "path": "docs/object-display/recognition-validation/focused-final.xml.gz",
+      "original_sha256": "de8b87f40f882752703726f35df376ffc60d865e4dabeadb9dd7bb29caa4427a",
+      "compressed_sha256": "92345093fed0d9d1e2e7f6e14a7e7b41ef84c691c9627eeb0a7d0d24508a2ef3",
+      "cases": 97,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "publication-final.xml": {
+      "path": "docs/object-display/recognition-validation/publication-final.xml.gz",
+      "original_sha256": "1efe1855c4ca3dfa152e4750f4905157ee6b67d17039e3459896f95a2f5c6f7f",
+      "compressed_sha256": "6aa4191ee2ff65b189f5a9410785c10f74f4557b86b57e3dc3c6835d6e467a40",
+      "cases": 3,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "lifecycle-final.xml": {
+      "path": "docs/object-display/recognition-validation/lifecycle-final.xml.gz",
+      "original_sha256": "c141ded1075a92d63e468a65481b6cf8bfadb99818beb730eb1ca0f200fbebeb",
+      "compressed_sha256": "991caa7f8237734cdf95d8d18152afeca2c95e2831acc59edd07e22b7e0c3f55",
+      "cases": 5,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "full-sandbox-initial.xml": {
+      "path": "docs/object-display/recognition-validation/full-sandbox-initial.xml.gz",
+      "original_sha256": "8a15da499e9fc3e71037bda277bcb854e63b859b8dfdd510862115f6c9629a01",
+      "compressed_sha256": "3de08a4bb30092e9c1ccbd8ba138837c254662efa2f040de2e7544c5571a6cde",
+      "cases": 1380,
+      "failure": 42,
+      "error": 0,
+      "skipped": 24
+    },
+    "full-native.xml": {
+      "path": "docs/object-display/recognition-validation/full-native.xml.gz",
+      "original_sha256": "20eb50500fb373ddcef89c5fe0f902b341be48ebc8507e588d215e9c4f84078f",
+      "compressed_sha256": "655a0f7da0db25d39b2147b569f834e410ebca134d6f03f8bb08b68ad134e66c",
+      "cases": 1389,
+      "failure": 0,
+      "error": 0,
+      "skipped": 24
+    }
+  },
+  "source_sha256": {
+    "behaviors/mobile_observe.py": "8a0060ee3d3bad3536d281bea9f1de3af2937baef4035ee295af962c258900ed",
+    "experiments/ppal/camera_session.py": "dcefb9af94c49058ddfd60167159d16f5a75abfd3ca05422b4b72777803eff38",
+    "experiments/ppal/eyes/active_vision.py": "e65c3c71df28e7edf93fcef962712a85c069a13d2b47419b00c1e4e49b3ddf69",
+    "experiments/ppal/eyes/camera_lease.py": "cf837e9e3a75df78514b3dcd648eeaaf2d232a151bcc339c874b171eba90d206",
+    "experiments/ppal/eyes/passive.py": "659161a3105d2e8102472c0d681c333281e2376bf7873033af44ff8e413fabd8",
+    "experiments/ppal/eyes/passive_viewer.py": "43fe8d932d05688c22aa7b06d4c6bd8a0e8d44ecd333da1d5c0433d9b3ec67be",
+    "experiments/ppal/eyes/run_active_vision.py": "c9667bfaca9c356575a3d58ce1f32572b82f056065f3f0c48105450c317eb215",
+    "hardware/elegoo_camera.py": "80b2dbcd356ec989a4e966cd61ec815dbe79e28d173d596c0c4f63fdbfe017b0",
+    "learning/mobile_runtime.py": "4cba46206f87beb417f541f099c00e919826345b094d68211a3cb71bb8a4a10f",
+    "main.py": "b59029748ad104064326313a3b07ff08c8f56d2e9affa5058fb3de48322c87e5",
+    "stimulus/bus.py": "396108917b6a93f430862e765d0d5f11b26dc608a079a99c1deb2b523a4693fe",
+    "stimulus/keyboard.py": "4332474ad7ff8b566a1f0ed773fa77f34dde54a781353889f584c1c6fb7af9c6",
+    "tests/test_brain_calibration.py": "001630f3a13eca7193b57f07f426d184d95b5856d7b036d486627ab350a8eb37",
+    "tests/test_calibration_integration.py": "0b91600caf958f4e0ae965dd3a37320dacd693272705c7ae0e0e08c2d15c3959",
+    "tests/test_camera_sources.py": "cf5fe68fa78ef78142bb6680831d48e15209a0c3cc2f474188e1940aec358027",
+    "tests/test_mobile_continuation.py": "e5a4d71b5c1d43731eb1789062c538af1e9a05a9ff75a56ba2cb19e001358eb2",
+    "tests/test_mobile_perception.py": "a0ce645d1b7324f32668997899858cbbaa10d4bf1a90de2aefc33539ac11ef70",
+    "tests/test_normal_learning_lifecycle.py": "9a11dbaae5805a9954b7579661d367eb9f84a99260dd0c783813ffceb481ea90",
+    "tests/test_passive_eyes.py": "0049b29b8b888a4a1c6b57e0e982647162989ad6a7e7c771620be45479b0519b",
+    "vision/camera.py": "3f0f62a5833eb994fa50de9c13915b4e7dad5d7a05ff46e2bba27592facdf0c3",
+    "vision/camera_source.py": "7f8c02bc5aa9613e7bf14db6ba8fd214c37356995719a816aa4f96a37bca14f5",
+    "vision/mobile_perception.py": "0b628fe5d910117d49295835d17a2944b2bd869bcb06e59d424faef2c9b4f012",
+    "vision/stimulus.py": "ebe4f2d6e6dd6718ff0693fc459e7de0686c3f06d1b908090632c1f77187073d",
+    "vision/tracker.py": "14671c8a12821d152f2208081308f0ccf3837904554f68ca66321568d1110a3d",
+    "learning/object_runtime.py": "ad4ca4420a33e50c6f20c43d39e16734ee8c5043391ae8220877b5514adae022",
+    "tests/camera_application_fixture.py": "4a2b3eb7bd71ef813279ee2fb46d3486eba46f0b70d7e7a82089794cb912d1c5",
+    "tests/conftest.py": "3aa5975250e5371592c8b4d1418237b426785a91d5c1b2dc0ac714162a2bce9e",
+    "tests/test_object_recognition.py": "20bdba9179238ce6ab5a57ff0370987ef543ac200144fff7b8e970956744c7ca",
+    "tests/test_published_frame_subscription.py": "13d8ab8d9d12b8e7d6c1d7493d70a98bc64a3f08175a4aedabc6c2512e067257",
+    "vision/object_recognition.py": "bb3f37b3b9c41a989e4c70dbc4fd56b16fa14f2ddf3f8628c82761a5a4657f03"
+  },
+  "full_native": {
+    "passed": 1365,
+    "skipped": 24,
+    "failures": 0,
+    "seconds": 455.06,
+    "scope": "native loopback device-free full suite before final mobile CLI subscription/poll-accounting refinements; final focused tests cover those refinements"
+  },
+  "final_focused": {
+    "passed": 97,
+    "failures": 0,
+    "scope": "final code, including mobile CLI no-feeder regression"
+  },
+  "installed_model": {
+    "path": "/home/five/charlie-mobile-models/yolov8n-hailo8l.hef",
+    "classes": 80,
+    "input_size": 640,
+    "sha256": "90e2cdad2875f23fb436ecdba88b4789de3bd8112cdf6b34beb1c8aa9fd7eed1",
+    "verification": "read-only installed bytes match existing manifest; no inference activation"
+  },
+  "limitations": [
+    "Local native suite: 24 skips (torch 18, Node/browser 3, archived originals 2, collection 1). Independent final-code CI: 21 skips; Node/browser checks execute there.",
+    "No physical camera, UART, firmware flash, servo/motor, navigation or policy activation",
+    "Physical accuracy, shared native throughput, thermals, lens configuration and display timing remain unqualified"
+  ],
+  "earlier_receipts": "Failures and interruption remain historical; they are not relabeled as passing tests",
+  "github_actions": {
+    "source_commit": "217a329fc8850dac92ccbd38387b65a644eb8abb",
+    "source_tree": "26868e0212d235d5517d3cb7265d370f495f220f",
+    "run_id": 40252336655,
+    "job_id": 121346749169,
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/40252336655",
+    "conclusion": "success",
+    "passed": 1370,
+    "skipped": 21,
+    "failures": 0,
+    "seconds": 306.31,
+    "scope": "independent GitHub Actions full suite of exact published final runtime/test code",
+    "artifact": {
+      "id": 12620294978,
+      "name": "object-label-software-tests",
+      "digest": "sha256:6bb1a6e13fc60b96196522cd74d9f7b76f1bd83038702d0fcc7ced49fd031fb5"
+    },
+    "retained_log": {
+      "path": "docs/object-display/recognition-validation/github-ci.txt",
+      "sha256": "7bf148dc11854cd8aa0bf11c35fc81ce3aaff79be9a4e77622513690e9823106"
+    }
+  }
+}

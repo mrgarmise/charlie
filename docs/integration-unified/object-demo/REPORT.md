@@ -31,7 +31,7 @@ It had no operational/authenticated robot channel. The added browser UI calls th
 opt-in adapter in Charlie itself via an operator's SSH forward, with same-origin
 local fallback if browser local-network rules block hosted-to-loopback requests.
 No hosted robot backend or public listener was introduced. Inventory/history and
-Site access are retained. Site source/deployment IDs will be recorded after publication.
+Site access are retained. Final Site source/deployment IDs are recorded below.
 
 ## Software evidence
 
@@ -92,3 +92,46 @@ The correction keeps application shutdown/quit ahead of demo work and checks dem
 cancellation/expiry before label refresh. New tests cover both, alongside the repeat
 normal-app test. Corrected focused selection: 88 passed, 2.96 s
 (`validation/bounds-focused.txt`). Native timing remains unqualified.
+
+## Final verification and handoff — 2026-10-31
+
+Corrected implementation: `77d7e3434229101a8612a81de69260b75925ed34`
+(local `17fb1d0`), tree `5d4745ebb18650d916d9c4a624d4431bd3c9269c`.
+The CI merge `62a25f57f2f98eb79b8e2bc03c67f78a0792fdf5` has exactly the
+same tree. All three independent workflows completed successfully on October 29,
+verified October 31: **1,600 passed, 21 skipped, one warning** in each:
+
+- [Unified integration](https://github.com/mrgarmise/charlie/actions/runs/40905354884): 310.05 s.
+- [Shared sensory audit](https://github.com/mrgarmise/charlie/actions/runs/40905354997): 350.41 s.
+- [Best of Charlie](https://github.com/mrgarmise/charlie/actions/runs/40905354962): 328.69 s.
+
+Exact checkout and result lines are in `validation/ci-summary.json`. Final clean
+focused and conformance checks passed (88 and 129 respectively; overlapping), with
+logs `bounds-clean-focused.txt` and `bounds-conformance.txt`.
+
+The clean full local run on the first implementation (`58cda83`) had **3 failed,
+1,595 passed, 21 skipped**, 360.34 s (`clean-full.txt`, `clean-full.xml`). The
+calibration normal-main test timed out; two Robotron terminal/restart tests reported
+evidence-writer saturation. Rechecking those three against corrected `17fb1d0`
+gave **2 failed, 1 passed**: calibration passed, the same two writer failures remained.
+Running the same three on unchanged starting revision `ef41b4d` also gave
+**2 failed, 1 passed**, with the same writer saturation failures (`recheck-three.txt`,
+`baseline-three.txt`). These local failures are retained, not recast as passes;
+unrelated writer behavior and safety expectations were not altered. Independent CI
+passed the full suite as recorded above.
+
+The existing owner-private dashboard was deployed successfully on October 31 at
+15:15:54 UTC, retaining its access settings:
+https://charlie-project-dashboard.garmiseprojects.chatgpt.site .
+Site source: `75bf5897e8adc262de500e5cf4b96651421e9ba5`.
+Deployment: `appgdep_6ae6062500848191aa704477bf71d5c4`.
+Saved version: `appgprj_6ad39fb624888191ae560b8058e856a7~appgver_68101df5abbc819199ced2b0b8412369`.
+The packaged static source was verified against that source commit. The Abilities
+page still requires the operator's opt-in authenticated Charlie endpoint and SSH
+forward; static deployment alone does not connect to or run Charlie.
+
+PR #13 remains draft and unmerged. Native installation, two supervised demonstrations,
+physical display observation, frame provenance, cancellation/restart and measured
+timing remain pending under [the operator runbook](README.md). No Pi deployment,
+motion or firmware change occurred. This final increment records evidence only;
+the tested implementation is unchanged.

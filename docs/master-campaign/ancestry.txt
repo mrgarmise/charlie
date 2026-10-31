@@ -1,0 +1,128 @@
+* 9c4d899 Expire displayed frames by source age and expose qualified transport limits
+* 8f2a4b1 Bind overlays to retained decision pixels and qualify persistent manual request sequences
+* 3537833 Add shared Mobile Body console with leased qualified manual requests
+| * 6aa55ab Expire displayed frames by source age and expose qualified transport limits
+| * edd2928 Bind overlays to retained decision pixels and qualify persistent manual request sequences
+| * 1ca0bd8 Add shared Mobile Body console with leased qualified manual requests
+| * fa8c71e Restore pinned published PR 13 dashboard baseline 77d7e34
+| * 8f3b988 Bind each overlapping STOP diagnostic to its own command
+| * 6dfa292 Preserve STOP receipt compatibility while recording separate wire diagnostics
+| * 7b1cca8 Retain disconnect evidence and integrate measured STOP deadline into face preparation
+| * 17708e9 Prepare supervised shared face trials and reject invalid pan acknowledgments
+| * 7707c53 Use firmware-timed N2 for qualified ELEGOO pulses and require completion acknowledgments
+| | * 097f110 Record object demonstration CI evidence and dashboard handoff
+| |/  
+|/|   
+* | 77d7e34 Preserve application shutdown and label expiry ahead of demonstration work
+* | 23d2b07 Add bounded operator object demonstration through existing attention and display
+* | ef41b4d Bind each overlapping STOP diagnostic to its own command
+* | 57e6290 Preserve STOP receipt compatibility while recording separate wire diagnostics
+* | df54a8d Prepare supervised shared face trials with strict pan replies and preserved native evidence
+* | f2a879a Allow bounded 150 ms STOP acknowledgment after measured 85 ms reply
+* | 95a7cd5 Use firmware-timed N2 for qualified ELEGOO pulses and require completion acknowledgments
+|/  
+* 08ae83f Route standalone Active Vision through the qualified RP2040 gateway
+* 1dce735 Migrate Head 2 diagnostic to shared actuator and camera ownership
+* 08b74e0 Attach legacy Head 2 entry to shared application ownership
+* d716710 Reuse original face-search preference at the sentry decision
+* caa9578 Preserve face-search outcomes through existing lifecycle memory
+* 4ace930 Keep disarmed RP2040 observation passive and test freshness contracts
+* a1ded33 Recheck capture age throughout pet motion
+* dccdce6 Route normal Deck motion shortcuts through the RP2040 gateway
+* 8ad73fd Keep STOP wire access independent of slow safety evidence checks
+* 550de77 Bound safety evidence age from capture through dispatch
+* 531f4a9 Keep idle face yielding from interrupting selected pet motion
+* afde441 Keep native application fixtures compatible with emergency callback
+* f89119b Prepare native validation and evidence-preserving rollback handoff
+* 5e174a3 Publish RP2040 state and preserve emergency-stop loss semantics
+* 7f5bbf2 Share primary vision and CAL-1 with normal mobile attention
+* 3bc299f Run shared pet object and face abilities with direct emergency STOP
+* 9aeee49 Fence RP2040 requests and latch emergency stops across behaviors
+* 21cf79a Bind shared actuator admission to independent evidence and durable uncertainty
+* 95d1d66 Route face and pet requests through shared ELEGOO transport and publish bounded telemetry
+* 615f0ae Prevent duplicate qualified executors on a live transport
+* 51d540e Serialize qualified mobile dispatch and preempt with STOP
+* 225d05e Fail closed legacy ELEGOO motion pending qualified migration
+* eba2d33 Preserve interrupted host suite and baseline failure reproduction
+* 4328f23 Add a focused unified contract test entrypoint
+* a64f5ee Latch ambiguous mobile stop outcomes for executor session
+* d79f613 Record reconciliation test provenance and native acceptance limits
+*   ed32fce Reconcile pet executive with shared sensory publication
+|\  
+| * 9c1319d Reject negative mobile stopping measurements and preserve native readiness audit
+| * cafe21a Publish pet integration evidence, reproduced host limitations and precise native acceptance handoff
+| * 0536888 Expose recovered native evidence to the same active Executive portfolio during pet attention
+| * b678268 Separate proxy, live-pet and operation grants; latch uncertain stopping and expose staged acceptance tools
+| * 1e6cad5 Enforce exclusive body and camera leases and direction-specific staged qualification
+| * 2640629 Revalidate pulse safety context and retain independent qualification and evaluation evidence
+| * b3eab6e Wire elective pet abilities into normal AttentionManager and existing Executive portfolio
+| * 4ecc13e Add qualified bounded ELEGOO execution and independent mobile deployment boundary
+* | ae09f52 Record full host and independent CI sensory audit qualification
+* | ed37a3a Document canonical sensory contracts and add bounded shared frame history
+* | a19c908 Record independent final-code camera subscription and recognition CI qualification
+* | 217a329 Make camera capabilities subscription-only and add normal stationary object recognition
+* | 4d14e0e Share identity-preserving Pi and ELEGOO camera sources with exclusive lifecycle ownership
+* | 30eeea7 Record successful independent host and GitHub validation with native limits
+* | 469a10f Fetch recovery history required by existing firmware rollback regression
+* | 8e8626c Document independently verified object-label software and native qualification gaps
+* | dc8b4a6 Validate stacked object-label feature in software-only CI
+* | 19a12fc Connect existing observations and attention to opt-in object labels with no-device replay
+* | d75f672 Add negotiated low-priority object labels and cooperative pico:ed scroll
+|/  
+* 96e6513 Publish continuation validation, native runbook and remaining physical gates
+* c2ec29e Bound image-motion association and expose expired animal track lifecycle
+* 4c98adb Preserve legacy Hailo inference and expose provisional animal observation opportunities
+* 490d1e5 Add sourced spatial-depth preparation and Executive-selected native label review
+* a21ec45 Add bounded stationary recovery and reusable cooperative Hailo sessions
+* 8e98a46 Preserve native prediction evidence and track animals across species flips
+* 95c769f Recover native mobile evidence provenance and continuation blockers
+* a25b2b7 Publish exact-source mobile validation, runbook and open qualification gates
+* 429a47d Require target-associated range and reject malformed mobile telemetry
+* 91a8083 Integrate unarmed mobile behavior, durable Executive evidence and reproducible replay
+* 2642821 Add species tracking and independent fail-closed navigation proposal gates
+* c02ea08 Extend existing ELEGOO camera with bounded mobile perception and Hailo adapters
+* 3c5735f Audit historical ELEGOO pipeline and mobile qualification boundaries
+| * d360514 Prepare authentic Robotron evidence with atomic offline batch review
+| * e0d94e1 Separate registered perception tasks from reusable model learning data and evaluation
+| * b07b614 Reconcile scoped integration hooks and count retained model learning progress once
+| * f4e6c3b Preserve sensory and human architecture in disposable integration validation
+| * b0b1e13 Strengthen model commissions and resource gates with localization evidence and integration CI
+| * 5c0d51a Add Executive-owned guarded perception model learning in shadow mode
+|/  
+| * fb22d74 Prepare authentic Robotron evidence with atomic offline batch review
+| * f478977 Separate registered perception tasks from reusable model learning data and evaluation
+| * 1e7fe7c Reconcile scoped integration hooks and count retained model learning progress once
+| * e6ee1c1 Preserve sensory and human architecture in disposable integration validation
+| * 40c3037 Strengthen model commissions and resource gates with localization evidence and integration CI
+| * 1cf0fb9 Add Executive-owned guarded perception model learning in shadow mode
+|/  
+| * 4bb3bff Publish independent validation receipts, synthetic UI screenshot and pending acceptance
+| * eb0128d Serialize lifecycle changes and validate concurrent answers and interrupted intake
+| * 6b2317c Add atomic requester review intake, browser CI and operator runbook
+| * 50665a5 Add Executive-derived asynchronous questions and journal-backed human evidence
+|/  
+| * 9ba60e2 Consolidate native campaign preflight with provenance-preserving readiness report
+| * 28abb7b Restore durable three / meditation / three Robotron campaign
+| * bd9b323 Publish protected-window root cause, regression receipts and pinned handoff
+| * c8db987 Drain protected SELF windows to bounded lossless storage during acquisition
+| * 02f5c94 Publish coordinated visual-readiness recovery receipts and pinned Pi handoff
+| * 795db6c Share qualified visual readiness and preserve unchanged-focus geometry continuity
+| * db3a097 Publish October 24 controller interface regression receipts and pinned handoff
+| * 0045857 Forward supervised controller keyword arguments through SELF discovery
+| * bb39d17 Retain native recovery stop evidence and reconcile existing operator acceptance
+| * 0b40569 Recover transient final border misses and enable bounded integrated learning trial
+| * bb77fb6 Publish pinned controller lease reconciliation, receipts and ARMv6 handoff
+| * d6ef07b Require progressing controller lease in native two-game runner
+| * aaf36ac Connect retained evidence to guarded gameplay policy and prepare native foreground trial
+| * e2f265c Preserve native integration receipts and correct causal test fixture pacing
+| * 2d75f5a Integrate native marathon, guarded score proposals and retained learning diagnostics
+| * 7dcea80 Recover native marathon session and define offline reserve-life support
+| * 716212c Reject invalid stream focus and duplicate meaningful exposures; record native marathon qualification
+| | * 7189261 Prepare independent native foreground trial runner and operator preflight
+| | * f7a043b Connect frozen retained response evidence to guarded gameplay policy interface
+| | * 5608bd6 Preserve native integration receipts and correct causal test fixture pacing
+| | * 6a46319 Integrate native marathon, guarded score proposals and retained learning diagnostics
+| | * f43bb2b Recover interrupted session and define offline reserve-life evidence semantics
+| | * ab9ced5 Reject invalid stream focus and duplicate meaningful exposures; qualify native marathon software
+| | * b197bb9 Reconstruct PR 5 text baseline for isolated native marathon audit
+| | | * b4f2588 Add score crop and CTC diagnostics with exact-zero and ONNX safeguards

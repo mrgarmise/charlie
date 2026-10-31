@@ -42,7 +42,7 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
         lifecycle.callback(recognition.close)
         recognition.select_camera(args.camera_source)
         face_runtime = None
-        if actuator_executor is not None:
+        if actuator_executor is not None and args.elegoo_face_track:
             from behaviors.mobile_face_runtime import MobileFaceRuntime
             face_runtime = MobileFaceRuntime(frame_bus,recognition.attention_bus,actuator_executor)
             lifecycle.callback(face_runtime.close)
@@ -68,6 +68,9 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
                     recognition.select_camera(previous)
             return Borrow()
         demonstration=attach_dashboard(args,resources,frame_bus,recognition.attention,lifecycle,factory=borrow_recognition)
+        if getattr(args,'mobile_dashboard',False) and not args.abilities_dashboard:
+            from ui.dashboard import attach_mobile
+            attach_mobile(args,frame_bus,lifecycle,executor=actuator_executor)
         telemetry_at = 0.
         keyboard = KeyboardStimulus(bus, object_mode=True,
             on_emergency=actuator_executor.emergency_stop if actuator_executor is not None else None)

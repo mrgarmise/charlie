@@ -7,6 +7,8 @@ from vision.object_observation import object_observation
 
 class ObjectRecognition:
     def __init__(self, frame_bus, perception, evidence, bus, labels=None, *, attention=None):
+        from vision.detection_publication import DetectionPublication
+        self.publication=DetectionPublication(frame_bus)
         self.perception, self.evidence, self.bus = perception, evidence, bus
         from stimulus.bus import StimulusBus
         self.owns_attention = attention is None
@@ -18,6 +20,7 @@ class ObjectRecognition:
         self.generation = None
 
     def invalidate(self, reason):
+        self.publication.invalidate(reason)
         self.attention.object_attention = None
         self.attention.visual_target = None
         self.attention.handle_event('object_observation_fault', None)
@@ -76,6 +79,7 @@ class ObjectRecognition:
             row = self.evidence.record(observation, tracking, proposal, execution)
             self.evidence.opportunities(row.id)
             packet = object_observation(observation)
+            self.publication.publish(object_observation(observation, tracking))
             if getattr(self, 'output_allowed', lambda: True)():
                 self.attention.handle_event('object_observation', packet)
                 if self.attention.object_labels is not None:self.attention.object_labels.tick()
@@ -88,6 +92,7 @@ class ObjectRecognition:
         if self.closed:
             return
         self.stopped = True
+        self.publication.close()
         try:
             if self.owns_attention:self.attention.close()
             elif self.attention.object_labels is not None:

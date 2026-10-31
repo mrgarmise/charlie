@@ -1,0 +1,22 @@
+# User-unit TEMPLATE. Not installed/enabled by this mission.
+# Stop/reconcile the existing Charlie application before selecting this startup.
+[Unit]
+Description=Charlie application with authenticated Mobile Body monitoring
+After=default.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/charlie-mobile-console
+EnvironmentFile=%h/.config/charlie/mobile-console.env
+# Safe preparation default: existing offline Executive, no device initialization.
+# A reviewed native startup may replace --offline with --hardware only after
+# the documented stationary-read/native qualification gates. Never flash here.
+ExecStart=%h/Projects/charlie/.venv/bin/python main.py --offline --mobile-dashboard
+KillSignal=SIGINT
+TimeoutStopSec=10
+Restart=no
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

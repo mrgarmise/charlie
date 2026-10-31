@@ -39,7 +39,7 @@ def validate_actuator_report(report):
         require_timed_motion(protocol)
         if (protocol.get('local_expiry_verified') is not True
                 or protocol.get('motion') != {'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}
-                or set(envelope.get('directions',[])) != {'LEFT','RIGHT'}
+                or not {'LEFT','RIGHT'} <= set(envelope.get('directions',[])) <= {'LEFT','RIGHT','FORWARD','REVERSE'}
                 or type(envelope.get('max_pwm')) is not int or not 1 <= envelope['max_pwm'] <= 35
                 or not finite(envelope.get('max_duration')) or not 0 < envelope['max_duration'] <= .2
                 or not finite(envelope.get('max_stop_seconds')) or not 0 < envelope['max_stop_seconds'] <= .5
@@ -67,7 +67,7 @@ def validate_actuator_report(report):
         trials = report.get('trials',{}).get(stage,[])
         if len(trials) < 3:
             raise ValueError('three independent trials required: '+stage)
-        direction_counts = {'LEFT': 0, 'RIGHT': 0}
+        direction_counts = {direction: 0 for direction in envelope.get('directions',[])} if group=='chassis' else {}
         for ref in trials:
             trial = artifact(ref)
             if (trial.get('authentic') is not True or trial.get('passed') is not True
@@ -184,6 +184,26 @@ class ActuatorSafetyAuthority:
                 or abs(measured-expected) > 2):
             raise PermissionError('independently measured pan disagrees with tracker')
         return feed
+
+    def measured_pan(self, evidence, *, boot_id):
+        """Read existing independent feed; command receipts never supply pose.
+
+        This is an interpretation of an already produced snapshot, not a sensor
+        acquisition or motion grant. Actual admit/safe repeat all checks.
+        """
+        from types import SimpleNamespace
+        _, report = self.active('chassis',boot_id)
+        if getattr(evidence,'authentic',False) is not True or evidence.source!='elegoo-v4':
+            raise PermissionError('authentic source required')
+        if self.feed is None or self.feed.stat().st_size>256*1024:
+            raise PermissionError('independent safety feed absent')
+        candidate=json.loads(self.feed.read_text()).get('pan_degrees')
+        request=SimpleNamespace(source=evidence.source,observation_id=evidence.id,group='chassis',
+                                parameters={'expected_pan_degrees':candidate})
+        snapshot=self._snapshot(request,report,boot_id)
+        if snapshot.get('frame_sha256')!=evidence.metadata()['sha256']:
+            raise PermissionError('independent pose not bound to decision pixels')
+        return snapshot['pan_degrees']
 
     def admit(self, request, evidence, *, boot_id):
         activation, report = self.active(request.group,boot_id)

@@ -112,3 +112,38 @@ def test_feed_capture_age_includes_time_since_feed_was_written(tmp_path):
     request=ActuatorRequest('r','face','camera-pan','pan',10.,'elegoo-v4','f',{'degrees':100,'expected_pan_degrees':90})
     with pytest.raises(PermissionError):authority.admit(request,SimpleNamespace(authentic=True,metadata=lambda:{'sha256':'pixels'}),boot_id='boot')
     journal.close()
+
+
+def test_manual_pan_reads_only_independent_frame_bound_measurements(tmp_path):
+    report=fixture_report(tmp_path,'chassis')
+    feed=dict(schema='charlie.actuator.safety.v1',boot_id='boot',hardware_id='fixture',zone='fixture',
+        source='elegoo-v4',observation_id='f',firmware_sha256='a'*64,producer_sha256='c'*64,at=10.,
+        capture_timing_verified=True,capture_age_seconds=.1,frame_sha256='pixels',power_ok=True,human_clear=True,
+        animal_clear=True,stop_available=True,zone_inspected=True,floor_clear=True,blind_spots_clear=True,
+        lateral_clear=True,pan_degrees=90.)
+    path=tmp_path/'feed.json';write(path,feed)
+    authority=ActuatorSafetyAuthority(None,hardware_id='fixture',zone='fixture',feed=path,clock=lambda:10.)
+    authority.active=lambda *a:({},report)
+    frame=SimpleNamespace(authentic=True,source='elegoo-v4',id='f',metadata=lambda:{'sha256':'pixels'})
+    assert authority.measured_pan(frame,boot_id='boot')==90
+    feed['frame_sha256']='other';write(path,feed)
+    with pytest.raises(PermissionError):authority.measured_pan(frame,boot_id='boot')
+    feed['frame_sha256']='pixels';feed['at']=9.;write(path,feed)
+    with pytest.raises(PermissionError):authority.measured_pan(frame,boot_id='boot')
+
+
+def test_forward_reverse_never_inherit_pivot_only_measurements(tmp_path):
+    report=fixture_report(tmp_path,'chassis')
+    report['envelope']['directions'] += ['FORWARD','REVERSE']
+    with pytest.raises(ValueError,match='three separate trials per chassis direction'):
+        validate_actuator_report(report)
+    for stage in ('wheels_up','floor_braking'):
+        for direction in ('FORWARD','REVERSE'):
+            for i in range(3):
+                trial=json.loads(open(report['trials'][stage][0]['path']).read())
+                name=f'{stage}-{direction}-{i}'
+                trial.update(direction=direction,trial_id=name)
+                raw=tmp_path/(name+'.raw');raw.write_text('synthetic '+name)
+                trial['raw_artifacts']=[dict(path=str(raw),sha256=hashlib.sha256(raw.read_bytes()).hexdigest())]
+                report['trials'][stage].append(write(tmp_path/(name+'.json'),trial))
+    assert validate_actuator_report(report)==report

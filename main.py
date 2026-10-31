@@ -66,6 +66,7 @@ def parser():
     p.add_argument('--object-label-display',choices=['off','dry-run','rp2040'],default='off',help='opt-in stabilized object labels; rp2040 needs reviewed firmware and separately authorized hardware use')
     p.add_argument('--object-label-port',default='/dev/ttyACM0')
     p.add_argument('--object-label-replay',type=Path,help='no-device JSONL event-to-display diagnostic')
+    p.add_argument('--mobile-dashboard',action='store_true',help='Mobile Body page on the existing authenticated Pi dashboard; motion independently gated')
     p.add_argument('--abilities-dashboard',action='store_true',help='authenticated in-process operator ability endpoint; explicit hardware required')
     p.add_argument('--abilities-port',type=int,default=8768)
     p.add_argument('--abilities-origin',default='https://charlie-project-dashboard.garmiseprojects.chatgpt.site')
@@ -152,6 +153,13 @@ def main(argv=None):
     if args.list_capabilities:
         from learning.capabilities import default_registry
         print(json.dumps(default_registry().describe(),indent=2));return
+    if args.mobile_dashboard:
+        monitor=os.environ.get('CHARLIE_OPERATOR_TOKEN' if args.abilities_dashboard else 'CHARLIE_MONITOR_TOKEN','')
+        drive=os.environ.get('CHARLIE_DRIVE_TOKEN')
+        if len(monitor)<32 or any(c.isspace() for c in monitor):raise ValueError('strong monitoring credential required before startup')
+        if drive is not None and (len(drive)<32 or any(c.isspace() for c in drive) or drive==monitor):
+            raise ValueError('separate strong drive credential required')
+        if not 1<=args.abilities_port<=65535:raise ValueError('invalid dashboard port')
     if args.abilities_dashboard:
         if args.offline or args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow or args.elegoo_face_track:
             raise ValueError('operator demonstration requires normal primary or stationary object runtime; active body services have no safe interruption contract')
@@ -228,7 +236,12 @@ def main(argv=None):
             run_mobile(args,resources)
         return
     if args.offline:
-        run(args.learning_state,roots,**kwargs)
+        with ExitStack() as lifecycle:
+            if args.mobile_dashboard:
+                from stimulus.bus import StimulusBus
+                from ui.dashboard import attach_mobile
+                attach_mobile(args,StimulusBus(),lifecycle)
+            run(args.learning_state,roots,**kwargs)
         return
     # Spawn a single application-owned child; no hardware objects are inherited.
     process=multiprocessing.get_context('spawn').Process(target=run,args=(args.learning_state,roots),kwargs=kwargs)
@@ -243,6 +256,20 @@ def main(argv=None):
             process.start()
             next_worker_restart=time.monotonic()+5.
     try:
+        mobile_only = args.mobile_dashboard and not any((args.abilities_dashboard,args.object_recognition,
+            args.elegoo_face_track,args.primary_vision))
+        if mobile_only:
+            with ExitStack() as lifecycle:
+                frame_bus=lifecycle.enter_context(application_camera_feeders(args,selected=('elegoo',)))
+                executor,telemetry=lifecycle.enter_context(application_mobile_actuators(frame_bus,
+                    state=args.learning_state,hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.actuator_safety_feed))
+                from ui.dashboard import attach_mobile
+                attach_mobile(args,frame_bus,lifecycle,executor=executor)
+                while True:
+                    supervise_development()
+                    telemetry.poll()
+                    time.sleep(.1)
+            return
         if standalone_face:
             from learning.face_trial import run_face
             with application_camera_feeders(args,selected=('elegoo',)) as frame_bus:
@@ -254,7 +281,7 @@ def main(argv=None):
         if args.object_recognition:
             from learning.object_runtime import run_objects
             with application_camera_feeders(args) as frame_bus:
-                if args.elegoo_face_track:
+                if args.elegoo_face_track or args.mobile_dashboard:
                     with application_mobile_actuators(frame_bus,state=args.learning_state,hardware_id=args.mobile_hardware_id,
                             zone=args.mobile_zone,feed=args.actuator_safety_feed) as (executor,telemetry):
                         run_objects(args,resources,frame_bus,supervise=supervise_development,
@@ -315,6 +342,9 @@ def main(argv=None):
                 lifecycle.callback(face_runtime.close)
             from ui.dashboard import attach_dashboard
             demonstration=attach_dashboard(args,resources,frame_bus,attention,lifecycle)
+            if not args.abilities_dashboard:
+                from ui.dashboard import attach_mobile
+                attach_mobile(args,frame_bus,lifecycle,executor=executor)
             last_telemetry=0.
             last_neck_telemetry=0.
             bus.emit('idle')

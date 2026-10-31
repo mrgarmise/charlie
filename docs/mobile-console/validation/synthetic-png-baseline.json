@@ -1,0 +1,22 @@
+{
+  "kind": "SYNTHETIC encoding only; no live camera or HTTP transport",
+  "machine": "aarch64",
+  "python": "3.13.5",
+  "frames": 20,
+  "geometry": [
+    640,
+    480
+  ],
+  "format": "lossless PNG baseline; random incompressible BGR fixture",
+  "encoding_seconds": {
+    "p50": 0.05101936849996491,
+    "p95": 0.056172608349925233,
+    "max": 0.08182616799990683
+  },
+  "mean_encoded_bytes": 923407.05,
+  "elapsed_seconds": 1.0947382350000225,
+  "synthetic_encode_throughput_fps": 18.910871992769714,
+  "live_camera_fps": null,
+  "exposure_latency_seconds": null,
+  "transport_latency_seconds": null
+}

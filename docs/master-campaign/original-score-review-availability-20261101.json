@@ -1,0 +1,15 @@
+{
+  "path": "/home/five/.local/share/charlie/score-review/learning-evidence.sqlite3",
+  "sha256": "ee612110302b40d89b977fc7dbb57ae2dc3a2ac09f7482bd78aa83d682464d21",
+  "bytes": 15142912,
+  "read_only": true,
+  "immutable": true,
+  "sidecars": [],
+  "category_counts": {
+    "score_human_annotation": 8,
+    "score_review_source": 13,
+    "score_review_status": 16
+  },
+  "source_preserved": true,
+  "acceptance": "Availability inventory only; original photograph binding, finalized reviews, heldout benefit and native qualification not repeated or claimed"
+}

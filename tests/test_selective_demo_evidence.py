@@ -10,6 +10,7 @@ from vision.mobile_perception import FrameArtifactStore, SelectiveFrameArtifacts
 def test_full_store_preserves_pixels_and_keeps_real_pipeline_observing(tmp_path):
     s = setup_session(tmp_path)
     store = FrameArtifactStore(tmp_path/'pixels', max_bytes=1)
+    store.retain = Mock(wraps=store.retain)
     s.session.artifact_store = SelectiveFrameArtifacts(store)
     try:
         s.session.select_camera('pi')
@@ -25,6 +26,7 @@ def test_full_store_preserves_pixels_and_keeps_real_pipeline_observing(tmp_path)
             assert row['provenance']['frame']['artifact'] is None
             assert not row['motion_authorized']
         assert s.session.perception.stats['processed'] == 10
+        assert store.retain.call_count == 1
         assert s.labels.current == ('pi-primary', 'CHAIR')
         assert not list(store.directory.glob('*.png'))
     finally:

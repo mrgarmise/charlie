@@ -211,6 +211,7 @@ class SelectiveFrameArtifacts:
         self.store, self.interval, self.max_samples = store, interval, max_samples
         self.last_at = self.last_labels = None
         self.samples = 0
+        self.capacity_exhausted = False
 
     def retain_observation(self, frame, observation):
         labels = tuple(sorted({r['label'] for r in observation['objects']}))
@@ -221,6 +222,10 @@ class SelectiveFrameArtifacts:
                        source=frame.source, frame_id=frame.id,
                        stream_generation=getattr(frame,'stream_generation',None),
                        pixel_sha256=observation['frame']['sha256'])
+        if self.capacity_exhausted:
+            receipt.update(status='not_retained', reason='cumulative_pixel_budget_exhausted')
+            self.last_labels = labels
+            return receipt
         if reason is not None:
             if self.samples >= self.max_samples:
                 receipt.update(status='not_retained', reason='session_sample_limit')
@@ -228,6 +233,9 @@ class SelectiveFrameArtifacts:
                 try:
                     selected = self.store.retain(frame)
                 except PixelBudgetExhausted:
+                    # This session never evicts evidence. Stop encoding after
+                    # capacity denial; a new session may reassess the store.
+                    self.capacity_exhausted = True
                     receipt.update(status='not_retained', reason='cumulative_pixel_budget_exhausted')
                 else:
                     receipt.update(status='retained', reason=reason, artifact=selected.artifact)

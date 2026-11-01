@@ -2,22 +2,26 @@
 import hashlib
 import subprocess
 import sys
+import pytest
 
 from memory.evidence import EvidenceJournal
 from memory.human_interaction import HumanInteractionGateway
 from tests.test_object_recognition import setup_session, feed
 
 
-def run(state, enabled=True):
+def run(state, enabled=True, models=False):
     command = [sys.executable, 'main.py', '--offline', '--learning-state', str(state),
                '--learning-turns', '1', '--learning-interval', '.05', '--learning-budget', '1']
     if enabled:
         command.append('--human-questions')
+    if models:
+        command.append('--model-learning')
     result = subprocess.run(command, capture_output=True, text=True, timeout=40)
     assert result.returncode == 0, result.stderr
 
 
-def test_normal_import_question_answer_and_restart_preserve_source(tmp_path):
+@pytest.mark.parametrize('models', [False, True])
+def test_normal_import_question_answer_and_restart_preserve_source(tmp_path, models):
     state = tmp_path/'state'; state.mkdir()
     session = setup_session(tmp_path/'source')
     try:
@@ -40,7 +44,7 @@ def test_normal_import_question_answer_and_restart_preserve_source(tmp_path):
     journal = EvidenceJournal(state/'learning-evidence.sqlite3')
     assert not HumanInteractionGateway(journal).questions()
     journal.close()
-    run(state)
+    run(state, models=models)
     journal = EvidenceJournal(state/'learning-evidence.sqlite3')
     service = HumanInteractionGateway(journal)
     questions = service.questions()
@@ -51,8 +55,8 @@ def test_normal_import_question_answer_and_restart_preserve_source(tmp_path):
     assert journal.get(row.id).committed_at == row.committed_at
     service.answer(q['id'], value='cat', operator='synthetic-reviewer', request_id='runtime-answer')
     journal.close()
-    run(state)
-    run(state)
+    run(state, models=models)
+    run(state, models=models)
     journal = EvidenceJournal(state/'learning-evidence.sqlite3')
     try:
         reviews = journal.category_records('observation', 'human_answer_review')

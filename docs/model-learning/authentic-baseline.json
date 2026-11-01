@@ -1,0 +1,289 @@
+{
+  "schema": "model-learning-baseline-v1",
+  "counts": {
+    "total": 6,
+    "authentic": 6,
+    "labeled": 5,
+    "sessions": 3
+  },
+  "incumbent": {
+    "confusion": {
+      "title_menu": {
+        "title_menu": 2,
+        "gameplay": 0,
+        "terminal": 0,
+        "unknown": 0
+      },
+      "gameplay": {
+        "title_menu": 0,
+        "gameplay": 2,
+        "terminal": 0,
+        "unknown": 0
+      },
+      "terminal": {
+        "title_menu": 0,
+        "gameplay": 0,
+        "terminal": 1,
+        "unknown": 0
+      },
+      "unknown": {
+        "title_menu": 0,
+        "gameplay": 0,
+        "terminal": 0,
+        "unknown": 0
+      }
+    },
+    "per_class": {
+      "title_menu": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 2
+      },
+      "gameplay": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 2
+      },
+      "terminal": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 1
+      },
+      "unknown": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 0
+      }
+    },
+    "macro_recall": 0.75,
+    "accuracy": 1.0,
+    "abstention": 0.0,
+    "false_positives": 0
+  },
+  "observations": [
+    {
+      "observation_id": "5386bda6be70fdfff6e8042331fa856951a4e4b4baa5f0b5186185dd4ee974a4",
+      "sha256": "bf1a310ea2ef0d0c97d349f7043f1ab23ff5623969f58286bf975b2a675ac7c3",
+      "provenance": {
+        "calibration": {
+          "corners": [
+            [
+              0.11998016084180993,
+              0.21179578020011722
+            ],
+            [
+              0.6847962025784925,
+              0.1146773202156617
+            ],
+            [
+              0.7672169800355161,
+              0.7972213232796561
+            ],
+            [
+              0.13227011834529548,
+              0.9550675102556031
+            ]
+          ],
+          "output_size": [
+            640,
+            480
+          ]
+        },
+        "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+        "expected_phase": "startable",
+        "path": "pregame-bright.jpg",
+        "source_file": "exposure-ev-0.png",
+        "source_run": "body-fire-bootstrap-20261001-020552",
+        "source_sha256": "e5d09521b8ad5b7ac22470c9e9990af588bd9e095512e3c8a23eb812b84ae8d5"
+      },
+      "session": "body-fire-bootstrap-20261001-020552",
+      "label": "title_menu",
+      "incumbent": "title_menu"
+    },
+    {
+      "observation_id": "7028b5bff918332b6a28749e9786ed8cc82fa43f27dfb2dbe7096509f053c488",
+      "sha256": "90d17f2d38463542fa057815c196a4b90698fbd6d57cc781f6bd350f38679ea4",
+      "provenance": {
+        "calibration": {
+          "corners": [
+            [
+              0.12031101591235549,
+              0.2154569873890193
+            ],
+            [
+              0.6849457057815312,
+              0.10864048947858333
+            ],
+            [
+              0.7690819488650085,
+              0.7920378696048298
+            ],
+            [
+              0.12852105520912888,
+              0.9510977705297269
+            ]
+          ],
+          "output_size": [
+            640,
+            480
+          ]
+        },
+        "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+        "expected_phase": "startable",
+        "path": "pregame-heldout.jpg",
+        "source_file": "exposure-ev-2.png",
+        "source_run": "response-window-20261001-012341",
+        "source_sha256": "c354137b7aac2797f8e9ed10c04857d0a2afd4ce3d2ffd56609cdf511e864035"
+      },
+      "session": "response-window-20261001-012341",
+      "label": "title_menu",
+      "incumbent": "title_menu"
+    },
+    {
+      "observation_id": "cc50c448bcf56b93c6c7b9c069385d46d9f5ea326ec1e356cac263343bf9d73d",
+      "sha256": "d7e499e2e7e55de30ef418a85026e8076662c751eea2f2f4d0b6a46fa162db5b",
+      "provenance": {
+        "calibration": {
+          "corners": [
+            [
+              0.11998016084180993,
+              0.21179578020011722
+            ],
+            [
+              0.6847962025784925,
+              0.1146773202156617
+            ],
+            [
+              0.7672169800355161,
+              0.7972213232796561
+            ],
+            [
+              0.13227011834529548,
+              0.9550675102556031
+            ]
+          ],
+          "output_size": [
+            640,
+            480
+          ]
+        },
+        "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+        "expected_phase": "terminal",
+        "path": "terminal.jpg",
+        "source_file": "review-003-14-final-view.jpg",
+        "source_run": "body-fire-bootstrap-20261001-020552",
+        "source_sha256": "ab97d61292d060bbb233da0389e9804b9670e83328511a85558bff3ddd94dbac"
+      },
+      "session": "body-fire-bootstrap-20261001-020552",
+      "label": "terminal",
+      "incumbent": "terminal"
+    },
+    {
+      "observation_id": "8e0e13ca67d113664d3d5ec681316103b6ca52da582fd6f273d5db9f2f7f9a48",
+      "sha256": "56231585b981d368531e18462c13c6a239f5dfaba57161c5cc57fa4aaf9c2feb",
+      "provenance": {
+        "calibration": {
+          "corners": [
+            [
+              0.11998016084180993,
+              0.21179578020011722
+            ],
+            [
+              0.6847962025784925,
+              0.1146773202156617
+            ],
+            [
+              0.7672169800355161,
+              0.7972213232796561
+            ],
+            [
+              0.13227011834529548,
+              0.9550675102556031
+            ]
+          ],
+          "output_size": [
+            640,
+            480
+          ]
+        },
+        "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+        "expected_phase": "gameplay",
+        "path": "gameplay-white.jpg",
+        "source_file": "setup-attempt-000.png",
+        "source_run": "body-fire-bootstrap-20261001-020552",
+        "source_sha256": "7d59d9bb713b630b2bd68096950572e8271a21d92babeb47f86d622b5f42a853"
+      },
+      "session": "body-fire-bootstrap-20261001-020552",
+      "label": "gameplay",
+      "incumbent": "gameplay"
+    },
+    {
+      "observation_id": "43db8a9422eb2cbca4a60634c24bdf398f5c92b93eca98ed73da767ceb98c880",
+      "sha256": "414beb9c6d1b94aa5ecd1f643e9fa84278c2e899fe4ddeac4ae5d8722a9505c4",
+      "provenance": {
+        "calibration": {
+          "corners": [
+            [
+              0.12031101591235549,
+              0.2154569873890193
+            ],
+            [
+              0.6849457057815312,
+              0.10864048947858333
+            ],
+            [
+              0.7690819488650085,
+              0.7920378696048298
+            ],
+            [
+              0.12852105520912888,
+              0.9510977705297269
+            ]
+          ],
+          "output_size": [
+            640,
+            480
+          ]
+        },
+        "derived_format": "full camera RGB JPEG quality88; original evidence remains in source archive",
+        "expected_phase": "gameplay",
+        "path": "gameplay-colored.jpg",
+        "source_file": "setup-attempt-000.png",
+        "source_run": "response-window-20261001-012341",
+        "source_sha256": "48c82efec9113c58d228b8d9a3bb9dc138126f6fe7497d2d6ea2cb6b4b9dc59e"
+      },
+      "session": "response-window-20261001-012341",
+      "label": "gameplay",
+      "incumbent": "gameplay"
+    },
+    {
+      "observation_id": "75aedd72dbf7ee7b5670fcab56e4dc9436996b26d937c845fc43b2d13caf084d",
+      "sha256": "60a53ec71812431a4edb5e8a5524da104a66f7e8a16ccca62362572ff173c2bb",
+      "provenance": {
+        "archive": "marathon-20261008-031501.tar.gz",
+        "archive_sha256": "c6894512e8a79898bbd158f957d22113f1580138bc9d373f67a92209e2208635",
+        "label": "Original classifier-unknown startup failure; not an operator-verified title reference",
+        "library_file_id": "libfile_215da3053d108191a9fd7286de8dc279",
+        "original_path": "marathon-20261008-031501/game-01/start-decision-000.png",
+        "sha256": "60a53ec71812431a4edb5e8a5524da104a66f7e8a16ccca62362572ff173c2bb"
+      },
+      "session": "marathon-20261008-031501",
+      "label": null,
+      "incumbent": "unknown"
+    }
+  ],
+  "latency_ms_including_image_load": [
+    979.8312380003154,
+    202.3658080001951,
+    202.07152900002257,
+    203.9379299999382,
+    200.65648199988573,
+    243.13356099992234
+  ],
+  "hardware": "host CPU only",
+  "candidate": null,
+  "independence": "reused regression fixtures; NOT an independent accuracy estimate",
+  "transitions": "not measured",
+  "unknown_recall": "not measured: no reviewed unknown labels",
+  "status": "NEEDS_LABELS"
+}

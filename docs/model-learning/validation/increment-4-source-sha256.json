@@ -1,0 +1,20 @@
+{
+  "learning/model_learning/human.py": "5b17b712ac3327b73f66ae73ca0f77c41d1cca4608afbfca8f6f83ed59de1653",
+  "learning/model_learning/qualification.py": "6d68edc88c5910e46a3c8e9f738a3c2637dfe7034a2ac160d0e1c48884c0a087",
+  "learning/model_learning/service.py": "71a5c933b1e83bf14bbb1cabd84fa4c7bf41da59e5eba2dad89a04ea98121b6c",
+  "learning/model_learning/evaluation.py": "36b131254974737c4a4c2461a173d11a4b45c2c91566fdc419eac517e6e7c190",
+  "learning/model_learning/data.py": "1ddca2e21017236d47ea8e2cecf62d7263caddc5578fb5048d75eae9967c6e1a",
+  "learning/model_learning/__init__.py": "a435c0d88f2fc40314364658e7bb0cd5da470ed33d98e386a105e28f9ef9d0bb",
+  "learning/model_learning/deployment.py": "f033261785c92a57b3b425a64a890ebdf893607ce8784f969645e5a8e72e3759",
+  "learning/model_learning/contracts.py": "c0623b9d56987fef8076068972056252c236c4eb9652b2ef158873375ae89d80",
+  "learning/model_learning/worker.py": "79470b18f4894cb5f56c814b638ff13a6b33fa414f3b26909692bcf4f000b20e",
+  "learning/model_learning/__main__.py": "7cb3461e82c4f320ac36f7f4b6076487d1096f4ff07153678651f636f874453b",
+  "learning/model_learning/subscriber.py": "17a5bdfede2ee514a3f85bdfc5653529a68e6b8f930895293b1afb7af0a55165",
+  "learning/model_learning/questions.py": "299e887db55dad3448b80677741f3b7cc1d1dcff6e4af363ab67e76bc101cf0b",
+  "learning/model_learning/robotron.py": "d6ce0cada1d45fe84801f3e1db698b1f6a48c8898034dce6e0b4a089c934c274",
+  "memory/learning_projects.py": "eca4ab4b5526c801897a21d51a5115c451165d4885218a4df5714d973ee0b8e6",
+  "tools/resolve_model_learning_integration.py": "cf226b6a675b7ed0addc860a5e23c67ddd451008c23829e6e7d6d416ec634c7a",
+  "tests/test_model_learning_shared_gateway.py": "559d1fd05559fb94ff04276eec58f34a3103a27805a4d05ade12fd694aceffe4",
+  "tests/test_model_learning.py": "862759ece96f6feaae27c3f45e8ec6682bd1aef5b7da9037c8487dbe19feca84",
+  "tests/test_model_learning_shared_bus.py": "01fc6b299226aacfde258b6591e589bcf6002e99710104a095ee66eb896509a1"
+}

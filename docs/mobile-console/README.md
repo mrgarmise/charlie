@@ -59,8 +59,12 @@ python main.py --hardware --mobile-dashboard \
   --actuator-safety-feed /path/to/independent-measured-feed.json
 ```
 
-This starts the existing ELEGOO feeder, qualified executor/telemetry facade and
-normal background developmental lifecycle. Neither the executor nor telemetry
+This now uses the normal primary application: Pi and ELEGOO feeders, the existing
+AttentionManager/vision and RP2040 lifecycle, qualified executor/telemetry facade
+and one background developmental lifecycle. The former dashboard-only hardware
+shortcut has been removed. Select `--object-recognition --object-label-display
+rp2040` to retain the established stationary object-label mode; adding monitoring
+does not select recognition automatically. Neither the executor nor telemetry
 opens the command transport until independent admission permits it. Merely
 supplying IDs/a feed path does not qualify any device or grant motion.
 

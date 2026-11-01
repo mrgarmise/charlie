@@ -1,9 +1,9 @@
 name: Mobile Body independent software validation
 on:
   push:
-    branches: [feature/mobile-body-console-20261031, campaign/monitoring-missions-20261101]
+    branches: [feature/mobile-body-console-20261031, campaign/monitoring-missions-20261101, 'objective-a/**']
   pull_request:
-    paths: ['ui/**', 'motion/elegoo_executor.py', 'tests/test_mobile*', '.github/workflows/mobile-console.yml']
+    paths: ['main.py', 'tests/test_objective_a*', 'ui/**', 'motion/elegoo_executor.py', 'tests/test_mobile*', '.github/workflows/mobile-console.yml']
 permissions:
   contents: read
 jobs:

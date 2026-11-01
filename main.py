@@ -262,20 +262,6 @@ def main(argv=None):
             process.start()
             next_worker_restart=time.monotonic()+5.
     try:
-        mobile_only = args.mobile_dashboard and not any((args.abilities_dashboard,args.object_recognition,
-            args.elegoo_face_track,args.primary_vision))
-        if mobile_only:
-            with ExitStack() as lifecycle:
-                frame_bus=lifecycle.enter_context(application_camera_feeders(args,selected=('elegoo',)))
-                executor,telemetry=lifecycle.enter_context(application_mobile_actuators(frame_bus,
-                    state=args.learning_state,hardware_id=args.mobile_hardware_id,zone=args.mobile_zone,feed=args.actuator_safety_feed))
-                from ui.dashboard import attach_mobile
-                attach_mobile(args,frame_bus,lifecycle,executor=executor)
-                while True:
-                    supervise_development()
-                    telemetry.poll()
-                    time.sleep(.1)
-            return
         if standalone_face:
             from learning.face_trial import run_face
             with application_camera_feeders(args,selected=('elegoo',)) as frame_bus:

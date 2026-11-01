@@ -64,11 +64,17 @@ class ObjectRecognition:
             if self.generation is not None and generation != self.generation:
                 self.invalidate('camera stream changed')
             self.generation = generation
-            if getattr(self, 'artifact_store', None) is not None:
+            store = getattr(self, 'artifact_store', None)
+            selective = store is not None and hasattr(store, 'retain_observation')
+            if store is not None and not selective:
                 frame = self.artifact_store.retain(frame)
             observation = self.perception.observe(frame)
             if observation is None:
                 return None
+            if selective:
+                receipt = store.retain_observation(frame, observation)
+                observation['frame']['retention'] = receipt
+                observation['frame']['artifact'] = receipt.get('artifact')
             tracking = self.tracker.update(observation)
             # Preserve original learning intake without a navigation planner/executor.
             proposal = dict(action='STOP', reason='object recognition is observational')

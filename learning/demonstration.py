@@ -221,7 +221,7 @@ def recognition_factory(args, resources, frame_bus, attention, service_clock=tim
         from memory.evidence import EvidenceJournal
         from stimulus.bus import StimulusBus
         from vision.mobile_models import HailoObjects, UnavailableDepth
-        from vision.mobile_perception import MobilePerception, FrameArtifactStore
+        from vision.mobile_perception import MobilePerception, FrameArtifactStore, SelectiveFrameArtifacts
         from vision.object_recognition import ObjectRecognition
         import subprocess
         config=json.loads(args.object_model_manifest.read_text())
@@ -237,7 +237,7 @@ def recognition_factory(args, resources, frame_bus, attention, service_clock=tim
             perception=MobilePerception(detector,UnavailableDepth(),resources=ResourceGuard(resources),revision=revision,clock=service_clock)
             pipeline=ObjectRecognition(frame_bus,perception,evidence,StimulusBus(),attention=attention)
             owners.callback(pipeline.close)
-            pipeline.artifact_store=FrameArtifactStore(args.learning_state/'operator-demo-frames')
+            pipeline.artifact_store=SelectiveFrameArtifacts(FrameArtifactStore(args.learning_state/'operator-demo-frames'))
             pipeline.select_camera('pi')
             pipeline.output_allowed=lambda: attention.demonstration.running and not attention.demonstration.cancel_requested and service_clock()-attention.demonstration.started<15
             class Lease:

@@ -36,7 +36,7 @@ def screen(monkeypatch):
     monkeypatch.setattr('time.ticks_diff',lambda a,b:a-b,raising=False)
     spec=importlib.util.spec_from_file_location('object_firmware_display',ROOT/'rp2040/display.py')
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-    return SimpleNamespace(d=module.Display(),now=now,pixels=pixels,calls=calls)
+    return SimpleNamespace(d=module.Display(),now=now,pixels=pixels,calls=calls,module=module)
 
 
 def transport(handler,board):
@@ -200,11 +200,12 @@ def test_dry_run_normal_main_never_opens_serial_or_camera(monkeypatch,capsys):
 
 
 def test_refresh_does_not_restart_firmware_scroll(screen):
-    d=screen.d;d.show_object_label('CAT')
+    d=screen.d;d.show_object_label('PERSON')
     screen.now[0]=100;d.update();offset=d.object_offset
-    screen.now[0]=200;d.show_object_label('CAT')
-    assert d.object_offset==offset
-    d.show_object_label('DOG');assert d.object_offset==17
+    assert offset==16
+    screen.now[0]=200;d.show_object_label('PERSON')
+    assert d.object_offset==offset and d.last_object_step==100 and d.object_until==4700
+    d.show_object_label('DINING TABLE');assert d.object_offset==17 and d.last_object_step==200
 
 
 @pytest.mark.parametrize('command',['OBJECT_LABEL 999999 100 CAT','OBJECT_LABEL 4500 0 CAT','OBJECT_LABEL 4500 100 CAT;STOP','OBJECT_LABEL 4500 100 '+'A'*25])
@@ -296,3 +297,138 @@ def test_display_failure_cannot_prevent_existing_behavior_update_or_shutdown():
     behavior.update.assert_called_once_with('fake-deck');mobile.update.assert_called_once()
     manager.close();mobile.exit.assert_called_once()
     assert manager.object_display_error
+
+
+@pytest.mark.parametrize('char', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ')
+def test_mini_glyphs_are_complete_bounded_and_use_existing_pixel_rules(screen,char):
+    font=screen.module._OBJECT_FONT
+    assert set(font)==set('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ')
+    columns=font[char]
+    assert 1<=len(columns)<=3 and all(type(c) is int and 0<=c<32 for c in columns)
+    if char!=' ':
+        assert columns[0] and columns[-1]
+    else:assert columns==(0,)
+    # Space is part of the font; normalized protocol labels cannot be blank.
+    screen.d.object_label=char
+    screen.d._draw_object_label(0)
+    assert all(1<=y<=5 and b==20 for x,y,b in screen.pixels)
+    assert screen.calls==[]
+
+
+@pytest.mark.parametrize('label,width', [('',0),('I',1),(' ',1),('II',3),('I I',5),
+    ('CAT',11),('CHAIR',17),('AAAAI',17),('AAA1I',16),('AAAA1',18),('PERSON',23),('CAT CAT',25)])
+def test_actual_variable_width_has_one_gap_and_no_trailing_column(screen,label,width):
+    assert screen.module._object_label_width(label)==width
+    assert screen.module._object_label_width(label)==width
+    assert len(screen.module._OBJECT_FONT['I'])==len(screen.module._OBJECT_FONT[' '])==1
+
+
+@pytest.mark.parametrize('label,rows', [
+    ('CAT',[('.##','#..','#..','#..','.##'),('.#.','#.#','###','#.#','#.#'),('###','.#.','.#.','.#.','.#.')]),
+    ('CHAIR',[('.##','#..','#..','#..','.##'),('#.#','#.#','###','#.#','#.#'),
+              ('.#.','#.#','###','#.#','#.#'),('#',)*5,('##.','#.#','##.','#.#','#.#')]),
+])
+def test_short_words_are_complete_centered_and_stationary_on_first_update(screen,label,rows):
+    expected_rows=['.'.join(glyph[y] for glyph in rows) for y in range(5)]
+    left=(17-len(expected_rows[0]))//2
+    expected={(left+x,y+1,20) for y,row in enumerate(expected_rows) for x,value in enumerate(row) if value=='#'}
+    d=screen.d;d.show_object_label(label)
+    # Object rendering must not consult the vendor stock or blocking show().
+    screen.module.matrix.wordStock=None
+    for now in (100,200,300,1000):
+        screen.pixels.clear();screen.now[0]=now;d.update()
+        assert set(screen.pixels)==expected and len(screen.pixels)==len(expected)
+        assert d.object_offset==17 and d.last_object_step==0
+    assert screen.calls==[]
+
+
+def test_exact_fit_static_and_one_column_over_scrolls_at_original_cadence(screen):
+    d=screen.d;d.show_object_label('AAAAI',step_ms=200)
+    screen.now[0]=100;d.update()
+    assert min(x for x,y,b in screen.pixels)==0 and max(x for x,y,b in screen.pixels)==16
+    assert d.object_offset==17
+    d.show_object_label('AAAA1',step_ms=200)
+    screen.pixels.clear();screen.now[0]=200;d.update()
+    assert d.object_offset==17 and screen.pixels==[]
+    screen.now[0]=300;d.update();assert d.object_offset==16
+    assert screen.pixels and all(x==16 for x,y,b in screen.pixels)
+    screen.now[0]=400;d.update();assert d.object_offset==16
+    screen.now[0]=500;d.update();assert d.object_offset==15
+    # A delayed update still takes one step; no catch-up loop or timing change.
+    screen.now[0]=1500;d.update();assert d.object_offset==14
+
+
+def test_long_label_scroll_reaches_true_final_column_before_reset(screen):
+    d=screen.d;d.show_object_label('AAAA1')
+    width=screen.module._object_label_width(d.object_label)
+    assert width==18
+    # Exercise the whole cycle at the existing 100 ms step, within original TTL.
+    for step in range(1,17+width+2):
+        screen.pixels.clear();screen.now[0]=step*100;d.update()
+        offset=17-step
+        if offset < -width:offset=17
+        assert d.object_offset==offset
+        assert all(0<=x<17 and 1<=y<=5 and b==20 for x,y,b in screen.pixels)
+        if offset==1-width:
+            assert screen.pixels==[(0,y,20) for y in range(1,6)]
+        if offset in (-width,17):assert screen.pixels==[]
+    screen.now[0]=3700;d.update();assert d.object_offset==16
+    assert screen.calls==[] and d.object_label=='AAAA1'
+
+
+def test_static_refresh_extends_original_ttl_without_repositioning_and_clear(screen):
+    d=screen.d;d.show_object_label('CAT',ttl_ms=500)
+    screen.now[0]=100;d.update();first=list(screen.pixels)
+    screen.now[0]=400;d.show_object_label('CAT',ttl_ms=500)
+    assert d.object_until==900 and d.last_object_step==0
+    screen.pixels.clear();screen.now[0]=800;d.update();assert screen.pixels==first
+    screen.now[0]=900;d.update();assert d.object_label is None
+    d.show_object_label('CHAIR');d.clear_object_label()
+    assert d.object_label is None and d.object_until==0 and d.object_offset==17
+
+
+@pytest.mark.parametrize('priority', ['ERROR','NO_BRAIN','SLEEP','message','feedback','capability','progress'])
+def test_existing_higher_priorities_never_enter_object_renderer(screen,monkeypatch,priority):
+    d=screen.d
+    if priority in ('ERROR','NO_BRAIN','SLEEP'):d.status(priority)
+    elif priority=='message':d.show_text('TEXT')
+    elif priority=='feedback':d.feedback(d.HAPPY)
+    elif priority=='capability':d.capability_status('CAL READY')
+    else:d.set_progress(50)
+    d.show_object_label('CAT')
+    render=Mock(side_effect=AssertionError('priority bypass'))
+    monkeypatch.setattr(d,'_draw_object_label',render)
+    screen.now[0]=100;d.update();render.assert_not_called()
+    assert d.object_offset==17
+
+
+def test_ordinary_text_retains_vendor_pages_and_700ms_page_timing(screen):
+    d=screen.d;d.show_object_label('CAT');d.show_text('ABCDE',1800)
+    for now in (100,700,1400):screen.now[0]=now;d.update()
+    assert screen.calls==['ABC','DE','ABC'] and d.object_offset==17
+    screen.now[0]=1900;d.update()
+    assert d.message is None and screen.calls==['ABC','DE','ABC']
+    assert screen.pixels and all(1<=y<=5 for x,y,b in screen.pixels)
+
+
+def test_existing_pixel_clipping_and_half_brightness_cap_are_unchanged(screen):
+    d=screen.d
+    for x,y in [(-1,0),(17,0),(0,-1),(0,7)]:d._pixel(x,y,1000)
+    assert screen.pixels==[]
+    for value in (-10,15,40,80,255,1000):d._pixel(8,3,value)
+    assert screen.pixels==[(8,3,b) for b in (0,7,20,40,127,127)]
+
+
+@pytest.mark.parametrize('state,expected', [
+    ('IDLE',[(8,3,6)]),
+    ('SCAN',[(x,y,b) for y in range(7) for x,b in [(0,12),(0,55)]]),
+    ('TRACK',[(8,3,75),(6,3,20),(10,3,20),(8,1,20),(8,5,20)]),
+    ('HOME',[(0,3,50),(16,3,50),(8,3,12)]),
+    ('SLEEP',[(8,3,7)]),
+    ('ERROR',[(5+i,y,70) for i in range(7) for y in (i,6-i)]),
+    ('THINK',[(5,3,65),(8,3,7),(11,3,7)]),
+    ('HAPPY',[(6,1,65),(10,1,65),(5,4,35),(6,5,50),(7,5,60),(8,5,70),(9,5,60),(10,5,50),(11,4,35)]),
+])
+def test_existing_status_animation_pixels_at_frame_zero(screen,state,expected):
+    screen.d._draw_named_state(state)
+    assert screen.pixels==expected

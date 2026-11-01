@@ -23,7 +23,7 @@ class MeditationYield(Exception):
 
 
 class DevelopmentLifecycle:
-    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None, resource_guard=None):
+    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None, resource_guard=None, human_questions=False):
         from .resources import ResourceGuard
         self.resources=resource_guard or ResourceGuard(resources)
         self._stage_cache={}
@@ -62,6 +62,10 @@ class DevelopmentLifecycle:
         self.gateway = MemoryGateway(store=JsonlStore(self.output/'memory.jsonl'),
             evaluator=MemoryEvaluator(self.output/'evaluator.sqlite3'))
         self.executive = LearningExecutive(self.journal, self.gateway)
+        self.human_questions = None
+        if human_questions:
+            from memory.human_interaction import HumanInteractionGateway
+            self.human_questions = HumanInteractionGateway(self.journal)
         self.budget = budget_seconds
         self.authority = offline_authority
         import subprocess
@@ -252,6 +256,9 @@ class DevelopmentLifecycle:
         expose_score_review_contexts(self.dataset)
         expose_measurement_review_contexts(self.dataset)
         changed |= len(self.journal.records())!=before
+        if self.human_questions is not None:
+            from learning.human_runtime import review_information
+            changed |= review_information(self)
         self.acquisition_roots=roots
         changed |= bool(self.respond_to_requests())
         return changed
@@ -655,7 +662,7 @@ class DevelopmentLifecycle:
 
 def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None,
         history_roots=(), resources=None, wall_seconds=None, cooldown_seconds=None,
-        clock=None, sleep=None, lifecycle_factory=None):
+        clock=None, sleep=None, lifecycle_factory=None, human_questions=False):
     """One existing Executive, with resource polling rather than a second scheduler.
 
     ``turns`` bounds nonthermal attempt slots (including other resource refusals),
@@ -694,8 +701,9 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
         if termination:raise DevelopmentInterrupted(termination)
     try:
         factory=lifecycle_factory or DevelopmentLifecycle
+        options = dict(human_questions=True) if human_questions else {}
         lifecycle=factory(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,
-            history_roots=history_roots,resources=resources)
+            history_roots=history_roots,resources=resources,**options)
         lifecycle.resources.interruption_check=interrupt
         while turns is None or counters['nonthermal_attempt_slots']<turns:
             try:interrupt()

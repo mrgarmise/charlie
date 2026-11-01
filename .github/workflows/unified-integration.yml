@@ -1,7 +1,7 @@
 name: Unified integration software tests
 on:
   push:
-    branches: [integration/unified-sensory-motion-20261026, campaign/selective-demo-evidence-20261031]
+    branches: [integration/unified-sensory-motion-20261026, 'campaign/**']
   pull_request:
     branches: [master]
 permissions:

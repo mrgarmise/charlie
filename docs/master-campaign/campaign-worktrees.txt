@@ -1,0 +1,12 @@
+worktree /tmp/charlie-master-campaign-20261031
+HEAD bcf8082f6319c63c4bd6bcceeab5faea37241654
+detached
+
+worktree /tmp/charlie-campaign-register
+HEAD bcf8082f6319c63c4bd6bcceeab5faea37241654
+branch refs/heads/campaign/register-20261031
+
+worktree /tmp/charlie-campaign-stack
+HEAD 097f110fd0c6d321d24024c399d79f0a427bf23c
+detached
+

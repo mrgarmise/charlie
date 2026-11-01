@@ -15,7 +15,7 @@ from learning.demonstration import ABILITY
 DEFAULT_ORIGIN = 'https://charlie-project-dashboard.garmiseprojects.chatgpt.site'
 
 
-def start_dashboard(service, token, *, port=8768, origin=DEFAULT_ORIGIN, mobile=None, drive_token=None):
+def start_dashboard(service, token, *, port=8768, origin=DEFAULT_ORIGIN, mobile=None, drive_token=None, learning_state=None):
     if not isinstance(token,str) or len(token)<32 or any(c.isspace() for c in token):
         raise ValueError('dashboard token must have at least 32 non-whitespace characters')
     if drive_token is not None and (len(drive_token)<32 or any(c.isspace() for c in drive_token) or drive_token==token):
@@ -85,6 +85,21 @@ def start_dashboard(service, token, *, port=8768, origin=DEFAULT_ORIGIN, mobile=
                 self.send_header('X-Frame-Options','DENY')
                 self.end_headers();self.wfile.write(raw);return
             if not self.authorized():return
+            if self.path in ('/discoveries','/api/discoveries'):
+                try:
+                    from ui.discoveries import read_status, render
+                    status=read_status(learning_state)
+                    if self.path=='/api/discoveries':self.reply(200,status)
+                    else:
+                        raw=render(status)
+                        self.send_response(200)
+                        self.send_header('Content-Type','text/html; charset=utf-8')
+                        self.send_header('Content-Length',str(len(raw)))
+                        self.send_header('Cache-Control','no-store')
+                        self.send_header('Content-Security-Policy',"default-src 'none'; frame-ancestors 'none'; base-uri 'none'")
+                        self.end_headers();self.wfile.write(raw)
+                except (OSError,ValueError,TypeError):self.reply(503,{'error':'Executive status unavailable'})
+                return
             if self.path=='/api/missions':
                 from ui.missions import mission_status
                 try:self.reply(200,mission_status())
@@ -165,7 +180,7 @@ def attach_dashboard(args, resources, frame_bus, attention, lifecycle, *, factor
     lifecycle.callback(service.close)
     mobile=attach_mobile(args,frame_bus,lifecycle,start_http=False)
     server=start_dashboard(service,os.environ.get('CHARLIE_OPERATOR_TOKEN',''),
-                           port=args.abilities_port,origin=args.abilities_origin,mobile=mobile,drive_token=os.environ.get('CHARLIE_DRIVE_TOKEN'))
+                           port=args.abilities_port,origin=args.abilities_origin,mobile=mobile,drive_token=os.environ.get('CHARLIE_DRIVE_TOKEN'),learning_state=args.learning_state)
     lifecycle.callback(server.close)
     print(f'Abilities listening on http://127.0.0.1:{server.address[1]} (authenticated, motion not requested)',flush=True)
     return service
@@ -184,7 +199,7 @@ def attach_mobile(args, frame_bus, lifecycle, *, executor=None, start_http=True)
     if start_http:
         server=start_dashboard(None,os.environ.get('CHARLIE_MONITOR_TOKEN',''),
             port=args.abilities_port,origin=args.abilities_origin,mobile=mobile,
-            drive_token=os.environ.get('CHARLIE_DRIVE_TOKEN'))
+            drive_token=os.environ.get('CHARLIE_DRIVE_TOKEN'),learning_state=args.learning_state)
         lifecycle.callback(server.close)
         print(f'Mobile Body: http://127.0.0.1:{server.address[1]}/mobile (per-command qualification required)',flush=True)
     return mobile

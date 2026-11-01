@@ -189,3 +189,74 @@ def test_discoveries_readonly_and_html_escape(tmp_path):
     page=render(read_status(tmp_path)).decode()
     assert '<script>' not in page and '&lt;script&gt;' in page
     assert 'unverified hypothesis' in page and p.read_bytes()==before
+
+
+@pytest.mark.parametrize('human,models,consult',[(h,m,c) for h in (False,True) for m in (False,True) for c in (False,True)])
+def test_one_normal_executive_shared_journal_and_default_no_transport(tmp_path,human,models,consult,monkeypatch):
+    from learning.lifecycle import DevelopmentLifecycle
+    def forbidden(*args,**kwargs):raise AssertionError('normal startup attempted inference')
+    monkeypatch.setattr(OllamaProvider,'consult',forbidden)
+    lifecycle=DevelopmentLifecycle(tmp_path/'state',[],human_questions=human,model_learning=models,llm_consultation=consult)
+    try:
+        assert lifecycle.executive.journal is lifecycle.journal
+        assert (lifecycle.consultation is not None)==consult
+        if consult:
+            assert lifecycle.consultation.journal is lifecycle.journal
+            assert lifecycle.consultation.shadow and lifecycle.consultation.provider is None
+        if human:assert lifecycle.human_questions.journal is lifecycle.journal
+        assert (lifecycle.model_learning is not None)==models
+        status=json.loads((tmp_path/'state'/'development-status.json').read_text())
+        assert (status['consultations'] is not None)==consult
+    finally:lifecycle.close()
+
+
+def test_executive_refuses_foreign_journal(journal,tmp_path):
+    from memory.learning_projects import LearningExecutive
+    from memory.gateway import MemoryGateway
+    other=EvidenceJournal(tmp_path/'other.sqlite3')
+    try:
+        ex=LearningExecutive(journal,MemoryGateway())
+        with pytest.raises(ValueError):ex.consider_consultation(ConsultationService(other),source(journal).id)
+    finally:other.close()
+
+
+def test_normal_offline_cli_shadow_restart(tmp_path):
+    import subprocess,sys
+    state=tmp_path/'state'
+    command=[sys.executable,'main.py','--offline','--learning-state',str(state),
+        '--episode-root',str(tmp_path/'empty'),'--learning-turns','1','--learning-budget','1','--llm-consultation']
+    for _ in range(2):
+        result=subprocess.run(command,capture_output=True,text=True,timeout=30)
+        assert result.returncode==0,result.stderr
+    status=json.loads((state/'development-status.json').read_text())
+    assert status['consultations']['mode']=='shadow'
+    assert status['consultations']['counts']['verified']==0
+    assert not status['consultations']['questions']
+
+
+def test_human_answer_after_queue_prevents_submission(journal):
+    from memory.human_interaction import HumanInteractionGateway,detect_need
+    s,f,q,r=queued(journal)
+    h=HumanInteractionGateway(journal)
+    need=detect_need(journal,r.id,now=time.time(),reason='test',consequence=1.,priority=1)
+    human=h.consider(need)
+    h.answer(human['question_id'],value='cat',operator='operator',request_id='late-human-answer')
+    s.process_one()
+    assert not f.calls and s.questions()[q.id]['status']=='deferred'
+
+
+def test_nonsense_cannot_become_verified(journal):
+    s,f,q,r=queued(journal);f.answer='Purple quantum banana cats.'
+    s.process_one()
+    assert s.questions()[q.id]['trust']=='unverified_hypothesis'
+    assert s.status()['counts']['verified']==0
+
+
+def test_total_local_remote_wall_budget(journal):
+    class Slow(FakeProvider):
+        def consult(self,prompt,check):time.sleep(.12);check();raise TimeoutError()
+    local=Slow();remote=FakeProvider();remote.origin='remote'
+    s=ConsultationService(journal,local,remote=remote,remote_authorized=True,shadow=False,wall_seconds=.1)
+    q=s.consider(source(journal).id)
+    with pytest.raises(InterruptedError):s.process_one()
+    assert not remote.calls and s.questions()[q.id]['status']=='deferred'

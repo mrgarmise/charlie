@@ -114,7 +114,9 @@ def main():
     finally:
         stop.set();worker.join(timeout=2)
         if args.warm:
-            _http(config,dict(model=config.model,keep_alive=0),'/api/generate')
+            try:_http(config,dict(model=config.model,keep_alive=0),'/api/generate')
+            except Exception as exc:
+                (args.output/'unload-failure.json').write_text(json.dumps(dict(error=type(exc).__name__,operator_stop_required=True)))
         (args.output/'samples.json').write_text(json.dumps(samples))
         (args.output/'postflight.json').write_text(json.dumps(snapshot(),indent=2))
 

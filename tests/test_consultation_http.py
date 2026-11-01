@@ -65,3 +65,26 @@ def test_cancel_while_inference_inflight(server):
         if time.monotonic()-start>.5:raise InterruptedError('cancel')
     with pytest.raises(InterruptedError):provider(server).consult('question',check)
     assert time.monotonic()-start<2
+
+
+def test_existing_dashboard_discoveries_requires_auth_and_is_read_only(server,tmp_path):
+    from ui.dashboard import start_dashboard
+    import urllib.request
+    import urllib.error
+    status=dict(mode='shadow',counts=dict(verified=0,pending=1),questions=[])
+    path=tmp_path/'development-status.json';path.write_text(json.dumps(dict(consultations=status)))
+    before=path.read_bytes();token='x'*40
+    dashboard=start_dashboard(None,token,port=0,learning_state=tmp_path)
+    base='http://127.0.0.1:'+str(dashboard.address[1])
+    try:
+        with pytest.raises(urllib.error.HTTPError) as error:urllib.request.urlopen(base+'/api/discoveries')
+        assert error.value.code==401
+        req=urllib.request.Request(base+'/api/discoveries',headers={'Authorization':'Bearer '+token})
+        with urllib.request.urlopen(req) as response:assert json.load(response)==status
+        req=urllib.request.Request(base+'/discoveries',headers={'Authorization':'Bearer '+token})
+        with urllib.request.urlopen(req) as response:
+            assert 'Questions &amp; Discoveries' in response.read().decode()
+        req=urllib.request.Request(base+'/api/discoveries',data=b'{}',headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'})
+        with pytest.raises(urllib.error.HTTPError) as error:urllib.request.urlopen(req)
+        assert error.value.code==404 and path.read_bytes()==before
+    finally:dashboard.close()

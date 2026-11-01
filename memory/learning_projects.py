@@ -97,6 +97,12 @@ class LearningExecutive:
             consequence=consequence, priority=priority, alternative_available=alternative_available)
         return service.consider(need) if need else dict(asked=False, reason='no_supported_information_need')
 
+    def consider_consultation(self, service, evidence_id):
+        """General observation advice from authentic retained uncertainty only."""
+        if service.journal is not self.journal:
+            raise ValueError('consultant must share Executive journal')
+        return service.consider(evidence_id)
+
     def receive_human_answers(self, service, owner):
         """Existing Executive receives fallible evidence, never activates policy."""
         if service.journal is not self.journal:
@@ -865,6 +871,9 @@ class LearningExecutive:
             model_progress=len(lifecycle.model_learning.data.events("model_turn"))>before_model
         self.commission_evidence_searches()
         changed=lifecycle.acquire()
+        if getattr(lifecycle,"consultation",None) is not None:
+            from learning.consultation import review_consultations
+            review_consultations(lifecycle)
         self.receive_evidence_searches()
         self.stage_evidence_experiment()
         self.reconcile_agenda()

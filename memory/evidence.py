@@ -77,6 +77,8 @@ class EvidenceJournal:
             CREATE TRIGGER IF NOT EXISTS immutable_delete BEFORE DELETE ON records
             BEGIN SELECT RAISE(ABORT, 'evidence is append-only'); END;
             CREATE INDEX IF NOT EXISTS evidence_kind ON records(json_extract(document,'$.kind'));
+            CREATE INDEX IF NOT EXISTS evidence_kind_category ON records(
+                json_extract(document,'$.kind'), json_extract(document,'$.payload.category'));
             CREATE INDEX IF NOT EXISTS evidence_resolution_prediction ON records(
                 json_extract(document,'$.kind'), json_extract(document,'$.payload.prediction_id'));
             CREATE INDEX IF NOT EXISTS evidence_observation_time ON records(

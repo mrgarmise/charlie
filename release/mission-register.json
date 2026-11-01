@@ -151,7 +151,7 @@
       "owner": "Charlie maintainers/operator",
       "date": "2026-10-31",
       "blockers": [],
-      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "safe_next_action": "Only receipt/index slice transferred to campaign stage; review remaining E1/P1/diagnostic mechanisms separately; do not claim full inclusion or I1",
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/7"
       ],
@@ -517,7 +517,7 @@
       "source_tree": "63330e711fc5a2322d7c23844a296957722823be",
       "status": {
         "implemented": "published source",
-        "independently_tested": "1602 passed / 21 skipped / one existing marathon failure; unchanged retry running",
+        "independently_tested": "Attempt 2: 1603 passed / 21 skipped; original attempt 1 retained (1602 passed / 21 skipped / one marathon failure)",
         "integrated": "normal-runtime staging; inherited holds",
         "published_to_master": "pending",
         "installed": "UNKNOWN",
@@ -630,10 +630,10 @@
     "pr18_head": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
     "pr18_tree": "63330e711fc5a2322d7c23844a296957722823be",
     "independent_ci": "https://github.com/mrgarmise/charlie/actions/runs/41323688078",
-    "integration_stage": "Mobile Body console and read-only mission view reconciled; independent combined tests pending",
+    "integration_stage": "Selective PR 7 immutable acquisition recovery; 23 focused passed; full CI pending",
     "pr19_head": "c783b4002aa5ded2a092b4799e291a844ca67d26",
     "pr19_browser_ci": "https://github.com/mrgarmise/charlie/actions/runs/41324201202",
-    "pr18_ci": "1602 passed / 21 skipped / one existing marathon failure; unchanged retry running",
+    "pr18_ci": "Attempt 2: 1603 passed / 21 skipped; original attempt 1 retained (1602 passed / 21 skipped / one marathon failure)",
     "pr19_full_ci": {
       "url": "https://github.com/mrgarmise/charlie/actions/runs/41324201298",
       "result": "1632 passed / 23 skipped"
@@ -642,6 +642,11 @@
     "pr20_focused_ci": {
       "url": "https://github.com/mrgarmise/charlie/actions/runs/41324698128",
       "result": "success"
+    },
+    "pr21_head": "9a1fee83ca518a4d106021e918263a4bafdd0620",
+    "pr21_browser_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41324964308",
+      "result": "36 browser/HTTP passed; full regression pending"
     }
   }
 }

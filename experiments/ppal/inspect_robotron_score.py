@@ -218,11 +218,29 @@ def import_queue(journal, root):
             source_sha256=content,reason=str(exc),physical_authorization=False),
             episode='score-review-acquisition',producer='existing-acquisition-capability',version='score-feedback-v1')
     # Existing session diary includes attempts without report.json.
+    receipts=journal.category_records('event','preserved_session_history_import')
     for path in sorted(set(root.rglob('experiment-evidence.sqlite3')) | set(root.rglob('session-evidence.sqlite3'))):
         if path.resolve()==journal.path.resolve():continue
         import sqlite3
         try:
+            if any(Path(str(path)+suffix).exists() for suffix in ('-wal','-shm','-journal')):
+                raise ValueError('quiesced session snapshot required; SQLite sidecars present')
             source_hash=hashlib.sha256(path.read_bytes()).hexdigest()
+            previous=next((r for r in reversed(receipts)
+                if r.data['payload'].get('source_path')==str(path.resolve())
+                and r.data['payload'].get('source_sha256')==source_hash),None)
+            if previous is not None:
+                # The original graph was already verified on import. Immutable
+                # target records were verified when this journal was opened.
+                # Rewalking a large unchanged session on every learning turn
+                # adds no evidence; still check the receipt's complete delivery.
+                identifiers=previous.data['payload']['record_ids']
+                present={r[0] for r in journal.conn.execute('SELECT id FROM records')}
+                if not set(identifiers)<=present:
+                    raise ValueError('retained session receipt has missing records')
+                if hashlib.sha256(path.read_bytes()).hexdigest()!=source_hash:
+                    raise ValueError('original session journal changed during receipt verification')
+                continue
             source=EvidenceJournal(path,read_only=True)
             try:
                 identifiers=[r.id for r in source.records()]

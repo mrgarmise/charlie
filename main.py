@@ -20,6 +20,7 @@ def parser():
     mode.add_argument('--hardware',dest='offline',action='store_false',help='explicit separately authorized hardware startup; CAL-1 gates still apply')
     p.set_defaults(offline=True)
     p.add_argument('--learning-state',type=Path,default=Path.home()/'.local/share/charlie/development')
+    p.add_argument('--human-questions',action='store_true',help='opt-in Executive review questions from committed evidence; no web listener or authority')
     p.add_argument('--episode-root',type=Path,action='append',default=[])
     p.add_argument('--history-root',type=Path,action='append',default=[],help='preserve and additively restore an existing notebook')
     p.add_argument('--learning-budget',type=float,default=10.)
@@ -211,6 +212,8 @@ def main(argv=None):
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
                 turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources,
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
+    if args.human_questions:
+        kwargs['human_questions'] = True
     if args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow:
         if args.pet_follow and args.offline:
             raise ValueError('physical pet following requires explicit --hardware; --offline never actuates')

@@ -680,7 +680,8 @@
       "safe_next_action": "Review scoped stage; resolve original holds before promotion; no deployment or physical authorization",
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/21"
-      ]
+      ],
+      "base": "be9e259781c09d9b56c065111aa2c0341c8187d6"
     },
     {
       "id": "charlie-pr-22",
@@ -719,7 +720,8 @@
       "safe_next_action": "Review scoped stage; resolve original holds before promotion; no deployment or physical authorization",
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/22"
-      ]
+      ],
+      "base": "9a1fee83ca518a4d106021e918263a4bafdd0620"
     },
     {
       "id": "charlie-pr-23",
@@ -757,7 +759,8 @@
       "safe_next_action": "Review scoped stage; resolve original holds before promotion; no deployment or physical authorization",
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/23"
-      ]
+      ],
+      "base": "fa7d5d5db5726e8e251000d79e9cc009fa912ae8"
     }
   ],
   "checkpoint": {

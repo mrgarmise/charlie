@@ -1,7 +1,7 @@
 name: Immutable acquisition contracts
 on:
   push:
-    branches: [campaign/immutable-acquisition-20261101]
+    branches: [campaign/immutable-acquisition-20261101, campaign/mobile-review-options-20261101]
 permissions:
   contents: read
 jobs:
@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -r requirements.txt pytest
-      - run: python -m pytest tests/test_session_import_receipts.py tests/test_evidence_category_index.py tests/test_score_feedback_learning.py tests/test_score_feedback_recovery.py tests/test_normal_human_questions.py -q --junitxml=immutable-acquisition.xml
+      - run: python -m pytest tests/test_session_import_receipts.py tests/test_evidence_category_index.py tests/test_score_feedback_learning.py tests/test_score_feedback_recovery.py tests/test_normal_human_questions.py tests/test_mobile_integration.py -q --junitxml=immutable-acquisition.xml
       - uses: actions/upload-artifact@v4
         if: always()
         with:

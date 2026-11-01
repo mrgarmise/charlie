@@ -45,7 +45,15 @@
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/3"
       ],
-      "ancestor_of_pr13": false
+      "ancestor_of_pr13": false,
+      "availability_update": {
+        "date": "2026-11-01",
+        "journal_sha256": "ee612110302b40d89b977fc7dbb57ae2dc3a2ac09f7482bd78aa83d682464d21",
+        "bytes": 15142912,
+        "score_human_annotations": 8,
+        "score_review_status": 16,
+        "scope": "Read-only availability; original hold and photograph/benefit qualification remain"
+      }
     },
     {
       "id": "charlie-pr-5",
@@ -599,7 +607,7 @@
       "source_tree": "44aa5f7ede2dc1f27096405fc83f8c7636cbfdd5",
       "status": {
         "implemented": "published source",
-        "independently_tested": "49 local focused passed; independent current-contract CI passed; full CI running",
+        "independently_tested": "Independent focused and full passed; 1677 passed / 26 skipped",
         "integrated": "normal-runtime staging; inherited holds",
         "published_to_master": "pending",
         "installed": "UNKNOWN",
@@ -630,7 +638,7 @@
     "pr18_head": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
     "pr18_tree": "63330e711fc5a2322d7c23844a296957722823be",
     "independent_ci": "https://github.com/mrgarmise/charlie/actions/runs/41323688078",
-    "integration_stage": "Selective PR 7 immutable acquisition recovery; 23 focused passed; full CI pending",
+    "integration_stage": "Mobile entrypoint now preserves both review opt-ins; 13 focused passed; full CI pending",
     "pr19_head": "c783b4002aa5ded2a092b4799e291a844ca67d26",
     "pr19_browser_ci": "https://github.com/mrgarmise/charlie/actions/runs/41324201202",
     "pr18_ci": "Attempt 2: 1603 passed / 21 skipped; original attempt 1 retained (1602 passed / 21 skipped / one marathon failure)",
@@ -647,6 +655,22 @@
     "pr21_browser_ci": {
       "url": "https://github.com/mrgarmise/charlie/actions/runs/41324964308",
       "result": "36 browser/HTTP passed; full regression pending"
+    },
+    "pr20_full_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41324698124",
+      "result": "1677 passed / 26 skipped"
+    },
+    "pr21_full_ci": {
+      "urls": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41324964421",
+        "https://github.com/mrgarmise/charlie/actions/runs/41324960647"
+      ],
+      "result": "1711 passed / 27 skipped each"
+    },
+    "pr22_head": "fa7d5d5db5726e8e251000d79e9cc009fa912ae8",
+    "pr22_focused_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41325251230",
+      "result": "success"
     }
   }
 }

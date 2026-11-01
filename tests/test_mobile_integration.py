@@ -59,6 +59,32 @@ def test_lifecycle_imports_once_without_second_executive(tmp_path):
     j.close()
 
 
+@pytest.mark.parametrize('flags', [[],['--human-questions'],['--model-learning'],['--human-questions','--model-learning']])
+def test_mobile_entrypoint_retains_opt_in_review_on_one_executive(tmp_path,monkeypatch,flags):
+    from learning.lifecycle import DevelopmentLifecycle
+    instances=[]
+    def observe(*args,**kwargs):
+        instance=DevelopmentLifecycle(*args,**kwargs);instances.append(instance)
+        return instance
+    monkeypatch.setattr('learning.lifecycle.DevelopmentLifecycle',observe)
+    state=tmp_path/'state'
+    main(['--mobile-replay',str(fixture(tmp_path/'fixture.json')),'--learning-state',str(state),*flags])
+    assert len(instances)==1
+    life=instances[0]
+    assert (life.human_questions is not None)==('--human-questions' in flags)
+    assert (life.model_learning is not None)==('--model-learning' in flags)
+    if life.model_learning is not None:
+        assert life.model_learning.journal is life.executive.journal
+    if life.human_questions is not None:
+        assert life.human_questions.journal is life.executive.journal
+    j=EvidenceJournal(state/'learning-evidence.sqlite3',read_only=True)
+    try:
+        assert len(j.category_records('observation','mobile_perception'))==4
+        assert not j.category_records('event','human_interaction')
+        assert not j.category_records('event','capability_activation')
+    finally:j.close()
+
+
 def test_registry_discovery_and_authority():
     r=default_registry()
     assert {c['id'] for c in r.describe()} >= {'mobile-observe','mobile-navigation-proposal','mobile-mobility'}

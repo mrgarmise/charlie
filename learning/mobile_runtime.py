@@ -67,8 +67,9 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
     from learning.capabilities import default_registry
     from attention.manager import AttentionManager
     from stimulus.bus import StimulusBus
+    review_options={name:True for name in ('human_questions','model_learning') if getattr(args,name,False)}
     lifecycle=DevelopmentLifecycle(state,args.episode_root or [Path(__file__).resolve().parents[1]/'robotron-runs'],
-        budget_seconds=args.learning_budget,resources=resources,history_roots=args.history_root)
+        budget_seconds=args.learning_budget,resources=resources,history_roots=args.history_root,**review_options)
     from contextlib import ExitStack
     with ExitStack() as owners:
         if getattr(args,'mobile_dashboard',False) and frame_bus is not None:

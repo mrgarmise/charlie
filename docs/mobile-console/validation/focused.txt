@@ -1,0 +1,19 @@
+.....F.................................................................. [ 94%]
+....                                                                     [100%]
+=================================== FAILURES ===================================
+__ test_disconnect_watchdog_revokes_and_stops_and_never_revives_expired_lease __
+
+    def test_disconnect_watchdog_revokes_and_stops_and_never_revives_expired_lease():
+        s=fixture();s.c.acquire();old=command(s);s.now[0]+=.401
+        assert s.c.expire();assert s.e._manual_owner is None
+        with pytest.raises(PermissionError):s.c.control(old)
+>       assert s.c.status()['control']['command']['state']=='watchdog STOP'
+E       AssertionError: assert 'rejected or failed' == 'watchdog STOP'
+E         
+E         - watchdog STOP
+E         + rejected or failed
+
+tests/test_mobile_console.py:97: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_mobile_console.py::test_disconnect_watchdog_revokes_and_stops_and_never_revives_expired_lease
+1 failed, 75 passed in 2.04s

@@ -1,0 +1,167 @@
+..........................FFF..........................F................ [ 80%]
+......F...F.....F                                                        [100%]
+=================================== FAILURES ===================================
+__ test_all_classes_through_attention_serializer_and_learning_with_no_motion ___
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-0/test_all_classes_through_atten0')
+
+    def test_all_classes_through_attention_serializer_and_learning_with_no_motion(tmp_path):
+        s=setup_session(tmp_path)
+        try:
+            for i,at in enumerate((1.,1.11,1.22)):result=feed(s,at,sequence=i)
+>           assert any('OBJECT_LABEL 4500 100 CHAIR' in command for command in s.transport.commands)
+E           assert False
+E            +  where False = any(<generator object test_all_classes_through_attention_serializer_and_learning_with_no_motion.<locals>.<genexpr> at 0x7fffa6c9c520>)
+
+tests/test_object_recognition.py:55: AssertionError
+_ test_switch_subscription_preserves_other_consumers_and_forces_reconfirmation _
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-0/test_switch_subscription_prese0')
+
+    def test_switch_subscription_preserves_other_consumers_and_forces_reconfirmation(tmp_path):
+        s=setup_session(tmp_path)
+        face=s.frames.subscribe_frames('pi-primary',clock=lambda:s.now[0])
+        learning=s.frames.subscribe_frames('pi-primary',clock=lambda:s.now[0])
+        try:
+            for i,at in enumerate((1.,1.11,1.22)):feed(s,at,sequence=i)
+>           assert s.labels.current==('pi-primary','CHAIR')
+E           AssertionError: assert None == ('pi-primary', 'CHAIR')
+E            +  where None = <attention.object_labels.ObjectLabels object at 0x7fffa62d1bd0>.current
+E            +    where <attention.object_labels.ObjectLabels object at 0x7fffa62d1bd0> = namespace(now=[1.22], frames=<stimulus.bus.StimulusBus object at 0x7fffa6c5da90>, events=<stimulus.bus.StimulusBus obj..._models.FixtureModel object at 0x7fffa62d11d0>, labels=<attention.object_labels.ObjectLabels object at 0x7fffa62d1bd0>).labels
+
+tests/test_object_recognition.py:74: AssertionError
+__ test_feeder_fault_and_generation_change_drop_display_and_stale_association __
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-0/test_feeder_fault_and_generati0')
+
+    def test_feeder_fault_and_generation_change_drop_display_and_stale_association(tmp_path):
+        s=setup_session(tmp_path)
+        try:
+            for i,at in enumerate((1.,1.11,1.22)):feed(s,at,sequence=i)
+            s.frames.frame_fault('pi-primary',s.pi,'source lost')
+            with pytest.raises(OSError):s.session.step()
+            assert s.labels.current is None
+            assert len(s.journal.category_records('event','mobile_acquisition_fault'))==1
+            feed(s,1.8,sequence=4,generation='replacement')
+            assert s.labels.current is None
+            feed(s,1.91,sequence=5,generation='replacement');feed(s,2.02,sequence=6,generation='replacement')
+>           assert s.labels.current==('pi-primary','CHAIR')
+E           AssertionError: assert None == ('pi-primary', 'CHAIR')
+E            +  where None = <attention.object_labels.ObjectLabels object at 0x7fffa62d3250>.current
+E            +    where <attention.object_labels.ObjectLabels object at 0x7fffa62d3250> = namespace(now=[2.02], frames=<stimulus.bus.StimulusBus object at 0x7fffa6303a10>, events=<stimulus.bus.StimulusBus obj..._models.FixtureModel object at 0x7fffa62d20d0>, labels=<attention.object_labels.ObjectLabels object at 0x7fffa62d3250>).labels
+
+tests/test_object_recognition.py:101: AssertionError
+________ test_real_pipeline_stabilizes_journals_and_ends_without_motion ________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-0/test_real_pipeline_stabilizes_0')
+
+    def test_real_pipeline_stabilizes_journals_and_ends_without_motion(tmp_path):
+        s=fixture(tmp_path)
+        other=s.frames.subscribe_frames('pi-primary',clock=lambda:s.now[0])
+        try:
+            row=start(s)
+            for i,at in enumerate((1.,1.11,1.22)):feed(s,at,i)
+            assert other.read().id=='pi-primary2'
+>           assert s.labels.current==('pi-primary','CHAIR')
+E           AssertionError: assert None == ('pi-primary', 'CHAIR')
+E            +  where None = <attention.object_labels.ObjectLabels object at 0x7fffa6234830>.current
+E            +    where <attention.object_labels.ObjectLabels object at 0x7fffa6234830> = namespace(now=[1.22], frames=<stimulus.bus.StimulusBus object at 0x7fffa61f5b70>, events=<stimulus.bus.StimulusBus obj...labels.ObjectLabels object at 0x7fffa6234830>, service=<learning.demonstration.Demonstration object at 0x7fff84a623c0>).labels
+
+tests/test_operator_demonstration.py:57: AssertionError
+_______ test_no_object_camera_loss_model_unavailable_and_serial_failure ________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-0/test_no_object_camera_loss_mod0')
+
+    def test_no_object_camera_loss_model_unavailable_and_serial_failure(tmp_path):
+        s=fixture(tmp_path)
+        try:
+            s.detector.infer=lambda frame:[]
+            start(s);feed(s,1.,1)
+            s.now[0]=16.;s.service.tick()
+            assert s.service.status()['session']['reason']=='no_recognizable_objects'
+        finally:close(s)
+        for mode in ('camera','model','serial','stall'):
+            folder=tmp_path/mode;folder.mkdir();s=fixture(folder)
+            try:
+                if mode=='model':s.service.factory=Mock(side_effect=OSError('model unavailable'))
+                row=s.service.submit(request(s.service));s.service.begin(row['id'])
+                if mode=='model':assert s.service.status()['session']['state']=='unavailable';continue
+                if mode=='camera':
+                    s.frames.frame_fault('pi-primary',s.pi,'lost');s.service.tick()
+                if mode=='serial':s.transport.show_object_label=lambda *args:False
+                if mode=='stall':s.now[0]=3.1;s.service.tick()
+                else:
+                    for i,at in enumerate((1.,1.11,1.22)):feed(s,at,i)
+>               assert s.service.status()['session']['state']=='failed'
+E               AssertionError: assert 'running' == 'failed'
+E                 
+E                 - failed
+E                 + running
+
+tests/test_operator_demonstration.py:174: AssertionError
+________ test_http_auth_origin_host_nonce_and_actual_attention_dispatch ________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-0/test_http_auth_origin_host_non0')
+
+    def test_http_auth_origin_host_nonce_and_actual_attention_dispatch(tmp_path):
+        from ui.dashboard import start_dashboard, DEFAULT_ORIGIN
+>       s=fixture(tmp_path);token='t'*40;server=start_dashboard(s.service,token,port=0)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_operator_demonstration.py:230: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ui/dashboard.py:133: in start_dashboard
+    server=Server(('127.0.0.1',port),Handler)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <socket.socket fd=-1, family=0, type=0, proto=0>
+family = <AddressFamily.AF_INET: 2>, type = <SocketKind.SOCK_STREAM: 1>
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+>       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError
+__________ test_attention_update_cannot_refresh_label_after_deadline ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-0/test_attention_update_cannot_r0')
+
+    def test_attention_update_cannot_refresh_label_after_deadline(tmp_path):
+        s=fixture(tmp_path)
+        try:
+            start(s)
+            for i,at in enumerate((1.,1.11,1.22)):feed(s,at,i)
+            shown=sum(x.startswith('OBJECT_LABEL') for x in s.transport.commands)
+            s.now[0]=16.
+            s.session.attention.update(None)
+            assert s.service.status()['session']['state']=='completed'
+            assert sum(x.startswith('OBJECT_LABEL') for x in s.transport.commands)==shown
+>           assert s.transport.commands[-1]=='OBJECT_CLEAR'
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+E           IndexError: deque index out of range
+
+tests/test_operator_demonstration.py:340: IndexError
+=========================== short test summary info ============================
+FAILED tests/test_object_recognition.py::test_all_classes_through_attention_serializer_and_learning_with_no_motion
+FAILED tests/test_object_recognition.py::test_switch_subscription_preserves_other_consumers_and_forces_reconfirmation
+FAILED tests/test_object_recognition.py::test_feeder_fault_and_generation_change_drop_display_and_stale_association
+FAILED tests/test_operator_demonstration.py::test_real_pipeline_stabilizes_journals_and_ends_without_motion
+FAILED tests/test_operator_demonstration.py::test_no_object_camera_loss_model_unavailable_and_serial_failure
+FAILED tests/test_operator_demonstration.py::test_http_auth_origin_host_nonce_and_actual_attention_dispatch
+FAILED tests/test_operator_demonstration.py::test_attention_update_cannot_refresh_label_after_deadline
+7 failed, 82 passed in 9.51s

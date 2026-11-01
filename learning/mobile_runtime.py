@@ -71,6 +71,9 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
         budget_seconds=args.learning_budget,resources=resources,history_roots=args.history_root)
     from contextlib import ExitStack
     with ExitStack() as owners:
+        if getattr(args,'mobile_dashboard',False) and frame_bus is not None:
+            from ui.dashboard import attach_mobile
+            attach_mobile(args,frame_bus,owners,executor=actuator_executor)
         owners.callback(lifecycle.close)
         owners.callback(source.close)
         owners.callback(detector.close) if hasattr(detector,'close') else None
@@ -128,6 +131,10 @@ def run_mobile(args, resources, frame_bus=None, actuator_executor=None, telemetr
         attention=AttentionManager(bus,mobile_enabled=False,object_labels=labels,
             emergency_stop=actuator_executor.emergency_stop if actuator_executor is not None else None)
         behavior=MobileObserveBehavior(source,perception,adapter,tracker=PetTracker(loss_seconds=2.),bus=bus)
+        if frame_bus is not None:
+            from vision.detection_publication import DetectionPublication
+            behavior.detection_publication=DetectionPublication(frame_bus)
+            owners.callback(behavior.detection_publication.close)
         context=None
         if getattr(args,'pet_follow',False):
             from learning.mobile_safety import MobileSafetyContext

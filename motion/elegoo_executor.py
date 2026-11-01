@@ -4,7 +4,7 @@ An authority is an independently installed admission service, not a behavior or
 registry flag. Without it no transport is opened. Command receipts are not pose.
 """
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import threading
 import os
 from pathlib import Path
@@ -39,6 +39,10 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
         self._receipts = 0
         self._receipt_lock = threading.Lock()
         self._generation = uuid4().hex
+        self._manual_owner = None
+        self._manual_until = 0.
+        self._manual_epoch = None
+        self._manual_sequence = -1
         bus.claim_observations('elegoo-actuator-state', self, metadata={
             'body': 'ELEGOO', 'modality': 'command-state',
             'clock': 'host-monotonic', 'physical_pose': 'unknown',
@@ -82,6 +86,7 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
         self.context = context
 
     def _execute_exclusive(self, proposal, *, lease, local_cancel):
+        self._check_manual(None)
         if self._safety_stopped:
             raise PermissionError('emergency STOP latched')
         if self.context is None:
@@ -121,13 +126,69 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
             return observation
         raise ValueError('fresh source-bound observation required')
 
-    def request(self, request):
+    def _check_manual(self, owner):
+        # Expired browser authority never silently resumes autonomous movement.
+        # Release/watchdog must first finish STOP and explicitly clear ownership.
+        with self._state_lock:
+            if self._manual_owner is not None:
+                if owner is not self._manual_owner or self.clock() >= self._manual_until:
+                    raise PermissionError('manual control owns chassis')
+            elif owner is not None:
+                raise PermissionError('manual authority revoked')
+
+    def claim_manual(self, owner, until):
+        if owner is None or not 0 < until-self.clock() <= .5:
+            raise ValueError('bounded manual owner required')
+        with self._state_lock:
+            if self._manual_owner is not None or self._safety_stopped or self.stop_uncertain or self._closed:
+                raise PermissionError('manual control unavailable')
+            self._manual_owner, self._manual_until = owner, until
+            self._manual_epoch, self._manual_sequence = uuid4().hex, -1
+        # Block autonomy before preempting any existing in-flight pulse.
+        try:
+            self.stop()
+            if self.stop_uncertain:raise PermissionError('STOP uncertain')
+        except BaseException:
+            self.emergency_stop()
+            raise
+
+    def renew_manual(self, owner, until):
+        with self._state_lock:
+            if owner is not self._manual_owner or not self.clock() < self._manual_until or not 0 < until-self.clock() <= .5:
+                raise PermissionError('manual lease expired or foreign')
+            self._manual_until = until
+
+    def release_manual(self, owner):
+        with self._state_lock:
+            if owner is not self._manual_owner:raise PermissionError('foreign manual owner')
+            self._manual_until = 0.
+        try:return self.stop()
+        finally:
+            with self._state_lock:self._manual_owner = None
+
+    def request_manual(self, owner, request, *, sequence):
+        if request.group != 'chassis' or request.requester != 'mobile-operator':
+            raise PermissionError('manual chassis request required')
+        self._check_manual(owner)
+        with self._state_lock:
+            if type(sequence) is not int or not self._manual_sequence < sequence <= 2**53:
+                raise ValueError('manual request sequence replayed or invalid')
+            self._manual_sequence = sequence
+            # Identity is minted by the trusted gateway, not supplied by HTTP.
+            # A new opaque owner gets a new epoch; old sequences cannot return.
+            request=replace(request,id=f'manual:{self.boot_id}:{self._manual_epoch}:{sequence}')
+        return self.request(request, _manual_owner=owner)
+
+    def request(self, request, *, _manual_owner=None):
         if not isinstance(request, ActuatorRequest):
             raise ValueError('typed actuator request required')
         # Isolate nested input from caller mutation during admission/dispatch.
         request = deepcopy(request)
         if request.action == 'stop':
             return self.stop()
+        if request.requester == 'mobile-operator' and _manual_owner is None:
+            raise PermissionError('manual requests require the opaque owner channel')
+        if request.group == 'chassis':self._check_manual(_manual_owner)
         if not self._request_lock.acquire(blocking=False):
             raise ValueError('another actuator request is active')
         cancel = threading.Event()
@@ -138,9 +199,10 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
                         or (self._stop_at is not None and request.at <= self._stop_at)):
                     raise ValueError('stopped, closed or uncertain executor')
                 self._active_cancel = cancel
+            if request.group == 'chassis':self._check_manual(_manual_owner)
             if (not isinstance(request.id,str) or not 1 <= len(request.id) <= 128
                     or not isinstance(request.requester,str) or not 1 <= len(request.requester) <= 128 or request.id in self.used
-                    or len(self.used) >= 256 or not 0 <= age(self.clock(), request.at) <= .1):
+                    or (_manual_owner is None and len(self.used) >= 256) or not 0 <= age(self.clock(), request.at) <= .1):
                 raise ValueError('invalid, stale or replayed actuator request')
             if (request.group, request.action) not in (('chassis', 'pulse'), ('camera-pan', 'pan')):
                 raise ValueError('unsupported actuator request')
@@ -169,6 +231,9 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
                         or self.clock()+.05 > lease.expires_at):
                     raise ValueError('pan envelope unqualified or exceeded')
             def safe():
+                try:
+                    if request.group == 'chassis':self._check_manual(_manual_owner)
+                except PermissionError:return False
                 return (not cancel.is_set() and not self.stop_uncertain and
                         lease.valid(self.clock(), self.boot_id) and
                         self.authority.safe(request, grant) is True)
@@ -215,6 +280,10 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
             with self._state_lock:
                 if self._active_cancel is cancel:
                     self._active_cancel = None
+            if _manual_owner is not None:
+                # Manual replay defense is epoch+monotonic sequence, so it does
+                # not accumulate a lifetime set or inherit the autonomous cap.
+                self.used.discard(request.id)
             self._request_lock.release()
 
     def emergency_stop(self):

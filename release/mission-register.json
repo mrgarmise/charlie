@@ -499,6 +499,130 @@
         "https://github.com/mrgarmise/charlie/pull/16"
       ],
       "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-18",
+      "description": "Selective demonstration evidence without repeated full-store encoding",
+      "priority": 1,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/18",
+      "linear_url": null,
+      "base": "097f110fd0c6d321d24024c399d79f0a427bf23c",
+      "head": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+      "target": "integration/unified-sensory-motion-20261026",
+      "source_tree": "63330e711fc5a2322d7c23844a296957722823be",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "1602 passed / 21 skipped / one existing marathon failure; unchanged retry running",
+        "integrated": "normal-runtime staging; inherited holds",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+      "dependencies": [
+        "charlie-pr-13"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Inherited draft/no-merge holds; no deployment or physical authority",
+        "Native/authentic-data acceptance remains separate"
+      ],
+      "safe_next_action": "Review exact tested staging tree; resolve inherited holds before any master promotion",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41323688078"
+      ]
+    },
+    {
+      "id": "charlie-pr-19",
+      "description": "Opt-in human interpretation review in the normal Executive",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/19",
+      "linear_url": null,
+      "base": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+      "head": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+      "target": "campaign/selective-demo-evidence-20261031",
+      "source_tree": "6c5d8206b1bd258118ea19a9ada3d86d864ebd94",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "Independent full: 1632 passed / 23 skipped; independent browser/security passed",
+        "integrated": "normal-runtime staging; inherited holds",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+      "dependencies": [
+        "charlie-pr-18",
+        "charlie-pr-14"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Inherited draft/no-merge holds; no deployment or physical authority",
+        "Native/authentic-data acceptance remains separate"
+      ],
+      "safe_next_action": "Review exact tested staging tree; resolve inherited holds before any master promotion",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41324201298",
+        "https://github.com/mrgarmise/charlie/actions/runs/41324201202"
+      ]
+    },
+    {
+      "id": "charlie-pr-20",
+      "description": "Guarded model learning with shared Executive and human review",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/20",
+      "linear_url": null,
+      "base": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+      "head": "be9e259781c09d9b56c065111aa2c0341c8187d6",
+      "target": "campaign/executive-human-review-20261101",
+      "source_tree": "44aa5f7ede2dc1f27096405fc83f8c7636cbfdd5",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "49 local focused passed; independent current-contract CI passed; full CI running",
+        "integrated": "normal-runtime staging; inherited holds",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "be9e259781c09d9b56c065111aa2c0341c8187d6",
+      "dependencies": [
+        "charlie-pr-19",
+        "charlie-pr-15"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Inherited draft/no-merge holds; no deployment or physical authority",
+        "Native/authentic-data acceptance remains separate"
+      ],
+      "safe_next_action": "Review exact tested staging tree; resolve inherited holds before any master promotion",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41324698128",
+        "https://github.com/mrgarmise/charlie/actions/runs/41324698124"
+      ]
     }
   ],
   "checkpoint": {
@@ -506,9 +630,18 @@
     "pr18_head": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
     "pr18_tree": "63330e711fc5a2322d7c23844a296957722823be",
     "independent_ci": "https://github.com/mrgarmise/charlie/actions/runs/41323688078",
-    "integration_stage": "Guarded model learning reconciled with shared normal Executive and human review; full CI pending",
+    "integration_stage": "Mobile Body console and read-only mission view reconciled; independent combined tests pending",
     "pr19_head": "c783b4002aa5ded2a092b4799e291a844ca67d26",
     "pr19_browser_ci": "https://github.com/mrgarmise/charlie/actions/runs/41324201202",
-    "pr18_ci": "1602 passed / 21 skipped / one existing marathon failure; unchanged retry running"
+    "pr18_ci": "1602 passed / 21 skipped / one existing marathon failure; unchanged retry running",
+    "pr19_full_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41324201298",
+      "result": "1632 passed / 23 skipped"
+    },
+    "pr20_head": "be9e259781c09d9b56c065111aa2c0341c8187d6",
+    "pr20_focused_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41324698128",
+      "result": "success"
+    }
   }
 }

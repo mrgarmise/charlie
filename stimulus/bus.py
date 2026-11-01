@@ -121,6 +121,7 @@ class StimulusBus:
         self.observation_history = {}
         self.observation_order = {}
         self.observation_health = {}
+        self.observation_fault_counts = {}
         self.observation_metadata = {}
         self.observation_subscribers = set()
 
@@ -141,6 +142,7 @@ class StimulusBus:
             self.observation_history[source] = deque(maxlen=32)
             self.observation_order[source] = None
             self.observation_health[source] = 'waiting'
+            self.observation_fault_counts.setdefault(source,0)
 
     def publish_observation(self, source, owner, observation):
         import json
@@ -178,6 +180,7 @@ class StimulusBus:
                 raise PermissionError('observation fault requires source owner')
             fault = OSError(str(reason))
             self.observation_health[source] = fault
+            self.observation_fault_counts[source] += 1
             self.observation_history[source].clear()
             for subscriber in self.observation_subscribers:
                 if subscriber.source == source:
@@ -225,6 +228,7 @@ class StimulusBus:
         with self.lock:
             return {source: dict(deepcopy(metadata), source_id=source,
                     health=str(self.observation_health[source]),
+                    failures=self.observation_fault_counts[source],
                     retained=len(self.observation_history[source]), history_limit=32,
                     payload_limit_bytes=16384, physical_authorization=False)
                     for source, metadata in self.observation_metadata.items()}

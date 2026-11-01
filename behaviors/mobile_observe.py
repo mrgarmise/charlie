@@ -17,6 +17,7 @@ class MobileObserveBehavior:
         if self.gate.backend is not None:raise ValueError('observation behavior has no physical execution backend')
 
     def acquisition_fault(self, error, metrics=None):
+        if hasattr(self,'detection_publication'):self.detection_publication.invalidate(str(error))
         self.tracker.invalidate(type(error).__name__)
         self.gate.close()
         if self.context is not None:self.context.current=None
@@ -57,7 +58,9 @@ class MobileObserveBehavior:
             if self.bus is not None:
                 emit_attention(self.bus,tracking,observation['frame'])
                 from vision.object_observation import object_observation
-                self.bus.emit('object_observation',object_observation(observation,tracking))
+                packet=object_observation(observation,tracking)
+                if hasattr(self,'detection_publication'):self.detection_publication.publish(packet)
+                self.bus.emit('object_observation',packet)
             result=dict(observation=observation,tracking=tracking,proposal=proposal,execution=execution,evidence_id=row.id)
             if self.attention is not None:
                 self.bus.emit('mobile_opportunity',result)

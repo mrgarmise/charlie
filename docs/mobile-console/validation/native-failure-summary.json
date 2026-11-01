@@ -1,0 +1,146 @@
+{
+  "run": "development tree; edits continued during run; not final revision certificate",
+  "result": "1584 passed, 35 failed, 27 skipped",
+  "failures": [
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RT]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[rt]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RT_DOWN]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RT_UP]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER_DOWN]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[R2]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[ABS_RZ]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[QUIT]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[PLAYER_ALEX]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[GUIDE+BACK]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[GUIDE BACK]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[A\\nRT]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[A\\rRT]",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_repeated_buttons_combinations_and_release",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_controller_sandbox::test_stopped_caller_hold_lease_neutralizes",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_deferred_measurement_review::test_real_http_shared_operator_server",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_marm.MarmTests::test_connection_failure_leaves_pending",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_marm.MarmTests::test_corrected_memory_is_filtered_from_recall",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_marm.MarmTests::test_failure_survives_restart_then_recovers",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_marm.MarmTests::test_partial_semantic_success_is_not_retried",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_marm.MarmTests::test_persist_deliver_scope_and_no_resend",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_marm.MarmTests::test_recall_uses_charlie_project_and_session",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_operator_demonstration::test_http_auth_origin_host_nonce_and_actual_attention_dispatch",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_passive_eyes::test_http_reuses_frames_without_camera_or_tracking_pass",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_passive_eyes::test_eof_shuts_down_remote_server_without_systemd",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_ppal_arcade_transport.ArcadeTransportTests::test_current_absolute_position_protocol_and_neutral",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_ppal_arcade_transport.ArcadeTransportTests::test_independent_sticks_and_held_direction_changes",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_ppal_arcade_transport.ArcadeTransportTests::test_rejected_command_stops_and_releases",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_ppal_hands.HandsTests::test_tcp_round_trip_ack_and_release",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_robotron.RobotronTests::test_camera_failure_releases_controls",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_robotron.RobotronTests::test_ppal_action_maps_to_confirmed_protocol",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_robotron.RobotronTests::test_rejection_disconnects_and_cannot_be_reused",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_robotron.RobotronTests::test_reset_is_not_fabricated",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    },
+    {
+      "test": "tests.test_score_review_queue::test_http_batch_review_preserves_originals_and_restart",
+      "message": "PermissionError: [Errno 1] Operation not permitted"
+    }
+  ]
+}

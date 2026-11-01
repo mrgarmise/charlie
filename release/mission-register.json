@@ -1,7 +1,7 @@
 {
   "schema": "charlie.master-campaign.v1",
-  "observed_utc": "2026-10-31T17:26:49.282246+00:00",
-  "master": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+  "observed_utc": "2026-11-01T16:25:30Z",
+  "master": "c53c7e662ececbd8d90c8945f04cddbdf909ace4",
   "mission": {
     "filename": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
     "sha256": "efc4ab2600c9f68b3ffc4a60e60aa2d678bdec1a32ee1ac9ed1d438a444e855f",
@@ -39,13 +39,24 @@
       "owner": "Charlie maintainers/operator",
       "date": "2026-10-31",
       "blockers": [
-        "MERGE BLOCKER: The October 10 original review store /home/five/.local/share/charlie/score-review/learning-evidence.sqlite3 and hash-bound reviewed photographs are unavailable here. The historical handoff reports 16 status records and 8 annotations, not verified distinct images. The examined October 11 uploaded archive contains zero human annotations. Exact accepted/corrected rows, finalization, prior consumption, authentic before/after feedback effect, held-out recognition and native Pi cost remain unverified. User merge authorization is conditional on acceptance; do not bypass this evidence requirement. Leave master unchanged until valid original feedback and authentic retained-state controls are independently examined and remaining checks satisfied."
+        "Original score-review notebook is now available read-only (hash/count inventory recorded); exact photograph binding, review finalization/prior consumption, heldout benefit and native acceptance remain unqualified. Conditional original merge hold remains."
       ],
-      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "safe_next_action": "Inspect original hash-bound photographs and authentic review lineage without rewriting the notebook; do not repeat prior ALA-2 recovery or infer acceptance from counts",
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/3"
       ],
-      "ancestor_of_pr13": false
+      "ancestor_of_pr13": false,
+      "availability_update": {
+        "date": "2026-11-01",
+        "journal_sha256": "ee612110302b40d89b977fc7dbb57ae2dc3a2ac09f7482bd78aa83d682464d21",
+        "bytes": 15142912,
+        "score_human_annotations": 8,
+        "score_review_status": 16,
+        "scope": "Read-only availability; original hold and photograph/benefit qualification remain"
+      },
+      "historical_blockers": [
+        "MERGE BLOCKER: The October 10 original review store /home/five/.local/share/charlie/score-review/learning-evidence.sqlite3 and hash-bound reviewed photographs are unavailable here. The historical handoff reports 16 status records and 8 annotations, not verified distinct images. The examined October 11 uploaded archive contains zero human annotations. Exact accepted/corrected rows, finalization, prior consumption, authentic before/after feedback effect, held-out recognition and native Pi cost remain unverified. User merge authorization is conditional on acceptance; do not bypass this evidence requirement. Leave master unchanged until valid original feedback and authentic retained-state controls are independently examined and remaining checks satisfied."
+      ]
     },
     {
       "id": "charlie-pr-5",
@@ -77,7 +88,7 @@
       "owner": "Charlie maintainers/operator",
       "date": "2026-10-31",
       "blockers": [
-        "Native 8\u201312 meaningful updates/s, camera/controller/display latency, projectile shape discrimination, individual-life sensing and complete-game tactical success remain NOT YET DEMONSTRATED. The original archive/notebook are unchanged; no new gameplay or learning evidence is fabricated. No physical gameplay, controller activation, servos, firmware deployment or learned-policy activation was performed. E1, P1 and I1 remain independently open. Keep this PR draft; no merge to main is authorized."
+        "Native 8–12 meaningful updates/s, camera/controller/display latency, projectile shape discrimination, individual-life sensing and complete-game tactical success remain NOT YET DEMONSTRATED. The original archive/notebook are unchanged; no new gameplay or learning evidence is fabricated. No physical gameplay, controller activation, servos, firmware deployment or learned-policy activation was performed. E1, P1 and I1 remain independently open. Keep this PR draft; no merge to main is authorized."
       ],
       "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
       "evidence": [
@@ -151,7 +162,7 @@
       "owner": "Charlie maintainers/operator",
       "date": "2026-10-31",
       "blockers": [],
-      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "safe_next_action": "Only receipt/index slice transferred to campaign stage; review remaining E1/P1/diagnostic mechanisms separately; do not claim full inclusion or I1",
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/7"
       ],
@@ -263,7 +274,7 @@
       "owner": "Charlie maintainers/operator",
       "date": "2026-10-31",
       "blockers": [
-        "[Current native audit, failures and exact remaining requirements](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/REPORT.md) \u00b7 [Artifact hashes and machine audit](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/audit.json) \u00b7 [Existing staged acceptance interfaces](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/completion/RUNBOOK.md). The older runbook's native-file access limitation is superseded by the new file audit only; hardware remains inaccessible. Original evidence, acceptance checkout, main Robotron checkout and separate motivational work are preserved. No merge or installation overwrite. Tracks CHA-15."
+        "[Current native audit, failures and exact remaining requirements](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/REPORT.md) · [Artifact hashes and machine audit](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/audit.json) · [Existing staged acceptance interfaces](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/completion/RUNBOOK.md). The older runbook's native-file access limitation is superseded by the new file audit only; hardware remains inaccessible. Original evidence, acceptance checkout, main Robotron checkout and separate motivational work are preserved. No merge or installation overwrite. Tracks CHA-15."
       ],
       "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
       "evidence": [
@@ -363,7 +374,7 @@
       "status": {
         "implemented": "published source",
         "independently_tested": "historical receipts; fresh campaign pending",
-        "integrated": "candidate; see original PR acceptance",
+        "integrated": "Reconciled in tested campaign staging; not master or native installation",
         "published_to_master": "pending",
         "installed": "UNKNOWN",
         "operating": "UNKNOWN",
@@ -381,9 +392,11 @@
       ],
       "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
       "evidence": [
-        "https://github.com/mrgarmise/charlie/pull/13"
+        "https://github.com/mrgarmise/charlie/pull/13",
+        "https://github.com/mrgarmise/charlie/pull/23"
       ],
-      "ancestor_of_pr13": true
+      "ancestor_of_pr13": true,
+      "staging_pr": "https://github.com/mrgarmise/charlie/pull/23"
     },
     {
       "id": "charlie-pr-14",
@@ -403,7 +416,7 @@
       "status": {
         "implemented": "published source",
         "independently_tested": "historical receipts; fresh campaign pending",
-        "integrated": "candidate; see original PR acceptance",
+        "integrated": "Reconciled in tested campaign staging; not master or native installation",
         "published_to_master": "pending",
         "installed": "UNKNOWN",
         "operating": "UNKNOWN",
@@ -418,11 +431,13 @@
         "Keep draft. Normal live producer/consumer attachment is pending: PR #13's MobileEvidenceAdapter.opportunities needs an opt-in Executive call with actual decision context; Robotron source journals need reviewed lineage/freshness-preserving consolidation to the application notebook. Callable APIs and deterministic E2E are implemented, not a deployed autonomous loop. Pi service access, approved phone tunnel, physical Safari and image-preview authorization remain pending.",
         "No original evidence, active PR head, deployment, firmware, GPIO, camera ownership, controller or motor restriction changed. No merge/rebase, Pi access, motion or live policy activation."
       ],
-      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "safe_next_action": "Validate additive normal-runtime review stage; original draft and native holds remain",
       "evidence": [
-        "https://github.com/mrgarmise/charlie/pull/14"
+        "https://github.com/mrgarmise/charlie/pull/14",
+        "https://github.com/mrgarmise/charlie/pull/19"
       ],
-      "ancestor_of_pr13": false
+      "ancestor_of_pr13": false,
+      "staging_pr": "https://github.com/mrgarmise/charlie/pull/19"
     },
     {
       "id": "charlie-pr-15",
@@ -442,7 +457,7 @@
       "status": {
         "implemented": "published source",
         "independently_tested": "historical receipts; fresh campaign pending",
-        "integrated": "candidate; see original PR acceptance",
+        "integrated": "Reconciled in tested campaign staging; not master or native installation",
         "published_to_master": "pending",
         "installed": "UNKNOWN",
         "operating": "UNKNOWN",
@@ -458,9 +473,11 @@
       ],
       "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
       "evidence": [
-        "https://github.com/mrgarmise/charlie/pull/15"
+        "https://github.com/mrgarmise/charlie/pull/15",
+        "https://github.com/mrgarmise/charlie/pull/20"
       ],
-      "ancestor_of_pr13": false
+      "ancestor_of_pr13": false,
+      "staging_pr": "https://github.com/mrgarmise/charlie/pull/20"
     },
     {
       "id": "charlie-pr-16",
@@ -480,7 +497,7 @@
       "status": {
         "implemented": "published source",
         "independently_tested": "historical receipts; fresh campaign pending",
-        "integrated": "candidate; see original PR acceptance",
+        "integrated": "Reconciled in tested campaign staging; not master or native installation",
         "published_to_master": "pending",
         "installed": "UNKNOWN",
         "operating": "UNKNOWN",
@@ -496,9 +513,305 @@
       ],
       "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
       "evidence": [
-        "https://github.com/mrgarmise/charlie/pull/16"
+        "https://github.com/mrgarmise/charlie/pull/16",
+        "https://github.com/mrgarmise/charlie/pull/21"
       ],
-      "ancestor_of_pr13": false
+      "ancestor_of_pr13": false,
+      "staging_pr": "https://github.com/mrgarmise/charlie/pull/21"
+    },
+    {
+      "id": "charlie-pr-18",
+      "description": "Selective demonstration evidence without repeated full-store encoding",
+      "priority": 1,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/18",
+      "linear_url": null,
+      "base": "097f110fd0c6d321d24024c399d79f0a427bf23c",
+      "head": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+      "target": "integration/unified-sensory-motion-20261026",
+      "source_tree": "63330e711fc5a2322d7c23844a296957722823be",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "Attempt 2: 1603 passed / 21 skipped; original attempt 1 retained with one existing marathon failure",
+        "integrated": "normal-runtime staging; inherited holds",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+      "dependencies": [
+        "charlie-pr-13"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Inherited draft/no-merge holds; no deployment or physical authority",
+        "Native/authentic-data acceptance remains separate"
+      ],
+      "safe_next_action": "Review exact tested staging tree; resolve inherited holds before any master promotion",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41323688078"
+      ]
+    },
+    {
+      "id": "charlie-pr-19",
+      "description": "Opt-in human interpretation review in the normal Executive",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/19",
+      "linear_url": null,
+      "base": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+      "head": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+      "target": "campaign/selective-demo-evidence-20261031",
+      "source_tree": "6c5d8206b1bd258118ea19a9ada3d86d864ebd94",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "Independent full: 1632 passed / 23 skipped; independent browser/security passed",
+        "integrated": "normal-runtime staging; inherited holds",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+      "dependencies": [
+        "charlie-pr-18",
+        "charlie-pr-14"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Inherited draft/no-merge holds; no deployment or physical authority",
+        "Native/authentic-data acceptance remains separate"
+      ],
+      "safe_next_action": "Review exact tested staging tree; resolve inherited holds before any master promotion",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41324201298",
+        "https://github.com/mrgarmise/charlie/actions/runs/41324201202"
+      ]
+    },
+    {
+      "id": "charlie-pr-20",
+      "description": "Guarded model learning with shared Executive and human review",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/20",
+      "linear_url": null,
+      "base": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+      "head": "be9e259781c09d9b56c065111aa2c0341c8187d6",
+      "target": "campaign/executive-human-review-20261101",
+      "source_tree": "44aa5f7ede2dc1f27096405fc83f8c7636cbfdd5",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "Independent focused and full passed; 1677 passed / 26 skipped",
+        "integrated": "normal-runtime staging; inherited holds",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "be9e259781c09d9b56c065111aa2c0341c8187d6",
+      "dependencies": [
+        "charlie-pr-19",
+        "charlie-pr-15"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Inherited draft/no-merge holds; no deployment or physical authority",
+        "Native/authentic-data acceptance remains separate"
+      ],
+      "safe_next_action": "Review exact tested staging tree; resolve inherited holds before any master promotion",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41324698128",
+        "https://github.com/mrgarmise/charlie/actions/runs/41324698124"
+      ]
+    },
+    {
+      "id": "charlie-pr-21",
+      "description": "Mobile Body monitoring and canonical read-only mission view",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/21",
+      "linear_url": null,
+      "head": "9a1fee83ca518a4d106021e918263a4bafdd0620",
+      "target": "campaign/executive-model-review-20261101",
+      "source_tree": "95705eede18cca4e4634a4b9589c3dcc1485869c",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "1711 passed / 27 skipped in two independent suites; 36 browser/HTTP passed",
+        "integrated": "normal-runtime staging; all inherited holds retained",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "9a1fee83ca518a4d106021e918263a4bafdd0620",
+      "dependencies": [
+        "charlie-pr-20",
+        "charlie-pr-16"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Explicit inherited draft/no-merge and separate native/authentic-data acceptance gates"
+      ],
+      "safe_next_action": "Review scoped stage; resolve original holds before promotion; no deployment or physical authorization",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/21"
+      ],
+      "base": "be9e259781c09d9b56c065111aa2c0341c8187d6"
+    },
+    {
+      "id": "charlie-pr-22",
+      "description": "Scoped immutable session receipt and category-index recovery",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/22",
+      "linear_url": null,
+      "head": "fa7d5d5db5726e8e251000d79e9cc009fa912ae8",
+      "target": "campaign/monitoring-missions-20261101",
+      "source_tree": "71fab47fb62ba1b39e12e804cc83b56e9df9944d",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "1715 passed / 27 skipped; independent acquisition contracts passed",
+        "integrated": "normal-runtime staging; all inherited holds retained",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "fa7d5d5db5726e8e251000d79e9cc009fa912ae8",
+      "dependencies": [
+        "charlie-pr-21",
+        "charlie-pr-7"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Explicit inherited draft/no-merge and separate native/authentic-data acceptance gates"
+      ],
+      "safe_next_action": "Review scoped stage; resolve original holds before promotion; no deployment or physical authorization",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/22"
+      ],
+      "base": "9a1fee83ca518a4d106021e918263a4bafdd0620"
+    },
+    {
+      "id": "charlie-pr-23",
+      "description": "Preserve opt-in review in mobile-specific normal startup",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/23",
+      "linear_url": null,
+      "head": "3b364f9b3eca8ae3348fb5f9eb4eaeb315f32b27",
+      "target": "campaign/immutable-acquisition-20261101",
+      "source_tree": "eb8ea26b8460a3b2f3d6f6dfee93dd9cc347a8de",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "1719 passed / 27 skipped in two independent suites; 36 browser/HTTP and 131 conformance passed",
+        "integrated": "normal-runtime staging; all inherited holds retained",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "3b364f9b3eca8ae3348fb5f9eb4eaeb315f32b27",
+      "dependencies": [
+        "charlie-pr-22"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Explicit inherited draft/no-merge and separate native/authentic-data acceptance gates"
+      ],
+      "safe_next_action": "Review scoped stage; resolve original holds before promotion; no deployment or physical authorization",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/pull/23"
+      ],
+      "base": "fa7d5d5db5726e8e251000d79e9cc009fa912ae8"
     }
-  ]
+  ],
+  "checkpoint": {
+    "master_before": "c53c7e662ececbd8d90c8945f04cddbdf909ace4",
+    "master_after": "c53c7e662ececbd8d90c8945f04cddbdf909ace4",
+    "prior_register_pr17": "merged at c53c7e662ececbd8d90c8945f04cddbdf909ace4",
+    "latest_implementation": "3b364f9b3eca8ae3348fb5f9eb4eaeb315f32b27",
+    "latest_implementation_tree": "eb8ea26b8460a3b2f3d6f6dfee93dd9cc347a8de",
+    "source_comparison": {
+      "compared": 640,
+      "published": 640,
+      "mismatches": []
+    },
+    "ancestry": {
+      "base": "c53c7e662ececbd8d90c8945f04cddbdf909ace4",
+      "merge_base": "c53c7e662ececbd8d90c8945f04cddbdf909ace4",
+      "status": "ahead",
+      "ahead_by": 87,
+      "behind_by": 0
+    },
+    "full_ci": [
+      {
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/41325698765",
+        "passed": 1719,
+        "skipped": 27
+      },
+      {
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/41325702200",
+        "passed": 1719,
+        "skipped": 27
+      }
+    ],
+    "browser_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41325702200",
+      "passed": 36
+    },
+    "conformance": 131,
+    "merge_authority": "All inherited source holds retained; no runtime merges",
+    "installed": "UNKNOWN; no deployment",
+    "operating": "Host process identity not established",
+    "physical_authorization": false,
+    "local_evidence": "/home/five/charlie-master-campaign-evidence-20261101",
+    "resume": "Continue from PR 23 exact implementation, not original master or repeated PR 17 inventory",
+    "restricted_host_final": {
+      "passed": 1669,
+      "skipped": 34,
+      "failures": 36,
+      "errors": 7,
+      "socket_denials": 42,
+      "other": "Normal calibration completion failure also reproduces on unchanged #21 control",
+      "acceptance": "not a pass"
+    }
+  }
 }

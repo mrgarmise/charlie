@@ -1,5 +1,10 @@
 # Master integration campaign
 
+Latest published continuation: [November 1 checkpoint](CHECKPOINT-20261101.md).
+Master remains `c53c7e6`; runtime increments #18–#23 are tested draft stages.
+The October 31 inventory below is historical and preserved; resume from the
+linked checkpoint without repeating completed work or waiving inherited holds.
+
 The [machine-readable register](../../release/mission-register.json) is the single
 campaign status source for repository and local dashboard consumers. It extends
 [release capabilities](../../release/capabilities.json); it does not change the

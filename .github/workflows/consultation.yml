@@ -1,0 +1,29 @@
+name: Independent consultation software validation
+on:
+  push:
+    branches: ['feature/onboard-consultation-20261101']
+  pull_request:
+    paths: ['learning/consultation.py', 'tests/test_consultation*', 'ui/discoveries.py', 'docs/consultation/**']
+permissions:
+  contents: read
+jobs:
+  software:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest
+      - run: python -m pytest tests/test_consultation* -q --junitxml=consultation-focused.xml
+      - run: python tools/check_unified_contracts.py
+      - run: python -m pytest tests -q --junitxml=consultation-full.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: consultation-software-evidence
+          path: |
+            consultation-focused.xml
+            consultation-full.xml

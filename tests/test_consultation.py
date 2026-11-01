@@ -260,3 +260,18 @@ def test_total_local_remote_wall_budget(journal):
     q=s.consider(source(journal).id)
     with pytest.raises(InterruptedError):s.process_one()
     assert not remote.calls and s.questions()[q.id]['status']=='deferred'
+
+
+def test_local_retained_knowledge_checked_without_network(journal,tmp_path):
+    from types import SimpleNamespace
+    from memory.learning_projects import LearningExecutive
+    calls=[]
+    class Evaluator:
+        def for_evidence(self,ids):
+            calls.append(ids)
+            return [dict(id='retained-correction',status='promoted',source='user:correction')]
+    # Empty Executive agenda needs no writes or memory promotions.
+    ex=LearningExecutive(journal,SimpleNamespace(evaluator=Evaluator()))
+    r=source(journal)
+    assert ex.consider_consultation(ConsultationService(journal),r.id) is None
+    assert calls==[[r.id,str(journal.path.resolve())+'#'+r.id]]

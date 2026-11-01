@@ -8,7 +8,10 @@ from stimulus.bus import StimulusBus
 
 
 @pytest.mark.parametrize('review', [[], ['--human-questions'], ['--model-learning'],
-                                  ['--human-questions', '--model-learning']])
+                                  ['--human-questions', '--model-learning'], ['--llm-consultation'],
+                                  ['--human-questions','--llm-consultation'],
+                                  ['--model-learning','--llm-consultation'],
+                                  ['--human-questions','--model-learning','--llm-consultation']])
 def test_monitoring_keeps_normal_vision_attention_and_single_worker(monkeypatch, tmp_path, review):
     workers = []
     class Worker:
@@ -64,7 +67,7 @@ def test_monitoring_keeps_normal_vision_attention_and_single_worker(monkeypatch,
     assert owners == ['cameras', 'executor'] and servers == [frame_bus]
     assert len(managers) == 1 and not managers[0].mobile_enabled
     assert len(workers) == 1 and not workers[0].alive
-    for flag in ('human_questions', 'model_learning'):
+    for flag in ('human_questions', 'model_learning', 'llm_consultation'):
         assert workers[0].kwargs['kwargs'].get(flag, False) == ('--' + flag.replace('_', '-') in review)
     assert 'vision update' in events
     telemetry.poll.assert_called_once(); gateway.poll.assert_called_once()

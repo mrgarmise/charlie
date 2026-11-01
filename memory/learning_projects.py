@@ -101,7 +101,9 @@ class LearningExecutive:
         """General observation advice from authentic retained uncertainty only."""
         if service.journal is not self.journal:
             raise ValueError('consultant must share Executive journal')
-        return service.consider(evidence_id)
+        references=[evidence_id,str(self.journal.path.resolve())+'#'+evidence_id]
+        retained=self.gateway.evaluator.for_evidence(references)
+        return service.consider(evidence_id,retained=retained[:20])
 
     def receive_human_answers(self, service, owner):
         """Existing Executive receives fallible evidence, never activates policy."""

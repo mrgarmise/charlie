@@ -223,8 +223,9 @@ class ConsultationService:
             updated_at=self.clock(),**extra),episode=q['episode'],sources=[q['id']],
             producer='LearningExecutive:consultation',version='consultation-v1')
 
-    def consider(self,evidence_id):
+    def consider(self,evidence_id,*,retained=()):
         row=self.journal.get(evidence_id);p=row.data['payload'];now=self.clock()
+        if any(m.get('source')=='user:correction' and m.get('status')=='promoted' for m in retained):return None
         # Deliberately small authentic-source allowlist, not model-created needs.
         if row.data['kind']!='observation' or p.get('synthetic') or p.get('demo'):return None
         if row.data['provenance'].get('authentic') is not True:return None
@@ -253,6 +254,7 @@ class ConsultationService:
                 or sum(0<=now-q['created_at']<86400 for q in questions)>=self.daily_budget):return None
         return self.journal.append('event',dict(category=CATEGORY,op='queued',key=key,
             question=question,evidence_ids=[row.id],created_at=now,owner=need.owner,subject=need.subject,
+            retained_knowledge_checked=[m['id'] for m in retained],
             status='pending',trust='unverified_hypothesis',physical_authorization=False,model_update=False),
             episode=row.data['episode'],sources=[row.id],producer='LearningExecutive:consultation',version='consultation-v1')
 

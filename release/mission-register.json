@@ -672,5 +672,59 @@
       "url": "https://github.com/mrgarmise/charlie/actions/runs/41325251230",
       "result": "success"
     }
+  },
+  "objective_a_continuation": {
+    "mission": "docs/objective-a/Charlie_Mobile_Body_Objective_A_Codex_Handoff_v2.md",
+    "mission_sha256": "d2343c82a486962423672ebb344529fc32a91fba3dda2a6817ac4a53558db31d",
+    "report": "docs/objective-a/REPORT-20261101.md",
+    "pr_url": "https://github.com/mrgarmise/charlie/pull/26",
+    "base_pr": 23,
+    "base_head": "3b364f9b3eca8ae3348fb5f9eb4eaeb315f32b27",
+    "runtime_revision": "28c3cef8756801de7009ccd85238fc3687a66a2d",
+    "runtime_tree": "81f7cf826ecc60436f2d3eb763fc17b159c5409d",
+    "mobile_only_split": "removed; existing normal primary loop owns monitoring",
+    "status": {
+      "code_integrated": "draft continuation; independent full 1723 passed / 27 skipped; conformance 131; browser/HTTP 36",
+      "installed": "BLOCKED: host service/device/socket access",
+      "operating": "UNKNOWN",
+      "hosted_published": "PENDING: Node and DNS source workflow unavailable",
+      "physically_qualified": "not claimed; Cleared Room required",
+      "autonomous_ready": "not claimed; Objective B deferred"
+    },
+    "barriers": {
+      "1": "deferred Objective B",
+      "2": "blocked authentic native telemetry admission",
+      "3": "unknown safety feeds, fail closed",
+      "4": "prepared monitoring-only 0600 config; not installed",
+      "5": "blocked actual existing service inventory/cutover",
+      "6": "blocked socket/systemd/device access",
+      "7": "pending actual Site source publication"
+    },
+    "ci_url": "https://github.com/mrgarmise/charlie/actions/runs/41329211878",
+    "preservation": "all inherited PR/draft/merge/safety holds and original evidence retained",
+    "last_tested_revision": "28c3cef8756801de7009ccd85238fc3687a66a2d",
+    "tests": {
+      "independent_full": {
+        "passed": 1723,
+        "skipped": 27,
+        "seconds": 409.42
+      },
+      "conformance_passed": 131,
+      "browser_http_passed": 36,
+      "local_focused": {
+        "passed": 123,
+        "failed": 1,
+        "reason": "socket denied"
+      },
+      "unchanged_pr23_control": "four new tests fail before fix",
+      "restricted_host_full": {
+        "passed": 1673,
+        "skipped": 34,
+        "failed": 36,
+        "errors": 7,
+        "socket_denials": 42,
+        "other_failure": "existing normal calibration completion failure preserved in PR24 checkpoint"
+      }
+    }
   }
 }

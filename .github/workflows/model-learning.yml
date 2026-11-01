@@ -1,0 +1,30 @@
+name: Guarded model learning
+on:
+  push:
+    branches: [campaign/executive-model-review-20261101]
+  pull_request:
+    branches: [master]
+permissions:
+  contents: read
+jobs:
+  model-learning:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest
+      - name: Test current integrated contracts and normal runtime
+        env:
+          CHARLIE_MODEL_LEARNING_SHARED_GATEWAY: ${{ github.workspace }}/memory/human_interaction.py
+          CHARLIE_MODEL_LEARNING_SHARED_BUS: ${{ github.workspace }}/stimulus/bus.py
+        run: python -m pytest tests/test_model_learning.py tests/test_model_learning_review.py tests/test_model_learning_shared_bus.py tests/test_model_learning_shared_gateway.py tests/test_normal_human_questions.py -q --junitxml=model-learning-tests.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: model-learning-tests
+          path: model-learning-tests.xml

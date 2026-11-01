@@ -19,6 +19,7 @@ def parser():
     mode.add_argument('--offline',dest='offline',action='store_true',help='no camera, motion, firmware or game transport (default)')
     mode.add_argument('--hardware',dest='offline',action='store_false',help='explicit separately authorized hardware startup; CAL-1 gates still apply')
     p.set_defaults(offline=True)
+    p.add_argument('--model-learning',action='store_true',help='opt in to guarded Executive perception investigations; candidates stay shadow')
     p.add_argument('--learning-state',type=Path,default=Path.home()/'.local/share/charlie/development')
     p.add_argument('--human-questions',action='store_true',help='opt-in Executive review questions from committed evidence; no web listener or authority')
     p.add_argument('--episode-root',type=Path,action='append',default=[])
@@ -230,6 +231,8 @@ def main(argv=None):
         else:
             run_mobile(args,resources)
         return
+    if args.model_learning:
+        kwargs["model_learning"]=True
     if args.offline:
         run(args.learning_state,roots,**kwargs)
         return

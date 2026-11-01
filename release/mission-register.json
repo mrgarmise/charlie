@@ -506,6 +506,9 @@
     "pr18_head": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
     "pr18_tree": "63330e711fc5a2322d7c23844a296957722823be",
     "independent_ci": "https://github.com/mrgarmise/charlie/actions/runs/41323688078",
-    "integration_stage": "Opt-in Executive human review; CI pending; inherited holds preserved"
+    "integration_stage": "Guarded model learning reconciled with shared normal Executive and human review; full CI pending",
+    "pr19_head": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+    "pr19_browser_ci": "https://github.com/mrgarmise/charlie/actions/runs/41324201202",
+    "pr18_ci": "1602 passed / 21 skipped / one existing marathon failure; unchanged retry running"
   }
 }

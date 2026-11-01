@@ -110,3 +110,38 @@ Do not reset existing worktrees, alter active PRs or roll back unrelated service
 API design references: https://docs.ollama.com/api/chat ,
 https://docs.ollama.com/api/show , https://docs.ollama.com/api/generate ,
 https://ollama.com/library/qwen3 . Native numbers remain unavailable until measured.
+
+## Example version-pinned archive staging (operator only)
+
+After choosing an exact upstream `VERSION` and obtaining its authenticated
+published checksum, stage into a new directory. These commands were **not run**:
+
+```sh
+RELEASE_DIR="$HOME/ollama-consultation/$VERSION"
+mkdir -p "$RELEASE_DIR"
+curl -fL --proto '=https' --tlsv1.2 \
+  "https://github.com/ollama/ollama/releases/download/$VERSION/ollama-linux-arm64.tar.zst" \
+  -o "$RELEASE_DIR/ollama-linux-arm64.tar.zst"
+sha256sum "$RELEASE_DIR/ollama-linux-arm64.tar.zst"
+# Stop until the digest matches the authenticated upstream checksum.
+tar --zstd -tf "$RELEASE_DIR/ollama-linux-arm64.tar.zst"
+# Stop on absolute paths, .. escapes or unsafe link targets in the member list.
+tar --zstd --no-same-owner -xf "$RELEASE_DIR/ollama-linux-arm64.tar.zst" -C "$RELEASE_DIR"
+OLLAMA_BIN="$RELEASE_DIR/bin/ollama"
+"$OLLAMA_BIN" --version
+```
+
+Current official ARM64 documentation uses `.tar.zst`; verify asset name/layout for
+the pinned release. Set a **new** private `OLLAMA_MODELS` directory and bind both
+that writable directory and the release directory read-only as described above.
+For model pull/identity/unload against the verified loopback-only service:
+
+```sh
+OLLAMA_HOST=127.0.0.1:11434 "$OLLAMA_BIN" pull qwen3:1.7b
+curl --fail --max-time 5 http://127.0.0.1:11434/api/version
+curl --fail --max-time 5 http://127.0.0.1:11434/api/tags
+curl --fail --max-time 5 http://127.0.0.1:11434/api/show \
+  -H 'Content-Type: application/json' -d '{"model":"qwen3:1.7b"}'
+curl --fail --max-time 5 http://127.0.0.1:11434/api/generate \
+  -H 'Content-Type: application/json' -d '{"model":"qwen3:1.7b","keep_alive":0}'
+```

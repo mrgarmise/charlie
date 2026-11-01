@@ -212,10 +212,10 @@ def test_one_normal_executive_shared_journal_and_default_no_transport(tmp_path,h
 
 def test_executive_refuses_foreign_journal(journal,tmp_path):
     from memory.learning_projects import LearningExecutive
-    from memory.gateway import MemoryGateway
+    from types import SimpleNamespace
     other=EvidenceJournal(tmp_path/'other.sqlite3')
     try:
-        ex=LearningExecutive(journal,MemoryGateway())
+        ex=LearningExecutive(journal,SimpleNamespace())
         with pytest.raises(ValueError):ex.consider_consultation(ConsultationService(other),source(journal).id)
     finally:other.close()
 

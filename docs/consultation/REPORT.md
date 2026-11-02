@@ -150,3 +150,53 @@ review tests; it is not an exact final-head count. The 43 failures/errors reprod
 the base environment pattern: 42 socket-creation denials and one existing normal
 calibration-completion failure. Independent final CI is required for the complete
 software verdict. Raw full XML/log remain in the evidence directory.
+
+
+## Resumed checkpoint — 2026-11-02
+
+Repository and GitHub inspection established that all four original increments
+were already published in draft PR #27 at `b60f4a5edb3605bac212ce7ed81a1f9b43ba92e5`,
+tree `8cdc145afb9a729e251f8dd704b2c3ee85e87b7e`. No unpublished consultation
+implementation existed. GitHub again reports both exact-head independent runs
+41332473459 and 41332473577 completed successfully. The final private receipt and
+PR ledger record **1780 passed / 27 skipped** in each full suite, **53 focused**,
+**131 contracts**, and **36 browser/HTTP** checks. This supersedes the provisional
+CI-pending wording above without discarding its original failure evidence.
+
+The continuation fixes one standalone benchmark defect: optional missing token
+counts with a supplied duration now produce an unknown rate instead of losing a
+valid answer to KeyError. Zero token counts still produce zero rate. Two fixture
+cases verify retained answers, resource-refusal receipts, warm-model unload and
+postflight capture. No normal runtime enabling change is made.
+
+Local continuation validation: **84 passed / 5 socket-denial skips**, 14.72 s,
+including consultation, probe, all review-option combinations and resource tests;
+**131 contracts passed**, 3.47 s. Commands:
+
+```sh
+python -m pytest tests/test_consultation_probe.py tests/test_consultation.py tests/test_consultation_http.py tests/test_normal_multi_ability.py tests/test_normal_human_questions.py tests/test_objective_a_normal_runtime.py tests/test_development_resources.py -q -p no:cacheprovider
+python tools/check_unified_contracts.py
+```
+
+Fresh read-only preflight: 7,433,536 KiB available, zero swap used, 32 C, fan
+0 RPM at this idle sample; neither fan failure nor active cooling is established
+by an idle reading. Ollama is absent, TCP/UDP creation and systemd are denied,
+video/Hailo/serial nodes absent, throttling and live revision UNKNOWN. Native
+acceptance remains inaccessible. No installation, inference or hardware action
+was attempted. Private new evidence: `/home/five/charlie-consultation-evidence-20261102/`.
+
+All existing local worktrees were inventoried. Unrelated unpublished agency,
+calibration, controller-lease changes and untracked evidence remain untouched;
+`worktrees.json` preserves exact dirty-path inventory. Runtime checkout is clean.
+The earlier staged pico:ed work is no longer present there; no assumption is made
+about its disposition. PRs #23–#26 remain open and separate. Git fetch still fails
+on SSH system-config permissions; live connector metadata supplies source identity.
+
+**Exact continuation:** use the existing PR #27 branch; do not rebuild its four
+completed increments. First complete OPERATOR.md's finite native checklist in an
+unrestricted Pi terminal: live identity/owners, dedicated bounded loopback service,
+verified model identity, cold/warm performance and answer review, cooling/throttling,
+and separately authorized stationary sensing interference. Only actual Stage A
+qualification permits review of enabling the existing transport in the normal
+Executive. Keep shadow/default-off, draft/no-merge and every hardware/learning
+authority hold until then. No paid provider or remote call is enabled.

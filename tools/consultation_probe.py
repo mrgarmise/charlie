@@ -102,7 +102,7 @@ def main():
             try:
                 result=provider.consult(question,check)
                 for field,denominator in [('prompt_eval_count','prompt_eval_duration'),('eval_count','eval_duration')]:
-                    m=result['metrics'];m[field+'_per_second']=m[field]*1e9/m[denominator] if m.get(denominator) else None
+                    m=result['metrics'];m[field+'_per_second']=m[field]*1e9/m[denominator] if m.get(field) is not None and m.get(denominator) else None
                 record=dict(index=index,question=question,start=start,result=result)
             except Exception as exc:
                 record=dict(index=index,question=question,start=start,error=type(exc).__name__)

@@ -263,12 +263,14 @@ def test_normal_attention_lifecycle_survives_worker_interruption(tmp_path,monkey
         'motion.controller':dict(Deck=lambda:SimpleNamespace(body=SimpleNamespace(close=lambda:None),stop=lambda:None,observe_frame=lambda *a:None)),
         'hardware.calibration_service':dict(CalibrationService=SimpleNamespace(open=lambda *a:SimpleNamespace(close=lambda:None,refresh=lambda:None,attach_brain=lambda **kw:None))),
         'attention.manager':dict(AttentionManager=Attention),
-        'stimulus.keyboard':dict(KeyboardStimulus=lambda bus:None),
+        'stimulus.keyboard':dict(KeyboardStimulus=lambda bus, **kwargs:SimpleNamespace(close=lambda:None)),
         'vision.camera':dict(Camera=Camera),
         'vision.detector':dict(ColorDetector=lambda **kw:object()),
         'vision.stimulus':dict(VisionStimulus=Vision)}
     for name,contents in replacements.items():
         module=ModuleType(name);module.__dict__.update(contents);monkeypatch.setitem(sys.modules,name,module)
+    from camera_application_fixture import install
+    install(monkeypatch,main,Camera())
     with pytest.raises(KeyboardInterrupt):main.main(['--hardware','--learning-state',str(tmp_path/'state')])
     assert calls.count('worker started')==2
     assert calls.count('attention update')==3

@@ -4,6 +4,78 @@ from .datasets import SCOPE, sha
 
 class CapabilityDeployment:
     def __init__(self,journal): self.journal=journal
+    def activate_actuator(self, qualification_id, *, authorization):
+        """Record external group-specific authority; never operate hardware."""
+        from .actuator_safety import GROUPS, validate_actuator_report
+        from .mobile_safety import artifact, finite, runtime_hash
+        q = self.journal.get(qualification_id)
+        p, a = q.data['payload'], authorization
+        if (q.data['producer'] != 'independent-actuator-evaluator'
+                or p.get('category') != 'actuator_physical_qualification'
+                or p.get('passed') is not True or p.get('runtime_sha256') != runtime_hash()):
+            raise ValueError('current independent group qualification required')
+        report = validate_actuator_report(artifact(p['report_artifact']))
+        group = report['group']
+        if (report != p['report'] or a.get('target') != GROUPS[group]
+                or a.get('qualification_id') != qualification_id or not a.get('source')
+                or not a.get('boot_id') or a.get('mode') != 'supervised_trial'
+                or a.get('execution') != ('read-only' if group == 'telemetry' else 'physical')
+                or a.get('hardware_id') != report['hardware_id'] or a.get('zone') != report['zone']
+                or not finite(a.get('issued_at')) or not finite(a.get('expires_at'))
+                or not 0 < a['expires_at']-a['issued_at'] <= 600):
+            raise ValueError('separate bounded group/device/boot/zone authority required')
+        key = digest(dict(qualification=qualification_id, authorization=a))
+        if any(row.data['payload'].get('revoked_activation') == key for row in self.journal.records('event')):
+            raise ValueError('revoked activation cannot be reused')
+        return self.journal.append('event',dict(category='capability_activation',target=GROUPS[group],
+            candidate_id=qualification_id,qualification_id=qualification_id,authorization=a,
+            activation_key=key,previous_activation=None),episode=q.data['episode'],sources=[qualification_id],
+            producer='authorized-capability-deployment',version='actuator-safety-v1')
+
+    def revoke_actuator(self, target, *, reason, authorization):
+        from .actuator_safety import GROUPS
+        active = self.active(target)
+        if target not in GROUPS.values() or not active or not active.get('candidate_id') or not reason or not authorization.get('source'):
+            raise ValueError('active group and explicit revocation authority required')
+        return self.journal.append('event',dict(category='capability_activation',target=target,
+            candidate_id=None,previous_activation=None,revoked_activation=active['activation_key'],
+            activation_key=digest(dict(revoke=active['activation_key'],reason=reason)),reason=reason,
+            authorization=authorization),episode='actuator-qualification',
+            producer='authorized-capability-deployment',version='actuator-safety-v1')
+
+    def activate_mobile(self, qualification_id, *, authorization):
+        """Same deployment journal/rollback surface, separate mobile domain proof."""
+        from .mobile_safety import artifact, validate_report, runtime_hash
+        q=self.journal.get(qualification_id);p=q.data['payload'];a=authorization
+        if (q.data['producer']!='independent-mobile-evaluator' or p.get('category')!='mobile_physical_qualification'
+                or p.get('passed') is not True or p.get('runtime_sha256')!=runtime_hash()):
+            raise ValueError('independent current mobile qualification required')
+        if (a.get('target')!='mobile-pet-follow' or a.get('qualification_id')!=qualification_id
+                or a.get('execution')!='physical' or not a.get('source') or not a.get('boot_id')
+                or a.get('mode') not in ('supervised_trial','qualified_autonomous')
+                or a.get('purpose') not in ('proxy','live_pet','operation')
+                or (a['mode']=='qualified_autonomous')!=(a['purpose']=='operation')):
+            raise ValueError('separate boot-bound mobile authorization required')
+        report=validate_report(artifact(p['report_artifact']),autonomous=a['mode']=='qualified_autonomous',live_pet=a['purpose']=='live_pet')
+        if report!=p['report'] or a.get('hardware_id')!=report['hardware_id'] or a.get('zone')!=report['zone']:
+            raise ValueError('authorization differs from qualified hardware/zone')
+        key=digest(dict(qualification=qualification_id,authorization=a))
+        if any(r.data['payload'].get('revoked_activation')==key for r in self.journal.records('event')):
+            raise ValueError('mobile activation revoked; new authority required')
+        return self.journal.append('event',dict(category='capability_activation',target='mobile-pet-follow',
+            candidate_id=qualification_id,qualification_id=qualification_id,authorization=a,
+            activation_key=key,previous_activation=None),episode=q.data['episode'],sources=[qualification_id],
+            producer='authorized-capability-deployment',version='mobile-safety-v1')
+
+    def revoke_mobile(self, *, reason, authorization):
+        active=self.active('mobile-pet-follow')
+        if not active or not reason or not authorization.get('source'):
+            raise ValueError('explicit mobile revocation required')
+        return self.journal.append('event',dict(category='capability_activation',target='mobile-pet-follow',
+            candidate_id=None,previous_activation=None,activation_key=digest(dict(revoke=active['activation_key'],reason=reason)),
+            revoked_activation=active['activation_key'],reason=reason,authorization=authorization),
+            episode='mobile-qualification',producer='authorized-capability-deployment',version='mobile-safety-v1')
+
     def active(self,target):
         active=None
         for row in self.journal.records('event'):

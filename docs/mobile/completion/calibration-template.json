@@ -1,0 +1,23 @@
+{
+  "schema": "charlie.mobile.calibration-trial.v1",
+  "runtime_sha256": "77990e4eff18e44d568b72338d23709a34fb0ec0a1b8ceb1bfd58f8c30610514",
+  "stage": "wheels_up",
+  "witness": null,
+  "hardware_id": null,
+  "zone": null,
+  "supervised": false,
+  "power_cutoff_accessible": false,
+  "no_animals": false,
+  "no_people_in_path": false,
+  "isolated_flat_test_area": false,
+  "wheels_clear": false,
+  "firmware_sha256": null,
+  "bridge_sha256": null,
+  "protocol_artifact": {
+    "path": null,
+    "sha256": null
+  },
+  "direction": null,
+  "pwm": null,
+  "seconds": null
+}

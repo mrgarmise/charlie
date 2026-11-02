@@ -1,0 +1,6 @@
+{"schema":"charlie.object-observation.v1","source":"offline-fixture","frame_id":"cat-1","at":1.0,"clock_domain":"pi-monotonic","objects":[{"id":"fixture-cat","label":"cat","confidence":0.9,"prominence":0.2}],"fixture":true}
+{"schema":"charlie.object-observation.v1","source":"offline-fixture","frame_id":"cat-2","at":1.11,"clock_domain":"pi-monotonic","objects":[{"id":"fixture-cat","label":"cat","confidence":0.9,"prominence":0.2}],"fixture":true}
+{"schema":"charlie.object-observation.v1","source":"offline-fixture","frame_id":"cat-3","at":1.22,"clock_domain":"pi-monotonic","objects":[{"id":"fixture-cat","label":"cat","confidence":0.9,"prominence":0.2}],"fixture":true}
+{"schema":"charlie.object-observation.v1","source":"offline-fixture","frame_id":"dog-1","at":3.5,"clock_domain":"pi-monotonic","objects":[{"id":"fixture-dog","label":"dog","confidence":0.92,"prominence":0.3}],"fixture":true}
+{"schema":"charlie.object-observation.v1","source":"offline-fixture","frame_id":"dog-2","at":3.61,"clock_domain":"pi-monotonic","objects":[{"id":"fixture-dog","label":"dog","confidence":0.92,"prominence":0.3}],"fixture":true}
+{"schema":"charlie.object-observation.v1","source":"offline-fixture","frame_id":"dog-3","at":3.72,"clock_domain":"pi-monotonic","objects":[{"id":"fixture-dog","label":"dog","confidence":0.92,"prominence":0.3}],"fixture":true}

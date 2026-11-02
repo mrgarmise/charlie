@@ -1,0 +1,36 @@
+.......................F................................................ [ 86%]
+...........                                                              [100%]
+=================================== FAILURES ===================================
+_______ test_no_object_camera_loss_model_unavailable_and_serial_failure ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_no_object_camera_loss_mod0')
+
+    def test_no_object_camera_loss_model_unavailable_and_serial_failure(tmp_path):
+        s=fixture(tmp_path)
+        try:
+            s.detector.infer=lambda frame:[]
+            start(s);feed(s,1.,1)
+            s.now[0]=16.;s.service.tick()
+            assert s.service.status()['session']['reason']=='no_recognizable_objects'
+        finally:close(s)
+        for mode in ('camera','model','serial','stall'):
+            folder=tmp_path/mode;folder.mkdir();s=fixture(folder)
+            try:
+                if mode=='model':s.service.factory=Mock(side_effect=OSError('model unavailable'))
+                row=s.service.submit(request(s.service));s.service.begin(row['id'])
+                if mode=='model':assert s.service.status()['session']['state']=='unavailable';continue
+                if mode=='camera':s.frames.frame_fault('pi-primary',s.pi,'lost')
+                if mode=='serial':s.transport.show_object_label=lambda *args:False
+                if mode=='stall':s.now[0]=3.1;s.service.tick()
+                else:
+                    for i,at in enumerate((1.,1.11,1.22)):feed(s,at,i)
+>               assert s.service.status()['session']['state']=='failed'
+E               AssertionError: assert 'running' == 'failed'
+E                 
+E                 - failed
+E                 + running
+
+tests/test_operator_demonstration.py:172: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_operator_demonstration.py::test_no_object_camera_loss_model_unavailable_and_serial_failure
+1 failed, 82 passed in 2.52s

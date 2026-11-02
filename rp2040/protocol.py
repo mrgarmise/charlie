@@ -94,6 +94,9 @@ VALID_COMMANDS = {
     "PROGRESS_CLEAR",
 
     "MESSAGE",
+    "DISPLAY_CAPS",
+    "OBJECT_LABEL",
+    "OBJECT_CLEAR",
 
     "RX",
     "TX",

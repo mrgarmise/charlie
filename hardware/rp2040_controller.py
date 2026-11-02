@@ -3,6 +3,9 @@ import time
 import threading
 import json
 import uuid
+import os
+import hashlib
+from contextlib import contextmanager
 
 
 class RP2040Controller:
@@ -19,6 +22,14 @@ class RP2040Controller:
     PING is only transmitted after a quiet period.
     """
 
+    def __new__(cls, *args, **kwargs):
+        instance = super().__new__(cls)
+        instance._motion_fence_lock = threading.Lock()
+        instance._motion_generation = 0
+        instance._motion_scope = threading.local()
+        instance._serial_lease = None
+        return instance
+
     HEARTBEAT_INTERVAL = 3.0
     RECONNECT_INTERVAL = 3.0
 
@@ -33,6 +44,9 @@ class RP2040Controller:
 
         self.serial = None
         self.lock = threading.Lock()
+        self._motion_fence_lock = threading.Lock()
+        self._motion_generation = 0
+        self._motion_scope = threading.local()
 
         self.connected = False
 
@@ -60,6 +74,14 @@ class RP2040Controller:
         try:
 
             with self.lock:
+                if getattr(self, 'running', True) is False:
+                    return False
+                if self._serial_lease is None:
+                    from hardware.hailo_session import accelerator_lease
+                    key=hashlib.sha256(os.path.realpath(self.port).encode()).hexdigest()[:20]
+                    lease=accelerator_lease('/tmp/charlie-rp2040-'+key+'.lock')
+                    lease.__enter__()
+                    self._serial_lease=lease
 
                 if self.serial:
 
@@ -123,6 +145,47 @@ class RP2040Controller:
     # SEND
     # --------------------------------------------------
 
+    @contextmanager
+    def motion_scope(self, guard=None):
+        # A gateway request is bound to this STOP generation. The firmware
+        # session/epoch and CAL-1 checks still independently govern motion.
+        previous = getattr(self._motion_scope, 'generation', None)
+        previous_guard = getattr(self._motion_scope, 'guard', None)
+        with self._motion_fence_lock:
+            generation = self._motion_generation if previous is None else previous
+        self._motion_scope.generation = generation
+        self._motion_scope.guard = (lambda: previous_guard() and guard()) if previous_guard and guard else (previous_guard or guard)
+        try:
+            yield
+        finally:
+            if previous is None:
+                del self._motion_scope.generation
+            else:
+                self._motion_scope.generation = previous
+            if previous is None:
+                if hasattr(self._motion_scope, 'guard'):del self._motion_scope.guard
+            else:
+                self._motion_scope.guard = previous_guard
+
+    def _scope_allows(self, command):
+        if command == 'STOP':
+            return True
+        generation = getattr(self._motion_scope, 'generation', None)
+        guard = getattr(self._motion_scope, 'guard', None)
+        return (generation is None or generation == self._motion_generation) and (guard is None or guard() is True)
+
+    def motion_scope_valid(self):
+        with self._motion_fence_lock:
+            return self._scope_allows('MOTION_INTENT')
+
+    def apply_motion_intent(self, callback):
+        # Scheduling a future movement must be ordered with STOP too.
+        with self._motion_fence_lock:
+            if not self._scope_allows('MOTION_INTENT'):
+                return False
+            callback()
+            return True
+
     def send(self, command):
 
         if not self.connected:
@@ -131,13 +194,10 @@ class RP2040Controller:
         try:
 
             with self.lock:
-
-                self.serial.write(
-                    (
-                        command
-                        + "\n"
-                    ).encode()
-                )
+                with self._motion_fence_lock:
+                    if not self._scope_allows(command):
+                        return False
+                    self.serial.write((command + "\n").encode())
 
             # Every real transmission proves the Pi is alive.
             #
@@ -217,6 +277,10 @@ class RP2040Controller:
         )
 
     def stop(self):
+        # Invalidate in-flight request scopes before waiting for the serial
+        # lock. STOP itself remains available outside the motion scope.
+        with self._motion_fence_lock:
+            self._motion_generation += 1
         self.motion_epoch = self.motion_owner = None
         return self.send("STOP")
 
@@ -277,7 +341,10 @@ class RP2040Controller:
         if not self.connected:return None
         try:
             with self.lock:
-                self.serial.write((command + "\n").encode())
+                with self._motion_fence_lock:
+                    if not self._scope_allows(command):
+                        return None
+                    self.serial.write((command + "\n").encode())
                 self.last_tx = time.monotonic()
                 deadline = self.last_tx + timeout
                 old_timeout = self.serial.timeout
@@ -290,7 +357,7 @@ class RP2040Controller:
                             if sink is not None: sink(json.loads(line.split(' ',1)[1]))
                             continue
                         if line.startswith(prefix):return line
-                        if prefix.startswith("OK ") and line.startswith("ERR "):
+                        if (prefix.startswith("OK ") or prefix=="DISPLAY_CAPS ") and line.startswith("ERR "):
                             return line
                 finally:self.serial.timeout = old_timeout
         except Exception:
@@ -367,6 +434,32 @@ class RP2040Controller:
         return self.send(
             str(state).upper()
         )
+
+    def display_capabilities(self):
+        # Capability query is safe on old firmware; no generic MESSAGE fallback.
+        session=getattr(self,'link_session',None)
+        if not self.connected or not session:return None
+        if getattr(self,'_object_caps_session',None)==session:return getattr(self,'_object_caps',None)
+        self._object_caps_session=session;self._object_caps=None
+        reply=self._exchange('DISPLAY_CAPS','DISPLAY_CAPS ',timeout=.15)
+        try:
+            caps=json.loads(reply.split(' ',1)[1]) if reply else None
+            if (not isinstance(caps,dict) or caps.get('schema')!='charlie-display-v1'
+                    or type(caps.get('object_labels')) is not int or caps['object_labels']!=1 or caps.get('width')!=17 or caps.get('height')!=7
+                    or type(caps.get('max_label')) is not int or caps['max_label']<24):return None
+            self._object_caps=caps
+        except (ValueError,TypeError,IndexError):pass
+        return self._object_caps
+
+    def show_object_label(self,text,ttl_ms=4500,step_ms=100):
+        from rp2040.object_label import normalize_label,label_request
+        command=label_request(normalize_label(text),ttl_ms,step_ms)
+        if self.display_capabilities() is None:return False
+        return self._exchange(command,'OK OBJECT_LABEL',timeout=.15)=='OK OBJECT_LABEL'
+
+    def clear_object_label(self):
+        if self.display_capabilities() is None:return False
+        return self._exchange('OBJECT_CLEAR','OK OBJECT_CLEAR',timeout=.15)=='OK OBJECT_CLEAR'
 
     def think(self):
 
@@ -455,5 +548,7 @@ class RP2040Controller:
 
             except Exception:
                 pass
-
-        self.connected = False
+            self.connected = False
+            if self._serial_lease is not None:
+                lease,self._serial_lease=self._serial_lease,None
+                lease.__exit__(None,None,None)

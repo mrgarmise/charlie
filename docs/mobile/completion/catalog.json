@@ -1,0 +1,372 @@
+[
+  {
+    "id": "pet_observe",
+    "purpose": "Electively inspect animal hypotheses with existing camera and Executive",
+    "inputs": [
+      "mobile-camera",
+      "mobile-models"
+    ],
+    "outputs": [
+      "mobile-observation",
+      "attention-decision"
+    ],
+    "cost": 0.3,
+    "limitations": [
+      "class hypothesis is not identity",
+      "no physical authority"
+    ],
+    "evaluation": "immutable observations and independent review",
+    "execution": "unarmed-perception",
+    "body": "ELEGOO",
+    "prerequisites": [
+      "camera lease",
+      "Hailo lease"
+    ],
+    "conflicts": [
+      "legacy mobile face control",
+      "Robotron Hailo",
+      "thermal/power",
+      "higher attention"
+    ],
+    "lifecycle": "discover/consider/lease/observe/yield/bookmark; fresh inputs after restart",
+    "readiness": {
+      "available": false,
+      "reasons": [
+        "runtime not attached"
+      ]
+    },
+    "independently_qualified": false
+  },
+  {
+    "id": "pet_follow",
+    "purpose": "Electively follow a sensor-grounded willing animal in an independently qualified zone",
+    "inputs": [
+      "mobile-camera",
+      "mobile-models",
+      "qualified-car-local-controller",
+      "motion-lease"
+    ],
+    "outputs": [
+      "proposal",
+      "guard",
+      "wire",
+      "ack",
+      "unknown-or-measured-consequence"
+    ],
+    "cost": 1.0,
+    "limitations": [
+      "requires independent activation and fresh frame/pose/range",
+      "no identity or welfare inference from classifier"
+    ],
+    "evaluation": "staged witnessed physical qualification",
+    "execution": "guarded-physical",
+    "body": "ELEGOO",
+    "prerequisites": [
+      "deployment qualification",
+      "boot/zone-bound authority",
+      "pet-associated range",
+      "safe corridor"
+    ],
+    "conflicts": [
+      "legacy mobile face control",
+      "Robotron Hailo",
+      "primary activity",
+      "human/pet avoidance"
+    ],
+    "lifecycle": "consider/activate/bounded approach/hold/yield/abort/journal; never resume motion on restart",
+    "readiness": {
+      "available": false,
+      "reasons": [
+        "runtime not attached"
+      ]
+    },
+    "independently_qualified": false
+  },
+  {
+    "id": "mobile-evidence-review",
+    "purpose": "Retrieve original species predictions and independent operator labels",
+    "inputs": [
+      "native-labeled-mobile-evidence"
+    ],
+    "outputs": [
+      "label-review",
+      "evidence-gap"
+    ],
+    "cost": 0.1,
+    "limitations": [
+      "correlated frames are one evidence group",
+      "no physical or model activation"
+    ],
+    "evaluation": "immutable pixel-bound operator annotations",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "mobile-observe",
+    "purpose": "Acquire unarmed mobile species/depth evidence for an existing Executive investigation",
+    "inputs": [
+      "mobile-camera",
+      "mobile-models"
+    ],
+    "outputs": [
+      "mobile-observation",
+      "evidence-deficiency"
+    ],
+    "cost": 0.3,
+    "limitations": [
+      "no actuation authority",
+      "species is not individual pet identity",
+      "native model qualification required for authentic projects"
+    ],
+    "evaluation": "independent replay labels and native source provenance",
+    "execution": "unarmed-perception",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "mobile-navigation-proposal",
+    "purpose": "Evaluate bounded local motion proposals without physical execution",
+    "inputs": [
+      "mobile-observation",
+      "car-telemetry"
+    ],
+    "outputs": [
+      "mobile-proposal",
+      "safety-veto"
+    ],
+    "cost": 0.1,
+    "limitations": [
+      "relative depth is not metric clearance",
+      "no qualified car-local backend supplied"
+    ],
+    "evaluation": "independent safety fault injection",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "mobile-mobility",
+    "purpose": "Prospective independently qualified car-local motion",
+    "inputs": [
+      "qualified-car-local-controller",
+      "motion-lease"
+    ],
+    "outputs": [
+      "execution-acknowledgement"
+    ],
+    "cost": 1.0,
+    "limitations": [
+      "independent mobile qualification and activation required"
+    ],
+    "evaluation": "separately authorized empty-room then pet-present qualification",
+    "execution": "unavailable",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "score-reader-evaluation",
+    "purpose": "Independently compare an existing Charlie-originated score-reader candidate with immutable pre-review predictions",
+    "inputs": [
+      "score-reader-candidate",
+      "reviewed-score-evidence"
+    ],
+    "outputs": [
+      "reader-evaluation",
+      "evidence-deficiency"
+    ],
+    "cost": 0.1,
+    "limitations": [
+      "no candidate generation or deployment authority",
+      "sealed final reader protocol unavailable",
+      "source groups may not overlap training"
+    ],
+    "evaluation": "hash-bound independent labels; diagnostic or validation only",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "meditation-motion",
+    "purpose": "Generate executable temporal planning candidates from preserved meditation",
+    "inputs": [
+      "meditation-evidence"
+    ],
+    "outputs": [
+      "candidate",
+      "evidence-gate-result"
+    ],
+    "cost": 0.1,
+    "limitations": [
+      "unverified retrospective tracks cannot qualify evaluation",
+      "no physical activation adapter"
+    ],
+    "evaluation": "fresh independently verified trajectories required",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "evidence-review",
+    "purpose": "Search frozen experience references for recurring unresolved questions",
+    "inputs": [
+      "context-evidence"
+    ],
+    "outputs": [
+      "retrieval-resolution"
+    ],
+    "cost": 0.05,
+    "limitations": [
+      "reported questions are not established causal facts"
+    ],
+    "evaluation": "distinct source episodes; unknown provenance abstains",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "model-diagnostics",
+    "purpose": "Retrieve discriminating training-history evidence for competing failure explanations",
+    "inputs": [
+      "model-evaluation"
+    ],
+    "outputs": [
+      "diagnostic-resolution"
+    ],
+    "cost": 0.05,
+    "limitations": [
+      "compatibility is not causal identification",
+      "no test pixels are opened"
+    ],
+    "evaluation": "frozen training-history predicates",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "collect-examples",
+    "purpose": "Retrieve unlabeled recorded candidate crops without a new vision pass",
+    "inputs": [
+      "evidence-gap"
+    ],
+    "outputs": [
+      "examples",
+      "dataset-request"
+    ],
+    "cost": 0.2,
+    "limitations": [
+      "saved subset is biased",
+      "replay is not another independent physical experiment"
+    ],
+    "evaluation": "hashes and capture/track provenance",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "clarify-labels",
+    "purpose": "Seek independent verification of ambiguous interpretations",
+    "inputs": [
+      "uncertainty"
+    ],
+    "outputs": [
+      "annotation-request"
+    ],
+    "cost": 0.2,
+    "limitations": [
+      "does not certify existing predictions"
+    ],
+    "evaluation": "annotation provenance",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "cnn-reconstruction",
+    "purpose": "Test whether a compact visual representation generalizes",
+    "inputs": [
+      "RGB-examples",
+      "three-independent-groups"
+    ],
+    "outputs": [
+      "candidate",
+      "heldout-error",
+      "opaque-embeddings"
+    ],
+    "cost": 0.6,
+    "limitations": [
+      "reconstruction is not semantic recognition or score utility"
+    ],
+    "evaluation": "independent held-out reconstruction MSE",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "cnn-classification",
+    "purpose": "Test supervised visual recognition",
+    "inputs": [
+      "verified-labels",
+      "three-independent-groups"
+    ],
+    "outputs": [
+      "candidate",
+      "heldout-accuracy"
+    ],
+    "cost": 0.6,
+    "limitations": [
+      "weak labels are excluded from validation"
+    ],
+    "evaluation": "independent held-out balanced accuracy",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  },
+  {
+    "id": "cnn-validation-extension",
+    "purpose": "Compare bounded training duration when retrieved history is still improving",
+    "inputs": [
+      "RGB-examples",
+      "model-evaluation"
+    ],
+    "outputs": [
+      "validation-comparison",
+      "resolved-prediction"
+    ],
+    "cost": 0.6,
+    "limitations": [
+      "validation is reused, not fresh independent confirmation",
+      "cannot authorize deployment"
+    ],
+    "evaluation": "matched configuration, validation only; final test remains sealed",
+    "execution": "offline",
+    "body": null,
+    "prerequisites": [],
+    "conflicts": [],
+    "lifecycle": null
+  }
+]

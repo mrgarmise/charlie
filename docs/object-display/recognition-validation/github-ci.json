@@ -1,0 +1,22 @@
+{
+  "source_commit": "217a329fc8850dac92ccbd38387b65a644eb8abb",
+  "source_tree": "26868e0212d235d5517d3cb7265d370f495f220f",
+  "run_id": 40252336655,
+  "job_id": 121346749169,
+  "url": "https://github.com/mrgarmise/charlie/actions/runs/40252336655",
+  "conclusion": "success",
+  "passed": 1370,
+  "skipped": 21,
+  "failures": 0,
+  "seconds": 306.31,
+  "scope": "independent GitHub Actions full suite of exact published final runtime/test code",
+  "artifact": {
+    "id": 12620294978,
+    "name": "object-label-software-tests",
+    "digest": "sha256:6bb1a6e13fc60b96196522cd74d9f7b76f1bd83038702d0fcc7ced49fd031fb5"
+  },
+  "retained_log": {
+    "path": "docs/object-display/recognition-validation/github-ci.txt",
+    "sha256": "7bf148dc11854cd8aa0bf11c35fc81ce3aaff79be9a4e77622513690e9823106"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "source": "recovered authentic frame/prediction log with separate operator labels; host retrospective",
+  "control": "same code and opportunity/resources; notebook prefix before Executive outcome delivery vs full retained notebook",
+  "interpretation": "existing Executive retained diagnostic history changes portfolio uncertainty/valuation; not PPAL learning or physical performance proof",
+  "comparisons": {
+    "without_retained_outcome": [
+      {
+        "project_id": "c70a1fcae1ecf5e166f27cd8a7cb68d1ba7da550fd689da554a64c7699a17736",
+        "score": 0.5,
+        "blocked": false,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.5,
+          "remaining_uncertainty": 0.5,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 0,
+          "resolution_ids": [],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "active"
+      }
+    ],
+    "with_retained_outcome": [
+      {
+        "project_id": "c70a1fcae1ecf5e166f27cd8a7cb68d1ba7da550fd689da554a64c7699a17736",
+        "score": 0.25,
+        "blocked": true,
+        "terms": {
+          "objective_contribution": 0.5,
+          "learning_value": 0.5,
+          "remaining_uncertainty": 0.25,
+          "cost": 0.5,
+          "risk": 0.5
+        },
+        "opportunity_cost": "foregone eligible alternatives shown in this selection",
+        "experience_basis": {
+          "independent_units": 1,
+          "resolution_ids": [
+            "46f9440f7676bd69c59379971bf4e0555f55da968fc69e4d5f922dfc1b10f42f"
+          ],
+          "interpretation": "retained diagnostic outcomes; independence accounting is not authenticity or score qualification"
+        },
+        "missing_resources": [],
+        "unmet_dependencies": [],
+        "method_available": true,
+        "authorized": true,
+        "urgent": false,
+        "status": "paused"
+      }
+    ]
+  }
+}

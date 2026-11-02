@@ -1,0 +1,28 @@
+{
+  "runtime_sha256": "77990e4eff18e44d568b72338d23709a34fb0ec0a1b8ceb1bfd58f8c30610514",
+  "qualification": "controlled host replay of authentic historical records; NOT live/native acceptance",
+  "source_journal_sha256": "612c6146f580d5b5e2f6b1e776d8cdf99f8591704851cf6b37a1225c8d7bf2de",
+  "raw_records": 614,
+  "verified_original_images": 9,
+  "initial_interest": "mobile-evidence-review",
+  "animal_opportunity_intent": "decline",
+  "selected_project_method": "mobile-evidence-review",
+  "same_executive": true,
+  "new_camera_frames": 0,
+  "inference_calls": 0,
+  "physical_connections": 0,
+  "motor_commands": 0,
+  "review_result": "contradicted",
+  "metrics": {
+    "correct_species": 3,
+    "independent_source_logs": 1,
+    "interpretation": "retrieval of historical classification discrepancies; no causal failure explanation or unseen accuracy claim",
+    "physical_authorization": false,
+    "recall": null,
+    "reviewed_frames": 9,
+    "verdict": "contradicted",
+    "wrong_species": 6
+  },
+  "learned_improvement": false,
+  "pet_follow_demonstrated": false
+}

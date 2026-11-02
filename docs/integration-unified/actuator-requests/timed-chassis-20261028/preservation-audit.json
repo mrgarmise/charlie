@@ -1,0 +1,31 @@
+{
+  "base": "08ae83f7a6f54a7b0acefc4f240df784f176573e",
+  "runtime_sha256": "b9a9905f92ce72ab4c9fea2e389eb22535e44142b03e27cb1dee2e59e1503d6f",
+  "prior_runtime_sha256": "47f3b16b1d0c8362ed5451cdf479891ac3bc45d15dcbc975e906a2a2293117a6",
+  "ultrasonic_body_unchanged": true,
+  "ultrasonic_body_sha256": "3050f1c124aa10df64a47de3679f0df3968032c859b4ddd9a89abb98626dcd86",
+  "historical_evidence_unchanged": [
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154336645883Z-wheels-forward.json",
+      "sha256": "026dd233d6be8b5e9ee4aadbaa36c509b34deffbf9604778af5f060c790544b7"
+    },
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154353143112Z-wheels-reverse.json",
+      "sha256": "2e63ec4fd5f09605bb7975a27e3f2ae5f02e3d71fb9ee98653ea7220a19b1c52"
+    },
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154418511983Z-floor-forward.json",
+      "sha256": "776f0680511df502e1cef5b3461d8d735004528600263ce1ed384539381ac06b"
+    },
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154432146437Z-floor-reverse.json",
+      "sha256": "a29853f0a3edb6c07eb6c8c669a9f74bc016e5aa1997237eb52fe350a01da89d"
+    },
+    {
+      "path": "/home/five/charlie-mobile-evidence/motion-qualification/20261025T154446341045Z-floor-reverse.json",
+      "sha256": "843a539b3ce97eeddb8114f7c0b793aa1e3af49a0a5e3878330242999bfeff71"
+    }
+  ],
+  "physical_tests": false,
+  "physical_stop_claim": false
+}

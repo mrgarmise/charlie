@@ -1,0 +1,35 @@
+The broad-host-in-progress run began while the worktree was changing and other
+focused suites were running. It is retained for failure provenance, not accepted
+as a test of any single commit. It had 1469 passes, 21 skips and one failure:
+Robotron evidence writer saturation in the two-episode terminal-restart test.
+The same test subsequently passed alone on the untouched PR #10 baseline and on
+the integration worktree, sequentially. A first parallel rerun collided with
+the shared gameplay lock, demonstrating why the reruns must be sequential.
+The writer-saturation cause is not established and no production writer behavior
+was modified. Independent CI is required on the final published commit.
+
+A contract run overlapped that isolated gameplay test and failed one attention
+assertion because the real gameplay resource lock was held. Its sequential rerun
+passed. These observed environmental conflicts are not silently discarded.
+
+Clean host run on remote commit 9aeee4916a3563fb17f22c716b566ea124bbb3e1:
+1477 passed, 21 skipped, one failure. Independent CI on that commit also failed
+all three workflows on the same test: lost-target reason after an emergency stop.
+The later correction handles target loss first while retaining the latched stop;
+focused tests cover both loss semantics and the inability to resume movement.
+The clean broad output is preserved in broad-9aeee.txt. CI on the corrected head
+must still pass before software qualification is asserted.
+
+A clean broad host run on 5e174a3 exposed existing native-application test
+doubles that still used the old KeyboardStimulus constructor. The new emergency
+callback is a compatible optional production parameter; the affected test doubles
+were updated to accept keyword parameters. The original assertions were kept.
+The affected calibration and primary-application suites then passed 66 tests.
+The broad run was still in progress when this receipt was written; its final
+result and independent CI remain authoritative for that exact revision.
+
+During face-memory testing, the combined no-device runtime fixture once lost
+its only prerecorded frame to the real freshness limit while lifecycle startup
+was under load. The fixture now publishes a new frame at watcher start, modeling
+its existing running feeder. The affected suite subsequently passed; the
+production freshness checks were not relaxed.

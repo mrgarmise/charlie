@@ -1,0 +1,113 @@
+{
+  "schema": "charlie.mobile.continuation-validation.v1",
+  "source_commit": "c2ec29e55acd6c50de4a96463646b2ecd188c576",
+  "base": "a25b2b7256dffe140c375916d882b759e85b9911",
+  "environment": {
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "packages": {
+      "pytest": "9.1.1",
+      "numpy": "2.3.5",
+      "opencv-python-headless": "5.0.0.93"
+    }
+  },
+  "protected_source_byte_identical": [
+    "hardware/elegoo_mobile.py",
+    "motion/mobile_base.py",
+    "behaviors/mobile_face_track.py",
+    "behaviors/mobile_track.py",
+    "attention/manager.py",
+    "vision/mobile_face.py",
+    "vision/camera.py",
+    "motion/controller.py",
+    "ALA_LEARNING_CHARTER.md",
+    "ALA2_ACCEPTANCE_STANDARD.md"
+  ],
+  "source_sha256": {
+    "behaviors/mobile_observe.py": "bb75f227535e1d273ea4cef7b01925965ade8a1e2a547b97563c59e6b87dbf5f",
+    "docs/mobile/continuation/AUDIT.md": "64d9f02f33a9944679df9da98ae5f3a17074a34e62de34dd21dcfeaf36e2c7ca",
+    "docs/mobile/continuation/depth-source.json": "04956959f10c1c20b65b28a6fc2c6b75326a8e9b7cd6e72bbad5c576263ad7fb",
+    "docs/mobile/continuation/executive-retention-control.json": "cd78d28432aa1ef604b8ac1e772e7d2c46a371e7e75ecc932bc36e7fe21b94e6",
+    "docs/mobile/continuation/recovered-evidence.json": "a67b9065e9d611c98d430e8d528b694890371cdc2a60e73fc8a1c97b79a58da4",
+    "experiments/ppal/detector_bridge.py": "5224ac36a09048a46fd17f254d0445ca05fe99ff4778a929d793db11c239dcb2",
+    "experiments/ppal/mobile_navigation.py": "9a8d562314beaa998639049d400f321aab4b703c057d60137c853028a23e22af",
+    "hardware/elegoo_camera.py": "01804242231325bc225c77b786a27c0e6de45025daa7b453630dade0c32f7230",
+    "hardware/hailo_session.py": "f93305588654d37125c56fda39f7d5e2daa70e8674a14fe97ba5fc8857834dbb",
+    "learning/capabilities.py": "c93655d02d6772df67507059c36f0f78cb0ac5ff9ae72840f196bb6c08913d52",
+    "learning/cycle.py": "f6c94fd2b1395b7b1230a4ab64b2d56a5f07da58b550c9de61ea16d46d01a261",
+    "learning/mobile.py": "94e314365377f4efecef1ca991653f208e9bed3a1f6b04bd3ba20195525040e5",
+    "learning/mobile_evidence.py": "6e853437dfabda30d9faa59b748bf13a7acc7e9fbfbda8ccaafbaeda845a908b",
+    "learning/mobile_review.py": "7ba5285f28809e4023519cfd0788016e0de2c68ea06c1729c65fd2134980a73f",
+    "learning/mobile_runtime.py": "9889a45ec0e49fa060b68d575ebb12e4747387d591e3ca58a26270862530cab4",
+    "main.py": "d19bf857b786f6b2dcd65d13cef36824a24972e633b2e6e1faa736c273884ac7",
+    "memory/evaluator.py": "9580e639d00d8c5fd5c0c76ec38a00c9f67272bc5f8735d71236bca7eebe2a75",
+    "tests/test_mobile_continuation.py": "5f6ef802b351608c07f36c82d1e4b1d6335404a4c3bb7ffdea5b6cc04722f37f",
+    "tests/test_mobile_tracking_navigation.py": "b7ac0d5dcb049828dba1610b126fd0a1c633a5c60cf96eba476bf6012d645385",
+    "vision/mobile_models.py": "95d22fd4b47b71e6c689002cfa7abf8ed550748fe26d7a21b95cd0a10738de66",
+    "vision/mobile_perception.py": "e38467eaca9814255ed2e1bc2d4d1c126e27208517f189b28efa687b15e03f97",
+    "vision/mobile_tracking.py": "c4e076ef0fb244872b6d23016845bdf4870716bcb8bcbd6e665005fd3eb89673"
+  },
+  "baseline_focused": {
+    "passed": 55
+  },
+  "final_focused": {
+    "passed": 66
+  },
+  "upstream_detector_contract": {
+    "passed": 24,
+    "deselected": 4
+  },
+  "fake_io_live_entry": {
+    "passed": 1,
+    "control_socket_calls": 0
+  },
+  "native_recovery": {
+    "events": 614,
+    "verified_pngs": 9,
+    "labeled_frames": 9,
+    "unlabeled_events": 605,
+    "wrong_species": 6,
+    "correct_species": 3,
+    "reviewed_track_count": 1,
+    "photo_hash_verified": true
+  },
+  "executive": {
+    "normal_lifecycle_selected_review": true,
+    "result": "contradicted",
+    "independent_source_logs": 1,
+    "restart_repeated_evaluation": false,
+    "portfolio_score_without_retained_outcome": 0.5,
+    "portfolio_score_with_retained_outcome": 0.25
+  },
+  "depth": {
+    "download_sha256": "625c8d6a236d8f305454d28ae43bab129ca65025c4be0dbcd6cf6d3e41983c79",
+    "bytes": 4635184,
+    "native_parsed": false,
+    "native_executed": false
+  },
+  "physical": {
+    "servo_commands": 0,
+    "chassis_commands": 0,
+    "firmware_flashes": 0,
+    "policy_activations": 0,
+    "physical_executor_attached": false,
+    "native_tests_this_worker": false
+  },
+  "broad": {
+    "status": "passed",
+    "tests": 1334,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 21,
+    "passed": 1313,
+    "seconds": 337.405,
+    "command": "python -m pytest tests -q --disable-warnings --junitxml=/tmp/mobile-continuation-final.xml",
+    "clean_worktree": true
+  },
+  "github_actions": {
+    "run_id": 40203291463,
+    "run_number": 84,
+    "source_commit": "c2ec29e55acd6c50de4a96463646b2ecd188c576",
+    "conclusion": "success"
+  }
+}

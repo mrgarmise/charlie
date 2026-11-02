@@ -1,0 +1,84 @@
+{
+  "schema": "charlie.mobile.host-validation.v1",
+  "source_commit": "429a47d57a5dfdee7b700280b2cd0bd7353796e1",
+  "base": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+  "environment": {
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "packages": {
+      "pytest": "9.1.1",
+      "numpy": "2.3.5",
+      "opencv-python-headless": "5.0.0.93",
+      "Pillow": "12.3.0",
+      "pyserial": "3.5"
+    }
+  },
+  "source_sha256": {
+    "behaviors/mobile_observe.py": "38122619b35bde29a301bc424563941771bf803f9a5c84bb11e8851eb7e4cbd7",
+    "docs/mobile/AUDIT.md": "b3f9cb362716c5a50a0e6ee1d2e7401feecc0e17e0650607afb351c97c108d6f",
+    "docs/mobile/RUNBOOK.md": "6a417ddafdb02b926f5ad70a03a913c9a74584ac916a544c6eea47ef7761fee5",
+    "experiments/ppal/detector_bridge.py": "886ed0c1651448f4de420670668bc97ceb28e45603a4eb0892dca56d18902494",
+    "experiments/ppal/mobile_navigation.py": "32486cd5c5f555a8bffb1dbbe093d5d81cb2659526809521d762c6e092e98889",
+    "hardware/elegoo_camera.py": "82a8d8a3186348b808bbeb777b2212f985cd9870bc0454f16ee4e91ed9226a84",
+    "learning/capabilities.py": "fe1be569ea9f45f201219de0add8ebeb11643931a5af781f597d868f5ec1dce2",
+    "learning/lifecycle.py": "9f85a2132032696adc821249da02cc3058de1120eeee9550292f0307507302dd",
+    "learning/mobile.py": "2a806dd7ab973772bb939a7765957635de15961ee5218b12502bbc2c24bc254c",
+    "learning/mobile_runtime.py": "d41b84758be773cf6c13b2d3213b554ca5ca6fe13e60b84f1b26fb1fbd1e4887",
+    "main.py": "acf11ed99aa5f011b11398d4b50ee79783c6dae3f36df64565196ef4b8401ae1",
+    "tests/fixtures/mobile/species-loss.json": "7d51bf330e956634ddd29db66e54661fd17354973a855cf25ecd03cdc48dbd38",
+    "tests/test_mobile_integration.py": "89cf88a3bc9c985e5b8035ad8d5106bf4123cbc3075760e7e0e33d2034da5529",
+    "tests/test_mobile_legacy_regression.py": "76bdb33e9027d7f6c948826d6bf0eee0af987dfb9edf02a30c6d78824fa91197",
+    "tests/test_mobile_perception.py": "389c455ecce9317c96ce18318f6af19677b68ada7eaa794b53ccf16002b0b0dc",
+    "tests/test_mobile_tracking_navigation.py": "83c80931d29e6069a13d0d384f804f7d94d7cbf844d0e59a00436084d26db898",
+    "vision/mobile_evaluation.py": "90bb4353d9f78a8661739389747e025c62be2982ce9cffe80164c9e2cd82cb34",
+    "vision/mobile_models.py": "cd66a36d9359a2401042d6f557e0e29877d19b2c8fe22c2024447413ef03c7a9",
+    "vision/mobile_perception.py": "3c020e3a455a6433463f939397974188c4e780c9f7b144920e58748addddce1f",
+    "vision/mobile_tracking.py": "74b11397374d117dc9ae2c76cebd993ee301dac33d9d634ae4ef617cd9437b06"
+  },
+  "baseline": {
+    "passed": 1251,
+    "skipped": 21,
+    "seconds": 306.92
+  },
+  "focused": {
+    "passed": 55,
+    "includes_existing_recall": 4,
+    "command": "python -m pytest tests/test_mobile_perception.py tests/test_mobile_tracking_navigation.py tests/test_mobile_integration.py tests/test_mobile_legacy_regression.py tests/test_memory_recall.py -q"
+  },
+  "reused_hailo_scope": {
+    "passed": 24,
+    "deselected": 4,
+    "source_branch_sha": "ab58a3d3d3f83a44e77184d329f0e28c1f9cbda8",
+    "reason": "unimported replay/compiler tooling excluded; initial exploratory 4 import failures documented in REPORT.md"
+  },
+  "broad": {
+    "status": "passed",
+    "tests": 1323,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 21,
+    "passed": 1302,
+    "seconds": 304.711,
+    "command": "python -m pytest tests -q --disable-warnings --junitxml=/tmp/mobile-final.xml"
+  },
+  "smoke": {
+    "frames": 4,
+    "records": 4,
+    "normal_lifecycle_imported": 4,
+    "motion_dispatched": 0,
+    "authentic": false
+  },
+  "native": {
+    "pi_validated": false,
+    "car_camera_observed": false,
+    "hailo_executed": false,
+    "physical_qualified": false,
+    "motion_authorized": false,
+    "firmware_flashed": false,
+    "authentic_learning_demonstrated": false
+  },
+  "documentation_sha256": {
+    "docs/mobile/AUDIT.md": "b3f9cb362716c5a50a0e6ee1d2e7401feecc0e17e0650607afb351c97c108d6f",
+    "docs/mobile/RUNBOOK.md": "d329e000f26f2b182a6f0e614e59dc089c7024b0caf1efa2a61946fc3ddae82a"
+  }
+}

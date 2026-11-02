@@ -1,0 +1,35 @@
+[
+  {
+    "run_id": 40905354884,
+    "job_id": 123558496283,
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/40905354884",
+    "head": "77d7e3434229101a8612a81de69260b75925ed34",
+    "tested_merge": "62a25f57f2f98eb79b8e2bc03c67f78a0792fdf5",
+    "summary": [
+      "2026-10-29T15:49:04.3519129Z HEAD is now at 62a25f5 Merge 77d7e3434229101a8612a81de69260b75925ed34 into bcf8082f6319c63c4bd6bcceeab5faea37241654",
+      "2026-10-29T15:54:20.5357446Z 1600 passed, 21 skipped, 1 warning in 310.05s (0:05:10)"
+    ]
+  },
+  {
+    "run_id": 40905354997,
+    "job_id": 123558496216,
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/40905354997",
+    "head": "77d7e3434229101a8612a81de69260b75925ed34",
+    "tested_merge": "62a25f57f2f98eb79b8e2bc03c67f78a0792fdf5",
+    "summary": [
+      "2026-10-29T15:49:05.6889203Z HEAD is now at 62a25f5 Merge 77d7e3434229101a8612a81de69260b75925ed34 into bcf8082f6319c63c4bd6bcceeab5faea37241654",
+      "2026-10-29T15:55:03.1219939Z 1600 passed, 21 skipped, 1 warning in 350.41s (0:05:50)"
+    ]
+  },
+  {
+    "run_id": 40905354962,
+    "job_id": 123558496604,
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/40905354962",
+    "head": "77d7e3434229101a8612a81de69260b75925ed34",
+    "tested_merge": "62a25f57f2f98eb79b8e2bc03c67f78a0792fdf5",
+    "summary": [
+      "2026-10-29T15:49:04.4133560Z HEAD is now at 62a25f5 Merge 77d7e3434229101a8612a81de69260b75925ed34 into bcf8082f6319c63c4bd6bcceeab5faea37241654",
+      "2026-10-29T15:54:38.8724887Z 1600 passed, 21 skipped, 1 warning in 328.69s (0:05:28)"
+    ]
+  }
+]

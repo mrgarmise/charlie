@@ -466,6 +466,27 @@ class LearningExecutive:
                          interrupted_projects=interrupted, reason=reason))
         return dict(project=self.projects()[chosen['project_id']], alternatives=alternatives, reason=reason)
 
+    def consider_mobile_attention(self, observation_id, *, primary_priority=0, resources=(),
+                                  methods=(), authorized_methods=()):
+        """Use this Executive's existing portfolio, never a pet-only chooser.
+
+        Attention and physical deployment authority remain independent. No frame
+        creates a selected goal. Existing projects/experience supply interests.
+        """
+        row=self.journal.get(observation_id);o=row.data['payload']['observation']
+        if not o['frame']['authentic']:
+            return dict(intent='decline',reason='fixture cannot commission an authentic interest',project_id=None)
+        if primary_priority>40:
+            return dict(intent='yield',reason='higher-priority primary activity',project_id=None)
+        selected=self.select(methods=set(methods),resources=set(resources),authorized_methods=set(authorized_methods))
+        project=selected['project']
+        intent=('follow' if project and project['method']=='pet_follow' else
+                'observe' if project and project['method'] in ('mobile-observe','pet_observe') else 'decline')
+        return dict(intent=intent,project_id=project['id'] if project else None,
+                    reason=selected.get('reason','existing portfolio selected another activity'),
+                    alternatives=selected['alternatives'],originator='LearningExecutive',
+                    policy='existing rule-based portfolio; not learned preference or motion authority')
+
     def chooser_context(self, project_id):
         project = self.projects()[project_id]
         if project['status'] != 'active':

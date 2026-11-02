@@ -1,0 +1,8 @@
+2026-10-26T00:27:54.0639247Z ##[group]Operating System
+2026-10-26T00:27:54.0639931Z Ubuntu
+2026-10-26T00:27:54.0642853Z Image: ubuntu-26.04
+2026-10-26T00:27:54.0644769Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261012.163/images/ubuntu/Ubuntu2604-Readme.md
+2026-10-26T00:27:56.6992118Z Successfully set up CPython (3.12.15)
+2026-10-26T00:28:03.2272480Z ##[group]Run python -m pytest tests -q --junitxml=software-tests.xml
+2026-10-26T00:28:03.2273021Z [36;1mpython -m pytest tests -q --junitxml=software-tests.xml[0m
+2026-10-26T00:34:11.0426924Z 1358 passed, 21 skipped, 1 warning in 366.99s (0:06:06)

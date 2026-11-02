@@ -155,7 +155,8 @@ class DevelopmentLifecycle:
         from .meditation import qualify_corpus
         from .acquisition import maintain_episode_identity
         from .episode_identity import verified_tracks
-        changed = False
+        from .mobile_runtime import import_mobile_evidence
+        changed = import_mobile_evidence(self)
         self.available_tracks = {}
         roots=list(self.roots)
         # A marathon relinquishes primary resources and hands evidence to this

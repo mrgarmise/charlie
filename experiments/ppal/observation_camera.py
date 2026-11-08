@@ -19,18 +19,42 @@ class ObservedCamera:
         self.recorder = None
         self.sequence = 0
         self.observation_id = None
+        self.stream = getattr(source,"stream",None)
+        self.stream_sequence = self.stream.sequence if self.stream is not None else 0
+        self.stream_skipped = 0
+
+    def start_stream(self):
+        start=getattr(self.source,'start_stream',None)
+        if callable(start):
+            self.stream=start()
+            self.stream.latest(not_before=self.timestamp) # acquisition precedes controls
+        return self.stream
+
+    def accept_exposure(self, packet):
+        if packet.sequence<=self.stream_sequence:raise ValueError('duplicate or reordered observation delivery')
+        self.stream_skipped+=max(0,packet.sequence-self.stream_sequence-1)
+        self.stream_sequence=packet.sequence
+        self.raw=packet.image;self.capture=dict(packet.capture)
+        self.capture.update(stream_sequence=packet.sequence,ordinary_skipped_total=self.stream_skipped)
+        return self._publish_observation()
 
     def read_fresh(self):
         """Use the same recorder/ownership path for optics and fresh metadata."""
         previous = self.require_fresh
+        previous_floor=getattr(self,"not_before",None)
+        if self.stream is not None:self.not_before=time.monotonic()
         self.require_fresh = True
         try:
             return self.read()
         finally:
             self.require_fresh = previous
+            self.not_before=previous_floor
 
     def read(self):
         if self.progress: self.progress.enter('camera')
+        if self.stream is not None:
+            return self.accept_exposure(self.stream.latest(after=self.stream_sequence,
+                not_before=getattr(self,"not_before",None)))
         read = getattr(self.source, 'read_fresh', None) if self.require_fresh else None
         for attempt in range(3):
             try:
@@ -44,6 +68,9 @@ class ObservedCamera:
                     raise ObservationFailure('camera failed three reads; evidence retained') from exc
                 time.sleep(.05)
         self.capture = getattr(self.source, 'last_capture', None) if read is not None else None
+        return self._publish_observation()
+
+    def _publish_observation(self):
         # Pixel/exposure timestamp is shared with score evidence. Non-Pi mocks
         # and portable sources explicitly use read completion without claiming
         # exposure freshness.

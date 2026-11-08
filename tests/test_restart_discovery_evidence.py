@@ -58,7 +58,7 @@ def test_empty_regions_still_produce_a_qualified_bounded_probe_receipt():
     class Controller:
         def execute(self,action,ms):commands.append(action.move)
     assert agency.discover(read,Controller(),observation_time=lambda:clock[0]) is None
-    assert len(commands)==12 and EpisodeEndObserver().observe_discovery(agency.last_discovery)
+    assert len(commands)==14 and EpisodeEndObserver().observe_discovery(agency.last_discovery)
 
 
 def test_autonomous_attract_sprite_never_becomes_causal_self():

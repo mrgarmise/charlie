@@ -199,7 +199,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     assert t['first_life_lost_at'] is None
     if recalibrate:
         assert t['start_requested']>=20. and report['calibration_mode']=='fresh_session'
-    assert report['acquisition']==('provisional_body_agency' if bootstrap else 'generic_visual_agency')
+    assert report['acquisition']=='generic_visual_agency'  # provisional no longer ends discovery
     actions=[r for r in report['steps'] if 'action' in r]
     assert actions
     if respawn:
@@ -221,7 +221,7 @@ def test_armed_runner_uses_generic_agency_and_always_releases(monkeypatch,tmp_pa
     if bootstrap:
         assert report['bootstrap_body_fire']
         assert any(getattr(c,'fire','NONE') != 'NONE' for c in commands)
-        assert any(r['agency']['identity_status']=='provisional' for r in actions)
+        assert actions[0]['agency']['identity_status']=='confirmed'
     if experiment:
         attempted=[r for r in actions if r.get('experiment')]
         assert len(attempted)==1

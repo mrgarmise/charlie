@@ -1,0 +1,122 @@
+{
+  "receipt": {
+    "receipt_id": "3894c27747119aec70d147e30bd805525a627c7fa0572ea57b69d2b91781b480",
+    "original_records": 1641,
+    "added_records": 24,
+    "images": 13,
+    "missing": [],
+    "physical_authorization": false,
+    "consumption": "Historical import and reconciliation only; candidate training/inference is separate"
+  },
+  "eligible_diagnostic_labels": [
+    {
+      "proposal_id": "96caef434658f9142ea9aeb319d7444d61067846cff13f87027aaf1296e4bb9f",
+      "label": 1200,
+      "annotation_ids": [
+        "cac5ec4fc0bff11f7baf7a691a764ca41e5b7dffece6a3d91f267a55694b27d6"
+      ]
+    },
+    {
+      "proposal_id": "ef62991e016c702183cde5d991a91721054027df8d451c3bc3f080ae3aa7db89",
+      "label": 1500,
+      "annotation_ids": [
+        "3e3e9cc0515bc8080ed8a1ca4b4a937deb4bd48587acd3e36ba25b87baaff461"
+      ]
+    },
+    {
+      "proposal_id": "a5e58d3e2447fd6429b6932f7edeb06da94f9a6e4ccb0a212c8fb17503c7c619",
+      "label": 1300,
+      "annotation_ids": [
+        "743a7ef25a50474e8880d5593fdbccde454fbcf88726c5d60c48afe3a6344a93"
+      ]
+    },
+    {
+      "proposal_id": "8db56dc1d3a2be37ddd41061b0fdb3d5758b647db58f9945d3faa75ae936e50f",
+      "label": 100,
+      "annotation_ids": [
+        "8e75a54ca237281cfba9f01eb0a2b72d03000fac9c66b1719ef042a9a4de78f5"
+      ]
+    },
+    {
+      "proposal_id": "70ef7d82bd82fc477fa10e1bc534032b0137dedefc2afb6fe2ecab207dcfb18a",
+      "label": 100,
+      "annotation_ids": [
+        "57c9ca04aba1942ce871037e152428c4c466b8182ba871bde0504fab02ae8f48"
+      ]
+    },
+    {
+      "proposal_id": "ce897790cc485ae9b1bbde6ae9370d75e199e544a2568af6bacfdd69989e661d",
+      "label": 200,
+      "annotation_ids": [
+        "e3195e24c111280881a91b2b16150f9de67362a03d410c12bf3f1b5e162cc244"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "proposal_id": "c99c103634b4c618707e440bfa2882aea98d8dc60d89a809e2acd26899c51a7b",
+      "reason": "unresolved review status"
+    },
+    {
+      "proposal_id": "916985ee79bfa247b144880713aa99de7946abcb76d2d202edcafd932b8a3803",
+      "reason": "independent readable review required"
+    },
+    {
+      "proposal_id": "07dfcd10a2b962cb6f35572bb0618fc19adc7da2c047e3b48fbe3bdb9acd16ec",
+      "reason": "unresolved review status"
+    },
+    {
+      "proposal_id": "3c6977826aa4caf172b4dea89a5c841b4d2fb0bc729507698f001daa55fff07e",
+      "reason": "independent readable review required"
+    },
+    {
+      "proposal_id": "63b9ffebb2ba900df8f05453824237f4ba8faea9c1793c3c102b75a489065326",
+      "reason": "unresolved review status"
+    },
+    {
+      "proposal_id": "6dae851c2bd61e350d15f5d450fa1a0ea99d9a7384f625e441db3280e1b19408",
+      "reason": "independent readable review required"
+    },
+    {
+      "proposal_id": "af8083b50a9ba791c8a776100e47c58325efb114b3da854e27571d0f72234603",
+      "reason": "independent readable review required"
+    },
+    {
+      "proposal_id": "abe95be913e35f8d37f5131456bf5d4189c9418dd1b2c62a520ca36367343346",
+      "reason": "independent readable review required"
+    },
+    {
+      "proposal_id": "a7394c2ca2b075e15d59e09f7ef7c63044f5a52ec80d4e2045abffce30b6608b",
+      "reason": "unresolved review status"
+    },
+    {
+      "proposal_id": "5848494775fb9ede2d4cd37a0b1a87976f8dbb8e5bbeacfcb2292f3b4bf1513b",
+      "reason": "independent readable review required"
+    },
+    {
+      "proposal_id": "d04dfb124987257b7f889ad8eb4e077120b0bdb8daf2aee988935b26d76ff963",
+      "reason": "unresolved review status"
+    },
+    {
+      "proposal_id": "4695a790765416f6eb105d55c442c98cc30b1ffd6568b578f79199caab8361c2",
+      "reason": "independent readable review required"
+    },
+    {
+      "proposal_id": "660931ffa84cdd6bd8c98a6818978df77523925ad4ba73672cae6fa946569abe",
+      "reason": "unresolved review status"
+    },
+    {
+      "proposal_id": "bb730ce3af53de5e33af09415d948822cf9b9b952b1702dfbd7386689b04172e",
+      "reason": "independent readable review required"
+    },
+    {
+      "proposal_id": "ba0752ec2ee47d7f0c590ba1bbeb2403e61ad44413cbd53a9d9b48b30873f5e6",
+      "reason": "independent readable review required"
+    },
+    {
+      "proposal_id": "1b37ff8faa3231eeba93db783187bb5a52990a05dad3b714bd5d47d2d6dac3a5",
+      "reason": "independent readable review required"
+    }
+  ],
+  "held_out_training_labels": []
+}

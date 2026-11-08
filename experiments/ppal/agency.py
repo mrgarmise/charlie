@@ -68,7 +68,7 @@ class AgencyTracker:
         self.pending_lineage[successor_id] = (previous_id, min(.18, prior.confidence*.2), 3)
         return True
 
-    def observe(self, positions, command=None, *, interval_seconds=None, reference_positions=None):
+    def observe(self, positions, command=None, *, interval_seconds=None, reference_positions=None, candidate_prior=None):
         """command caused displacement since previous observation; None=unmeasured.
 
         reference_positions optionally supplies an explicit pre-action window
@@ -158,7 +158,10 @@ class AgencyTracker:
                              'reason': reason, 'contradictions': belief.contradictions,
                              'indirect_score': belief.indirect_score,
                              'lineage_source': belief.lineage_source})
-        ranked = sorted(self.beliefs, key=lambda k: self.beliefs[k].confidence, reverse=True)
+        # A spatial prior may rank equally supported hypotheses; it never
+        # contributes to confidence, separation, hits, stops, or qualification.
+        candidate_prior = candidate_prior or {}
+        ranked = sorted(self.beliefs, key=lambda k: (self.beliefs[k].confidence, candidate_prior.get(k,0.)), reverse=True)
         leader = ranked[0] if ranked else None
         runner = ranked[1] if len(ranked) > 1 else None
         top = self.beliefs.get(leader)

@@ -1,0 +1,19 @@
+{
+  "inputs": "identical frozen historical interpreted worlds in every arm",
+  "ledger_digest": "eb579a4dd98425e32530e364fce05aedf875d7db775ae406cfae23753a025f7a",
+  "physical_actions": 0,
+  "policy_activated": false,
+  "preference_changes": 84,
+  "qualification": "retrospective diagnostic shadow only; no independent strategy or score qualification",
+  "schema": "ala2-retained-tactical-replay-v1",
+  "valuation_changes": 96,
+  "replayed_contexts": 99,
+  "fresh_process_report_sha256": [
+    "b58d78b4de402fdb167327ff95312ba17bef79c1a6e33599ae727826bc6719c4",
+    "b58d78b4de402fdb167327ff95312ba17bef79c1a6e33599ae727826bc6719c4"
+  ],
+  "all_actions_unchanged": true,
+  "all_ablations_restore_baseline": true,
+  "first_process_report": "ppal-valuations-1.json.gz",
+  "strict_recovery_same_rows": true
+}

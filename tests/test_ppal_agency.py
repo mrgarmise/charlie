@@ -196,12 +196,13 @@ def test_adapter_discovers_unknown_sprite_with_bounded_neutral_probes():
         return [(Detection('unknown',p,(1,1,10,20),100),{}) for p in points.values()]
     class Controller:
         def execute(self,action,ms):
-            assert action.fire == 'NONE' and ms == 60
+            assert ms == 60
+            assert action.fire in ('NONE','E','N')
             commands.append(action.move)
             u=VECTORS[action.move]; p=points[1]; points[1]=(p[0]+u[0],p[1]+u[1])
     v=VisualAgency()
     assert v.discover(read,Controller(),record=snapshots.append) == points[1]
-    assert commands == ['E','STAY','W','STAY','S','STAY']
+    assert commands == ['STAY','STAY','E','STAY','W','STAY','S','STAY']
     assert snapshots[-1]['self_track_id'] is not None
     assert snapshots[-1]['latency_seconds'] is None
 
@@ -210,9 +211,10 @@ def test_adapter_no_candidates_uses_only_bounded_exploratory_probes():
     from unittest.mock import Mock
     controller=Mock(); v=VisualAgency()
     assert v.discover(lambda:[],controller) is None
-    assert controller.execute.call_count==12
+    assert controller.execute.call_count==14
     assert all(call.args[1]==60 for call in controller.execute.call_args_list)
-    assert all(call.args[0].fire=='NONE' for call in controller.execute.call_args_list)
+    assert [call.args[0].fire for call in controller.execute.call_args_list[:2]]==['E','N']
+    assert all(call.args[0].fire=='NONE' for call in controller.execute.call_args_list[2:])
     assert v.agency.self_id is None
 
 
@@ -226,7 +228,7 @@ def test_adapter_ambiguous_candidates_exhausts_bounded_probes():
             points[:]=[(p[0]+u[0],p[1]+u[1]) for p in points]
     v=VisualAgency()
     assert v.discover(read,Controller()) is None
-    assert len(commands) == 12
+    assert len(commands) == 14
 
 
 def test_adapter_deadline_prevents_new_probe():

@@ -1,0 +1,58 @@
+......................FFFF......                                         [100%]
+=================================== FAILURES ===================================
+____________________ test_real_gate_default_remains_shadow _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_real_gate_default_remains0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f71398273b0>
+
+    def test_real_gate_default_remains_shadow(tmp_path, monkeypatch):
+>       with EvidenceJournal(tmp_path/'j.sqlite3') as journal:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'EvidenceJournal' object does not support the context manager protocol
+
+tests/test_consultation_activation.py:104: TypeError
+_______________ test_worker_retains_answer_before_clearing_latch _______________
+
+native_fakes = namespace(path=PosixPath('/tmp/pytest-of-root/pytest-2/test_worker_retains_answer_bef0/private/approval.json'), mode={...880>, marker=PosixPath('/tmp/pytest-of-root/pytest-2/test_worker_retains_answer_bef0/private/completion-unknown.json'))
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_worker_retains_answer_bef0')
+
+    def test_worker_retains_answer_before_clearing_latch(native_fakes,tmp_path):
+>       with EvidenceJournal(tmp_path/'j.sqlite3') as journal:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'EvidenceJournal' object does not support the context manager protocol
+
+tests/test_consultation_activation.py:113: TypeError
+__________________ test_not_ready_never_sends_inference[cold] __________________
+
+native_fakes = namespace(path=PosixPath('/tmp/pytest-of-root/pytest-2/test_not_ready_never_sends_inf0/private/approval.json'), mode={...d80>, marker=PosixPath('/tmp/pytest-of-root/pytest-2/test_not_ready_never_sends_inf0/private/completion-unknown.json'))
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_not_ready_never_sends_inf0')
+mode = 'cold'
+
+    @pytest.mark.parametrize('mode', ['cold','unapproved'])
+    def test_not_ready_never_sends_inference(native_fakes, tmp_path, mode):
+        native_fakes.mode['value']=mode
+>       with EvidenceJournal(tmp_path/'j.sqlite3') as journal:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'EvidenceJournal' object does not support the context manager protocol
+
+tests/test_consultation_activation.py:131: TypeError
+_______________ test_not_ready_never_sends_inference[unapproved] _______________
+
+native_fakes = namespace(path=PosixPath('/tmp/pytest-of-root/pytest-2/test_not_ready_never_sends_inf1/private/approval.json'), mode={...da0>, marker=PosixPath('/tmp/pytest-of-root/pytest-2/test_not_ready_never_sends_inf1/private/completion-unknown.json'))
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_not_ready_never_sends_inf1')
+mode = 'unapproved'
+
+    @pytest.mark.parametrize('mode', ['cold','unapproved'])
+    def test_not_ready_never_sends_inference(native_fakes, tmp_path, mode):
+        native_fakes.mode['value']=mode
+>       with EvidenceJournal(tmp_path/'j.sqlite3') as journal:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'EvidenceJournal' object does not support the context manager protocol
+
+tests/test_consultation_activation.py:131: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_consultation_activation.py::test_real_gate_default_remains_shadow
+FAILED tests/test_consultation_activation.py::test_worker_retains_answer_before_clearing_latch
+FAILED tests/test_consultation_activation.py::test_not_ready_never_sends_inference[cold]
+FAILED tests/test_consultation_activation.py::test_not_ready_never_sends_inference[unapproved]
+4 failed, 28 passed in 1.07s

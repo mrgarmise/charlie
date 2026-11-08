@@ -1,9 +1,9 @@
 name: Independent consultation software validation
 on:
   push:
-    branches: ['feature/onboard-consultation-20261101']
+    branches: ['feature/onboard-consultation-20261101', 'feature/operational-consultation-20261104']
   pull_request:
-    paths: ['learning/consultation.py', 'tests/test_consultation*', 'ui/discoveries.py', 'docs/consultation/**']
+    paths: ['learning/consultation*.py', 'learning/lifecycle.py', 'main.py', 'tests/test_consultation*', 'ui/discoveries.py', 'docs/consultation/**']
 permissions:
   contents: read
 jobs:

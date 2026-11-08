@@ -1,0 +1,118 @@
+{
+  "results": {
+    "full": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "2",
+      "tests": "1377",
+      "time": "346.668",
+      "timestamp": "2026-10-21T07:10:59.094909+09:00",
+      "hostname": "188de692308d",
+      "skips": [
+        {
+          "name": "test_actual_october1_collision_normal_discovery",
+          "reason": "original October 1 artifacts required; use documented acceptance environment"
+        },
+        {
+          "name": "test_full_original_archive_when_supplied",
+          "reason": "Optional full 119-original archive replay; retained nine originals always run"
+        }
+      ]
+    },
+    "focused": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "144",
+      "time": "4.693",
+      "timestamp": "2026-10-21T07:09:59.975941+09:00",
+      "hostname": "188de692308d",
+      "skips": []
+    },
+    "development_concurrent_1": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "3",
+      "skipped": "2",
+      "tests": "1377",
+      "time": "360.348",
+      "timestamp": "2026-10-21T07:01:04.107592+09:00",
+      "hostname": "188de692308d",
+      "skips": [
+        {
+          "name": "test_actual_october1_collision_normal_discovery",
+          "reason": "original October 1 artifacts required; use documented acceptance environment"
+        },
+        {
+          "name": "test_full_original_archive_when_supplied",
+          "reason": "Optional full 119-original archive replay; retained nine originals always run"
+        }
+      ]
+    },
+    "development_concurrent_2": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "2",
+      "skipped": "2",
+      "tests": "1377",
+      "time": "351.910",
+      "timestamp": "2026-10-21T07:04:33.619678+09:00",
+      "hostname": "188de692308d",
+      "skips": [
+        {
+          "name": "test_actual_october1_collision_normal_discovery",
+          "reason": "original October 1 artifacts required; use documented acceptance environment"
+        },
+        {
+          "name": "test_full_original_archive_when_supplied",
+          "reason": "Optional full 119-original archive replay; retained nine originals always run"
+        }
+      ]
+    }
+  },
+  "artifact_sha256": {
+    "operator-model-002-baseline.json": "3af577f18c754d13ae816ba813410e966c129e6f64bd997977b92b5ab749144d",
+    "historical-examples.json": "58b913bd8afe9d4733610dbe2e4ed44789e37255a05a5395f650a762bcd9fe9a",
+    "environment-and-source.json": "818af3778b96859515b82ab47557ced5500d2902d1ab0c6ddfa0abb976078dbe",
+    "synthetic-alignment-control.json": "bc053ab50e89425ebe258af5d5bc89999ee06705f8d986a9cc37a0f8c926e9fb",
+    "historical-geometry/01-score-rgb-channel-resize-256x32-v1.png": "d20aec27beb70c08916a26fe22af6432a3e9c766952524554d54df1b17cb6d72",
+    "historical-geometry/01-score-rgb-channel-resize-224x28-pad16x2-v2.png": "713cbad037596c7f80b684cec0a99789372ae44a46d7ef7308df0bca1e47be18",
+    "historical-geometry/01-remove-top-bezel-bottom-border.png": "da72226e1f8b66d7d30b79e00281ccd1c3a4f82cdac43b9cd3c0235c052d8877",
+    "historical-geometry/00-score-rgb-channel-resize-256x32-v1.png": "3252edc340f052ea96cc63c5e5e49be0fa9fc113a3a0391d36ccd8aab03de991",
+    "historical-geometry/00-widen-inner-margin-and-trim.png": "2bd82da7764c2407d27d2218bcb08db146ffb2bead6b085827dae2d7f8a284c2",
+    "historical-geometry/00-remove-top-bezel-bottom-border.png": "669e270589155f86e4a87688774f121db25399a3ef41d588d22a01bd0b314c63",
+    "historical-geometry/audit.json": "e8c0d55ff5b200f1c7d690e08e4e572c7dddd6c52220718f039514033e89c94c",
+    "historical-geometry/01-widen-inner-margin-and-trim.png": "cee406db514f8195746189083342ce3646b3886796b0a07b581c210bbd28160c",
+    "historical-geometry/00-score-rgb-channel-resize-224x28-pad16x2-v2.png": "cf8fc64af71e0089eef9e753fb2331ec297b84b5930c3af2834562b51bf07308",
+    "historical-geometry/contact-sheet.png": "0955c93b4c028f15ec459024f59b16b02e1c567ae92d32f3641b938deff17054",
+    "host-tests/full.xml.gz": "088f87636d34acf9469d0dc72bd4b8cede854a33c625c691430a17a0ec247cc1",
+    "host-tests/development-concurrent-1.xml.gz": "829f61afcecb2504042ab6af41f691889b1856da48c3d8f0d14693cc2b8b6741",
+    "host-tests/development-concurrent-2.log.gz": "8f1b7f49875aad307ccfe442c3e20e8e10f74bbe87bef28661c8abcaedaba9f8",
+    "host-tests/focused.log.gz": "37534862438dc85b4b47cbfac9c5cb9b43d341025ee7d7fe335c41e9a52a7185",
+    "host-tests/focused.xml.gz": "19e33854047dd7038e3d86c9117dff146253ff9e4d5e5af304f6b1edf9deddba",
+    "host-tests/full.log.gz": "8f0a293be0c31775a9d89e2d8b97cd90da08e1a1f72a36cf295927f32966ec70",
+    "host-tests/development-concurrent-2.xml.gz": "8091cc5797bf68702fbc00c181c2f295f3da51627e85d8eb31fe882852ec9d15",
+    "host-tests/development-concurrent-1.log.gz": "8383f1de0c9a12fb8154ea1dd179df3b6cfcc649aa613a8e71009a907ae32d8e"
+  },
+  "schema": "charlie-score-crop-host-validation-v1",
+  "parent": "d45cce134e10d342f64a4d33f8baf9fcc1a41b01",
+  "native": false,
+  "source": "environment-and-source.json",
+  "commands": {
+    "full": "TMPDIR=<isolated crop-full-tmp> <crop-env>/bin/python -m pytest tests -q --junitxml=crop-accepted-full.xml",
+    "focused": "TMPDIR=<isolated crop-focused-tmp> <crop-env>/bin/python -m pytest tests/test_score_crop_diagnostics.py tests/test_neural_score.py tests/test_neural_score_sampler.py tests/test_score_feedback_recovery.py tests/test_score_feedback_learning.py tests/test_score_review_navigation.py tests/test_score_review_frontend.py tests/test_score_human_review.py tests/test_score_tracker.py -q --junitxml=crop-focused-final-source.xml"
+  },
+  "originals_modified": false,
+  "private_model_002_accessed": false,
+  "final_test_consulted": false,
+  "hardware_accessed": false,
+  "pip_check": "No broken requirements found; pip warned about leftover invalid ~ympy distribution metadata",
+  "development_failures": "Concurrent development runs shared default temp gameplay ownership lock; source not frozen. Failed logs retained. Final isolated run is acceptance evidence.",
+  "gates": {
+    "E1": "NOT YET DEMONSTRATED",
+    "P1": "NOT YET DEMONSTRATED",
+    "I1": "NOT YET DEMONSTRATED"
+  }
+}

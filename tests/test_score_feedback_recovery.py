@@ -58,7 +58,10 @@ def test_conflicts_supersession_missing_sensor_identity_and_partition_guards(tmp
     assert not reviewed_labels(j)[0]
     ScoreObserver.annotate_review(j,p.id,annotator='other',verdict='confirm',reason='conflicting fixture',independent=True)
     assert not reviewed_labels(j,allow_fixture=True)[0]
-    with pytest.raises(ValueError,match='training'):reviewed_labels(j,partition='final')
+    # Explicit final holdout access is now supported for the neural-score
+    # review corpus; a training-partition fixture must not leak into it.
+    assert reviewed_labels(j,partition='final') == ([], [])
+    assert reviewed_labels(j,partition='validation') == ([], [])
     Image.new('RGB',frame.size,'blue').save(tmp_path/'original.png')
     assert not reviewed_labels(j,allow_fixture=True)[0]
     j.close()

@@ -1,0 +1,16 @@
+{
+  "experiments/ppal/neural_score/__init__.py": "df6fa74cb8ded4b99ae2525f639aac2cc611f536c32c8a2ea51c5e61aa177097",
+  "experiments/ppal/neural_score/backends.py": "fe83b08b29346a40396578aab3ad5b9c9000110b155b31397fd6378e04151f21",
+  "experiments/ppal/neural_score/benchmark.py": "2f771fa8050d07ab04cc36533e8bf1573f101f816ce518b8caf2f1d5f5a7991c",
+  "experiments/ppal/neural_score/cli.py": "6273be0719c0b0096612b006ffe2b43630a27cb364a26d8c043d8a0bd07aa707",
+  "experiments/ppal/neural_score/compile.py": "f4b7e49cd65fc49ef5ebce1f5c8c10acc809bfe3f3ae5ffabfcb520b5cb75c7c",
+  "experiments/ppal/neural_score/contract.py": "324e926de23dcdfc26448519f7177b4d3dbbbb9085c0dbaba453575f964bfc84",
+  "experiments/ppal/neural_score/corpus.py": "90cbdc81138cb32cd6477d24f77821a8f31c7ce624becc700946ff68a1439157",
+  "experiments/ppal/neural_score/evaluate.py": "7f301160871669d271ae9d48d7e1cf624ea62c04d94e3cc63e8ab52b322b3428",
+  "experiments/ppal/neural_score/model.py": "90ae35d67ebff232180c20be93bcac2aaeb43a6df08e47a2ef5462b2ea8ebfed",
+  "experiments/ppal/neural_score/reader.py": "fa4e1743bc551e2d241f7f59f47998f038d67147b64ef988005b10ce49d0d238",
+  "experiments/ppal/neural_score/train.py": "4c9b6478b6306012034d96512e7c913920967425b207d39e6d30ed39e98d24dd",
+  "experiments/ppal/robotron_score_system.py": "d1f8ca8b7db4904002bcca24ba02d54f2afa6f4a775ab57df317b73a01d46f61",
+  "experiments/ppal/score_observer.py": "04c09ed19a5cb494eeec3296d521cc5e55d809dd4fc842878542dd11cd48cd42",
+  "tests/test_neural_score.py": "b2b49f855712c2e46016a5c567428a3b918acee44bfeed12a32fecfef52a8d97"
+}

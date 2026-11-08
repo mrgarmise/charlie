@@ -1,0 +1,574 @@
+{
+  "scope": "SYNTHETIC SOFTWARE CONTROL; not authentic recognition evidence",
+  "seed": 17,
+  "steps": 300,
+  "samples": 8,
+  "independent_validation": false,
+  "model_002_accessed": false,
+  "results": {
+    "legacy": {
+      "audit": {
+        "schema": "charlie-score-crop-ctc-audit-v1",
+        "manifest_digest": "fc3330056704b7c75357af702c0bd60a875fcfbaebb73c5efc5788ac4a3d12d0",
+        "manifest_sha256": "4155addc1f79e2e0988ff669ac713411262bacbaf1e1739e1607fdbe6aae12d2",
+        "qualification": "SYNTHETIC / NOT ROBOTRON-QUALIFIED",
+        "scope": "training-set diagnostics only; no generalization claim",
+        "model": {
+          "checkpoint_sha256": "7c204c286d0b6f32ad795de03d1380cd8568bc9163e177284fdc627f1a4804f2"
+        },
+        "preprocessing": "score-rgb-channel-resize-256x32-v1",
+        "training_images": 8,
+        "label_counts": {
+          "100": 1,
+          "300": 1,
+          "800": 1,
+          "1200": 1,
+          "00": 4
+        },
+        "geometry_status": {
+          "original/calibration not supplied": 8
+        },
+        "metrics": {
+          "samples": 8,
+          "readable": 8,
+          "accepted": 0,
+          "correct": 0,
+          "raw_exact": 0,
+          "raw_exact_accuracy": 0,
+          "always_00_raw_accuracy": 0.5,
+          "raw_digit_edit_distance": 12,
+          "raw_high_confidence_wrong": 0,
+          "confidence_calibration": "NOT ESTABLISHED; empirical bins describe only the supplied rows",
+          "confidence_bins": [
+            {
+              "low": 0,
+              "high": 0.5,
+              "samples": 4,
+              "raw_correct": 0
+            },
+            {
+              "low": 0.5,
+              "high": 0.85,
+              "samples": 4,
+              "raw_correct": 0
+            },
+            {
+              "low": 0.85,
+              "high": 0.95,
+              "samples": 0,
+              "raw_correct": 0
+            },
+            {
+              "low": 0.95,
+              "high": 1.000001,
+              "samples": 0,
+              "raw_correct": 0
+            }
+          ],
+          "per_score": {
+            "100": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 1
+              }
+            },
+            "300": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "10": 1
+              }
+            },
+            "800": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "10": 1
+              }
+            },
+            "1200": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "10": 1
+              }
+            },
+            "00": {
+              "samples": 4,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 4
+              }
+            }
+          },
+          "rejection_reasons": {
+            "edge/truncated sequence": 8
+          },
+          "coverage": 0,
+          "exact_accuracy_at_coverage": null,
+          "exact_over_all_readable": 0,
+          "correct_over_all_wilson95": [
+            0,
+            0.3244156195108769
+          ],
+          "total_digit_edit_distance": 21,
+          "high_confidence_wrong": 0,
+          "no_score_samples": 0,
+          "no_score_false_positives": 0,
+          "p1_p2_swaps": "unmeasured without paired channel truth",
+          "quantization_drift": "unmeasured without real HEF",
+          "latency": {
+            "p50": 0.00115122199997586,
+            "p95": 0.0035830289999694287,
+            "p99": 0.0035830289999694287
+          }
+        },
+        "nonblank_edges": 8,
+        "output_shape": [
+          1,
+          11,
+          1,
+          64
+        ],
+        "horizontal_stride": 4,
+        "horizontal_receptive_field": 15,
+        "final_test_consulted": false,
+        "originals_modified": false,
+        "hardware_accessed": false
+      },
+      "training": {
+        "seed": 17,
+        "steps": 300,
+        "dataset_digest": "fc3330056704b7c75357af702c0bd60a875fcfbaebb73c5efc5788ac4a3d12d0",
+        "checkpoint_sha256": "7c204c286d0b6f32ad795de03d1380cd8568bc9163e177284fdc627f1a4804f2",
+        "onnx_sha256": "13fae754b948dcf8c39c165eafefe7ab35e95ae1fb44cc6f5185eef1ff89ce96",
+        "preprocessing": "score-rgb-channel-resize-256x32-v1",
+        "boundary_blank_weight": 0,
+        "export": {
+          "operators": [
+            "Conv",
+            "Relu"
+          ],
+          "input_shape": [
+            1,
+            3,
+            32,
+            256
+          ],
+          "output_shape": [
+            1,
+            11,
+            1,
+            64
+          ],
+          "opset_imports": {
+            "": 11
+          },
+          "exporter": "torch.onnx legacy; dynamo=False",
+          "input_node": "images",
+          "output_node": "logits",
+          "onnx_nodes": [
+            "/layers/layers.0/Conv",
+            "/layers/layers.1/Relu",
+            "/layers/layers.2/Conv",
+            "/layers/layers.3/Relu",
+            "/layers/layers.4/Conv",
+            "/layers/layers.5/Relu",
+            "/layers/layers.6/Conv"
+          ],
+          "maximum_absolute_error": 0.0000762939453125,
+          "onnxruntime_checked": true,
+          "hailo_compilation": "UNVERIFIED",
+          "qualification": "SYNTHETIC / NOT ROBOTRON-QUALIFIED"
+        }
+      }
+    },
+    "padding_only": {
+      "audit": {
+        "schema": "charlie-score-crop-ctc-audit-v1",
+        "manifest_digest": "fc3330056704b7c75357af702c0bd60a875fcfbaebb73c5efc5788ac4a3d12d0",
+        "manifest_sha256": "4155addc1f79e2e0988ff669ac713411262bacbaf1e1739e1607fdbe6aae12d2",
+        "qualification": "SYNTHETIC / NOT ROBOTRON-QUALIFIED",
+        "scope": "training-set diagnostics only; no generalization claim",
+        "model": {
+          "checkpoint_sha256": "e32f18da3a04fae26096fd03f76bfb82eabead58b45c6a91821b49c251328a4b"
+        },
+        "preprocessing": "score-rgb-channel-resize-224x28-pad16x2-v2",
+        "training_images": 8,
+        "label_counts": {
+          "100": 1,
+          "300": 1,
+          "800": 1,
+          "1200": 1,
+          "00": 4
+        },
+        "geometry_status": {
+          "original/calibration not supplied": 8
+        },
+        "metrics": {
+          "samples": 8,
+          "readable": 8,
+          "accepted": 0,
+          "correct": 0,
+          "raw_exact": 0,
+          "raw_exact_accuracy": 0,
+          "always_00_raw_accuracy": 0.5,
+          "raw_digit_edit_distance": 13,
+          "raw_high_confidence_wrong": 0,
+          "confidence_calibration": "NOT ESTABLISHED; empirical bins describe only the supplied rows",
+          "confidence_bins": [
+            {
+              "low": 0,
+              "high": 0.5,
+              "samples": 0,
+              "raw_correct": 0
+            },
+            {
+              "low": 0.5,
+              "high": 0.85,
+              "samples": 8,
+              "raw_correct": 0
+            },
+            {
+              "low": 0.85,
+              "high": 0.95,
+              "samples": 0,
+              "raw_correct": 0
+            },
+            {
+              "low": 0.95,
+              "high": 1.000001,
+              "samples": 0,
+              "raw_correct": 0
+            }
+          ],
+          "per_score": {
+            "100": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 1
+              }
+            },
+            "300": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 1
+              }
+            },
+            "800": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 1
+              }
+            },
+            "1200": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 1
+              }
+            },
+            "00": {
+              "samples": 4,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 4
+              }
+            }
+          },
+          "rejection_reasons": {
+            "edge/truncated sequence": 8
+          },
+          "coverage": 0,
+          "exact_accuracy_at_coverage": null,
+          "exact_over_all_readable": 0,
+          "correct_over_all_wilson95": [
+            0,
+            0.3244156195108769
+          ],
+          "total_digit_edit_distance": 21,
+          "high_confidence_wrong": 0,
+          "no_score_samples": 0,
+          "no_score_false_positives": 0,
+          "p1_p2_swaps": "unmeasured without paired channel truth",
+          "quantization_drift": "unmeasured without real HEF",
+          "latency": {
+            "p50": 0.0011008169999513484,
+            "p95": 0.0017055069999969419,
+            "p99": 0.0017055069999969419
+          }
+        },
+        "nonblank_edges": 8,
+        "output_shape": [
+          1,
+          11,
+          1,
+          64
+        ],
+        "horizontal_stride": 4,
+        "horizontal_receptive_field": 15,
+        "final_test_consulted": false,
+        "originals_modified": false,
+        "hardware_accessed": false
+      },
+      "training": {
+        "seed": 17,
+        "steps": 300,
+        "dataset_digest": "fc3330056704b7c75357af702c0bd60a875fcfbaebb73c5efc5788ac4a3d12d0",
+        "checkpoint_sha256": "e32f18da3a04fae26096fd03f76bfb82eabead58b45c6a91821b49c251328a4b",
+        "onnx_sha256": "5483d9f4729cfc46a834d8bce4cab5e4fc943b87e7aee7e5d8618346610772ad",
+        "preprocessing": "score-rgb-channel-resize-224x28-pad16x2-v2",
+        "boundary_blank_weight": 0,
+        "export": {
+          "operators": [
+            "Conv",
+            "Relu"
+          ],
+          "input_shape": [
+            1,
+            3,
+            32,
+            256
+          ],
+          "output_shape": [
+            1,
+            11,
+            1,
+            64
+          ],
+          "opset_imports": {
+            "": 11
+          },
+          "exporter": "torch.onnx legacy; dynamo=False",
+          "input_node": "images",
+          "output_node": "logits",
+          "onnx_nodes": [
+            "/layers/layers.0/Conv",
+            "/layers/layers.1/Relu",
+            "/layers/layers.2/Conv",
+            "/layers/layers.3/Relu",
+            "/layers/layers.4/Conv",
+            "/layers/layers.5/Relu",
+            "/layers/layers.6/Conv"
+          ],
+          "maximum_absolute_error": 0.00002288818359375,
+          "onnxruntime_checked": true,
+          "hailo_compilation": "UNVERIFIED",
+          "qualification": "SYNTHETIC / NOT ROBOTRON-QUALIFIED"
+        }
+      }
+    },
+    "padding_boundary": {
+      "audit": {
+        "schema": "charlie-score-crop-ctc-audit-v1",
+        "manifest_digest": "fc3330056704b7c75357af702c0bd60a875fcfbaebb73c5efc5788ac4a3d12d0",
+        "manifest_sha256": "4155addc1f79e2e0988ff669ac713411262bacbaf1e1739e1607fdbe6aae12d2",
+        "qualification": "SYNTHETIC / NOT ROBOTRON-QUALIFIED",
+        "scope": "training-set diagnostics only; no generalization claim",
+        "model": {
+          "checkpoint_sha256": "4c771e24d686646b126717f2285a1961e6424260b281d1ef6f02dd48e0751b00"
+        },
+        "preprocessing": "score-rgb-channel-resize-224x28-pad16x2-v2",
+        "training_images": 8,
+        "label_counts": {
+          "100": 1,
+          "300": 1,
+          "800": 1,
+          "1200": 1,
+          "00": 4
+        },
+        "geometry_status": {
+          "original/calibration not supplied": 8
+        },
+        "metrics": {
+          "samples": 8,
+          "readable": 8,
+          "accepted": 0,
+          "correct": 0,
+          "raw_exact": 0,
+          "raw_exact_accuracy": 0,
+          "always_00_raw_accuracy": 0.5,
+          "raw_digit_edit_distance": 13,
+          "raw_high_confidence_wrong": 0,
+          "confidence_calibration": "NOT ESTABLISHED; empirical bins describe only the supplied rows",
+          "confidence_bins": [
+            {
+              "low": 0,
+              "high": 0.5,
+              "samples": 0,
+              "raw_correct": 0
+            },
+            {
+              "low": 0.5,
+              "high": 0.85,
+              "samples": 8,
+              "raw_correct": 0
+            },
+            {
+              "low": 0.85,
+              "high": 0.95,
+              "samples": 0,
+              "raw_correct": 0
+            },
+            {
+              "low": 0.95,
+              "high": 1.000001,
+              "samples": 0,
+              "raw_correct": 0
+            }
+          ],
+          "per_score": {
+            "100": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 1
+              }
+            },
+            "300": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 1
+              }
+            },
+            "800": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 1
+              }
+            },
+            "1200": {
+              "samples": 1,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 1
+              }
+            },
+            "00": {
+              "samples": 4,
+              "raw_exact": 0,
+              "accepted": 0,
+              "accepted_correct": 0,
+              "proposed_counts": {
+                "0": 4
+              }
+            }
+          },
+          "rejection_reasons": {
+            "ambiguous digit or blank": 8
+          },
+          "coverage": 0,
+          "exact_accuracy_at_coverage": null,
+          "exact_over_all_readable": 0,
+          "correct_over_all_wilson95": [
+            0,
+            0.3244156195108769
+          ],
+          "total_digit_edit_distance": 21,
+          "high_confidence_wrong": 0,
+          "no_score_samples": 0,
+          "no_score_false_positives": 0,
+          "p1_p2_swaps": "unmeasured without paired channel truth",
+          "quantization_drift": "unmeasured without real HEF",
+          "latency": {
+            "p50": 0.00114986999994926,
+            "p95": 0.0014903769999818905,
+            "p99": 0.0014903769999818905
+          }
+        },
+        "nonblank_edges": 0,
+        "output_shape": [
+          1,
+          11,
+          1,
+          64
+        ],
+        "horizontal_stride": 4,
+        "horizontal_receptive_field": 15,
+        "final_test_consulted": false,
+        "originals_modified": false,
+        "hardware_accessed": false
+      },
+      "training": {
+        "seed": 17,
+        "steps": 300,
+        "dataset_digest": "fc3330056704b7c75357af702c0bd60a875fcfbaebb73c5efc5788ac4a3d12d0",
+        "checkpoint_sha256": "4c771e24d686646b126717f2285a1961e6424260b281d1ef6f02dd48e0751b00",
+        "onnx_sha256": "72b0a2b69738a9c6f405b7b1713c923f2ecb4220bf7276087aa03a68e03135a4",
+        "preprocessing": "score-rgb-channel-resize-224x28-pad16x2-v2",
+        "boundary_blank_weight": 0.25,
+        "export": {
+          "operators": [
+            "Conv",
+            "Relu"
+          ],
+          "input_shape": [
+            1,
+            3,
+            32,
+            256
+          ],
+          "output_shape": [
+            1,
+            11,
+            1,
+            64
+          ],
+          "opset_imports": {
+            "": 11
+          },
+          "exporter": "torch.onnx legacy; dynamo=False",
+          "input_node": "images",
+          "output_node": "logits",
+          "onnx_nodes": [
+            "/layers/layers.0/Conv",
+            "/layers/layers.1/Relu",
+            "/layers/layers.2/Conv",
+            "/layers/layers.3/Relu",
+            "/layers/layers.4/Conv",
+            "/layers/layers.5/Relu",
+            "/layers/layers.6/Conv"
+          ],
+          "maximum_absolute_error": 0.000091552734375,
+          "onnxruntime_checked": true,
+          "hailo_compilation": "UNVERIFIED",
+          "qualification": "SYNTHETIC / NOT ROBOTRON-QUALIFIED"
+        }
+      }
+    }
+  }
+}

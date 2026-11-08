@@ -27,10 +27,13 @@ def reviewed_labels(journal, *, partition='training', allow_fixture=False):
     Diagnostic use must be requested explicitly. Final/validation labels cannot
     become development data. Returns exclusions instead of guessing labels.
     """
-    if partition not in ('training','diagnostic'):raise ValueError('training or explicit diagnostic consultation required')
+    if partition not in ('training','validation','final','diagnostic'):
+        raise ValueError('explicit training, validation, final or diagnostic review partition required')
     proposals=journal.category_records('observation','score_review_proposal')
     if len(proposals)>4096:raise ValueError('bounded feedback requires <=4096 proposals')
     annotations=journal.category_records('observation','score_human_annotation')
+    from .score_review_attestation import attested_photo_annotation_ids
+    retrospectively_attested=attested_photo_annotation_ids(journal)
     superseded={r.data['payload'].get('supersedes') for r in annotations}
     statuses={r.data['payload'].get('proposal_id'):r.data['payload'].get('status') for r in
         journal.category_records('observation','score_review_status')}
@@ -49,9 +52,14 @@ def reviewed_labels(journal, *, partition='training', allow_fixture=False):
         if any(a.data['payload']['partition']!=partition and same_source(a.data['payload']) for a in proposals):reason='source partition conflict'
         elif any(a.data['payload']['synthetic'] for a in aliases) and not allow_fixture:reason='fixture evidence excluded'
         elif any(statuses.get(a.id) in ('pending','insufficient','disputed') for a in aliases):reason='unresolved review status'
-        elif not peers or any(r.data['payload'].get('independence_attested') is not True for r in peers):reason='independent readable review required'
+        elif not peers or any(r.data['payload'].get('independence_attested') is not True
+                               and r.id not in retrospectively_attested for r in peers):
+            reason='photo reading not attested (original submission or later linked confirmation required)'
         elif any(r.data['payload'].get('artifact_sha256')!=sha or r.data['payload'].get('source_episode')!=journal.get(r.data['payload']['proposal_id']).data['payload']['source_episode'] for r in peers):reason='annotation provenance mismatch'
         elif len({r.data['payload']['value'] for r in peers})!=1:reason='conflicting reviewer labels'
+        elif len({r.data['payload'].get('visible_digits') for r in peers
+                  if r.data['payload'].get('visible_digits') is not None})>1:
+            reason='conflicting exact visible digit strings'
         elif next(iter({r.data['payload']['value'] for r in peers})) is None:reason='unreadable review'
         if not reason:
             try:path=ScoreObserver.review_artifact(journal,p)
@@ -60,7 +68,24 @@ def reviewed_labels(journal, *, partition='training', allow_fixture=False):
         value=peers[0].data['payload']['value']
         if type(value) is not int or not 0<=value<=9999999:
             excluded.append(dict(proposal_id=key,reason='bounded nonnegative seven-digit label required'));continue
-        rows.append(dict(proposal_id=key,proposal=p,label=value,path=path,annotation_ids=[r.id for r in peers]))
+        explicit={r.data['payload'].get('visible_digits') for r in peers
+                  if r.data['payload'].get('visible_digits') is not None}
+        if explicit:
+            digits=next(iter(explicit))
+            if (not isinstance(digits,str) or not digits.isascii() or not digits.isdigit()
+                    or not 1<=len(digits)<=7 or int(digits)!=value):
+                excluded.append(dict(proposal_id=key,reason='visible digit string conflicts with numeric score'));continue
+        elif value==0:
+            # Historic numeric zero cannot tell whether one or two zero
+            # glyphs appeared. Never invent visual text for a CTC target.
+            excluded.append(dict(proposal_id=key,reason='visible zero count unverified (0 versus 00)'));continue
+        else:
+            digits=str(value)
+        from .score_digits import valid_display_digits
+        if not valid_display_digits(digits):
+            excluded.append(dict(proposal_id=key,reason='unsupported Robotron visible digits (only 0 or 00 for zero)'));continue
+        rows.append(dict(proposal_id=key,proposal=p,label=value,display_digits=digits,
+                         path=path,annotation_ids=[r.id for r in peers]))
         seen.add(sha)
     return rows,excluded
 

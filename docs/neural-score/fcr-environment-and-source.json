@@ -1,0 +1,90 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "packages": {
+    "torch": "2.5.1+cpu",
+    "numpy": "2.3.5",
+    "Pillow": "12.3.0",
+    "opencv-python-headless": "5.0.0.93",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.20.1",
+    "pytest": "9.1.1",
+    "sympy": "1.13.1"
+  },
+  "source_sha256": {
+    "experiments/ppal/neural_score/backends.py": "85de668c9cf86231f1bd0c68b85a4a90ba97fef623fb68c5f82251022f5a14f7",
+    "experiments/ppal/neural_score/compile.py": "5673f2c6eb05a7ac0f9449d3f7b80a979db3c423d45bfb029396bbd32ac83a84",
+    "tools/recover_score_review_evidence.py": "ed27169884b599b1613747f1c44a2234bb62372ecae9b241b76d6ee143d81fdf",
+    "tests/test_neural_score.py": "97a3237f74bb27b4b4fd55da22be78d0886cbd3ea476b1cd68883c88a9ae7e55",
+    "tests/test_score_archive_recovery.py": "3a298f5061bf73a39c4f97180f42bed33d58b443179b9c4c1512d842f9d98e9a",
+    "tests/test_score_review_navigation.py": "cc709009955ef15a82dc4f470010af2ee01bd60f8c6ca4861c005a7c93c43c83"
+  },
+  "corpus_check": {
+    "eligible_crops": 0,
+    "exclusions": [
+      {
+        "proposal_id": "c99c103634b4c618707e440bfa2882aea98d8dc60d89a809e2acd26899c51a7b",
+        "reason": "unresolved review status",
+        "review_partition": "diagnostic"
+      },
+      {
+        "proposal_id": "916985ee79bfa247b144880713aa99de7946abcb76d2d202edcafd932b8a3803",
+        "reason": "photo reading not attested (original submission or later linked confirmation required)",
+        "review_partition": "diagnostic"
+      },
+      {
+        "proposal_id": "07dfcd10a2b962cb6f35572bb0618fc19adc7da2c047e3b48fbe3bdb9acd16ec",
+        "reason": "unresolved review status",
+        "review_partition": "diagnostic"
+      },
+      {
+        "proposal_id": "3c6977826aa4caf172b4dea89a5c841b4d2fb0bc729507698f001daa55fff07e",
+        "reason": "photo reading not attested (original submission or later linked confirmation required)",
+        "review_partition": "diagnostic"
+      },
+      {
+        "proposal_id": "63b9ffebb2ba900df8f05453824237f4ba8faea9c1793c3c102b75a489065326",
+        "reason": "unresolved review status",
+        "review_partition": "diagnostic"
+      },
+      {
+        "proposal_id": "6dae851c2bd61e350d15f5d450fa1a0ea99d9a7384f625e441db3280e1b19408",
+        "reason": "photo reading not attested (original submission or later linked confirmation required)",
+        "review_partition": "diagnostic"
+      },
+      {
+        "proposal_id": "af8083b50a9ba791c8a776100e47c58325efb114b3da854e27571d0f72234603",
+        "reason": "photo reading not attested (original submission or later linked confirmation required)",
+        "review_partition": "diagnostic"
+      },
+      {
+        "proposal_id": "96caef434658f9142ea9aeb319d7444d61067846cff13f87027aaf1296e4bb9f",
+        "reason": "explicit channel/session/calibration binding required"
+      },
+      {
+        "proposal_id": "ef62991e016c702183cde5d991a91721054027df8d451c3bc3f080ae3aa7db89",
+        "reason": "explicit channel/session/calibration binding required"
+      },
+      {
+        "proposal_id": "a5e58d3e2447fd6429b6932f7edeb06da94f9a6e4ccb0a212c8fb17503c7c619",
+        "reason": "explicit channel/session/calibration binding required"
+      },
+      {
+        "proposal_id": "8db56dc1d3a2be37ddd41061b0fdb3d5758b647db58f9945d3faa75ae936e50f",
+        "reason": "explicit channel/session/calibration binding required"
+      },
+      {
+        "proposal_id": "70ef7d82bd82fc477fa10e1bc534032b0137dedefc2afb6fe2ecab207dcfb18a",
+        "reason": "explicit channel/session/calibration binding required"
+      },
+      {
+        "proposal_id": "ce897790cc485ae9b1bbde6ae9370d75e199e544a2568af6bacfdd69989e661d",
+        "reason": "explicit channel/session/calibration binding required"
+      }
+    ],
+    "calibration_sha256": "79ca606d7211a9eae00edaed365505cd54dae320a8080342dc91d716d41cda1a",
+    "calibration_qualified": false
+  },
+  "compiler_preflight": "FAIL: DFC 3.33.0 not installed on Work host; no HEF generated",
+  "native_work_access": false
+}

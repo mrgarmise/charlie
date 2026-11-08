@@ -1,0 +1,420 @@
+{
+  "scope": "historical diagnostic originals; not the private 64 training images",
+  "examples_sha256": "58b913bd8afe9d4733610dbe2e4ed44789e37255a05a5395f650a762bcd9fe9a",
+  "images": [
+    {
+      "hud_size": [
+        640,
+        96
+      ],
+      "crop_box_hud": [
+        64,
+        0,
+        179,
+        96
+      ],
+      "crop_size": [
+        115,
+        96
+      ],
+      "raw_hud_quad": [
+        [
+          125.64530944824219,
+          96.4144058227539
+        ],
+        [
+          844.4332275390625,
+          23.322492599487305
+        ],
+        [
+          855.22607421875,
+          72.46604919433594
+        ],
+        [
+          127.53131866455078,
+          149.37850952148438
+        ]
+      ],
+      "raw_channel_quad": [
+        [
+          201.3246307373047,
+          88.71875
+        ],
+        [
+          334.0121154785156,
+          75.22605895996094
+        ],
+        [
+          338.587646484375,
+          127.0712661743164
+        ],
+        [
+          204.19764709472656,
+          141.275390625
+        ]
+      ],
+      "camera_pixel_coverage": 1.0,
+      "crop_pixel_sha256": "58c4e737178ba8750564a56098813723a1d29e15823860f0c8a2f4d65aecfa71",
+      "bright_threshold": 200,
+      "bright_bbox": [
+        0,
+        63,
+        115,
+        96
+      ],
+      "bright_fraction": 0.05679347826086956,
+      "bright_touches_edge": true,
+      "source_image": "../../../tests/fixtures/robotron-developmental/012801-score-raw-0097.png",
+      "source_sha256": "4de1bb7249cc9208fff051cfa1c2465a824cd385c0f1f904b43658339b9101a9",
+      "source_size": [
+        1280,
+        720
+      ],
+      "calibration": {
+        "corners": [
+          [
+            0.09963384097880594,
+            0.20747015127050908
+          ],
+          [
+            0.6681453831266196,
+            0.10064728677221926
+          ],
+          [
+            0.7524643450650015,
+            0.7831966089678687
+          ],
+          [
+            0.11436825649577206,
+            0.9430826357763197
+          ]
+        ],
+        "output_size": [
+          640,
+          480
+        ]
+      },
+      "provenance": {
+        "path": "012801-score-raw-0097.png",
+        "source_run": "development-20261002-012801",
+        "source_file": "score-raw-0097.png",
+        "sha256": "4de1bb7249cc9208fff051cfa1c2465a824cd385c0f1f904b43658339b9101a9",
+        "external_timestamp": null,
+        "external_source": "Alex physical screen observation; not adjudicated; not necessarily same capture time"
+      },
+      "inputs": {
+        "score-rgb-channel-resize-256x32-v1": {
+          "metadata": {
+            "version": "score-rgb-channel-resize-256x32-v1",
+            "scale_xy": [
+              2.226086956521739,
+              0.3333333333333333
+            ],
+            "padding": [
+              0,
+              0
+            ],
+            "input_shape": [
+              1,
+              3,
+              32,
+              256
+            ],
+            "color": "RGB",
+            "range": [
+              0,
+              1
+            ],
+            "resize": "bilinear full-channel fixed aspect transform",
+            "source_size": [
+              115,
+              96
+            ]
+          },
+          "png": "00-score-rgb-channel-resize-256x32-v1.png",
+          "tensor_sha256": "fd850b171b70395b9a4d16e792212479d36f6d5da03865a2303695c43ed53246"
+        },
+        "score-rgb-channel-resize-224x28-pad16x2-v2": {
+          "metadata": {
+            "version": "score-rgb-channel-resize-224x28-pad16x2-v2",
+            "scale_xy": [
+              1.9478260869565218,
+              0.2916666666666667
+            ],
+            "padding": [
+              16,
+              2
+            ],
+            "input_shape": [
+              1,
+              3,
+              32,
+              256
+            ],
+            "color": "RGB",
+            "range": [
+              0,
+              1
+            ],
+            "resize": "bilinear full-channel fixed aspect transform",
+            "source_size": [
+              115,
+              96
+            ]
+          },
+          "png": "00-score-rgb-channel-resize-224x28-pad16x2-v2.png",
+          "tensor_sha256": "c1a2aa6605cd68dd241fa94a39d062424303732618ea40899953d8b21da3cad9"
+        }
+      },
+      "scope": "historical diagnostic only; not corpus-005 training or verified score truth",
+      "candidate_rois": {
+        "remove-top-bezel-bottom-border": {
+          "crop_box_hud": [
+            64,
+            48,
+            179,
+            92
+          ],
+          "bright_threshold": 200,
+          "bright_bbox": [
+            63,
+            15,
+            112,
+            38
+          ],
+          "bright_fraction": 0.0800395256916996,
+          "bright_touches_edge": false,
+          "derived_png": "00-remove-top-bezel-bottom-border.png",
+          "qualification": "diagnostic hypothesis only"
+        },
+        "widen-inner-margin-and-trim": {
+          "crop_box_hud": [
+            64,
+            48,
+            205,
+            92
+          ],
+          "bright_threshold": 200,
+          "bright_bbox": [
+            63,
+            15,
+            131,
+            44
+          ],
+          "bright_fraction": 0.0859123146357189,
+          "bright_touches_edge": true,
+          "derived_png": "00-widen-inner-margin-and-trim.png",
+          "qualification": "diagnostic hypothesis only"
+        }
+      }
+    },
+    {
+      "hud_size": [
+        640,
+        96
+      ],
+      "crop_box_hud": [
+        64,
+        0,
+        179,
+        96
+      ],
+      "crop_size": [
+        115,
+        96
+      ],
+      "raw_hud_quad": [
+        [
+          127.2708740234375,
+          95.4739990234375
+        ],
+        [
+          842.48046875,
+          22.093481063842773
+        ],
+        [
+          853.2085571289062,
+          71.45291900634766
+        ],
+        [
+          129.0591583251953,
+          148.56887817382812
+        ]
+      ],
+      "raw_channel_quad": [
+        [
+          202.43690490722656,
+          87.761962890625
+        ],
+        [
+          334.3018798828125,
+          74.23261260986328
+        ],
+        [
+          338.78167724609375,
+          126.23515319824219
+        ],
+        [
+          205.21217346191406,
+          140.45921325683594
+        ]
+      ],
+      "camera_pixel_coverage": 1.0,
+      "crop_pixel_sha256": "9091cb72754769ec86f54694b5c0214a559fe5ada5727e9b446f0863437b7ad9",
+      "bright_threshold": 200,
+      "bright_bbox": [
+        62,
+        63,
+        113,
+        89
+      ],
+      "bright_fraction": 0.06231884057971015,
+      "bright_touches_edge": false,
+      "source_image": "../../../tests/fixtures/robotron-developmental/015817-score-raw-0175.png",
+      "source_sha256": "2ca8fb8ae67b415f7bd2dfe1d77e48daaefb295aad2719bf0d1693a8bd55ffc8",
+      "source_size": [
+        1280,
+        720
+      ],
+      "calibration": {
+        "corners": [
+          [
+            0.10082746758585914,
+            0.20634565701326216
+          ],
+          [
+            0.6665691972014437,
+            0.0992401696617243
+          ],
+          [
+            0.7503820458251076,
+            0.7847879464049893
+          ],
+          [
+            0.11479849682654923,
+            0.9437745277911843
+          ]
+        ],
+        "output_size": [
+          640,
+          480
+        ]
+      },
+      "provenance": {
+        "path": "015817-score-raw-0175.png",
+        "source_run": "development-20261002-015817",
+        "source_file": "score-raw-0175.png",
+        "sha256": "2ca8fb8ae67b415f7bd2dfe1d77e48daaefb295aad2719bf0d1693a8bd55ffc8",
+        "external_timestamp": null,
+        "external_source": "Alex physical screen observation; not adjudicated; not necessarily same capture time"
+      },
+      "inputs": {
+        "score-rgb-channel-resize-256x32-v1": {
+          "metadata": {
+            "version": "score-rgb-channel-resize-256x32-v1",
+            "scale_xy": [
+              2.226086956521739,
+              0.3333333333333333
+            ],
+            "padding": [
+              0,
+              0
+            ],
+            "input_shape": [
+              1,
+              3,
+              32,
+              256
+            ],
+            "color": "RGB",
+            "range": [
+              0,
+              1
+            ],
+            "resize": "bilinear full-channel fixed aspect transform",
+            "source_size": [
+              115,
+              96
+            ]
+          },
+          "png": "01-score-rgb-channel-resize-256x32-v1.png",
+          "tensor_sha256": "c69579849198ab173642fac1dbdab9f7f7658198b5e045ba8dcb144be3681e6c"
+        },
+        "score-rgb-channel-resize-224x28-pad16x2-v2": {
+          "metadata": {
+            "version": "score-rgb-channel-resize-224x28-pad16x2-v2",
+            "scale_xy": [
+              1.9478260869565218,
+              0.2916666666666667
+            ],
+            "padding": [
+              16,
+              2
+            ],
+            "input_shape": [
+              1,
+              3,
+              32,
+              256
+            ],
+            "color": "RGB",
+            "range": [
+              0,
+              1
+            ],
+            "resize": "bilinear full-channel fixed aspect transform",
+            "source_size": [
+              115,
+              96
+            ]
+          },
+          "png": "01-score-rgb-channel-resize-224x28-pad16x2-v2.png",
+          "tensor_sha256": "176eaf3243f4234e1077b210e4bc9e81a10a33eac185c880b48286b8780c2c90"
+        }
+      },
+      "scope": "historical diagnostic only; not corpus-005 training or verified score truth",
+      "candidate_rois": {
+        "remove-top-bezel-bottom-border": {
+          "crop_box_hud": [
+            64,
+            48,
+            179,
+            92
+          ],
+          "bright_threshold": 200,
+          "bright_bbox": [
+            62,
+            15,
+            113,
+            41
+          ],
+          "bright_fraction": 0.1359683794466403,
+          "bright_touches_edge": false,
+          "derived_png": "01-remove-top-bezel-bottom-border.png",
+          "qualification": "diagnostic hypothesis only"
+        },
+        "widen-inner-margin-and-trim": {
+          "crop_box_hud": [
+            64,
+            48,
+            205,
+            92
+          ],
+          "bright_threshold": 200,
+          "bright_bbox": [
+            62,
+            15,
+            113,
+            41
+          ],
+          "bright_fraction": 0.11089619600257898,
+          "bright_touches_edge": false,
+          "derived_png": "01-widen-inner-margin-and-trim.png",
+          "qualification": "diagnostic hypothesis only"
+        }
+      }
+    }
+  ],
+  "originals_modified": false,
+  "final_test_consulted": false
+}

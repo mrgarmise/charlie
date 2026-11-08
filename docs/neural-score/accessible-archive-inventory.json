@@ -1,0 +1,22 @@
+[
+  {
+    "archive": "charlie-executive-diagnostics-20261016.tar.gz",
+    "bytes": 43961811,
+    "score_named_members": [],
+    "score_photos": 0,
+    "journals": [],
+    "qualification": "read-only original archive bytes; copied SQLite examination only; no label admission",
+    "archive_sha256": "dd5ebba5f396a3b528a5f4257bd85cecb1d931e5013d60f915e278d40a30666d",
+    "inventory_scope": "matching score-named members and learning-evidence.sqlite3/WAL; not an exhaustive nested-container audit"
+  },
+  {
+    "archive": "charlie-overnight-results-20261016.tar.gz",
+    "bytes": 54356977,
+    "score_named_members": [],
+    "score_photos": 0,
+    "journals": [],
+    "qualification": "read-only original archive bytes; copied SQLite examination only; no label admission",
+    "archive_sha256": "ec3e121b8eb6257fa3e52453500d3044b96cb79d5e5eabb90fe3c815883481a4",
+    "inventory_scope": "matching score-named members and learning-evidence.sqlite3/WAL; not an exhaustive nested-container audit"
+  }
+]

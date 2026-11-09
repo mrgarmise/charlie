@@ -194,6 +194,8 @@ class NetworkManager:
                 if checkpoint is not None:
                     self._restore(checkpoint, self.clock()+5)
             finally:
+                if self.state['state'] != 'verified':
+                    self._publish(state='failed', valid=False, verified=False)
                 self.lock.release()
 
     def _restore(self, checkpoint, deadline):

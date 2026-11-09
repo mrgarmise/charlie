@@ -204,3 +204,10 @@ def test_passive_authenticated_join_never_claims_provisioning_commit(rig):
     assert state['authenticated'] and state['joined']
     assert not state['verified']
     assert not any(call[0]=='confirm' for call in p.calls)
+
+
+def test_restoration_finally_never_leaves_failed_operation_in_progress(rig):
+    m,d,p,a,c=rig;d.online=False;p.fail='credentials'
+    with pytest.raises(ProvisioningError):m.provision(credentials(),auth(c,allow_setup=True))
+    assert m.status()['state']=='failed'
+    assert m.status()['restoration']=='verified'

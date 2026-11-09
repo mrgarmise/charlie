@@ -116,3 +116,13 @@ def test_native_profile_validation_rejects_primary_interference(unsafe):
     elif unsafe=='adapter':settings['connection']['interface-name']='wlan0'
     elif unsafe=='dhcp-routes':settings['ipv4']['ignore-auto-routes']=False
     with pytest.raises(ValueError):backend.validate_setup('/profile','wlan1')
+
+
+def test_deadline_cannot_automatically_reopen_unpinned_session(wire):
+    protocol,connection,enrollment=wire
+    original=connection.request
+    def request(self,*args,**kwargs):
+        assert self.auto_open==0
+        return original(self,*args,**kwargs)
+    connection.request=request
+    protocol.status(Endpoint('10.0.0.8'),'device-test',protocol.clock()+5)

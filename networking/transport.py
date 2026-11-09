@@ -120,6 +120,9 @@ class TLSProtocol:
         timer.start()
         try:
             connection.connect()
+            # A deadline close must never cause http.client to reconnect and send
+            # secrets on a new, unpinned TLS session.
+            connection.auto_open = 0
             actual = hashlib.sha256(connection.sock.getpeercert(binary_form=True)).hexdigest()
             if not hmac.compare_digest(actual, enrollment.fingerprint):
                 raise ValueError('device certificate mismatch')

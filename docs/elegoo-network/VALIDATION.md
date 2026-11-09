@@ -32,3 +32,23 @@ Second increment strengthens restoration with a saved address/route/DNS snapshot
 rejects DHCP route injection and exposes only fresh authenticated location hints
 for existing owners. These hints never rebind cameras or control sockets or grant
 motion; the existing owner must explicitly consume them within its normal lifecycle.
+
+Real HTTPS failure-injection fixture: ephemeral self-signed certificate and token,
+loopback-only simulated ESP32 endpoints, actual TLS pin validation before sending
+credentials, prepare -> rediscover -> identity/target verify -> confirm. Wrong pin
+sends zero HTTP authorization requests. Local final networking suite: 40 passed;
+no physical network, NetworkManager or devices involved. Fixture keys exist only
+under pytest temporary directories and are never staged. Initial expected wrong-pin
+peer-disconnect diagnostics were silenced in the simulated server only.
+
+Offline private-backup inspection independently confirms ESP32-S3 app header chip
+ID 9, bootloader/app0 magic E9 and all six partition offsets/sizes. Sanitized metadata
+is in offline-backup-layout.json; no image bytes, NVS values or credentials are
+published. This proves the offline layout, not current device identity or source
+compatibility. Full private image checksum remains unchanged.
+
+Firmware-core independent run, separate PR #29 exact commit
+669f93e45065dda7aae852c69e298ee1b4672a1d:
+https://github.com/mrgarmise/charlie/actions/runs/42674136842 passed strict C++17
+compile with ASan+UBSan, all five scenario groups and six image-boundary subcases.
+It compiles the portable core, NOT ArduinoPlatform or a flashable ESP32 application.

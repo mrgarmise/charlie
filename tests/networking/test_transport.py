@@ -126,3 +126,13 @@ def test_deadline_cannot_automatically_reopen_unpinned_session(wire):
         return original(self,*args,**kwargs)
     connection.request=request
     protocol.status(Endpoint('10.0.0.8'),'device-test',protocol.clock()+5)
+
+
+def test_no_secondary_profile_does_not_require_secondary_adapter():
+    backend=Backend()
+    adapters=SavedAdapters(backend,{'wlan0':'fixture-uuid'},Endpoint('192.168.4.1'))
+    assert adapters.secondary()==()
+    assert adapters.primary()=='wlan0'
+    checkpoint=adapters.checkpoint(adapters.primary(),95)
+    assert adapters.connect_setup('wlan0',adapters.clock()+1)==Endpoint('192.168.4.1')
+    assert adapters.restore(checkpoint,adapters.clock()+1)

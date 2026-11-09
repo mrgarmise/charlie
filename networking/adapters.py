@@ -114,7 +114,7 @@ class SavedAdapters:
         self.clock, self.sleep = clock, sleep
 
     def secondary(self):
-        return self.secondary_names
+        return tuple(name for name in self.secondary_names if name in self.profiles)
 
     def primary(self):
         return self.primary_name

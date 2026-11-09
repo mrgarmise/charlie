@@ -39,7 +39,9 @@ bool Identity::enroll(const char* text,const char* expected) {
   cJSON* body=cJSON_Parse(text);if(!cJSON_IsObject(body)){cJSON_Delete(body);return false;}
   std::unique_ptr<IdentityRecord> allocated(new(std::nothrow) IdentityRecord);
   if(!allocated){cJSON_Delete(body);return false;}
-  auto& next=*allocated;next.schema=1;
+  auto& next=*allocated;
+  // Canonicalize padding as well as fields before checksumming/persisting the blob.
+  wipeBytes(&next,sizeof(next));next.schema=1;
   struct Field {const char* key;char* target;size_t size;};
   Field fields[]={{"device_id",next.device,sizeof(next.device)}, {"certificate",next.certificate,sizeof(next.certificate)},
     {"private_key",next.privateKey,sizeof(next.privateKey)}, {"token",next.token,sizeof(next.token)},

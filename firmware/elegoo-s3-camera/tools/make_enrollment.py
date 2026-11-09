@@ -17,7 +17,12 @@ import subprocess
 
 def generate(directory,device):
     if not re.fullmatch(r'elegoo-[a-f0-9]{12}',device):raise ValueError('verified device ID required')
-    directory=Path(directory)
+    directory=Path(directory).resolve()
+    # A token-bearing peer record has no extension; never generate it in Git.
+    for ancestor in (directory,*directory.parents):
+        git=ancestor/'.git'
+        if git.is_file() or (git/'HEAD').is_file():
+            raise ValueError('enrollment material must be generated outside Git working trees')
     directory.mkdir(mode=0o700,parents=False,exist_ok=False)
     def run(*arguments):
         subprocess.run(['openssl',*map(str,arguments)],check=True,capture_output=True,timeout=30)

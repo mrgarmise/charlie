@@ -61,3 +61,11 @@ def test_failure_never_claims_verified_and_never_switches(failure):
         def candidates(self,*args):return ['lan']
     with pytest.raises(TimeoutError):peer.verify(t,Protocol(),Discovery(),clock=clock,sleep=clock.sleep)
     assert clock.now<=2
+
+
+def test_private_material_cannot_be_generated_in_git(tmp_path):
+    repository=tmp_path/'repository';git=repository/'.git';git.mkdir(parents=True)
+    (git/'HEAD').write_text('ref: refs/heads/test\n')
+    output=repository/'private-identity'
+    with pytest.raises(ValueError):enrollment.generate(output,DEVICE)
+    assert not output.exists()

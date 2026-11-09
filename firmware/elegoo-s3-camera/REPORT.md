@@ -22,7 +22,7 @@ were added afterward; final counts/independent CI are recorded in the draft PR l
 Actual ESP32 runtime endpoints are native compiled, not executed by host TLS fixtures.
 No physical safe-stop, radio, sensor or on-device security claim follows from them.
 
-## Native builds — NOT HARDWARE QUALIFIED / DO NOT FLASH
+## First native builds — historical baseline, NOT HARDWARE QUALIFIED / DO NOT FLASH
 
 Native cross-compilation ran on the Pi aarch64 host with isolated Arduino CLI1.2.2,
 Arduino-ESP32 2.0.17, bundled xtensa-esp32s3 GCC8.4.0 and ESP-IDF4.4.7. No upload or
@@ -123,3 +123,33 @@ and dependent checksum/digest footer differ, as expected from debug/build-path
 metadata. Exact binaries/hashes remain distinguished; no digest was fabricated or
 rewritten to appear reproducible. The clean-checkout artifact is retained under
 build-independent-opi/ outside Git, with its own command/log/image-info receipt.
+
+## Final canonical-record candidate — NOT HARDWARE QUALIFIED / DO NOT FLASH
+
+The identity blob is now zeroed across fields AND structure padding before its
+checksum and atomic NVS write. The offline enrollment generator refuses Git working
+trees so token-bearing extensionless peer records cannot be accidentally staged.
+A new refusal test passes. Camera/control protocols and original PR28/29 are unchanged.
+
+| Local aarch64 artifact | .bin bytes | SHA256 | Slot headroom |
+|---|---:|---|---:|
+| build-release-opi/ElegooS3Camera.ino.bin | 3,135,616 | 9a765c635ab53ac213836453277e4dd63b13fb47cebdc8760a55cdb715e9a5a8 | 206,720 |
+| build-release-qspi/ElegooS3Camera.ino.bin | 3,134,272 | d80d58a60b734a2d7c92ec253bd33f4c2795d0b5108dceedca1044a5db7ad00b | 208,064 |
+
+Both builds pass native integrity/partition/header/slot gates, source SHA256
+a6c0c2cab3425a2120d04e79fcdc04581d3a50c855377c5b98af4e6276c07f6c.
+Actual files and their build-report/image-info/ELF/map/logs are under the private
+s3-integration-build-toolchain-20261109 directory described above. No binary or
+private enrollment material is staged or uploaded. These images enable no motor
+forwarding and remain unqualified for flashing.
+
+Pre-hardening exact commit93a3aa7d03d55ac53e2bad766d40506459317615 independent CI
+https://github.com/mrgarmise/charlie/actions/runs/42708912007 passed both native
+variants,29 Python/browser/TLS tests (zero skips), five ASan+UBSan C++ suites,
+prior core regressions and131 existing contracts. Artifact13715616164 (host JUnit)
+ZIP SHA256 f51401be02a8f04ba0ba615274cc3270054c5c33326c544b3f982b85035df05d;
+build-report artifact13715086907 ZIP SHA256
+c5854f4b9d2c865870a02480377c85087f06158569d629d79aa01f792ce10c67.
+Final exact-head independent results are maintained in draft PR30's acceptance ledger
+and the private s3-camera-integration-evidence-20261109 directory. Hardware gates in
+ACCEPTANCE.md remain mandatory; no installation or physical qualification occurred.

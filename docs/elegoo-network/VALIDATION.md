@@ -52,3 +52,13 @@ Firmware-core independent run, separate PR #29 exact commit
 https://github.com/mrgarmise/charlie/actions/runs/42674136842 passed strict C++17
 compile with ASan+UBSan, all five scenario groups and six image-boundary subcases.
 It compiles the portable core, NOT ArduinoPlatform or a flashable ESP32 application.
+
+Preserved CI failure on second increment: dedicated workflow 42674271217 used
+a shallow checkout; existing rollback test requires historical commit 8777955.
+Result: 1871 passed, 27 skipped, one failure in
+tests/test_active_vision_firmware.py::test_rollback_boots_recovery_without_pwm
+(`git show 8777955:rp2040/servos.py` unavailable). The inherited Mobile Body
+workflow 42674271356 uses fetch-depth:0 and passed its full suite on the SAME
+commit. Corrected dedicated checkout to fetch-depth:0; no test or firmware safety
+assertion is suppressed. Subsequent full runs before that checkout correction may
+retain the same workflow-only failure and must not be counted as fully passing.

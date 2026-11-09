@@ -15,11 +15,14 @@ from learning.demonstration import ABILITY
 DEFAULT_ORIGIN = 'https://charlie-project-dashboard.garmiseprojects.chatgpt.site'
 
 
-def start_dashboard(service, token, *, port=8768, origin=DEFAULT_ORIGIN, mobile=None, drive_token=None, learning_state=None):
+def start_dashboard(service, token, *, port=8768, origin=DEFAULT_ORIGIN, mobile=None, drive_token=None, learning_state=None, network=None, network_token=None):
     if not isinstance(token,str) or len(token)<32 or any(c.isspace() for c in token):
         raise ValueError('dashboard token must have at least 32 non-whitespace characters')
     if drive_token is not None and (len(drive_token)<32 or any(c.isspace() for c in drive_token) or drive_token==token):
         raise ValueError('separate strong drive credential required')
+    if network is not None and (not isinstance(network_token,str) or len(network_token)<32
+            or any(c.isspace() for c in network_token) or network_token in (token,drive_token)):
+        raise ValueError('separate strong network credential required')
     parsed=urlsplit(origin)
     if parsed.scheme!='https' or not parsed.netloc or parsed.path or parsed.query or parsed.fragment:
         raise ValueError('exact HTTPS dashboard origin required')
@@ -100,6 +103,8 @@ def start_dashboard(service, token, *, port=8768, origin=DEFAULT_ORIGIN, mobile=
                         self.end_headers();self.wfile.write(raw)
                 except (OSError,ValueError,TypeError):self.reply(503,{'error':'Executive status unavailable'})
                 return
+            if network is not None and self.path=='/api/network':
+                self.reply(200,network.status());return
             if self.path=='/api/missions':
                 from ui.missions import mission_status
                 try:self.reply(200,mission_status())
@@ -135,6 +140,25 @@ def start_dashboard(service, token, *, port=8768, origin=DEFAULT_ORIGIN, mobile=
             if self.path!='/api/abilities' or service is None:self.reply(404,{'error':'not found'});return
             self.reply(200,service.status())
         def do_POST(self):
+            is_network=self.path=='/api/network' and network is not None
+            if is_network:
+                if not self.permitted():self.reply(403,{'error':'origin or host denied'});return
+                supplied=self.headers.get('Authorization','')
+                if not hmac.compare_digest(supplied.encode(),('Bearer '+network_token).encode()):
+                    self.reply(401,{'error':'network operation authentication required'});return
+                try:
+                    if self.headers.get('Content-Type')!='application/json' or self.headers.get('Transfer-Encoding'):
+                        raise ValueError('bounded JSON required')
+                    size=int(self.headers.get('Content-Length','0'))
+                    if not 0<size<=256:raise ValueError('bounded operation required')
+                    raw=self.rfile.read(size)
+                    if len(raw)!=size:raise ValueError('incomplete request')
+                    request=json.loads(raw)
+                    if not isinstance(request,dict):raise ValueError('object required')
+                    self.reply(202,network.execute(request))
+                except (ValueError,TypeError,KeyError,PermissionError,RuntimeError):
+                    self.reply(403,{'error':'network operation rejected'})
+                return
             is_mobile=self.path=='/api/mobile' and mobile is not None
             if not self.authorized(drive=is_mobile):return
             if not is_mobile and (self.path!='/api/abilities' or service is None):self.reply(404,{'error':'not found'});return

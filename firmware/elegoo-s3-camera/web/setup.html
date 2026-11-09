@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>Charlie ELEGOO setup</title>
+<h1>ELEGOO network setup</h1>
+<p>Use the device certificate verified during physical enrollment. Recovery access remains available. Charlie must independently verify the target LAN before credentials are saved.</p>
+<form id="setup"><p><label>Enrollment token <input id="token" type="password" autocomplete="off" minlength="43" maxlength="64" required></label></p>
+<p><label>2.4 GHz network name <input id="ssid" autocomplete="off" required></label></p>
+<p><label>Network password <input id="password" type="password" autocomplete="off" minlength="8" required></label></p>
+<button>Try network for 90 seconds</button></form>
+<p id="status" role="status">Waiting for explicitly authorized setup.</p>
+<p><a id="ticket" hidden>Save Charlie verification ticket</a></p>
+<p>On Charlie, use the reviewed Pi peer and run <code>verify_ticket.py --ticket TICKET --enrollments PRIVATE_DIRECTORY --lan-ip CHARLIE_LAN_IP --device-id VERIFIED_DEVICE_ID --authorize-confirm</code> before the lease expires. This performs verification only; it cannot switch Charlie's Wi-Fi or operate motors. The ticket contains network metadata, never the password or enrollment token.</p>
+<script src="/setup.js" defer></script></html>

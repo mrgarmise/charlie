@@ -1,0 +1,238 @@
+NATIVE-HOST PREFLIGHT AND BOUNDED TWO-GAME ROBOTRON TRIAL
+
+Run these instructions only in an ordinary Pi desktop/console terminal as five,
+outside Codex. This file does not execute any of the commands below.
+Standing operator gameplay authorization applies; technical qualification is
+still mandatory. No sudo, firmware change, sandbox escape, new service, or
+automatic restart is part of this procedure.
+
+Reuse the authentic passing acceptance receipt:
+/home/five/charlie-native-preflight-833CeFMG/socket-tests.xml
+All 153 acceptance tests passed, including all 34 formerly blocked socket cases.
+No test rerun is included here.
+
+1. RESTORE VARIABLES AND VERIFY THE FROZEN CHECKOUT
+
+set -euo pipefail
+CODE=/home/five/charlie-native-foreground-20261021
+PYTHON=/home/five/Projects/charlie/.venv/bin/python
+AUDIT=/home/five/charlie-native-preflight-833CeFMG
+EXPECTED_SHA=71892612069018998de98fe4b303f0ed202472cc
+SHA=$(git -C "$CODE" rev-parse HEAD)
+printf 'Trial source: %s\n' "$SHA"
+test "$SHA" = "$EXPECTED_SHA"
+test -z "$(git -C "$CODE" status --porcelain)"
+test -s "$AUDIT/socket-tests.xml"
+TRIAL=/home/five/charlie-native-trials/foreground-$(date -u +%Y%m%dT%H%M%SZ)
+mkdir -p /home/five/charlie-native-trials
+test ! -e "$TRIAL"
+export CODE PYTHON AUDIT SHA TRIAL
+printf 'Preflight evidence: %s\nTrial evidence: %s\n' "$AUDIT" "$TRIAL"
+
+Keep this terminal open through the remaining steps. Do not substitute a moving
+PR head. Preserve existing worktrees, reference sources, and evidence.
+
+2. COLLECT A FRESH READ-ONLY NATIVE HOST INVENTORY
+
+INVENTORY="$AUDIT/host-inventory-$(date -u +%Y%m%dT%H%M%SZ).txt"
+{
+  date -u
+  cat /proc/1/comm
+  id
+  ps -eo pid,ppid,user,comm
+  systemctl --no-pager list-units --type=service --state=running
+  systemctl --user --no-pager list-units --type=service --state=running
+  ls -l /dev/video* /dev/media* /dev/v4l-subdev* /dev/hailo* /dev/ttyACM* /dev/ttyUSB* 2>/dev/null || true
+  vcgencmd get_throttled
+  cat /sys/class/thermal/thermal_zone0/temp
+  df -h /home/five
+  free -m
+} > "$INVENTORY" 2>&1
+printf 'Host inventory: %s\n' "$INVENTORY"
+cat "$INVENTORY"
+
+Inspect actual owner process command lines, checkout, interpreter, and open
+device handles with established native host tools. Saved PID files, stale Eyes
+metadata, and old inventories cannot certify current ownership. Review other-user
+clients independently; the wrapper only inspects same-user device descriptors.
+If another player, Eyes process, or offline learner owns a required device,
+preserve its evidence and use its established stop procedure. Never kill broad
+process-name matches. Do not run the old observe script: it requests automatic
+calibration. Keep camera/head position and manual focus unchanged.
+
+3. COMPLETE THE ACTUAL HOST REVIEW
+
+cat "$AUDIT/host-review.txt"
+
+The saved review has these outstanding requirements:
+- Independently verify host-wide device ownership and exclusive camera admission.
+- Verify controller lease expiry and neutral release under a stalled live
+  connection. Disconnect release alone does not establish this behavior.
+- Verify continuous host monitoring and independent stop availability during play.
+
+Before creating review.json, actually verify and record all of the following:
+- Independently tested physical emergency-stop path and who can operate it.
+  Ctrl-C, a STOP file, Python, and Codex do not establish this physical path.
+- Actual controller endpoint, firmware/service identity, acknowledgments,
+  disconnect behavior, lease expiry, and tested neutral/release procedure.
+  The player default is charlie-arcade.local:8765; confirm the established Xbox
+  service. The existing note records 192.168.1.238:8765 at its inspection time;
+  recheck the actual identity. Do not reconfigure firmware or the service here.
+- Exclusive camera/media/Hailo ownership, including other-user clients, and no
+  incompatible device client or offline learner. Unknown ownership blocks play.
+- Visible Robotron display, supported framing, complete playfield and score HUD,
+  fixed viewpoint and unchanged manual focus. Current-view player preflight,
+  bounded fresh-frame/SELF acquisition, and terminal/START safeguards remain
+  mandatory; an old image cannot satisfy them.
+- Continuous valid temperature/throttling readings, visible worker tree, adequate
+  disk/memory, recording-writer/fresh-frame/controller guards, and availability of
+  the ownership monitor and independently verified physical stop throughout play.
+- Exact clean source SHA and the authentic passing software receipt.
+
+Record factual findings, actual tested stop/release procedures, and supporting
+evidence paths/hashes in the existing host-review.txt. Preserve prior findings
+and distinguish newly verified results. Use your normal editor, for example:
+
+nano "$AUDIT/host-review.txt"
+
+Do not write a blanket PASS or invent hardware proofs. Stop here if any required
+fact remains unknown. The review is technical evidence, not a replacement for
+independent measurements or an expansion of standing gameplay authority.
+
+4. CREATE FRESH SAME-BOOT review.json
+
+Only after completing the factual review:
+
+export CODE SHA AUDIT TRIAL
+"$PYTHON" - <<'PY'
+from pathlib import Path
+import hashlib
+import json
+import os
+import time
+
+root = Path(os.environ["AUDIT"])
+note = root / "host-review.txt"
+if not note.is_file() or not note.read_text().strip():
+    raise SystemExit("Actual host review is missing; keep gameplay unarmed")
+
+def proof(path):
+    return {
+        "path": str(path),
+        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+    }
+
+keys = (
+    "independent_physical_stop",
+    "independent_neutral_release",
+    "controller_identity_and_lease",
+    "camera_ownership",
+    "display_fixed_focus_and_framing",
+    "host_monitoring",
+)
+review = {
+    "runtime_revision": os.environ["SHA"],
+    "reviewed_at": time.time(),
+    "host_boot_id": Path("/proc/sys/kernel/random/boot_id").read_text().strip(),
+    "proofs": {key: proof(note) for key in keys},
+}
+review["proofs"]["software_tests"] = proof(root / "socket-tests.xml")
+with (root / "review.json").open("x") as out:
+    json.dump(review, out, indent=2)
+    out.write("\n")
+PY
+
+Exclusive creation refuses to overwrite an existing review.json. Preserve any
+existing review rather than silently replacing it. The wrapper requires a
+same-boot review no older than one hour. Do not refresh the timestamp without
+renewing the actual review. A hash-bound operator note cannot itself prove a
+physical emergency stop, controller lease, or neutral/release behavior.
+
+5. SELECT POLICY AND RUN UNARMED INSPECTION
+
+No independently qualified retained-response policy has been identified. Use:
+
+POLICY_ARGS=()
+"$PYTHON" "$CODE/tools/native_robotron_trial.py" \
+  --expected-revision "$SHA" \
+  --review "$AUDIT/review.json" \
+  --output "$TRIAL" \
+  "${POLICY_ARGS[@]}"
+
+This command has NO --run flag. It performs unarmed inspection and must pass.
+It checks the fresh same-boot review, proof hashes, clean source identity,
+resources, and receipt coverage of all 34 originally blocked socket cases.
+No launch is eligible if inspection fails.
+
+Only if an independently qualified manifest exists, select its actual path:
+
+POLICY_ARGS=(--learned-policy /absolute/path/to/qualified/ppal-policy.json)
+
+Then repeat the unarmed inspection command above. The path is a placeholder,
+not a supplied qualified artifact. Charlie must originate an eligible proposal
+and pass independent evaluation, activation, runtime identity, and Robotron
+physical-readiness gates. Do not deploy the engineering replay attachment.
+The loader rejects offline grants, altered candidates, runtime mismatch, and
+revoked activation. Policy admission is rechecked for each game.
+
+The wrapper retains --baseline-only to disable commissioned actuator experiments;
+this still permits an explicitly supplied qualified policy. Do not remove that
+flag to enable learning. Ambient CHARLIE_LEARNING_STATE discovery is removed by
+the wrapper so policy selection matches the declared identity.
+
+6. LAUNCH ONE BOUNDED TWO-GAME TRIAL; STOP AND ACCEPT EVIDENCE
+
+Only after all actual host prerequisites and unarmed inspection pass, run in
+the same terminal, retaining the selected POLICY_ARGS:
+
+"$PYTHON" "$CODE/tools/native_robotron_trial.py" \
+  --expected-revision "$SHA" \
+  --review "$AUDIT/review.json" \
+  --output "$TRIAL" \
+  "${POLICY_ARGS[@]}" \
+  --run
+
+This is one foreground trial bounded to at most TWO complete games. It does not
+start a six-game marathon, background service, automatic restart, or automatic
+retry. Keep the terminal open; Codex may close.
+
+The wrapper samples once per second and fsyncs native resource evidence. It
+stops for missing telemetry, temperature >=75 C, any throttling flags, less than
+512 MiB free memory, worker RSS above 768 MiB, less than 2 GiB free disk, or a
+conflicting outside same-user device owner. A stricter independently verified
+host condition takes precedence. Other-user ownership remains an independent
+host-monitoring responsibility. Existing fresh-frame, stream-overflow,
+controller acknowledgment, writer-health, neutral/release, completed-work, and
+watchdog safeguards remain mandatory. Cooling never causes automatic resumption.
+
+Normal software stop: press Ctrl-C in the foreground runner terminal.
+Terminal SIGHUP and SIGTERM also trigger owned-process cleanup.
+In another ordinary host terminal, request the same bounded software stop using
+the EXACT trial path printed in step 1, replacing this placeholder:
+
+touch /home/five/charlie-native-trials/foreground-REPLACE_WITH_EXACT_TIMESTAMP/STOP
+
+Urgent risk: operate the independently tested physical emergency stop immediately;
+do not wait for software. Do not use kill -9 as the normal release procedure.
+Verify actual controller neutral acknowledgment and termination of every owned
+worker; the wrapper's return code is not physical proof.
+
+Preserve the complete AUDIT and TRIAL directories, including frozen source,
+policy, configuration, review/proof and learning-state identities, runner logs
+and result, resource trace, nested marathon sessions, original images, journals,
+progress/controller events, scores, completion/recording seals, and all partial
+or failed evidence.
+
+Independently accept genuine Game 1 terminal/completion and a fresh acknowledged
+START with playable supported-SELF Game 2. Elapsed time, reserve-life count, or a
+demonstration sprite cannot establish completion. A failed lifecycle requires
+diagnosis and a restored verified safe state before another attempt; no blind
+retry. Block A, offline Reflection/Meditation with devices released, and Block B
+remain gated on independent phase acceptance. This procedure launches neither
+three-game block.
+
+Rollback: stop and confirm neutral first. Use the previously qualified runtime
+and policy from a separate clean checkout, with a fresh technical preflight and
+fresh evidence root. Omitting the learned manifest disables that component.
+Journal revocation is enforced on reload; it does not hot-revoke an already
+cached episode policy. Preserve all learning notebooks and evidence.

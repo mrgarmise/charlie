@@ -13,4 +13,6 @@ jobs:
       - uses: actions/checkout@v4
       - run: g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined firmware/elegoo-network/tests/core.cpp -o /tmp/elegoo-core-tests
       - run: /tmp/elegoo-core-tests
+      - run: g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined -Ifirmware/elegoo-network/tests/stubs firmware/elegoo-network/tests/platform.cpp -o /tmp/elegoo-platform-tests
+      - run: /tmp/elegoo-platform-tests
       - run: python3 firmware/elegoo-network/tests/test_image.py

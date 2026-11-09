@@ -3,6 +3,8 @@
 This separable firmware-source increment implements a nonblocking two-phase
 network lifecycle, a candidate Arduino WiFi/NVS adapter, a setup page, a control-
 session guard and an offline image gate. It is **not** a replacement camera sketch.
+Host stubs also compile/exercise ArduinoPlatform AP retention and transactional
+blob/corruption/failure behavior, without claiming native SDK compilation.
 The matched installed S3 source is an essential unresolved hardware/source boundary.
 TLS API/server integration, native Arduino compilation and image generation are
 blocked pending that source; no complete firmware or hardware provisioning is claimed.
@@ -108,3 +110,11 @@ Exact persistent ESP32 USB identity/MAC and private original backup must be veri
 never access RP2040. App-only flashing cannot be proposed as safe until boot
 selection/security/partition compatibility is proven. Full restore would overwrite
 NVS/SPIFFS/enrollment and requires its own review. No motion testing under this mission.
+
+Initial independent exact-head CI at 669f93e45065dda7aae852c69e298ee1b4672a1d
+passed ASan+UBSan and image checks:
+https://github.com/mrgarmise/charlie/actions/runs/42674136842 .
+Second increment also host-compiles ArduinoPlatform against deterministic WiFi/NVS
+stubs and checks AP retention, no implicit credential persistence, atomic-write
+failure and corrupted-record rejection. It does not validate actual ESP-IDF NVS
+power-loss behavior, radio timing or SDK ABI.

@@ -1,0 +1,16 @@
+{
+  "commit": "a92013016d2386cd4ed2e0e7893b018f04b89cfc",
+  "files": {
+    "converter.py": "0ff42e37c7c4a9a69b24b05c8287776cfd62a87ac938037d8ff440e4bde03b7e",
+    "config.h": "13946ae8867eb117d93d2009d781330cadf83f92530faa3eb8bea9e92d0853ab",
+    "camera_pins.h": "239c1e820a22b04cbac7d0e6eb608ac195b9b03570a6bb173be6d8f5e5374854",
+    "camera_index.html": "04002eac35865b2c2d7b6e07f4094a255748207268a52a49b3b1a5abde892cc8",
+    "camera_index.h": "d97f03a390ed2c979623a8571619122eba03e496ad7a3c75da6ea81e7fefaa59",
+    "app_httpd.cpp": "172b9894d4eaa45edf49b51717104f15b6e995aed0fbc13cf5794be1f07e7f32",
+    "README.md": "30a37b30af3a3657a3b1887e7ea68ed100a08dd8d8b8cb059b49bd2cdb3b9fd5",
+    "Notes.txt": "dbb142b643723ada74740a398ba15e704cfd573cc32764198315e878bd33e3d3",
+    "ESP32_CameraServer_AP_2023_V1.3.ino": "9a4ab3bfe8f94af03a8596bb048e7e3f90cbf30f4a3691d83ccc665871f9c0e4",
+    "CameraWebServer_AP.h": "e61629dfdd091a6ccdf24c5af370e95b885d2983738cd60c34830667247b0202",
+    "CameraWebServer_AP.cpp": "d259205178d4c39f7ff986a0220b72ec71cd26ee2fb9552324b9bef09606c90e"
+  }
+}

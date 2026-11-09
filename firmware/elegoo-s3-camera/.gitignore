@@ -1,0 +1,8 @@
+build*/
+*.bin
+*.elf
+*.map
+*.key
+*.pem
+*.crt
+identity*.json

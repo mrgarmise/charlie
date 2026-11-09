@@ -20,7 +20,9 @@ SecretStore(private_directory), TLSProtocol(store), Discovery(zeroconf, lan_ip),
 SavedAdapters(DBusBackend(), saved_setup_profile_uuids, Endpoint(configured_setup_ip)),
 NetworkManager(bus, discovery, protocol, adapters), NetworkService(manager).
 Pass network=service and a separate random network_token to the existing
-start_dashboard call. No second dashboard process, camera reader, registry or
+start_dashboard call. Use manager.endpoint_for(device_id) as a fresh authenticated location hint when
+configuring the existing camera/qualified executor owners; never mutate an active
+control session or automatically regrant authority on reconnect. No second dashboard process, camera reader, registry or
 executor. Do not attach it to startup until native acceptance. The current change
 leaves normal startup untouched deliberately; application opt-in is explicit.
 
@@ -36,7 +38,7 @@ Wi-Fi credentials in config files, environment, logs, notebooks or telemetry.
 
 Pre-create saved setup profiles only in a separately authorized maintenance window:
 bind the configured adapter; ipv4.never-default/ipv6.never-default yes,
-ignore-auto-dns yes for both, no explicit routes/rules/DNS. Obtain setup AP name and
+ignore-auto-dns and ignore-auto-routes yes for both, no explicit routes/rules/DNS. Obtain setup AP name and
 secret physically; do not copy the fork's settings or assume installed AP identity.
 Verify NetworkManager checkpoint support and Polkit scope without granting blanket
 root access. Capture original saved profile UUID/IP/routes/DNS before any trial.

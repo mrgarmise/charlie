@@ -66,6 +66,7 @@ def test_deadline_no_network(wire):
 class Backend:
     def __init__(self): self.calls=[]; self.saved_profile='original'; self.current='original'
     def device(self,name): return name
+    def snapshot(self,device): return "fixture-ip-routes-dns"
     def saved(self,device): return self.saved_profile
     def checkpoint(self,device,seconds): self.calls.append(('checkpoint',device,seconds)); return 'checkpoint'
     def profile(self,uuid): return 'setup'
@@ -90,3 +91,28 @@ def test_daemon_rollback_never_cancelled_on_failure():
     checkpoint=adapters.checkpoint('wlan1',95)
     assert not adapters.restore(checkpoint,adapters.clock()+1)
     assert backend.calls==[('checkpoint','wlan1',95)]
+
+
+def test_restored_uuid_without_original_routes_is_failure():
+    backend=Backend(); adapters=SavedAdapters(backend,{'wlan1':'fixture-uuid'},Endpoint('192.168.4.1'))
+    checkpoint=adapters.checkpoint('wlan1',95)
+    backend.snapshot=lambda device:'changed-default-route'
+    assert not adapters.restore(checkpoint,adapters.clock())
+
+
+@pytest.mark.parametrize('unsafe', ['default','dns','routes','adapter','dhcp-routes'])
+def test_native_profile_validation_rejects_primary_interference(unsafe):
+    from networking.adapters import DBusBackend
+    import copy
+    settings={'connection':{'type':'802-11-wireless','interface-name':'wlan1'},
+              'ipv4':{'never-default':True,'ignore-auto-dns':True,'ignore-auto-routes':True},
+              'ipv6':{'never-default':True,'ignore-auto-dns':True,'ignore-auto-routes':True}}
+    backend=object.__new__(DBusBackend)
+    backend.call=lambda *args:settings
+    backend.validate_setup('/profile','wlan1')
+    if unsafe=='default':settings['ipv4']['never-default']=False
+    elif unsafe=='dns':settings['ipv6']['dns']=['fixture']
+    elif unsafe=='routes':settings['ipv4']['route-data']=[{'dest':'0.0.0.0'}]
+    elif unsafe=='adapter':settings['connection']['interface-name']='wlan0'
+    elif unsafe=='dhcp-routes':settings['ipv4']['ignore-auto-routes']=False
+    with pytest.raises(ValueError):backend.validate_setup('/profile','wlan1')

@@ -6,6 +6,7 @@ A daemon checkpoint survives client death. Rollback errors retain that checkpoin
 """
 from dataclasses import dataclass
 import time
+import json
 
 from networking.transport import Endpoint
 
@@ -15,6 +16,7 @@ class Checkpoint:
     path: str
     device: str
     saved: str
+    snapshot: str
 
 
 class DBusBackend:
@@ -47,6 +49,18 @@ class DBusBackend:
         if str(active) == '/': return '/'
         return str(self.property(active, self.interface+'.Connection.Active', 'Connection'))
 
+    def snapshot(self, device):
+        result = {}
+        for family in ('Ip4Config', 'Ip6Config'):
+            path = self.property(device, self.interface+'.Device', family)
+            if str(path) == '/':
+                result[family] = None
+            else:
+                interface = self.interface+'.'+family.replace('Ip', 'IP')
+                result[family] = {name: self.property(path, interface, name)
+                                 for name in ('AddressData', 'RouteData', 'Nameservers')}
+        return json.dumps(result, sort_keys=True, default=list)
+
     def checkpoint(self, device, seconds):
         # flags=0: refuse overlapping checkpoints; preserve others' checkpoints.
         return str(self.manager('CheckpointCreate', self.dbus.Array([device], signature='o'),
@@ -69,6 +83,8 @@ class DBusBackend:
             block = settings.get(family, {})
             if any(block.get(key) for key in ('routes', 'route-data', 'routing-rules', 'dns', 'dns-data')):
                 raise ValueError('setup profile may not install explicit routing or DNS')
+            if not block.get('ignore-auto-routes', False):
+                raise ValueError('setup profile must ignore DHCP routes')
             if not block.get('ignore-auto-dns', False):
                 raise ValueError('setup profile must ignore DHCP DNS')
 
@@ -108,8 +124,9 @@ class SavedAdapters:
         self.backend.validate_setup(profile, adapter)
         device = self.backend.device(adapter)
         saved = self.backend.saved(device)
+        snapshot = self.backend.snapshot(device)
         path = self.backend.checkpoint(device, seconds)
-        return Checkpoint(path, device, saved)
+        return Checkpoint(path, device, saved, snapshot)
 
     def connect_setup(self, adapter, deadline):
         profile = self.backend.profile(self.profiles[adapter])
@@ -124,7 +141,8 @@ class SavedAdapters:
     def restore(self, checkpoint, deadline):
         if not self.backend.rollback(checkpoint.path): return False
         while self.clock() < deadline:
-            if self.backend.restored(checkpoint.device, checkpoint.saved):
+            if (self.backend.restored(checkpoint.device, checkpoint.saved)
+                    and self.backend.snapshot(checkpoint.device) == checkpoint.snapshot):
                 # NM rollback normally destroys the checkpoint itself. No explicit
                 # destruction here: never cancel daemon recovery before verification.
                 return True

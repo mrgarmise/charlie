@@ -53,17 +53,29 @@ class NetworkManager:
         self.next_retry = 0.
         self.failures = 0
         self.used = set()
+        self.location = None
+        self.location_at = 0.
         self.state = dict(state='offline', valid=False, device_id=None, transport=None,
-                          joined=False, verified=False, restoration='not-needed')
+                          joined=False, verified=False, authenticated=False, restoration='not-needed')
         bus.claim_observations(self.source, self, metadata={
             'body': 'ELEGOO', 'modality': 'network-health', 'clock': 'host-monotonic',
             'acquisition': 'authenticated provisioning; no movement authority'})
         self._publish()
 
+    def endpoint_for(self, device_id):
+        """Read-only location hint for existing owners; never opens/rebinds transport."""
+        if (self.state['device_id'] == device_id and self.state['authenticated']
+                and 0 <= self.clock()-self.location_at <= 5):
+            return self.location
+        return None
+
     def status(self):
         return dict(self.state)
 
     def _publish(self, **changes):
+        if changes.get('valid') is False:
+            self.location = None
+            changes['authenticated'] = False
         self.state.update(changes)
         self.sequence += 1
         self.bus.publish_observation(self.source, self, Observation(
@@ -97,8 +109,10 @@ class NetworkManager:
             endpoint = self._find(device_id, self.clock()+3)
             self.failures = 0 if endpoint else min(8, self.failures+1)
             self.next_retry = self.clock()+min(60, 2**self.failures)
+            self.location, self.location_at = endpoint, self.clock()
             self._publish(state='online' if endpoint else 'offline', valid=bool(endpoint),
-                          device_id=device_id, verified=bool(endpoint), joined=bool(endpoint),
+                          device_id=device_id, authenticated=bool(endpoint), joined=bool(endpoint),
+                          verified=bool(endpoint and self.state['verified'] and self.state['device_id']==device_id),
                           transport='lan' if endpoint else None)
             return self.status()
         finally:
@@ -167,7 +181,8 @@ class NetworkManager:
                     self.protocol.confirm(endpoint, device, transaction, credentials.ssid, deadline)
                     if self.clock() >= deadline:
                         raise ProvisioningError('verification expired')
-                    self._publish(state='verified', valid=True, verified=True)
+                    self.location, self.location_at = endpoint, self.clock()
+                    self._publish(state='verified', valid=True, verified=True, authenticated=True)
                     return self.status()
                 self.sleep(min(1, max(0, deadline-self.clock())))
             raise ProvisioningError('target LAN verification timed out; recovery retained')

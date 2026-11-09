@@ -184,3 +184,23 @@ def test_discovery_excludes_setup_stale_address_and_binds_lan():
         def get_service_info(self,*args,**kwargs): return Info()
     discovery=Discovery(Z(),'10.0.0.2',hints=[Endpoint('10.0.0.8')])
     assert discovery.candidates('device-test',discovery.clock()+1)==[Endpoint('10.0.0.8',443,'10.0.0.2')]
+
+
+def test_location_only_while_fresh_authenticated_and_no_rebind(rig):
+    m,d,p,a,c=rig
+    assert m.endpoint_for('device-test') is None
+    m.poll('device-test')
+    assert m.endpoint_for('device-test')=='lan'
+    assert m.endpoint_for('impostor') is None
+    c.now+=6
+    assert m.endpoint_for('device-test') is None
+    d.online=False;m.poll('device-test')
+    assert m.endpoint_for('device-test') is None
+
+
+def test_passive_authenticated_join_never_claims_provisioning_commit(rig):
+    m,d,p,a,c=rig;p.transaction='unconfirmed-external-change'
+    state=m.poll('device-test')
+    assert state['authenticated'] and state['joined']
+    assert not state['verified']
+    assert not any(call[0]=='confirm' for call in p.calls)

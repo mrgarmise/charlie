@@ -6,6 +6,7 @@ Repository: public `mrgarmise/charlie`; staging branch: `missions/library-archiv
 
 ## Active / current instruction
 
+- [Charlie_ELEGOO_Stock_Parity_Qualification_Codex_Mission_20261109.md](active/Charlie_ELEGOO_Stock_Parity_Qualification_Codex_Mission_20261109.md) — **next:** validate stock parity, independent S3 firmware references, qualified manual control and no-flash readiness.
 - [Charlie_ELEGOO_S3_Camera_Firmware_Integration_Codex_Mission_20261109.md](active/Charlie_ELEGOO_S3_Camera_Firmware_Integration_Codex_Mission_20261109.md) — **next mission:** use the UMRT S3 camera source and PR #29's tested core to build and validate replacement firmware; do not flash.
 - [Charlie_Elegoo_Network_Provisioning_Codex_Mission_20261109.md](active/Charlie_Elegoo_Network_Provisioning_Codex_Mission_20261109.md) — the currently prepared ELEGOO network-provisioning mission; live status may differ from its initial instructions.
 

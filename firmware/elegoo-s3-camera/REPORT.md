@@ -93,3 +93,33 @@ to flash experimentally. ACCEPTANCE.md defines the separate supervised evidence 
 No flash, deploy, merge, live Pi network change, service restart, RP2040 access or
 physical actuation occurred. Approved runtime remains f3304c588a893a953e34e5c4d00bd5f9bfb18f19.
 The original private8MiB backup remains unchanged with SHA256 c196e9077be06b3f61f6acfcf66219fe0535b60ae1d26183c43b2de80ff25c5b.
+
+## First independent CI and pinned runner correction
+
+Published implementation commit61164585f8ce84e415e7ad7b4e402c779ba3130c.
+Independent native builds passed on x86_64:
+https://github.com/mrgarmise/charlie/actions/runs/42708236101 .
+OPI3,135,264 bytes / SHA2562969130d08c8b3a0ea6f15206053f4d02cda52c1276c9e908fd22f1755cfdf08;
+QSPI3,133,920 bytes / SHA2561f7cfb45f3a426ed4e4e267cbab1649284d1b3d6261ebcb40c981326d80253ff.
+Same sketch-source hash7003862f85a80e05552b4fd5574004e3fedc136f37c65b0d1065e080fca6ec99.
+Native binaries can differ with host/build paths and embedded ELF metadata; no
+bitwise cross-host reproducibility is claimed. Both geometry/integrity/slot gates pass.
+
+That run's host job failed BEFORE tests because ubuntu-latest selected Ubuntu26.04,
+unsupported by pinned Playwright1.56.0. No sanitizer/browser tests were counted as
+passing in that failed job. Corrected runner to supported Ubuntu24.04; dependencies
+remain pinned and no test is skipped or weakened. Original failed log retained.
+
+Baseline asset audit also confirms original embedded gzip21,403 bytes expands to
+117,582 bytes, while original plain camera_index.html is117,101 bytes. This upstream
+difference is preserved, not silently regenerated. The actual served asset is the
+unchanged embedded gzip. No fork network defaults occur in its decompressed content.
+
+A fresh separate checkout of published6116458 native-built OPI successfully:
+3,135,600 bytes, SHA2567629a448195d6347e7170715bcbad08d6a24e27d3f6a43ce692b8a89b7929174,
+same sketch-source hash. Byte comparison with the original local build confirms
+identical executable/data payload: only the embedded ELF SHA256 field0xb0..0xcf
+and dependent checksum/digest footer differ, as expected from debug/build-path
+metadata. Exact binaries/hashes remain distinguished; no digest was fabricated or
+rewritten to appear reproducible. The clean-checkout artifact is retained under
+build-independent-opi/ outside Git, with its own command/log/image-info receipt.

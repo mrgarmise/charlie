@@ -14,6 +14,10 @@ class MotorBridge {
   char commandKey_[65]{};
   bool pulseActive_=false,pulseTxPending_=false;
   uint32_t pulseAt_=0,pulseDuration_=0;
+  // Completion ACK is emitted AFTER the UNO stops. Bound its loop/serial slack;
+  // this is a fallback deadline, never a change to the requested UNO duration.
+  static constexpr uint32_t pulseCompletionSlack_=80;
+  char pulseAck_[38]{};
   bool stopPending_=true;
   bool factoryLinked_=false;
   uint32_t sentHeartbeat_=0, factoryAt_=0;

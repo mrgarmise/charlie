@@ -45,6 +45,13 @@ def test_stop_no_qualification_and_no_legacy_fallback():
     with pytest.raises(PermissionError):car._send_raw(b'{"N":3,"D1":3,"D2":20}')
     with pytest.raises(PermissionError):car.bind_qualified_executor(object())
 
+
+def test_candidate_sensor_queries_do_not_gain_motion_admission():
+    car=ElegooMobileBase(command_key=TOKEN);car.sock=Socket();car._running=True
+    with pytest.raises(PermissionError):car._send_raw(b'{"N":24,"H":"yaw1"}')
+    with pytest.raises(PermissionError):car._send_raw(b'{"N":21,"H":"range1","D1":2}')
+    assert car.sock.writes==[]
+
 @pytest.mark.parametrize('token',['', 'x'*42, 'x'*65, 'bad secret'*6])
 def test_token_bounds(token):
     with pytest.raises(ValueError):CommandAuthenticator(token)

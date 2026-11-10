@@ -35,7 +35,11 @@ void MotorBridge::tick(uint32_t now) {
     if(uart_wait_tx_done(UART_NUM_2,0)==ESP_OK){pulseTxPending_=false;pulseAt_=now;}
     else if(uint32_t(now-pulseAt_)>=100)closeClient(); // stalled transmit: fail closed
   }
-  if(pulseActive_ && !pulseTxPending_ && uint32_t(now-pulseAt_)>=pulseDuration_){pulseActive_=false;stopPending_=true;}
+  if(pulseActive_ && !pulseTxPending_ && uint32_t(now-pulseAt_)>=pulseDuration_+pulseCompletionSlack_) {
+    // Missing completion is ambiguous. Independently stop and close; a late ACK
+    // must not turn this failed pulse into success or admit another command.
+    closeClient();
+  }
   // STOP always precedes new traffic and survives session close/reconnect.
   if(stopPending_)writeUart("{\"N\":100}");
   if(server_.hasClient()) {
@@ -78,7 +82,12 @@ void MotorBridge::tick(uint32_t now) {
             || uart_wait_tx_done(UART_NUM_2,0)!=ESP_OK
             || Serial2.availableForWrite()<static_cast<int>(strlen(frame))) {closeClient();break;}
         writeUart(frame);
-        if(duration>0){pulseActive_=true;pulseTxPending_=true;pulseAt_=now;pulseDuration_=duration;}
+        if(duration>0){
+          char id[33]{};
+          sscanf(frame,"{\"N\":2,\"H\":\"%32[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]",id);
+          snprintf(pulseAck_,sizeof(pulseAck_),"{%s_ok}",id);
+          pulseActive_=true;pulseTxPending_=true;pulseAt_=now;pulseDuration_=duration;
+        }
       }
       tcp_.reset();
     }
@@ -87,6 +96,11 @@ void MotorBridge::tick(uint32_t now) {
     const auto result=uart_.feed(static_cast<char>(Serial2.read()),now);
     if(result==charlie_elegoo::FrameParser::Result::Error){closeClient();break;}
     if(result==charlie_elegoo::FrameParser::Result::Complete) {
+      if(pulseActive_ && !strcmp(uart_.frame(),pulseAck_)) {
+        // No early, bare, wrong-ID or wrong-value reply can retire the watchdog.
+        if(pulseTxPending_ || uint32_t(now-pulseAt_)<pulseDuration_){closeClient();break;}
+        pulseActive_=false;stopPending_=true;
+      }
       if(session_.connected()) {if(!sendClient(uart_.frame()))closeClient();}
       else if(!strcmp(uart_.frame(),"{BT_detection}"))writeUart("{BT_OK}");
       else if(!strcmp(uart_.frame(),"{WA_detection}")) {

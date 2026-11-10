@@ -11,6 +11,10 @@ int main(){
  gate.clear();assert(gate.header("{Auth:1:100:717b702dfe9caccb73829fbe4cf81eea230efc4b2c391aac8b3505e0b5c351cd}",0));assert(!gate.consume(frame,1));
  assert(commandDuration(frame)==100);
  assert(commandDuration("{\"N\":3,\"D1\":3,\"D2\":20}")==-1);
+ // Read-only intent is not permission for arbitrary forwarding. Until installed
+ // protocol/timing are bound, these queries cannot bypass the sole UART owner.
+ assert(commandDuration(R"({"N":21,"H":"range1","D1":2})")==-1);
+ assert(commandDuration(R"({"N":24,"H":"yaw1"})")==-1);
  assert(commandDuration("{\"N\":2,\"H\":\"a\",\"D1\":3,\"D2\":36,\"T\":100}")==-1);
  assert(commandDuration("{\"N\":2,\"H\":\"a\",\"D1\":3,\"D2\":20,\"T\":201}")==-1);
  assert(commandDuration("{\"N\":5,\"H\":\"a\",\"D1\":1,\"D2\":90}")==0);

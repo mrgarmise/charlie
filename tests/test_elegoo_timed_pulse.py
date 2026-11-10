@@ -255,3 +255,12 @@ def test_candidate_accounts_for_9600_baud_without_extending_motion(monkeypatch,s
         assert result['acknowledged'] and result['stop']['acknowledged']
         assert peer.commands[0]['T']==100
         assert peer.now>10.15 # old candidate timeout could not accommodate serialization
+
+
+def test_candidate_lease_covers_independent_fallback_not_only_completion(monkeypatch):
+    peer=Peer(monkeypatch)
+    peer.car._command_auth=SimpleNamespace(wrap=lambda raw,**kwargs:raw,challenge=lambda frame:False)
+    # Normal completion fits this horizon; worst-case TX+T+fallback STOP does not.
+    with pytest.raises(InterruptedError):
+        peer.pulse(lease=MotionLease('supervised_trial',10.30,'fixture','boot'))
+    assert [p['N'] for p in peer.commands]==[1]

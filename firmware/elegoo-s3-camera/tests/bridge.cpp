@@ -19,8 +19,10 @@ int main(){
  const auto stops=std::count(Serial2.writes.begin(),Serial2.writes.end(),"{\"N\":100}");
  uartTxBusy=true;bridge.tick(49);uartTxBusy=false;bridge.tick(50);
  put(peer,"{Heartbeat}");bridge.tick(149);assert(std::count(Serial2.writes.begin(),Serial2.writes.end(),"{\"N\":100}")==stops);
- bridge.tick(150);assert(Serial2.writes.back()=="{\"N\":100}");
- // A sequence replay closes and schedules STOP, even with a valid MAC.
+ bridge.tick(150);assert(std::count(Serial2.writes.begin(),Serial2.writes.end(),"{\"N\":100}")==stops);
+ bridge.tick(230);assert(!bridge.connected());assert(Serial2.writes.back()=="{\"N\":100}");
+ // A replay on a fresh nonce session without a heartbeat cannot move.
+ ::close(peer);peer=connectPeer();bridge.tick(0);
  put(peer,"{Auth:1:100:717b702dfe9caccb73829fbe4cf81eea230efc4b2c391aac8b3505e0b5c351cd}");bridge.tick(151);assert(!bridge.connected());bridge.tick(152);::close(peer);
  peer=connectPeer();bridge.tick(10);assert(bridge.connected());put(peer,"{\"N\":");bridge.tick(11);
  ::close(peer);bridge.tick(12);bridge.tick(13);assert(!bridge.connected());

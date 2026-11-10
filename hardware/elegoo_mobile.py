@@ -682,7 +682,13 @@ class ElegooMobileBase:
         # this is transport latency, not an extension of requested motor duration.
         candidate_frame={'N':2,'H':ident,'D1':{'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}[direction],
                          'D2':pwm,'T':milliseconds}
-        wire_budget=(len(json.dumps(candidate_frame,separators=(',',':')).encode())+len(expected))/960+.04 if self._command_auth is not None else .05
+        command_wire_seconds=len(json.dumps(candidate_frame,separators=(',',':')).encode())/960
+        wire_budget=max(command_wire_seconds,.100)+len(expected)/960+.04 if self._command_auth is not None else .05
+        # Include the independent ESP32 fallback: up to100ms TX confirmation,
+        # T+80ms completion slack, N100 serialization, and40ms scheduling.
+        # Do not dispatch if that finite fail-safe horizon exceeds the lease.
+        fallback_budget=.100+.080+len(b'{"N":100}')/960+.040
+        lease_budget=max(wire_budget,fallback_budget) if self._command_auth is not None else 0
         def check():
             if (not self.connected or not lease.valid(clock(),boot_id)
                     or (cancel is not None and cancel.is_set()) or safety_check() is not True):
@@ -694,7 +700,7 @@ class ElegooMobileBase:
             # independent safety I/O is checked outside that lock.
             now=clock()
             if ((cancel is not None and cancel.is_set()) or not lease.valid(now,boot_id)
-                    or now+duration+(wire_budget if self._command_auth is not None else 0)>lease.expires_at):
+                    or now+duration+lease_budget>lease.expires_at):
                 return False
             result['wire_started_at']=now
             return True

@@ -43,7 +43,7 @@ def generate(directory,device):
     chain=certificate.read_text()+ca.read_text()
     if len(chain.encode())>=2048 or len(key.read_bytes())>=2048:raise ValueError('certificate material exceeds firmware bound')
     enrollment=dict(device_id=device,certificate=chain,private_key=key.read_text(),
-                    token=secrets.token_urlsafe(32),recovery_secret=secrets.token_urlsafe(24))
+                    token=secrets.token_urlsafe(32),command_key=secrets.token_urlsafe(32),recovery_secret=secrets.token_urlsafe(24))
     target=directory/'identity-enrollment.json'
     target.write_text(json.dumps(enrollment,separators=(',',':')));target.chmod(0o600)
     line=directory/'physical-usb-enrollment.txt'
@@ -52,6 +52,10 @@ def generate(directory,device):
     # Peer Enrollment schema from PR #28: private token never printed.
     peer=directory/device
     peer.write_text(json.dumps(dict(device_id=device,fingerprint=fingerprint,token=enrollment['token'])));peer.chmod(0o600)
+    # Separate control capability: never include in PR28 provisioning peer/browser.
+    control=directory/'qualified-control.json'
+    control.write_text(json.dumps(dict(device_id=device,command_key=enrollment['command_key'])))
+    control.chmod(0o600)
     return dict(device_id=device,certificate_sha256=fingerprint,directory=str(directory),
                 enrollment_bytes=target.stat().st_size,not_hardware_authorized=True)
 

@@ -1,5 +1,6 @@
 #include "MotorBridge.h"
 #include <sys/socket.h>
+#include <esp_system.h>
 MotorBridge* MotorBridge::owner_=nullptr;
 void MotorBridge::stopCallback(){if(owner_)owner_->stopPending_=true;}
 void MotorBridge::writeUart(const char* frame) {
@@ -14,17 +15,21 @@ bool MotorBridge::sendClient(const char* frame) {
   return client_ && ::send(client_.fd(),frame,size,MSG_DONTWAIT)==static_cast<int>(size);
 }
 void MotorBridge::closeClient() {
-  session_.close();client_.stop();tcp_.reset();uart_.reset();
+  session_.close();client_.stop();tcp_.reset();uart_.reset();gate_.clear();pulseActive_=false;
 }
-void MotorBridge::begin(const char* legacyFactoryName) {
+void MotorBridge::begin(const char* legacyFactoryName,const char* commandKey) {
+  strncpy(commandKey_,commandKey,sizeof(commandKey_)-1);
   strncpy(factoryName_,legacyFactoryName,sizeof(factoryName_)-1);
   Serial2.setTxBufferSize(512);
   Serial2.begin(9600,SERIAL_8N1,3,40); // candidate pin contract; NOT hardware qualified
   server_.begin();server_.setNoDelay(true);
   pinMode(46,OUTPUT);
   writeUart("{\"N\":100}");
+  // Official startup marker is bracketed by STOP; it never authorizes a session.
+  writeUart("{Factory}");stopPending_=true;writeUart("{\"N\":100}");
 }
 void MotorBridge::tick(uint32_t now) {
+  if(pulseActive_ && uint32_t(now-pulseAt_)>=pulseDuration_){pulseActive_=false;stopPending_=true;}
   // STOP always precedes new traffic and survives session close/reconnect.
   if(stopPending_)writeUart("{\"N\":100}");
   if(server_.hasClient()) {
@@ -33,7 +38,10 @@ void MotorBridge::tick(uint32_t now) {
     else {
       client_=incoming;tcp_.reset();uart_.reset();
       session_.open(now);sentHeartbeat_=now;
-      if(!sendClient("{Heartbeat}"))closeClient();
+      uint8_t random[16];esp_fill_random(random,sizeof(random));char nonce[33]{};
+      for(unsigned i=0;i<16;++i)snprintf(nonce+2*i,3,"%02x",random[i]);
+      gate_.begin(commandKey_,nonce);char challenge[64];snprintf(challenge,sizeof(challenge),"{Challenge:%s:%lu}",nonce,static_cast<unsigned long>(now));
+      if(!sendClient(challenge) || !sendClient("{Heartbeat}"))closeClient();
     }
   }
   session_.tick(now,client_ && client_.connected());
@@ -48,17 +56,22 @@ void MotorBridge::tick(uint32_t now) {
     if(result==charlie_elegoo::FrameParser::Result::Complete) {
       const char* frame=tcp_.frame();
       if(!strcmp(frame,"{Heartbeat}"))session_.heartbeated(now);
-      else if(!strcmp(frame,"{\"N\":100}"))stopPending_=true;
-      else {
-#if CHARLIE_ENABLE_MOTOR_FORWARDING
-        if(!session_.mayForward() || stopPending_ || Serial2.availableForWrite()<static_cast<int>(strlen(frame))) {
-          closeClient();break;
-        }
+      else if(stopFrame(frame)) {
+        pulseActive_=false;gate_.cancel();
+        // Canonical N1 tagged STOP preserves existing Pi exact-ACK handling.
+        if(Serial2.availableForWrite()<static_cast<int>(strlen(frame))){closeClient();break;}
+        if(stopPending_)writeUart("{\"N\":100}");
         writeUart(frame);
-#else
-        // Observation-only candidate; no remote operation grants motion admission.
-        closeClient();break;
-#endif
+      }
+      else if(!strncmp(frame,"{Auth:",6)) {
+        if(!gate_.header(frame,now)){closeClient();break;}
+      }
+      else {
+        const int duration=commandDuration(frame);
+        if(!session_.mayForward() || stopPending_ || pulseActive_ || duration<0 || !gate_.consume(frame,now)
+            || Serial2.availableForWrite()<static_cast<int>(strlen(frame))) {closeClient();break;}
+        writeUart(frame);
+        if(duration>0){pulseActive_=true;pulseAt_=now;pulseDuration_=duration;}
       }
       tcp_.reset();
     }

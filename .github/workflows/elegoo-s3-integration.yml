@@ -22,12 +22,14 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -r requirements.txt pytest==8.4.2 playwright==1.56.0 zeroconf==0.148.0
       - run: python -m playwright install --with-deps chromium
+      - run: sudo apt-get update && sudo apt-get install -y libmbedtls-dev
       - run: python firmware/elegoo-s3-camera/tools/host_tests.py --sanitizers address,undefined
       - run: g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined firmware/elegoo-network/tests/core.cpp -o /tmp/prior-core-tests
       - run: /tmp/prior-core-tests
       - run: python -m pytest firmware/elegoo-s3-camera/tests -q --junitxml=s3-integration-host.xml
         env:
           CHARLIE_PEER_ROOT: ${{ github.workspace }}/reviewed-peer
+      - run: python -m pytest tests/test_elegoo_command_auth.py tests/test_elegoo_timed_pulse.py tests/test_elegoo_stop_ack_deadline.py tests/test_unified_actuator_requests.py tests/test_mobile_console.py -q
       - run: python tools/check_unified_contracts.py
       - uses: actions/upload-artifact@v4
         if: always()

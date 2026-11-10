@@ -57,7 +57,11 @@ class ElegooMobileBase:
         turn_speed=55,
         max_align_seconds=3.0,
         min_pan_step=2,
+        command_key=None,
     ):
+        from hardware.elegoo_command_auth import CommandAuthenticator
+        self._command_auth = CommandAuthenticator(command_key) if command_key is not None else None
+        self._qualified_owner = None
         self.host = host
         self.port = port
         self.timeout = timeout
@@ -86,6 +90,14 @@ class ElegooMobileBase:
     # --------------------------------------------------
     # CONNECTION
     # --------------------------------------------------
+
+    def bind_qualified_executor(self, executor):
+        from motion.elegoo_executor import QualifiedElegooExecutor
+        if not isinstance(executor, QualifiedElegooExecutor) or executor.base.car is not self:
+            raise PermissionError("existing qualified executor required")
+        if self._qualified_owner is not None and self._qualified_owner is not executor:
+            raise PermissionError("transport already bound")
+        self._qualified_owner = executor
 
     def connect(self):
         # Normal application consumers cannot create a parallel command owner.
@@ -153,6 +165,7 @@ class ElegooMobileBase:
             self._pending.clear()
 
         self._rx_buffer = ""
+        if self._command_auth is not None:self._command_auth.reset()
         lease,self._body_lease=self._body_lease,None
         if lease is not None:lease.__exit__(None,None,None)
 
@@ -251,6 +264,8 @@ class ElegooMobileBase:
 
     def _handle_frame(self, frame):
         self._wire_event("rx", frame=frame[:512], truncated=len(frame)>512)
+        if self._command_auth is not None and self._command_auth.challenge(frame):
+            return
         if frame == "{Heartbeat}":
             try:
                 self._send_raw(
@@ -325,11 +340,14 @@ class ElegooMobileBase:
             )
 
         with self._send_lock:
+            wire = raw
+            if self._command_auth is not None:
+                wire = self._command_auth.wrap(raw, qualified=self._qualified_owner is not None and preflight is not None)
             if preflight is not None and preflight() is not True:
                 raise InterruptedError("command cancelled before wire dispatch")
             self._wire_event('tx_attempt', raw=raw[:512].decode(errors='replace'), bytes=len(raw))
             try:
-                sock.sendall(raw)
+                sock.sendall(wire)
             except BaseException as exc:
                 self._wire_event('tx_error', error=type(exc).__name__, delivery='unknown')
                 raise

@@ -1,0 +1,29 @@
+# Qualified LAN control follow-on — build only
+
+This separate branch follows PR30 ea2172ae84f16e7efe9d661301ce649672da69b3. PR30, original firmware and approved runtime remain untouched. No service, hardware action, network change or deployment is installed by this change. Historical REPORT.md/PROVENANCE.md describe PR30, not this follow-on.
+
+The official/herrsergio S3 binary exactly matches the saved stock app. The official root UI selects OV3660 or OV2640 gzip assets; UMRT replaced it with one custom view. StockCameraIndex.h is an exact copy (SHA256140c06e5772b02beae77c88f958f525e651a7b948dae96e7410c1166b67b86f6) from the official camera package, also herrsergio/elegoo-smart-robot commit3e857eac1c4248efbb792edf3498ff0b6b4b0907. Its lineage is Espressif CameraWebServer; retain the existing Apache-2.0 notice/license alongside the camera implementation. Root sensor selection is restored; /custom-ui retains the unchanged UMRT asset. Unauthenticated /keypress and /json_command remain403; they are UMRT additions, absent in the official package.
+
+Official startup emits {Factory}. Archived official UNO ignores the marker or rejects it as non-JSON; it does not grant a mode. The bridge restores STOP/Factory/STOP before accepting clients. Physical installed-UNO provenance and capture remain pending. Factory/AP indicators cannot authorize forwarding.
+
+## Authority and transport
+
+Existing manual gateway → QualifiedElegooExecutor → existing ElegooMobileBase → TCP100 → single MotorBridge UART owner. This introduces neither another socket owner nor a motion chooser. Every Pi request still needs independent source/firmware-bound admission, finite envelope, lease, manual owner/deadman when applicable, post-connect recheck and under-lock cancellation guard. Durable STOP uncertainty and exact tagged ACK semantics remain. An opt-in command_key argument equips the existing car transport; the existing executor constructor binds its owner. No application configuration is changed to activate it.
+
+Physical enrollment schema2 now includes a separate 256-bit command_key. The generator puts it in physical USB enrollment and a separate private qualified-control.json (0600 inside0700). It never puts it in PR28’s provisioning peer record, browser, ticket or stdout. Provisioning bearer token and control key must differ. Prior schema1 candidate enrollment fails closed and requires a separately authorized physical reenrollment; no deployed schema1 installation is assumed and there is no remote migration/reset endpoint. Existing stock NVS is not erased. Provisioning code has no reference to MotorBridge or the control key. Independent qualification remains a Pi trust boundary; do not give the control key to browser/untrusted behavior code.
+
+Each accepted connection receives `{Challenge:<32 lowercase hex nonce>:<device millis>}` then the legacy heartbeat. esp_fill_random supplies128 bits of nonce. Before each qualified frame, the Pi sends `{Auth:<sequence>:<device deadline>:<64 lowercase hex MAC>}` immediately followed by the exact compact UNO frame. HMAC-SHA256 input is UTF-8/ASCII:
+
+```
+charlie-elegoo-command-v1\n<nonce>\n<sequence>\n<deadline>\n<exact frame>
+```
+
+The final line has no trailing newline. Key bytes are the ASCII base64url command_key, not its decoded representation. Sequence starts1, increases, never wraps. Deadlines wrap modulo2^32, derived from the challenge clock plus host elapsed time and100ms. Device requires expiry strictly in the next500ms and rechecks on consumption; authentication header also has a500ms assembly bound. Network delay/drift can deny a command, never silently fall back to unsigned forwarding. Reconnect replaces nonce and parser/auth state. No retries/reconnects are introduced for movement. STOP cancels pending authentication and pulse state; invalid MAC, replay, malformed frame, heartbeat loss, congestion or disconnect closes the session and schedules STOP.
+
+Only existing compact N2 timed pulses (directions1–4, PWM1–35, T1–200ms) and N5 position (20–160degrees) may pass a valid MAC. N1 all-zero tagged STOP, N100 and heartbeats remain available without a key. Continuous N3 and arbitrary UART/query forwarding are excluded. The bridge requests STOP at pulse duration independently of heartbeats; a second moving command while a pulse is active closes/stops. Network or UART ACK never constitutes physical stopping. The serial scheduler/buffers and task timing must be measured on-device; host stubs establish logic, not a hard real-time physical deadline. No control key by itself creates a Pi qualification grant, and these software bounds are not independently measured safe actuator limits.
+
+MACs protect command integrity/admission, not video confidentiality, end-to-end UNO ACK authenticity or denial/relay resistance. An active LAN attacker can interrupt service; ACK authenticity/threat assumptions require explicit review before physical qualification. Enrollment key custody, installed UNO binding, firmware/runtime qualification, physical STOP/pan limits and resource/timing tests remain blockers. Do not provision a control key into the running application until a separately authorized qualified trial.
+
+## Offline validation
+
+Run focused Python auth/executor/manual-console/STOP suites, firmware browser/TLS/enrollment suites, production C++ gate/bridge with ASan+UBSan, unified contracts and native OPI/QSPI builds. Host C++ uses the actual system mbedTLS library with a tiny ABI declaration shim; Python-generated HMAC vectors are independently consumed by production C++. CI installs libmbedtls-dev. No live hardware tests are run. Full results and image hashes are recorded in VALIDATION_STOCK_PARITY.md; native images remain private and must not be flashed based on this report.

@@ -7,6 +7,7 @@ struct IdentityRecord {
   char certificate[2048]{};
   char privateKey[2048]{};
   char token[65]{};
+  char commandKey[65]{};
   char recoverySecret[65]{};
   uint32_t checksum=0;
 };

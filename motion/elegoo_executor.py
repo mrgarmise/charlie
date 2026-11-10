@@ -43,6 +43,8 @@ class QualifiedElegooExecutor(QualifiedMobileExecutor):
         self._manual_until = 0.
         self._manual_epoch = None
         self._manual_sequence = -1
+        bind = getattr(getattr(base, "car", None), "bind_qualified_executor", None)
+        if bind is not None:bind(self)
         bus.claim_observations('elegoo-actuator-state', self, metadata={
             'body': 'ELEGOO', 'modality': 'command-state',
             'clock': 'host-monotonic', 'physical_pose': 'unknown',

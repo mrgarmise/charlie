@@ -38,6 +38,10 @@ def test_private_physical_enrollment_and_name_constrained_ca(tmp_path,capsys):
     assert len(record['certificate'].encode())<2048 and len(record['private_key'].encode())<2048
     assert metadata['enrollment_bytes']<7168
     assert record['token'] not in json.dumps(metadata)+capsys.readouterr().out
+    assert record['command_key'] != record['token']
+    assert record['command_key'] not in (path/DEVICE).read_text()
+    assert record['command_key'] not in json.dumps(metadata)
+    assert json.loads((path/'qualified-control.json').read_text())['command_key']==record['command_key']
     assert record['private_key'] not in json.dumps(metadata)
     # A certificate for this device cannot authenticate another hostname.
     command=['openssl','verify','-CAfile',str(path/'operator-ca.crt'),'-verify_hostname','foreign.invalid',str(path/'device.crt')]

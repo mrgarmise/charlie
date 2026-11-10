@@ -19,6 +19,7 @@
 #include "esp32-hal-ledc.h"
 #include "sdkconfig.h"
 #include "camera_index.h"
+#include "StockCameraIndex.h"
 
 #include "Arduino.h"  // added for serial print
 
@@ -1119,36 +1120,19 @@ static esp_err_t win_handler(httpd_req_t *req) {
   return httpd_resp_send(req, NULL, 0);
 }
 
-static esp_err_t index_handler(httpd_req_t *req) {
-  // httpd_resp_set_type(req, "text/html");
-  // httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
-  // sensor_t *s = esp_camera_sensor_get();
-  // if (s != NULL) {
-  //   if (s->id.PID == OV3660_PID) {
-  //     return httpd_resp_send(req, (const char *)index_ov3660_html_gz, index_ov3660_html_gz_len);
-  //   } else if (s->id.PID == OV5640_PID) {
-  //  //   return httpd_resp_send(req, (const char *)index_ov5640_html_gz, index_ov5640_html_gz_len);
-  //   } else {
-  //     return httpd_resp_send(req, (const char *)index_ov2640_html_gz, index_ov2640_html_gz_len);
-  //   }
-  // } else {
-  //   log_e("Camera sensor not found");
-  //   return httpd_resp_send_500(req);
-  // }
-
-    httpd_resp_set_type(req, "text/html");
-    httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
-    sensor_t *s = esp_camera_sensor_get();
-    // if (s->id.PID == OV3660_PID)
-    // {
-    //     // return httpd_resp_send(req, (const char *)index_ov3660_html_gz, index_ov3660_html_gz_len);
-    //     return httpd_resp_send(req, (const char *)index_ov3660_html_gz_CEP, index_ov3660_html_gz_len_CEP);
-    // }
-    // return httpd_resp_send(req, (const char *)index_ov2640_html_gz, index_ov2640_html_gz_len);
-
-    return httpd_resp_send(req, (const char *)index_ov3660_html_gz_CEP, index_ov3660_html_gz_len_CEP);
+// Stock sensor-selected UI; preserve the UMRT customization at /custom-ui.
+static esp_err_t custom_index_handler(httpd_req_t *req) {
+  httpd_resp_set_type(req,"text/html");httpd_resp_set_hdr(req,"Content-Encoding","gzip");
+  return httpd_resp_send(req,(const char*)index_ov3660_html_gz_CEP,index_ov3660_html_gz_len_CEP);
 }
-
+static esp_err_t index_handler(httpd_req_t *req) {
+  sensor_t *sensor=esp_camera_sensor_get();
+  if(!sensor)return httpd_resp_send_500(req);
+  httpd_resp_set_type(req,"text/html");httpd_resp_set_hdr(req,"Content-Encoding","gzip");
+  if(sensor->id.PID==OV3660_PID)
+    return httpd_resp_send(req,(const char*)index_ov3660_html_gz,index_ov3660_html_gz_len);
+  return httpd_resp_send(req,(const char*)index_ov2640_html_gz,index_ov2640_html_gz_len);
+}
 
 static esp_err_t Test1_handler(httpd_req_t *req)
 {
@@ -1435,6 +1419,8 @@ httpd_uri_t json_command_uri = {
   log_i("Starting web server on port: '%d'", config.server_port);
   if (httpd_start(&camera_httpd, &config) == ESP_OK) {
     httpd_register_uri_handler(camera_httpd, &index_uri);
+    httpd_uri_t custom_uri={};custom_uri.uri="/custom-ui";custom_uri.method=HTTP_GET;custom_uri.handler=custom_index_handler;
+    httpd_register_uri_handler(camera_httpd,&custom_uri);
     httpd_register_uri_handler(camera_httpd, &cmd_uri);
     httpd_register_uri_handler(camera_httpd, &status_uri);
     httpd_register_uri_handler(camera_httpd, &capture_uri);

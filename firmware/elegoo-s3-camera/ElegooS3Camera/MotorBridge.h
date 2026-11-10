@@ -3,15 +3,17 @@
 #include <WiFi.h>
 #include "NetworkCore.h"
 #include "FrameParser.h"
-#ifndef CHARLIE_ENABLE_MOTOR_FORWARDING
-#define CHARLIE_ENABLE_MOTOR_FORWARDING 0
-#endif
+#include "CommandGate.h"
 // One UART writer. Provisioning has no reference to this object.
 class MotorBridge {
   WiFiServer server_{100};
   WiFiClient client_;
   charlie_elegoo::FrameParser tcp_, uart_;
   charlie_elegoo::ControlSession session_;
+  CommandGate gate_;
+  char commandKey_[65]{};
+  bool pulseActive_=false;
+  uint32_t pulseAt_=0,pulseDuration_=0;
   bool stopPending_=true;
   bool factoryLinked_=false;
   uint32_t sentHeartbeat_=0, factoryAt_=0;
@@ -23,7 +25,7 @@ class MotorBridge {
   void closeClient();
  public:
   MotorBridge():session_(stopCallback){owner_=this;}
-  void begin(const char* legacyFactoryName);
+  void begin(const char* legacyFactoryName,const char* commandKey);
   void tick(uint32_t now);
   bool connected() const {return session_.connected();}
 };

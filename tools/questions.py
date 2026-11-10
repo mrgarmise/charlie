@@ -20,7 +20,9 @@ def main():
         if a.id:report['candidates']=[q for q in report['candidates'] if q['id']==a.id]
         print(json.dumps(report,indent=2));return
     if not a.notebook:p.error('--notebook required; choose a NEW separate decision journal')
-    if a.notebook.resolve() in [Path(s).resolve() for s in a.source]:p.error('notebook must differ from sources')
+    if any(a.notebook.resolve()==Path(s).resolve() or (a.notebook.exists() and Path(s).exists()
+            and os.path.samefile(a.notebook,s)) for s in a.source):
+        p.error('notebook must differ from sources, including hardlink aliases')
     read_only=a.action in ('show-answer','pending-evaluation')
     with closing(EvidenceJournal(a.notebook,read_only=read_only)) as j:
         q=QuestionQueue(j)

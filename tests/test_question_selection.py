@@ -121,3 +121,11 @@ def test_current_queue_cannot_make_inauthentic_sources_eligible(tmp_path,authent
             evidence_ids=[origin.id],owner='score',subject='uncertainty'),episode='current',sources=[origin.id],
             producer='LearningExecutive:consultation',version='consultation-v1')
     assert not discover([path])['candidates'][0]['eligible']
+
+
+def test_cli_rejects_hardlink_before_any_source_write(tmp_path):
+    import os,subprocess,sys
+    path=source(tmp_path);before=fingerprint(path);alias=tmp_path/'alias.sqlite3';os.link(path,alias)
+    result=subprocess.run([sys.executable,'-m','tools.questions','queue','--source',str(path),'--notebook',str(alias)],capture_output=True,text=True)
+    assert result.returncode!=0 and 'hardlink aliases' in result.stderr
+    assert fingerprint(path)==before

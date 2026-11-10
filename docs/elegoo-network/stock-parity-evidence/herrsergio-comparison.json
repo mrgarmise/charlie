@@ -1,0 +1,83 @@
+{
+  "herrsergio_commit": "3e857eac1c4248efbb792edf3498ff0b6b4b0907",
+  "files": {
+    "CameraWebServer_AP.cpp": {
+      "bytes": 5162,
+      "sha256": "7c02ca1ba2483eef2dd4369666b6d6b36820ec8c493728445ce984031677d332",
+      "official_byte_equal": false,
+      "official_lf_equal": false,
+      "official_sha256": "1a18bb0d640effef54b10d3f05d689c5d43f9eb7471e821b2db74bdd17e4b4b6",
+      "umrt_byte_equal": false,
+      "umrt_lf_equal": false,
+      "umrt_sha256": "d259205178d4c39f7ff986a0220b72ec71cd26ee2fb9552324b9bef09606c90e"
+    },
+    "CameraWebServer_AP.h": {
+      "bytes": 565,
+      "sha256": "4f0fd9063b5e477a4dfaacad58d5ed541b42bae628c99e5e25e46d084acd3514",
+      "official_byte_equal": true,
+      "official_lf_equal": true,
+      "official_sha256": "4f0fd9063b5e477a4dfaacad58d5ed541b42bae628c99e5e25e46d084acd3514",
+      "umrt_byte_equal": false,
+      "umrt_lf_equal": false,
+      "umrt_sha256": "e61629dfdd091a6ccdf24c5af370e95b885d2983738cd60c34830667247b0202"
+    },
+    "ESP32_CameraServer_AP_2023_V1.3.ino": {
+      "bytes": 6407,
+      "sha256": "09e9844f69f4d827e15fff04dde20d1928fec05ba43a4d968c8be85ffbcf2bb6",
+      "official_byte_equal": true,
+      "official_lf_equal": true,
+      "official_sha256": "09e9844f69f4d827e15fff04dde20d1928fec05ba43a4d968c8be85ffbcf2bb6",
+      "umrt_byte_equal": false,
+      "umrt_lf_equal": true,
+      "umrt_sha256": "9a4ab3bfe8f94af03a8596bb048e7e3f90cbf30f4a3691d83ccc665871f9c0e4"
+    },
+    "ESP32_CameraServer_AP_2023_V1.3.ino.bin": {
+      "bytes": 2960064,
+      "sha256": "1f0075a5e922908bd11907ab8595ee8c000b4be981b34f9b58fc131ca2892b3c",
+      "official_byte_equal": true,
+      "official_lf_equal": true,
+      "official_sha256": "1f0075a5e922908bd11907ab8595ee8c000b4be981b34f9b58fc131ca2892b3c",
+      "backup_app0_exact_equal": true
+    },
+    "Notes.txt": {
+      "bytes": 272,
+      "sha256": "ad55adb75c8682f846f7b4f6dc1178332eab8ed6a9342586cf1e8c814f078399",
+      "official_byte_equal": true,
+      "official_lf_equal": true,
+      "official_sha256": "ad55adb75c8682f846f7b4f6dc1178332eab8ed6a9342586cf1e8c814f078399",
+      "umrt_byte_equal": false,
+      "umrt_lf_equal": true,
+      "umrt_sha256": "dbb142b643723ada74740a398ba15e704cfd573cc32764198315e878bd33e3d3"
+    },
+    "app_httpd.cpp": {
+      "bytes": 42889,
+      "sha256": "bf1650139c46d11b752859702bc69d1170173c46fa4e17c26dab39727e1edafa",
+      "official_byte_equal": true,
+      "official_lf_equal": true,
+      "official_sha256": "bf1650139c46d11b752859702bc69d1170173c46fa4e17c26dab39727e1edafa",
+      "umrt_byte_equal": false,
+      "umrt_lf_equal": false,
+      "umrt_sha256": "172b9894d4eaa45edf49b51717104f15b6e995aed0fbc13cf5794be1f07e7f32"
+    },
+    "camera_index.h": {
+      "bytes": 150713,
+      "sha256": "140c06e5772b02beae77c88f958f525e651a7b948dae96e7410c1166b67b86f6",
+      "official_byte_equal": true,
+      "official_lf_equal": true,
+      "official_sha256": "140c06e5772b02beae77c88f958f525e651a7b948dae96e7410c1166b67b86f6",
+      "umrt_byte_equal": false,
+      "umrt_lf_equal": false,
+      "umrt_sha256": "d97f03a390ed2c979623a8571619122eba03e496ad7a3c75da6ea81e7fefaa59"
+    },
+    "camera_pins.h": {
+      "bytes": 4757,
+      "sha256": "b8cf149f4271a148c52d10b11842d537de57316afec7ec2ba9c6e251134923ff",
+      "official_byte_equal": true,
+      "official_lf_equal": true,
+      "official_sha256": "b8cf149f4271a148c52d10b11842d537de57316afec7ec2ba9c6e251134923ff",
+      "umrt_byte_equal": false,
+      "umrt_lf_equal": true,
+      "umrt_sha256": "239c1e820a22b04cbac7d0e6eb608ac195b9b03570a6bb173be6d8f5e5374854"
+    }
+  }
+}

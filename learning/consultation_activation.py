@@ -189,25 +189,31 @@ def runtime_directory():
 def _operational_worker(config, prompt, approval_path, pipe):
     """All system/HTTP work stays in the existing provider's cancellable child."""
     lock = None
+    stage = 'approval'
     try:
         admission = Admission(approval_path)
+        stage = 'native-service-and-resources'
         admission.check(starting=True)
         # A common owner-only approval directory is required across notebooks.
         parent = runtime_directory()
         info = parent.stat()
         if info.st_uid != os.getuid() or info.st_mode & 0o077:
             raise ValueError('private approval directory required')
+        stage = 'exclusive-request-or-prior-completion'
         lock = os.open(parent / 'consultation.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         marker = parent / 'completion-unknown.json'
         if marker.exists():
             raise ValueError('unknown prior completion requires independent clearance')
         # Any ambiguous exit after this point leaves a durable, no-retry latch.
+        stage = 'server-version'
         version = _http(config, None, '/api/version')
         if version.get('version') != admission.doc['server_version']:
             raise ValueError('server version mismatch')
+        stage = 'resident-model'
         resident = ready_model(_http(config, None, '/api/ps'), admission.doc, now=time.time())
         admission.check(starting=True)
+        stage = 'submission'
         fd = os.open(marker, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
         with os.fdopen(fd, 'w') as stream:
             json.dump(dict(service=admission.identity, submitted_at=time.time(),
@@ -220,6 +226,7 @@ def _operational_worker(config, prompt, approval_path, pipe):
         result = parse_response(_http(config, request_payload(config, prompt)), config)
         admission.check()
         # keep_alive=0 requests unload; verify rather than assert cleanup happened.
+        stage = 'unload-confirmation'
         if _http(config, None, '/api/ps').get('models') != []:
             raise ValueError('unload not confirmed; operator clearance required')
         result['identity'] = dict(server_version=version['version'], model_digest=resident['digest'],
@@ -235,7 +242,7 @@ def _operational_worker(config, prompt, approval_path, pipe):
             finally: os.close(directory)
             pipe.send(('cleared', None))
     except Exception as exc:
-        pipe.send(('error', type(exc).__name__))
+        pipe.send(('error', stage + ':' + type(exc).__name__))
     finally:
         if lock is not None: os.close(lock)
         pipe.close()
@@ -248,11 +255,12 @@ class OperationalProvider:
         self.path = str(approval_path)
         self.config = OllamaConfig(keep_alive=0)
         self.state = 'awaiting-native-safe-idle-admission'
+        self.error = None
         self.child = None
         self.pipe = None
 
     def status(self):
-        return dict(state=self.state, mode='qualified-safe-idle-only',
+        return dict(state=self.state, reason=self.error, mode='qualified-safe-idle-only',
                     active_sensing_supported=False, prewarming=False, remote_fallback=False)
 
     def consult(self, prompt, check=lambda: None):
@@ -266,6 +274,7 @@ class OperationalProvider:
         started = time.monotonic()
         self.child, self.pipe = child, receive
         self.state = 'checking-native-admission'
+        self.error = None
         try:
             check(); child.start(); send.close()
             admission = None
@@ -282,12 +291,15 @@ class OperationalProvider:
                             raise ValueError('admission changed during dispatch')
                         self.state = 'request-in-flight'
                         continue
-                    if state != 'ok': raise ValueError('operational admission/provider refused: ' + result)
+                    if state != 'ok':
+                        self.error = result
+                        raise ValueError('operational admission/provider refused')
                     self.state = 'answer-awaiting-journal'
                     result.update(origin=self.origin, latency_seconds=time.monotonic() - started)
                     return result
                 if not child.is_alive(): raise ValueError('provider exited without receipt')
-        except BaseException:
+        except BaseException as exc:
+            self.error = self.error or 'interrupted:' + type(exc).__name__
             self.state = 'deferred-check-native-clearance'
             self.close()
             raise

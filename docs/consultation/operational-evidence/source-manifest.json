@@ -1,0 +1,45 @@
+{
+  "source_refs": {
+    "campaign/mobile-review-options-20261101": "3b364f9b3eca8ae3348fb5f9eb4eaeb315f32b27",
+    "objective-a/normal-runtime-20261101": "3d8591d8126bf9bc8c49bdddfb80fd7ea5487b98",
+    "feature/onboard-consultation-20261101": "b0c04ad4c5c6e1f0b2b9fd2e6316af286c36c01f"
+  },
+  "pr27_metadata_head": "b60f4a5edb3605bac212ce7ed81a1f9b43ba92e5",
+  "verified_continuation": "b0c04ad4c5c6e1f0b2b9fd2e6316af286c36c01f",
+  "approved_runtime": "f3304c588a893a953e34e5c4d00bd5f9bfb18f19",
+  "approved_runtime_available": false,
+  "approved_runtime_comparison": "PENDING native read-only tree inspection; GitHub commit lookup returned 422",
+  "inherited_pr27_files": [
+    ".github/workflows/consultation.yml",
+    "docs/consultation/MISSION.md",
+    "docs/consultation/OPERATOR.md",
+    "docs/consultation/REPORT.md",
+    "learning/consultation.py",
+    "learning/lifecycle.py",
+    "learning/mobile_runtime.py",
+    "main.py",
+    "memory/learning_projects.py",
+    "tests/test_consultation.py",
+    "tests/test_consultation_http.py",
+    "tests/test_consultation_probe.py",
+    "tests/test_development_resources.py",
+    "tests/test_objective_a_normal_runtime.py",
+    "tools/consultation_probe.py",
+    "ui/dashboard.py",
+    "ui/discoveries.py"
+  ],
+  "inherited_pr27_diff_sha256": "eb2f5d9e95e9325ed74b7df5e8358d4a7bc30cedf9952e7370a14d546191aabd",
+  "implementation_increment": "e2fae66b491b17fa12d2d49148e66f06d21df26e",
+  "continuation_files": [
+    ".github/workflows/consultation.yml",
+    "docs/consultation/OPERATIONAL_REPORT.md",
+    "docs/consultation/operational-evidence/contracts-increment-1.txt",
+    "docs/consultation/operational-evidence/focused-increment-1.txt",
+    "docs/consultation/operational-evidence/initial-fixture-failures.txt",
+    "learning/consultation.py",
+    "learning/consultation_activation.py",
+    "learning/lifecycle.py",
+    "main.py",
+    "tests/test_consultation_activation.py"
+  ]
+}

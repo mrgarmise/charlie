@@ -288,3 +288,77 @@ def test_source_age_not_just_queue_age_blocks_stale_evidence(tmp_path):
         q=service.consider(row.id);assert q
         now[0]+=2;service.process_one()
         assert service.questions()[q.id]['status']=='deferred' and not provider.calls
+
+
+@pytest.mark.parametrize('extras', [[], ['--human-questions'], ['--model-learning'],
+                                    ['--human-questions','--model-learning']])
+def test_real_optin_forwarded_only_to_existing_normal_worker(monkeypatch,tmp_path,extras):
+    from test_objective_a_normal_runtime import test_monitoring_keeps_normal_vision_attention_and_single_worker
+    test_monitoring_keeps_normal_vision_attention_and_single_worker(monkeypatch,tmp_path,
+        ['--llm-consultation','--llm-consultation-approval',str(tmp_path/'unissued-native-approval'),*extras])
+
+
+def test_normal_worker_constructs_same_journal_real_service_without_native_calls(tmp_path,monkeypatch):
+    from learning.lifecycle import run, DevelopmentLifecycle
+    from learning.resources import DevelopmentResources, ResourceGuard
+    monkeypatch.setattr(DevelopmentResources,'apply',lambda self:None)
+    monkeypatch.setattr('os.nice',lambda n:None)
+    policy=DevelopmentResources()
+    guard=ResourceGuard(policy,thermal_reader=lambda:40,memory_reader=lambda:(1024,0))
+    seen=[]
+    def factory(*args,**kwargs):
+        life=DevelopmentLifecycle(*args,**kwargs,resource_guard=guard)
+        def turn():
+            assert life.consultation.journal is life.journal
+            assert isinstance(life.consultation.provider,activation.OperationalProvider)
+            assert life.consultation.provider.child is None
+            seen.append(life.consultation.status())
+            return True
+        life.turn=turn
+        return life
+    result=run(tmp_path/'state',[],resources=policy,lifecycle_factory=factory,turns=1,
+               llm_consultation=True,llm_consultation_approval=tmp_path/'not-approved')
+    assert result['termination_reason']=='attempt limit reached'
+    assert seen[0]['mode']=='qualified-safe-idle'
+    assert seen[0]['transport']['state']=='awaiting-native-safe-idle-admission'
+
+
+@pytest.mark.parametrize('ready', [False,True])
+def test_operational_protocol_over_real_loopback(native_fakes,monkeypatch,ready):
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+    from threading import Thread
+    from learning.consultation import _http
+    state={'loaded':ready,'requests':[]}
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self,*args):pass
+        def reply(self,value):
+            raw=json.dumps(value).encode();self.send_response(200)
+            self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)
+        def do_GET(self):
+            if self.path=='/api/version':return self.reply({'version':'fixture'})
+            assert self.path=='/api/ps'
+            self.reply(resident(approval()) if state['loaded'] else {'models':[]})
+        def do_POST(self):
+            assert self.path=='/api/chat'
+            value=json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+            state['requests'].append(value);state['loaded']=False
+            self.reply(dict(model=activation.MODEL,done=True,message=dict(content='Unverified loopback fixture.')))
+    server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+    thread=Thread(target=server.serve_forever,daemon=True);thread.start()
+    monkeypatch.setattr(activation,'_http',_http)
+    provider=activation.OperationalProvider(native_fakes.path)
+    provider.config=OllamaConfig(endpoint='http://127.0.0.1:'+str(server.server_port))
+    try:
+        if ready:
+            answer=provider.consult('General evidence question')
+            assert answer['answer']=='Unverified loopback fixture.'
+            assert answer['identity']['model_digest']=='a'*64
+            assert native_fakes.marker.exists()  # awaiting durable result receipt
+            provider.retained()
+            assert not native_fakes.marker.exists()
+            assert len(state['requests'])==1 and state['requests'][0]['keep_alive']==0
+        else:
+            with pytest.raises(ValueError):provider.consult('General evidence question')
+            assert state['requests']==[] and not native_fakes.marker.exists()
+    finally:
+        provider.close();server.shutdown();server.server_close();thread.join(timeout=2)

@@ -96,3 +96,29 @@ investigation or claim of an LLM fix is part of this change.
 
 See [native acceptance and rollback](OPERATIONAL_ACCEPTANCE.md) and
 [promotion reconciliation](PROMOTION_RECONCILIATION.md) before any native work.
+
+## Second local increment
+
+Added startup/worker isolation checks for every human/model review combination,
+actual loopback HTTP ready/cold tests for the operational path, and sanitized
+status reasons identifying approval, residency, service, submission or cleanup
+refusal. No native state is inferred from a passing fixture.
+
+Focused suite: **114 passed**, two Python deprecation warnings from the test-only
+fork seam used to propagate native mocks into a worker while a fixture HTTP server
+runs. Production always uses spawn; the warnings are retained, not suppressed.
+
+An exploratory broad run completed **1828 passed / 5 failed / 27 skipped** in
+419.23s. The five failures are arcade camera/evidence-writer/terminal tests, listed
+in `operational-evidence/exploratory-full.txt`. Some later edits occurred while this
+run was active, so it is not an exact-final-commit acceptance run. A clean parent
+reproduction and independent clean candidate run are being retained separately.
+
+Publication was rejected twice by automatic approval review. After the first
+rejection, the exact remote was checked against the mission and the GitHub
+connector confirmed mrgarmise/charlie is public with push permissions. The second
+review still requires explicit end-user authorization naming the destination and
+source/test/documentation payload. No alternative publishing channel was used.
+GitHub CI and a draft PR therefore remain blocked pending that approval. Both
+implementation increments are preserved as local commits; there is no claim
+that they have been published.

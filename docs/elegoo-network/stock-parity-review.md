@@ -4,7 +4,7 @@
 
 Mission: [archived stock-parity instructions](https://github.com/mrgarmise/charlie/blob/missions/library-archive-20261109/missions/active/Charlie_ELEGOO_Stock_Parity_Qualification_Codex_Mission_20261109.md).
 
-This audit starts at PR30 `ea2172ae84f16e7efe9d661301ce649672da69b3`. PR28/29/30 remain unchanged drafts. The separate qualified-control follow-on restores eligible behavior without modifying the approved runtime. See [operator worksheet](stock-parity-worksheet.md), [evidence ledger](stock-parity-ledger.md), and [validation report](stock-parity-validation.md).
+This audit starts at PR30 `ea2172ae84f16e7efe9d661301ce649672da69b3`. PR28/29/30 remain unchanged drafts. The separate [qualified-control follow-on PR31](https://github.com/mrgarmise/charlie/pull/31) restores eligible behavior without modifying the approved runtime. See [operator worksheet](stock-parity-worksheet.md), [evidence ledger](stock-parity-ledger.md), and [validation report](stock-parity-validation.md).
 
 ## Stronger stock identification
 

@@ -10,6 +10,6 @@ def test_comparison_uses_exact_app_offset_and_detects_changed_byte():
     assert not audit.compare_image(backup,image[:-1]+b'!')['exact_bytes_equal']
     assert not audit.compare_image(bytes(audit.APP_OFFSET-1)+image+b'!',image)['exact_bytes_equal']
 
-@pytest.mark.parametrize('backup,image',[(b'',b''),(b'too short',b'image'),(b'',bytes(audit.APP_SLOT+1))])
+@pytest.mark.parametrize('backup,image',[(b'',b''),(b'too short',b'image'),(b'',bytes(audit.APP_SLOT+1))],ids=['empty','truncated','oversize'])
 def test_short_or_oversize_inputs_are_rejected(backup,image):
     with pytest.raises(ValueError):audit.compare_image(backup,image)

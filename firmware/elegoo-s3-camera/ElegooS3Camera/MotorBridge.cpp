@@ -1,6 +1,7 @@
 #include "MotorBridge.h"
 #include <sys/socket.h>
 #include <esp_system.h>
+#include <driver/uart.h>
 MotorBridge* MotorBridge::owner_=nullptr;
 void MotorBridge::stopCallback(){if(owner_)owner_->stopPending_=true;}
 void MotorBridge::writeUart(const char* frame) {
@@ -15,7 +16,7 @@ bool MotorBridge::sendClient(const char* frame) {
   return client_ && ::send(client_.fd(),frame,size,MSG_DONTWAIT)==static_cast<int>(size);
 }
 void MotorBridge::closeClient() {
-  session_.close();client_.stop();tcp_.reset();uart_.reset();gate_.clear();pulseActive_=false;
+  session_.close();client_.stop();tcp_.reset();uart_.reset();gate_.clear();pulseActive_=false;pulseTxPending_=false;
 }
 void MotorBridge::begin(const char* legacyFactoryName,const char* commandKey) {
   strncpy(commandKey_,commandKey,sizeof(commandKey_)-1);
@@ -29,7 +30,12 @@ void MotorBridge::begin(const char* legacyFactoryName,const char* commandKey) {
   writeUart("{Factory}");stopPending_=true;writeUart("{\"N\":100}");
 }
 void MotorBridge::tick(uint32_t now) {
-  if(pulseActive_ && uint32_t(now-pulseAt_)>=pulseDuration_){pulseActive_=false;stopPending_=true;}
+  if(pulseActive_ && pulseTxPending_) {
+    // UART transmit completion, not enqueue time, bounds when UNO can parse '}'.
+    if(uart_wait_tx_done(UART_NUM_2,0)==ESP_OK){pulseTxPending_=false;pulseAt_=now;}
+    else if(uint32_t(now-pulseAt_)>=100)closeClient(); // stalled transmit: fail closed
+  }
+  if(pulseActive_ && !pulseTxPending_ && uint32_t(now-pulseAt_)>=pulseDuration_){pulseActive_=false;stopPending_=true;}
   // STOP always precedes new traffic and survives session close/reconnect.
   if(stopPending_)writeUart("{\"N\":100}");
   if(server_.hasClient()) {
@@ -57,7 +63,7 @@ void MotorBridge::tick(uint32_t now) {
       const char* frame=tcp_.frame();
       if(!strcmp(frame,"{Heartbeat}"))session_.heartbeated(now);
       else if(stopFrame(frame)) {
-        pulseActive_=false;gate_.cancel();
+        pulseActive_=false;pulseTxPending_=false;gate_.cancel();
         // Canonical N1 tagged STOP preserves existing Pi exact-ACK handling.
         if(Serial2.availableForWrite()<static_cast<int>(strlen(frame))){closeClient();break;}
         if(stopPending_)writeUart("{\"N\":100}");
@@ -69,9 +75,10 @@ void MotorBridge::tick(uint32_t now) {
       else {
         const int duration=commandDuration(frame);
         if(!session_.mayForward() || stopPending_ || pulseActive_ || duration<0 || !gate_.consume(frame,now)
+            || uart_wait_tx_done(UART_NUM_2,0)!=ESP_OK
             || Serial2.availableForWrite()<static_cast<int>(strlen(frame))) {closeClient();break;}
         writeUart(frame);
-        if(duration>0){pulseActive_=true;pulseAt_=now;pulseDuration_=duration;}
+        if(duration>0){pulseActive_=true;pulseTxPending_=true;pulseAt_=now;pulseDuration_=duration;}
       }
       tcp_.reset();
     }

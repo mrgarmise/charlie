@@ -677,18 +677,24 @@ class ElegooMobileBase:
                     timed_completion=False)
         ident=self._next_id('pulse')
         expected='{'+ident+'_ok}'
+        # The candidate's sole UART owner runs at9600baud (10 bits per byte).
+        # Bound command+ACK serialization and scheduling in the existing deadline;
+        # this is transport latency, not an extension of requested motor duration.
+        candidate_frame={'N':2,'H':ident,'D1':{'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}[direction],
+                         'D2':pwm,'T':milliseconds}
+        wire_budget=(len(json.dumps(candidate_frame,separators=(',',':')).encode())+len(expected))/960+.04 if self._command_auth is not None else .05
         def check():
             if (not self.connected or not lease.valid(clock(),boot_id)
                     or (cancel is not None and cancel.is_set()) or safety_check() is not True):
                 raise InterruptedError('pulse safety condition changed')
-            if result.get('wire_started_at') is not None and clock()>result['wire_started_at']+duration+.05:
+            if result.get('wire_started_at') is not None and clock()>result['wire_started_at']+duration+wire_budget:
                 raise TimeoutError('timed completion deadline exceeded')
         def preflight():
             # Cheap cancellation/horizon check under the existing wire lock;
             # independent safety I/O is checked outside that lock.
             now=clock()
             if ((cancel is not None and cancel.is_set()) or not lease.valid(now,boot_id)
-                    or now+duration>lease.expires_at):
+                    or now+duration+(wire_budget if self._command_auth is not None else 0)>lease.expires_at):
                 return False
             result['wire_started_at']=now
             return True
@@ -697,11 +703,10 @@ class ElegooMobileBase:
             check()
         try:
             check()
-            payload={'N':2,'H':ident,'D1':{'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}[direction],
-                     'D2':pwm,'T':milliseconds}
+            payload=candidate_frame
             result['command']=payload
             result['sent']=None  # Delivery stays ambiguous if the write fails.
-            response=self._send(payload,expected_id=ident,timeout=duration+.05,retry=False,
+            response=self._send(payload,expected_id=ident,timeout=duration+wire_budget,retry=False,
                 preflight=preflight,expected_response=expected,wait_check=awaiting_completion)
             result['completion_response']=response.get('response')
             check()

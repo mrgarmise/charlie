@@ -1,6 +1,7 @@
 #include "../ElegooS3Camera/MotorBridge.h"
 #include <cassert>
 #include <algorithm>
+#include <driver/uart.h>
 static int connectPeer(){int peer=socket(AF_INET,SOCK_STREAM,0);assert(peer>=0);sockaddr_in address{};address.sin_family=AF_INET;address.sin_addr.s_addr=htonl(INADDR_LOOPBACK);address.sin_port=htons(bridgePort);assert(::connect(peer,reinterpret_cast<sockaddr*>(&address),sizeof(address))==0);return peer;}
 static void put(int peer,const char* text){assert(::send(peer,text,strlen(text),0)==static_cast<int>(strlen(text)));}
 int main(){
@@ -16,10 +17,11 @@ int main(){
  const auto before=Serial2.writes.size();put(peer,"{Auth:1:100:717b702dfe9caccb73829fbe4cf81eea230efc4b2c391aac8b3505e0b5c351cd}");put(peer,R"({"N":2,"H":"pulse1","D1":3,"D2":20,"T":100})");bridge.tick(3);
  assert(bridge.connected());assert(Serial2.writes.size()==before+1);assert(Serial2.writes.back()==R"({"N":2,"H":"pulse1","D1":3,"D2":20,"T":100})");
  const auto stops=std::count(Serial2.writes.begin(),Serial2.writes.end(),"{\"N\":100}");
- put(peer,"{Heartbeat}");bridge.tick(102);assert(std::count(Serial2.writes.begin(),Serial2.writes.end(),"{\"N\":100}")==stops);
- bridge.tick(103);assert(Serial2.writes.back()=="{\"N\":100}");
+ uartTxBusy=true;bridge.tick(49);uartTxBusy=false;bridge.tick(50);
+ put(peer,"{Heartbeat}");bridge.tick(149);assert(std::count(Serial2.writes.begin(),Serial2.writes.end(),"{\"N\":100}")==stops);
+ bridge.tick(150);assert(Serial2.writes.back()=="{\"N\":100}");
  // A sequence replay closes and schedules STOP, even with a valid MAC.
- put(peer,"{Auth:1:100:717b702dfe9caccb73829fbe4cf81eea230efc4b2c391aac8b3505e0b5c351cd}");bridge.tick(104);assert(!bridge.connected());bridge.tick(105);::close(peer);
+ put(peer,"{Auth:1:100:717b702dfe9caccb73829fbe4cf81eea230efc4b2c391aac8b3505e0b5c351cd}");bridge.tick(151);assert(!bridge.connected());bridge.tick(152);::close(peer);
  peer=connectPeer();bridge.tick(10);assert(bridge.connected());put(peer,"{\"N\":");bridge.tick(11);
  ::close(peer);bridge.tick(12);bridge.tick(13);assert(!bridge.connected());
  // Partial data from the old client cannot be replayed by a new client.

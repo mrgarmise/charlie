@@ -232,3 +232,26 @@ def test_existing_pet_executor_uses_timed_driver_and_retains_failed_command(monk
     assert service.stop_uncertain
     assert service.last_attempt['wire_result']['command']['N']==2
     assert all(p['N']!=3 for p in peer.commands)
+
+@pytest.mark.parametrize('short_lease',[False,True])
+def test_candidate_accounts_for_9600_baud_without_extending_motion(monkeypatch,short_lease):
+    peer=Peer(monkeypatch)
+    # Authentication itself has independent vectors; this fixture models only UART time.
+    peer.car._command_auth=SimpleNamespace(wrap=lambda raw,**kwargs:raw,challenge=lambda frame:False)
+    original=peer.sendall
+    def serial_delay(raw):
+        original(raw)
+        payload=json.loads(raw)
+        if payload['N']==2:
+            at,reply=peer.due[-1]
+            peer.due[-1]=(at+(len(raw)+len(reply))/960,reply)
+    peer.car.sock.sendall=serial_delay
+    if short_lease:
+        with pytest.raises(InterruptedError):
+            peer.pulse(lease=MotionLease('supervised_trial',10.15,'fixture','boot'))
+        assert [p['N'] for p in peer.commands]==[1]
+    else:
+        result=peer.pulse()
+        assert result['acknowledged'] and result['stop']['acknowledged']
+        assert peer.commands[0]['T']==100
+        assert peer.now>10.15 # old candidate timeout could not accommodate serialization

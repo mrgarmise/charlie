@@ -1,8 +1,8 @@
 {
-  "image_bytes": 3154016,
-  "image_sha256": "54461ab297ea8bd231231ca6d14d1b24601e015e6bd4e0034fa4000324d056a4",
+  "image_bytes": 3154112,
+  "image_sha256": "c8cfab4f5f9c36383ffb6e76ad7e9f967ed8ce6a26c97edaa62c9e3ca1b4aa1a",
   "slot_bytes": 3342336,
-  "slot_remaining": 188320,
+  "slot_remaining": 188224,
   "partitions": [
     [
       "nvs",
@@ -44,7 +44,7 @@
   "psram_candidate": "opi",
   "cli_version": "arduino-cli  Version: 1.2.2 Commit: c11b9dd5 Date: 2025-04-22T13:51:03Z",
   "compiler_version": "xtensa-esp32s3-elf-g++ (crosstool-NG esp-2021r2-patch5) 8.4.0",
-  "source_sha256": "011f58cc40b046163e2398d7f785824ef6e1ac78a7b81c8a2503133cc82feed9",
+  "source_sha256": "caf218e749d7ec8e4220e8e4ec33062b8ff32ea0283554e2a790a8e62695a4df",
   "upstream_commit": "a92013016d2386cd4ed2e0e7893b018f04b89cfc",
   "core_parent": "b71cd3dd917b83aff3b643795a76dab3ac5b42ed",
   "not_hardware_qualified": true,

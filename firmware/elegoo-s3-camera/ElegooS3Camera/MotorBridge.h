@@ -12,7 +12,7 @@ class MotorBridge {
   charlie_elegoo::ControlSession session_;
   CommandGate gate_;
   char commandKey_[65]{};
-  bool pulseActive_=false;
+  bool pulseActive_=false,pulseTxPending_=false;
   uint32_t pulseAt_=0,pulseDuration_=0;
   bool stopPending_=true;
   bool factoryLinked_=false;

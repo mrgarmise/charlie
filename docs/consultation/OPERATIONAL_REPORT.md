@@ -141,3 +141,51 @@ warnings. The five originally failing arcade cases were rerun on a clean detache
 this implementation. The remaining parameterized case varied; it is not claimed
 resolved. Relevant arcade/hardware/vision files are byte-identical to the parent.
 Independent broad results and final exact revisions follow in the final ledger.
+
+## Final local validation — 2026-11-08
+
+**Software candidate ready for review / native acceptance pending / publication
+and GitHub CI awaiting explicit approval / merge and deployment blocked.**
+
+The three implementation commits are:
+
+- `e2fae66b491b17fa12d2d49148e66f06d21df26e`: bounded activation and initial tests.
+- `25a81bc6d385c2b678becc0c09039b43d21fea89`: protocol/startup tests and runbooks.
+- `cb4879d7501c6506f1b865c7370fa9112c5dd499`: cutoff hardening; final tested code.
+
+A fresh detached checkout of **cb4879d** completed, sequentially:
+
+| Check | Result |
+|---|---|
+| Consultation tests | **119 passed**, 0 failed, 7.292 seconds; two retained test-only fork deprecation warnings. |
+| Shared architecture contracts | **131 passed**, 2.75 seconds. |
+| Full suite | **1846 passed, 27 skipped, 0 failures/errors**, 365.926 seconds. |
+
+The complete full JUnit receipt contains 1873 testcase nodes and includes the last
+suite (`test_unified_reconciliation`); its counts agree with those above and the
+command exited zero. The raw console capture ends at 73%, so it is retained as
+partial console output, not represented as the complete receipt. Compressed JUnit,
+raw logs, SHA256 values, commands, package versions and counts are retained in
+[the final evidence directory](operational-evidence/20261108/results.json).
+The checkout was clean before and after testing. The final evidence commit adds
+documentation and receipts only; tested implementation files remain identical to cb4879d.
+
+Workspace maintenance removed temporary logs and packages from the earlier
+interrupted session. The source commits and committed evidence survived. The
+lost temporary full-run outputs are not counted as completed acceptance. The
+fresh results above supersede uncertainty about the current software candidate,
+without erasing the earlier preserved failures or claiming their timing behavior
+is fixed. No unrelated production code or assertion was weakened.
+
+GitHub CI has **not** run for this continuation, and this session has not created
+a continuation PR. Publication remains blocked by automatic approval review,
+which requires explicit end-user confirmation naming the public destination
+`https://github.com/mrgarmise/charlie` and payload (implementation, tests,
+documentation and retained software-test logs). Proposed branch:
+`feature/operational-consultation-20261104`; proposed draft base:
+`feature/onboard-consultation-20261101`. No existing branch is to be overwritten.
+
+After that approval: publish these increments, open the draft continuation PR,
+and inspect independent GitHub CI on the exact published commit. Native steps
+remain the ordered, separately authorized prerequisite/idle-trial/review sequence
+in OPERATIONAL_ACCEPTANCE.md. No native deployment or promotion is requested now.

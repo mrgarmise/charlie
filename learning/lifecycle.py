@@ -663,6 +663,8 @@ class DevelopmentLifecycle:
 
     def close(self):
         self.last_activity=self.phase
+        if self.consultation and hasattr(self.consultation.provider, 'close'):
+            self.consultation.provider.close()
         try:
             self._operational('clean shutdown',self.operational.get('termination_reason','Executive closed'))
             self._phase('stopped')
@@ -673,7 +675,8 @@ class DevelopmentLifecycle:
 
 def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None,
         history_roots=(), resources=None, wall_seconds=None, cooldown_seconds=None,
-        clock=None, sleep=None, lifecycle_factory=None, human_questions=False, model_learning=False, llm_consultation=False):
+        clock=None, sleep=None, lifecycle_factory=None, human_questions=False, model_learning=False, llm_consultation=False,
+        llm_consultation_approval=None):
     """One existing Executive, with resource polling rather than a second scheduler.
 
     ``turns`` bounds nonthermal attempt slots (including other resource refusals),
@@ -691,6 +694,8 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
     cooldown_seconds=120. if cooldown_seconds is None and turns is not None else cooldown_seconds
     if any(v is not None and (not math.isfinite(v) or v<=0) for v in (wall_seconds,cooldown_seconds)):
         raise ValueError('positive finite wall/cooldown deadlines required')
+    if llm_consultation_approval is not None and not llm_consultation:
+        raise ValueError('real consultation requires explicit queue opt-in')
     resources=resources or DevelopmentResources()
     resources.apply()
     os.nice(10)  # Vision/control retain host CPU priority.
@@ -716,8 +721,8 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
         lifecycle=factory(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,
             history_roots=history_roots,resources=resources,**options)
         if llm_consultation:
-            from .consultation import ConsultationService
-            lifecycle.consultation=ConsultationService(lifecycle.journal)
+            from .consultation_activation import make_service
+            lifecycle.consultation=make_service(lifecycle.journal, llm_consultation_approval)
         if model_learning:
             from .model_learning.service import ModelLearningService
             lifecycle.model_learning=ModelLearningService(lifecycle.journal,lifecycle.output/"model-learning",wall_seconds=budget_seconds)

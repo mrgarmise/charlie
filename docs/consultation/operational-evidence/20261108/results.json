@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-08",
+  "tested_commit": "cb4879d7501c6506f1b865c7370fa9112c5dd499",
+  "clean_checkout_before_and_after": true,
+  "process_exit_code": 0,
+  "results": {
+    "focused": {
+      "tests": 119,
+      "passed": 119,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 7.292
+    },
+    "full": {
+      "tests": 1873,
+      "passed": 1846,
+      "skipped": 27,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 365.926
+    }
+  },
+  "contracts": {
+    "passed": 131
+  },
+  "commands": [
+    "python -m pytest tests/test_consultation* -q --junitxml=../validation-20261108/focused.xml",
+    "python tools/check_unified_contracts.py",
+    "python -m pytest tests -q --junitxml=../validation-20261108/full.xml"
+  ],
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "architecture": "x86_64",
+    "packages": {
+      "pytest": "9.2.0",
+      "numpy": "2.3.5",
+      "Pillow": "12.3.0",
+      "opencv-python-headless": "5.0.0.93",
+      "pyserial": "3.5"
+    }
+  },
+  "limitations": [
+    "software fixtures and loopback endpoints only; native acceptance pending",
+    "GitHub publication and CI blocked pending explicit destination/payload approval",
+    "full console capture ends at 73%; complete JUnit has 1873 testcase nodes, zero errors/failures and 27 skips; command exited 0"
+  ],
+  "files": {
+    "contracts.log": "ab36632d8331063b78304e6ddc8e0a49d3e6ed2b69e933a2bb6e799fd03f15ba",
+    "focused.xml.gz": "4a1b31686ee5ba67105b348837fc6c31dc20d0365d8b05346fa7dbed2e285064",
+    "full.xml.gz": "19699c57939346f998a283268271cae3521cb3c6d1be11a89f657fd6e19b420f",
+    "full.log": "f336385dee351b36026db270985b7e96ff41b49d51a920dca0b09a25e1a48cbb",
+    "focused.log": "14d1dd5adf33177c3cdec073bb9973cf46569c63cc0c49b5dfd60330ece1f474"
+  }
+}

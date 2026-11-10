@@ -272,7 +272,9 @@ class ConsultationService:
             if any(h['need']['subject']==q['subject'] and h['status']=='answered'
                    for h in HumanInteractionGateway(self.journal).questions().values()):
                 self._event(q,'deferred',reason='authenticated human answer retained; no model supersession');continue
-            if not 0<=self.clock()-q['created_at']<=self.max_age:
+            evidence_stale = any(not 0 <= self.clock()-datetime.fromisoformat(
+                self.journal.get(ref).committed_at).timestamp() <= self.max_age for ref in q['evidence_ids'])
+            if evidence_stale or not 0<=self.clock()-q['created_at']<=self.max_age:
                 self._event(q,'deferred',reason='stale evidence');continue
             if self.provider is None:
                 return self._event(q,'deferred',reason='local provider unavailable')
@@ -291,8 +293,11 @@ class ConsultationService:
                 check()
                 self.failures=0
                 # Store provider fields as data only. No dispatch or activation.
-                return self._event(q,'answered',result=result,trust='unverified_hypothesis',
+                receipt = self._event(q,'answered',result=result,trust='unverified_hypothesis',
                     physical_authorization=False,model_update=False)
+                if hasattr(self.provider, 'retained'):
+                    self.provider.retained()
+                return receipt
             except InterruptedError:
                 self._event(q,'deferred',reason='resource interruption; no automatic retry')
                 self.circuit_until=self.clock()+300
@@ -300,7 +305,9 @@ class ConsultationService:
             except Exception:
                 self.failures+=1;self.circuit_until=self.clock()+300
                 return self._event(q,'deferred',reason='provider failure; circuit open; no automatic retry')
-            finally:self.busy=False
+            finally:
+                self.busy=False
+                if hasattr(self.provider, 'close'):self.provider.close()
         return None
 
     def reject(self,question_id,evidence_id,reason):
@@ -316,7 +323,8 @@ class ConsultationService:
 
     def status(self):
         questions=list(self.questions().values())
-        return dict(mode='shadow' if self.shadow else 'explicit-independent-test',
+        return dict(mode='shadow' if self.shadow else ('qualified-safe-idle' if hasattr(self.provider, 'status') else 'explicit-independent-test'),
+            transport=self.provider.status() if hasattr(self.provider, 'status') else None,
             native_qualified=False,counts={k:sum(q['status']==k for q in questions)
             for k in ('pending','submitted','answered','deferred','rejected','verified')},questions=questions[-32:])
 

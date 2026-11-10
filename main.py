@@ -22,6 +22,7 @@ def parser():
     p.add_argument('--model-learning',action='store_true',help='opt in to guarded Executive perception investigations; candidates stay shadow')
     p.add_argument('--learning-state',type=Path,default=Path.home()/'.local/share/charlie/development')
     p.add_argument('--llm-consultation',action='store_true',help='shadow consultation queue only; native transport qualification pending')
+    p.add_argument('--llm-consultation-approval',type=Path,help='additional default-off real transport gate: private native safe-idle approval')
     p.add_argument('--human-questions',action='store_true',help='opt-in Executive review questions from committed evidence; no web listener or authority')
     p.add_argument('--episode-root',type=Path,action='append',default=[])
     p.add_argument('--history-root',type=Path,action='append',default=[],help='preserve and additively restore an existing notebook')
@@ -153,6 +154,11 @@ def application_mobile_actuators(frame_bus, *, state=None, hardware_id='unverifi
 def main(argv=None):
     arguments = list(sys.argv[1:] if argv is None else argv)
     args=parser().parse_args(arguments)
+    if args.llm_consultation_approval is not None:
+        if not args.llm_consultation:
+            raise ValueError('real consultation requires --llm-consultation as well as approval')
+        if args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow:
+            raise ValueError('real consultation requires the separate normal Executive worker')
     if args.list_capabilities:
         from learning.capabilities import default_registry
         print(json.dumps(default_registry().describe(),indent=2));return
@@ -224,6 +230,8 @@ def main(argv=None):
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
     if args.llm_consultation:
         kwargs['llm_consultation'] = True
+        if args.llm_consultation_approval is not None:
+            kwargs['llm_consultation_approval'] = args.llm_consultation_approval
     if args.human_questions:
         kwargs['human_questions'] = True
     if args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow:

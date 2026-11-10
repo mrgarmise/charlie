@@ -363,7 +363,7 @@ class DevelopmentLifecycle:
                 save_checkpoint()
                 coordinator = self.meditation_consultations
                 if coordinator is not None:
-                    coordinator.on_meditation(commission_id, progress)
+                    coordinator.on_meditation(commission_id, progress, client_deadline=deadline)
                 # A stable saved iteration is already complete, even if the
                 # process stopped between its checkpoint and result publication.
                 while len(history)<6 and (not history or history[-1]['merges']):

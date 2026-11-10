@@ -197,7 +197,8 @@ def test_actual_executive_meditation_hook_keeps_checkpoint(tmp_path):
     life=DevelopmentLifecycle(tmp_path/'state',[root])
     class Coordinator:
         def refresh(self,check):check();seen.append('refresh')
-        def on_meditation(self,commission_id,check):
+        def on_meditation(self,commission_id,check,*,client_deadline):
+            assert client_deadline>0
             row=life.journal.get(commission_id)
             assert row.data['payload']['category']=='reflection_commission'
             checkpoints=list((life.output/'meditations').glob('**/checkpoint.json'))
@@ -288,4 +289,39 @@ def test_slot_deadline_expiry_retains_unknown_without_answer(tmp_path):
         states=[r.data['payload']['state'] for r in x.j.records()]
         assert states[-1]=='uncertain-completion' and 'answer-durable' not in states
         x.clock[0]+=100;x.c.on_meditation('next');assert len(x.providers)==1
+    finally:x.j.close()
+
+
+@pytest.mark.parametrize('budget,admitted',[(10,False),(60,True)])
+def test_existing_meditation_budget_admits_only_sufficient_client_headroom(tmp_path,budget,admitted):
+    from learning.lifecycle import DevelopmentLifecycle
+    from test_normal_learning_lifecycle import experience
+    questions=tmp_path/'questions';questions.mkdir()
+    x=setup(questions);x.authority.safe=True
+    life=DevelopmentLifecycle(tmp_path/'state',[experience(tmp_path)],budget_seconds=budget)
+    life.meditation_consultations=x.c
+    try:
+        life.turn()
+        assert len(x.providers)==int(admitted)
+        expected='awaiting-evaluation' if admitted else 'deferred-to-next-eligible-meditation'
+        assert any(s['state']==expected for s in x.q.states().values())
+    finally:life.close();x.j.close()
+
+
+def test_service_preparation_cannot_consume_required_client_headroom(tmp_path,monkeypatch):
+    import time
+    import learning.meditation_consultation as module
+    x=setup(tmp_path);x.authority.safe=True;base=time.monotonic()
+    original=x.authority.reserve
+    @contextmanager
+    def preparation(**kwargs):
+        with original(**kwargs) as slot:
+            monkeypatch.setattr(module,'time',SimpleNamespace(monotonic=lambda:base+30))
+            yield slot
+    x.authority.reserve=preparation
+    try:
+        x.c.on_meditation('commission',client_deadline=base+60)
+        assert not x.providers
+        assert not x.authority.active
+        assert any('preparation consumed' in s['reason'] for s in x.q.states().values())
     finally:x.j.close()

@@ -68,7 +68,7 @@ class MeditationConsultations:
         return [r.data['payload'] for r in self.queue.journal.category_records('event','generalized_question')
                 if r.data['payload']['state']=='admission-pending']
 
-    def on_meditation(self, commission_id, check=lambda:None, *, selected_id=None):
+    def on_meditation(self, commission_id, check=lambda:None, *, selected_id=None, client_deadline=None):
         """Called only after an Executive commission, at a stable checkpoint.
 
         Selection is automatic unless a manual selected_id is supplied. No retry
@@ -88,6 +88,11 @@ class MeditationConsultations:
         if not eligible:return None
         eligible.sort(key=lambda s:(-s['item']['score'],s['item']['committed_at'],s['item']['id']))
         item=eligible[0]['item']; now=self.clock()
+        def client_ready():
+            return client_deadline is None or (type(client_deadline) in (int,float)
+                and math.isfinite(client_deadline) and time.monotonic()+35<=client_deadline)
+        if not client_ready():
+            return self.queue.event(item,'deferred-to-next-eligible-meditation',reason='insufficient client budget before native admission')
         attempts=self._attempts()
         if (sum(0<=now-p['timestamp']<86400 for p in attempts)>=self.daily_limit
                 or any(now-p['timestamp']<self.cooldown for p in attempts)
@@ -114,12 +119,18 @@ class MeditationConsultations:
                     return self.queue.event(item,'rejected',reason='source eligibility changed')
                 if current['locations']!=item['locations']:
                     return self.queue.event(item,'rejected',reason='source fingerprint changed; review required')
+                if not client_ready():
+                    return self.queue.event(item,'deferred-to-next-eligible-meditation',reason='source review consumed client headroom')
                 with self.authority.reserve(commission_id=commission_id,seconds=self.slot_seconds) as slot, ExitStack() as cleanup:
                     def guard():
                         check();slot.check()
+                        if client_deadline is not None and time.monotonic()>=client_deadline-5:
+                            raise InterruptedError('client budget cutoff headroom')
                         if not math.isfinite(slot.ends_at) or self.clock()>=slot.ends_at-5:
                             raise InterruptedError('safe slot cutoff headroom')
                     guard()
+                    if not client_ready():
+                        return self.queue.event(item,'deferred-to-next-eligible-meditation',reason='service preparation consumed client headroom')
                     if any(p.get('slot_id')==slot.id for p in self._attempts()):
                         return self.queue.event(item,'deferred-to-next-eligible-meditation',reason='safe slot already consumed')
                     if slot.ends_at-self.clock()<35:raise InterruptedError('insufficient consultation headroom')

@@ -15,8 +15,11 @@ alone never merges distinct scopes. The existing read-only project ledger
 reconciles active/blocked/completed/abandoned/superseded status. Any held copy wins
 over a stale candidate copy. Unsupported methods and provenance fail closed.
 
-Current mobile/score sensory proposals remain in ConsultationService with its
-300-second freshness guard. They are not relabeled historical. Historical events
+Current mobile/score sensory proposals remain produced by ConsultationService.
+The catalog additionally projects its canonical queued questions read-only as
+current-authentic-investigation, rechecks the same authentic observation/frame
+allowlist and 300-second source/question freshness, and respects terminal queue
+states. They are not relabeled historical. Historical events
 use the separate classification and retain original commitment times. Human
 question-looking strings and arbitrary events are not canonical candidates;
 human answer mapping beyond existing ConsultationService is a conservative
@@ -26,7 +29,7 @@ QuestionQueue appends decisions to a separate EvidenceJournal. Original IDs,
 journal fingerprints, scope and source IDs are payload references across
 notebooks; never forged same-episode causal references. Ranking combines declared
 uncertainty, learning value, inverse cost and capped age; deterministic tie breaks
-favor older commitments. Queue max 8; discovery max 16 files/4096 proposals/file,
+favor older commitments. Queue max 8 including selected/deferred work; discovery max 16 files/4096 proposals/file,
 256 MiB/file and 256 returned candidates. Full verification cost is bounded by
 source size; meditation must use a previously prepared catalog, not scan history
 inside a real-time slice. Truncation is reported and execution refuses incomplete

@@ -1,0 +1,166 @@
+[
+  {
+    "name": "generalized-full.xml",
+    "sha256": "f57b00c480c36e03d0764e07ba04141b0bf9792fad3f4f1eeda39b032784d386",
+    "bytes": 359228,
+    "suites": [
+      {
+        "tests": "1959",
+        "failures": "38",
+        "errors": "7",
+        "skipped": "39",
+        "time": "495.919"
+      }
+    ]
+  },
+  {
+    "name": "generalized-full.log",
+    "sha256": "7fa0b042043d06e2bcd549f3f5476a0bba9373ac49b632a2e5058481461bf842",
+    "bytes": 85613
+  },
+  {
+    "name": "generalized-final-code.xml",
+    "sha256": "018fc83912c8ff4a045c736a87a4b21c7ad5c626cfde0ec4b81a1483670d0cd5",
+    "bytes": 5604,
+    "suites": [
+      {
+        "tests": "38",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "1",
+        "time": "2.013"
+      }
+    ]
+  },
+  {
+    "name": "generalized-final-code.log",
+    "sha256": "bd22bcb3d815ceb5554a98fdec4de81d1e2c9b897b7cd5f7c12cceb86ca6a3a1",
+    "bytes": 110
+  },
+  {
+    "name": "generalized-authentic-final.xml",
+    "sha256": "5a53f7ca9920c1de033ebb56a5cd7b57fccf77c99418b8bf1100e74ba80da659",
+    "bytes": 842,
+    "suites": [
+      {
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "time": "7.726"
+      }
+    ]
+  },
+  {
+    "name": "generalized-authentic-final.log",
+    "sha256": "33eb3546d625e8f641edf096b1d37b745e8a031aef92ab23dfb3e6bc82c3c5a9",
+    "bytes": 98
+  },
+  {
+    "name": "generalized-baseline-failures.xml",
+    "sha256": "9cecb31f26d154732a8f6cefd766204c581803521f63b46ad34fdda09014ea3d",
+    "bytes": 11084,
+    "suites": [
+      {
+        "tests": "3",
+        "failures": "3",
+        "errors": "0",
+        "skipped": "0",
+        "time": "1.779"
+      }
+    ]
+  },
+  {
+    "name": "generalized-baseline-failures.log",
+    "sha256": "3b144f0b146e42f498dcffaae12677308264f52a66ae172412fb7c4e32afbf0a",
+    "bytes": 11076
+  },
+  {
+    "name": "generalized-contracts-final.log",
+    "sha256": "f8741295c80027e9a70b91e0ec082f5681530b3b77aea1ffbcaafe2eb5cab4d2",
+    "bytes": 180
+  },
+  {
+    "name": "generalized-regression.xml",
+    "sha256": "4ead8f300e5182e37a612bb99f6af8b7438de088678d255e045a6b4fddae7d38",
+    "bytes": 24490,
+    "suites": [
+      {
+        "tests": "168",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "1",
+        "time": "30.337"
+      }
+    ]
+  },
+  {
+    "name": "generalized-regression.log",
+    "sha256": "48b92d6067d3b5400b0e4b60c5983296c898942cabe55b4cc0d0cee878bff7f7",
+    "bytes": 272
+  },
+  {
+    "name": "generalized-consultation.xml",
+    "sha256": "4515d1b4ce176c6b2ebe9cf591a98ed3696c2c56a8df443d653f136efd704fae",
+    "bytes": 27160,
+    "suites": [
+      {
+        "tests": "149",
+        "failures": "2",
+        "errors": "0",
+        "skipped": "5",
+        "time": "5.720"
+      }
+    ]
+  },
+  {
+    "name": "generalized-consultation.log",
+    "sha256": "b1c0bca124f063cf0c993f746e96ec051cc67bad5aacc61957a2c2fbeb32182e",
+    "bytes": 6579
+  },
+  {
+    "name": "generalized-authentic-catalog.log",
+    "sha256": "ff3774731eda417c14d4b056a07cd57761c133810ee00cfe749332e44d378d7a",
+    "bytes": 98
+  },
+  {
+    "name": "generalized-authentic-catalog.xml",
+    "sha256": "216dab37c80508dc7ea636d17f36070b1096319456073308e4bfa163a5744332",
+    "bytes": 1402
+  },
+  {
+    "name": "generalized-catalog-contracts.log",
+    "sha256": "86c451ea85fdf6097618552716de750019a13f879e884351b2057bacfc9ef946",
+    "bytes": 180
+  },
+  {
+    "name": "generalized-catalog-final.log",
+    "sha256": "33e484201bf48cf7b3ecc40a1f50893bb919a5ec2bdbbe31b5594d3ee141b693",
+    "bytes": 285
+  },
+  {
+    "name": "generalized-catalog-final.xml",
+    "sha256": "892f5fa4bd05994a679860532c45080fa3aa73e130dedff8f056e979fa7d6586",
+    "bytes": 22771
+  },
+  {
+    "name": "generalized-pinned-host.log",
+    "sha256": "871be0df8972d34c8c95ff06707bf283e7ae099a2151ef8b987cd1a6da79a86c",
+    "bytes": 286
+  },
+  {
+    "name": "generalized-pinned-host.xml",
+    "sha256": "cddb654a4a44955dd21a05ac9102f45a35eb69b10a6ca27d6965e7b328db4306",
+    "bytes": 22627
+  },
+  {
+    "name": "generalized-source-alias.log",
+    "sha256": "6d9de8446456823247adde0a1f321e99341d96d409f995e72d5da35ae89aa832",
+    "bytes": 285
+  },
+  {
+    "name": "generalized-source-alias.xml",
+    "sha256": "e974838b2185cb6a2a7264e6d678c605d669416c5eb25c30510182d05b250737",
+    "bytes": 22896
+  }
+]

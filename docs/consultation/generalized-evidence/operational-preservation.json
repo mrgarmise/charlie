@@ -1,0 +1,12 @@
+{
+  "runtime_revision": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+  "runtime_status": "",
+  "qualification_revision": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+  "operational_asset_sha256": {
+    "/home/five/charlie-ops/approved.sha": "5022c8cf88b0928d9abea764510d53d10ace5cc570447e7650db406b2cb70e30",
+    "/home/five/charlie-ops/start-stationary.sh": "3305e83b84874162578d70f0de276c3dde5a80883261782bf0052db5420bd5e2",
+    "/home/five/charlie-ops/run-historical-consultation.py": "3a3956e899c20609a25ef6d63964aa80f9ef7894cd1c93955603c5db62c62a75"
+  },
+  "candidate_changed_baseline_runtime_paths": "",
+  "note": "Read-only end snapshot; no operational writes performed. No new native trial claimed."
+}

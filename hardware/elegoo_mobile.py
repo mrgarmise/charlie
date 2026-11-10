@@ -496,7 +496,10 @@ class ElegooMobileBase:
             )
 
         try:
-            return float(value)
+            yaw = float(value)
+            if not math.isfinite(yaw):
+                raise ValueError("non-finite yaw")
+            return yaw
 
         except ValueError as exc:
             raise ValueError(
@@ -516,6 +519,8 @@ class ElegooMobileBase:
             ),
         )
 
+        # Owner UNO divides D2 by ten, then writes ten times that integer.
+        degrees = degrees // 10 * 10
         ident = self._next_id(
             "pan"
         )
@@ -739,7 +744,12 @@ class ElegooMobileBase:
             raise PermissionError('pan requires application executor')
         if type(degrees) not in (int, float) or not math.isfinite(degrees) or not 20 <= degrees <= 160:
             raise ValueError('bounded pan position required')
-        degrees = int(round(degrees))
+        # Reject unsupported positions before sending or changing the request.
+        # The owner UNO truncates to ten-degree steps, which can escape a lease
+        # or envelope approved for a different position.
+        if degrees % 10 != 0:
+            raise ValueError('UNO pan requires a ten-degree position')
+        degrees = int(degrees)
         if safety_check() is not True:
             raise InterruptedError('independent pan safety veto')
         ident = self._next_id('qualifiedpan')
@@ -760,9 +770,10 @@ class ElegooMobileBase:
         ident=self._next_id('range');started=clock()
         response=self._send(dict(protocol['ultrasonic'],H=ident),expected_id=ident,timeout=.1,retry=False)
         value=float(response['value'])
-        if not math.isfinite(value) or not 0<value<=1000:raise ValueError('invalid ultrasonic cm')
+        if not math.isfinite(value) or not value.is_integer() or not 0<value<=150:raise ValueError('invalid ultrasonic cm')
         return dict(meters=value/100,at=started,received_at=clock(),valid=True,source='car-qualified',
-                    kind='obstacle-only',field_of_view_verified=False,target_association=False)
+                    kind='obstacle-only',field_of_view_verified=False,target_association=False,
+                    saturated=value == 150)
 
     # --------------------------------------------------
     # COORDINATED ATTENTION ALIGNMENT

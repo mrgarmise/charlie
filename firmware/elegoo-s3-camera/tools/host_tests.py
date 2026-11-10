@@ -11,7 +11,8 @@ args=parser.parse_args()
 with tempfile.TemporaryDirectory(prefix='elegoo-s3-host-') as directory:
     for name,source,extra in [('framing','framing.cpp',[]),('auth','auth.cpp',[]),('power-loss','power_loss.cpp',[]),
                               ('bridge-authenticated','bridge.cpp',[]),('command-gate','command_gate.cpp',[]),
-                              ('bridge-timing','bridge_timing.cpp',[]),('vendor-uno-timer','vendor_uno_timer.cpp',[])]:
+                              ('bridge-timing','bridge_timing.cpp',[]),('vendor-uno-timer','vendor_uno_timer.cpp',[]),
+                              ('owner-uno-timer','owner_uno_timer.cpp',[]),('owner-uno-protocol','owner_uno_protocol.cpp',[])]:
         if args.no_sockets and source=='bridge.cpp':continue
         target=Path(directory)/name
         command=['g++','-std=c++17','-Wall','-Wextra','-Werror','-pedantic','-fsanitize='+args.sanitizers,

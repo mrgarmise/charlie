@@ -1,0 +1,8 @@
+framing: passed
+auth: passed
+power-loss: passed
+command-gate: passed
+bridge-timing: passed
+vendor-uno-timer: passed
+owner-uno-timer: passed
+owner-uno-protocol: passed

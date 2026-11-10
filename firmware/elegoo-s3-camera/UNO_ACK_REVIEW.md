@@ -1,112 +1,104 @@
-# UNO completion ACK and independent ESP32 fallback
+# Owner UNO compatibility review
 
-Review baseline: PR31 `7e97365b19e5372603c2dc178fff148fc9fdc11c`.
-No flash, deployment, merge, service activation, UART hardware access or motor
-activation. Historical stock STOP issue: **HANDLED — DONE / OK**; not reopened.
+Baseline: PR #31 commit `74b9cbd69b74f8229adda77d6a44086480f1968f`.
+Historical STOP remains **HANDLED — DONE / OK**.
+This review used host fakes only. No hardware, UART, flash, deployment, merge,
+service activation or motor activation occurred.
 
-## Source identity — modified archive comparison pending
+## Owner source identity
 
-The owner explicitly identified a separate modified artifact,
-`SmartRobotCarV4.0_V0_20210104.tar.gz`, verified outside this workspace at
-`/mnt/data/SmartRobotCarV4.0_V0_20210104.tar.gz`. It has not yet been supplied in
-this accessible workspace. It reportedly contains Charlie's N24 yaw handler near
-line1901. **Do not substitute a vendor ZIP for this modified source.** Exact
-modified-source comparison and N24 evaluation remain pending artifact delivery.
+The owner-provided archive is now available at
+`/home/five/charlie-ops/uno-firmware/SmartRobotCarV4.0_V0_20210104.tar.gz`.
+Its SHA256 is
+`12f9c05c17a54ae1dec25aaedcf1f968551f27c10ab78e25db757884e3d76b48`.
+The archive was opened read-only; nothing was extracted over an installed project.
+No vendor source was substituted. Availability of this archive does not establish
+which bytes are installed on the physical UNO.
 
-For a clearly separate reference regression only, the vendor ZIP at
-`/home/five/SmartRobotCarV4.0_V0_20210104.zip` has SHA256
-`7a4ab175a8b36df76c8ab981899bd2c6cc923b5c3ed4bd253cf0481342fa10a9`.
-Its nested ApplicationFunctionSet_xxx0.cpp has SHA256
-`1ba1c11268f3c320090bf9d7bb56bd86c0403fa71b3f90a91781a895903e61ac`;
-DeviceDriverSet_xxx0.cpp has SHA256
-`ab6fea4596decbeaa989c9c53d2904333c8e4a454a91957979099fe09598340e`.
-Hashes are original archive member bytes, including CRLF. This vendor reference
-is neither the owner-modified nor installed UNO source.
+Under its doubled `SmartRobotCarV4.0_V0_20210104/` directory:
 
-## Race and correction
+| Member | Original-byte SHA256 |
+|---|---|
+| ApplicationFunctionSet_xxx0.cpp | `bbca3edc708fa225292dc820a4b75c9a0200a625eab9a71ee5585d40b3241b64` |
+| DeviceDriverSet_xxx0.cpp | `0c1ae9f01d77de41b710bcf797cee88d93833021aba4b7e09fbe0fd7eec0c253` |
 
-The vendor reference ApplicationFunctionSet_xxx0.cpp lines1791–1818 assign a shared CommandSerialNumber
-from every JSON H, select the N2 timed mode and record `_millis()`. N2's immediate
-ACK is commented out. Lines1179–1226 check **elapsed > T**, stop locally, switch
-to programming mode, then print `{H_ok}`. The sketch calls UART parsing before
-the timer routine. N100 (lines1906–1912) replaces that timed mode and emits a bare
-`{ok}`. Consequently N100 arriving between T and the next timer iteration can
-suppress the tagged completion; a bare STOP reply is not N2 completion evidence.
-This is a new candidate timing interaction, not the historical stock STOP issue.
+`tests/fixtures/owner_uno_provenance.json` binds seven verbatim excerpts to these
+members and the archive. Only CRLF normalization was applied. Verify read-only:
 
-Example: closing N2 brace transmitted at50ms; T100; the old ESP32 watchdog queues
-N100 at150ms, parsed about160ms at9600baud; the UNO's next timed iteration161ms
-then cannot emit N2 completion. With the correction, UNO stops161ms and its11-byte
-ACK can finish around173ms before the230ms fallback. Tests also execute the
-vendor timer function verbatim (`tests/fixtures/vendor_uno_timer.inc`, normalized
-line endings only), with fake time and motor calls, demonstrating stop-before-ACK
-and cancellation by a mode replacement. These schedules are fixtures, not physical
-latency measurements.
+```
+python firmware/elegoo-s3-camera/tools/verify_owner_uno.py /path/to/SmartRobotCarV4.0_V0_20210104.tar.gz
+```
 
-N2 T remains1–200ms. After TX-complete, the independent fallback has a fixed80ms
-completion allowance: up to40ms loop/poll allowance plus the maximum37-byte tagged
-ACK at9600baud (38.6ms, rounded within80ms). It does not grow with heartbeats,
-partial replies or unrelated traffic. A matching ACK arriving at/after T and
-strictly before T+80 requests STOP; early matching ACK fails closed. At T+80,
-the bridge closes and queues N100 before processing ACKs, preventing a late ACK
-from converting timeout to success. Explicit STOP, disconnect, authentication
-failure and100ms TX stall retain their independent stopping paths. STOP priority
-and retry on UART congestion remain in the one writer. Another motion command
-cannot be admitted during the pending pulse.
+The separately named vendor timer regression remains a historical reference;
+the new owner timer and protocol suites execute the supplied modified source.
 
-The 80ms allowance is an engineering budget, not an established worst-case UNO
-loop bound. In this vendor source, ultrasonic `pulseIn` has no explicit timeout;
-the UNO loop can exceed this allowance. That yields a failed pulse and independent
-STOP request, not a longer wait or a claim of physical expiry. An ESP32 UART STOP
-cannot guarantee execution by a blocked/broken UNO. Physical qualification must
-bound that behavior independently, under separate authorization.
+## Command comparison and corrections
 
-The Pi reserves the worst-case fallback horizon under its existing wire lock:
-T+100ms TX confirmation+80ms completion allowance+N100 serialization+40ms poll
-allowance. Completion timeout separately allows TX confirmation, ACK serialization
-and40ms scheduling. Requested motor duration is never increased to cover serial
-latency. Existing exact tagged completion, explicit tagged N1 STOP and durable
-uncertainty behavior remain required. Old source/runtime qualification is invalid.
-
-## N21 ultrasonic and N24 yaw through the existing owner
-
-| Request | Vendor reference source | Candidate access decision |
+| Command | Owner source behavior | PR31 compatibility result |
 |---|---|---|
-| N21, D1=2 | Lines1497–1527 acquire ultrasonic cm and return `{H_integer}`; no motion-mode assignment. DeviceDriverSet lines306–326 use blocking pulseIn and clamp above150cm. D1=1 returns an obstacle boolean, not cm. | Read-only in actuator intent, but not timing-neutral. Preserve the existing Python read_ultrasonic contract. No candidate UART allowlist expansion in this change. |
-| N24 | No case24 exists in the vendor reference. The owner explicitly confirms the separate modified tarball implements this handler. | Existing Python yaw() serializer alone does not establish firmware support. Remains unavailable on this candidate pending comparison with the actual modified source and capability binding. |
+| N2 | Parser lines1809–1818 selects timed mode, captures time, and emits no immediate ACK. Timer lines1179–1224 checks elapsed **> T**, stops, switches mode, then emits `{H_ok}`. | Existing bounded completion allowance remains appropriate as a software fallback. No increase to N2 T. |
+| N21 D1=2 | Lines1497–1524 return `{H_integer}` cm. D1=1 returns `{H_true}` or `{H_false}`. Device driver lines308–328 uses blocking pulseIn with no explicit timeout and caps at150 cm. | Python now accepts only finite integer cm in1–150; zero is unavailable and150 is explicitly marked saturated. It remains obstacle-only data with no target association. |
+| N24 | Modified handler lines1901–1912 calls MPU6050_dveGetEulerAngles and emits `{H_yaw}` with two decimals. | Python serializer matches. Non-finite yaw is now rejected. Source support is confirmed; installed capability and transport qualification are separate. |
+| N5 D1=1 | Parser lines1837–1844 ACKs immediately. Servo routine lines1323–1329 divides D2 by10; driver lines420–452 clamps its integer step, writes step*10 degrees, calls _delay(500), then detaches. | Legacy pan now reports/sends the representable ten-degree position. Qualified pan rejects nonmultiples of10 before dispatch, preserving the admitted position rather than silently changing it. |
+| N1 / N100 | N1 parser emits `{H_ok}` after selecting motor mode; N100 emits bare `{ok}` after replacing the mode. | Existing exact tagged N1 STOP acknowledgement remains required; bare N100 is never N2 completion or physical-stop evidence. Historical STOP stays closed. |
 
-Both query serializers currently fail closed on the authenticated candidate;
-production C++ tests pin their exclusion. No second socket, serial reader,
-telemetry service, endpoint, polling loop or motion authority is introduced.
-The existing driver RX thread remains the only TCP reply dispatcher and MotorBridge
-the only UART writer. Its existing noncandidate N21 regression remains passing.
+N5 ACK is parser acceptance, **not servo completion**. Its later routine includes
+a500ms delay call. The supplied `_delay` calls blocking Arduino `delay(ms / TimeCompensation)`
+then resets the watchdog; the header defines TimeCompensation as4 for its altered
+Timer0. Thus the source calls Arduino delay(125) for _delay(500), without
+servicing the command parser there. Wall-clock timing and the full loop latency
+must still be qualified independently. This review does not establish bounded command
+execution after a pan, physical STOP latency, or a safe mixed pan/chassis schedule.
+The existing executor reports `executed=None` and `physically_observed=None`.
+No readiness claim or qualification grant is added by these corrections.
 
-Any future read-only admission belongs in these same owners, with a separate
-exact N21/N24 query allowlist and authenticated transport admission that grants no
-motion qualification. It must serialize one pending request and correlate exact H
-responses, reject queries during pulses, and prevent new pulses until a bounded
-query completes or faults. Even an unknown N24 replaces shared CommandSerialNumber
-before its switch dispatch in the vendor source, so interleaving it can relabel a pending
-N2 ACK. Read-only ultrasonic work can also delay local stopping. STOP must preempt
-queries; queue/rate/time bounds, finite reply validation, source/runtime binding,
-freshness and explicit unavailable/unsupported states need tests before enabling.
-No cached yaw/range, ACK or availability flag may create motion authority.
+## N2 timing and serial ownership
+
+The original at-T ESP32 N100 could replace timed mode before the UNO's next
+strict-after-T iteration, suppressing completion. The existing correction starts
+its watchdog after TX completion and uses an independent T+80ms fallback. Only
+an exact matching completion at/after T and strictly before fallback retires it
+and schedules STOP. Early completion fails closed; expiry closes before processing
+late replies. Heartbeats, wrong IDs, bare replies and fragments cannot extend it.
+Explicit STOP, disconnect and100ms TX stall retain independent stopping paths.
+Pi reserves the existing TX, completion/fallback and STOP serialization horizon
+under its wire lock. The80ms allowance is an engineering budget, not a measured
+upper bound on the UNO loop; blocking acquisition/servo work may exceed it.
+UART enqueue and any serial ACK never prove physical stopping.
+
+Every parsed JSON command assigns shared CommandSerialNumber at line1793 before
+dispatch. N21/N24 do not assign a motion mode, but interleaving queries with N2
+can relabel its eventual completion; ultrasonic work can also delay stopping.
+The candidate bridge therefore still denies both queries, as pinned by the
+production command-gate tests. This review confirms source semantics without
+introducing query admission, another socket, serial reader, polling owner, or
+motion authority. Any future query admission needs serialized pending requests,
+exact H correlation, finite bounded validation, STOP preemption, timing bounds,
+and installed source/runtime binding through the existing owners.
 
 ## Offline evidence
 
-Local:108 focused Python auth/pulse/STOP/executor/manual-console checks passed;
-134 unified contracts passed. Six production C++/source-fixture suites passed with
-ASan+UBSan (`ASAN_OPTIONS=detect_leaks=0`, LeakSanitizer is unavailable under the
-local sandbox tracer). Deterministic bridge tests cover delayed/fragmented ACK,
-missing/bare/wrong/early/boundary/late ACK, live heartbeats, immediate STOP,
-disconnect, TX stall and millis wrap. They use an in-memory client transport and
-fake UART; no OS socket or hardware is opened. The normal loopback bridge suite
-cannot run in this sandbox (socket creation denied); independent CI runs it.
+The new Python regressions are run against both the baseline and correction;
+the baseline fails on unsupported pan positions, non-finite yaw, out-of-range cm
+and saturation reporting. C++ owner fixtures independently execute N2 boundaries,
+mode replacement, stop-before-ACK, N21 replies, N24 formatting, and N5
+ACK-before-write, truncation and delay invocation (including the original compensated delay helper). All hardware interfaces are
+fakes. Fixture provenance verification checks hashes and source membership.
 
-Repeat: `python firmware/elegoo-s3-camera/tools/host_tests.py --sanitizers address,undefined`.
-Use `--no-sockets` only in restricted local sandboxes; CI defaults to every suite.
-The same bridge regression fails against the original PR31 MotorBridge at the
-T boundary and passes against the correction. Independent CI on the published
-correction is required in addition to these local
-results. Native builds, when run by CI, are build evidence only. No binaries are
-published or deployed by this correction.
+Repeat focused tests:
+
+```
+python -m pytest -q tests/test_owner_uno_compatibility.py tests/test_elegoo_command_auth.py tests/test_elegoo_timed_pulse.py tests/test_elegoo_stop_ack_deadline.py tests/test_face_trial_preparation.py tests/test_unified_actuator_requests.py
+ASAN_OPTIONS=detect_leaks=0 python firmware/elegoo-s3-camera/tools/host_tests.py --sanitizers address,undefined --no-sockets
+python tools/check_unified_contracts.py
+```
+
+LeakSanitizer cannot run under the sandbox tracer; address and undefined-behavior
+sanitizers remain enabled. The OS-socket bridge suite is attempted separately;
+this sandbox denies socket creation at WiFiServer::begin. The eight remaining
+suites include deterministic production MotorBridge timing tests without sockets.
+Final local results:126 focused Python tests and134 unified contracts passed;
+eight C++ suites passed with ASan+UBSan. The25 new Python cases produce13
+failures and12 passes against unchanged74b9cbd, then all pass after correction.
+Full socket coverage still needs an environment permitting loopback sockets.
+No source/runtime qualification from before this change can be reused.

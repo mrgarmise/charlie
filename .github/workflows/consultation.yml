@@ -1,9 +1,9 @@
 name: Independent consultation software validation
 on:
   push:
-    branches: ['feature/onboard-consultation-20261101', 'feature/operational-consultation-20261104']
+    branches: ['feature/onboard-consultation-20261101', 'feature/operational-consultation-20261104', 'feature/meditation-questions-20261110']
   pull_request:
-    paths: ['learning/consultation*.py', 'learning/lifecycle.py', 'main.py', 'tests/test_consultation*', 'ui/discoveries.py', 'docs/consultation/**']
+    paths: ['learning/consultation*.py', 'learning/question_selection.py', 'learning/meditation_consultation.py', 'learning/runtime_exclusion.py', 'learning/standing_consultation_policy.py', 'tools/questions.py', 'tools/qualify_question_sources.py', 'tests/test_question_selection.py', 'tests/test_meditation_consultation.py', 'learning/lifecycle.py', 'main.py', 'tests/test_consultation*', 'ui/discoveries.py', 'docs/consultation/**']
 permissions:
   contents: read
 jobs:
@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -r requirements.txt pytest
-      - run: python -m pytest tests/test_consultation* -q --junitxml=consultation-focused.xml
+      - run: python -m pytest tests/test_consultation* tests/test_question_selection.py tests/test_meditation_consultation.py tests/test_historical_question_qualification.py -q --junitxml=consultation-focused.xml
       - run: python tools/check_unified_contracts.py
       - run: python -m pytest tests -q --junitxml=consultation-full.xml
       - uses: actions/upload-artifact@v4

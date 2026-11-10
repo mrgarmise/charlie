@@ -1,0 +1,550 @@
+{
+  "schema": "question-source-qualification-v1",
+  "source_fingerprints": {
+    "/home/five/.local/share/charlie/development/learning-project-evidence.sqlite3": "93fa829a9e87352105d7e4ee0174b4bdfc9b1b85e67430bfbb8192ca20dc72e4"
+  },
+  "original_journals_unchanged": true,
+  "model_calls": 0,
+  "candidates": [
+    {
+      "question_id": "5524edc23f1affbda1d8a65253b7bd1000e52df6c66661f6d86bf4609a745643",
+      "candidate_id": "a8a6b3b42a455334e7762a74015b4fc47a30fa499d584f1c25728049e56989b3",
+      "sources": [
+        "d2e61e24fee2e333ed764cc3c4ed691a5c50af7dac5b11026c37d68cdcec87e0"
+      ],
+      "committed_at": "2026-10-03T22:22:55.225132+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "e4b46ac7b8ae7d8482aea85a5ed6be266dc3105d1b7e53a99edbb58fdcd398f5"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "43b3d0d91de289ca39a4799ed95236a99e4597b6ca84516e012d461c368a21ea",
+      "candidate_id": "4bcbb36b28cf35bbebd7210584cd4a185a67185fe367ba3fd9558755cbe19734",
+      "sources": [
+        "38e21d6513c1f6a18271d27920fe02de68591b8430f517ddf7b2ed8002ed511f"
+      ],
+      "committed_at": "2026-10-03T22:22:55.261227+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "3fa39aefed01ea8fae9b9a0d97b95e52f3d6552284950f4e8c0976c471f8bde6"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "7f0f520008340024ef8c79412f0f0f62f22e90fe6634e0f4e0c71b02e0574afe",
+      "candidate_id": "de5e61dc3753d00127e3083869616d0502a23c9ea44e428bb9d5b382afc633e6",
+      "sources": [
+        "15f13ce31e234998c5146f956f9463b084eed9012c8350730176684b061ed724"
+      ],
+      "committed_at": "2026-10-04T22:36:22.356142+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "9f48390757f38d41e39a844905fc8457bce6e4fd7b9d075d06bf9b38d4c7344c"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "39183dc19dda6821d9a42ee8f7044a021d1861743c9de2687788a4ad56c30c8c",
+      "candidate_id": "65f396d6e97fec818cbaef7719e24bddc3a9a1edac61f394468fc03d1c1cb13a",
+      "sources": [
+        "ba65336ae1498a893678bf6ba6d7beadaed9be7d27375142a668a7947a0cc5e6"
+      ],
+      "committed_at": "2026-10-04T22:36:22.427227+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "fe1f15e46e8abe25a1388d3f44c773933679a1fcc140e6133d85f31bde114a3b"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "2266bfab14ffa7e203f95991bbe4a6e3146ba83ab23a2fc56db794ba9321326c",
+      "candidate_id": "e98a4ca6ca3e402a3740c5bf8a160857aed094a468abb3be1496020c17208c14",
+      "sources": [
+        "a1e9d8361f050bc4c4460a522201d0c32b4b1a51969cc5dbf183d89a9639e66d"
+      ],
+      "committed_at": "2026-10-04T22:37:42.213961+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "8b1dfa161572810aab85c9d52155ba2d1ef13504fa842fd027444557424c7b9c"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "758d600e30d55841e60f4067e99c4422fc93105cd68d51d5e42491bd83f379ae",
+      "candidate_id": "700f930f1027919046e54d6dabdf860b490afa7e155a04af66828a70ac1692d6",
+      "sources": [
+        "e4d490491e7eae9d0728c3b9153716efdf2d3ce116f1ead2c3a59856b6307a18"
+      ],
+      "committed_at": "2026-10-04T22:40:18.624322+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "1117c190767a17b7214b897bfcbc4008a4524d30c066d82142b39f35743e7648"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "6f4f28518f827822c37fed8d0738218cb3328b99765d2db4be59ee01883f66e3",
+      "candidate_id": "5f3901281d7b3e8ab098bc8c3e4630c428687af49fb24c4bbcef2288906b0f1e",
+      "sources": [
+        "3e1027cb6e1c8c06c5d4ef39d96b8902b1e2b1cf8af818f1b574401a62dd01a7"
+      ],
+      "committed_at": "2026-10-04T22:42:38.390538+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "895dbdf8297a8b2a926a4bbd0b777fd10ef5aaeffc269df39b44d25e5f394000"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "7744c2a005b86b27b05bbadc1beef5373e35e60f6b290ccec4877fe65a78d2ac",
+      "candidate_id": "63b138a55f76e2145884acea0596a12a8b814e8bc81b1b934cd73fc65106b281",
+      "sources": [
+        "005ed5612f5f1c605630bca07a0a6138d9576a0758a4d569e5e171bb5cb74908"
+      ],
+      "committed_at": "2026-10-04T22:44:06.934424+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "80859760f45ce24ec2be2828247bd9e0f93f00c566ac9e9bd19c6e9a59edabfb"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "e305085828bc144594558dce54fb6e3d217f38f55d14c1985cfdb34f15b0671b",
+      "candidate_id": "8825fceabb4613c7b5e729191ff147e1074b9c335ddd6f73d7bbe7d2b90cc945",
+      "sources": [
+        "19213cfc3334702819d8477f896ea9b9e0463c9a34b111a96c5c296821a42c8f"
+      ],
+      "committed_at": "2026-10-06T18:21:03.036598+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "a377732c899f2a28cc26b09ad679f7fc73fbd476daa84294aa145a3214bf3e0c"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "03e914e80e9be3d39ddb2b9d7f195bb89343cd6ea6cbc9b69af7074ded2b718b",
+      "candidate_id": "23d6c6382b5b12743e7c45d468f5c98f496bcec64c821c25e2b440ce31dbce87",
+      "sources": [
+        "fc8c2ebd610650d89b9a77d57944cc863f1aeb0b8da357df7ff751217a3c0b73"
+      ],
+      "committed_at": "2026-10-08T23:08:01.356550+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "95c8548588cb809a3c174694514dd616dad423b70c64a9ac7ac90154666ace37"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "7f98c156cc64afdbbdfce4b913df7f403c50b8a0a4b50708e7d585b0828ecff9",
+      "candidate_id": "18c6a43541334dca599e181d0b65d0859dd85aaee5518c3ff5819790f4be4912",
+      "sources": [
+        "f895fc5139234561a0efc3e245c73fb2ba4e743b2dfd34576ad798a231d41397"
+      ],
+      "committed_at": "2026-10-08T23:10:11.541404+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "3bc3c790fbe5d1a0943bf0584d2934d6bf0515bd6ea37ee0ab9f6eb6cbc545f7"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "e2914832c8ca3696c56140c592578a08de44863c9108ee5b234a5309d32b5970",
+      "candidate_id": "72d894f05cdd851cd1947de291f1bbf206a97d36d7dafe38c283fbe94a671267",
+      "sources": [
+        "07f4d794845064acfb4abbedf609ea0a118a680b844bd09b27cdd113b0205981"
+      ],
+      "committed_at": "2026-10-08T23:12:32.740963+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "8d8c4a1924f8c4505c87db45269f07df20e804b695536a12ac70090eb67b1b60"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "1d3a17ecc3614c98923b9183a741f76d0c93013fbb310ae467f919af33cc294c",
+      "candidate_id": "48adc58da9f2f301858909591db25202af12e5311e54fac56f2430711f8c3f18",
+      "sources": [
+        "cadedd0b5adea36896c29286ca3b9202ce7872abdbf20c248d3897d19e2f90b7"
+      ],
+      "committed_at": "2026-10-08T23:14:57.270999+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "938b5289955e2efd4e6a4ac0da32e7c40577e92fcfbcab7180031524c5f43303"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "47fccfd2ddaa502a818b2f33232883f24f099b825426102c5a39bf2d392c7104",
+      "candidate_id": "6092db8580a687013e03b574c6674094f003b6cc8263d520b4533420e8e45254",
+      "sources": [
+        "1ae6d48a5e1a2f555ae7196e32cc0f9eb2cfee933c1fe3a511a97bb1017792c9"
+      ],
+      "committed_at": "2026-10-09T23:51:15.169963+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "6e044774c3eb45768416b738c6ab548e4065420a3a066d11aa80ba5050942055"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "d97554aa3305b94a209f841c20257976a3e2ec7de979e6d604eb55ba7a92eaf0",
+      "candidate_id": "4fcc7359e350628b8ddd9a58218a2295b82c987684f2239812b02f3073e41f5b",
+      "sources": [
+        "8662b83510fa496a453b9224d8b46e4a8d99a5b49d395248f23ee65479c9ca3f"
+      ],
+      "committed_at": "2026-10-10T00:56:52.698005+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "4b136ac98c4b249c8829cb520ec55f981f658731d6abeedc520d186048110374"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "f25bab1d7a8be2138c660d5a523121f33a22c89e3d82f102cce67a1f8c0664be",
+      "candidate_id": "2309180b75dc9c5c7b5331e49235edf994a66d1d9a35af0e75ed309ebd415cf0",
+      "sources": [
+        "325e0c291b537e58e94829602d183d8e2ac488b9b44941329e33bf22c8148e32"
+      ],
+      "committed_at": "2026-10-10T01:03:26.044634+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "df9ce79e9cb433e40d78346c249f9d92e49ef49dffe79142e0afda68affcc0de"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "fc27408df56dd737b0f2fba41b14be7ddf127fc758dc73d83acf7ba9fe677398",
+      "candidate_id": "7fca7fd34ee44d3235e2aa53eeeb2d2a6139c9da79f91cd1ed5f7c8de04ece8c",
+      "sources": [
+        "cfd5d6d8ed612508c6e47098df279fee9eea61aa34971c433c43a291dca93036"
+      ],
+      "committed_at": "2026-10-10T01:36:51.384873+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "137bafebcee87483d86059c89fbc75ac70a88bcbf73cc22ab283dc38c93ac52c"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "88f5fceeeb31af719f584efa7d338edfaef65479bddf619127e07d2cded41e61",
+      "candidate_id": "59473fc89e83523c36871847c7e61931ba13a9f8893a8ba34c83c027e2a42593",
+      "sources": [
+        "37026f6cf5d97911fe7428b11b4b04eedba0177dc8f37c4b52864270cf87dee9"
+      ],
+      "committed_at": "2026-10-10T02:51:32.871360+00:00",
+      "method": "meditation-motion",
+      "scope": {
+        "corpus_id": null,
+        "meditation_id": "9ce989017b11d9aa5dd160fa11e9da7aaefe3610285103dc30960b8708a8d498"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "b341a9c251ae88cb9d4f27e9a9e102d1cb0486223c856a3361e273baad14db2d",
+      "prompt_bytes": 522
+    },
+    {
+      "question_id": "a7c06272f4b3077018e11e9444d6d7284d22d71848418eec7a9f3682bad3fc9a",
+      "candidate_id": "efa79948df2cd3a9d1b996545ff3780652b69c6dcdf2c3c45d9bed9571e87c25",
+      "sources": [
+        "f9f5417b099ab7a5723f974b85e2a17bb8653fb175400651d0a5b43fcd2d7491"
+      ],
+      "committed_at": "2026-10-04T22:36:21.288488+00:00",
+      "method": "evidence-review",
+      "scope": {
+        "predicate": "recurrent_context_gap",
+        "question_category": "action_execution"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "95d3847c4c3daffc171f1e8ee3ddd07f175311b73e4a645720d95d999e8dbcc9",
+      "prompt_bytes": 546
+    },
+    {
+      "question_id": "5d89d26ea1e2f5d6965a5d29cf6beb7e8139adc83f902d89813e30f80e9e15cf",
+      "candidate_id": "dcb5d0c4ee6bc7793ba6ccee33df0ede0c0438520d384a600b364fefac44f891",
+      "sources": [
+        "e8bdb9598fd329e067f4f33a4b172ea8e612c8724edcc490970243f92ccf23bf"
+      ],
+      "committed_at": "2026-10-04T22:36:21.327261+00:00",
+      "method": "evidence-review",
+      "scope": {
+        "predicate": "recurrent_context_gap",
+        "question_category": "death_observability"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-blocked"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "60547a1c15a8862b21c271d91ea674cbda70aa4d75c846b1ead34c195ba8c1c6",
+      "prompt_bytes": 549
+    },
+    {
+      "question_id": "26c465b670f4b409a1304565e0293d36df57772122d20372cea213e51330c83b",
+      "candidate_id": "530014085cee1e508c42b31f2330c2e4e5faf9af22f9500b76585a645e542d91",
+      "sources": [
+        "fc4cb4793863cf2610a812cb300a5b931016b95c6bb7f5ff02b037e35c9d8a4d"
+      ],
+      "committed_at": "2026-10-04T22:36:21.360260+00:00",
+      "method": "evidence-review",
+      "scope": {
+        "predicate": "recurrent_context_gap",
+        "question_category": "ownership_continuity"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "f6b8df91d8948c9d5c08dafcac4798db8a777b75cd0910b9a96fb3344eabdd9c",
+      "prompt_bytes": 550
+    },
+    {
+      "question_id": "8b00769de8ac3c6b9b9bc099e242ca3b334959514a819ae2e9473e6eb0a6dee7",
+      "candidate_id": "91195d16b2be44f524b82db0188e70a8b901ec39c9249e867b2ebc0bdae2316b",
+      "sources": [
+        "4e668598ef6dceac3846694f361748b47cd6a542ba887df7a3dfc1d8e06f067c"
+      ],
+      "committed_at": "2026-10-04T22:36:21.398102+00:00",
+      "method": "evidence-review",
+      "scope": {
+        "predicate": "recurrent_context_gap",
+        "question_category": "score_attribution"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "492394ca0422c01f5498b37b1208a8aade3203fa60e5033c9455aa440b43a07b",
+      "prompt_bytes": 547
+    },
+    {
+      "question_id": "a041fbe93f8f904bf804988295bbbc86b68c045fcae3adfdbbcc6a8c9dba9176",
+      "candidate_id": "87dc7156c07dd965d517193a9db86fc592ca58658280d19445da0213988d432c",
+      "sources": [
+        "afab5e0438036ec5884254008cf5b0a62d9bd9da4a3af8231559b5c6a9ae98e4"
+      ],
+      "committed_at": "2026-10-04T22:36:21.437497+00:00",
+      "method": "evidence-review",
+      "scope": {
+        "predicate": "recurrent_context_gap",
+        "question_category": "self_uncertainty"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "957cf30aed5437fd2beece6a017de2275d9726c76c539933baa28b9b97918325",
+      "prompt_bytes": 546
+    },
+    {
+      "question_id": "e8ad6eaf718404aa5bb6c56ed8f47e3399b6e4e09a96c7edbdb4421c91518dc5",
+      "candidate_id": "2a5320a9388b7876b0059e0c18ef7cf5da3e9111e68d56a752b2cd759faaf9ce",
+      "sources": [
+        "aa00793aad49a593cd42ee24298b2524875d1f7d78e71848d43aab1a3fa4949f"
+      ],
+      "committed_at": "2026-10-04T22:36:21.471371+00:00",
+      "method": "evidence-review",
+      "scope": {
+        "predicate": "recurrent_context_gap",
+        "question_category": "semantic_coverage"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "4d1f42e8736eb1ad8fe1ff5cd900b0171fdcfe7233200457f4ca24c2c2a92ec3",
+      "prompt_bytes": 547
+    },
+    {
+      "question_id": "52f7dfdc55ed96c6930760a6e33ca076f5e84c780038a3fc23c6d9268c8c2009",
+      "candidate_id": "6d0a33463973c7eb34d263d7a649855ec255bebc0f7ae460db2e1d2bd1945c1a",
+      "sources": [
+        "79b6edc7603412dab8443fc4c987afa6fea74570c2d3673f6c8391b944c3e0ed"
+      ],
+      "committed_at": "2026-10-04T22:36:22.213934+00:00",
+      "method": "evidence-review",
+      "scope": {
+        "predicate": "capture_horizon_supported",
+        "question_category": "motion_evidence_availability"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "f27c74d9e04ca39ec3c8b6b3b26076ec0e4de945a67352b4d6a008bdbf91160f",
+      "prompt_bytes": 568
+    },
+    {
+      "question_id": "ff6d236afaa65d30efdff210e9285ea2d9185ec65f44a0314fd0a6e9904b536e",
+      "candidate_id": "7d1e9aabdb5519a5144b0f0377295494c7f96ed9f2d62045b0e6ff11f6ab7ecb",
+      "sources": [
+        "7271755388ebc7d005467a53de0274794ae620ed00b0e6449b29b215ac02d852"
+      ],
+      "committed_at": "2026-10-09T23:51:12.410452+00:00",
+      "method": "evidence-review",
+      "scope": {
+        "predicate": "recurrent_context_gap",
+        "question_category": "perception_reconciliation"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-paused"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "95a2b388496ee16627b5305f95cac26bad285faa448985ba722fd2903cb75b78",
+      "prompt_bytes": 555
+    },
+    {
+      "question_id": "ae34a68462dae3dd17eca801be9a293841e7a3101d5ec1d924f41e7e70c06dd5",
+      "candidate_id": "5df561003b73aac15338754a0fa83f387aa664d27109897f8aab9f4077ebe0a0",
+      "sources": [
+        "03b89711aa452acf0073ff230d2786488dad6dc3fda814664104439b9d4b8cfd"
+      ],
+      "committed_at": "2026-10-04T22:36:19.836077+00:00",
+      "method": "cnn-reconstruction",
+      "scope": {
+        "dataset_family": "visual-experience",
+        "objective": "reconstruction"
+      },
+      "eligible": false,
+      "reasons": [
+        "project-blocked"
+      ],
+      "prompt_version": "question-selection-v1",
+      "prompt_digest": "4c97ff97e092340a4b59156ffa7dfeba3a8cdcb6ab6d1a532f8254d18d68624c",
+      "prompt_bytes": 622
+    }
+  ]
+}

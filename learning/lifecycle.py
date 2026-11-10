@@ -62,6 +62,7 @@ class DevelopmentLifecycle:
         self.gateway = MemoryGateway(store=JsonlStore(self.output/'memory.jsonl'),
             evaluator=MemoryEvaluator(self.output/'evaluator.sqlite3'))
         self.executive = LearningExecutive(self.journal, self.gateway)
+        self.meditation_consultations = None  # separately configured trusted-slot adapter; default off
         self.consultation = None
         if llm_consultation:
             from .consultation import ConsultationService
@@ -357,6 +358,12 @@ class DevelopmentLifecycle:
                 document['state_digest']=digest(document)
                 atomic_json(checkpoint,document,compact=True)
             try:
+                # Consult only at a resumable boundary after Executive commission.
+                # The independent authority, never meditation state, admits a slot.
+                save_checkpoint()
+                coordinator = self.meditation_consultations
+                if coordinator is not None:
+                    coordinator.on_meditation(commission_id, progress, client_deadline=deadline)
                 # A stable saved iteration is already complete, even if the
                 # process stopped between its checkpoint and result publication.
                 while len(history)<6 and (not history or history[-1]['merges']):
@@ -652,7 +659,10 @@ class DevelopmentLifecycle:
         self._operational('running','Executive developmental attempt')
         self.reflection_dependency_blocked=False
         self.reflection_dependency=None
-        try:self.executive.develop(self)
+        try:
+            if self.meditation_consultations is not None:
+                self.meditation_consultations.refresh(self.yield_for_primary)
+            self.executive.develop(self)
         except InterruptedError as exc:
             from .resources import DevelopmentInterrupted
             if not isinstance(exc,(ResourceUnavailable,DevelopmentInterrupted)) and exc is not self.resources.blockage:

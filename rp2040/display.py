@@ -36,6 +36,29 @@ except ImportError:
     DISPLAY_AVAILABLE = False
 
 
+# Object labels only: columns of five bits, least-significant bit at the top.
+# Ordinary messages continue to use the vendor font and three-character pages.
+_OBJECT_FONT = {
+    'A': (30, 5, 30), 'B': (31, 21, 10), 'C': (14, 17, 17),
+    'D': (31, 17, 14), 'E': (31, 21, 17), 'F': (31, 5, 1),
+    'G': (14, 17, 29), 'H': (31, 4, 31), 'I': (31,),
+    'J': (8, 16, 15), 'K': (31, 4, 27), 'L': (31, 16, 16),
+    'M': (31, 6, 31), 'N': (31, 14, 31), 'O': (14, 17, 14),
+    'P': (31, 5, 2), 'Q': (14, 25, 30), 'R': (31, 5, 26),
+    'S': (18, 21, 9), 'T': (1, 31, 1), 'U': (31, 16, 31),
+    'V': (15, 16, 15), 'W': (31, 12, 31), 'X': (27, 4, 27),
+    'Y': (3, 28, 3), 'Z': (25, 21, 19),
+    '0': (31, 17, 31), '1': (2, 31), '2': (25, 21, 18),
+    '3': (17, 21, 10), '4': (7, 4, 31), '5': (23, 21, 9),
+    '6': (30, 21, 29), '7': (1, 29, 3), '8': (31, 21, 31),
+    '9': (23, 21, 15), ' ': (0,),
+}
+
+
+def _object_label_width(text):
+    return sum(len(_OBJECT_FONT[char]) for char in text) + max(0, len(text) - 1)
+
+
 class Display:
 
     WIDTH = 17
@@ -187,15 +210,23 @@ class Display:
 
     def _draw_object_label(self, now):
         # One replaceable slot, no queue/sleep or vendor long-string show().
-        if time.ticks_diff(now,self.last_object_step)>=self.object_step_ms:
-            self.object_offset-=1
-            if self.object_offset < -len(self.object_label)*6:self.object_offset=self.WIDTH
-            self.last_object_step=now
-        font=getattr(matrix,'wordStock',{})
-        for index,char in enumerate(self.object_label):
-            origin=index*6+self.object_offset
-            if origin>self.WIDTH-1 or origin+4<0:continue
-            for x,y in font.get(char,()):self._pixel(origin+x,y,40)
+        width = _object_label_width(self.object_label)
+        if width <= self.WIDTH:
+            origin = (self.WIDTH - width) // 2
+        else:
+            if time.ticks_diff(now,self.last_object_step)>=self.object_step_ms:
+                self.object_offset-=1
+                if self.object_offset < -width:self.object_offset=self.WIDTH
+                self.last_object_step=now
+            origin = self.object_offset
+        for char in self.object_label:
+            columns = _OBJECT_FONT[char]
+            if origin < self.WIDTH and origin + len(columns) > 0:
+                for x, column in enumerate(columns):
+                    for y in range(5):
+                        if column & (1 << y):
+                            self._pixel(origin+x, y+1, 40)
+            origin += len(columns) + 1
 
     def rx_activity(self):
         self.show_text("RX", 600)

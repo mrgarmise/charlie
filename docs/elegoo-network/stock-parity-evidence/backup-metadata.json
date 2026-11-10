@@ -1,0 +1,82 @@
+{
+  "bytes": 8388608,
+  "sha256": "c196e9077be06b3f61f6acfcf66219fe0535b60ae1d26183c43b2de80ff25c5b",
+  "partitions": [
+    {
+      "type": 1,
+      "subtype": 2,
+      "offset": "0x9000",
+      "size": "0x5000",
+      "label": "nvs",
+      "flags": 0
+    },
+    {
+      "type": 1,
+      "subtype": 0,
+      "offset": "0xe000",
+      "size": "0x2000",
+      "label": "otadata",
+      "flags": 0
+    },
+    {
+      "type": 0,
+      "subtype": 16,
+      "offset": "0x10000",
+      "size": "0x330000",
+      "label": "app0",
+      "flags": 0
+    },
+    {
+      "type": 0,
+      "subtype": 17,
+      "offset": "0x340000",
+      "size": "0x330000",
+      "label": "app1",
+      "flags": 0
+    },
+    {
+      "type": 1,
+      "subtype": 130,
+      "offset": "0x670000",
+      "size": "0x180000",
+      "label": "spiffs",
+      "flags": 0
+    },
+    {
+      "type": 1,
+      "subtype": 3,
+      "offset": "0x7f0000",
+      "size": "0x10000",
+      "label": "coredump",
+      "flags": 0
+    }
+  ],
+  "bootloader": {
+    "header": "e903023f",
+    "chip_id": 9
+  },
+  "app0": {
+    "header": "e905023f",
+    "chip_id": 9,
+    "version": "esp-idf: v4.4.5 ac5d805d0e",
+    "project": "arduino-lib-builder",
+    "time": "16:32:29",
+    "date": "Jun 12 2023",
+    "idf": "v4.4.5"
+  },
+  "app1": {
+    "header": "ffffffff"
+  },
+  "ota0": {
+    "seq": 1,
+    "state": 2,
+    "crc": "0x4743989a",
+    "erased": false
+  },
+  "ota1": {
+    "seq": 4294967295,
+    "state": 4294967295,
+    "crc": "0xffffffff",
+    "erased": true
+  }
+}

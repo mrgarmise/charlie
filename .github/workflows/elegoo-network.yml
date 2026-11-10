@@ -1,0 +1,29 @@
+name: ELEGOO network independent validation
+on:
+  push:
+    branches: ['feature/elegoo-network-**', 'feature/elegoo-firmware-**']
+  pull_request:
+    paths: ['networking/**', 'tests/networking/**', 'firmware/elegoo-network/**', 'ui/dashboard.py', '.github/workflows/elegoo-network.yml']
+permissions:
+  contents: read
+jobs:
+  software:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest
+      - run: python -m pytest tests/networking tests/test_mobile_console.py tests/test_mobile_http.py -q --junitxml=network-tests.xml
+      - run: python tools/check_unified_contracts.py
+      - run: python -m pytest tests -q --junitxml=network-full.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: network-validation
+          path: |
+            network-tests.xml
+            network-full.xml

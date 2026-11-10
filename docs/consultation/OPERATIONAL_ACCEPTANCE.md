@@ -42,7 +42,9 @@ cat /proc/sys/kernel/random/boot_id
 systemctl --user show charlie-consultant.service \
   -p ActiveState -p MainPID -p InvocationID -p ControlGroup \
   -p PrivateDevices -p NoNewPrivileges -p ProtectHome \
-  -p RuntimeMaxUSec -p TimeoutStopUSec -p Restart -p KillMode -p SendSIGKILL
+  -p RuntimeMaxUSec -p TimeoutStopUSec -p Restart -p KillMode -p SendSIGKILL \
+  -p ActiveEnterTimestampMonotonic -p RuntimeRandomizedExtraUSec \
+  -p FinalKillSignal -p NotifyAccess -p TimeoutStopFailureMode
 curl --noproxy '*' --max-time 2 http://127.0.0.1:11434/api/version
 curl --noproxy '*' --max-time 2 http://127.0.0.1:11434/api/ps
 vcgencmd get_throttled
@@ -69,7 +71,7 @@ safe-idle window. It must not claim complete integration acceptance in advance.
 
 The unit must have finite RuntimeMaxSec <=120, TimeoutStopSec <=5,
 KillMode=control-group, SendSIGKILL=yes, Restart=no. RuntimeMaxSec should be short
-enough that its final cutoff, measured conservatively from MainPID's start, falls
+enough that its final cutoff, measured from the later of unit activation and MainPID's start, falls
 inside the 90-second safe-idle trial. Choose a shorter bound if required by
 existing native restrictions. Verify real cutoff and cgroup emptiness in a
 separately authorized idle test before marking this prerequisite verified.
@@ -181,3 +183,7 @@ Retain the marker as evidence. A later operator clearance must confirm quiescenc
 archive the marker, reverify service/boot/model identity, and issue a new approval.
 No automatic clearance or fallback exists. After reboot, fresh boot-bound approval
 and an independently verified empty/exclusive service are still required.
+
+The cutoff check also rejects randomized extra runtime, notification-based timeout
+extensions, non-SIGKILL final signals, and abort-mode stop handling. These properties
+must be verified; the client does not equate a requested stop with observed quiescence.

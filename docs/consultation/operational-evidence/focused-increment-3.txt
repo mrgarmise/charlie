@@ -1,0 +1,10 @@
+........................................................................ [ 60%]
+...............................................                          [100%]
+=============================== warnings summary ===============================
+tests/test_consultation_activation.py::test_operational_protocol_over_real_loopback[False]
+tests/test_consultation_activation.py::test_operational_protocol_over_real_loopback[True]
+  /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=5) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    self.pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+119 passed, 2 warnings in 8.11s

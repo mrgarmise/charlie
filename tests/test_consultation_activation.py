@@ -191,7 +191,9 @@ def service_files(tmp_path, monkeypatch):
     (proc/'net/tcp').write_text('header\n0: 0100007F:2CAA 00000000:0000 0A 0 0 0 0 0 999\n')
     props=dict(ActiveState='active',MainPID='321',InvocationID='c'*32,ControlGroup='/test/service',
                PrivateDevices='yes',NoNewPrivileges='yes',ProtectHome='tmpfs',RuntimeMaxUSec='1min 30s',
-               TimeoutStopUSec='5s',Restart='no',KillMode='control-group',SendSIGKILL='yes')
+               TimeoutStopUSec='5s',Restart='no',KillMode='control-group',SendSIGKILL='yes',
+               ActiveEnterTimestampMonotonic='10000000',RuntimeRandomizedExtraUSec='0',
+               FinalKillSignal='9',NotifyAccess='none',TimeoutStopFailureMode='terminate')
     def path(*args):
         original=Path(*args)
         if str(original).startswith('/sys/fs/cgroup'):return tmp_path/str(original).lstrip('/')
@@ -207,13 +209,16 @@ def test_service_identity_checks_kernel_limits_and_owned_listener(service_files)
     result=activation.service_identity()
     assert result['pid']==321 and result['invocation_id']=='c'*32
     assert result['memory_max']==2500*1024**2
+    assert result['cutoff_monotonic']==105  # active at 10s, later than PID start, plus 90+5
     (group/'cpu.max').write_text('max 100000')
     with pytest.raises(ValueError):activation.service_identity()
 
 
 @pytest.mark.parametrize('key,value', [('PrivateDevices','no'),('Restart','always'),
     ('RuntimeMaxUSec','infinity'),('RuntimeMaxUSec','3min'),('TimeoutStopUSec','30s'),
-    ('KillMode','process'),('SendSIGKILL','no'),('ProtectHome','no'),('ActiveState','inactive')])
+    ('KillMode','process'),('SendSIGKILL','no'),('ProtectHome','no'),('ActiveState','inactive'),
+    ('ActiveEnterTimestampMonotonic','0'),('RuntimeRandomizedExtraUSec','10s'),
+    ('FinalKillSignal','15'),('NotifyAccess','all'),('TimeoutStopFailureMode','abort')])
 def test_unbounded_or_unsandboxed_service_refused(service_files,key,value):
     service_files[0][key]=value
     with pytest.raises(ValueError):activation.service_identity()

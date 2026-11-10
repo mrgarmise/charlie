@@ -74,7 +74,9 @@ def service_identity():
     """Read the existing dedicated unit and effective kernel limits; never edit it."""
     props = ('ActiveState', 'MainPID', 'InvocationID', 'ControlGroup',
              'PrivateDevices', 'NoNewPrivileges', 'ProtectHome', 'RuntimeMaxUSec',
-             'TimeoutStopUSec', 'Restart', 'KillMode', 'SendSIGKILL')
+             'TimeoutStopUSec', 'Restart', 'KillMode', 'SendSIGKILL',
+             'ActiveEnterTimestampMonotonic', 'RuntimeRandomizedExtraUSec',
+             'FinalKillSignal', 'NotifyAccess', 'TimeoutStopFailureMode')
     result = subprocess.run(['systemctl', '--user', 'show', SERVICE,
                              '--property=' + ','.join(props)], check=True,
                             capture_output=True, text=True, timeout=2)
@@ -84,15 +86,20 @@ def service_identity():
         raise ValueError('dedicated sandbox unavailable')
     def seconds(value):
         # systemctl renders these durations as e.g. '1min 30s', '5s', '500ms'.
+        if value == '0': return 0.
         units = {'min': 60, 's': 1, 'ms': .001, 'us': .000001}
         parts = re.findall(r'([0-9]+(?:\.[0-9]+)?)(min|ms|us|s)', value)
         if not parts or ''.join(a+b for a,b in parts) != value.replace(' ', ''):
             raise ValueError('finite service lifetime required')
         return sum(float(a)*units[b] for a,b in parts)
     runtime = seconds(values.get('RuntimeMaxUSec', ''))
+    extra = seconds(values.get('RuntimeRandomizedExtraUSec', ''))
+    active = int(values.get('ActiveEnterTimestampMonotonic', '0')) / 1e6
     stop = seconds(values.get('TimeoutStopUSec', ''))
     if (not 0 < runtime <= 120 or not 0 < stop <= 5 or values.get('Restart') != 'no'
-            or values.get('KillMode') != 'control-group' or values.get('SendSIGKILL') != 'yes'):
+            or values.get('KillMode') != 'control-group' or values.get('SendSIGKILL') != 'yes'
+            or extra != 0 or active <= 0 or values.get('FinalKillSignal') != '9'
+            or values.get('NotifyAccess') != 'none' or values.get('TimeoutStopFailureMode') != 'terminate'):
         raise ValueError('finite non-restarting service cutoff required for safe-idle containment')
     pid = int(values.get('MainPID', '0'))
     if pid <= 0:
@@ -126,7 +133,7 @@ def service_identity():
     ticks = Path('/proc', str(pid), 'stat').read_text().rsplit(')', 1)[1].split()[19]
     return dict(invocation_id=values['InvocationID'], pid=pid, start_ticks=ticks,
                 cgroup=group, memory_max=memory, cpu_max=[quota, period],
-                cutoff_monotonic=int(ticks)/os.sysconf('SC_CLK_TCK') + runtime + stop)
+                cutoff_monotonic=max(active, int(ticks)/os.sysconf('SC_CLK_TCK')) + runtime + stop)
 
 
 class Admission:

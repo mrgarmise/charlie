@@ -56,7 +56,7 @@ acknowledges cleanup. No automatic retry or marker deletion after failure exists
 A client disconnect does not prove the server stopped generating. Admission
 therefore also requires the existing dedicated unit to have a finite runtime
 (maximum 120 seconds), a <=5-second stop timeout, control-group kill, SIGKILL
-escalation and no restart. Its conservative process-start-based final cutoff must
+escalation and no restart. Its conservative activation/process-start-based final cutoff must
 fall within the approved safe-idle window. This is a **new native prerequisite**;
 we have not changed the user's installed unit or verified that it meets it.
 Hard memory <=2500 MiB, zero swap, CPU quota <=1 core, PrivateDevices,
@@ -122,3 +122,22 @@ source/test/documentation payload. No alternative publishing channel was used.
 GitHub CI and a draft PR therefore remain blocked pending that approval. Both
 implementation increments are preserved as local commits; there is no claim
 that they have been published.
+
+The cutoff check also rejects randomized extra runtime, notification-based timeout
+extensions, non-SIGKILL final signals, and abort-mode stop handling. These properties
+must be verified; the client does not equate a requested stop with observed quiescence.
+
+## Cutoff hardening increment
+
+Use the later of unit activation and process start for the conservative service
+cutoff. Refuse randomized extra runtime, notification-based extensions, a final
+signal other than SIGKILL, and abort-mode timeout handling. These checks prevent
+an apparently finite setting from admitting a longer-lived server than the
+independent idle window. Native observation is still mandatory.
+
+Final focused source validation: **119 passed**, two retained test-only fork
+warnings. The five originally failing arcade cases were rerun on a clean detached
+`b0c04ad` parent: **4 failed / 1 passed**. Four failures therefore reproduce without
+this implementation. The remaining parameterized case varied; it is not claimed
+resolved. Relevant arcade/hardware/vision files are byte-identical to the parent.
+Independent broad results and final exact revisions follow in the final ledger.

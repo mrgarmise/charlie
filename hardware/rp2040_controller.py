@@ -282,6 +282,8 @@ class RP2040Controller:
         with self._motion_fence_lock:
             self._motion_generation += 1
         self.motion_epoch = self.motion_owner = None
+        cancel=getattr(self,'meditation_cancel',None)
+        if cancel is not None:cancel.set()  # no RPC or notice lock before urgent STOP
         return self.send("STOP")
 
     def look(self, pan, tilt, *, rate=None):
@@ -460,6 +462,31 @@ class RP2040Controller:
     def clear_object_label(self):
         if self.display_capabilities() is None:return False
         return self._exchange('OBJECT_CLEAR','OK OBJECT_CLEAR',timeout=.15)=='OK OBJECT_CLEAR'
+
+    def meditation_notice(self, slot, sequence, ttl_ms=2000, phase='PREPARING'):
+        from rp2040.meditation_notice import request
+        caps=self.display_capabilities()
+        if not caps or caps.get('meditation_notice')!=1:return None
+        session=self.link_session
+        command=request(session,slot,sequence,ttl_ms,phase)
+        reply=self._exchange(command,'MEDITATION_ACK ',timeout=.15)
+        try:
+            status=json.loads(reply.split(' ',1)[1]) if reply else None
+            if (not isinstance(status,dict) or self.link_session!=session
+                    or status.get('session')!=session or status.get('sequence')!=sequence):return None
+            if phase=='CLEAR':
+                return status if status.get('phase')=='CLEAR' and status.get('visible') is False else None
+            if (status.get('slot')!=slot or status.get('phase')!=phase or status.get('visible') is not True
+                    or not 0<status.get('remaining_ms',0)<=ttl_ms):return None
+            return status
+        except (ValueError,TypeError,IndexError):return None
+
+    def meditation_notice_status(self):
+        reply=self._exchange('MEDITATION_STATUS','MEDITATION_STATUS ',timeout=.15)
+        try:
+            status=json.loads(reply.split(' ',1)[1]) if reply else None
+            return status if isinstance(status,dict) and status.get('session')==self.link_session else None
+        except (ValueError,TypeError,IndexError):return None
 
     def think(self):
 

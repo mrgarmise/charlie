@@ -1,0 +1,29 @@
+name: Independent native meditation and notice validation
+on:
+  push:
+    branches: ['feature/native-meditation-notice-20261110']
+  pull_request:
+    paths: ['learning/native_meditation/**', 'learning/meditation_consultation.py', 'learning/lifecycle.py', 'learning/consultation_activation.py', 'hardware/rp2040_controller.py', 'rp2040/**', 'tests/test_native_meditation*', 'tests/test_meditation_notice.py', 'docs/consultation/**']
+permissions:
+  contents: read
+jobs:
+  software:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest
+      - run: python -m pytest tests/test_meditation_notice.py tests/test_object_display.py -q --junitxml=native-focused.xml
+      - run: python tools/check_unified_contracts.py
+      - run: python -m pytest tests -q --junitxml=native-full.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-meditation-software-evidence
+          path: |
+            native-focused.xml
+            native-full.xml

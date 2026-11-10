@@ -19,13 +19,14 @@ METHODS = {'meditation-motion', 'evidence-review', 'cnn-reconstruction'}
 MAX_BYTES = 256 * 1024**2
 
 
-def fingerprint(path):
+def fingerprint(path, check=lambda:None):
     path = Path(path)
     if not path.is_file() or path.stat().st_size > MAX_BYTES:
         raise ValueError('missing or oversized source journal')
     h = hashlib.sha256()
     with path.open('rb') as f:
-        for block in iter(lambda: f.read(65536), b''): h.update(block)
+        for block in iter(lambda: f.read(65536), b''):
+            check();h.update(block)
     # A live WAL cannot be represented by the main-file hash alone.
     wal = Path(str(path) + '-wal')
     if wal.exists() and wal.stat().st_size:
@@ -33,7 +34,7 @@ def fingerprint(path):
     return h.hexdigest()
 
 
-def discover(paths, *, now=None, limit=128):
+def discover(paths, *, now=None, limit=128, check=lambda:None):
     """Bounded explicit source list. No recursive home discovery or source writes."""
     if not 1 <= limit <= 256 or len(paths) > 16:
         raise ValueError('bounded discovery required')
@@ -41,14 +42,15 @@ def discover(paths, *, now=None, limit=128):
     candidates = {}; errors = []; answered_global = set()
     for path in sorted(set(str(Path(p).resolve()) for p in paths)):
         try:
-            before = fingerprint(path)
-            with closing(EvidenceJournal(path, read_only=True)) as journal:
+            before = fingerprint(path,check)
+            with closing(EvidenceJournal(path, on_progress=check, read_only=True)) as journal:
                 from memory.learning_projects import LearningExecutive
                 projects = LearningExecutive.project_state(journal)
                 held = {o['evidence_id']: project['status'] for project in projects.values()
                         for o in project.get('origins', []) if project['status'] != 'candidate'}
                 answered = set()
                 for r in journal.records('event'):
+                    check()
                     p = r.data['payload']
                     if p.get('op') in ('answered', 'answer-durable', 'awaiting-evaluation'):
                         answered.update(p.get('evidence_ids', []))
@@ -64,6 +66,7 @@ def discover(paths, *, now=None, limit=128):
                 rows = journal.category_records('event', 'learning_project_proposal')
                 if len(rows) > 4096: raise ValueError('source proposal bound exceeded')
                 for row in rows:
+                    check()
                     d = row.data; p = d['payload'].get('proposal', {})
                     if d['producer'] != 'Reflection': continue
                     text = p.get('goal'); refs = d['sources']; reasons = []
@@ -72,6 +75,10 @@ def discover(paths, *, now=None, limit=128):
                     if p.get('method') not in METHODS: reasons.append('unsupported investigation method')
                     sources = [journal.get(ref) for ref in refs]
                     if any(s.data['producer'] != 'Reflection' for s in sources): reasons.append('unsupported source producer')
+                    if d['provenance'].get('authentic') is False or any(
+                            s.data['payload'].get('synthetic') or s.data['payload'].get('demo')
+                            or s.data['provenance'].get('authentic') is False for s in sources):
+                        reasons.append('synthetic/demo source')
                     if row.id in held: reasons.append('project-' + held[row.id])
                     if row.id in answered: reasons.append('previous answer retained')
                     age = now - datetime.fromisoformat(row.committed_at).timestamp()
@@ -99,7 +106,7 @@ def discover(paths, *, now=None, limit=128):
                         # A refusal in any copy wins over a permissive stale archive.
                         if not item['eligible']: old.update(eligible=False, reasons=sorted(set(old['reasons']+reasons)))
                     else: candidates[key] = item
-            if fingerprint(path) != before: raise ValueError('source changed during discovery')
+            if fingerprint(path,check) != before: raise ValueError('source changed during discovery')
         except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
             # Do not keep partially discovered candidates from an invalid source.
             candidates = {k:v for k,v in candidates.items() if not any(l['path']==path for l in v['locations'])}

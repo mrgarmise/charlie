@@ -52,3 +52,13 @@ def test_project_completed_in_copy_wins(tmp_path):
         j.append('event',dict(op='proposed',project=dict(id='project',status='completed',origins=[{'evidence_id':item['question_id']}],experiment_history=[])),episode=SCOPE,producer='LearningExecutive',version='1')
     q=next(q for q in discover([path,copy])['candidates'] if q['id']==item['id'])
     assert not q['eligible'] and 'project-completed' in q['reasons']
+
+
+def test_answer_in_separate_receipt_source_vetoes_history(tmp_path):
+    path=source(tmp_path);item=discover([path])['candidates'][0]
+    receipt=tmp_path/'receipt.sqlite3'
+    with closing(EvidenceJournal(receipt)) as j:
+        j.append('event',dict(category='historical_consultation',op='answered',original_question_id=item['question_id']),episode='receipt',producer='HistoricalQuestionQualification',version='1')
+    report=discover([path,receipt])
+    q=next(q for q in report['candidates'] if q['id']==item['id'])
+    assert not q['eligible'] and 'previous answer retained' in q['reasons']

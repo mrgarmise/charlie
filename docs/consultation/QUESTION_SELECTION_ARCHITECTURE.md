@@ -47,3 +47,9 @@ Native independent guard remains an explicit denying adapter until a separately
 qualified external process can prove owner/deadline exclusion, finite service
 startup/prewarm/cutoff and revocation. In-process simulation attestations never
 count as a native authorization boundary. Existing manual adapter stays intact.
+
+The coordinator receives the actual monotonic meditation client deadline. It
+requires at least 35 seconds before reservation and rechecks after source review
+and service preparation, preserving 5 seconds for receipt/cancellation within
+the existing <=30-second provider wall bound. The default 10-second slice defers;
+a qualified 60-second profile may consult when all independent gates also pass.

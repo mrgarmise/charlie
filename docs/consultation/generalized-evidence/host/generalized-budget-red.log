@@ -1,0 +1,32 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_normal_ten_second_meditation_defers_before_any_model_call ________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-49/test_normal_ten_second_meditat0')
+
+    def test_normal_ten_second_meditation_defers_before_any_model_call(tmp_path):
+        from learning.lifecycle import DevelopmentLifecycle
+        from test_normal_learning_lifecycle import experience
+        questions=tmp_path/'questions';questions.mkdir()
+        x=setup(questions);x.authority.safe=True
+        life=DevelopmentLifecycle(tmp_path/'state',[experience(tmp_path)],budget_seconds=10)
+        life.meditation_consultations=x.c
+        try:
+            life.turn()
+>           assert not x.providers
+E           AssertionError: assert not [<test_meditation_consultation.Provider object at 0x7ffee6fcf8c0>]
+E            +  where [<test_meditation_consultation.Provider object at 0x7ffee6fcf8c0>] = namespace(c=<learning.meditation_consultation.MeditationConsultations object at 0x7ffee788a120>, q=<learning.question_...800000000.0], path=PosixPath('/tmp/pytest-of-five/pytest-49/test_normal_ten_second_meditat0/questions/source.sqlite3')).providers
+
+tests/test_meditation_consultation.py:303: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Development operational: running | application-owned Executive startup
+Development: idle | no project | 
+Development operational: running | Executive developmental attempt
+Development: reflecting | Meditation c36e0d094fad00c062c49e509304a2e0f8a70fe33c721558be6d1163465927fd for episode:1be877869a1b6342ef3747a4e879e4737871cb987e664dd43bf1b914dd3cc3a3 | Executive developmental attempt running
+Development: investigating | no project | Executive developmental attempt running
+Development: idle | no project | Committed developmental checkpoint or conclusion advanced
+Development operational: clean shutdown | Executive closed
+Development: stopped | no project | Committed developmental checkpoint or conclusion advanced
+=========================== short test summary info ============================
+FAILED tests/test_meditation_consultation.py::test_normal_ten_second_meditation_defers_before_any_model_call
+1 failed in 1.12s

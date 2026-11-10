@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.117" timestamp="2026-11-10T19:13:37.890738+00:00" hostname="charlie"><testcase classname="tests.test_meditation_consultation" name="test_normal_ten_second_meditation_defers_before_any_model_call" time="0.996"><failure message="AssertionError: assert not [&lt;test_meditation_consultation.Provider object at 0x7ffee6fcf8c0&gt;]&#10; +  where [&lt;test_meditation_consultation.Provider object at 0x7ffee6fcf8c0&gt;] = namespace(c=&lt;learning.meditation_consultation.MeditationConsultations object at 0x7ffee788a120&gt;, q=&lt;learning.question_...800000000.0], path=PosixPath('/tmp/pytest-of-five/pytest-49/test_normal_ten_second_meditat0/questions/source.sqlite3')).providers">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-49/test_normal_ten_second_meditat0')
+
+    def test_normal_ten_second_meditation_defers_before_any_model_call(tmp_path):
+        from learning.lifecycle import DevelopmentLifecycle
+        from test_normal_learning_lifecycle import experience
+        questions=tmp_path/'questions';questions.mkdir()
+        x=setup(questions);x.authority.safe=True
+        life=DevelopmentLifecycle(tmp_path/'state',[experience(tmp_path)],budget_seconds=10)
+        life.meditation_consultations=x.c
+        try:
+            life.turn()
+&gt;           assert not x.providers
+E           AssertionError: assert not [&lt;test_meditation_consultation.Provider object at 0x7ffee6fcf8c0&gt;]
+E            +  where [&lt;test_meditation_consultation.Provider object at 0x7ffee6fcf8c0&gt;] = namespace(c=&lt;learning.meditation_consultation.MeditationConsultations object at 0x7ffee788a120&gt;, q=&lt;learning.question_...800000000.0], path=PosixPath('/tmp/pytest-of-five/pytest-49/test_normal_ten_second_meditat0/questions/source.sqlite3')).providers
+
+tests/test_meditation_consultation.py:303: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,7 +1,8 @@
 # Validation ledger (development only)
 
-Final code: local b89adae / published 5297498b0305e72c091d4f5fe776dc5e4a3f6181,
-identical tree 414adc49b3cca3dcc807d784f23f33020be2548c.
+Final code: local 53b5b9b / published 6e0a67c0005bcc025e2bb735b6edb60a7e07dc72,
+identical tree ff24ab01a06898adf1a55d80ca730e59b661a1c5.
+Prior source-alias increment b89adae / 5297498b has tree 414adc49b3cca3dcc807d784f23f33020be2548c.
 Catalog increment bf0c662 / 561614dd has identical tree 9b13c4b45d986cc18a9cab3a9e8d6102ac09c838.
 Earlier f637d495 / local 032a46d has identical tree 3afe8872d41805d685dcc8deda10d09f6918d8b2.
 Logs/JUnit and SHA256 manifest are in host-validation.tar.gz and host/.
@@ -81,3 +82,30 @@ from the draft PR publication ledger; they supersede exploratory host runs.
 Final exact-code independent run (5297498b):
 https://github.com/mrgarmise/charlie/actions/runs/42881120199
 The GitHub run and PR publication ledger provide the final live conclusion.
+
+## Meditation client-budget regression
+
+An additional integrated Executive test first failed on the prior source: the
+default 10-second slice called the fake provider despite the native 35-second
+client headroom requirement. The red result is preserved as generalized-budget-red.
+The fix propagates the real monotonic slice deadline and defers before service
+reservation if insufficient; it rechecks after source review and service
+preparation. Tests prove a 10-second slice makes zero provider calls, a 60-second
+slice can complete one authorized fake consultation through the actual Executive,
+and preparation consuming the headroom causes deferral without inference.
+
+Pinned budget-fix host run without the private source: 157 passed, 6 skipped,
+2 forbidden socket tests deselected; architecture contracts 131 passed. The
+private-source pinned run and independent final-head CI provide final totals.
+The earlier 5297498b independent code run passed 161 focused tests / 1 private
+source skip, 131 contracts, and 1959 full tests / 28 skips; artifact
+https://github.com/mrgarmise/charlie/actions/runs/42881120199/artifacts/13793753035
+ZIP SHA256 9533bf1005dfb787d288fd4333aebaa1423c2681a84ad09a5fba1e8012932b5a.
+
+The final private-source budget-fix host run passed 158 tests, with 5 host
+prerequisite skips and 2 forbidden socket tests deselected. All original source
+fingerprints and operational asset hashes remained unchanged.
+
+Final client-budget code CI:
+https://github.com/mrgarmise/charlie/actions/runs/42883701612
+Final evidence-head CI and full totals are recorded in the PR publication ledger.

@@ -14,7 +14,9 @@ model inference, autostart or operational approval changes were performed.
 | 6bad3dc | a92705b90a5685ce9afdba0e5cc76d13e5f1f8a0 | 1e3221d74d09e17495b01846d66c1b3b40d5ef64; coordinator/policy |
 | 032a46d | f637d495a6b814449b7a6b9b1cc103fa35c7f757 | 3afe8872d41805d685dcc8deda10d09f6918d8b2; provider boundary hardening |
 | bf0c662 | 561614ddd39789c78fb140d4983275a2cd4c7513 | 9b13c4b45d986cc18a9cab3a9e8d6102ac09c838; current catalog and queue bounds |
-| b89adae | 5297498b0305e72c091d4f5fe776dc5e4a3f6181 | 414adc49b3cca3dcc807d784f23f33020be2548c; final source-alias write protection |
+| b89adae | 5297498b0305e72c091d4f5fe776dc5e4a3f6181 | 414adc49b3cca3dcc807d784f23f33020be2548c; source-alias write protection |
+| cf69dc9 | fad7d16b0d6b2ecc202a3891e868e7f764594922 | 796cf4df99a64ef4485af88af2094e717ba2a7ac; evidence-only handoff |
+| 53b5b9b | 6e0a67c0005bcc025e2bb735b6edb60a7e07dc72 | ff24ab01a06898adf1a55d80ca730e59b661a1c5; meditation client-budget admission |
 
 GitHub did not have d3dca905 (commit lookup 422). Shell fetch failed DNS, after
 working around an existing SSH config ownership error. GitHub connector publication
@@ -124,6 +126,14 @@ authorization: independently_owned_backend is intentionally not provided by the
 Executive. Do not substitute a test Authority for it. NativeSlotAuthority denies
 if no authority is supplied. A normal worker has no coordinator by default;
 `--llm-consultation` keeps its pre-existing semantics, not standing authorization.
+
+The normal 10-second thinking slice cannot admit a native client requiring
+35 seconds of headroom: it defers before service preparation. A separately
+qualified meditation profile can use the existing `--learning-budget 60` (or
+`budget_seconds=60` at composition). The remaining monotonic client budget is
+checked again after source review and service preparation; insufficient headroom
+defers without inference. Client and independent service-cutoff budgets remain
+separate, and both must fit the qualified primary-free interval.
 
 Queue maintenance runs in bounded offline turns; source hashing/verification has
 cooperative primary-work checks. Consultation runs at a saved meditation iteration

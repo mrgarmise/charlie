@@ -162,5 +162,40 @@
     "name": "generalized-source-alias.xml",
     "sha256": "e974838b2185cb6a2a7264e6d678c605d669416c5eb25c30510182d05b250737",
     "bytes": 22896
+  },
+  {
+    "name": "generalized-budget-contracts.log",
+    "sha256": "147f41b26f07350fa9036425593b7557dc48887f78cbfd4d2bfed0be243e1219",
+    "bytes": 180
+  },
+  {
+    "name": "generalized-budget-green.log",
+    "sha256": "dd56d3865a1c56966b4d0f0923b9be9a534c32461817cb8a57b021797061a8b2",
+    "bytes": 285
+  },
+  {
+    "name": "generalized-budget-green.xml",
+    "sha256": "9d7ffcb3c7b5765a476f681bcfcc326c52f5ae8efd3d67f17ed439968a84c73e",
+    "bytes": 23359
+  },
+  {
+    "name": "generalized-budget-pinned.log",
+    "sha256": "fa02bc46dbd3d9199284fa18f2f5b42b78f548c71f960e64091d1a071545f192",
+    "bytes": 286
+  },
+  {
+    "name": "generalized-budget-pinned.xml",
+    "sha256": "065e77a59ebaf6729f02ee6d29294ac94df507e40b97479f34c685ba34f106c6",
+    "bytes": 23090
+  },
+  {
+    "name": "generalized-budget-red.log",
+    "sha256": "4310867ad510dfedc0bb773627c6ed902afaac4c8b34fcbb8a4814362dccd9f5",
+    "bytes": 2362
+  },
+  {
+    "name": "generalized-budget-red.xml",
+    "sha256": "95b54abd5aded9f171e3fda73ec22578e768dca941f4a2868ad289d5b3b3be98",
+    "bytes": 2006
   }
 ]

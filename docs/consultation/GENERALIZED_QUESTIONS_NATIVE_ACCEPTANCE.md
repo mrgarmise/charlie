@@ -71,7 +71,11 @@ new reviewed decision notebook/attestation; never delete a marker to retry.
    do not bypass a hold or fabricate a renewal. Wait for an independently renewed
    investigation/new evidence. Verify canonical IDs, source fingerprints and
    bounded historical context. No sensor timestamps are refreshed.
-6. In one genuine Executive-commissioned meditation, enable the independently
+6. Configure a reviewed finite meditation client budget with >=35 seconds left
+   after source review/prewarm (existing --learning-budget 60 is a candidate,
+   subject to measured native headroom). The normal 10-second slice correctly
+   defers without preparing a service. Do not weaken this guard to obtain a query.
+   In one genuine Executive-commissioned meditation, enable the independently
    qualified authority for a finite trial only. Attach coordinator to the existing
    lifecycle using the API in GENERALIZED_QUESTIONS_HANDOFF.md; no second
    Executive. Capture commission, checkpoint, external slot/policy/receipt IDs,

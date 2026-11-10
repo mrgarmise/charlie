@@ -6,6 +6,7 @@ A test authority is an injected dependency, never an OS trust boundary.
 from dataclasses import dataclass
 from contextlib import contextmanager, ExitStack
 import fcntl
+import hashlib
 import math
 import os
 import time
@@ -98,7 +99,14 @@ class MeditationConsultations:
             with (self.queue.journal.path.parent/'question-execution.lock').open('a') as lock:
                 fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
                 # Re-read under lock to prevent stale selections by another process.
-                if self.queue.states()[item['id']]['state'] not in ('queued','operator-selected','deferred-to-next-eligible-meditation'):return None
+                latest=self.queue.states()
+                if latest[item['id']]['state'] not in ('queued','operator-selected','deferred-to-next-eligible-meditation'):return None
+                if any(s['state'] in ('admission-pending','submitted/unknown','answer-durable',
+                                     'provider-cleanup-confirmed','uncertain-completion') for s in latest.values()):return None
+                attempts=self._attempts();now=self.clock()
+                if (sum(0<=now-p['timestamp']<86400 for p in attempts)>=self.daily_limit
+                        or any(now-p['timestamp']<self.cooldown for p in attempts)
+                        or any(p.get('commission_id')==commission_id for p in attempts)):return None
                 # Refuse changed source, status drift and newly retained answers.
                 fresh=discover(self.paths,now=self.clock(),check=check)
                 current=next((q for q in fresh['candidates'] if q['id']==item['id']),None)
@@ -165,7 +173,7 @@ class ManualApprovalSlot:
             admission=Admission(self.approval)
             admission.check(starting=True)
             try:
-                yield Slot(commission_id,str(self.approval),admission.doc['expires_at'],admission.check)
+                yield Slot(hashlib.sha256(admission.raw).hexdigest(),str(self.approval),admission.doc['expires_at'],admission.check)
             finally:
                 # The independently qualified kernel cutoff is already inside
                 # the approved interval. Keep runtime exclusion through it even

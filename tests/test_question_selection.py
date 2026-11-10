@@ -75,3 +75,49 @@ def test_authentic_private_source_when_explicitly_available():
             'ae34a68462dae3dd17eca801be9a293841e7a3101d5ec1d924f41e7e70c06dd5',
             '52f7dfdc55ed96c6930760a6e33ca076f5e84c780038a3fc23c6d9268c8c2009'}<=ids
     assert report['model_calls']==0
+
+
+def test_deferred_and_selected_work_still_consume_queue_capacity(tmp_path):
+    path=source(tmp_path);item=discover([path])['candidates'][0]
+    with closing(EvidenceJournal(tmp_path/'queue.sqlite3')) as j:
+        q=QuestionQueue(j)
+        for n in range(8):
+            entry=dict(item,id=f'candidate-{n}')
+            q.queue(entry);q.decide(entry['id'],'defer','wait for an independent slot')
+        with pytest.raises(ValueError,match='full'):q.queue(dict(item,id='ninth'))
+        q.decide('candidate-0','skip','operator rejects this investigation')
+        q.queue(dict(item,id='ninth'))
+        assert len(q.states())==9  # bounded pending work; audit history retained
+
+
+def test_existing_current_queue_keeps_authenticity_and_recency(tmp_path):
+    from datetime import datetime
+    path=tmp_path/'current.sqlite3'
+    with closing(EvidenceJournal(path)) as j:
+        origin=j.append('observation',dict(category='score_review_proposal',authentic=True),episode='current',
+            producer='score-review',version='1',provenance={'authentic':True})
+        queued=j.append('event',dict(category='llm_consultation',op='queued',question='What safe observation reduces score ambiguity?',
+            evidence_ids=[origin.id],owner='score',subject='uncertainty'),episode='current',sources=[origin.id],
+            producer='LearningExecutive:consultation',version='consultation-v1')
+    now=datetime.fromisoformat(queued.committed_at).timestamp()+1
+    item=discover([path],now=now)['candidates'][0]
+    assert item['eligible'] and item['classification']=='current-authentic-investigation'
+    assert 'Current authentic retained question' in context_for(item)['text']
+    stale=discover([path],now=now+301)['candidates'][0]
+    assert not stale['eligible'] and 'stale current source' in stale['reasons']
+    with closing(EvidenceJournal(path)) as j:
+        j.append('event',dict(category='llm_consultation',op='answered',question_id=queued.id),episode='current',
+            producer='LearningExecutive:consultation',version='consultation-v1')
+    assert not discover([path],now=now)['candidates'][0]['eligible']
+
+
+@pytest.mark.parametrize('authentic,synthetic',[(False,False),(True,True)])
+def test_current_queue_cannot_make_inauthentic_sources_eligible(tmp_path,authentic,synthetic):
+    path=tmp_path/'current.sqlite3'
+    with closing(EvidenceJournal(path)) as j:
+        origin=j.append('observation',dict(category='score_review_proposal',authentic=True,synthetic=synthetic),
+            episode='current',producer='score-review',version='1',provenance={'authentic':authentic})
+        j.append('event',dict(category='llm_consultation',op='queued',question='What safe observation reduces score ambiguity?',
+            evidence_ids=[origin.id],owner='score',subject='uncertainty'),episode='current',sources=[origin.id],
+            producer='LearningExecutive:consultation',version='consultation-v1')
+    assert not discover([path])['candidates'][0]['eligible']

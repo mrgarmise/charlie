@@ -267,6 +267,7 @@ def test_manual_existing_admission_holds_lock_through_cutoff(tmp_path,monkeypatc
     from learning.meditation_consultation import ManualApprovalSlot
     cutoff=time.monotonic()+.02
     class Admission:
+        raw=b'externally issued one-off admission'
         doc={'expires_at':time.time()+40}
         identity={'cutoff_monotonic':cutoff}
         def __init__(self,path):pass

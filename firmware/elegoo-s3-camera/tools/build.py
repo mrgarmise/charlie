@@ -68,7 +68,8 @@ def main():
         compile_command=shlex.join(command),compile_log=str(log),binary=str(binary),
         source_sha256=before,upstream_commit='a92013016d2386cd4ed2e0e7893b018f04b89cfc',
         core_parent='b71cd3dd917b83aff3b643795a76dab3ac5b42ed',
-        not_hardware_qualified=True,deployed=False,motor_forwarding_enabled=False)
+        not_hardware_qualified=True,deployed=False,motor_forwarding_policy="per-command-hmac-bounded-qualified-pi",
+        motor_forwarding_default="closed-without-authenticated-command")
     (build/'build-report.json').write_text(json.dumps(report,indent=2))
     print(json.dumps(report,indent=2))
 

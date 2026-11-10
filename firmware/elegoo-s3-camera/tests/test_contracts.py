@@ -24,7 +24,8 @@ def test_legacy_camera_routes_and_single_uart_writer():
             code=re.sub(r'/\*.*?\*/|//[^\n]*','',path.read_text(),flags=re.S)
             writers.extend([path.name]*len(re.findall(r'Serial2\.(?:print|write)\s*\(',code)))
     assert writers==['MotorBridge.cpp']
-    assert '#define CHARLIE_ENABLE_MOTOR_FORWARDING 0' in (sketch/'MotorBridge.h').read_text()
+    assert 'CommandGate gate_' in (sketch/'MotorBridge.h').read_text()
+    assert 'gate_.consume(frame,now)' in (sketch/'MotorBridge.cpp').read_text()
 
 def test_one_wifi_owner_no_provisioning_uart_or_credentials():
     camera=(sketch/'CameraWebServer_AP.cpp').read_text()
@@ -49,3 +50,11 @@ def test_partition_geometry_matches_original_layout():
     assert [(r[0],int(r[3],16),int(r[4],16)) for r in rows]==[
         ('nvs',0x9000,0x5000),('otadata',0xe000,0x2000),('app0',0x10000,0x330000),
         ('app1',0x340000,0x330000),('spiffs',0x670000,0x180000),('coredump',0x7f0000,0x10000)]
+
+
+def test_official_sensor_selected_ui_and_custom_preservation():
+    asset=sketch/'StockCameraIndex.h'
+    assert hashlib.sha256(asset.read_bytes()).hexdigest()=='140c06e5772b02beae77c88f958f525e651a7b948dae96e7410c1166b67b86f6'
+    source=(sketch/'app_httpd.cpp').read_text()
+    assert 'custom_uri.uri="/custom-ui"' in source
+    assert 'sensor->id.PID==OV3660_PID' in source

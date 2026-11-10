@@ -45,7 +45,7 @@ void setup() {
   if(!camera.CameraWebServer_AP_Init())Serial.println("Camera unavailable; authenticated recovery remains available");
   const uint64_t chip=ESP.getEfuseMac();char legacyName[13];
   snprintf(legacyName,sizeof(legacyName),"%04X%08X",static_cast<uint16_t>(chip>>32),static_cast<uint32_t>(chip));
-  bridge.begin(legacyName);
+  bridge.begin(legacyName,identity.record().commandKey);
   if(xTaskCreatePinnedToCore(bridgeTask,"charlie-uart-owner",6144,nullptr,6,nullptr,1)!=pdPASS)
     Serial.println("Bridge task unavailable");
 }

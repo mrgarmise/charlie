@@ -13,6 +13,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/checkout@v4
         with:
           ref: c8a7a8d471130e40d9a5ecf827870118f3757b8f
@@ -22,22 +23,28 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -r requirements.txt pytest==8.4.2 playwright==1.56.0 zeroconf==0.148.0
       - run: python -m playwright install --with-deps chromium
+      - run: sudo apt-get update && sudo apt-get install -y libmbedtls-dev
       - run: python firmware/elegoo-s3-camera/tools/host_tests.py --sanitizers address,undefined
       - run: g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined firmware/elegoo-network/tests/core.cpp -o /tmp/prior-core-tests
       - run: /tmp/prior-core-tests
       - run: python -m pytest firmware/elegoo-s3-camera/tests -q --junitxml=s3-integration-host.xml
         env:
           CHARLIE_PEER_ROOT: ${{ github.workspace }}/reviewed-peer
+      - run: python -m pytest tests/test_owner_uno_compatibility.py tests/test_face_trial_preparation.py tests/test_elegoo_command_auth.py tests/test_elegoo_timed_pulse.py tests/test_elegoo_stop_ack_deadline.py tests/test_unified_actuator_requests.py tests/test_mobile_console.py -q --junitxml=owner-uno-compatibility.xml
       - run: python tools/check_unified_contracts.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: s3-host-validation
-          path: s3-integration-host.xml
+          path: |
+            s3-integration-host.xml
+            owner-uno-compatibility.xml
   native-build:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -60,3 +67,4 @@ jobs:
             /tmp/s3-qspi/build-report.json
             /tmp/s3-qspi/image-info.txt
             /tmp/s3-qspi-compile.log
+

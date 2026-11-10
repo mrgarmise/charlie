@@ -94,7 +94,7 @@ def test_qualified_pan_cannot_accept_untagged_negative_or_foreign_ack(reply):
         frame={'{ok}':'{ok}','error':'{'+command['H']+'_error}','wrong-id':'{other_ok}'}[reply]
         car._handle_frame(frame)
     car.sock=SimpleNamespace(sendall=send)
-    with pytest.raises(TimeoutError):car.pan_qualified(95,safety_check=lambda:True)
+    with pytest.raises(TimeoutError):car.pan_qualified(90,safety_check=lambda:True)
     assert not car._pending
 
 
@@ -103,7 +103,7 @@ def test_pan_cancellation_wins_ack_race():
     def send(raw):
         p=json.loads(raw);car._handle_frame('{'+p['H']+'_ok}');safe[0]=False
     car.sock=SimpleNamespace(sendall=send)
-    with pytest.raises(InterruptedError):car.pan_qualified(95,safety_check=lambda:safe[0])
+    with pytest.raises(InterruptedError):car.pan_qualified(90,safety_check=lambda:safe[0])
 
 
 def test_stop_timeout_retains_command_and_does_not_retry():

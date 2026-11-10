@@ -1,3 +1,5 @@
+Current follow-on policy and validation: [QUALIFIED_CONTROL.md](QUALIFIED_CONTROL.md). Historical PR30 reports below describe the earlier pinned candidate.
+
 # ELEGOO S3 camera/network integration — BUILD ONLY, DO NOT FLASH
 
 This is a complete candidate sketch based on the owner-selected UMRT S3 camera
@@ -23,7 +25,7 @@ The original PR28/PR29 heads, approved Charlie runtime and private backup are in
   closes the session and prioritizes N100 STOP. A reconnect resets all parser and
   heartbeat state and cannot replay an old command. AP count never controls safety.
   FactoryTest receives explicit session state and shares the same UART writer.
-- Default CHARLIE_ENABLE_MOTOR_FORWARDING=0. The candidate binary is observation-only.
+- Follow-on candidate uses a closed per-command authenticated gate; see QUALIFIED_CONTROL.md. PR30 remains observation-only at its pinned commit.
   Forwarding implementation is compiled/tested on the host with UART capture stubs;
   changing that gate needs separate source review, physical qualification and a new
   runtime/firmware-bound grant. Existing QualifiedElegooExecutor admission is never

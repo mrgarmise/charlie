@@ -1,0 +1,12 @@
+bridge-authenticated: /tmp/charlie-pr31-owner-review/firmware/elegoo-s3-camera/tests/stubs/WiFi.h:29: void WiFiServer::begin(): Assertion `fd_>=0' failed.
+framing: passed
+auth: passed
+power-loss: passed
+Traceback (most recent call last):
+  File "/tmp/charlie-pr31-owner-review/firmware/elegoo-s3-camera/tools/host_tests.py", line 27, in <module>
+    subprocess.run([str(target)],check=True,timeout=15)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/tmp/elegoo-s3-host-lyusab2x/bridge-authenticated']' died with <Signals.SIGABRT: 6>.

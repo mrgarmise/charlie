@@ -13,10 +13,12 @@ static uint32_t checksum(const IdentityRecord& record) {
 }
 static bool bounded(const char* value,size_t size) {return value && strnlen(value,size)<size;}
 bool Identity::validate(const IdentityRecord& r,const char* expected) {
-  if(r.schema!=1 || !bounded(r.device,sizeof(r.device)) || strcmp(r.device,expected)
+  if(r.schema!=2 || !bounded(r.device,sizeof(r.device)) || strcmp(r.device,expected)
      || !bounded(r.token,sizeof(r.token)) || strlen(r.token)<43
+     || !bounded(r.commandKey,sizeof(r.commandKey)) || strlen(r.commandKey)<43 || !strcmp(r.token,r.commandKey)
      || !bounded(r.recoverySecret,sizeof(r.recoverySecret)) || strlen(r.recoverySecret)<20 || strlen(r.recoverySecret)>63
      || !bounded(r.certificate,sizeof(r.certificate)) || !bounded(r.privateKey,sizeof(r.privateKey)))return false;
+  for(const char* p=r.commandKey;*p;++p)if(!isalnum(static_cast<unsigned char>(*p)) && *p!='_' && *p!='-')return false;
   for(const char* p=r.token;*p;++p)if(!isalnum(static_cast<unsigned char>(*p)) && *p!='_' && *p!='-')return false;
   mbedtls_x509_crt cert;mbedtls_x509_crt_init(&cert);
   mbedtls_pk_context key;mbedtls_pk_init(&key);
@@ -35,18 +37,19 @@ bool Identity::begin(const char* expected) {
 }
 bool Identity::enroll(const char* text,const char* expected) {
   // No existing-identity reset endpoint. Physical recovery requires its own maintenance.
-  if(record_.schema==1 || !text || strlen(text)>7168 || strstr(text,"\\u0000"))return false;
+  if(record_.schema==2 || !text || strlen(text)>7168 || strstr(text,"\\u0000"))return false;
   cJSON* body=cJSON_Parse(text);if(!cJSON_IsObject(body)){cJSON_Delete(body);return false;}
   std::unique_ptr<IdentityRecord> allocated(new(std::nothrow) IdentityRecord);
   if(!allocated){cJSON_Delete(body);return false;}
   auto& next=*allocated;
   // Canonicalize padding as well as fields before checksumming/persisting the blob.
-  wipeBytes(&next,sizeof(next));next.schema=1;
+  wipeBytes(&next,sizeof(next));next.schema=2;
   struct Field {const char* key;char* target;size_t size;};
   Field fields[]={{"device_id",next.device,sizeof(next.device)}, {"certificate",next.certificate,sizeof(next.certificate)},
     {"private_key",next.privateKey,sizeof(next.privateKey)}, {"token",next.token,sizeof(next.token)},
+    {"command_key",next.commandKey,sizeof(next.commandKey)},
     {"recovery_secret",next.recoverySecret,sizeof(next.recoverySecret)}};
-  bool good=cJSON_GetArraySize(body)==5;
+  bool good=cJSON_GetArraySize(body)==6;
   for(const auto& field:fields){const auto* value=cJSON_GetObjectItemCaseSensitive(body,field.key);
     if(!cJSON_IsString(value) || !bounded(value->valuestring,field.size)){good=false;continue;}
     strcpy(field.target,value->valuestring);

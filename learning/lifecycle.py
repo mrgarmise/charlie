@@ -659,9 +659,10 @@ class DevelopmentLifecycle:
         self._operational('running','Executive developmental attempt')
         self.reflection_dependency_blocked=False
         self.reflection_dependency=None
-        if self.meditation_consultations is not None:
-            self.meditation_consultations.refresh(self.yield_for_primary)
-        try:self.executive.develop(self)
+        try:
+            if self.meditation_consultations is not None:
+                self.meditation_consultations.refresh(self.yield_for_primary)
+            self.executive.develop(self)
         except InterruptedError as exc:
             from .resources import DevelopmentInterrupted
             if not isinstance(exc,(ResourceUnavailable,DevelopmentInterrupted)) and exc is not self.resources.blockage:

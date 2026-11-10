@@ -210,3 +210,81 @@ def test_actual_executive_meditation_hook_keeps_checkpoint(tmp_path):
         assert life.journal.category_records('observation','normal_meditation_result')
         assert sha(root/'tracks.json')==before
     finally:life.close()
+
+
+from test_consultation_activation import native_fakes
+
+
+def test_actual_operational_provider_admission_refusal_is_not_submission(tmp_path,native_fakes):
+    from learning.consultation_activation import OperationalProvider
+    native_fakes.mode['value']='unapproved'
+    x=setup(tmp_path,lambda _:OperationalProvider(native_fakes.path));x.authority.safe=True
+    try:
+        x.c.on_meditation('commission')
+        assert not native_fakes.rows()
+        states=[r.data['payload']['state'] for r in x.j.records()]
+        assert 'admission-pending' in states and 'submitted/unknown' not in states
+        assert states[-1]=='uncertain-completion'  # conservative no retry
+    finally:x.j.close()
+
+
+def test_actual_operational_provider_retention_order(tmp_path,native_fakes):
+    from learning.consultation_activation import OperationalProvider
+    x=setup(tmp_path,lambda _:OperationalProvider(native_fakes.path));x.authority.safe=True
+    try:
+        x.c.on_meditation('commission')
+        states=[r.data['payload']['state'] for r in x.j.records()]
+        assert states[-5:]==['admission-pending','submitted/unknown','answer-durable','provider-cleanup-confirmed','awaiting-evaluation']
+        assert not native_fakes.marker.exists()
+        assert len([r for r in native_fakes.rows() if r['path']=='/api/chat'])==1
+    finally:x.j.close()
+
+
+def test_slot_replay_cannot_consult_second_question(tmp_path):
+    x=setup(tmp_path);x.authority.safe=True
+    original=x.authority.reserve
+    @contextmanager
+    def same_slot(**kwargs):
+        with original(**kwargs) as slot:yield Slot('same-external-slot',slot.approval_path,slot.ends_at,slot.check)
+    x.authority.reserve=same_slot
+    try:
+        x.c.on_meditation('one');x.clock[0]+=100;x.c.on_meditation('two')
+        assert len(x.providers)==1
+    finally:x.j.close()
+
+
+def test_decision_notebook_cannot_alias_source(tmp_path):
+    import os
+    path=source(tmp_path)
+    alias=tmp_path/'alias.sqlite3';os.link(path,alias)
+    with closing(EvidenceJournal(path)) as j:
+        with pytest.raises(ValueError,match='separate'):
+            MeditationConsultations(QuestionQueue(j),[alias])
+
+
+def test_manual_existing_admission_holds_lock_through_cutoff(tmp_path,monkeypatch):
+    import time
+    from learning.meditation_consultation import ManualApprovalSlot
+    cutoff=time.monotonic()+.02
+    class Admission:
+        doc={'expires_at':time.time()+40}
+        identity={'cutoff_monotonic':cutoff}
+        def __init__(self,path):pass
+        def check(self,**kwargs):pass
+    monkeypatch.setattr('learning.consultation_activation.Admission',Admission)
+    with ManualApprovalSlot(tmp_path/'external-approval',tmp_path/'runtime.lock').reserve(commission_id='manual',seconds=40):pass
+    assert time.monotonic()>=cutoff
+
+
+def test_slot_deadline_expiry_retains_unknown_without_answer(tmp_path):
+    x=None
+    class Late(Provider):
+        def consult(self,prompt,check):
+            self.state='request-in-flight';check();x.clock[0]+=90;check()
+    x=setup(tmp_path,Late);x.authority.safe=True
+    try:
+        x.c.on_meditation('finite')
+        states=[r.data['payload']['state'] for r in x.j.records()]
+        assert states[-1]=='uncertain-completion' and 'answer-durable' not in states
+        x.clock[0]+=100;x.c.on_meditation('next');assert len(x.providers)==1
+    finally:x.j.close()

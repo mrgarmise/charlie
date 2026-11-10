@@ -103,10 +103,14 @@ def discover(paths, *, now=None, limit=128, check=lambda:None):
                         locations=[dict(path=path, sha256=before, question_id=row.id)])
                     if key in candidates:
                         old = candidates[key]; old['locations'] += item['locations']
+                        if old['question_id']==item['question_id'] and old['committed_at']!=item['committed_at']:
+                            old.update(eligible=False,reasons=['conflicting original commitment times'])
                         # A refusal in any copy wins over a permissive stale archive.
                         if not item['eligible']: old.update(eligible=False, reasons=sorted(set(old['reasons']+reasons)))
                     else: candidates[key] = item
             if fingerprint(path,check) != before: raise ValueError('source changed during discovery')
+        except InterruptedError:
+            raise
         except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
             # Do not keep partially discovered candidates from an invalid source.
             candidates = {k:v for k,v in candidates.items() if not any(l['path']==path for l in v['locations'])}

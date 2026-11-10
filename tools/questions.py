@@ -2,12 +2,14 @@
 import argparse
 from contextlib import closing
 import json
+import os
 from pathlib import Path
 from learning.question_selection import discover, QuestionQueue
 from memory.evidence import EvidenceJournal
 
 
 def main():
+    os.umask(0o077)
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('action',choices=['list','inspect','explain','queue','skip','defer','select','show-answer','pending-evaluation','consult'])
     p.add_argument('--source',action='append',default=[])
@@ -19,7 +21,8 @@ def main():
         print(json.dumps(report,indent=2));return
     if not a.notebook:p.error('--notebook required; choose a NEW separate decision journal')
     if a.notebook.resolve() in [Path(s).resolve() for s in a.source]:p.error('notebook must differ from sources')
-    with closing(EvidenceJournal(a.notebook)) as j:
+    read_only=a.action in ('show-answer','pending-evaluation')
+    with closing(EvidenceJournal(a.notebook,read_only=read_only)) as j:
         q=QuestionQueue(j)
         if a.action=='queue':
             report=discover(a.source)

@@ -62,3 +62,16 @@ def test_answer_in_separate_receipt_source_vetoes_history(tmp_path):
     report=discover([path,receipt])
     q=next(q for q in report['candidates'] if q['id']==item['id'])
     assert not q['eligible'] and 'previous answer retained' in q['reasons']
+
+
+def test_authentic_private_source_when_explicitly_available():
+    import os
+    from tools.qualify_question_sources import qualify
+    path=os.environ.get('CHARLIE_QUESTION_SOURCE')
+    if not path:pytest.skip('private authentic journal supplied only via explicit read-only path')
+    report=qualify([path]);assert report['original_journals_unchanged']
+    ids={q['question_id'] for q in report['candidates']}
+    assert {'5524edc23f1affbda1d8a65253b7bd1000e52df6c66661f6d86bf4609a745643',
+            'ae34a68462dae3dd17eca801be9a293841e7a3101d5ec1d924f41e7e70c06dd5',
+            '52f7dfdc55ed96c6930760a6e33ca076f5e84c780038a3fc23c6d9268c8c2009'}<=ids
+    assert report['model_calls']==0

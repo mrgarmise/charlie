@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from contextlib import contextmanager, ExitStack
 import fcntl
 import math
+import os
 import time
 import uuid
 from pathlib import Path
@@ -42,6 +43,10 @@ class MeditationConsultations:
                  daily_limit=4, cooldown=3600, slot_seconds=90):
         if (type(enabled) is not bool or not 1<=daily_limit<=4 or not 60<=cooldown<=86400
                 or not 40<=slot_seconds<=120):raise ValueError('finite standing policy required')
+        for path in paths:
+            if Path(path).resolve()==queue.journal.path.resolve() or (
+                    Path(path).exists() and os.path.samefile(path,queue.journal.path)):
+                raise ValueError('decision notebook must be separate from immutable sources')
         self.queue=queue;self.paths=list(paths);self.authority=authority or NativeSlotAuthority()
         self.enabled=enabled;self.provider_factory=provider_factory;self.clock=clock
         self.daily_limit=daily_limit;self.cooldown=cooldown;self.slot_seconds=slot_seconds
@@ -107,6 +112,8 @@ class MeditationConsultations:
                         if not math.isfinite(slot.ends_at) or self.clock()>=slot.ends_at-5:
                             raise InterruptedError('safe slot cutoff headroom')
                     guard()
+                    if any(p.get('slot_id')==slot.id for p in self._attempts()):
+                        return self.queue.event(item,'deferred-to-next-eligible-meditation',reason='safe slot already consumed')
                     if slot.ends_at-self.clock()<35:raise InterruptedError('insufficient consultation headroom')
                     self.queue.event(item,'admission-pending',attempt_id=attempt,commission_id=commission_id,
                                      slot_id=slot.id,context=context_for(item))
@@ -157,4 +164,13 @@ class ManualApprovalSlot:
         with runtime_exclusion(self.runtime_lock):
             admission=Admission(self.approval)
             admission.check(starting=True)
-            yield Slot(commission_id,str(self.approval),admission.doc['expires_at'],admission.check)
+            try:
+                yield Slot(commission_id,str(self.approval),admission.doc['expires_at'],admission.check)
+            finally:
+                # The independently qualified kernel cutoff is already inside
+                # the approved interval. Keep runtime exclusion through it even
+                # when client completion/unload is unknown; never clear markers.
+                cutoff=admission.identity['cutoff_monotonic']
+                while time.monotonic()<cutoff:
+                    try:time.sleep(max(0.,min(.1,cutoff-time.monotonic())))
+                    except KeyboardInterrupt:continue

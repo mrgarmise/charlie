@@ -1,0 +1,48 @@
+{
+  "backup_bytes": 8388608,
+  "backup_sha256": "c196e9077be06b3f61f6acfcf66219fe0535b60ae1d26183c43b2de80ff25c5b",
+  "app0_comparison": {
+    "image_bytes": 2960064,
+    "image_sha256": "1f0075a5e922908bd11907ab8595ee8c000b4be981b34f9b58fc131ca2892b3c",
+    "backup_offset": "0x10000",
+    "exact_bytes_equal": true
+  },
+  "public_vs_umrt_sources": {
+    "ESP32_CameraServer_AP_2023_V1.3.ino": {
+      "left_sha256": "09e9844f69f4d827e15fff04dde20d1928fec05ba43a4d968c8be85ffbcf2bb6",
+      "right_sha256": "9a4ab3bfe8f94af03a8596bb048e7e3f90cbf30f4a3691d83ccc665871f9c0e4",
+      "byte_equal": false,
+      "lf_equal": true
+    },
+    "CameraWebServer_AP.cpp": {
+      "left_sha256": "7c02ca1ba2483eef2dd4369666b6d6b36820ec8c493728445ce984031677d332",
+      "right_sha256": "d259205178d4c39f7ff986a0220b72ec71cd26ee2fb9552324b9bef09606c90e",
+      "byte_equal": false,
+      "lf_equal": false
+    },
+    "CameraWebServer_AP.h": {
+      "left_sha256": "4f0fd9063b5e477a4dfaacad58d5ed541b42bae628c99e5e25e46d084acd3514",
+      "right_sha256": "e61629dfdd091a6ccdf24c5af370e95b885d2983738cd60c34830667247b0202",
+      "byte_equal": false,
+      "lf_equal": false
+    },
+    "app_httpd.cpp": {
+      "left_sha256": "bf1650139c46d11b752859702bc69d1170173c46fa4e17c26dab39727e1edafa",
+      "right_sha256": "172b9894d4eaa45edf49b51717104f15b6e995aed0fbc13cf5794be1f07e7f32",
+      "byte_equal": false,
+      "lf_equal": false
+    },
+    "camera_index.h": {
+      "left_sha256": "140c06e5772b02beae77c88f958f525e651a7b948dae96e7410c1166b67b86f6",
+      "right_sha256": "d97f03a390ed2c979623a8571619122eba03e496ad7a3c75da6ea81e7fefaa59",
+      "byte_equal": false,
+      "lf_equal": false
+    },
+    "camera_pins.h": {
+      "left_sha256": "b8cf149f4271a148c52d10b11842d537de57316afec7ec2ba9c6e251134923ff",
+      "right_sha256": "239c1e820a22b04cbac7d0e6eb608ac195b9b03570a6bb173be6d8f5e5374854",
+      "byte_equal": false,
+      "lf_equal": true
+    }
+  }
+}

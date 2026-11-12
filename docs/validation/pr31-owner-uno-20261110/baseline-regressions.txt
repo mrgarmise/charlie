@@ -1,0 +1,192 @@
+.F.FF..F.FF.FFF...FFF...F                                                [100%]
+=================================== FAILURES ===================================
+_____________ test_pan_reports_representable_position[False-29-20] _____________
+
+requested = 29, effective = 20, qualified = False
+
+    @pytest.mark.parametrize('requested,effective',[(20,20),(29,20),(90,90),(95,90),(159,150),(160,160)])
+    @pytest.mark.parametrize('qualified',[False,True])
+    def test_pan_reports_representable_position(requested,effective,qualified):
+        car,commands=peer('ok')
+        if qualified and requested != effective:
+            with pytest.raises(ValueError):car.pan_qualified(requested,safety_check=lambda:True)
+            assert commands==[]
+            return
+        result=car.pan_qualified(requested,safety_check=lambda:True) if qualified else car.pan(requested)
+>       assert result==effective
+E       assert 29 == 20
+
+tests/test_owner_uno_compatibility.py:26: AssertionError
+_____________ test_pan_reports_representable_position[False-95-90] _____________
+
+requested = 95, effective = 90, qualified = False
+
+    @pytest.mark.parametrize('requested,effective',[(20,20),(29,20),(90,90),(95,90),(159,150),(160,160)])
+    @pytest.mark.parametrize('qualified',[False,True])
+    def test_pan_reports_representable_position(requested,effective,qualified):
+        car,commands=peer('ok')
+        if qualified and requested != effective:
+            with pytest.raises(ValueError):car.pan_qualified(requested,safety_check=lambda:True)
+            assert commands==[]
+            return
+        result=car.pan_qualified(requested,safety_check=lambda:True) if qualified else car.pan(requested)
+>       assert result==effective
+E       assert 95 == 90
+
+tests/test_owner_uno_compatibility.py:26: AssertionError
+____________ test_pan_reports_representable_position[False-159-150] ____________
+
+requested = 159, effective = 150, qualified = False
+
+    @pytest.mark.parametrize('requested,effective',[(20,20),(29,20),(90,90),(95,90),(159,150),(160,160)])
+    @pytest.mark.parametrize('qualified',[False,True])
+    def test_pan_reports_representable_position(requested,effective,qualified):
+        car,commands=peer('ok')
+        if qualified and requested != effective:
+            with pytest.raises(ValueError):car.pan_qualified(requested,safety_check=lambda:True)
+            assert commands==[]
+            return
+        result=car.pan_qualified(requested,safety_check=lambda:True) if qualified else car.pan(requested)
+>       assert result==effective
+E       assert 159 == 150
+
+tests/test_owner_uno_compatibility.py:26: AssertionError
+_____________ test_pan_reports_representable_position[True-29-20] ______________
+
+requested = 29, effective = 20, qualified = True
+
+    @pytest.mark.parametrize('requested,effective',[(20,20),(29,20),(90,90),(95,90),(159,150),(160,160)])
+    @pytest.mark.parametrize('qualified',[False,True])
+    def test_pan_reports_representable_position(requested,effective,qualified):
+        car,commands=peer('ok')
+        if qualified and requested != effective:
+>           with pytest.raises(ValueError):car.pan_qualified(requested,safety_check=lambda:True)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/test_owner_uno_compatibility.py:22: Failed
+_____________ test_pan_reports_representable_position[True-95-90] ______________
+
+requested = 95, effective = 90, qualified = True
+
+    @pytest.mark.parametrize('requested,effective',[(20,20),(29,20),(90,90),(95,90),(159,150),(160,160)])
+    @pytest.mark.parametrize('qualified',[False,True])
+    def test_pan_reports_representable_position(requested,effective,qualified):
+        car,commands=peer('ok')
+        if qualified and requested != effective:
+>           with pytest.raises(ValueError):car.pan_qualified(requested,safety_check=lambda:True)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/test_owner_uno_compatibility.py:22: Failed
+____________ test_pan_reports_representable_position[True-159-150] _____________
+
+requested = 159, effective = 150, qualified = True
+
+    @pytest.mark.parametrize('requested,effective',[(20,20),(29,20),(90,90),(95,90),(159,150),(160,160)])
+    @pytest.mark.parametrize('qualified',[False,True])
+    def test_pan_reports_representable_position(requested,effective,qualified):
+        car,commands=peer('ok')
+        if qualified and requested != effective:
+>           with pytest.raises(ValueError):car.pan_qualified(requested,safety_check=lambda:True)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/test_owner_uno_compatibility.py:22: Failed
+_________________ test_yaw_rejects_non_measurement_reply[nan] __________________
+
+value = 'nan'
+
+    @pytest.mark.parametrize('value',['nan','inf','-inf','ok'])
+    def test_yaw_rejects_non_measurement_reply(value):
+        car,_=peer(value)
+>       with pytest.raises(ValueError):car.yaw()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_owner_uno_compatibility.py:34: Failed
+_________________ test_yaw_rejects_non_measurement_reply[inf] __________________
+
+value = 'inf'
+
+    @pytest.mark.parametrize('value',['nan','inf','-inf','ok'])
+    def test_yaw_rejects_non_measurement_reply(value):
+        car,_=peer(value)
+>       with pytest.raises(ValueError):car.yaw()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_owner_uno_compatibility.py:34: Failed
+_________________ test_yaw_rejects_non_measurement_reply[-inf] _________________
+
+value = '-inf'
+
+    @pytest.mark.parametrize('value',['nan','inf','-inf','ok'])
+    def test_yaw_rejects_non_measurement_reply(value):
+        car,_=peer(value)
+>       with pytest.raises(ValueError):car.yaw()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_owner_uno_compatibility.py:34: Failed
+__________ test_ultrasonic_rejects_unavailable_or_non_cm_reply[12.5] ___________
+
+value = '12.5'
+
+    @pytest.mark.parametrize('value',['0','12.5','151','1000','nan','inf','true'])
+    def test_ultrasonic_rejects_unavailable_or_non_cm_reply(value):
+        car,_=peer(value)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_owner_uno_compatibility.py:46: Failed
+___________ test_ultrasonic_rejects_unavailable_or_non_cm_reply[151] ___________
+
+value = '151'
+
+    @pytest.mark.parametrize('value',['0','12.5','151','1000','nan','inf','true'])
+    def test_ultrasonic_rejects_unavailable_or_non_cm_reply(value):
+        car,_=peer(value)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_owner_uno_compatibility.py:46: Failed
+__________ test_ultrasonic_rejects_unavailable_or_non_cm_reply[1000] ___________
+
+value = '1000'
+
+    @pytest.mark.parametrize('value',['0','12.5','151','1000','nan','inf','true'])
+    def test_ultrasonic_rejects_unavailable_or_non_cm_reply(value):
+        car,_=peer(value)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_owner_uno_compatibility.py:46: Failed
+____________________ test_ultrasonic_marks_owner_saturation ____________________
+
+    def test_ultrasonic_marks_owner_saturation():
+        car,commands=peer('150')
+        reading=car.read_ultrasonic(protocol=dict(ultrasonic_read_only=True,ultrasonic={'N':21,'D1':2}))
+>       assert reading['meters']==1.5 and reading['saturated'] is True
+                                          ^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'saturated'
+
+tests/test_owner_uno_compatibility.py:53: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_owner_uno_compatibility.py::test_pan_reports_representable_position[False-29-20]
+FAILED tests/test_owner_uno_compatibility.py::test_pan_reports_representable_position[False-95-90]
+FAILED tests/test_owner_uno_compatibility.py::test_pan_reports_representable_position[False-159-150]
+FAILED tests/test_owner_uno_compatibility.py::test_pan_reports_representable_position[True-29-20]
+FAILED tests/test_owner_uno_compatibility.py::test_pan_reports_representable_position[True-95-90]
+FAILED tests/test_owner_uno_compatibility.py::test_pan_reports_representable_position[True-159-150]
+FAILED tests/test_owner_uno_compatibility.py::test_yaw_rejects_non_measurement_reply[nan]
+FAILED tests/test_owner_uno_compatibility.py::test_yaw_rejects_non_measurement_reply[inf]
+FAILED tests/test_owner_uno_compatibility.py::test_yaw_rejects_non_measurement_reply[-inf]
+FAILED tests/test_owner_uno_compatibility.py::test_ultrasonic_rejects_unavailable_or_non_cm_reply[12.5]
+FAILED tests/test_owner_uno_compatibility.py::test_ultrasonic_rejects_unavailable_or_non_cm_reply[151]
+FAILED tests/test_owner_uno_compatibility.py::test_ultrasonic_rejects_unavailable_or_non_cm_reply[1000]
+FAILED tests/test_owner_uno_compatibility.py::test_ultrasonic_marks_owner_saturation
+13 failed, 12 passed in 0.12s

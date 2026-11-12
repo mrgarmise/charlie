@@ -18,3 +18,12 @@ Source test results, immutable commit/tree and artifact links are recorded in th
 integration draft PR publication ledger, avoiding self-referential commit hashes.
 No master merge, operational checkout edit, deployment, service/model operation,
 credential activation, firmware flash, motor operation or autonomous consultation.
+
+Increment B: #28 networking/dashboard, #29 portable firmware core, latest #31
+S3 application/owner-UNO corrections (subsuming #30), and #32 read-only stock
+audit are included as disabled source. No installed firmware or network changes.
+All 130 transferred blobs match the donor manifest; the firmware peer test now
+uses this candidate's networking module instead of only an older peer checkout.
+Host: 267 passed / 6 dependency/socket skips / 2 loopback cases deferred to CI;
+eight socket-free C++ UBSan suites passed. New exact candidate builds/TLS/browser
+and full CI are mandatory before the next cumulative promotion.

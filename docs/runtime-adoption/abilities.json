@@ -2056,10 +2056,10 @@
         }
       ],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "select exact reviewed dormant source in a later tested increment",
+      "source_present": true,
+      "transfer": "exact source blobs with provenance manifest; #31 supersedes #30 application, #32 audit only",
       "touches": {
         "devices": false,
         "motion": false,
@@ -2071,7 +2071,7 @@
         "identified": "PASSED",
         "published": "PASSED",
         "software-tested": "PASSED exact donor checks; not candidate/native acceptance",
-        "compatible-in-candidate": "PENDING",
+        "compatible-in-candidate": "PASSED focused software; exact candidate full/build CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "NOT APPLICABLE",
         "operator-approved-for-master": "PENDING",
@@ -2101,7 +2101,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect new candidate TLS/browser, host sanitizers, OPI/QSPI builds and full CI; no activation",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {
@@ -2141,10 +2141,10 @@
         }
       ],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "select exact reviewed dormant source in a later tested increment",
+      "source_present": true,
+      "transfer": "exact source blobs with provenance manifest; #31 supersedes #30 application, #32 audit only",
       "touches": {
         "devices": true,
         "motion": false,
@@ -2156,7 +2156,7 @@
         "identified": "PASSED",
         "published": "PASSED",
         "software-tested": "PASSED exact donor checks; not candidate/native acceptance",
-        "compatible-in-candidate": "PENDING",
+        "compatible-in-candidate": "PASSED focused software; exact candidate full/build CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "NOT APPLICABLE",
         "operator-approved-for-master": "PENDING",
@@ -2186,7 +2186,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect new candidate TLS/browser, host sanitizers, OPI/QSPI builds and full CI; no activation",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {
@@ -2240,10 +2240,10 @@
         }
       ],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "select exact reviewed dormant source in a later tested increment",
+      "source_present": true,
+      "transfer": "exact source blobs with provenance manifest; #31 supersedes #30 application, #32 audit only",
       "touches": {
         "devices": true,
         "motion": true,
@@ -2255,7 +2255,7 @@
         "identified": "PASSED",
         "published": "PASSED",
         "software-tested": "PASSED exact donor checks; not candidate/native acceptance",
-        "compatible-in-candidate": "PENDING",
+        "compatible-in-candidate": "PASSED focused software; exact candidate full/build CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "PENDING",
         "operator-approved-for-master": "PENDING",
@@ -2287,7 +2287,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect new candidate TLS/browser, host sanitizers, OPI/QSPI builds and full CI; no activation",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {
@@ -2353,10 +2353,10 @@
         }
       ],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "select exact reviewed dormant source in a later tested increment",
+      "source_present": true,
+      "transfer": "exact source blobs with provenance manifest; #31 supersedes #30 application, #32 audit only",
       "touches": {
         "devices": true,
         "motion": true,
@@ -2368,7 +2368,7 @@
         "identified": "PASSED",
         "published": "PASSED",
         "software-tested": "PASSED exact donor checks; not candidate/native acceptance",
-        "compatible-in-candidate": "PENDING",
+        "compatible-in-candidate": "PASSED focused software; exact candidate full/build CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "PENDING",
         "operator-approved-for-master": "PENDING",
@@ -2400,7 +2400,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect new candidate TLS/browser, host sanitizers, OPI/QSPI builds and full CI; no activation",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {
@@ -2434,10 +2434,10 @@
         }
       ],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "select exact reviewed dormant source in a later tested increment",
+      "source_present": true,
+      "transfer": "exact source blobs with provenance manifest; #31 supersedes #30 application, #32 audit only",
       "touches": {
         "devices": false,
         "motion": false,
@@ -2449,7 +2449,7 @@
         "identified": "PASSED",
         "published": "PASSED",
         "software-tested": "PASSED exact donor checks; not candidate/native acceptance",
-        "compatible-in-candidate": "PENDING",
+        "compatible-in-candidate": "PASSED focused software; exact candidate full/build CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "NOT APPLICABLE",
         "operator-approved-for-master": "PENDING",
@@ -2479,7 +2479,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect new candidate TLS/browser, host sanitizers, OPI/QSPI builds and full CI; no activation",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {

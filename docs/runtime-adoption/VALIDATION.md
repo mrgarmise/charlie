@@ -37,3 +37,22 @@ First independent core CI 43238637623 failed one guard-fingerprint comparison
 source bytes, rather than interpreter-specific AST dumps. No protected source or
 acceptance condition changed. Raw first failure is retained in evidence/ and
 artifact [13952683417](https://github.com/mrgarmise/charlie/actions/runs/43238637623/artifacts/13952683417), ZIP SHA256 `696d975bf1313e434f83b98efed1c0e84960b71be659c99d530f1d34d1ba5081`, remains on the failed workflow.
+
+Core correction independently passed exact-head source CI: run 43239537206
+software reported 210 focused / one optional-source skip, 131 contracts and
+2060 full / 28 skips. Its separate browser first attempt had one existing
+viewport input timing failure (35 passed); push run 43239526388 browser passed.
+The failed job/artifact 13954441203 is retained (ZIP SHA256
+7c0b80f11fe976db6b635b009b3bcf8cff9cac45a0e0012ea16ebd4cdb51d60c),
+and only that failed job was retried. Software artifact 13955140342 SHA256
+919ec928a028514088db6a7739a53ab5515bb0974b634a091a6d40a22edd8e80.
+
+Firmware/network before-transfer host check: eight UBSan C++ suites passed,
+real TCP bridge deferred to independent CI. After transfer: 267 Python checks
+passed / six optional-dependency or sandbox-loopback skips / two baseline
+loopback cases deferred to CI. No source test failure was suppressed.
+Historical stock STOP remains HANDLED—DONE/OK per latest #31; older #32 reports
+are preserved as historical, not reopened acceptance. New candidate firmware
+and transport timing remain a separate artifact-specific physical gate.
+
+Increment B canonical contracts: 134 passed (new owner-UNO parameter cases extend the earlier 131 selection). Current build/TLS/browser and full CI remain mandatory.

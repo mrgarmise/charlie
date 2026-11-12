@@ -97,6 +97,8 @@ VALID_COMMANDS = {
     "DISPLAY_CAPS",
     "OBJECT_LABEL",
     "OBJECT_CLEAR",
+    "MEDITATION",
+    "MEDITATION_STATUS",
 
     "RX",
     "TX",

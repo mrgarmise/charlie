@@ -3,7 +3,10 @@ from contextlib import contextmanager
 from stimulus.bus import StimulusBus
 
 
-def install(monkeypatch, application, camera):
+def install(monkeypatch, application, camera, *, neck_state):
+    # Only mocked hardware-application tests opt in: the same environment
+    # variable enables CAL-1 in other routes, so it cannot be a global fixture.
+    monkeypatch.setenv('CHARLIE_NECK_STATE', str(neck_state))
     @contextmanager
     def fake_feeders(*args, **kwargs):
         try:yield StimulusBus()

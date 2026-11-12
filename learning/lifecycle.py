@@ -3,6 +3,7 @@
 One supervised child keeps SQLite and bounded investigations away from vision's
 real-time loop. It has no camera, motion or controller transport.
 """
+from contextlib import nullcontext
 from pathlib import Path
 import json
 import time
@@ -362,18 +363,26 @@ class DevelopmentLifecycle:
                 # The independent authority, never meditation state, admits a slot.
                 save_checkpoint()
                 coordinator = self.meditation_consultations
-                if coordinator is not None:
+                native_window=coordinator is not None and hasattr(coordinator,'window')
+                if coordinator is not None and not native_window:
                     coordinator.on_meditation(commission_id, progress, client_deadline=deadline)
-                # A stable saved iteration is already complete, even if the
-                # process stopped between its checkpoint and result publication.
-                while len(history)<6 and (not history or history[-1]['merges']):
-                    progress()
-                    tracks, step, additions=meditate(tracks,iterations=1,
-                        on_progress=progress,resume_state=reconstruction)
-                    iteration=len(history)+1
-                    history.extend(dict(h,iteration=iteration) for h in step)
-                    merges.extend(dict(m,iteration=iteration) for m in additions)
-                    save_checkpoint()
+                context=(coordinator.window(commission_id,progress,client_deadline=deadline)
+                         if native_window else nullcontext(None))
+                with context as native_check:
+                    original_progress=progress
+                    if native_check is not None:progress=native_check
+                    try:
+                        # A stable saved iteration is already complete, even if the
+                        # process stopped between its checkpoint and result publication.
+                        while len(history)<6 and (not history or history[-1]['merges']):
+                            progress()
+                            tracks, step, additions=meditate(tracks,iterations=1,
+                                on_progress=progress,resume_state=reconstruction)
+                            iteration=len(history)+1
+                            history.extend(dict(h,iteration=iteration) for h in step)
+                            merges.extend(dict(m,iteration=iteration) for m in additions)
+                            save_checkpoint()
+                    finally:progress=original_progress
             except MeditationYield as exc:
                 if sha(source)!=source_hash:
                     raise ValueError('meditation source changed during computation')
@@ -679,6 +688,7 @@ class DevelopmentLifecycle:
             self._operational('clean shutdown',self.operational.get('termination_reason','Executive closed'))
             self._phase('stopped')
         finally:
+            if getattr(self,'native_decision_journal',None) is not None:self.native_decision_journal.close()
             self.journal.close()
             self.lock.close()
 
@@ -686,7 +696,7 @@ class DevelopmentLifecycle:
 def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None,
         history_roots=(), resources=None, wall_seconds=None, cooldown_seconds=None,
         clock=None, sleep=None, lifecycle_factory=None, human_questions=False, model_learning=False, llm_consultation=False,
-        llm_consultation_approval=None):
+        llm_consultation_approval=None, native_meditation=False):
     """One existing Executive, with resource polling rather than a second scheduler.
 
     ``turns`` bounds nonthermal attempt slots (including other resource refusals),
@@ -736,6 +746,9 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
         if model_learning:
             from .model_learning.service import ModelLearningService
             lifecycle.model_learning=ModelLearningService(lifecycle.journal,lifecycle.output/"model-learning",wall_seconds=budget_seconds)
+        if native_meditation:
+            from .native_meditation.profile import attach
+            attach(lifecycle)
         lifecycle.resources.interruption_check=interrupt
         while turns is None or counters['nonthermal_attempt_slots']<turns:
             try:interrupt()

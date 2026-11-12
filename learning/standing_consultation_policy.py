@@ -66,7 +66,8 @@ class StandingSlotAuthority:
         # The backend verifies its independently accepted deployment/issuer identity.
         # This Python object is not, and cannot be, a process isolation boundary.
         with self.backend.exclusive(commission_id,seconds) as lease:
-            end=self.clock()+seconds
+            end=min(self.clock()+seconds,getattr(lease,'ends_at',float('inf')))
+            if not math.isfinite(end) or end-self.clock()<35:raise PermissionError('negotiated slot too short')
             self._check(lease,end)
             # Rate ledger must be durable in the independent authority, not only
             # the Executive queue. reserve_budget is atomic and replay resistant.

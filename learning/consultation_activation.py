@@ -70,14 +70,15 @@ def validate_approval(doc, *, now, boot_id, revision):
     return doc
 
 
-def service_identity():
+def service_identity(*, system=False):
     """Read the existing dedicated unit and effective kernel limits; never edit it."""
     props = ('ActiveState', 'MainPID', 'InvocationID', 'ControlGroup',
              'PrivateDevices', 'NoNewPrivileges', 'ProtectHome', 'RuntimeMaxUSec',
              'TimeoutStopUSec', 'Restart', 'KillMode', 'SendSIGKILL',
              'ActiveEnterTimestampMonotonic', 'RuntimeRandomizedExtraUSec',
              'FinalKillSignal', 'NotifyAccess', 'TimeoutStopFailureMode')
-    result = subprocess.run(['systemctl', '--user', 'show', SERVICE,
+    result = subprocess.run(['systemctl', *([] if system else ['--user']), 'show',
+                             'charlie-meditation-consultant.service' if system else SERVICE,
                              '--property=' + ','.join(props)], check=True,
                             capture_output=True, text=True, timeout=2)
     values = dict(line.split('=', 1) for line in result.stdout.splitlines() if '=' in line)
@@ -125,7 +126,8 @@ def service_identity():
                 inodes.add(target[8:-1])
         except FileNotFoundError:
             continue
-    listeners = [line.split() for line in Path('/proc/net/tcp').read_text().splitlines()[1:]]
+    tcp_path=Path('/proc',str(pid),'net/tcp') if system else Path('/proc/net/tcp')
+    listeners = [line.split() for line in tcp_path.read_text().splitlines()[1:]]
     if any(row[3] == '0A' and row[9] in inodes and row[1] != '0100007F:2CAA' for row in listeners):
         raise ValueError('additional service listener refused')
     if not any(row[1] == '0100007F:2CAA' and row[3] == '0A' and row[9] in inodes for row in listeners):
@@ -140,15 +142,22 @@ class Admission:
     """Expiring operator attestation, never self-issued or refreshed by Charlie."""
     def __init__(self, path):
         self.path = Path(path)
-        self.raw = private_read(self.path)
+        from .native_meditation.security import APPROVALS, standing_bytes, root_read, validate_live
+        self.standing=self.path.parent==APPROVALS
+        self._read=standing_bytes if self.standing else private_read
+        self.raw = self._read(self.path)
         self.doc = json.loads(self.raw)
+        if self.standing:
+            if self.doc.get('issuer')!='root-meditation-v1':raise PermissionError('native issuer missing')
+            self._standing_snapshot=validate_live(self.doc,self.raw)
+        elif self.doc.get('issuer'):raise PermissionError('standing issuer cannot use owner-writable approval')
         self.revision = git_revision()
         self.boot = Path('/proc/sys/kernel/random/boot_id').read_text().strip()
         validate_approval(self.doc, now=time.time(), boot_id=self.boot, revision=self.revision)
-        receipt = private_read(self.doc['qualification_path'], 1024 * 1024)
+        receipt = (root_read if self.standing else private_read)(self.doc['qualification_path'], 1024 * 1024)
         if hashlib.sha256(receipt).hexdigest() != self.doc['qualification_sha256']:
             raise ValueError('qualification receipt changed')
-        self.identity = service_identity()
+        self.identity = self._standing_snapshot['identity'] if self.standing else service_identity()
         if self.identity['invocation_id'] != self.doc['service_invocation_id']:
             raise ValueError('service restarted since approval')
         if self.identity['cutoff_monotonic'] - time.monotonic() > self.doc['expires_at'] - time.time():
@@ -156,8 +165,12 @@ class Admission:
         self.next_sample = 0.
 
     def check(self, *, starting=False):
-        if private_read(self.path) != self.raw:
+        reader=getattr(self,'_read',private_read)
+        if reader(self.path) != self.raw:
             raise ValueError('approval revoked or changed')
+        if getattr(self,'standing',False):
+            from .native_meditation.security import validate_live
+            self._standing_snapshot=validate_live(self.doc,self.raw)
         validate_approval(self.doc, now=time.time(), boot_id=self.boot, revision=self.revision)
         if starting and self.doc['expires_at'] - time.time() < 35:
             raise ValueError('insufficient safe-idle time remaining')
@@ -170,9 +183,26 @@ class Admission:
                                        capture_output=True, text=True, timeout=1).stdout.strip()
             if throttled != 'throttled=0x0':
                 raise ValueError('throttling or undervoltage reported')
-            if service_identity() != self.identity:
+            identity=self._standing_snapshot['identity'] if getattr(self,'standing',False) else service_identity()
+            if identity != self.identity:
                 raise ValueError('service identity or limits changed')
             self.next_sample = time.monotonic() + .5
+
+    def http(self, config, payload, path='/api/chat'):
+        if not self.standing:return _http(config,payload,path)
+        from .native_meditation.security import SOCKET,rpc
+        return rpc(SOCKET,dict(op='http',slot=self.doc['slot_id'],digest=hashlib.sha256(self.raw).hexdigest(),
+                   path=path,payload=payload),timeout=config.wall_seconds+1)
+
+    def submit(self):
+        if getattr(self,'standing',False):self._authority('submit')
+
+    def retained(self):
+        if getattr(self,'standing',False):self._authority('retained')
+
+    def _authority(self, op):
+        from .native_meditation.security import SOCKET, rpc
+        return rpc(SOCKET,dict(op=op,slot=self.doc['slot_id'],digest=hashlib.sha256(self.raw).hexdigest()))
 
 
 def ready_model(raw, approval, *, now):
@@ -199,6 +229,7 @@ def _operational_worker(config, prompt, approval_path, pipe):
     stage = 'approval'
     try:
         admission = Admission(approval_path)
+        http=admission.http if hasattr(admission,'http') else _http
         stage = 'native-service-and-resources'
         admission.check(starting=True)
         # A common owner-only approval directory is required across notebooks.
@@ -214,11 +245,11 @@ def _operational_worker(config, prompt, approval_path, pipe):
             raise ValueError('unknown prior completion requires independent clearance')
         # Any ambiguous exit after this point leaves a durable, no-retry latch.
         stage = 'server-version'
-        version = _http(config, None, '/api/version')
+        version = http(config, None, '/api/version')
         if version.get('version') != admission.doc['server_version']:
             raise ValueError('server version mismatch')
         stage = 'resident-model'
-        resident = ready_model(_http(config, None, '/api/ps'), admission.doc, now=time.time())
+        resident = ready_model(http(config, None, '/api/ps'), admission.doc, now=time.time())
         admission.check(starting=True)
         stage = 'submission'
         fd = os.open(marker, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
@@ -229,12 +260,13 @@ def _operational_worker(config, prompt, approval_path, pipe):
         directory = os.open(parent, os.O_RDONLY | os.O_DIRECTORY)
         try: os.fsync(directory)
         finally: os.close(directory)
+        if hasattr(admission,'submit'):admission.submit()
         pipe.send(('admitted', dict(approval=admission.doc, identity=admission.identity)))
-        result = parse_response(_http(config, request_payload(config, prompt)), config)
+        result = parse_response(http(config, request_payload(config, prompt)), config)
         admission.check()
         # keep_alive=0 requests unload; verify rather than assert cleanup happened.
         stage = 'unload-confirmation'
-        if _http(config, None, '/api/ps').get('models') != []:
+        if http(config, None, '/api/ps').get('models') != []:
             raise ValueError('unload not confirmed; operator clearance required')
         result['identity'] = dict(server_version=version['version'], model_digest=resident['digest'],
                                   service=admission.identity,
@@ -243,6 +275,7 @@ def _operational_worker(config, prompt, approval_path, pipe):
         # Parent must durably retain the answer before acknowledging completion.
         pipe.send(('ok', result))
         if pipe.poll(2) and pipe.recv() == 'retained':
+            if hasattr(admission,'retained'):admission.retained()
             marker.unlink()
             directory = os.open(parent, os.O_RDONLY | os.O_DIRECTORY)
             try: os.fsync(directory)

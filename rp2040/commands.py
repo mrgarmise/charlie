@@ -39,6 +39,7 @@ class CommandHandler:
             elif name=='SESSION':
                 values=arguments(cmd,(1,));servos.establish_session(values[0])
                 if self.display and hasattr(self.display,'clear_object_label'):self.display.clear_object_label()
+                if self.display and hasattr(getattr(self.display,'meditation',None),'reset'):self.display.meditation.reset(values[0])
                 self.behaviors.set_mode(self.behaviors.IDLE)
                 if self.display and hasattr(self.display, 'show_text'):
                     self.display.show_text('BRAIN ONLINE', 3000)
@@ -84,6 +85,7 @@ class CommandHandler:
                 arguments(cmd,(0,))
                 # IDLE and SLEEP must not leave a pending servo target alive.
                 servos.stop(name)
+                if self.display and hasattr(getattr(self.display,'meditation',None),'cancel'):self.display.meditation.cancel()
                 if self.display and hasattr(self.display,'clear_object_label'):self.display.clear_object_label()
                 self.behaviors.set_mode(self.behaviors.SLEEP if name=='SLEEP' else self.behaviors.IDLE)
                 print('OK',name)
@@ -126,6 +128,17 @@ class CommandHandler:
                 try:from object_label import capabilities
                 except ImportError:from rp2040.object_label import capabilities
                 print('DISPLAY_CAPS',json.dumps(capabilities()))
+            elif name=='MEDITATION_STATUS':
+                arguments(cmd,(0,))
+                if not self.display or not hasattr(self.display,'meditation_status'):raise ValueError('MEDITATION_UNAVAILABLE')
+                print('MEDITATION_STATUS',json.dumps(self.display.meditation_status()))
+            elif name=='MEDITATION':
+                session,slot,seq,ttl,phase=arguments(cmd,(5,))
+                if session!=servos.status().get('session'):raise ValueError('MEDITATION_SESSION')
+                if not seq.isdigit() or not ttl.isdigit():raise ValueError('INVALID_MEDITATION_NOTICE')
+                if not self.display or not hasattr(self.display,'show_meditation'):raise ValueError('MEDITATION_UNAVAILABLE')
+                status=self.display.show_meditation(session,slot,int(seq),int(ttl),phase)
+                print('MEDITATION_ACK',json.dumps(status))
             elif name=='OBJECT_LABEL':
                 values=arguments(cmd,tuple(range(3,27)))
                 if not values[0].isdigit() or not values[1].isdigit():raise ValueError('INVALID_OBJECT_LABEL')

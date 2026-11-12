@@ -22,6 +22,6 @@ def label_request(text,ttl_ms,step_ms):
 
 
 def capabilities():
-    return dict(schema='charlie-display-v1',object_labels=1,width=17,height=7,
+    return dict(schema='charlie-display-v1',meditation_notice=1,meditation_ttl_max=10000,object_labels=1,width=17,height=7,
                 max_label=MAX_LABEL,min_ttl_ms=MIN_TTL_MS,max_ttl_ms=MAX_TTL_MS,
                 min_step_ms=MIN_STEP_MS,max_step_ms=MAX_STEP_MS)

@@ -67,3 +67,16 @@ def test_old_firmware_and_forged_ack_are_not_visibility():
 def test_invalid_notice_cannot_be_a_command(args):
     from rp2040.meditation_notice import request
     with pytest.raises(ValueError):request('session',*args)
+
+
+def test_legacy_display_session_and_stop_keep_safety_commands_working(board,capsys):
+    calls=[]
+    class LegacyDisplay:
+        def __getattr__(self,name):return lambda *args:calls.append((name,args))
+    a,b,h,hb=board.create(calibrated=False,electrical=False,interlock=False)
+    h.display=LegacyDisplay()
+    board.command(h,'SESSION legacy_session')
+    assert 'OK SESSION' in capsys.readouterr().out
+    board.command(h,'STOP')
+    assert 'OK STOP' in capsys.readouterr().out
+    assert not a.status()['armed'] and not board.pwms

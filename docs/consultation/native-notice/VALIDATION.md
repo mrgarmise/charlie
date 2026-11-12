@@ -7,7 +7,7 @@ python -m pytest -q tests/test_native_meditation.py tests/test_meditation_notice
 python tools/check_unified_contracts.py
 ```
 
-Result: 304 passed, 2 skipped, 2 deselected; unified contracts: 131 passed.
+Result: 306 passed, 2 skipped, 2 deselected; unified contracts: 131 passed.
 Raw [JUnit](evidence/host-focused.xml), [focused output](evidence/host-focused.txt),
 [contract output](evidence/host-contracts.txt). The host restricts one peer-credential
 probe; the other skip requires optional authentic private-source inputs. Two
@@ -46,3 +46,12 @@ Scheduler publication: remote `0c7c7e221fd08b45fede918e14d75bb4ac403961`, local
 `2d76a08590dfbf8298dbdf06dc7499050a4dfd2c`, identical tree
 `7471705829d15e276228ac13a91a5005e543bc48`. The next hardening increment rejects
 unknown/nonfinite inventory validity and scheduled duties before reservation.
+
+Final source hardening also checks legacy display cancellation methods, performs
+physical STOP before display housekeeping in the firmware safety exception, and
+tests namespace PID binding plus privilege drop before HTTP. These namespace
+tests inject syscalls; they do not execute privileged operations.
+
+Deadline hardening publication: remote `47c92204da6be57cee0559c27c16e8d320bf13d6`,
+local `40568edd544c8fc6082d0260916bf3ddea3662f8`, identical tree
+`d55f15f20d0896d81553d37fe5fe661300c177be`.

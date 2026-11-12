@@ -509,3 +509,28 @@ def test_root_deadline_inventory_rejects_unknown_and_nonfinite(monkeypatch,bad):
     d=linux.LinuxDriver.__new__(linux.LinuxDriver);d.p=dict(inventory_path='/protected')
     monkeypatch.setattr(linux,'root_read',lambda path:json.dumps(bad).encode())
     with pytest.raises(PermissionError):d.inventory()
+
+
+def test_namespace_helper_binds_pid_and_drops_authority_before_http(monkeypatch):
+    import io
+    import learning.native_meditation.ns_http as helper
+    trace=[];output=io.StringIO()
+    monkeypatch.setattr(helper,'root_read',lambda path:json.dumps(dict(model_uid=1102,model_gid=1102)).encode())
+    ticks=['12345']
+    monkeypatch.setattr(helper,'Path',lambda *args:SimpleNamespace(read_text=lambda:'1 (model) '+'0 '*19+ticks[0]))
+    monkeypatch.setattr(helper,'sys',SimpleNamespace(argv=['helper','123','12345','/api/ps'],
+        stdin=SimpleNamespace(buffer=io.BytesIO(b'{"payload":null,"timeout":2}')),stdout=output))
+    monkeypatch.setattr(helper,'os',SimpleNamespace(geteuid=lambda:0,O_RDONLY=0,CLONE_NEWNET=0x40000000,
+        open=lambda *args:trace.append('open-model-netns') or 99,close=lambda fd:trace.append('close-netns'),
+        setns=lambda *args:trace.append('setns'),setgroups=lambda groups:trace.append('groups-empty'),
+        setgid=lambda gid:trace.append('model-gid'),setuid=lambda uid:trace.append('model-uid')))
+    def http(*args):
+        assert trace[-3:]==['groups-empty','model-gid','model-uid']
+        trace.append('http');return dict(models=[])
+    monkeypatch.setattr(helper,'_http',http)
+    helper.main();assert json.loads(output.getvalue())==dict(models=[])
+    assert trace==['open-model-netns','setns','close-netns','groups-empty','model-gid','model-uid','http']
+    trace.clear();ticks[0]='54321'
+    helper.sys.stdin.buffer=io.BytesIO(b'{"payload":null,"timeout":2}')
+    with pytest.raises(PermissionError):helper.main()
+    assert trace==['open-model-netns','close-netns']

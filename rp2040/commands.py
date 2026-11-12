@@ -85,7 +85,7 @@ class CommandHandler:
                 arguments(cmd,(0,))
                 # IDLE and SLEEP must not leave a pending servo target alive.
                 servos.stop(name)
-                if self.display and hasattr(self.display,'meditation'):self.display.meditation.cancel()
+                if self.display and hasattr(getattr(self.display,'meditation',None),'cancel'):self.display.meditation.cancel()
                 if self.display and hasattr(self.display,'clear_object_label'):self.display.clear_object_label()
                 self.behaviors.set_mode(self.behaviors.SLEEP if name=='SLEEP' else self.behaviors.IDLE)
                 print('OK',name)

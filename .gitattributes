@@ -1,3 +1,7 @@
 
 # Preserve downloaded test evidence verbatim, including terminal whitespace.
 docs/consultation/native-notice/evidence/*.txt -whitespace
+
+# Preserve the authoritative mission and terminal receipts as published.
+docs/runtime-adoption/UNIFIED_RUNTIME_ADOPTION_CODEX_MISSION_20261110.md -whitespace
+docs/runtime-adoption/evidence/*.txt -whitespace

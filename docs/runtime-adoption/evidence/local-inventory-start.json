@@ -1,0 +1,141 @@
+{
+  "approvals": {
+    "approval_binding": true,
+    "approved_sha": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+    "durable_markers": [
+      {
+        "bytes": 140,
+        "path": "/home/five/charlie-ops/state/elegoo-uncertain-motion.lock",
+        "sha256": "9a534aadd909ce5514e7237947c29b6132e5c3871aba335438dc53b004397ebd"
+      },
+      {
+        "bytes": 0,
+        "path": "/home/five/charlie-ops/state/offline.lock",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 53,
+        "path": "/home/five/.local/share/charlie/neck/rp2040-uncertain-motion.lock",
+        "sha256": "79d765105f82b186bff1974fc708c5f543775fd20f64f69bfec4a97ab403b516"
+      }
+    ],
+    "files": {
+      "QUALIFICATION.md": {
+        "bytes": 3246,
+        "path": "/home/five/charlie-ops/QUALIFICATION.md",
+        "sha256": "683b39044cc9081a34d3dfdf2db70f7a47e94cd755b6fbf62c2dae486e62d76a"
+      },
+      "approved.sha": {
+        "bytes": 41,
+        "path": "/home/five/charlie-ops/approved.sha",
+        "sha256": "5022c8cf88b0928d9abea764510d53d10ace5cc570447e7650db406b2cb70e30"
+      },
+      "run-historical-consultation.py": {
+        "bytes": 11050,
+        "path": "/home/five/charlie-ops/run-historical-consultation.py",
+        "sha256": "3a3956e899c20609a25ef6d63964aa80f9ef7894cd1c93955603c5db62c62a75"
+      },
+      "start-stationary.sh": {
+        "bytes": 1904,
+        "path": "/home/five/charlie-ops/start-stationary.sh",
+        "sha256": "3305e83b84874162578d70f0de276c3dde5a80883261782bf0052db5420bd5e2"
+      }
+    },
+    "path": "/home/five/charlie-ops"
+  },
+  "baseline": {
+    "branch": "runtime/llm-qualified-20261110",
+    "dirty": false,
+    "local_branches": [
+      "feature/agency-first-self bb40d02d3a128706e204cfd8e636fb1a9c5fd21b",
+      "feature/executive-model-learning fb22d7484ea1837d32d8d81ee95fcd27bd55caa0",
+      "feature/meditation-questions-20261110 1d14a3e510586e6a1518d31a9ceacdcc7a785149",
+      "feature/mobile-body-console-20261031 6aa55ab42da1f33b9b7289c8b36bd682e53ed25c",
+      "feature/native-marathon-restart a785c9f745bd0645dd01ac70af3beb5a8d44d37b",
+      "feature/native-meditation-notice-20261110 5eae293cd068e45c918249f2d340c791c0b34592",
+      "feature/native-persistent-agency 54292982ce7e0f8c408dadbc7f8da79645d194d8",
+      "feature/onboard-consultation-20261101 b0c04ad4c5c6e1f0b2b9fd2e6316af286c36c01f",
+      "feature/ppal-integration 89e291a0cbdabf297d7d7f52d08f2af2e6170f65",
+      "feature/supervised-manual-drive-20261102 169cc36d8a34891b41caedc6ab7ebcad0ada7731",
+      "fix/pr5-spawn-prior-serialization 73169db9ad2648ca7e4088979d22905900052c6a",
+      "integration/native-marathon-20261020 71892612069018998de98fe4b303f0ed202472cc",
+      "integration/unified-runtime-adoption-20261112-v2 5eae293cd068e45c918249f2d340c791c0b34592",
+      "integration/unified-sensory-motion-20261026 8f3b98804dfe9d8a7b69b0cf7030438fb45d0ca1",
+      "master ddea040d42bd3f1299b760661a1e3591291a2189",
+      "native-camera-lifecycle-validation 9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+      "qualification/llm-20261110 d3dca9059233b5f054c4f6f9979085b1422f9674",
+      "recovery/ala2-20261019 365bc84ca7f2b02cde94a3f604b2f957bb66a6f9",
+      "recovery/native-marathon-20261020 f43bb2be17d8d687683f35edda86d0b8734f7f59",
+      "runtime/llm-qualified-20261110 d3dca9059233b5f054c4f6f9979085b1422f9674",
+      "runtime/stationary-candidate-20261101 f3304c588a893a953e34e5c4d00bd5f9bfb18f19"
+    ],
+    "parents": [
+      "fe605eb45c0b81492c41e3538ea8f9e1d21eb236"
+    ],
+    "path": "/home/five/charlie-runtime",
+    "remotes": [
+      "origin"
+    ],
+    "sha": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+    "tree": "72cd9e4eba5939c181ae88d6ed03d5bbc50527c4"
+  },
+  "candidate": {
+    "branch": "integration/unified-runtime-adoption-20261112-v2",
+    "dirty": true,
+    "local_branches": [
+      "feature/agency-first-self bb40d02d3a128706e204cfd8e636fb1a9c5fd21b",
+      "feature/executive-model-learning fb22d7484ea1837d32d8d81ee95fcd27bd55caa0",
+      "feature/meditation-questions-20261110 1d14a3e510586e6a1518d31a9ceacdcc7a785149",
+      "feature/mobile-body-console-20261031 6aa55ab42da1f33b9b7289c8b36bd682e53ed25c",
+      "feature/native-marathon-restart a785c9f745bd0645dd01ac70af3beb5a8d44d37b",
+      "feature/native-meditation-notice-20261110 5eae293cd068e45c918249f2d340c791c0b34592",
+      "feature/native-persistent-agency 54292982ce7e0f8c408dadbc7f8da79645d194d8",
+      "feature/onboard-consultation-20261101 b0c04ad4c5c6e1f0b2b9fd2e6316af286c36c01f",
+      "feature/ppal-integration 89e291a0cbdabf297d7d7f52d08f2af2e6170f65",
+      "feature/supervised-manual-drive-20261102 169cc36d8a34891b41caedc6ab7ebcad0ada7731",
+      "fix/pr5-spawn-prior-serialization 73169db9ad2648ca7e4088979d22905900052c6a",
+      "integration/native-marathon-20261020 71892612069018998de98fe4b303f0ed202472cc",
+      "integration/unified-runtime-adoption-20261112-v2 5eae293cd068e45c918249f2d340c791c0b34592",
+      "integration/unified-sensory-motion-20261026 8f3b98804dfe9d8a7b69b0cf7030438fb45d0ca1",
+      "master ddea040d42bd3f1299b760661a1e3591291a2189",
+      "native-camera-lifecycle-validation 9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+      "qualification/llm-20261110 d3dca9059233b5f054c4f6f9979085b1422f9674",
+      "recovery/ala2-20261019 365bc84ca7f2b02cde94a3f604b2f957bb66a6f9",
+      "recovery/native-marathon-20261020 f43bb2be17d8d687683f35edda86d0b8734f7f59",
+      "runtime/llm-qualified-20261110 d3dca9059233b5f054c4f6f9979085b1422f9674",
+      "runtime/stationary-candidate-20261101 f3304c588a893a953e34e5c4d00bd5f9bfb18f19"
+    ],
+    "parents": [
+      "5a36e078da22a0122f4e60ce65c6ffd96f3e5bf6"
+    ],
+    "path": "/home/five/charlie-runtime-adoption-v2",
+    "remotes": [
+      "origin"
+    ],
+    "sha": "5eae293cd068e45c918249f2d340c791c0b34592",
+    "tree": "a46f530ee90cd5e34485c94bfd0e727a14146f41"
+  },
+  "devices": [],
+  "installed_firmware": "UNKNOWN: no device readback authorized or performed",
+  "mutations_performed": [],
+  "native_owners": "UNKNOWN until host namespace/unit and physical owner reconciliation",
+  "operational_release_owner": "existing charlie-ops approval hierarchy; not this tool",
+  "processes": {
+    "inaccessible": 0,
+    "scope": "current process namespace only; absence does not establish native idle or owner completeness",
+    "visible": []
+  },
+  "protected": [
+    {
+      "bytes": 98856960,
+      "path": "/home/five/.local/share/charlie/development/learning-project-evidence.sqlite3",
+      "sha256": "93fa829a9e87352105d7e4ee0174b4bdfc9b1b85e67430bfbb8192ca20dc72e4"
+    },
+    {
+      "bytes": 462848,
+      "path": "/home/five/.local/share/charlie/development/operator-demonstrations.sqlite3",
+      "sha256": "dde6c834e9e9cd6051b818b6a50bd35904a5ce2d6ed7273289528d9e53c65b84"
+    }
+  ],
+  "schema": "charlie-runtime-inventory-v2"
+}

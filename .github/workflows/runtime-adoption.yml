@@ -1,0 +1,47 @@
+name: Unified runtime adoption independent qualification
+on:
+  push:
+    branches: ['integration/unified-runtime-adoption-20261112-v2']
+  pull_request:
+    paths: ['tools/runtime_adoption/**', 'tests/test_runtime_adoption*', 'docs/runtime-adoption/**', '.github/workflows/runtime-adoption.yml']
+permissions:
+  contents: read
+jobs:
+  software:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest
+      - run: python -m pytest tests/test_runtime_adoption.py tests/test_consultation_activation.py tests/test_consultation.py tests/test_historical_question_qualification.py tests/test_native_meditation.py tests/test_question_selection.py -q --junitxml=adoption-focused.xml
+      - run: python tools/check_unified_contracts.py
+      - run: python -m pytest tests -q --junitxml=adoption-full.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: adoption-software
+          path: |
+            adoption-focused.xml
+            adoption-full.xml
+  browser:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt pytest playwright==1.56.0
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m pytest tests/test_mobile_console.py tests/test_mobile_http.py tests/test_mobile_browser.py tests/test_mission_status.py -q --junitxml=adoption-browser.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: adoption-browser
+          path: adoption-browser.xml

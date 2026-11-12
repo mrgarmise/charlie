@@ -39,7 +39,7 @@ class CommandHandler:
             elif name=='SESSION':
                 values=arguments(cmd,(1,));servos.establish_session(values[0])
                 if self.display and hasattr(self.display,'clear_object_label'):self.display.clear_object_label()
-                if self.display and hasattr(self.display,'meditation'):self.display.meditation.reset(values[0])
+                if self.display and hasattr(getattr(self.display,'meditation',None),'reset'):self.display.meditation.reset(values[0])
                 self.behaviors.set_mode(self.behaviors.IDLE)
                 if self.display and hasattr(self.display, 'show_text'):
                     self.display.show_text('BRAIN ONLINE', 3000)

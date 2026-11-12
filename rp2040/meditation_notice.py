@@ -3,7 +3,7 @@ PHASES = ('PREPARING', 'MEDITATING', 'THINKING', 'CLEAR')
 
 
 def request(session, slot, sequence, ttl_ms, phase):
-    if (not isinstance(session, str) or not session or len(session)>40 or ' ' in session
+    if (not isinstance(session, str) or not session or len(session)>40 or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-' for c in session)
             or not isinstance(slot,str) or len(slot)!=32 or any(c not in '0123456789abcdef' for c in slot)
             or type(sequence) is not int or not 1<=sequence<=2147483647 or phase not in PHASES
             or type(ttl_ms) is not int or (ttl_ms!=0 if phase=='CLEAR' else not 500<=ttl_ms<=10000)):

@@ -21,6 +21,7 @@ def parser():
     p.set_defaults(offline=True)
     p.add_argument('--model-learning',action='store_true',help='opt in to guarded Executive perception investigations; candidates stay shadow')
     p.add_argument('--learning-state',type=Path,default=Path.home()/'.local/share/charlie/development')
+    p.add_argument('--native-meditation',action='store_true',help='offline only; requires separately qualified root scheduler, standing policy and acknowledged display')
     p.add_argument('--llm-consultation',action='store_true',help='shadow consultation queue only; native transport qualification pending')
     p.add_argument('--llm-consultation-approval',type=Path,help='additional default-off real transport gate: private native safe-idle approval')
     p.add_argument('--human-questions',action='store_true',help='opt-in Executive review questions from committed evidence; no web listener or authority')
@@ -154,6 +155,10 @@ def application_mobile_actuators(frame_bus, *, state=None, hardware_id='unverifi
 def main(argv=None):
     arguments = list(sys.argv[1:] if argv is None else argv)
     args=parser().parse_args(arguments)
+    if args.native_meditation and (not args.offline or args.llm_consultation_approval is not None
+            or args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow
+            or args.object_label_replay or args.mobile_dashboard):
+        raise ValueError('native meditation requires the existing offline Executive and independent scheduler; no hardware/replay/manual-approval mix')
     if args.llm_consultation_approval is not None:
         if not args.llm_consultation:
             raise ValueError('real consultation requires --llm-consultation as well as approval')
@@ -228,6 +233,7 @@ def main(argv=None):
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
                 turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources,
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
+    if args.native_meditation:kwargs['native_meditation']=True
     if args.llm_consultation:
         kwargs['llm_consultation'] = True
         if args.llm_consultation_approval is not None:

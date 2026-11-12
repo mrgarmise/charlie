@@ -1,0 +1,7 @@
+{
+  "native_scheduler_display_accepted": false,
+  "code_revision": "REPLACE_WITH_REVIEWED_COMMIT",
+  "model_digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+  "inventory_sha256": "REPLACE_WITH_ACTUAL_INDEPENDENT_INVENTORY_HASH",
+  "note": "Template only; not an installed token, owner consent substitute or native acceptance evidence."
+}

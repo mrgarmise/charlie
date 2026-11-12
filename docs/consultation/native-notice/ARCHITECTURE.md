@@ -45,11 +45,22 @@ optional preparing/consulting -> answer durable -> unload -> notice cleared ->
 available. Any safety duty, policy revocation, missing display ack, unknown owner,
 client death or resource failure cancels. Service cleanup/observed cgroup empty
 precedes release. Unknown inference completion remains latched and never retries.
-A kernel-bounded model process itself holds runtime.lock so issuer death cannot
-prematurely release exclusion while inference survives. Normal interactions may
+A separate root guardian receives the same open-file-description flock via
+SCM_RIGHTS before warning or startup. It survives both issuer and model MainPID
+death and releases only after independently observing an empty model cgroup.
+The model unit has a preset kernel cutoff; late activation is rejected before
+exec rather than relying on unsupported runtime changes to RuntimeMaxSec. Normal interactions may
 be durably deferred; urgent requests revoke immediately and are never queued.
 
 Native qualification must establish the complete owner inventory, real serial
 bridge isolation, rendered pixels, reboot/STOP latency, effective cgroup cutoff,
 service identity, source pin and privilege separation. Software tests are not
 proof that these prerequisites are installed. Policy is disabled by default.
+
+Ollama runs in a private network namespace. Existing OperationalProvider uses
+a root-authenticated bounded proxy only for the independently issued standing
+approval; the manual loopback path is unchanged. The proxy reconstructs the fixed
+request envelope, independently reconciles original question sources, rejects
+administrative endpoints, and permits one actual chat per slot. Namespace helpers
+drop to the model UID before HTTP. The root guardian and cutoffs are real Linux
+implementations, not the simulation driver used in unit tests.

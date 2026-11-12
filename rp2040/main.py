@@ -152,7 +152,7 @@ while True:
         behaviors.update()
         servos.update()
     except MotionError:
-        display.meditation.cancel()
+        if hasattr(display,'meditation'):display.meditation.cancel()
         servos.stop('SCHEDULER_SAFETY_FAILURE')
         behaviors.set_mode(behaviors.IDLE)
     cal_status = servos.calibration.status()

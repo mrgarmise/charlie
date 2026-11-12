@@ -1,0 +1,7 @@
+{
+  "owner_classes": ["camera", "hailo", "serial", "telemetry", "watchdog", "motion", "gameplay", "human", "primary"],
+  "unknown_owners": ["Native owner/deadline inventory has NOT been qualified"],
+  "valid_until": 0,
+  "units": ["REPLACE_WITH_ACTUAL_AUDITED_PRIMARY_OWNER.service"],
+  "scheduled_duties": []
+}

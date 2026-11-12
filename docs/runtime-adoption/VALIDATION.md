@@ -30,3 +30,10 @@ baseline record. Final reports must recheck the same original files. Native
 qualification never rewrites an old receipt's code/model/firmware binding.
 
 Increment A host: 206 passed, 2 skipped, 2 real-loopback cases deferred to CI; 131 contracts passed. Raw core-focused XML/text and core-contracts text are retained under evidence/.
+
+First independent core CI 43238637623 failed one guard-fingerprint comparison
+(208 passed / one skipped). The three guarded file hashes matched; only Python
+3.12 vs 3.13 ast.dump formatting differed. Corrected by hashing exact function
+source bytes, rather than interpreter-specific AST dumps. No protected source or
+acceptance condition changed. Raw first failure is retained in evidence/ and
+artifact [13952683417](https://github.com/mrgarmise/charlie/actions/runs/43238637623/artifacts/13952683417), ZIP SHA256 `696d975bf1313e434f83b98efed1c0e84960b71be659c99d530f1d34d1ba5081`, remains on the failed workflow.

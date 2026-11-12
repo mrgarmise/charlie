@@ -39,10 +39,11 @@ GUARD_FILES=('learning/consultation.py','learning/resources.py','tools/historica
 
 def manual_guards(root):
     root=Path(root);result={name:digest(root/name)['sha256'] for name in GUARD_FILES}
-    tree=ast.parse((root/'learning/consultation_activation.py').read_text())
+    text=(root/'learning/consultation_activation.py').read_text()
+    tree=ast.parse(text)
     for node in tree.body:
         if isinstance(node,ast.FunctionDef) and node.name in ('private_read','validate_approval'):
-            result['function:'+node.name]=hashlib.sha256(ast.dump(node,include_attributes=False).encode()).hexdigest()
+            result['function:'+node.name]=hashlib.sha256(ast.get_source_segment(text,node).encode()).hexdigest()
     return result
 
 

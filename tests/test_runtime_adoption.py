@@ -127,3 +127,17 @@ def test_approved_manual_llm_guard_functions_and_resources_are_preserved():
     root=Path(__file__).resolve().parents[1]
     baseline=json.loads((root/'docs/runtime-adoption/evidence/approved-baseline.json').read_text())
     assert manual_guards(root)==baseline['manual_llm_guards']
+
+
+def test_guard_fingerprint_uses_exact_source_not_interpreter_ast_format(tmp_path,monkeypatch):
+    import ast,shutil
+    from tools.runtime_adoption.inventory import GUARD_FILES
+    root=Path(__file__).resolve().parents[1]
+    for name in (*GUARD_FILES,'learning/consultation_activation.py'):
+        target=tmp_path/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/name,target)
+    def forbidden(*args,**kwargs):raise AssertionError('AST dump is interpreter-version dependent')
+    monkeypatch.setattr(ast,'dump',forbidden)
+    before=manual_guards(tmp_path);assert before==manual_guards(root)
+    path=tmp_path/'learning/consultation_activation.py'
+    path.write_text(path.read_text().replace('35 <= expires - issued <= 120','34 <= expires - issued <= 120'))
+    assert manual_guards(tmp_path)['function:validate_approval']!=before['function:validate_approval']

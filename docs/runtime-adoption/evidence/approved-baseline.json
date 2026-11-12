@@ -39,8 +39,8 @@
     "learning/consultation.py": "a0dab5ef84f7d5a835ea5bbc52b8f554c8885bef1a1a80bec454a5e58d936d13",
     "learning/resources.py": "20a4bafa6718fe656f45a122c1c4f25ff363d2df97449b817f259e2f60133ea7",
     "tools/historical_question_qualification.py": "c0ff59fbe8c2b6fec6d1ba9e48c9b94a43c20bc875b1b52fa1c11046f6b40b02",
-    "function:private_read": "ad3b66295c6206f729eec55d830f1da5c619572d561baa3404244fc6274d922c",
-    "function:validate_approval": "1ebf0bdb899e6a4d90f43144dd22b24de41658cc485c36e647f9a37e0b2a8841"
+    "function:private_read": "e929dab9d3462d0f667d7830931f6c31d9d2cf054a46e9ace1334c34dc93b03f",
+    "function:validate_approval": "ae63f29ce2d5c778fae03966d296edebe50791cea7b256de45c9e5a182402d74"
   },
   "approved_pin": {
     "path": "/home/five/charlie-ops/approved.sha",
@@ -83,5 +83,6 @@
       "origin"
     ]
   },
-  "approval_hierarchy": "QUALIFICATION.md November 10 LLM promotion supersedes stationary pin; all earlier restrictions remain"
+  "approval_hierarchy": "QUALIFICATION.md November 10 LLM promotion supersedes stationary pin; all earlier restrictions remain",
+  "guard_fingerprint_schema": "exact-function-source-v2"
 }

@@ -3,7 +3,7 @@
 Host focused command (Python environment `/home/five/Projects/charlie/.venv`):
 
 ```
-python -m pytest -q tests/test_brain_calibration.py tests/test_native_meditation.py tests/test_meditation_notice.py tests/test_calibration_integration.py tests/test_consultation_activation.py tests/test_meditation_consultation.py tests/test_object_display.py tests/test_question_selection.py tests/test_historical_question_qualification.py -k 'not operational_protocol_over_real_loopback' -p no:cacheprovider --junitxml=/tmp/pr38-focused-final.xml
+python -m pytest -q tests/test_brain_calibration.py tests/test_native_meditation.py tests/test_meditation_notice.py tests/test_calibration_integration.py tests/test_consultation_activation.py tests/test_meditation_consultation.py tests/test_object_display.py tests/test_question_selection.py tests/test_historical_question_qualification.py -k 'not operational_protocol_over_real_loopback' -p no:cacheprovider --junitxml=/tmp/pr38-isolated-focused.xml
 python tools/check_unified_contracts.py
 ```
 
@@ -82,3 +82,50 @@ Pre-isolation source publication: remote
 `ce08257746b6c78f1de5a5594c7eefa7bd6988f8`, local
 `3889249c4143bef68ccc43677e4b20e681e991c8`, identical tree
 `96973dff763bd72cb4e787000bf4f388ee914839`.
+
+## Final source and exact-head checks
+
+Final implementation source, including test-state isolation: remote
+`0d58df70f56dd0c4c4dda7e916ba69107bd7c770`, local
+`ecb211e44f7369fee27f344cf48871fffee0fa86`, identical tree
+`87ff43725135f9886796111f62575e6131940bf7`.
+The evidence completion commit only adds documentation/logs/manifests. Its exact
+published SHA/tree and final CI conclusions are recorded in the draft PR #38
+publication description, avoiding a self-referential commit hash inside a file.
+No source after this boundary is excluded from review or testing.
+
+Immediately preceding source `ce082577` independently passed the full suite twice:
+2025 passed / 28 skipped, plus 131 contracts. [Consultation run 43129233169](https://github.com/mrgarmise/charlie/actions/runs/43129233169)
+retains artifact [13904557736](https://github.com/mrgarmise/charlie/actions/runs/43129233169/artifacts/13904557736),
+SHA-256 `0864bc50fbba8350156475ba273ee38f41a58c32e77e3bd520bd9a30b2deeb67`;
+[mobile regression run 43129233142](https://github.com/mrgarmise/charlie/actions/runs/43129233142)
+retains full-suite artifact [13904916791](https://github.com/mrgarmise/charlie/actions/runs/43129233142/artifacts/13904916791),
+SHA-256 `34e8b03ccd63d3f63f4298e25a82de696c122a9e8787cc91b17329280444eeee`.
+Its native-focused run passed 309 tests / one optional-source skip, but its full
+native job reproduced the shared-state calibration failure. The subsequent
+fixture isolation addresses that cause without weakening any production gate.
+
+Post-isolation independent runs (outcomes available through these immutable run
+links and final PR checks): [native](https://github.com/mrgarmise/charlie/actions/runs/43130281314),
+[consultation](https://github.com/mrgarmise/charlie/actions/runs/43130281356),
+[mobile/browser](https://github.com/mrgarmise/charlie/actions/runs/43130281297).
+The final evidence-only head also executes the full native workflow; its completed
+result must be inspected before reporting completion. Do not infer green status
+from these links alone. The final PR description records observed conclusions.
+The browser failure's first-attempt artifact remains linked above even if its
+retry passes. No tests are removed, marked xfail or automatically retried inside
+a test command.
+
+Actual unprivileged `python -m learning.native_meditation.daemon check-config`
+refuses with `PermissionError: native issuer requires separate root identity`.
+The [raw refusal](evidence/unprivileged-issuer-refusal.txt) confirms that the
+ordinary development account does not instantiate a trusted issuer. No native
+service or positive privileged operation was attempted. Tests now isolate the
+simulated neck-state directory; no real safety latch is deleted for validation.
+
+`evidence/source-manifest.json` records implementation/test/config blob hashes;
+`evidence/SHA256SUMS` covers retained evidence. Original source ledgers and
+approved runtime assets remain at the preservation hashes above. Native pending
+items remain exactly those in the Pi qualification runbook: independently
+installed identities/owners, real kernel isolation/cutoff/fault timing, physical
+display and firmware acceptance, and an authentic eligible-question trial.

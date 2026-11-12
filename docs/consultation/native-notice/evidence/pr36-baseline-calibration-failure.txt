@@ -1,0 +1,85 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_actual_normal_main_runs_calibration_and_resumes_tracking _________
+
+integrated = namespace(host=<hardware.rp2040_controller.RP2040Controller object at 0x7fff6eb5bb60>, a=<authority_test.ServoControll...0, 90], 'powered_initialization_verified': True, 'reviewer': 'reviewer_001', 'evidence': 'FAKE_powered_start_review'}})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fff6ef7cd60>
+
+    def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, monkeypatch):
+        import runpy
+        import hardware.rp2040_controller
+        import motion.controller
+        import vision.detector
+        f = integrated
+        import main
+        class Worker:
+            def __init__(self, **kwargs): self.alive = True
+            def start(self): pass
+            def is_alive(self): return self.alive
+            def terminate(self): self.alive = False
+            def join(self, **kwargs): pass
+        monkeypatch.setattr(main.multiprocessing, 'get_context', lambda *a: SimpleNamespace(Process=Worker))
+        camera = SimpleNamespace(read=f.frame, close=lambda: None)
+        f.s.request('uncertain', dict(reason='simulated normal-brain calibration request'))
+        monkeypatch.setitem(sys.modules, 'vision.camera', SimpleNamespace(Camera=lambda: camera))
+        from camera_application_fixture import install
+        install(monkeypatch,main,camera)
+        monkeypatch.setattr(hardware.rp2040_controller, 'RP2040Controller', lambda: f.host)
+        monkeypatch.setattr(motion.controller, 'RP2040Controller', lambda: f.host)
+        f.host.close = lambda: None
+        monkeypatch.setattr(CalibrationService, 'open', classmethod(lambda cls, *args: f.s))
+        attach = f.s.attach_brain
+        monkeypatch.setattr(f.s, 'attach_brain', lambda **options: attach(**options, simulated=True, maximum_steps=8))
+        bus_ref = []
+        monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus, **kwargs: (bus_ref.append(bus) or SimpleNamespace(close=lambda:None))))
+        monkeypatch.setattr(vision.detector, 'ColorDetector', lambda **options:
+            SimpleNamespace(detect=lambda frame: dict(x=460, y=180, width=10, height=10)
+                            if f.s.brain.session is None and f.s.brain.responses else None))
+        monkeypatch.setenv('CHARLIE_NECK_MOTION_AUTHORIZED', '1')
+        monkeypatch.setenv('CHARLIE_NECK_SUPERVISED', '1')
+        ticks = [0]
+        class EndApplication(BaseException): pass
+        def sleep(_):
+            ticks[0] += 1
+            brain = f.s.brain
+            if brain.last_state == 'VERIFY_INITIAL': bus_ref[0].emit('confirm_neck_start')
+            state = f.a.calibration.state
+            # One supervised contact at the first prepared increment only.
+            f.b.pressed[0] = state == 'PREPARED' and ticks[0] < 9
+            for _ in range(5): f.b.now[0] += 20; f.a.update()
+            if brain.tracking_pending is not None and brain.session is None:
+                raise EndApplication()
+            if ticks[0] > 150: pytest.fail('normal application failed to complete calibration')
+        monkeypatch.setattr('time.sleep', sleep)
+        with pytest.raises(EndApplication):
+            import main
+>           main.main(['--hardware','--learning-state',str(f.root/'application-state')])
+
+tests/test_brain_calibration.py:259: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+main.py:378: in main
+    time.sleep(.02)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+_ = 4
+
+    def sleep(_):
+        ticks[0] += 1
+        brain = f.s.brain
+        if brain.last_state == 'VERIFY_INITIAL': bus_ref[0].emit('confirm_neck_start')
+        state = f.a.calibration.state
+        # One supervised contact at the first prepared increment only.
+        f.b.pressed[0] = state == 'PREPARED' and ticks[0] < 9
+        for _ in range(5): f.b.now[0] += 20; f.a.update()
+        if brain.tracking_pending is not None and brain.session is None:
+            raise EndApplication()
+>       if ticks[0] > 150: pytest.fail('normal application failed to complete calibration')
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: normal application failed to complete calibration
+
+tests/test_brain_calibration.py:255: Failed
+----------------------------- Captured stdout call -----------------------------
+{"elegoo_executor_boot_id": "33deee898f77409084dd4ab77e07ac28", "physical_authorization": false, "uncertain": false}
+=========================== short test summary info ============================
+FAILED tests/test_brain_calibration.py::test_actual_normal_main_runs_calibration_and_resumes_tracking
+1 failed in 1.63s

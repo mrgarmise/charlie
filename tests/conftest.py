@@ -5,9 +5,12 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def no_unmocked_physical_io(monkeypatch):
+def no_unmocked_physical_io(monkeypatch, tmp_path):
     # Specific driver tests install their fake Picamera2/serial/HTTP dependencies
     # after this guard. Native loopback HTTP/socket fixtures remain usable.
+    # Simulated application runs must neither consume nor create a real user
+    # safety latch, and must not poison a later test through a shared HOME.
+    monkeypatch.setenv('CHARLIE_NECK_STATE', str(tmp_path / 'neck-state'))
     from vision.camera import _PiCameraDevice
     import serial
     original = urllib.request.urlopen

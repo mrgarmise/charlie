@@ -3,11 +3,11 @@
 Host focused command (Python environment `/home/five/Projects/charlie/.venv`):
 
 ```
-python -m pytest -q tests/test_native_meditation.py tests/test_meditation_notice.py tests/test_calibration_integration.py tests/test_consultation_activation.py tests/test_meditation_consultation.py tests/test_object_display.py tests/test_question_selection.py tests/test_historical_question_qualification.py -k 'not operational_protocol_over_real_loopback' -p no:cacheprovider --junitxml=/tmp/pr38-focused-final.xml
+python -m pytest -q tests/test_brain_calibration.py tests/test_native_meditation.py tests/test_meditation_notice.py tests/test_calibration_integration.py tests/test_consultation_activation.py tests/test_meditation_consultation.py tests/test_object_display.py tests/test_question_selection.py tests/test_historical_question_qualification.py -k 'not operational_protocol_over_real_loopback' -p no:cacheprovider --junitxml=/tmp/pr38-focused-final.xml
 python tools/check_unified_contracts.py
 ```
 
-Result: 306 passed, 2 skipped, 2 deselected; unified contracts: 131 passed.
+Result: 323 passed, 2 skipped, 2 deselected; unified contracts: 131 passed.
 Raw [JUnit](evidence/host-focused.xml), [focused output](evidence/host-focused.txt),
 [contract output](evidence/host-contracts.txt). The host restricts one peer-credential
 probe; the other skip requires optional authentic private-source inputs. Two
@@ -55,3 +55,30 @@ tests inject syscalls; they do not execute privileged operations.
 Deadline hardening publication: remote `47c92204da6be57cee0559c27c16e8d320bf13d6`,
 local `40568edd544c8fc6082d0260916bf3ddea3662f8`, identical tree
 `d55f15f20d0896d81553d37fe5fe661300c177be`.
+
+## Independent regression investigation
+
+The scheduler increment full suite passed twice at identical tree
+`7471705829d15e276228ac13a91a5005e543bc48`: mobile run 43128533044 and
+consultation run 43128533062 each reported 2019 passed / 28 skipped. The native
+run 43128533085 instead reported one normal-main calibration timeout, with
+2018 passed / 28 skipped. This was not dismissed or excluded: an isolated run
+on the unchanged PR #36 baseline reproduced it, as did the candidate.
+Raw baseline and candidate failures are retained in evidence. The application
+fixture had allowed simulated runs to use the shared default neck-state path,
+where a safety latch from another simulated campaign could suppress calibration.
+The autouse physical-I/O guard now assigns a fresh neck-state path per test.
+It never deletes/clears an existing real latch, and real fail-closed behavior is
+unchanged. Including all brain/calibration tests now passes 323 host focused
+checks. CI focused coverage includes this regression and the full suite stays
+unfiltered.
+
+First final-source browser attempt 43129233142 also timed out reacquiring control
+in the existing mobile viewport test (35 passed, one failure). Earlier browser
+runs passed. Its raw failure is preserved; subsequent exact-head validation is
+recorded below rather than silently discarding it.
+
+Pre-isolation source publication: remote
+`ce08257746b6c78f1de5a5594c7eefa7bd6988f8`, local
+`3889249c4143bef68ccc43677e4b20e681e991c8`, identical tree
+`96973dff763bd72cb4e787000bf4f388ee914839`.

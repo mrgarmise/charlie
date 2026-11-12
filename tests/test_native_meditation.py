@@ -498,3 +498,14 @@ def test_primary_completion_requires_fresh_independent_quiet_before_stop_reset(t
     d.inspect=unsafe
     with pytest.raises(InterruptedError):d.primary_done()
     assert d.pending is True and not trace and d._clearing_primary is False
+
+
+@pytest.mark.parametrize('bad', [dict(valid_until=float('nan'),scheduled_duties=[]),
+    dict(valid_until=2000000000,scheduled_duties=[dict(at=float('nan'))]),
+    dict(valid_until=2000000000,scheduled_duties=[dict(at='unknown')]),
+    dict(valid_until=2000000000,scheduled_duties=None)])
+def test_root_deadline_inventory_rejects_unknown_and_nonfinite(monkeypatch,bad):
+    import learning.native_meditation.linux as linux
+    d=linux.LinuxDriver.__new__(linux.LinuxDriver);d.p=dict(inventory_path='/protected')
+    monkeypatch.setattr(linux,'root_read',lambda path:json.dumps(bad).encode())
+    with pytest.raises(PermissionError):d.inventory()

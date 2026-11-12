@@ -7,7 +7,7 @@ python -m pytest -q tests/test_native_meditation.py tests/test_meditation_notice
 python tools/check_unified_contracts.py
 ```
 
-Result: 300 passed, 2 skipped, 2 deselected; unified contracts: 131 passed.
+Result: 304 passed, 2 skipped, 2 deselected; unified contracts: 131 passed.
 Raw [JUnit](evidence/host-focused.xml), [focused output](evidence/host-focused.txt),
 [contract output](evidence/host-contracts.txt). The host restricts one peer-credential
 probe; the other skip requires optional authentic private-source inputs. Two
@@ -41,3 +41,8 @@ Approved operational preservation checked read-only:
 The operational checkout is clean at
 `d3dca9059233b5f054c4f6f9979085b1422f9674`. No merge, deployment, firmware
 flash, service installation/start or unattended enablement was performed.
+
+Scheduler publication: remote `0c7c7e221fd08b45fede918e14d75bb4ac403961`, local
+`2d76a08590dfbf8298dbdf06dc7499050a4dfd2c`, identical tree
+`7471705829d15e276228ac13a91a5005e543bc48`. The next hardening increment rejects
+unknown/nonfinite inventory validity and scheduled duties before reservation.

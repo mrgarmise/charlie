@@ -13,6 +13,7 @@ import time
 import sys
 import socket
 import array
+import math
 from .security import POLICY, APPROVALS, root_read, rpc, root_directory
 from learning.consultation import OllamaConfig, _http, consultation_resources
 from learning.consultation_activation import service_identity, ready_model, SCHEMA
@@ -72,6 +73,16 @@ class LinuxDriver:
         self.p=p;self._verified_policy=stamp
         return p
 
+    def inventory(self):
+        inventory=json.loads(root_read(self.p['inventory_path']))
+        until=inventory.get('valid_until');duties=inventory.get('scheduled_duties')
+        if (type(until) not in (int,float) or not math.isfinite(until)
+                or not isinstance(duties,list) or len(duties)>1024
+                or any(not isinstance(d,dict) or type(d.get('at')) not in (int,float)
+                       or not math.isfinite(d['at']) for d in duties)):
+            raise PermissionError('unknown or nonfinite native deadlines')
+        return inventory
+
     def _lock_path(self):
         path=Path(self.p['runtime_lock'])
         # The Executive is a separate UID, not the human account owning ~/charlie-ops.
@@ -87,7 +98,7 @@ class LinuxDriver:
         try:
             fcntl.flock(self.fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
             self.lock_inode=(os.fstat(self.fd).st_dev,os.fstat(self.fd).st_ino)
-            inventory=json.loads(root_read(self.p['inventory_path']))
+            inventory=self.inventory()
             deadlines=inventory['scheduled_duties']
             end=min([requested_end]+[float(x['at'])-5 for x in deadlines])
             self.reserved_end=end;self.reserved_mono=time.monotonic()+end-time.time()
@@ -107,7 +118,7 @@ class LinuxDriver:
     def client_alive(self):return self.pidfd is not None and not select.select([self.pidfd],[],[],0)[0]
 
     def inspect(self, end):
-        p=self.p;inventory=json.loads(root_read(p['inventory_path']))
+        p=self.p;inventory=self.inventory()
         required={'camera','hailo','serial','telemetry','watchdog','motion','gameplay','human','primary'}
         if (set(inventory.get('owner_classes',[]))!=required or inventory.get('unknown_owners')!=[]
                 or inventory.get('valid_until',0)<end or not inventory.get('units')):

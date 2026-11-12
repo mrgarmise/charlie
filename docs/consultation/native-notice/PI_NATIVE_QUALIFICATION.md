@@ -110,3 +110,37 @@ No example unit has an Install section; do not enable unattended startup during
 qualification. Any deployment, operational runtime change or unattended promotion
 requires its own explicit authorization. Preserve unknown-completion ledger and
 approval history through revocation, drain and rollback.
+
+## Exact diagnostic command forms for the later authorized window
+
+Replace the sample paths/identities only with reviewed installed values. These
+commands are documentation; none was executed against a native service here.
+Root provisioning of directories/units/ACLs is a separately reviewed operational
+change. Start the broker manually only after acceptance authorizes its finite
+qualification campaign; never `enable` it during this process.
+
+```
+cd /opt/charlie-native
+git rev-parse HEAD
+git status --porcelain
+/opt/charlie-native-venv/bin/python -m learning.native_meditation.daemon check-config
+systemctl show charlie-meditation-consultant.service --property=MainPID,ActiveState,InvocationID,ControlGroup,PrivateNetwork,RuntimeMaxUSec,TimeoutStopUSec,ActiveEnterTimestampMonotonic
+python3 -m learning.native_meditation.client status
+python3 -m learning.native_meditation.client cancel
+python3 -m learning.native_meditation.client primary
+python3 -m learning.native_meditation.client primary-done
+```
+
+For a qualified Executive launched by its separately reviewed service under its
+isolated UID, the finite command form is:
+
+```
+/opt/charlie-native-venv/bin/python main.py --offline --native-meditation --learning-state /var/lib/charlie-executive/development --learning-turns 1 --learning-budget 90 --learning-wall-seconds 180 --learning-require-thermal
+```
+
+Do not run this as the human/root account: SO_PEERCRED and process identity must
+reject it. The usual 10-second budget intentionally defers a 35-second consultation;
+a reviewed 90-second client budget merely requests time, and cannot overrule the
+root reservation or upcoming primary duty. Preserve actual checkpoint sources;
+an empty new notebook is not evidence of a meaningful meditation or real question.
+Root service status can be captured read-only even when no query is eligible.

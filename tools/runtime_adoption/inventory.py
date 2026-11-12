@@ -1,5 +1,6 @@
 """Explicit-path, secret-free source/approval inventory. No device I/O or services."""
 import hashlib
+import math
 import ast
 import json
 import os
@@ -9,7 +10,7 @@ import subprocess
 
 
 def git(root, *args):
-    p=subprocess.run(['git','-C',str(root),*args],capture_output=True,text=True,timeout=15,env={**os.environ,'GIT_OPTIONAL_LOCKS':'0'})
+    p=subprocess.run(['git','-c','core.fsmonitor=false','-c','core.hooksPath=/dev/null','-C',str(root),*args],capture_output=True,text=True,timeout=15,env={**os.environ,'GIT_OPTIONAL_LOCKS':'0'})
     if p.returncode:raise ValueError('Git inventory unavailable: '+str(root))
     return p.stdout.strip()
 
@@ -83,10 +84,26 @@ def observed_processes():
         scope='current process namespace only; absence does not establish native idle or owner completeness')
 
 
+def resources():
+    temperatures=[]
+    for path in Path('/sys/class/thermal').glob('thermal_zone*/temp'):
+        try:
+            value=float(path.read_text())/1000
+            temperatures.append(dict(sensor=str(path),celsius=value if math.isfinite(value) and 0<=value<=150 else None))
+        except (OSError,ValueError):temperatures.append(dict(sensor=str(path),celsius=None))
+    try:mem={line.split(':')[0]:int(line.split()[1]) for line in Path('/proc/meminfo').read_text().splitlines() if len(line.split())>=3}
+    except (OSError,ValueError):mem={}
+    try:boot=Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+    except OSError:boot=None
+    return dict(boot_id=boot,temperatures=temperatures,load=os.getloadavg(),
+        available_memory_kib=mem.get('MemAvailable'),swap_total_kib=mem.get('SwapTotal'),swap_free_kib=mem.get('SwapFree'),
+        meaning='local read-only observations only, not native admission or a cool/idle assertion')
+
+
 def collect(baseline, candidate, ops, protected=()):
     b=source(baseline);c=source(candidate)
     return dict(schema='charlie-runtime-inventory-v2',baseline=b,candidate=c,
-        approvals=approvals(ops,b),manual_llm_guards=dict(baseline=manual_guards(baseline),candidate=manual_guards(candidate)),protected=[digest(p) for p in protected],processes=observed_processes(),
+        approvals=approvals(ops,b),resources=resources(),manual_llm_guards=dict(baseline=manual_guards(baseline),candidate=manual_guards(candidate)),protected=[digest(p) for p in protected],processes=observed_processes(),
         devices=[str(p) for pattern in ('video*','media*','hailo*','ttyACM*','ttyUSB*') for p in Path('/dev').glob(pattern)],
         installed_firmware='UNKNOWN: no device readback authorized or performed',
         native_owners='UNKNOWN until host namespace/unit and physical owner reconciliation',

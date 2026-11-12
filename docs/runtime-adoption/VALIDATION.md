@@ -66,3 +66,12 @@ repair the problem. S3 native-build job in run 43242132279 passed both OPI/QSPI
 compile and image/partition checks; host failed only because the omitted peer
 package could not import. Browser timing failure on the unchanged existing
 viewport test remains separately recorded.
+
+The tracked-file regression was strengthened again after finding the reviewed
+dashboard hook was still unstaged: it now checks actual index blob bytes, not
+merely file presence or working-tree bytes, including UI/tests/tools. The exact
+reviewed dashboard source is included in the correction. This prevents local
+uncommitted behavior from being counted as published integration.
+Approval records now bind the complete manifest digest, and that manifest binds
+the canonical CI bundle digest; changed evidence cannot reuse a signed review.
+All review tools remain read-only, with Git hooks/fsmonitor disabled for inventory.

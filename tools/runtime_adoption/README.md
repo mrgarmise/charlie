@@ -28,7 +28,7 @@ approval record and operator-pinned public-key digest (`--approval`, `--trust-ke
 `--trust-key-sha256`). No key from an approval document is trusted implicitly.
 Canonical signature bytes are UTF-8 JSON with sorted keys and compact separators.
 Review records bind schema `charlie-adoption-approval-v2`, candidate SHA/tree,
-stage, sorted ability IDs, named reviewer, issued/expiry times (<=7 days).
+stage, sorted ability IDs, exact manifest SHA-256, named reviewer, issued/expiry times (<=7 days). The manifest also binds the canonical exact CI-receipt bundle SHA-256.
 Verification requires OpenSSL, never a signing key or credential activation.
 Only tests generate ephemeral clearly labeled fixture keys.
 

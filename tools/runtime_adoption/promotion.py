@@ -111,6 +111,8 @@ def validate(manifest, inventory, receipts, *, stage='source', selected=(), appr
         require(str(receipt.get('url','')).startswith('https://github.com/mrgarmise/charlie/actions/runs/'),'independent CI origin missing')
         require(receipt.get('suite') not in known,'duplicate suite receipt');known[receipt['suite']]=receipt
     require(set(requirements)<=set(known),'required exact-head CI missing')
+    require(manifest.get('ci_bundle_sha256')==hashlib.sha256(canonical(receipts)).hexdigest(),
+            'CI bundle differs from reviewed manifest')
     abilities=manifest.get('abilities',[]);ids=[a.get('id') for a in abilities]
     require(all(isinstance(x,str) and x for x in ids) and len(ids)==len(set(ids)),'duplicate/invalid ability IDs')
     by_id={a['id']:a for a in abilities};visited=set();visiting=set()
@@ -127,7 +129,9 @@ def validate(manifest, inventory, receipts, *, stage='source', selected=(), appr
     if stage=='enablement':require(len(selected)==1,'one explicitly reviewed ability per enablement plan')
     if stage!='source':
         require(approval is not None,'separate operator approval required')
-        verify_record(approval,key_path=key_path,key_sha256=key_sha256,candidate=candidate,stage=stage,abilities=selected,now=now)
+        review=verify_record(approval,key_path=key_path,key_sha256=key_sha256,candidate=candidate,stage=stage,abilities=selected,now=now)
+        require(review.get('manifest_sha256')==hashlib.sha256(canonical(manifest)).hexdigest(),
+                'manifest differs from independent signed review')
     enabled=set(selected)|{a['id'] for a in abilities if a.get('enabled') is True}
     for a in abilities:
         require(type(a.get('enabled')) is bool,'explicit enabled/disabled state required')
@@ -169,4 +173,5 @@ def release_candidate(manifest):
     return dict(schema='charlie-release-candidate-v2',version=manifest['version'],source=manifest['candidate'],
         baseline=manifest['baseline'],rollback=manifest['rollback'],state_migration='none',
         capabilities=[{k:a.get(k) for k in ('id','enabled','dependencies','native_gates','required_native_gates')} for a in manifest['abilities']],
-        provenance_sha256=hashlib.sha256(canonical(manifest)).hexdigest(),installed=False,approved=False)
+        provenance_sha256=hashlib.sha256(canonical(manifest)).hexdigest(),installed=False,approved=False,
+        validation='unapproved proposal; validate exact CI and independent approvals separately')

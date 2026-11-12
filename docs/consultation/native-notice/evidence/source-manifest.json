@@ -1,8 +1,7 @@
 {
-  "remote_source_commit": "0d58df70f56dd0c4c4dda7e916ba69107bd7c770",
-  "source_tree": "87ff43725135f9886796111f62575e6131940bf7",
+  "revision_record": "Final immutable publication SHA and tree are recorded in draft PR #38; hashes below bind the implementation independently of documentation-only commits.",
   "sha256": {
-    ".github/workflows/native-meditation.yml": "41d7690f720dc895cf253b7e33360512f22e41781274a6c31ba85923f278db7d",
+    ".github/workflows/native-meditation.yml": "e9159e99b34418bd61d98695cb0676169edc744221ba66cacdb2264c40199023",
     "docs/consultation/native-notice/config/charlie-meditation-broker.service.example": "69f085fb21749e8e499e4fd3f8fa6bf506c29403b4a40346b36b7416eced85a3",
     "docs/consultation/native-notice/config/inventory.example.json": "2b0efca7f3cfafbfa3b0b8333c097275bc3c06b8c75cc0721790666a798d8e06",
     "docs/consultation/native-notice/config/policy.example.json": "d2be6b9b31047e7be2ba246e9e9e10ab11ac19bdaa247800278a2d6777346040",
@@ -30,8 +29,11 @@
     "rp2040/meditation_notice.py": "9612a7ee6f2190753b8225bf31ef74651490c633712a425e5995d9f3286db1de",
     "rp2040/object_label.py": "0f3a35379b38fec075cf4384d6848e81582efa6e4504503649d41763a748c6cc",
     "rp2040/protocol.py": "6686b12a80553dc77f84886538361356fec47c7dc5940c23912b405c2e98599e",
-    "tests/conftest.py": "8453e206c878aab25e97f982d1396d3c5bfc4fe26c4ccff47498053fb6798eab",
+    "tests/camera_application_fixture.py": "7064989427177f87cedbc89d532839a83cb2697ea53680d81911be51b35b9179",
+    "tests/test_brain_calibration.py": "324052a9912fbfd1f82bb838c20f6a3647526dc966b70b3f89167f4c73d5223e",
+    "tests/test_calibration_integration.py": "6902413f0bd21ff6de8e41d98ebedad656e6ac0836e4a07b893bc771d3a2b723",
     "tests/test_meditation_notice.py": "2f14ad1ba913e50cbd306bd3dc131873b3dd93bd631b9f1effb3f883dbe80911",
-    "tests/test_native_meditation.py": "65ff6bef96f84b8c404e4560d8a066b4b1355c62bacf7433f9b5fe0199e1f82a"
+    "tests/test_native_meditation.py": "65ff6bef96f84b8c404e4560d8a066b4b1355c62bacf7433f9b5fe0199e1f82a",
+    "tests/test_normal_learning_lifecycle.py": "9e30b2cf2ee4b8e6fae17ca6f0bce18a05cc0454d724202b42e2b1e0709d6ccb"
   }
 }

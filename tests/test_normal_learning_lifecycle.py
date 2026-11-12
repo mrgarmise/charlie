@@ -270,7 +270,7 @@ def test_normal_attention_lifecycle_survives_worker_interruption(tmp_path,monkey
     for name,contents in replacements.items():
         module=ModuleType(name);module.__dict__.update(contents);monkeypatch.setitem(sys.modules,name,module)
     from camera_application_fixture import install
-    install(monkeypatch,main,Camera())
+    install(monkeypatch,main,Camera(),neck_state=tmp_path/'neck-state')
     with pytest.raises(KeyboardInterrupt):main.main(['--hardware','--learning-state',str(tmp_path/'state')])
     assert calls.count('worker started')==2
     assert calls.count('attention update')==3

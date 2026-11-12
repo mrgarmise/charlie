@@ -3,11 +3,11 @@
 Host focused command (Python environment `/home/five/Projects/charlie/.venv`):
 
 ```
-python -m pytest -q tests/test_brain_calibration.py tests/test_native_meditation.py tests/test_meditation_notice.py tests/test_calibration_integration.py tests/test_consultation_activation.py tests/test_meditation_consultation.py tests/test_object_display.py tests/test_question_selection.py tests/test_historical_question_qualification.py -k 'not operational_protocol_over_real_loopback' -p no:cacheprovider --junitxml=/tmp/pr38-isolated-focused.xml
+python -m pytest -q tests/test_normal_learning_lifecycle.py tests/test_marathon_camera_session.py tests/test_robotron_agency_integration.py tests/test_robotron_startup_boundaries.py tests/test_brain_calibration.py tests/test_native_meditation.py tests/test_meditation_notice.py tests/test_calibration_integration.py tests/test_consultation_activation.py tests/test_meditation_consultation.py tests/test_object_display.py tests/test_question_selection.py tests/test_historical_question_qualification.py -k 'not operational_protocol_over_real_loopback' -p no:cacheprovider --junitxml=/tmp/pr38-scoped-focused.xml
 python tools/check_unified_contracts.py
 ```
 
-Result: 323 passed, 2 skipped, 2 deselected; unified contracts: 131 passed.
+Result: 379 passed, 2 skipped, 2 deselected; unified contracts: 131 passed.
 Raw [JUnit](evidence/host-focused.xml), [focused output](evidence/host-focused.txt),
 [contract output](evidence/host-contracts.txt). The host restricts one peer-credential
 probe; the other skip requires optional authentic private-source inputs. Two
@@ -67,7 +67,7 @@ on the unchanged PR #36 baseline reproduced it, as did the candidate.
 Raw baseline and candidate failures are retained in evidence. The application
 fixture had allowed simulated runs to use the shared default neck-state path,
 where a safety latch from another simulated campaign could suppress calibration.
-The autouse physical-I/O guard now assigns a fresh neck-state path per test.
+The mocked hardware-application fixture now assigns a fresh neck-state path for each application test.
 It never deletes/clears an existing real latch, and real fail-closed behavior is
 unchanged. Including all brain/calibration tests now passes 323 host focused
 checks. CI focused coverage includes this regression and the full suite stays
@@ -85,11 +85,11 @@ Pre-isolation source publication: remote
 
 ## Final source and exact-head checks
 
-Final implementation source, including test-state isolation: remote
+Intermediate implementation source, including the first test-state isolation attempt: remote
 `0d58df70f56dd0c4c4dda7e916ba69107bd7c770`, local
 `ecb211e44f7369fee27f344cf48871fffee0fa86`, identical tree
 `87ff43725135f9886796111f62575e6131940bf7`.
-The evidence completion commit only adds documentation/logs/manifests. Its exact
+That evidence completion commit only added documentation/logs/manifests; the subsequent scoped-fixture correction is documented below. Its exact
 published SHA/tree and final CI conclusions are recorded in the draft PR #38
 publication description, avoiding a self-referential commit hash inside a file.
 No source after this boundary is excluded from review or testing.
@@ -129,3 +129,25 @@ approved runtime assets remain at the preservation hashes above. Native pending
 items remain exactly those in the Pi qualification runbook: independently
 installed identities/owners, real kernel isolation/cutoff/fault timing, physical
 display and firmware acceptance, and an authentic eligible-question trial.
+
+## Scoped fixture correction and final evidence
+
+The first test-isolation attempt set CHARLIE_NECK_STATE globally. Independent
+[run 43130281356](https://github.com/mrgarmise/charlie/actions/runs/43130281356)
+exposed that this variable also opts the arcade player into CAL-1: 23 simulated
+Robotron tests refused unmocked serial ownership (2002 passed / 28 skipped).
+The physical-I/O guard correctly blocked those attempts; no serial device opened.
+This implementation mistake is corrected by reverting the global environment
+change and requiring an explicit temporary neck-state directory only in the
+existing mocked hardware-application feeder fixture. Arcade test configuration
+is preserved. No production code or native gate changed in this correction.
+The focused command now includes brain/calibration, normal lifecycle, marathon
+camera sessions, agency and startup-boundary regressions. Full CI remains
+unfiltered. Final exact-head counts, links and commit/tree are recorded in PR #38.
+
+The browser retry of 43129233142 passed, and both subsequent source/evidence-head
+browser campaigns passed their first attempt. Its initial timeout remains in
+the evidence bundle. The final source manifest supersedes the intermediate
+revision fields: its individual hashes are checked against the published final
+head; the PR publication record identifies that immutable head without a
+self-referential embedded commit hash.

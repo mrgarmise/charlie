@@ -226,7 +226,7 @@ def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, mo
     f.s.request('uncertain', dict(reason='simulated normal-brain calibration request'))
     monkeypatch.setitem(sys.modules, 'vision.camera', SimpleNamespace(Camera=lambda: camera))
     from camera_application_fixture import install
-    install(monkeypatch,main,camera)
+    install(monkeypatch,main,camera,neck_state=f.root/'neck-state')
     monkeypatch.setattr(hardware.rp2040_controller, 'RP2040Controller', lambda: f.host)
     monkeypatch.setattr(motion.controller, 'RP2040Controller', lambda: f.host)
     f.host.close = lambda: None
@@ -358,7 +358,7 @@ def test_normal_application_startup_failure_releases_transport_and_camera(integr
             yield
         monkeypatch.setattr(main,'application_camera_feeders',unavailable_feeder)
     else:
-        install(monkeypatch,main,camera)
+        install(monkeypatch,main,camera,neck_state=f.root/'neck-state')
     monkeypatch.setattr(hardware.rp2040_controller, 'RP2040Controller', lambda: f.host)
     monkeypatch.setattr(motion.controller, 'RP2040Controller', lambda: f.host)
     monkeypatch.setattr(f.host, 'close', lambda: calls.append('transport closed'))

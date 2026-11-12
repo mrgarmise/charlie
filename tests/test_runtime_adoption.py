@@ -146,13 +146,14 @@ def test_guard_fingerprint_uses_exact_source_not_interpreter_ast_format(tmp_path
     assert manual_guards(tmp_path)['function:validate_approval']!=before['function:validate_approval']
 
 
-def test_transferred_runtime_sources_are_tracked_and_match_reviewed_manifest():
+@pytest.mark.parametrize('manifest_name',['firmware-source-transfer.json','robotron-source-transfer.json'])
+def test_transferred_runtime_sources_are_tracked_and_match_reviewed_manifest(manifest_name):
     root=Path(__file__).resolve().parents[1]
-    path=root/'docs/runtime-adoption/evidence/firmware-source-transfer.json'
+    path=root/'docs/runtime-adoption/evidence'/manifest_name
     if not path.exists():return  # Core increment precedes the optional firmware transfer.
     for row in json.loads(path.read_text()):
         name=row['path']
-        if not name.startswith(('networking/','firmware/','hardware/','motion/','ui/','tests/','tools/')):continue
+        if not name.startswith(('networking/','firmware/','hardware/','motion/','ui/','tests/','tools/','experiments/','learning/','memory/','vision/','config/')):continue
         tracked=subprocess.run(['git','-C',str(root),'ls-files','--error-unmatch','--',name],capture_output=True)
         assert tracked.returncode==0,'reviewed source omitted from candidate: '+name
         indexed=subprocess.run(['git','-C',str(root),'show',':'+name],capture_output=True,check=True).stdout
@@ -228,5 +229,25 @@ def test_manifest_assembly_cannot_inherit_active_authority_or_native_receipts(qu
     a=proposal['abilities'][0]
     assert a['enabled'] is False and a['native_gates']=={} and not a['physical_stop_verified']
     assert proposal['approved'] is False and proposal['installed'] is False
+    bom=release_candidate(proposal)
+    assert bom['manual_llm_source_sha256']==proposal['manual_llm_guards']['source_sha256']
+    assert bom['capabilities'][0]['firmware_model_dataset_identity']=='UNKNOWN'
+    assert bom['protected_evidence_sha256']==proposal['protected']
     with pytest.raises(Refusal,match='not inventoried'):
         assemble(ledger,i,r,rollback_sha='e'*40,backup_manifests=['/missing'])
+
+
+def test_release_refuses_historical_backup_without_fresh_complete_restore_review(tmp_path,qualified):
+    m,i,r=qualified
+    approval,key,pin=signed(tmp_path,m,[],stage='release')
+    with pytest.raises(Refusal,match='backup/restore'):
+        validate(m,i,r,stage='release',approval=approval,key_path=key,key_sha256=pin,now=1001)
+    m['backup_qualification']=dict(status='passed',complete_scope_verified=True,isolated_restore_verified=True,
+        state_compatible=True,independent_review=True,candidate=m['candidate'],
+        backup_manifests=m['rollback']['backup_manifests'],evidence_sha256='f'*64,completed_at=1000)
+    approval,key,pin=signed(tmp_path,m,[],stage='release')
+    assert validate(m,i,r,stage='release',approval=approval,key_path=key,key_sha256=pin,now=1001)['mutations_performed']==[]
+    m['backup_qualification']['completed_at']=-900000
+    approval,key,pin=signed(tmp_path,m,[],stage='release')
+    with pytest.raises(Refusal,match='stale'):
+        validate(m,i,r,stage='release',approval=approval,key_path=key,key_sha256=pin,now=1001)

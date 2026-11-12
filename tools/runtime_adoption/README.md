@@ -57,3 +57,9 @@ Interruption/restart regression kills a fixture-only inventory process during a
 protected read, restarts inventory, compares original source/Git/state/backup
 bytes, and restores the backup into a separate scratch path. No production state
 or physical driver participates.
+
+Release review additionally refuses a missing, stale or incomplete signed
+backup_qualification: complete scope, compatible state, verified isolated restore,
+independent review, exact candidate/manifest binding and <=7-day age are required.
+The BOM retains per-ability provenance and unknown firmware/model identity,
+manual-LLM source hashes and protected evidence hashes.

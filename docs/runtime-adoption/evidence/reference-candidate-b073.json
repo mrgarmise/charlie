@@ -1,0 +1,1953 @@
+{
+  "schema": "charlie-adoption-candidate-v2",
+  "version": "source-b0733e15d466214e8fdbbce3e7f4aee1089048ad",
+  "candidate": {
+    "sha": "b0733e15d466214e8fdbbce3e7f4aee1089048ad",
+    "tree": "7a53b18c5c7dcda0a6866306fefe1b01df4ab667"
+  },
+  "baseline": {
+    "sha": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+    "tree": "72cd9e4eba5939c181ae88d6ed03d5bbc50527c4"
+  },
+  "state_migration": "none",
+  "unreconciled_branches": [],
+  "protected": {
+    "/home/five/.local/share/charlie/development/learning-project-evidence.sqlite3": "93fa829a9e87352105d7e4ee0174b4bdfc9b1b85e67430bfbb8192ca20dc72e4",
+    "/home/five/.local/share/charlie/development/operator-demonstrations.sqlite3": "dde6c834e9e9cd6051b818b6a50bd35904a5ce2d6ed7273289528d9e53c65b84",
+    "/home/five/charlie-state-backup-pre-pr13-20261031T161640Z/backup-manifest.json": "c70c547a2262723c055e9664436f647c682f9c9d4331e4c3b4451049072fe5b9"
+  },
+  "backup_qualification": {
+    "status": "pending",
+    "complete_scope_verified": false,
+    "isolated_restore_verified": false,
+    "state_compatible": false
+  },
+  "rollback": {
+    "sha": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+    "backup_manifests": {
+      "/home/five/charlie-state-backup-pre-pr13-20261031T161640Z/backup-manifest.json": "c70c547a2262723c055e9664436f647c682f9c9d4331e4c3b4451049072fe5b9"
+    }
+  },
+  "manual_llm_guards": {
+    "baseline_preserved": true,
+    "resource_limits_changed": false,
+    "autonomous_enabled": false,
+    "guardian_started": false,
+    "source_sha256": {
+      "learning/consultation.py": "a0dab5ef84f7d5a835ea5bbc52b8f554c8885bef1a1a80bec454a5e58d936d13",
+      "learning/resources.py": "20a4bafa6718fe656f45a122c1c4f25ff363d2df97449b817f259e2f60133ea7",
+      "tools/historical_question_qualification.py": "c0ff59fbe8c2b6fec6d1ba9e48c9b94a43c20bc875b1b52fa1c11046f6b40b02"
+    }
+  },
+  "required_ci": [
+    "full",
+    "contracts",
+    "baseline-llm",
+    "browser",
+    "firmware-host",
+    "firmware-build",
+    "neural-cpu"
+  ],
+  "ci_bundle_sha256": "48defed9349ee4d07ca510a2fde364b3c30450a71ca01c810d229022194b9b7f",
+  "abilities": [
+    {
+      "id": "pr-01",
+      "purpose": "Add Charlie memory, evidence evaluation, and PPAL-7 Pi gameplay setup",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [],
+      "provenance": {
+        "sha": "0115667c2d39bdf6c46594744952b512abb796e2",
+        "tree": "4802085f59c3d261ec16b2897385bfdaa52a1488"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-02",
+      "purpose": "Guard Robotron learning evidence before unattended game batches",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-01"
+      ],
+      "provenance": {
+        "sha": "bec0667bbe4458619dbcb93c66848e887041a46b",
+        "tree": "3603e2d73ac8548a262250c865b99eb25efe1e4c"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-03",
+      "purpose": "Recover Robotron score reviews and add bounded feedback consumption",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-04"
+      ],
+      "provenance": {
+        "sha": "b1d1ef14fd9100a34a94519305db802c2b75d66e",
+        "tree": "3a26a169986787421655b1291f4916523835802c"
+      },
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-04",
+      "purpose": "Best of Charlie: integrate ALA thermal recovery, Robotron, CAL-1 and safe release operations",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-01",
+        "pr-02"
+      ],
+      "provenance": {
+        "sha": "b4041e10c01bc6f57a8878025c5ee6bfbd23f849",
+        "tree": "1378a325ad5395ae6f9dbc95b51e8d7b776c1712"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-05",
+      "purpose": "Continuous capture and agency-first Robotron gameplay",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-04"
+      ],
+      "provenance": {
+        "sha": "7dcea80cd6a6448a7c13f8b83179435c049d7b3c",
+        "tree": "fe445569ec7cb7e64cc2a294cd42fdfb8b750b45"
+      },
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-06",
+      "purpose": "Add observation-only Hailo-8L detector bridge and Vision Lab export path",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-05"
+      ],
+      "provenance": {
+        "sha": "ab58a3d3d3f83a44e77184d329f0e28c1f9cbda8",
+        "tree": "0adf6ea3fec25da666a53ffc507519d0836bce12"
+      },
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-07",
+      "purpose": "ALA-2: recover experience-to-decision feedback and retained tactical diagnostics",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-05"
+      ],
+      "provenance": {
+        "sha": "83112b4b9d20f97178a6494f09f48713d4210344",
+        "tree": "93846db3ac9641414396724b567effb480211fb4"
+      },
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-08",
+      "purpose": "Add neural Robotron score proposals with CPU and Hailo-8L adapters",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-04"
+      ],
+      "provenance": {
+        "sha": "b4f258853964edbc3e442f9332675d5ebd7007e9",
+        "tree": "495ed7a126ed917c6d41800f63070c59f42858a0"
+      },
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-09",
+      "purpose": "Restore 3 / meditation / 3 Robotron campaign with consolidated native preflight",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-05",
+        "pr-06",
+        "pr-07",
+        "pr-08"
+      ],
+      "provenance": {
+        "sha": "9ba60e2e9c645c43f71072de413118dd5373e8c6",
+        "tree": "6dd4632c525d87027f917f55a05cfe61cd680412"
+      },
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-10",
+      "purpose": "Integrate elective pet abilities with Charlie attention, Executive and qualified ELEGOO execution",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-04"
+      ],
+      "provenance": {
+        "sha": "9c1319d2800749d19cd5086f34ba4643276d90a7",
+        "tree": "8a14e48b9d23ede92a0bc2a3a93550182c40af26"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-11",
+      "purpose": "Add subscription-only shared camera feeders and normal Hailo Object Recognition with pico:ed labels",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-10"
+      ],
+      "provenance": {
+        "sha": "a19c90822687739f79f69587302006a1bd6364d4",
+        "tree": "e3a7a0682149df0dc6cb8144686e70afdbc2c91b"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-12",
+      "purpose": "Establish canonical sensory contracts and bounded shared frame history",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-11"
+      ],
+      "provenance": {
+        "sha": "ae09f52d1a1f65de2bcb923cb7d112d666fb5798",
+        "tree": "1596c50700936285c72fbb25870a5a5e4e743401"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-13",
+      "purpose": "Reconcile shared sensory publication with pet Executive integration",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-10",
+        "pr-11",
+        "pr-12"
+      ],
+      "provenance": {
+        "sha": "097f110fd0c6d321d24024c399d79f0a427bf23c",
+        "tree": "6523dc59f4392cca16434f0a3c67ac1b041f4266"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-14",
+      "purpose": "Add asynchronous human information gateway for Executive review",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-04"
+      ],
+      "provenance": {
+        "sha": "4bb3bffecffea0d6e294485132f42f5e96f4c506",
+        "tree": "3657ef2354ef4af31bfdb54a8c842421b9519f2e"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-15",
+      "purpose": "Add reusable Executive-owned perception learning with guarded Robotron qualification",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-04"
+      ],
+      "provenance": {
+        "sha": "d36051481475084dc0e2c11627f49699c594f3dd",
+        "tree": "258fb4de194ff2441664ba2a667ea9bdc90b4209"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-16",
+      "purpose": "Add Mobile Body console through shared sensing and qualified manual leases",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-13"
+      ],
+      "provenance": {
+        "sha": "9c4d899ff6e60f4e17d8c21cb43f8101fbda6b56",
+        "tree": "04cfe0f3d0898e9756be1544bf9a76639956e13f"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-17",
+      "purpose": "Record master integration campaign and preserve promotion holds",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [
+        "pr-04"
+      ],
+      "provenance": {
+        "sha": "427b615ce68b6760b604efdf7d14394e52350aff",
+        "tree": "98ec4f1dda9a46b4803245c9caf8b5fabec70bd2"
+      },
+      "integration_revision": "reference only",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-18",
+      "purpose": "Keep stationary demonstrations observing when selective pixel storage is full",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-13"
+      ],
+      "provenance": {
+        "sha": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+        "tree": "63330e711fc5a2322d7c23844a296957722823be"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-19",
+      "purpose": "Connect opt-in human interpretation review to the normal Executive",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-18",
+        "pr-14"
+      ],
+      "provenance": {
+        "sha": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+        "tree": "6c5d8206b1bd258118ea19a9ada3d86d864ebd94"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-20",
+      "purpose": "Reconcile guarded model learning with Executive human review",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-19",
+        "pr-15"
+      ],
+      "provenance": {
+        "sha": "be9e259781c09d9b56c065111aa2c0341c8187d6",
+        "tree": "44aa5f7ede2dc1f27096405fc83f8c7636cbfdd5"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-21",
+      "purpose": "Reconcile Mobile Body monitoring and read-only mission status",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-20",
+        "pr-16"
+      ],
+      "provenance": {
+        "sha": "9a1fee83ca518a4d106021e918263a4bafdd0620",
+        "tree": "95705eede18cca4e4634a4b9589c3dcc1485869c"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-22",
+      "purpose": "Transfer scoped immutable acquisition recovery from PR #7",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-21"
+      ],
+      "provenance": {
+        "sha": "fa7d5d5db5726e8e251000d79e9cc009fa912ae8",
+        "tree": "71fab47fb62ba1b39e12e804cc83b56e9df9944d"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-23",
+      "purpose": "Preserve human and model review options in normal mobile startup",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-22"
+      ],
+      "provenance": {
+        "sha": "3b364f9b3eca8ae3348fb5f9eb4eaeb315f32b27",
+        "tree": "eb8ea26b8460a3b2f3d6f6dfee93dd9cc347a8de"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-24",
+      "purpose": "Record tested master campaign continuation and preserved promotion holds",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [
+        "pr-23"
+      ],
+      "provenance": {
+        "sha": "a93a7bf2818fc09ef0e776d7b4f6c7a0b65925a8",
+        "tree": "e502881cae5c38646ea761f0caae9de4fa5c3a66"
+      },
+      "integration_revision": "reference only",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-25",
+      "purpose": "Render pico:ed object labels with a centered miniature font",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-23"
+      ],
+      "provenance": {
+        "sha": "f8a05570fbea69dfe32476b0c464ab1059a2101d",
+        "tree": "1ecbdb068bec0a6bd25c468457082af236d5a665"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-26",
+      "purpose": "Integrate Mobile Body monitoring with normal primary runtime",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-23"
+      ],
+      "provenance": {
+        "sha": "3d8591d8126bf9bc8c49bdddfb80fd7ea5487b98",
+        "tree": "b2eea13b0a795819f5c90d319cd33ee6bb793ef8"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-27",
+      "purpose": "Add default-off onboard text consultation with unverified advice and native holds",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-26"
+      ],
+      "provenance": {
+        "sha": "b60f4a5edb3605bac212ce7ed81a1f9b43ba92e5",
+        "tree": "8cdc145afb9a729e251f8dd704b2c3ee85e87b7e"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-28",
+      "purpose": "Add opt-in ELEGOO network provisioning with authenticated identity and bounded rollback",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-33"
+      ],
+      "provenance": {
+        "sha": "c8a7a8d471130e40d9a5ecf827870118f3757b8f",
+        "tree": "3c2bcef80200e0a71acc10e1fe4b81cafb6a99e4"
+      },
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-29",
+      "purpose": "Add tested ELEGOO firmware lifecycle core and record matching-source build blocker",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-33"
+      ],
+      "provenance": {
+        "sha": "b71cd3dd917b83aff3b643795a76dab3ac5b42ed",
+        "tree": "2cdb4259c9b6a4e3f3778b157222ab17f2ad948d"
+      },
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": true,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-30",
+      "purpose": "Build selected ELEGOO S3 camera firmware with authenticated provisioning and bounded bridge",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-29"
+      ],
+      "provenance": {
+        "sha": "ea2172ae84f16e7efe9d661301ce649672da69b3",
+        "tree": "83d3cb227ae71ea8275abdc0754d92da5b657594"
+      },
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": true,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-31",
+      "purpose": "Restore stock S3 UI and add qualified per-command LAN admission",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-30"
+      ],
+      "provenance": {
+        "sha": "cab7babcae913cb33c15aa3115867ca31fe0ecf6",
+        "tree": "b10baa98d0fb71f37d50f9ed89ac50256106c278"
+      },
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": true,
+      "touches_firmware": true,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-32",
+      "purpose": "Qualify stock S3 image provenance and document replacement trial blockers",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-30"
+      ],
+      "provenance": {
+        "sha": "dba27aaf987c8ff3f3724bd90c5aad2589aeb871",
+        "tree": "3aa503a9359fe4838f39b51c48288ae31420d2b2"
+      },
+      "integration_revision": "Firmware/network increment; exact commit/tree in PR39 publication record",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": true,
+      "autonomous_consultation": false,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-33",
+      "purpose": "Add bounded safe-idle activation for Executive local consultation",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-27"
+      ],
+      "provenance": {
+        "sha": "b26f1ce0d1765299fe44755d2e5f3988b1fe6d9f",
+        "tree": "96930e1712c84f6f6e8f2e597c8ec0419538f3b9"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-34",
+      "purpose": "Document staged unified runtime adoption and reusable ability qualification mission",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "e15ba2ee9416106c4ba25bda6f97403f145acfbe",
+        "tree": "2e827465a9d8d0a714e3f4a6f5997bbde1f46855"
+      },
+      "integration_revision": "reference only",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-35",
+      "purpose": "docs: Codex mission for meditation-triggered local LLM consultations",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "16a8f2b8782ed17f463131a2edbde479529cd16b",
+        "tree": "a66b7b92a4f33fc39ddf80a2e02dc0bff0753c6e"
+      },
+      "integration_revision": "reference only",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-36",
+      "purpose": "Generalized questions and meditation consultation with fail-closed slot policy",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-33"
+      ],
+      "provenance": {
+        "sha": "0567147d9bdf87b74aac143124fb60c9b4c39322",
+        "tree": "56d71274708e0a85d91d71ac31058d4f0fb93883"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-37",
+      "purpose": "docs: native meditation scheduler and RP2040 meditating notice mission",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [
+        "pr-36"
+      ],
+      "provenance": {
+        "sha": "d890d598523ae6e0fd3fd1c70bc39aa76c42b634",
+        "tree": "543633786ed36b550e5d9460b1a6c69e007a0f64"
+      },
+      "integration_revision": "reference only",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": false,
+      "required_native_gates": [],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "pr-38",
+      "purpose": "Implement independent native meditation scheduler and acknowledged RP2040 notice",
+      "enabled": false,
+      "source_present": true,
+      "dependencies": [
+        "pr-36"
+      ],
+      "provenance": {
+        "sha": "e83b7d469e403559c68025b92120da27dc342dc9",
+        "tree": "a46f530ee90cd5e34485c94bfd0e727a14146f41"
+      },
+      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "firmware_model_dataset_identity": "recorded source hashes only; installed identity UNKNOWN except historical approved manual model digest in baseline receipt",
+      "motion": false,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "N0",
+        "N1",
+        "N2",
+        "N5"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-01",
+      "purpose": "Preserved local worktree charlie",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "bb40d02d3a128706e204cfd8e636fb1a9c5fd21b",
+        "tree": "f7a95d62406e64248c07b9c4879d06f45dc8b7f4"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-02",
+      "purpose": "Preserved local worktree charlie-agency-recovery",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+        "tree": "04f27dccaed509b9626e2061eac33b52561338de"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-03",
+      "purpose": "Preserved local worktree charlie-ala2-bae659f60b0e",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "6ba21fb9b56e492a85bf3b7fc2e9b5fb63ab9789",
+        "tree": "b71f2efa21f0bbbc50ff85afa8722484ae9e60f4"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-04",
+      "purpose": "Preserved local worktree charlie-ala2-recovery-20261019",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "365bc84ca7f2b02cde94a3f604b2f957bb66a6f9",
+        "tree": "93846db3ac9641414396724b567effb480211fb4"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-05",
+      "purpose": "Preserved local worktree charlie-best-of-v0.1.0",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+        "tree": "1378a325ad5395ae6f9dbc95b51e8d7b776c1712"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-06",
+      "purpose": "Preserved local worktree charlie-calibration-baseline",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "f3304c588a893a953e34e5c4d00bd5f9bfb18f19",
+        "tree": "3b0ccc30ad68475f06b0ebc54b40933182fea1dd"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-07",
+      "purpose": "Preserved local worktree charlie-camera-calibration",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+        "tree": "04f27dccaed509b9626e2061eac33b52561338de"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-08",
+      "purpose": "Preserved local worktree charlie-closed-loop-validation",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "d74d7a620c39104ce58fb2c9551381543a66b5f2",
+        "tree": "1ee29c9bd21381d76d7fc20ed302b45f9ca9d1aa"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-09",
+      "purpose": "Preserved local worktree charlie-consultation",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "b0c04ad4c5c6e1f0b2b9fd2e6316af286c36c01f",
+        "tree": "04e93dc9175f34d67820b40f15885de1ccaa01cc"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-10",
+      "purpose": "Preserved local worktree charlie-consultation-base-control",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "3d8591d8126bf9bc8c49bdddfb80fd7ea5487b98",
+        "tree": "b2eea13b0a795819f5c90d319cd33ee6bb793ef8"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-11",
+      "purpose": "Preserved local worktree charlie-consultation-candidate",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "b26f1ce0d1765299fe44755d2e5f3988b1fe6d9f",
+        "tree": "96930e1712c84f6f6e8f2e597c8ec0419538f3b9"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-12",
+      "purpose": "Preserved local worktree charlie-e1-probe",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "9152ee0c71df95f8aaeafe34cc923f5372681dcd",
+        "tree": "16f07ef4a15d2bff2cff9744e0e7705d08b853f9"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-13",
+      "purpose": "Preserved local worktree charlie-fast-self-validation",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "73169db9ad2648ca7e4088979d22905900052c6a",
+        "tree": "07cd49fa43acedfc3db3ccf99d6e1718b66df8c6"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-14",
+      "purpose": "Preserved local worktree charlie-learning-loop-validation",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "72b3ce5a42f74fa41d8e25a50805636efeca7ea9",
+        "tree": "a634369337c68169f380d409efacc32ec31cab05"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-15",
+      "purpose": "Preserved local worktree charlie-llm-qualification",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+        "tree": "72cd9e4eba5939c181ae88d6ed03d5bbc50527c4"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-16",
+      "purpose": "Preserved local worktree charlie-manual-drive",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "169cc36d8a34891b41caedc6ab7ebcad0ada7731",
+        "tree": "3f245f14b79482f51954d83d793f2536b8666bc5"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-17",
+      "purpose": "Preserved local worktree charlie-marathon-audit-20261020",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "f43bb2be17d8d687683f35edda86d0b8734f7f59",
+        "tree": "e22bef8d4106b7fb560d8482aebea42990aa167f"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-18",
+      "purpose": "Preserved local worktree charlie-marathon-camera-lifecycle",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+        "tree": "559eeb81b96a985a8ddbed4807529df9f410d64e"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-19",
+      "purpose": "Preserved local worktree charlie-meditation-questions",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "1d14a3e510586e6a1518d31a9ceacdcc7a785149",
+        "tree": "56d71274708e0a85d91d71ac31058d4f0fb93883"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-20",
+      "purpose": "Preserved local worktree charlie-mobile-console",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "6aa55ab42da1f33b9b7289c8b36bd682e53ed25c",
+        "tree": "04cfe0f3d0898e9756be1544bf9a76639956e13f"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-21",
+      "purpose": "Preserved local worktree charlie-model-learning",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "fb22d7484ea1837d32d8d81ee95fcd27bd55caa0",
+        "tree": "258fb4de194ff2441664ba2a667ea9bdc90b4209"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-22",
+      "purpose": "Preserved local worktree charlie-native-foreground-20261021",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "71892612069018998de98fe4b303f0ed202472cc",
+        "tree": "9ce102a4f94757d983440f0feb66f567e4d0969b"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-23",
+      "purpose": "Preserved local worktree charlie-native-integration-20261020",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "71892612069018998de98fe4b303f0ed202472cc",
+        "tree": "9ce102a4f94757d983440f0feb66f567e4d0969b"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-24",
+      "purpose": "Preserved local worktree charlie-native-meditation-notice",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "5eae293cd068e45c918249f2d340c791c0b34592",
+        "tree": "a46f530ee90cd5e34485c94bfd0e727a14146f41"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-25",
+      "purpose": "Preserved local worktree charlie-pr13-acceptance",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "8f3b98804dfe9d8a7b69b0cf7030438fb45d0ca1",
+        "tree": "395adfb0d6a8ee950a89dbf05cf3fd1e1fd4c394"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-26",
+      "purpose": "Preserved local worktree charlie-pr13-stationary-20261031",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "097f110fd0c6d321d24024c399d79f0a427bf23c",
+        "tree": "6523dc59f4392cca16434f0a3c67ac1b041f4266"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-27",
+      "purpose": "Preserved local worktree charlie-pr13-stop-ack-20261029",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "4132be08958d08b0ae7589c406545bbcd5615a54",
+        "tree": "89604f55e8e6b56389696454f413052bc927167e"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-28",
+      "purpose": "Preserved local worktree charlie-progress-watchdog",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "3723132e0a7643d24b7670c202aba0f4a1acee12",
+        "tree": "9d587a707e44ab15f036581bf16ec0dbe449cc62"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-29",
+      "purpose": "Preserved local worktree charlie-restart-recovery",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "a785c9f745bd0645dd01ac70af3beb5a8d44d37b",
+        "tree": "34e06b7cac8fa16442255d067d84585fb59dc2e0"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-30",
+      "purpose": "Preserved local worktree charlie-runtime",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+        "tree": "72cd9e4eba5939c181ae88d6ed03d5bbc50527c4"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-31",
+      "purpose": "Preserved local worktree charlie-runtime-adoption-v2",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "e83b7d469e403559c68025b92120da27dc342dc9",
+        "tree": "a46f530ee90cd5e34485c94bfd0e727a14146f41"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-32",
+      "purpose": "Preserved local worktree charlie-terminal-restart",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+        "tree": "551aaa07bcca5bce1a35fe67c8813d61f6a53f96"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    },
+    {
+      "id": "local-36",
+      "purpose": "Preserved local worktree charlie-pr36-regression",
+      "enabled": false,
+      "source_present": false,
+      "dependencies": [],
+      "provenance": {
+        "sha": "1d14a3e510586e6a1518d31a9ceacdcc7a785149",
+        "tree": "56d71274708e0a85d91d71ac31058d4f0fb93883"
+      },
+      "integration_revision": "not transferred",
+      "firmware_model_dataset_identity": "UNKNOWN; no raw private evidence imported",
+      "motion": true,
+      "touches_firmware": false,
+      "autonomous_consultation": true,
+      "required_native_gates": [
+        "frozen publication and independent review"
+      ],
+      "native_gates": {},
+      "installed_firmware_sha256": null,
+      "physical_stop_verified": false,
+      "rp2040_ack_ttl_qualified": false,
+      "authentic_eligible_question": false
+    }
+  ],
+  "proposal_only": true,
+  "approved": false,
+  "installed": false,
+  "warnings": [
+    "Native results deliberately unknown; disabled source is not qualification.",
+    "Historical backup manifests do not establish a fresh complete release backup."
+  ]
+}

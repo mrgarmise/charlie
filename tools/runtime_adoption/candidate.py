@@ -16,6 +16,7 @@ def assemble(ledger, inventory, receipts, *, rollback_sha, backup_manifests):
         abilities.append(dict(id=row['id'],purpose=row['purpose'],enabled=False,
             source_present=row.get('source_present',False),dependencies=row.get('dependencies',[]),
             provenance=row.get('latest_source'),integration_revision=row.get('integration_revision'),
+            firmware_model_dataset_identity=row.get('firmware_model_dataset_identity','UNKNOWN'),
             motion=touches.get('motion',False),touches_firmware=any(n in (29,30,31,32) for n in row.get('owning_prs',[])),
             autonomous_consultation=row.get('native_autonomous_consultation','NOT APPLICABLE')!='NOT APPLICABLE',
             required_native_gates=row.get('prerequisites',[]),native_gates={},installed_firmware_sha256=None,
@@ -23,6 +24,7 @@ def assemble(ledger, inventory, receipts, *, rollback_sha, backup_manifests):
     guards=inventory.get('manual_llm_guards',{})
     return dict(schema='charlie-adoption-candidate-v2',version='source-'+source['sha'],candidate=source,baseline=baseline,
         state_migration='none',unreconciled_branches=[],protected=observed,
+        backup_qualification=dict(status='pending',complete_scope_verified=False,isolated_restore_verified=False,state_compatible=False),
         rollback=dict(sha=rollback_sha,backup_manifests={p:observed[p] for p in backup_manifests}),
         manual_llm_guards=dict(baseline_preserved=bool(guards.get('baseline')) and guards.get('baseline')==guards.get('candidate'),
             resource_limits_changed=False,autonomous_enabled=False,guardian_started=False,

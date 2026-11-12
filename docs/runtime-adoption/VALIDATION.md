@@ -87,3 +87,35 @@ source, Git metadata, original state, approval and backup bytes remained intact.
 Isolated restore matched the original state hash. See promotion-interruption.xml
 and promotion-proposal.xml. Real runtime/state/firmware rollback remains an
 operator qualification, not inferred from these software tests.
+
+## Combined independent acceptance and final promotion hardening
+
+Exact head b0733e15d466214e8fdbbce3e7f4aee1089048ad, tree
+7a53b18c5c7dcda0a6866306fefe1b01df4ab667:
+[adoption run43325659748](https://github.com/mrgarmise/charlie/actions/runs/43325659748)
+passed2521 full/30skips,214focused/1skip,134contracts,36browser,84CPU engineering.
+[S3 run43325670140](https://github.com/mrgarmise/charlie/actions/runs/43325670140)
+passed183 Python host checks, nine C++ ASan/UBSan suites and prior firmware core,
+and build-only OPI/QSPI. Artifact IDs and SHA256 digests are recorded verbatim in
+combined-artifacts.json; semantic receipts bind the exact candidate/tree.
+Source-review-b073.json is a positive dry-run SOURCE review only. The reference
+candidate and release BOM retain disabled flags, unknown installed identities,
+empty native receipts and pending fresh-backup qualification. Neither is installed
+or release-approved. Local restricted socket failures remain preserved; these
+exact-head unrestricted jobs execute the full suite successfully.
+
+Final promotion changes add Robotron index/worktree source-manifest verification,
+BOM per-ability source/firmware/model provenance and manual-LLM/protected hashes,
+and a release-stage refusal for missing/stale/incomplete backup scope, incompatible
+state or unverified isolated restore. A signed review must bind this entire
+record and its evidence. Historical backup presence alone cannot pass release.
+41 fixture-only promotion tests pass, including kill/restart, isolated restore,
+missing/native/firmware/STOP/ACK/question/approval failures and positive dry review.
+The final PR-head rerun, artifact hashes and counts are in PR39; no earlier head
+is relabeled. SHA256SUMS covers the versioned evidence files verbatim.
+
+The preserved approved runtime remains clean at d3dca905; original journals,
+QUALIFICATION.md, approved.sha and both launchers match their starting hashes
+(see preservation-after-combined.json). No native service ownership, firmware
+installation, physical STOP, autonomous operation or gameplay/model benefit is
+inferred from these software receipts. Historical stock STOP remains accepted.

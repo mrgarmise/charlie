@@ -132,6 +132,15 @@ def validate(manifest, inventory, receipts, *, stage='source', selected=(), appr
         review=verify_record(approval,key_path=key_path,key_sha256=key_sha256,candidate=candidate,stage=stage,abilities=selected,now=now)
         require(review.get('manifest_sha256')==hashlib.sha256(canonical(manifest)).hexdigest(),
                 'manifest differs from independent signed review')
+    if stage=='release':
+        backup=manifest.get('backup_qualification',{})
+        require(backup.get('status')=='passed' and backup.get('complete_scope_verified') is True
+                and backup.get('isolated_restore_verified') is True and backup.get('state_compatible') is True
+                and backup.get('independent_review') is True,'fresh complete verified backup/restore required')
+        require(backup.get('candidate')==candidate and backup.get('backup_manifests')==manifest['rollback']['backup_manifests']
+                and hexmatch(HEX64,backup.get('evidence_sha256','')),'backup qualification binding mismatch')
+        stamp=backup.get('completed_at')
+        require(type(stamp) in (int,float) and math.isfinite(stamp) and 0<=now-stamp<=7*86400,'stale or future backup qualification')
     enabled=set(selected)|{a['id'] for a in abilities if a.get('enabled') is True}
     for a in abilities:
         require(type(a.get('enabled')) is bool,'explicit enabled/disabled state required')
@@ -172,6 +181,9 @@ def release_candidate(manifest):
     require(manifest.get('schema')=='charlie-adoption-candidate-v2','candidate schema')
     return dict(schema='charlie-release-candidate-v2',version=manifest['version'],source=manifest['candidate'],
         baseline=manifest['baseline'],rollback=manifest['rollback'],state_migration='none',
-        capabilities=[{k:a.get(k) for k in ('id','enabled','dependencies','native_gates','required_native_gates')} for a in manifest['abilities']],
+        capabilities=[{k:a.get(k) for k in ('id','enabled','source_present','dependencies','provenance','integration_revision',
+            'firmware_model_dataset_identity','installed_firmware_sha256','native_gates','required_native_gates')} for a in manifest['abilities']],
+        manual_llm_source_sha256=manifest.get('manual_llm_guards',{}).get('source_sha256',{}),
+        protected_evidence_sha256=manifest.get('protected',{}),
         provenance_sha256=hashlib.sha256(canonical(manifest)).hexdigest(),installed=False,approved=False,
         validation='unapproved proposal; validate exact CI and independent approvals separately')

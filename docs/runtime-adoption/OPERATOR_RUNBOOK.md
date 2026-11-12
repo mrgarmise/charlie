@@ -58,3 +58,12 @@ Do not clear durable faults or rewrite journals to recover. Operator rollback
 uses the preserved current d3 approval/launcher and f330 historical fallback only
 under its actual qualification. Restore compatible state only after isolated
 verification; source rollback alone does not roll back firmware or journals.
+
+A worked immutable source-only example is evidence/reference-candidate-b073.json,
+with inventory, exact CI receipts, BOM and successful dry SOURCE review beside it.
+It is not a release approval. Recreate the final-head proposal from a fresh
+read-only inventory and its exact receipts with `candidate-manifest`; preserve
+the reference files. Release validation additionally requires a signed
+backup_qualification record binding complete scope, compatible state, isolated
+restore, independent review, exact manifests/candidate and a fresh completion
+time (<=7 days). Historical backup manifests alone are refused.

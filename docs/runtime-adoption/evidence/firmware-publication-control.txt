@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_transferred_runtime_sources_are_tracked_and_match_reviewed_manifest ___
+
+    def test_transferred_runtime_sources_are_tracked_and_match_reviewed_manifest():
+        root=Path(__file__).resolve().parents[1]
+        path=root/'docs/runtime-adoption/evidence/firmware-source-transfer.json'
+        if not path.exists():return  # Core increment precedes the optional firmware transfer.
+        for row in json.loads(path.read_text()):
+            name=row['path']
+            if not name.startswith(('networking/','firmware/','hardware/','motion/')):continue
+            tracked=subprocess.run(['git','-C',str(root),'ls-files','--error-unmatch','--',name],capture_output=True)
+>           assert tracked.returncode==0,'reviewed source omitted from candidate: '+name
+E           AssertionError: reviewed source omitted from candidate: networking/__init__.py
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['git', '-C', '/home/five/charlie-runtime-adoption-v2', 'ls-files', '--error-unmatch', '--', 'ne...err=b"error: pathspec 'networking/__init__.py' did not match any file(s) known to git\nDid you forget to 'git add'?\n").returncode
+
+tests/test_runtime_adoption.py:154: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_runtime_adoption.py::test_transferred_runtime_sources_are_tracked_and_match_reviewed_manifest
+1 failed in 0.07s

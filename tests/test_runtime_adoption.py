@@ -141,3 +141,15 @@ def test_guard_fingerprint_uses_exact_source_not_interpreter_ast_format(tmp_path
     path=tmp_path/'learning/consultation_activation.py'
     path.write_text(path.read_text().replace('35 <= expires - issued <= 120','34 <= expires - issued <= 120'))
     assert manual_guards(tmp_path)['function:validate_approval']!=before['function:validate_approval']
+
+
+def test_transferred_runtime_sources_are_tracked_and_match_reviewed_manifest():
+    root=Path(__file__).resolve().parents[1]
+    path=root/'docs/runtime-adoption/evidence/firmware-source-transfer.json'
+    if not path.exists():return  # Core increment precedes the optional firmware transfer.
+    for row in json.loads(path.read_text()):
+        name=row['path']
+        if not name.startswith(('networking/','firmware/','hardware/','motion/')):continue
+        tracked=subprocess.run(['git','-C',str(root),'ls-files','--error-unmatch','--',name],capture_output=True)
+        assert tracked.returncode==0,'reviewed source omitted from candidate: '+name
+        assert hashlib.sha256((root/name).read_bytes()).hexdigest()==row['candidate_sha256'],name

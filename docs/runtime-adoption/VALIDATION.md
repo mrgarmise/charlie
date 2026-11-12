@@ -56,3 +56,13 @@ are preserved as historical, not reopened acceptance. New candidate firmware
 and transport timing remain a separate artifact-specific physical gate.
 
 Increment B canonical contracts: 134 passed (new owner-UNO parameter cases extend the earlier 131 selection). Current build/TLS/browser and full CI remain mandatory.
+
+Increment B first clean-checkout CI exposed omitted staging of five networking
+modules: they existed locally but were absent from the committed tree. This was
+a publication error, not missing hardware. The original runs and collection
+errors remain on 43242132654 / 43242132434; the new tracked-source manifest
+regression fails before staging and passes after it. No test was skipped to
+repair the problem. S3 native-build job in run 43242132279 passed both OPI/QSPI
+compile and image/partition checks; host failed only because the omitted peer
+package could not import. Browser timing failure on the unchanged existing
+viewport test remains separately recorded.

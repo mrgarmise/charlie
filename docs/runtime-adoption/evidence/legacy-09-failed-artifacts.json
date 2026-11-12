@@ -1,0 +1,71 @@
+{
+  "43328170643": {
+    "artifacts": [
+      {
+        "id": 13993314258,
+        "name": "network-validation",
+        "size_in_bytes": 55511,
+        "url": "https://api.github.com/repos/mrgarmise/charlie/actions/artifacts/13993314258",
+        "archive_download_url": "https://api.github.com/repos/mrgarmise/charlie/actions/artifacts/13993314258/zip",
+        "expired": false,
+        "created_at": "2026-11-12T23:33:05Z",
+        "expires_at": "2027-02-10T23:21:31Z",
+        "updated_at": "2026-11-12T23:33:05Z",
+        "digest": "sha256:9dbc6f005c92e0b32a5e06f3115a22c76aa29cda31006536b75a7b7d46619377",
+        "workflow_run": {
+          "id": 43328170643,
+          "repository_id": 1320367965,
+          "head_repository_id": 1320367965,
+          "head_branch": "integration/unified-runtime-adoption-20261112-v2",
+          "head_sha": "09e40fd78b85c16a5ed94e8c878eca545c933835"
+        }
+      }
+    ]
+  },
+  "43328170484": {
+    "artifacts": [
+      {
+        "id": 13993399458,
+        "name": "sensory-audit-software-tests",
+        "size_in_bytes": 53401,
+        "url": "https://api.github.com/repos/mrgarmise/charlie/actions/artifacts/13993399458",
+        "archive_download_url": "https://api.github.com/repos/mrgarmise/charlie/actions/artifacts/13993399458/zip",
+        "expired": false,
+        "created_at": "2026-11-12T23:32:52Z",
+        "expires_at": "2027-02-10T23:21:31Z",
+        "updated_at": "2026-11-12T23:32:52Z",
+        "digest": "sha256:c5fe227f2d67ed42ac9e67666bea58ba93ee70cd49374303d05895a60adef948",
+        "workflow_run": {
+          "id": 43328170484,
+          "repository_id": 1320367965,
+          "head_repository_id": 1320367965,
+          "head_branch": "integration/unified-runtime-adoption-20261112-v2",
+          "head_sha": "09e40fd78b85c16a5ed94e8c878eca545c933835"
+        }
+      }
+    ]
+  },
+  "43328170710": {
+    "artifacts": [
+      {
+        "id": 13994181935,
+        "name": "software-tests",
+        "size_in_bytes": 53323,
+        "url": "https://api.github.com/repos/mrgarmise/charlie/actions/artifacts/13994181935",
+        "archive_download_url": "https://api.github.com/repos/mrgarmise/charlie/actions/artifacts/13994181935/zip",
+        "expired": false,
+        "created_at": "2026-11-12T23:31:39Z",
+        "expires_at": "2027-02-10T23:21:31Z",
+        "updated_at": "2026-11-12T23:31:39Z",
+        "digest": "sha256:11714e66af889aebf5812b7b96b3085b921d278c99d6be7eb33c54afcb53634b",
+        "workflow_run": {
+          "id": 43328170710,
+          "repository_id": 1320367965,
+          "head_repository_id": 1320367965,
+          "head_branch": "integration/unified-runtime-adoption-20261112-v2",
+          "head_sha": "09e40fd78b85c16a5ed94e8c878eca545c933835"
+        }
+      }
+    ]
+  }
+}

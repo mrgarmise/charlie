@@ -119,3 +119,33 @@ QUALIFICATION.md, approved.sha and both launchers match their starting hashes
 (see preservation-after-combined.json). No native service ownership, firmware
 installation, physical STOP, autonomous operation or gameplay/model benefit is
 inferred from these software receipts. Historical stock STOP remains accepted.
+
+## Final skip audit and progress-fixture stabilization
+
+Head09e40fd78b85c16a5ed94e8c878eca545c933835 independently passed2523 full/30skips,
+216focus/1skip,134contracts,36browser,84neural CPU and49additional offline
+Torch/score-crop tests. Authentic private journal discovery passed read-only with
+zero model calls; October1 collision/restart and all119 historical geometry
+frames passed from byte-identical scratch copies. Original hashes were rechecked.
+These are software replays, never new native/physical or model-benefit acceptance.
+
+Three duplicate inherited full jobs exposed positive-fixture timing assumptions:
+Best of Charlie and sensory-audit productive derivation, and networking's
+productive derivation and real-child survival cases. All used150ms positive
+wall-clock horizons. Decoded logs show correct fail-closed interruption during
+JSON replacement or SQLite commit when the host did not meet that horizon.
+Two independent exact-head adoption full suites passed the same cases. First
+failure logs and artifact IDs/digests are retained in legacy-09-* evidence.
+One immutable old-head job retry is a diagnostic, not replacement qualification.
+
+Only the two successful-real-process test fixtures were stabilized:1-second
+configured horizons with genuine completed work over more than3seconds, stronger
+cycle/processing-unit and durable completion checks. Added deterministic149ms /
+151ms boundary assertions and proof that heartbeat-only updates cannot renew the
+150ms processing cutoff. Existing150ms/100ms real-process stall/kill/cleanup tests
+remain unchanged. All production supervision code/default deadlines and all
+physical STOP/lease/controller contracts remain byte-identical. No failure was
+converted to an accepted physical result, ignored, xfailed or deleted.
+Local progress/promotion/shared-owner selection:64passed. Final exact-head full,
+CPU, browser, contract and build reruns are recorded in PR39. This separates
+hardware-independent timing invariants from shared-runner scheduling assumptions.

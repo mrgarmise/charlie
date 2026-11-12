@@ -56,10 +56,13 @@ def child_command(path, body):
 
 def test_real_child_survives_multiple_watchdog_horizons(tmp_path):
     path = tmp_path/'progress.json'
-    cmd = child_command(path, "for n in range(25):\n p.enter('camera');p.fresh(time.monotonic());p.cycle();time.sleep(.02)\n")
-    assert supervise(cmd, path, silence=.15, camera=.15, poll=.01, grace=.2) == 0
+    cmd = child_command(path, "for n in range(65):\n p.enter('camera');p.fresh(time.monotonic());p.cycle();time.sleep(.05)\n")
+    # Real processes have scheduler/IO latency; exact short boundaries are tested below.
+    assert supervise(cmd, path, silence=1., camera=1., poll=.01, grace=.2) == 0
     summary = json.loads(path.with_name('progress-supervisor.json').read_text())
-    assert summary['reason'] == 'child_exited' and summary['last_progress']['cycles'] >= 20
+    assert summary['reason'] == 'child_exited' and summary['last_progress']['cycles'] >= 60
+    assert json.loads(path.read_text())['cycles']==65
+    assert summary['elapsed'] > 3.  # More than three configured watchdog horizons.
 
 
 @pytest.mark.parametrize('phase,expected', [('camera','observation_failure'), ('controller','controller_failure')])
@@ -214,10 +217,35 @@ def test_productive_derivation_exceeds_inactivity_threshold(tmp_path):
     body=("from memory.evidence import EvidenceJournal\n"
           "from experiments.ppal.episode_evidence import import_episode,derive_episode\n"
           "p.enter('processing')\n"
-          "def committed():p.update(processing_units=p.data.get('processing_units',0)+1);time.sleep(.02)\n"
+          "def committed():p.update(processing_units=p.data.get('processing_units',0)+1);time.sleep(.06)\n"
           f"j=EvidenceJournal({str(database)!r},on_progress=committed)\n"
           f"episode=import_episode({str(game)!r},j)\n"
           f"derive_episode({str(game)!r},j,episode)\n"
-          "j.close()\n")
-    assert supervise(child_command(path,body),path,processing=.15,silence=2.,poll=.01,grace=.2)==0
-    assert json.loads(path.with_name('processing-supervisor.json').read_text())['elapsed']>.5
+          "j.close()\n"
+          "p.update(test_completed_at=time.monotonic())\n")
+    assert supervise(child_command(path,body),path,processing=1.,silence=2.,poll=.01,grace=.2)==0
+    result=json.loads(path.with_name('processing-supervisor.json').read_text())
+    assert result['reason']=='child_exited'
+    final=json.loads(path.read_text())
+    assert final['processing_units']>=30
+    assert final['test_completed_at']-final['phase_started_at']>3.
+
+
+@pytest.mark.parametrize('phase,expected',[('camera','observation_failure'),('controller','controller_failure')])
+def test_exact_short_operation_deadline_is_unchanged(phase,expected):
+    row=dict(phase=phase,phase_started_at=1.,fresh_at=1.,updated_at=1.)
+    assert stalled_reason(row,1.149,camera=.15,controller=.15) is None
+    assert stalled_reason(row,1.151,camera=.15,controller=.15)==expected
+
+
+def test_exact_short_processing_deadline_requires_completed_forward_work():
+    from experiments.ppal.progress_supervision import WorkWatchdog
+    watch=WorkWatchdog();row=dict(phase='processing',processing_units=0)
+    # Total work may span many horizons; only genuine completed units renew it.
+    for n in range(21):
+        row['processing_units']=n
+        assert watch.observe(row,1.+n*.1,processing=.15) is None
+    row['updated_at']=3.149  # A heartbeat alone cannot extend completed work.
+    assert watch.observe(row,3.149,processing=.15) is None
+    row['updated_at']=3.151
+    assert watch.observe(row,3.151,processing=.15)=='processing_stall'

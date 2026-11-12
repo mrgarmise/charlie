@@ -46,3 +46,14 @@ PR39 after explicit human approval; donor PRs must not be double-merged.
 No merge, deploy, flash, model/service start, hardware operation, credential
 activation or autonomous consultation has been performed. Protected journal,
 ops qualification/approval/launchers and approved source hashes are unchanged.
+
+
+Final audit addendum: optional CPU coverage now also executes49offline learning /
+score-crop cases, all passed on09e40fd. Three optional authentic-input replays
+passed locally with original hashes preserved. Three duplicate CI jobs exposed
+150ms positive-process scheduling assumptions; raw failures are retained. The
+final increment changes test fixtures only, adds deterministic exact150ms boundary
+coverage and retains every short negative timeout/cleanup test. No runtime
+implementation or operational deadline changes.64focused local tests pass.
+Final exact-head results and immutable pins are in PR39; old receipts are never
+relabeled. The previous09generated final bundle is archived under cache/checkpoint-09.

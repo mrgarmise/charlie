@@ -1,0 +1,51 @@
+...............F........................................................ [ 19%]
+.........................................s.............................. [ 38%]
+.........................s.............................................. [ 58%]
+........................................................................ [ 77%]
+........................................................................ [ 97%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+_________ test_authentic_oct17_failure_is_preserved_and_remains_failed _________
+
+    def test_authentic_oct17_failure_is_preserved_and_remains_failed():
+        root=Path(__file__).resolve().parents[1]/'docs/validation/fast-projectile-self/originals'
+        archive=root/'charlie-first-game-diagnostics.tar.gz'
+>       manifest=json.loads((root/'sha256.json').read_text())
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_projectile_agency.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/fast-projectile-self/originals/sha256.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/fast-projectile-self/originals/sha256.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+=============================== warnings summary ===============================
+tests/test_neural_score.py::test_hailo_sdk_stream_contract[returned-dtype-FormatOrder.FCR]
+tests/test_neural_score.py::test_hailo_sdk_stream_contract[returned-dtype-FormatOrder.NHWC]
+  /home/five/charlie-adoption-robotron-review/tests/test_neural_score.py:244: RuntimeWarning: invalid value encountered in cast
+    if defect=='returned-dtype':value=value.astype(np.uint8)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_projectile_agency.py::test_authentic_oct17_failure_is_preserved_and_remains_failed
+1 failed, 367 passed, 2 skipped, 2 warnings in 152.66s (0:02:32)

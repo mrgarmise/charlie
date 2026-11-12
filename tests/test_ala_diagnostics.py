@@ -122,3 +122,15 @@ def test_context_provenance_missing_is_unknown(tmp_path):
     ds,g=make(tmp_path)
     r=investigate(ds,g,diagnostics_only=True,review_questions=True)
     assert len(r['results'])==1 and r['results'][0]['result']['result']=='unresolved'
+
+
+def test_unresolved_outcome_is_retained_without_false_negative_feedback(tmp_path,monkeypatch):
+    ds,g=make(tmp_path);failed(ds,[]);assessed=[];original=g.assess_decision
+    monkeypatch.setattr(g,'assess_decision',lambda *a,**kw:assessed.append(a) or original(*a,**kw))
+    report=investigate(ds,g,diagnostics_only=True)
+    assert report['results'] and all(r['result']['result']=='unresolved' for r in report['results'])
+    assert not assessed
+    assert all(ds.journal.resolution_for(r['plan']['prediction_id']) for r in report['results'])
+    from memory.learning_projects import LearningExecutive
+    assert not investigate(ds,g,executive=LearningExecutive(ds.journal,g),diagnostics_only=True)['results']
+    assert not assessed

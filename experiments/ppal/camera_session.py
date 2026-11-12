@@ -1,6 +1,6 @@
 """One live camera and current-observation calibration per marathon.
 
-No persisted profile is loaded. Episode borrowers cannot close the hardware.
+Saved visual evidence is only a candidate; fresh confirmation remains mandatory. Episode borrowers cannot close the hardware.
 The owner must be closed before offline learning or another marathon.
 """
 from uuid import uuid4
@@ -37,6 +37,22 @@ class CameraSession:
             frame=getattr(source,'raw',None)
             if frame is not None:self.reference=self.calibration.apply(frame).copy()
             self.origin = str(output.resolve())
+        elif self.report.get('visual_readiness') is not None:
+            from .eyes.visual_readiness import confirm_view, record_view
+            from learning.foundry import atomic_json
+            handoff={}
+            try:
+                self.calibration, frame = confirm_view(source, self.report['visual_readiness'], report=handoff)
+            except Exception:
+                self.invalid=True
+                raise
+            self.reference=self.calibration.apply(frame).copy()
+            record=record_view(self.calibration, handoff['focus'], frame, origin=output,
+                               observations=handoff['observations'])
+            self.report=dict(self.report, viewpoint_handoff=handoff, visual_readiness=record,
+                             quality=handoff['quality'])
+            output.mkdir(parents=True, exist_ok=True)
+            atomic_json(output/'visual-readiness.json',record)
         return self.calibration, dict(self.report, camera_session=dict(
             id=self.id, reused=reused, qualification_origin=self.origin,
             scope='current uninterrupted live camera session; not a saved profile'))

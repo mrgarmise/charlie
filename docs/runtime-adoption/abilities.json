@@ -170,10 +170,10 @@
       "original_accepted_physical_evidence": "see immutable donor receipts; no new physical acceptance inferred",
       "ci_receipts": [],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "e83b7d469e403559c68025b92120da27dc342dc9 inherited base",
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
       "default_enabled": false,
       "source_present": true,
-      "transfer": "retain already reconciled source; do not reimport older donor",
+      "transfer": "compatible source from #9 and inherited #5/#6/#7/#8; retain newer shared camera/Hailo ownership and fixed score default",
       "touches": {
         "devices": false,
         "motion": false,
@@ -184,8 +184,8 @@
       "stages": {
         "identified": "PASSED",
         "published": "PASSED",
-        "software-tested": "PENDING",
-        "compatible-in-candidate": "PASSED (inherited reconciled #38 source; new candidate CI still required)",
+        "software-tested": "focused tests passed; local full restricted sockets; independent cumulative CI pending",
+        "compatible-in-candidate": "software reconciliation complete; exact cumulative CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "NOT APPLICABLE",
         "operator-approved-for-master": "PENDING",
@@ -215,7 +215,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "run exact candidate full/contract/baseline-LLM/browser checks",
+      "next_step": "inspect exact cumulative CI and CPU export job; native trials remain disabled",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {
@@ -317,10 +317,10 @@
       "original_accepted_physical_evidence": "see immutable donor receipts; no new physical acceptance inferred",
       "ci_receipts": [],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "select exact reviewed dormant source in a later tested increment",
+      "source_present": true,
+      "transfer": "compatible source from #9 and inherited #5/#6/#7/#8; retain newer shared camera/Hailo ownership and fixed score default",
       "touches": {
         "devices": true,
         "motion": true,
@@ -331,8 +331,8 @@
       "stages": {
         "identified": "PASSED",
         "published": "PASSED",
-        "software-tested": "PENDING",
-        "compatible-in-candidate": "PENDING",
+        "software-tested": "focused tests passed; local full restricted sockets; independent cumulative CI pending",
+        "compatible-in-candidate": "software reconciliation complete; exact cumulative CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "PENDING",
         "operator-approved-for-master": "PENDING",
@@ -364,7 +364,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect exact cumulative CI and CPU export job; native trials remain disabled",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {
@@ -391,10 +391,10 @@
       "original_accepted_physical_evidence": "see immutable donor receipts; no new physical acceptance inferred",
       "ci_receipts": [],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "select exact reviewed dormant source in a later tested increment",
+      "source_present": true,
+      "transfer": "compatible source from #9 and inherited #5/#6/#7/#8; retain newer shared camera/Hailo ownership and fixed score default",
       "touches": {
         "devices": true,
         "motion": false,
@@ -405,8 +405,8 @@
       "stages": {
         "identified": "PASSED",
         "published": "PASSED",
-        "software-tested": "PENDING",
-        "compatible-in-candidate": "PENDING",
+        "software-tested": "focused tests passed; local full restricted sockets; independent cumulative CI pending",
+        "compatible-in-candidate": "software reconciliation complete; exact cumulative CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "NOT APPLICABLE",
         "operator-approved-for-master": "PENDING",
@@ -436,7 +436,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect exact cumulative CI and CPU export job; native trials remain disabled",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {
@@ -478,10 +478,10 @@
         }
       ],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "retain #22 immutable transfer; reconcile only remaining diagnostic/campaign slices",
+      "source_present": true,
+      "transfer": "compatible source from #9 and inherited #5/#6/#7/#8; retain newer shared camera/Hailo ownership and fixed score default",
       "touches": {
         "devices": true,
         "motion": true,
@@ -492,8 +492,8 @@
       "stages": {
         "identified": "PASSED",
         "published": "PASSED",
-        "software-tested": "PASSED exact donor checks; not candidate/native acceptance",
-        "compatible-in-candidate": "PENDING",
+        "software-tested": "focused tests passed; local full restricted sockets; independent cumulative CI pending",
+        "compatible-in-candidate": "software reconciliation complete; exact cumulative CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "PENDING",
         "operator-approved-for-master": "PENDING",
@@ -525,7 +525,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect exact cumulative CI and CPU export job; native trials remain disabled",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {
@@ -577,10 +577,10 @@
         }
       ],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "select exact reviewed dormant source in a later tested increment",
+      "source_present": true,
+      "transfer": "compatible source from #9 and inherited #5/#6/#7/#8; retain newer shared camera/Hailo ownership and fixed score default",
       "touches": {
         "devices": false,
         "motion": false,
@@ -591,8 +591,8 @@
       "stages": {
         "identified": "PASSED",
         "published": "PASSED",
-        "software-tested": "PASSED exact donor checks; not candidate/native acceptance",
-        "compatible-in-candidate": "PENDING",
+        "software-tested": "focused tests passed; local full restricted sockets; independent cumulative CI pending",
+        "compatible-in-candidate": "software reconciliation complete; exact cumulative CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "NOT APPLICABLE",
         "operator-approved-for-master": "PENDING",
@@ -622,7 +622,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect exact cumulative CI and CPU export job; native trials remain disabled",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {
@@ -654,10 +654,10 @@
       "original_accepted_physical_evidence": "see immutable donor receipts; no new physical acceptance inferred",
       "ci_receipts": [],
       "failed_and_skipped_receipts": "all original PR body claims and failures retained in evidence/github-pr-inventory.json; candidate XML retained separately",
-      "integration_revision": "PENDING source reconciliation",
+      "integration_revision": "Robotron reconciled increment; exact tree/head in PR39 publication",
       "default_enabled": false,
-      "source_present": false,
-      "transfer": "select exact reviewed dormant source in a later tested increment",
+      "source_present": true,
+      "transfer": "compatible source from #9 and inherited #5/#6/#7/#8; retain newer shared camera/Hailo ownership and fixed score default",
       "touches": {
         "devices": true,
         "motion": true,
@@ -668,8 +668,8 @@
       "stages": {
         "identified": "PASSED",
         "published": "PASSED",
-        "software-tested": "PENDING",
-        "compatible-in-candidate": "PENDING",
+        "software-tested": "focused tests passed; local full restricted sockets; independent cumulative CI pending",
+        "compatible-in-candidate": "software reconciliation complete; exact cumulative CI pending",
         "native-stationary-qualified": "PENDING",
         "native-motion-qualified": "PENDING",
         "operator-approved-for-master": "PENDING",
@@ -701,7 +701,7 @@
       "evidence_authority": "independent CI for source; operator + independent native reviewer for runtime/hardware",
       "rollback": "preserve approved d3dca905 and f3304c5 rollback with existing charlie-ops hierarchy; source-only revert candidate increment; never reset journals or fault markers",
       "accountable_human_action": "review exact grouped integration PR; separately approve applicable native procedure before any activation",
-      "next_step": "review and test source slice without activation",
+      "next_step": "inspect exact cumulative CI and CPU export job; native trials remain disabled",
       "out_of_scope": "native activation/deployment/firmware writes/credential changes prohibited; no new feature invention"
     },
     {

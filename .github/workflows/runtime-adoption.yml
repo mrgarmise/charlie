@@ -45,3 +45,20 @@ jobs:
         with:
           name: adoption-browser
           path: adoption-browser.xml
+  neural-cpu-engineering:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install -r requirements.txt -r requirements-neural-score.txt
+      - run: python -m pytest tests/test_neural_score.py tests/test_neural_score_sampler.py tests/test_runtime_adoption_integration.py -q --junitxml=adoption-neural-cpu.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: adoption-neural-cpu-engineering
+          path: adoption-neural-cpu.xml

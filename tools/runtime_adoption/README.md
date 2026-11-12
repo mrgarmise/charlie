@@ -44,3 +44,16 @@ Tests: `python -m pytest tests/test_runtime_adoption.py -q`. The CI workflow als
 runs baseline manual consultation/historical/generalized/native-negative checks,
 contracts, the complete suite and real-browser checks. Native fault timing is
 not proved by those software tests.
+
+`candidate-manifest --ledger LEDGER --inventory INVENTORY --receipts RECEIPTS
+--rollback-sha SHA --backup-manifest PATH` assembles a versioned unapproved proposal
+from observed identities. All capabilities are disabled and native gates empty,
+even if input ledger entries describe historical acceptance. It does not infer
+fresh backup completeness or active runtime authority. `release-manifest` then
+produces its unapproved/uninstalled BOM. Missing exact-head receipts cause
+validation refusal; assembly itself is not validation. Never sign fixture data.
+
+Interruption/restart regression kills a fixture-only inventory process during a
+protected read, restarts inventory, compares original source/Git/state/backup
+bytes, and restores the backup into a separate scratch path. No production state
+or physical driver participates.

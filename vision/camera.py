@@ -16,7 +16,7 @@ class _PiCameraDevice:
         try:
             self.picam2 = Picamera2()
             config = self.picam2.create_preview_configuration(
-                main={"size": (width, height), "format": "RGB888"})
+                main={"size": (width, height), "format": "RGB888"}, queue=False)
             self.picam2.configure(config)
             self.picam2.start()
         except Exception:
@@ -80,9 +80,13 @@ class _PublishedPi:
     def camera_controls(self):return dict(self.camera._information().get('controls',{}))
     @property
     def camera_properties(self):return dict(self.camera._information().get('properties',{}))
-    def capture_request(self, *, flush=False):
+    def capture_request(self, *, flush=False, wait=None):
+        import math
+        timeout=2 if wait is None or wait is True else wait
+        if type(timeout) not in (int,float) or not math.isfinite(timeout) or not 0<timeout<=2:
+            raise ValueError('bounded synchronous subscription wait required')
         after=time.monotonic() if flush else None
-        frame=self.camera.subscription.wait(timeout=2,captured_after=after)
+        frame=self.camera.subscription.wait(timeout=timeout,captured_after=after)
         self.camera._last_frame=frame
         return _SnapshotRequest(frame)
     def capture_metadata(self):

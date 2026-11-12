@@ -6,6 +6,7 @@ This module runs on Charlie/Mint, never on the arcade Pi Zero.
 """
 
 import socket
+import os
 import time
 import threading
 from typing import Callable
@@ -41,10 +42,13 @@ def controls_for(action: Action) -> frozenset[str]:
 class ArcadeController:
     def __init__(self, host: str, port: int = 8765, timeout: float = 2.0,
                  sleep: Callable[[float], None] = time.sleep,
-                 protocol: str = "positions", pulse: bool = True) -> None:
+                 protocol: str = "positions", pulse: bool = True,
+                 require_lease: bool | None = None) -> None:
         if protocol not in ("positions", "legacy"):
             raise ValueError("protocol must be positions or legacy")
         self.protocol = protocol
+        self.require_lease = (os.environ.get('CHARLIE_CONTROLLER_LEASE') == 'required'
+                              if require_lease is None else require_lease)
         self.pulse = pulse
         self.connection = socket.create_connection((host, port), timeout=timeout)
         self.connection.settimeout(timeout)
@@ -58,8 +62,11 @@ class ArcadeController:
         self.sandbox = ControllerSandbox()
         self._wire_lock = threading.RLock()
         self._hold_timer = None
+        self._hold_generation = 0
         try:
             self._command("NEUTRAL")
+            if self.require_lease:
+                self.renew_lease()
         except BaseException:
             self.stream.close()
             self.connection.close()
@@ -84,7 +91,10 @@ class ArcadeController:
     def _authorized_command(self, command):
         if self.closed and command != 'NEUTRAL':
             raise RuntimeError('controller closed')
-        command, held = self.sandbox.prepare(command)
+        if command == 'LEASE' and self.require_lease:
+            held = set(self.sandbox.held)
+        else:
+            command, held = self.sandbox.prepare(command)
         self.last_command = {'command':command, 'write_started_at':time.monotonic()}
         self.stream.write((command + "\n").encode("ascii"))
         self.last_command['write_completed_at'] = time.monotonic()
@@ -94,20 +104,38 @@ class ArcadeController:
         if response != b"OK\n":
             raise ConnectionError(f"arcade rejected {command}: {response[:32]!r}")
         self.sandbox.commit(held)
+        self._hold_generation += 1
         if self._hold_timer is not None:
             self._hold_timer.cancel()
         # Bounded safety lease, not an anti-spam limit. Each permitted new
         # pulse/hold renews it; stopped callers cannot hold buttons forever.
-        if command != 'NEUTRAL' and (held or command.startswith(('LS_', 'RS_', 'DPAD_'))):
-            self._hold_timer = threading.Timer(.5, self._expire_hold)
+        if command != 'NEUTRAL' and (held or command == 'LEASE' or command.startswith(('LS_', 'RS_', 'DPAD_'))):
+            self._hold_timer = threading.Timer(.75 if self.require_lease else .5, self._expire_hold,
+                                              args=(self._hold_generation,))
             self._hold_timer.daemon = True
             self._hold_timer.start()
 
-    def _expire_hold(self):
-        try:self._command('NEUTRAL')
+    def _expire_hold(self, generation=None):
+        try:
+            with self._wire_lock:
+                if generation is not None and generation != self._hold_generation:
+                    return
+                self._command('NEUTRAL')
+                self.held = frozenset()
+                self.positions = ('LS_CENTER', 'RS_CENTER')
         except (OSError, ValueError):self.connection.close()
 
-    def execute(self, action: Action, duration_ms: int = 100) -> None:
+    def renew_lease(self):
+        """Call from progressing gameplay, never an autonomous heartbeat thread.
+
+        Requires the server-side one-second LEASE protocol. A rejected renewal
+        closes the transport; reconnect and recompute intent after expiration.
+        """
+        if not self.require_lease:
+            raise RuntimeError('server lease was not required for this connection')
+        self._command('LEASE')
+
+    def execute(self, action: Action, duration_ms: int = 100, *, cancel_event=None, deadline=None) -> None:
         if self.closed:
             raise RuntimeError("controller closed")
         # Validate the entire action before modifying any held controls.
@@ -119,12 +147,30 @@ class ArcadeController:
         timing = {"started_at":time.monotonic(), "move":action.move,
                   "fire":action.fire, "duration_ms":duration_ms, "commands":[]}
         self.last_execution = timing
+        def check_cancel():
+            if (cancel_event is not None and cancel_event.is_set()) or (deadline is not None and time.monotonic()>=deadline):
+                timing['cancelled_at']=time.monotonic()
+                raise InterruptedError('bounded controller operation cancelled')
         def send(command):
+            check_cancel()
             began = time.monotonic()
             self._command(command)
+            acknowledged=time.monotonic()
+            wire=getattr(self,'last_command',None) or {}
             timing["commands"].append({"command":command, "sent_at":began,
-                                       "ack_at":time.monotonic()})
+                "write_completed_at":wire.get('write_completed_at') if wire.get('command')==command else None,
+                "ack_at":acknowledged})
+            if command.startswith('RS_'):
+                if command=='RS_CENTER' or command.endswith('_UP') and self.protocol=='legacy':
+                    timing['fire_off_submitted_at']=began
+                    timing['fire_off_ack_at']=acknowledged
+                else:
+                    timing.setdefault('fire_on_submitted_at',began)
+                    timing['fire_on_ack_at']=acknowledged
         try:
+            check_cancel()
+            if self.require_lease:
+                self.renew_lease()
             for button in buttons:
                 send(button+'_DOWN')
             if self.protocol == "positions":
@@ -139,9 +185,15 @@ class ArcadeController:
                     send(control + "_DOWN")
                 self.held = desired
             timing["controls_ready_at"] = time.monotonic()
-            self.sleep(duration_ms / 1000)
+            if cancel_event is None and deadline is None:self.sleep(duration_ms / 1000)
+            else:
+                wait=duration_ms/1000
+                if deadline is not None:wait=min(wait,max(0.,deadline-time.monotonic()))
+                (cancel_event or threading.Event()).wait(wait)
+                check_cancel()
             timing["pulse_finished_at"] = time.monotonic()
             if self.pulse:
+                timing['release_started_at']=time.monotonic()
                 for button in buttons:
                     send(button+'_UP')
                 if self.protocol == "positions":
@@ -152,6 +204,7 @@ class ArcadeController:
                     for control in sorted(self.held):
                         send(control + "_UP")
                     self.held = frozenset()
+            timing['release_completed_at']=time.monotonic() if self.pulse else None
             timing["returned_at"] = time.monotonic()
         except BaseException:
             # A dropped connection makes the Zero-side launcher neutralize too.

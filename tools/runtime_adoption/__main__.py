@@ -2,6 +2,7 @@
 import argparse
 import json
 from .inventory import collect
+from .candidate import assemble
 from .promotion import load,validate,plan,release_candidate
 
 
@@ -12,11 +13,14 @@ def main():
     inv.add_argument('--ops',required=True);inv.add_argument('--protected',action='append',default=[])
     for action in ('plan','release-manifest'):
         command=sub.add_parser(action);command.add_argument('--manifest',required=True)
+    proposal=sub.add_parser('candidate-manifest');proposal.add_argument('--ledger',required=True);proposal.add_argument('--inventory',required=True)
+    proposal.add_argument('--receipts',required=True);proposal.add_argument('--rollback-sha',required=True);proposal.add_argument('--backup-manifest',action='append',required=True)
     check=sub.add_parser('validate');check.add_argument('--manifest',required=True);check.add_argument('--inventory',required=True)
     check.add_argument('--receipts',required=True);check.add_argument('--stage',choices=('source','master','release','enablement'),default='source')
     check.add_argument('--ability',action='append',default=[]);check.add_argument('--approval');check.add_argument('--trust-key');check.add_argument('--trust-key-sha256');check.add_argument('--source-root',required=True)
     a=p.parse_args()
     if a.action=='inventory':result=collect(a.baseline,a.candidate,a.ops,a.protected)
+    elif a.action=='candidate-manifest':result=assemble(load(a.ledger),load(a.inventory),load(a.receipts),rollback_sha=a.rollback_sha,backup_manifests=a.backup_manifest)
     elif a.action=='plan':result=plan(load(a.manifest))
     elif a.action=='release-manifest':result=release_candidate(load(a.manifest))
     else:

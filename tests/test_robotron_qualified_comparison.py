@@ -89,3 +89,36 @@ def test_human_confirmation_requires_original_final_score_and_no_disagreement(tm
         reason='independent disagreement must survive',independent=True)
     with pytest.raises(ValueError,match='disagreement'):validate_certificates(j,row)
     j.close()
+
+
+def test_six_game_campaign_uses_certificates_and_preserves_missing_or_duplicate_results(tmp_path):
+    from experiments.comparison.robotron import compare_campaign
+    from memory.evidence import digest
+    j,plan,p=setup(tmp_path);games=[];identifiers=[]
+    for i in range(6):
+        directory=tmp_path/f'game-{i}';directory.mkdir()
+        row,frames,proof=certified(j,p,directory)
+        # Exact controlled report content and episode identity, distinct per game.
+        report=directory/'report.json'
+        policy=dict(kind='baseline',code_revision='software-fixture')
+        report.write_text(json.dumps(dict(controlled_game=i,policy_identity=policy)))
+        episode='episode:'+sha(report)
+        old=j.get(row['boundary_certificate']).data['payload']
+        old.update(source_episode=episode,source_report=dict(path=str(report),sha256=sha(report)))
+        boundary=j.append('observation',old,episode=p.data['episode'],producer='independent-physical-measurement',version='controlled')
+        score=j.get(row['score_observations'][0]['validation_evidence']).data['payload']
+        score.update(source_episode=episode,boundary_certificate=boundary.id,value=1000+i*100)
+        measurement=j.append('observation',score,episode=p.data['episode'],producer='independent-physical-measurement',version='controlled')
+        row.update(source_episode=episode,boundary_certificate=boundary.id,policy=policy)
+        row['score_observations'][0].update(validation_evidence=measurement.id,value=score['value'])
+        identifiers.append(j.append('observation',row,episode=p.data['episode'],producer='controlled-fixture',version='1').id)
+        games.append(dict(path=str(directory)))
+    result=compare_campaign(j,games,identifiers,conditions=p.data['payload']['conditions'])
+    assert result['status']=='measured',result
+    assert result['mean_change']==300
+    assert all(v=='NOT YET DEMONSTRATED' for v in result['learning_gates'].values())
+    assert compare_campaign(j,games,identifiers[:-1],conditions=p.data['payload']['conditions'])['status']=='inconclusive'
+    assert compare_campaign(j,games,identifiers+[identifiers[0]],conditions=p.data['payload']['conditions'])['status']=='inconclusive'
+    (tmp_path/'game-0/proof.txt').write_text('tampered independent proof')
+    assert compare_campaign(j,games,identifiers,conditions=p.data['payload']['conditions'])['status']=='inconclusive'
+    j.close()

@@ -115,7 +115,7 @@ def revision():
 def runtime_hash():
     root=Path(__file__).resolve().parents[1]
     files=('experiments/ppal/qualified_policy.py','experiments/ppal/forebrain.py',
-           'experiments/ppal/hindbrain.py','experiments/ppal/models.py','experiments/ppal/shadow_predictor.py')
+           'experiments/ppal/hindbrain.py','experiments/ppal/tactical_memory.py','experiments/ppal/models.py','experiments/ppal/shadow_predictor.py')
     return digest({name:sha(root/name) for name in files})
 
 

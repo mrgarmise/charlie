@@ -123,16 +123,22 @@ def _game_over_evidence(mask):
     import json, hashlib, base64, zlib
     from pathlib import Path
     if _GAME_OVER_ANCHOR is None:
-        d=json.loads((Path(__file__).resolve().parents[2]/
-            'config/robotron/screen-labels/game-over-anchor.json').read_text())
-        raw=zlib.decompress(base64.b64decode(d['zlib_base64']))
-        if d['schema']!='recorded-robotron-game-over-anchor-v1' or hashlib.sha256(raw).hexdigest()!=d['mask_sha256']:
-            raise ValueError('recorded GAME OVER anchor integrity mismatch')
-        anchor=np.frombuffer(raw,dtype=np.uint8).reshape(d['shape'])
-        _GAME_OVER_ANCHOR=([cv2.resize(anchor,None,fx=x,fy=x,interpolation=cv2.INTER_NEAREST)
-            for x in (.85,.925,1.,1.075,1.15)],d)
-    anchors,d=_GAME_OVER_ANCHOR
-    score=max(float(cv2.matchTemplate(mask[190:285,180:460],a,cv2.TM_CCOEFF_NORMED).max()) for a in anchors)
+        directory=Path(__file__).resolve().parents[2]/'config/robotron/screen-labels'
+        variants=[]
+        for name in ('game-over-anchor.json','game-over-oct24-anchor.json'):
+            d=json.loads((directory/name).read_text())
+            raw=zlib.decompress(base64.b64decode(d['zlib_base64']))
+            if d['schema']!='recorded-robotron-game-over-anchor-v1' or hashlib.sha256(raw).hexdigest()!=d['mask_sha256']:
+                raise ValueError('recorded GAME OVER anchor integrity mismatch')
+            anchor=np.frombuffer(raw,dtype=np.uint8).reshape(d['shape'])
+            variants.append(([cv2.resize(anchor,None,fx=x,fy=x,interpolation=cv2.INTER_NEAREST)
+                for x in (.85,.925,1.,1.075,1.15)],d))
+        _GAME_OVER_ANCHOR=variants
+    matches=[]
+    for anchors,d in _GAME_OVER_ANCHOR:
+        score=max(float(cv2.matchTemplate(mask[190:285,180:460],a,cv2.TM_CCOEFF_NORMED).max()) for a in anchors)
+        matches.append((score,d))
+    score,d=max(matches,key=lambda row:row[0])
     return dict(matched=score>=d['minimum_similarity'],similarity=score,
         minimum_similarity=d['minimum_similarity'],sha256=d['source_sha256'],
         anchor_sha256=d['mask_sha256'],basis='complete recorded GAME OVER pixels; similarity is not a probability')

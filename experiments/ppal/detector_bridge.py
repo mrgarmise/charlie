@@ -84,7 +84,7 @@ class HailoBackend:
     coordinates on the host; raw-head HEFs are rejected. No CPU device emulation.
     """
     name = 'hailort-hef'
-    def __init__(self, path, *, sha256, classes, size=640, timeout_seconds=1., persistent=False, lock=None):
+    def __init__(self, path, *, sha256, classes, size=640, timeout_seconds=1., persistent=False, lock=None, admission=None):
         path = Path(path)
         if path.suffix.lower() != '.hef' or hashlib.sha256(path.read_bytes()).hexdigest() != sha256:
             raise ValueError('HEF integrity mismatch')
@@ -109,6 +109,8 @@ class HailoBackend:
         self.input_name=inputs[0].name
         self.sha256,self.persistent,self.lock=sha256,persistent,lock
         self._session=None
+        from .neural_score.backends import HAILO_ADMISSION
+        self.admission=HAILO_ADMISSION if admission is None else admission
 
     def preprocessing(self, frame):
         transform=Letterbox(*frame.image.size,self.size)
@@ -118,6 +120,14 @@ class HailoBackend:
             padding_rgb=[114,114,114],resize='Pillow bicubic')
 
     def infer(self, frame):
+        from .neural_score.backends import HAILO_ADMISSION, Busy
+        try:
+            with getattr(self,'admission',HAILO_ADMISSION).perception():
+                return self._infer(frame)
+        except BlockingIOError as exc:
+            raise Busy('shared accelerator lease unavailable') from exc
+
+    def _infer(self, frame):
         import numpy as np
         from hailo_platform import (HEF,VDevice,ConfigureParams,HailoStreamInterface,
             InputVStreamParams,OutputVStreamParams,FormatType,InferVStreams)
@@ -133,7 +143,8 @@ class HailoBackend:
         else:
             hef=HEF(self.path)
             # Contexts close on every error; no background inference or camera reader.
-            with VDevice() as device:
+            from hardware.hailo_session import accelerator_lease
+            with accelerator_lease(getattr(self,'lock',None)), VDevice() as device:
                 groups=device.configure(hef,ConfigureParams.create_from_hef(hef,interface=HailoStreamInterface.PCIe))
                 if len(groups)!=1: raise ValueError('one network group required')
                 group=groups[0]
@@ -186,6 +197,8 @@ class DetectorBridge:
         except Exception as exc:
             failure = dict(error=type(exc).__name__,message=str(exc),frame_id=frame.id)
             self.events = (self.events+[failure])[-64:]
+            from .neural_score.backends import Busy
+            if isinstance(exc,(Busy,MemoryError)):raise
             if self.mode != 'fallback' or self.fallback is None: raise
             backend = self.fallback
             objects = self._normalize(backend.infer(frame),frame)

@@ -1,0 +1,1683 @@
+{
+  "status": "usable",
+  "started_at": 632.551288855,
+  "physical_motion": false,
+  "color_fidelity": "unqualified without an independent color reference",
+  "stage": "complete",
+  "initial_focus": {
+    "status": "stable manual starting point; image quality pending",
+    "started_at": 632.551320466,
+    "mode": "manual diagnostic",
+    "image_sharpness": "unqualified until playfield refinement and final quality gates",
+    "hardware_limits": [
+      0.0,
+      15.0
+    ],
+    "selected_position": 2.0,
+    "lock_samples": [
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 632.632069548,
+        "completed_at": 632.706741837,
+        "capture_seconds": 0.07467228899997735,
+        "sensor_timestamp_ns": 632689511000,
+        "exposure_time_us": 49986,
+        "first_pixel_exposure_at": 632.639525,
+        "frame_duration_us": 50437,
+        "lens_position": 0.0,
+        "af_state": 1,
+        "analogue_gain": 2.7234041690826416,
+        "digital_gain": 1.002579689025879,
+        "colour_gains": [
+          1.9034245014190674,
+          1.7903567552566528
+        ],
+        "colour_temperature": 4716,
+        "ae_locked": null,
+        "rejection": "manual mode not confirmed"
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 632.710534228,
+        "completed_at": 632.808351827,
+        "capture_seconds": 0.09781759899999543,
+        "sensor_timestamp_ns": 632790370000,
+        "exposure_time_us": 49986,
+        "first_pixel_exposure_at": 632.7403840000001,
+        "frame_duration_us": 50437,
+        "lens_position": 0.0,
+        "af_state": 1,
+        "analogue_gain": 2.5472636222839355,
+        "digital_gain": 1.001545786857605,
+        "colour_gains": [
+          1.9035964012145996,
+          1.7901885509490967
+        ],
+        "colour_temperature": 4717,
+        "ae_locked": null,
+        "rejection": "manual mode not confirmed"
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 632.825462604,
+        "completed_at": 632.908802959,
+        "capture_seconds": 0.08334035500001846,
+        "sensor_timestamp_ns": 632891227000,
+        "exposure_time_us": 49986,
+        "first_pixel_exposure_at": 632.841241,
+        "frame_duration_us": 50437,
+        "lens_position": 1.0,
+        "af_state": 1,
+        "analogue_gain": 2.3981263637542725,
+        "digital_gain": 1.0013391971588135,
+        "colour_gains": [
+          1.9034221172332764,
+          1.7903603315353394
+        ],
+        "colour_temperature": 4716,
+        "ae_locked": null,
+        "rejection": "manual mode not confirmed"
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 632.912066736,
+        "completed_at": 633.010667695,
+        "capture_seconds": 0.09860095900000942,
+        "sensor_timestamp_ns": 632992079000,
+        "exposure_time_us": 49986,
+        "first_pixel_exposure_at": 632.942093,
+        "frame_duration_us": 50437,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 2.321995496749878,
+        "digital_gain": 1.000335931777954,
+        "colour_gains": [
+          1.902951955795288,
+          1.7908227443695068
+        ],
+        "colour_temperature": 4714,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 633.014372826,
+        "completed_at": 633.110543107,
+        "capture_seconds": 0.09617028100001335,
+        "sensor_timestamp_ns": 633092936000,
+        "exposure_time_us": 49986,
+        "first_pixel_exposure_at": 633.04295,
+        "frame_duration_us": 50437,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 2.295964241027832,
+        "digital_gain": 1.000852108001709,
+        "colour_gains": [
+          1.9025276899337769,
+          1.7912399768829346
+        ],
+        "colour_temperature": 4712,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 633.11413159,
+        "completed_at": 633.211690397,
+        "capture_seconds": 0.09755880699992758,
+        "sensor_timestamp_ns": 633193795000,
+        "exposure_time_us": 49986,
+        "first_pixel_exposure_at": 633.143809,
+        "frame_duration_us": 50437,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 2.3981263637542725,
+        "digital_gain": 1.002312183380127,
+        "colour_gains": [
+          1.9021447896957397,
+          1.7916165590286255
+        ],
+        "colour_temperature": 4710,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 633.215515714,
+        "completed_at": 633.312103664,
+        "capture_seconds": 0.09658794999995735,
+        "sensor_timestamp_ns": 633294657000,
+        "exposure_time_us": 49986,
+        "first_pixel_exposure_at": 633.244671,
+        "frame_duration_us": 50437,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 2.5858585834503174,
+        "digital_gain": 1.0019949674606323,
+        "colour_gains": [
+          1.901799201965332,
+          1.7919564247131348
+        ],
+        "colour_temperature": 4708,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 633.329626407,
+        "completed_at": 633.413501733,
+        "capture_seconds": 0.08387532599999759,
+        "sensor_timestamp_ns": 633395514000,
+        "exposure_time_us": 49986,
+        "first_pixel_exposure_at": 633.3455280000001,
+        "frame_duration_us": 50437,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 2.797814130783081,
+        "digital_gain": 1.0004485845565796,
+        "colour_gains": [
+          1.9016058444976807,
+          1.7921462059020996
+        ],
+        "colour_temperature": 4707,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 633.416832121,
+        "completed_at": 633.513866129,
+        "capture_seconds": 0.09703400800003692,
+        "sensor_timestamp_ns": 633496372000,
+        "exposure_time_us": 49986,
+        "first_pixel_exposure_at": 633.446386,
+        "frame_duration_us": 50437,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 2.868347406387329,
+        "digital_gain": 1.0004907846450806,
+        "colour_gains": [
+          1.9015439748764038,
+          1.7922062873840332
+        ],
+        "colour_temperature": 4707,
+        "ae_locked": null
+      }
+    ],
+    "locked_position": 2.0,
+    "finished_at": 633.523168772
+  },
+  "exposure": {
+    "status": "selected",
+    "samples": [
+      {
+        "ev": 0.0,
+        "frame": "exposure-ev-0.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 634.122559331,
+          "completed_at": 634.220278496,
+          "capture_seconds": 0.09771916499994404,
+          "sensor_timestamp_ns": 634202369000,
+          "exposure_time_us": 49986,
+          "first_pixel_exposure_at": 634.152383,
+          "frame_duration_us": 50437,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 2.892655372619629,
+          "digital_gain": 1.0010367631912231,
+          "colour_gains": [
+            1.900378942489624,
+            1.7933529615402222
+          ],
+          "colour_temperature": 4701,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 480,
+            "edge_or_endpoint_support": 156
+          },
+          "candidate_checks": 660,
+          "accepted": 24,
+          "hough_lines": 163,
+          "selected_lines": [
+            12,
+            5
+          ],
+          "best_candidate_support": [
+            0.94,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              183.06950398240804,
+              161.99630882805292
+            ],
+            [
+              1065.039193530876,
+              115.1572405695467
+            ],
+            [
+              1083.8983957219252,
+              672.0
+            ],
+            [
+              200.82591876208897,
+              672.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            0.99,
+            0.94,
+            0.99
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            0.9
+          ]
+        },
+        "corners": [
+          [
+            183.06950398240804,
+            161.99630882805292
+          ],
+          [
+            1065.039193530876,
+            115.1572405695467
+          ],
+          [
+            1083.8983957219252,
+            672.0
+          ],
+          [
+            200.82591876208897,
+            672.0
+          ]
+        ],
+        "detail_pixels": 38365,
+        "clipped_channel_fraction": 0.47050697250097745,
+        "clipped_white_fraction": 0.24699595985924672,
+        "colored_fraction": 0.3216734002345888
+      },
+      {
+        "ev": -1.0,
+        "frame": "exposure-ev-1.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 636.042667076,
+          "completed_at": 636.136121192,
+          "capture_seconds": 0.09345411599997533,
+          "sensor_timestamp_ns": 636118667000,
+          "exposure_time_us": 49986,
+          "first_pixel_exposure_at": 636.068681,
+          "frame_duration_us": 50437,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 2.2407002449035645,
+          "digital_gain": 1.0021240711212158,
+          "colour_gains": [
+            1.905227541923523,
+            1.788600206375122
+          ],
+          "colour_temperature": 4725,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 729,
+            "edge_or_endpoint_support": 243
+          },
+          "candidate_checks": 990,
+          "accepted": 18,
+          "hough_lines": 174,
+          "selected_lines": [
+            12,
+            6
+          ],
+          "best_candidate_support": [
+            0.85,
+            0.7
+          ],
+          "best_support_corners": [
+            [
+              191.1240038669558,
+              161.56855572683963
+            ],
+            [
+              1063.0049816368387,
+              115.26527216165941
+            ],
+            [
+              1073.4413145539907,
+              671.0
+            ],
+            [
+              208.82625482625483,
+              671.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            0.97,
+            0.85,
+            0.99
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.7,
+            1.0,
+            0.9
+          ]
+        },
+        "corners": [
+          [
+            184.13127175014316,
+            164.75583062909612
+          ],
+          [
+            1070.9411877738744,
+            118.84774154200903
+          ],
+          [
+            1080.0827814569536,
+            671.0
+          ],
+          [
+            201.8252427184466,
+            671.0
+          ]
+        ],
+        "detail_pixels": 40094,
+        "clipped_channel_fraction": 0.4495435726043797,
+        "clipped_white_fraction": 0.25569910709831895,
+        "colored_fraction": 0.3225919090138175
+      },
+      {
+        "ev": -2.0,
+        "frame": "exposure-ev-2.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 638.187179831,
+          "completed_at": 638.283650493,
+          "capture_seconds": 0.09647066200000154,
+          "sensor_timestamp_ns": 638266195000,
+          "exposure_time_us": 49986,
+          "first_pixel_exposure_at": 638.216209,
+          "frame_duration_us": 50437,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 2.321995496749878,
+          "digital_gain": 1.000751256942749,
+          "colour_gains": [
+            1.9094609022140503,
+            1.784551978111267
+          ],
+          "colour_temperature": 4745,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 102,
+            "edge_or_endpoint_support": 16
+          },
+          "candidate_checks": 126,
+          "accepted": 8,
+          "hough_lines": 53,
+          "selected_lines": [
+            7,
+            4
+          ],
+          "best_candidate_support": [
+            0.94,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              184.06569028738957,
+              159.8904204926554
+            ],
+            [
+              1059.053139018004,
+              113.47460774960928
+            ],
+            [
+              1079.1801801801803,
+              672.0
+            ],
+            [
+              201.86100386100387,
+              672.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            0.99,
+            0.94,
+            0.98
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            0.9
+          ]
+        },
+        "corners": [
+          [
+            184.24095315235283,
+            164.93409627326488
+          ],
+          [
+            1059.2329943204331,
+            118.46559239202219
+          ],
+          [
+            1079.1801801801803,
+            672.0
+          ],
+          [
+            201.86100386100387,
+            672.0
+          ]
+        ],
+        "detail_pixels": 7045,
+        "clipped_channel_fraction": 0.41788502484031226,
+        "clipped_white_fraction": 0.3609652235628105,
+        "colored_fraction": 0.12292405961674947
+      },
+      {
+        "ev": -3.0,
+        "frame": "exposure-ev-3.png",
+        "attempt": 0,
+        "capture": {
+          "mode": "fresh_exposure",
+          "requested_at": 639.521534889,
+          "completed_at": 639.578611403,
+          "capture_seconds": 0.05707651399995939,
+          "sensor_timestamp_ns": 639560547000,
+          "exposure_time_us": 27627,
+          "first_pixel_exposure_at": 639.53292,
+          "frame_duration_us": 28078,
+          "lens_position": 2.0,
+          "af_state": 0,
+          "analogue_gain": 1.4992679357528687,
+          "digital_gain": 1.0007379055023193,
+          "colour_gains": [
+            1.9112259149551392,
+            1.7827935218811035
+          ],
+          "colour_temperature": 4753,
+          "ae_locked": null
+        },
+        "geometry_diagnostics": {
+          "rejections": {
+            "area": 70,
+            "edge_or_endpoint_support": 12
+          },
+          "candidate_checks": 90,
+          "accepted": 8,
+          "hough_lines": 50,
+          "selected_lines": [
+            6,
+            4
+          ],
+          "best_candidate_support": [
+            0.95,
+            0.9
+          ],
+          "best_support_corners": [
+            [
+              184.03290424876712,
+              158.94508314514474
+            ],
+            [
+              1063.936304538196,
+              112.16288878586514
+            ],
+            [
+              1083.2773722627737,
+              670.0
+            ],
+            [
+              201.82591876208897,
+              670.0
+            ]
+          ],
+          "best_edge_support": [
+            1.0,
+            0.99,
+            0.95,
+            1.0
+          ],
+          "best_endpoint_support": [
+            1.0,
+            0.9,
+            0.9,
+            1.0
+          ]
+        },
+        "corners": [
+          [
+            184.03290424876712,
+            158.94508314514474
+          ],
+          [
+            1063.936304538196,
+            112.16288878586514
+          ],
+          [
+            1083.2773722627737,
+            670.0
+          ],
+          [
+            201.82591876208897,
+            670.0
+          ]
+        ],
+        "detail_pixels": 6304,
+        "clipped_channel_fraction": 0.28378807106598986,
+        "clipped_white_fraction": 0.06725888324873096,
+        "colored_fraction": 0.7604695431472082
+      }
+    ],
+    "selected_ev": 0.0,
+    "awb": "unchanged; original RGB retained",
+    "reference_ev": 0.0,
+    "exposure_locked": true,
+    "selected_capture": {
+      "mode": "fresh_exposure",
+      "requested_at": 640.650531511,
+      "completed_at": 640.748034208,
+      "capture_seconds": 0.09750269699998171,
+      "sensor_timestamp_ns": 640729842000,
+      "exposure_time_us": 49986,
+      "first_pixel_exposure_at": 640.679856,
+      "frame_duration_us": 50437,
+      "lens_position": 2.0,
+      "af_state": 0,
+      "analogue_gain": 3.160493850708008,
+      "digital_gain": 1.0016205310821533,
+      "colour_gains": [
+        1.901900053024292,
+        1.7919164896011353
+      ],
+      "colour_temperature": 4708,
+      "ae_locked": null
+    },
+    "processing_seconds": 7.2291299420001
+  },
+  "geometry_attempts": [
+    {
+      "rejections": {
+        "area": 282,
+        "edge_or_endpoint_support": 152
+      },
+      "candidate_checks": 450,
+      "accepted": 16,
+      "hough_lines": 52,
+      "selected_lines": [
+        10,
+        5
+      ],
+      "best_candidate_support": [
+        0.93,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          180.08575437671277,
+          160.15476784666046
+        ],
+        [
+          1057.9467840147367,
+          113.53389960599704
+        ],
+        [
+          1078.1451905626134,
+          670.0
+        ],
+        [
+          205.64902506963787,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        0.98,
+        0.93,
+        0.99
+      ],
+      "best_endpoint_support": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "corners": [
+        [
+          180.33578498309586,
+          165.14148938507853
+        ],
+        [
+          1058.1279230414982,
+          118.52427979327636
+        ],
+        [
+          1078.1451905626134,
+          670.0
+        ],
+        [
+          205.64902506963787,
+          670.0
+        ]
+      ],
+      "stable_views": 1,
+      "jitter_pixels": 0.0
+    },
+    {
+      "rejections": {
+        "area": 160,
+        "edge_or_endpoint_support": 96
+      },
+      "candidate_checks": 280,
+      "accepted": 24,
+      "hough_lines": 50,
+      "selected_lines": [
+        8,
+        5
+      ],
+      "best_candidate_support": [
+        0.95,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          183.10201875488409,
+          160.94154076582444
+        ],
+        [
+          1064.07956644407,
+          114.20796882294437
+        ],
+        [
+          1084.0720720720722,
+          669.0
+        ],
+        [
+          200.72254335260115,
+          669.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        0.98,
+        0.95,
+        0.99
+      ],
+      "best_endpoint_support": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "corners": [
+        [
+          183.10201875488409,
+          160.94154076582444
+        ],
+        [
+          1064.07956644407,
+          114.20796882294437
+        ],
+        [
+          1084.0720720720722,
+          669.0
+        ],
+        [
+          200.72254335260115,
+          669.0
+        ]
+      ],
+      "stable_views": 2,
+      "jitter_pixels": 3.6760236528069563
+    },
+    {
+      "rejections": {
+        "area": 396,
+        "edge_or_endpoint_support": 225
+      },
+      "candidate_checks": 675,
+      "accepted": 54,
+      "hough_lines": 50,
+      "selected_lines": [
+        10,
+        6
+      ],
+      "best_candidate_support": [
+        0.94,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          188.02388119432072,
+          159.6872477032294
+        ],
+        [
+          1057.758047684033,
+          114.53174921730754
+        ],
+        [
+          1076.0661577608143,
+          668.0
+        ],
+        [
+          205.6872586872587,
+          668.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        0.98,
+        0.94,
+        0.99
+      ],
+      "best_endpoint_support": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "corners": [
+        [
+          188.25002031552918,
+          166.19502908022892
+        ],
+        [
+          1057.9938407155482,
+          121.6599539392641
+        ],
+        [
+          1076.0661577608143,
+          668.0
+        ],
+        [
+          205.6872586872587,
+          668.0
+        ]
+      ],
+      "stable_views": 3,
+      "jitter_pixels": 7.352047305613904
+    },
+    {
+      "rejections": {
+        "area": 120,
+        "edge_or_endpoint_support": 80
+      },
+      "candidate_checks": 216,
+      "accepted": 16,
+      "hough_lines": 51,
+      "selected_lines": [
+        9,
+        4
+      ],
+      "best_candidate_support": [
+        0.94,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          185.030716545562,
+          158.8390466919306
+        ],
+        [
+          1059.0152809810716,
+          112.42404722473405
+        ],
+        [
+          1079.0720720720722,
+          669.0
+        ],
+        [
+          203.70712909441232,
+          669.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        0.98,
+        0.94,
+        0.99
+      ],
+      "best_endpoint_support": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "corners": [
+        [
+          185.030716545562,
+          158.8390466919306
+        ],
+        [
+          1059.0152809810716,
+          112.42404722473405
+        ],
+        [
+          1079.0720720720722,
+          669.0
+        ],
+        [
+          203.70712909441232,
+          669.0
+        ]
+      ],
+      "stable_views": 4,
+      "jitter_pixels": 5.915683163505012
+    },
+    {
+      "rejections": {
+        "area": 88,
+        "edge_or_endpoint_support": 64
+      },
+      "candidate_checks": 168,
+      "accepted": 16,
+      "hough_lines": 56,
+      "selected_lines": [
+        8,
+        4
+      ],
+      "best_candidate_support": [
+        0.93,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          185.02922750302824,
+          158.84272633731456
+        ],
+        [
+          1059.0528708892884,
+          113.46452363328751
+        ],
+        [
+          1079.1805054151625,
+          671.0
+        ],
+        [
+          202.79190751445086,
+          671.0
+        ]
+      ],
+      "best_edge_support": [
+        0.99,
+        0.99,
+        0.93,
+        0.99
+      ],
+      "best_endpoint_support": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "corners": [
+        [
+          185.02922750302824,
+          158.84272633731456
+        ],
+        [
+          1059.0528708892884,
+          113.46452363328751
+        ],
+        [
+          1079.1805054151625,
+          671.0
+        ],
+        [
+          202.79190751445086,
+          671.0
+        ]
+      ],
+      "stable_views": 5,
+      "jitter_pixels": 7.521663538731521
+    },
+    {
+      "rejections": {
+        "area": 42,
+        "edge_or_endpoint_support": 6
+      },
+      "candidate_checks": 60,
+      "accepted": 12,
+      "hough_lines": 34,
+      "selected_lines": [
+        4,
+        5
+      ],
+      "best_candidate_support": [
+        0.96,
+        1.0
+      ],
+      "best_support_corners": [
+        [
+          184.03288347726115,
+          158.9463134011819
+        ],
+        [
+          1071.0511045236742,
+          112.8414115162836
+        ],
+        [
+          1081.089928057554,
+          671.0
+        ],
+        [
+          201.82625482625483,
+          671.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        1.0,
+        0.96,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "corners": [
+        [
+          184.20626812635538,
+          163.93593830289413
+        ],
+        [
+          1067.0551569277877,
+          117.05017810665986
+        ],
+        [
+          1077.0723327305607,
+          671.0
+        ],
+        [
+          201.82625482625483,
+          671.0
+        ]
+      ],
+      "stable_views": 6,
+      "jitter_pixels": 8.145997710107862
+    },
+    {
+      "rejections": {
+        "area": 354,
+        "edge_or_endpoint_support": 66
+      },
+      "candidate_checks": 450,
+      "accepted": 30,
+      "hough_lines": 51,
+      "selected_lines": [
+        10,
+        5
+      ],
+      "best_candidate_support": [
+        0.94,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          191.0103198419088,
+          159.58364439239796
+        ],
+        [
+          1064.0794155600036,
+          114.2037817901015
+        ],
+        [
+          1084.1081081081081,
+          670.0
+        ],
+        [
+          200.03536345776033,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        1.0,
+        0.94,
+        0.99
+      ],
+      "best_endpoint_support": [
+        1.0,
+        1.0,
+        0.9,
+        0.9
+      ],
+      "corners": [
+        [
+          191.13322519300718,
+          166.53462480451742
+        ],
+        [
+          1064.3311897964084,
+          121.19051685033487
+        ],
+        [
+          1084.1081081081081,
+          670.0
+        ],
+        [
+          200.03536345776033,
+          670.0
+        ]
+      ],
+      "stable_views": 1,
+      "jitter_pixels": 0.0
+    },
+    {
+      "rejections": {
+        "area": 276,
+        "edge_or_endpoint_support": 48
+      },
+      "candidate_checks": 360,
+      "accepted": 36,
+      "hough_lines": 51,
+      "selected_lines": [
+        9,
+        5
+      ],
+      "best_candidate_support": [
+        0.95,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          179.268652366519,
+          159.1939457527007
+        ],
+        [
+          1068.5259973489547,
+          112.9726600248001
+        ],
+        [
+          1079.0757575757575,
+          670.0
+        ],
+        [
+          205.68965517241378,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        0.98,
+        1.0,
+        0.95,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        1.0,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          179.66274413845264,
+          166.81305334341772
+        ],
+        [
+          1068.6744291924492,
+          120.80986136132216
+        ],
+        [
+          1079.0757575757575,
+          670.0
+        ],
+        [
+          205.68965517241378,
+          670.0
+        ]
+      ],
+      "stable_views": 2,
+      "jitter_pixels": 5.7369298861448845
+    },
+    {
+      "rejections": {
+        "area": 540,
+        "edge_or_endpoint_support": 96
+      },
+      "candidate_checks": 660,
+      "accepted": 24,
+      "hough_lines": 61,
+      "selected_lines": [
+        12,
+        5
+      ],
+      "best_candidate_support": [
+        0.94,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          184.13689807436052,
+          161.93962236215262
+        ],
+        [
+          1060.0514331746015,
+          115.42212727773303
+        ],
+        [
+          1080.108499095841,
+          670.0
+        ],
+        [
+          201.79150579150578,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        1.0,
+        0.94,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        1.0,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          184.13689807436052,
+          161.93962236215262
+        ],
+        [
+          1060.0514331746015,
+          115.42212727773303
+        ],
+        [
+          1080.108499095841,
+          670.0
+        ],
+        [
+          201.79150579150578,
+          670.0
+        ]
+      ],
+      "stable_views": 3,
+      "jitter_pixels": 6.996327118646661
+    },
+    {
+      "rejections": {
+        "area": 540,
+        "edge_or_endpoint_support": 96
+      },
+      "candidate_checks": 660,
+      "accepted": 24,
+      "hough_lines": 63,
+      "selected_lines": [
+        12,
+        5
+      ],
+      "best_candidate_support": [
+        0.95,
+        1.0
+      ],
+      "best_support_corners": [
+        [
+          192.04061443467998,
+          160.51987697352547
+        ],
+        [
+          1065.038869509504,
+          114.15725777746138
+        ],
+        [
+          1075.036036036036,
+          669.0
+        ],
+        [
+          209.07731958762886,
+          669.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        1.0,
+        0.95,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "corners": [
+        [
+          192.04061443467998,
+          160.51987697352547
+        ],
+        [
+          1065.038869509504,
+          114.15725777746138
+        ],
+        [
+          1075.036036036036,
+          669.0
+        ],
+        [
+          209.07731958762886,
+          669.0
+        ]
+      ],
+      "stable_views": 4,
+      "jitter_pixels": 8.378141821051338
+    },
+    {
+      "rejections": {
+        "area": 316,
+        "edge_or_endpoint_support": 56
+      },
+      "candidate_checks": 396,
+      "accepted": 24,
+      "hough_lines": 81,
+      "selected_lines": [
+        12,
+        4
+      ],
+      "best_candidate_support": [
+        0.95,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          186.02926529062333,
+          158.84219003016005
+        ],
+        [
+          1058.9408603912061,
+          113.36774679728711
+        ],
+        [
+          1079.108695652174,
+          670.0
+        ],
+        [
+          203.79150579150578,
+          670.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        0.99,
+        0.95,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        0.9,
+        0.9,
+        1.0
+      ],
+      "corners": [
+        [
+          186.16789904109947,
+          162.8317612938625
+        ],
+        [
+          1059.053446655498,
+          116.47512769174192
+        ],
+        [
+          1079.108695652174,
+          670.0
+        ],
+        [
+          203.79150579150578,
+          670.0
+        ]
+      ],
+      "stable_views": 5,
+      "jitter_pixels": 7.626776953030794
+    },
+    {
+      "rejections": {
+        "area": 316,
+        "edge_or_endpoint_support": 64
+      },
+      "candidate_checks": 396,
+      "accepted": 16,
+      "hough_lines": 79,
+      "selected_lines": [
+        12,
+        4
+      ],
+      "best_candidate_support": [
+        0.95,
+        0.9
+      ],
+      "best_support_corners": [
+        [
+          190.0964012581854,
+          161.62312897272915
+        ],
+        [
+          1064.0571829406574,
+          115.20939254439446
+        ],
+        [
+          1073.924276169265,
+          669.0
+        ],
+        [
+          208.74274661508704,
+          669.0
+        ]
+      ],
+      "best_edge_support": [
+        1.0,
+        0.99,
+        0.95,
+        1.0
+      ],
+      "best_endpoint_support": [
+        1.0,
+        0.9,
+        1.0,
+        1.0
+      ],
+      "corners": [
+        [
+          190.0964012581854,
+          161.62312897272915
+        ],
+        [
+          1064.0571829406574,
+          115.20939254439446
+        ],
+        [
+          1073.924276169265,
+          669.0
+        ],
+        [
+          208.74274661508704,
+          669.0
+        ]
+      ],
+      "stable_views": 6,
+      "jitter_pixels": 9.556796961875492
+    }
+  ],
+  "final_focus_lock": {
+    "lock_samples": [
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 649.060199125,
+        "completed_at": 649.155500188,
+        "capture_seconds": 0.09530106299996532,
+        "sensor_timestamp_ns": 649132721000,
+        "exposure_time_us": 49968,
+        "first_pixel_exposure_at": 649.0827529999999,
+        "frame_duration_us": 50419,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 3.160493850708008,
+        "digital_gain": 1.0001709461212158,
+        "colour_gains": [
+          1.9132130146026611,
+          1.7810466289520264
+        ],
+        "colour_temperature": 4762,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 649.16261964,
+        "completed_at": 649.255219668,
+        "capture_seconds": 0.09260002799999256,
+        "sensor_timestamp_ns": 649233542000,
+        "exposure_time_us": 49968,
+        "first_pixel_exposure_at": 649.183574,
+        "frame_duration_us": 50419,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 3.160493850708008,
+        "digital_gain": 1.0001709461212158,
+        "colour_gains": [
+          1.9114993810653687,
+          1.78270423412323
+        ],
+        "colour_temperature": 4754,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 649.259634344,
+        "completed_at": 649.357486756,
+        "capture_seconds": 0.09785241199995198,
+        "sensor_timestamp_ns": 649334362000,
+        "exposure_time_us": 49968,
+        "first_pixel_exposure_at": 649.284394,
+        "frame_duration_us": 50419,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 3.160493850708008,
+        "digital_gain": 1.0001709461212158,
+        "colour_gains": [
+          1.9094517230987549,
+          1.7847027778625488
+        ],
+        "colour_temperature": 4743,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 649.361852672,
+        "completed_at": 649.452527577,
+        "capture_seconds": 0.09067490499990072,
+        "sensor_timestamp_ns": 649435176000,
+        "exposure_time_us": 49968,
+        "first_pixel_exposure_at": 649.3852079999999,
+        "frame_duration_us": 50419,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 3.160493850708008,
+        "digital_gain": 1.0001709461212158,
+        "colour_gains": [
+          1.9076037406921387,
+          1.7865065336227417
+        ],
+        "colour_temperature": 4734,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 649.458635504,
+        "completed_at": 649.555123519,
+        "capture_seconds": 0.09648801499997717,
+        "sensor_timestamp_ns": 649536003000,
+        "exposure_time_us": 49968,
+        "first_pixel_exposure_at": 649.486035,
+        "frame_duration_us": 50419,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 3.160493850708008,
+        "digital_gain": 1.0001709461212158,
+        "colour_gains": [
+          1.9059358835220337,
+          1.7881343364715576
+        ],
+        "colour_temperature": 4726,
+        "ae_locked": null
+      },
+      {
+        "mode": "fresh_exposure",
+        "requested_at": 649.585553692,
+        "completed_at": 649.655258575,
+        "capture_seconds": 0.06970488299998578,
+        "sensor_timestamp_ns": 649636823000,
+        "exposure_time_us": 49968,
+        "first_pixel_exposure_at": 649.586855,
+        "frame_duration_us": 50419,
+        "lens_position": 2.0,
+        "af_state": 0,
+        "analogue_gain": 3.160493850708008,
+        "digital_gain": 1.0001709461212158,
+        "colour_gains": [
+          1.904430627822876,
+          1.7896034717559814
+        ],
+        "colour_temperature": 4719,
+        "ae_locked": null
+      }
+    ]
+  },
+  "geometry": {
+    "calibration": {
+      "corners": [
+        [
+          0.14697824230440815,
+          0.22553568309445496
+        ],
+        [
+          0.8314017081004164,
+          0.16103976039546872
+        ],
+        [
+          0.8430408020421607,
+          0.9305555555555556
+        ],
+        [
+          0.15995357850153108,
+          0.9305555555555556
+        ]
+      ],
+      "output_size": [
+        640,
+        480
+      ]
+    },
+    "corners": [
+      [
+        188.13215014964243,
+        162.38569182800757
+      ],
+      [
+        1064.1941863685329,
+        115.94862748473747
+      ],
+      [
+        1079.0922266139657,
+        670.0
+      ],
+      [
+        204.7405804819598,
+        670.0
+      ]
+    ],
+    "jitter_pixels": 9.556796961875492,
+    "observations": 6
+  },
+  "focus": {
+    "lens_position": 2.0,
+    "score": 110.69659803823846,
+    "previous_score": 110.69659803823846,
+    "changed": false
+  },
+  "final_image_attempts": [
+    {
+      "attempt": 1,
+      "geometry": {
+        "rejections": {
+          "area": 352,
+          "edge_or_endpoint_support": 36
+        },
+        "candidate_checks": 396,
+        "accepted": 8,
+        "hough_lines": 99,
+        "selected_lines": [
+          12,
+          4
+        ],
+        "best_candidate_support": [
+          0.87,
+          1.0
+        ],
+        "best_support_corners": [
+          [
+            189.09822268676567,
+            160.68303023323026
+          ],
+          [
+            1065.1078490150371,
+            115.15032649187377
+          ],
+          [
+            1084.136936936937,
+            671.0
+          ],
+          [
+            207.78034682080926,
+            671.0
+          ]
+        ],
+        "best_edge_support": [
+          0.99,
+          1.0,
+          0.87,
+          1.0
+        ],
+        "best_endpoint_support": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "quality": {
+        "detail_pixels": 16735,
+        "clipped_channel_fraction": 0.47636689572751717,
+        "clipped_white_fraction": 0.270331640274873,
+        "colored_fraction": 0.223603226770242,
+        "sharpness": 422.320822675726
+      },
+      "jitter_pixels": 5.142869067232084,
+      "status": "accepted"
+    }
+  ],
+  "quality": {
+    "detail_pixels": 16735,
+    "clipped_channel_fraction": 0.47636689572751717,
+    "clipped_white_fraction": 0.270331640274873,
+    "colored_fraction": 0.223603226770242,
+    "sharpness": 422.320822675726
+  },
+  "white_balance_locked": true,
+  "finished_at": 650.170332034,
+  "final_capture": {
+    "mode": "fresh_exposure",
+    "requested_at": 649.659353249,
+    "completed_at": 649.755825783,
+    "capture_seconds": 0.0964725339999859,
+    "sensor_timestamp_ns": 649737644000,
+    "exposure_time_us": 49968,
+    "first_pixel_exposure_at": 649.687676,
+    "frame_duration_us": 50419,
+    "lens_position": 2.0,
+    "af_state": 0,
+    "analogue_gain": 3.160493850708008,
+    "digital_gain": 1.0001709461212158,
+    "colour_gains": [
+      1.9030722379684448,
+      1.7909293174743652
+    ],
+    "colour_temperature": 4712,
+    "ae_locked": null
+  }
+}

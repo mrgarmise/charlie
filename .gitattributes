@@ -14,3 +14,5 @@ firmware/elegoo-s3-camera/ElegooS3Camera/camera_index.html -whitespace
 firmware/elegoo-s3-camera/ElegooS3Camera/StockCameraIndex.h -whitespace
 firmware/elegoo-s3-camera/MISSION.md -whitespace
 firmware/elegoo-s3-camera/tests/stubs/mbedtls/md.h -whitespace
+# Preserve raw JUnit failure tracebacks verbatim.
+docs/runtime-adoption/evidence/*.xml -whitespace

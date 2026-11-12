@@ -1,0 +1,768 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="20" skipped="1" tests="160" time="4.949" timestamp="2026-11-12T14:45:33.920361+00:00" hostname="charlie"><testcase classname="tests.test_detector_bridge" name="test_schema_timestamp_geometry_and_no_self" time="0.006"><failure message="TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'">def test_schema_timestamp_geometry_and_no_self():
+        packet=bridge().observe(frame()); row=packet['objects'][0]
+        assert packet['exposure_at']==1 and packet['timestamp_basis']=='sensor monotonic exposure'
+        assert row['bbox_board']==[20,20,30,40] and row['legacy_kind']=='unknown'
+        assert row['class_scores'] is None and packet['self_authorization'] is False
+&gt;       agency=VisualAgency();agency.observe(tracking_pairs(packet),observed_at=1)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_detector_bridge.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;experiments.ppal.robotron_agency.VisualAgency object at 0x7fff0f74e900&gt;
+pairs = [(Detection(kind='unknown', center=(25.0, 30.0), box=(40, 20, 60, 40), pixels=400), {'label': 'player', 'legacy_kind': 'unknown', 'bbox_pixels': (40, 20, 60, 40), 'bbox_board': [20.0, 20.0, 30.0, 40.0], ...})]
+move = None, interval_seconds = None, observed_at = 1
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) &lt;= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+&gt;       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError</failure></testcase><testcase classname="tests.test_detector_bridge" name="test_letterbox_roundtrip[size0]" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_letterbox_roundtrip[size1]" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_letterbox_roundtrip[size2]" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_invalid_or_stale[0]" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_invalid_or_stale[2]" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_invalid_or_stale[nan]" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_invalid_or_stale[True]" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_duplicate_reordered" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_late_result" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_explicit_failure_and_fallback[exc0]" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_explicit_failure_and_fallback[exc1]" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_explicit_failure_and_fallback[exc2]" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_explicit_failure_and_fallback[exc3]" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_class_transition_stable_id_and_motion" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_invalid_boxes[box0]" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_invalid_boxes[box1]" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_invalid_boxes[box2]" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_deterministic_and_no_camera_owner" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_hef_integrity" time="0.002" /><testcase classname="tests.test_detector_bridge" name="test_low_score_keeps_candidate_without_semantic_admission" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_cpu_template_preserves_legacy_semantics" time="0.000" /><testcase classname="tests.test_detector_bridge" name="test_hailo_startup_checks_with_fake_sdk" time="0.001" /><testcase classname="tests.test_detector_bridge" name="test_replay_cli_is_repeatable_and_protects_output" time="0.030" /><testcase classname="tests.test_detector_bridge" name="test_hailort_nms_execution_contract_and_timeout" time="0.013" /><testcase classname="tests.test_detector_bridge" name="test_compile_bridge_training_only_calibration[3.33.0-True]" time="0.004" /><testcase classname="tests.test_detector_bridge" name="test_compile_bridge_training_only_calibration[5.0.0-True]" time="0.002" /><testcase classname="tests.test_detector_bridge" name="test_compile_bridge_training_only_calibration[3.33.0-False]" time="0.002" /><testcase classname="tests.test_mobile_perception" name="test_both_models_same_frame_and_no_physical_authority" time="0.001" /><testcase classname="tests.test_mobile_perception" name="test_bad_time_rejected[0]" time="0.000" /><testcase classname="tests.test_mobile_perception" name="test_bad_time_rejected[2]" time="0.000" /><testcase classname="tests.test_mobile_perception" name="test_bad_time_rejected[nan]" time="0.000" /><testcase classname="tests.test_mobile_perception" name="test_late_inference_and_resource_preemption" time="0.001" /><testcase classname="tests.test_mobile_perception" name="test_cadence_reorder_and_invalid_detection" time="0.001" /><testcase classname="tests.test_mobile_perception" name="test_camera_source_drop_stale_reconnect" time="0.001" /><testcase classname="tests.test_mobile_perception" name="test_camera_legacy_read_and_atomic_metadata" time="0.000" /><testcase classname="tests.test_mobile_perception" name="test_mjpeg_corrupt_buffer_bounded_and_eof" time="0.001" /><testcase classname="tests.test_mobile_perception" name="test_depth_contract_rejects_nan_constant_wrong_layout" time="0.002" /><testcase classname="tests.test_mobile_perception" name="test_hailo_lease_yields_to_other_workload" time="0.001" /><testcase classname="tests.test_mobile_perception" name="test_fixture_cannot_label_live_frame" time="0.000" /><testcase classname="tests.test_mobile_perception" name="test_pixel_artifacts_hash_roundtrip_and_budget" time="0.196" /><testcase classname="tests.test_neural_score" name="test_ctc_repeated_full_strings[0]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_ctc_repeated_full_strings[00]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_ctc_repeated_full_strings[11]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_ctc_repeated_full_strings[100]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_ctc_repeated_full_strings[2200]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_ctc_repeated_full_strings[9999999]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_ctc_repeated_full_strings[3500]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_abstention[blank]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_abstention[uncertain-blank]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_abstention[edge]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_abstention[leading-zero]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_abstention[long]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_abstention[nonfinite]" time="0.000" /><testcase classname="tests.test_neural_score" name="test_abstention[shape]" time="0.000" /><testcase classname="tests.test_neural_score" name="test_geometry_above_arena_and_independent_channels" time="0.009" /><testcase classname="tests.test_neural_score" name="test_missing_invalid_stale_future_source[None]" time="0.003" /><testcase classname="tests.test_neural_score" name="test_missing_invalid_stale_future_source[True]" time="0.003" /><testcase classname="tests.test_neural_score" name="test_missing_invalid_stale_future_source[nan]" time="0.003" /><testcase classname="tests.test_neural_score" name="test_missing_invalid_stale_future_source[9.0]" time="0.003" /><testcase classname="tests.test_neural_score" name="test_missing_invalid_stale_future_source[11.0]" time="0.003" /><testcase classname="tests.test_neural_score" name="test_missing_basis_repeated_and_late" time="0.020" /><testcase classname="tests.test_neural_score" name="test_bad_crop[blank]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_bad_crop[glare]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_bad_crop[clipped]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_bad_crop[dim]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_extended_roi_mistake_abstains" time="0.003" /><testcase classname="tests.test_neural_score" name="test_required_and_preferred[error0]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_required_and_preferred[error1]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_required_and_preferred[error2]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_required_and_preferred[error3]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_required_and_preferred[error4]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_admission_nonblocking_priority" time="0.000" /><testcase classname="tests.test_neural_score" name="test_existing_score_tracker_no_boundary_or_self_authority" time="0.008" /><testcase classname="tests.test_neural_score" name="test_manifest_immutable_and_leakage" time="0.004" /><testcase classname="tests.test_neural_score" name="test_invalid_training_label[001]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_invalid_training_label[123]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_invalid_training_label[\uff11\uff12]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_invalid_training_label[12345678]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_corpus_preserves_unreadable_and_zero" time="0.004" /><testcase classname="tests.test_neural_score" name="test_raw_recognition_metrics_separate_abstention" time="0.004" /><testcase classname="tests.test_neural_score" name="test_corpus_sticky_splits_and_final_consultation" time="0.003" /><testcase classname="tests.test_neural_score" name="test_real_optimizer_export_and_resume" time="0.001"><skipped type="pytest.skip" message="could not import 'torch': No module named 'torch'">/home/five/charlie-adoption-robotron-review/tests/test_neural_score.py:170: could not import 'torch': No module named 'torch'</skipped></testcase><testcase classname="tests.test_neural_score" name="test_score_worker_integration_partition_and_shutdown" time="0.029" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[None-FormatOrder.FCR]" time="0.014" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[None-FormatOrder.NHWC]" time="0.002" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[input-order-FormatOrder.FCR]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[input-order-FormatOrder.NHWC]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[output-order-FormatOrder.FCR]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[output-order-FormatOrder.NHWC]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[input-name-FormatOrder.FCR]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[input-name-FormatOrder.NHWC]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[output-name-FormatOrder.FCR]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[output-name-FormatOrder.NHWC]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[input-shape-FormatOrder.FCR]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[input-shape-FormatOrder.NHWC]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[output-shape-FormatOrder.FCR]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[output-shape-FormatOrder.NHWC]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[returned-shape-FormatOrder.FCR]" time="0.002" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[returned-shape-FormatOrder.NHWC]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[returned-dtype-FormatOrder.FCR]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[returned-dtype-FormatOrder.NHWC]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[nonfinite-FormatOrder.FCR]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_hailo_sdk_stream_contract[nonfinite-FormatOrder.NHWC]" time="0.001" /><testcase classname="tests.test_neural_score" name="test_busy_hailo_does_not_move_contention_to_cpu" time="0.000" /><testcase classname="tests.test_neural_score" name="test_severe_blur_and_uncalibrated_logits" time="0.003" /><testcase classname="tests.test_neural_score" name="test_review_adapter_reuses_readonly_journal_without_changing_original" time="0.029" /><testcase classname="tests.test_neural_score" name="test_quantization_drift_does_not_disappear_in_tracker" time="0.002" /><testcase classname="tests.test_neural_score" name="test_confidence_crossing_is_valid_inference_not_permission_to_accept" time="0.001" /><testcase classname="tests.test_neural_score" name="test_channels_cannot_split_same_original_across_roles" time="0.002" /><testcase classname="tests.test_neural_score" name="test_score_queue_overflow_shutdown_is_bounded" time="0.004" /><testcase classname="tests.test_tactical_recovery.TestTacticalRecovery" name="test_conflicting_second_execution_is_not_hidden_by_action_filter" time="0.001" /><testcase classname="tests.test_tactical_recovery.TestTacticalRecovery" name="test_cross_track_and_cross_origin_resolution_are_excluded" time="0.000" /><testcase classname="tests.test_tactical_recovery.TestTacticalRecovery" name="test_dry_run_then_commit_does_not_duplicate_archived_copy" time="0.001" /><testcase classname="tests.test_tactical_recovery.TestTacticalRecovery" name="test_exact_prediction_execution_response_resolution_link" time="0.000" /><testcase classname="tests.test_tactical_recovery.TestTacticalRecovery" name="test_missing_identity_or_execution_is_excluded" time="0.000" /><testcase classname="tests.test_tactical_recovery.TestTacticalRecovery" name="test_real_capture_prediction_wrapper_is_supported" time="0.000" /><testcase classname="tests.test_native_preflight" name="test_passing_review_preserves_timestamp_hashes_and_launcher_validity" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_passing_review_preserves_0')
+
+    def test_passing_review_preserves_timestamp_hashes_and_launcher_validity(tmp_path):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[missing]" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_0')
+change = 'missing'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[stale]" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_1')
+change = 'stale'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[boot]" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_2')
+change = 'boot'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[revision]" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_3')
+change = 'revision'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[future]" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_4')
+change = 'future'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_missing_and_stale_proofs_never_refresh[nan]" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_5')
+change = 'nan'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_changed_and_conflicting_evidence_fail_closed" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_changed_and_conflicting_e0')
+
+    def test_changed_and_conflicting_evidence_fail_closed(tmp_path):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_independent_parts_assemble_with_oldest_actual_review_time" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_independent_parts_assembl0')
+
+    def test_independent_parts_assemble_with_oldest_actual_review_time(tmp_path):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_historical_xml_keeps_scope_and_cannot_certify_host" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_historical_xml_keeps_scop0')
+
+    def test_historical_xml_keeps_scope_and_cannot_certify_host(tmp_path):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_missing_lease_cases_and_suite_error_rejected" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_lease_cases_and_s0')
+
+    def test_missing_lease_cases_and_suite_error_rejected(tmp_path):
+        import xml.etree.ElementTree as ET
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_full_diagnostic_preserves_campaign_and_evidence" time="0.004" /><testcase classname="tests.test_native_preflight" name="test_controller_probe_never_opens_transport" time="0.002" /><testcase classname="tests.test_native_preflight" name="test_full_pass_writes_exact_review_without_issuing_authority" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_full_pass_writes_exact_re0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7ffef24a3a80&gt;
+
+    def test_full_pass_writes_exact_review_without_issuing_authority(tmp_path, monkeypatch):
+        from learning import campaign
+        evidence = tmp_path/'evidence'; evidence.mkdir()
+&gt;       path, doc = review(evidence)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_native_preflight" name="test_malformed_xml_is_a_diagnostic_not_a_crash" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_malformed_xml_is_a_diagno0')
+
+    def test_malformed_xml_is_a_diagnostic_not_a_crash(tmp_path):
+&gt;       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError</failure></testcase><testcase classname="tests.test_original_marathon_campaign" name="test_original_six_game_order_offline_checkpoint_and_separate_review" time="0.484" /><testcase classname="tests.test_original_marathon_campaign" name="test_partial_block_never_meditates_or_counts_as_three" time="0.165" /><testcase classname="tests.test_original_marathon_campaign" name="test_completed_interrupted_handoff_resumes_without_start" time="0.157" /><testcase classname="tests.test_original_marathon_campaign" name="test_mode_and_second_policy_bound_to_authority" time="0.064" /><testcase classname="tests.test_original_marathon_campaign" name="test_existing_marathon_and_reflection_execute_both_blocks" time="0.922" /><testcase classname="tests.test_agency_stream_engine" name="test_duplicate_stale_missing_or_nonmonotonic_metadata_rejected[1.0]" time="0.001" /><testcase classname="tests.test_agency_stream_engine" name="test_duplicate_stale_missing_or_nonmonotonic_metadata_rejected[0.9]" time="0.001" /><testcase classname="tests.test_agency_stream_engine" name="test_duplicate_stale_missing_or_nonmonotonic_metadata_rejected[nan]" time="0.001" /><testcase classname="tests.test_agency_stream_engine" name="test_duplicate_stale_missing_or_nonmonotonic_metadata_rejected[True]" time="0.001" /><testcase classname="tests.test_agency_stream_engine" name="test_duplicate_stale_missing_or_nonmonotonic_metadata_rejected[None]" time="0.001" /><testcase classname="tests.test_agency_stream_engine" name="test_ordinary_eviction_explicit_critical_window_never_evicted" time="0.001" /><testcase classname="tests.test_agency_stream_engine" name="test_newest_frame_selection_and_no_duplicate_evidence_delivery" time="0.001"><failure message="AttributeError: 'types.SimpleNamespace' object has no attribute 'read'">def test_newest_frame_selection_and_no_duplicate_evidence_delivery():
+        s=ObservationStream(None)
+        for at in (1.,2.,3.):append(s,at)
+        observed=ObservedCamera(SimpleNamespace(stream=s))
+        observed.stream_sequence=0
+&gt;       assert observed.read().size==(20,20) and observed.timestamp==3.
+               ^^^^^^^^^^^^^^^
+
+tests/test_agency_stream_engine.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;experiments.ppal.observation_camera.ObservedCamera object at 0x7fff11145160&gt;
+
+    def read(self):
+        if self.progress: self.progress.enter('camera')
+        read = getattr(self.source, 'read_fresh', None) if self.require_fresh else None
+        for attempt in range(3):
+            try:
+&gt;               self.raw = read() if read is not None else self.source.read()
+                                                           ^^^^^^^^^^^^^^^^
+E               AttributeError: 'types.SimpleNamespace' object has no attribute 'read'
+
+experiments/ppal/observation_camera.py:37: AttributeError</failure></testcase><testcase classname="tests.test_agency_stream_engine" name="test_capture_includes_before_during_and_after_synchronous_execute" time="0.052" /><testcase classname="tests.test_agency_stream_engine" name="test_cancelled_or_overbudget_shot_sends_nothing" time="0.000" /><testcase classname="tests.test_agency_stream_engine" name="test_failure_cancels_and_closes_controller" time="0.002" /><testcase classname="tests.test_agency_stream_engine" name="test_post_release_sample_extends_path_born_during_fire" time="0.000" /><testcase classname="tests.test_agency_stream_engine" name="test_terminal_templates_absent_with_supported_self_but_investigate_loss_change" time="0.003" /><testcase classname="tests.test_agency_stream_engine" name="test_start_ack_alone_and_attract_cannot_seed_expected_self" time="0.001"><failure message="TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'">def test_start_ack_alone_and_attract_cannot_seed_expected_self():
+        v=VisualAgency();receipt=dict(command='START',accepted=True,ack_at=1.)
+        assert not v.seed_new_game(receipt,[])
+        assert not v.seed_new_game(receipt,[dict(phase='title',capture_timestamp=t) for t in (2.,3.,4.)])
+        assert not v.seed_new_game(receipt,[dict(phase='gameplay',capture_timestamp=2.)]*3)
+        assert v.expected_self is None and v.player is None
+        assert v.seed_new_game(receipt,[dict(phase='gameplay',capture_timestamp=t) for t in (2.,3.,4.)])
+        assert v.expected_self['status']=='expected' and v.agency.self_id is None
+        pairs=[(Detection('unknown',p,(1,1,10,20),100),{}) for p in ((10,10),(50,50))]
+&gt;       row=v.observe(pairs,observed_at=5.)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agency_stream_engine.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;experiments.ppal.robotron_agency.VisualAgency object at 0x7ffef17fad50&gt;
+pairs = [(Detection(kind='unknown', center=(10, 10), box=(1, 1, 10, 20), pixels=100), {}), (Detection(kind='unknown', center=(50, 50), box=(1, 1, 10, 20), pixels=100), {})]
+move = None, interval_seconds = None, observed_at = 5.0
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) &lt;= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+&gt;       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError</failure></testcase><testcase classname="tests.test_agency_stream_engine" name="test_brief_occlusion_retains_identity_without_predicted_position_control" time="0.001"><failure message="TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'">def test_brief_occlusion_retains_identity_without_predicted_position_control():
+        v=VisualAgency();clock=[1.];p=[20.,20.]
+        def read():clock[0]+=.01;return [(Detection('unknown',tuple(p),(1,1,10,20),100),{})]
+        class C:
+            last_execution=None
+            def execute(self,a,ms):
+                u=VECTORS[a.move];p[0]+=u[0];p[1]+=u[1]
+&gt;       v.discover(read,C(),observation_time=lambda:clock[0],fire_first=False)
+
+tests/test_agency_stream_engine.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/robotron_agency.py:179: in discover
+    initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;experiments.ppal.robotron_agency.VisualAgency object at 0x7ffef17fa5d0&gt;
+pairs = [(Detection(kind='unknown', center=(20.0, 20.0), box=(1, 1, 10, 20), pixels=100), {})]
+move = None, interval_seconds = None, observed_at = 1.01
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) &lt;= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+&gt;       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError</failure></testcase><testcase classname="tests.test_agency_stream_engine" name="test_integer_weight_repair_survives_durable_journal_commit" time="0.001"><failure message="TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'">tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_integer_weight_repair_sur0')
+
+    def test_integer_weight_repair_survives_durable_journal_commit(tmp_path):
+        from experiments.ppal.progress_evidence import CaptureEvidence
+        from memory.evidence import EvidenceJournal
+&gt;       v=VisualAgency();row=v.observe([(Detection('unknown',(50,50),(1,1,10,20),100),{})],observed_at=1.)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agency_stream_engine.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;experiments.ppal.robotron_agency.VisualAgency object at 0x7ffef1857360&gt;
+pairs = [(Detection(kind='unknown', center=(50, 50), box=(1, 1, 10, 20), pixels=100), {})]
+move = None, interval_seconds = None, observed_at = 1.0
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) &lt;= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+&gt;       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError</failure></testcase><testcase classname="tests.test_agency_stream_engine" name="test_meaningful_updates_require_fresh_supported_decisions" time="0.001" /><testcase classname="tests.test_agency_stream_engine" name="test_batched_template_scores_preserve_existing_classifier" time="0.313" /><testcase classname="tests.test_agency_stream_engine" name="test_two_direction_buffer_replay_completes_existing_shot_handoff" time="0.001"><failure message="TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'">def test_two_direction_buffer_replay_completes_existing_shot_handoff():
+        v=VisualAgency(projectile_confirmation=True);clock=[1.];rows=[];seq=[0];calls=[]
+        def read():return [(Detection('unknown',(50,50),(1,1,10,20),100),{})]
+        def accept(p):
+            clock[0]=p.at
+            accept.projectiles=p.capture['dots']
+            return read()
+        read.accept_exposure=accept
+        def capture(c,a,duration,deadline,stop):
+            calls.append(a.fire);start=1.1 if a.fire=='E' else 1.5;u=VECTORS[a.fire]
+            frames=[]
+            for at,dist in ((start-.05,None),(start+.05,1),(start+.1,2),(start+.15,3)):
+                seq[0]+=1;p=packet(at,seq[0]);p.capture['dots']=[] if dist is None else [(50+u[0]*dist,50+u[1]*dist)]
+                frames.append(p)
+            return dict(move='STAY',fire=a.fire,controls_ready_at=start,pulse_finished_at=start+.1),frames,{'fixture':'synthetic buffer'}
+&gt;       v.discover(read,object(),capture_shots=capture,observation_time=lambda:clock[0],record=rows.append)
+
+tests/test_agency_stream_engine.py:227: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/robotron_agency.py:179: in discover
+    initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;experiments.ppal.robotron_agency.VisualAgency object at 0x7ffef18668b0&gt;
+pairs = [(Detection(kind='unknown', center=(50, 50), box=(1, 1, 10, 20), pixels=100), {})]
+move = None, interval_seconds = None, observed_at = 1.0
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) &lt;= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+&gt;       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError</failure></testcase><testcase classname="tests.test_agency_stream_engine" name="test_pre_ack_and_post_release_transport_bounds_do_not_claim_display_onset" time="0.001" /><testcase classname="tests.test_agency_stream_engine" name="test_one_producer_is_reused_across_three_episode_borrowers" time="0.004"><failure message="AttributeError: 'Camera' object has no attribute 'read'">def test_one_producer_is_reused_across_three_episode_borrowers():
+        from experiments.ppal.camera_session import CameraSession
+        owners=[];closed=[]
+        class Camera:
+            def __init__(self):self.stream=None;owners.append(self)
+            def start_stream(self):
+                if self.stream is None:
+                    def acquire():
+                        self.stream.stop_event.wait(.005)
+                        p=packet(time.monotonic());return p.image,p.capture
+                    self.stream=ObservationStream(acquire)
+                    self.stream.start()
+                return self.stream
+            def close(self):self.stream.close();closed.append(True)
+        session=CameraSession(Camera);sequences=[]
+        try:
+            for _ in range(3):
+&gt;               observed=ObservedCamera(session.borrow());observed.start_stream();observed.read()
+                                                                                  ^^^^^^^^^^^^^^^
+
+tests/test_agency_stream_engine.py:262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/observation_camera.py:37: in read
+    self.raw = read() if read is not None else self.source.read()
+                                               ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;experiments.ppal.camera_session._BorrowedCamera object at 0x7ffef1829400&gt;
+name = 'read'
+
+    def __getattr__(self, name):
+&gt;       return getattr(self.owner.source, name)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'Camera' object has no attribute 'read'
+
+experiments/ppal/camera_session.py:73: AttributeError</failure></testcase><testcase classname="tests.test_agency_stream_engine" name="test_camera_failure_signals_active_transport_cancellation_and_joins" time="0.001" /><testcase classname="tests.test_agency_stream_engine" name="test_transport_cancellation_keeps_existing_lease_and_neutralizes_without_socket" time="0.004" /><testcase classname="tests.test_agency_stream_engine" name="test_ordinary_preparation_overlaps_transport_on_main_thread" time="0.007" /></testsuite></testsuites>

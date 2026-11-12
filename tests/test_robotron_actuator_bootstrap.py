@@ -21,31 +21,27 @@ def discovery(two_responsive=False):
     return visual, points, rows, actions
 
 
-def test_independent_fire_and_simultaneous_body_fire_enter_play_provisionally():
+def test_fire_first_continues_past_provisional_until_movement_confirms():
     visual, points, rows, actions = discovery()
-    assert actions[0].move == 'STAY' and actions[0].fire == 'E'
-    assert [(a.move,a.fire) for a in actions[1:]] == [('E','N'),('STAY','NONE'),('W','E'),('STAY','NONE')]
-    assert visual.player == points[0] and visual.controlled_track_id == 1
-    assert visual.agency.self_id is None  # No invented combined FIRE certificate.
-    assert rows[-1]['identity_status'] == 'provisional'
-    assert sum(r.get('phase')=='fire_exploration_unmeasured_body' for r in rows) == 2
-    assert all(r['command'] is None for r in rows if r.get('phase')=='fire_exploration_unmeasured_body')
-    assert visual.tick == len(rows) == 9  # one association per consumed exposure
-    assert visual.agency.beliefs[1].hits == 2
-    # Ordinary movement can earn the existing full confirmation without
-    # returning to another bootstrap phase or adding a FIRE-origin gate.
-    points[0] = (points[0][0],points[0][1]+1)
-    pairs = [(Detection('unknown',p,(0,0,10,20),100),{}) for p in points]
-    result = visual.observe(pairs,'S',observed_at=visual.tracker.last_update['observed_at']+.3)
-    assert result['identity_status'] == 'confirmed' and visual.agency.self_id == 1
+    assert [(a.move,a.fire) for a in actions[:2]] == [('STAY','E'),('STAY','N')]
+    assert [(a.move,a.fire) for a in actions[2:]] == [('E','N'),('STAY','NONE'),('W','E'),('STAY','NONE'),('S','S'),('STAY','NONE')]
+    assert visual.player == points[0] and visual.controlled_track_id == 2
+    assert visual.agency.self_id == 2  # Existing movement certificate, not fabricated FIRE evidence.
+    assert rows[-1]['identity_status'] == 'confirmed'
+    assert any(r['identity_status']=='provisional' for r in rows)
+    shots=[r for r in rows if r.get('phase')=='shot_origin_experiment']
+    assert len(shots)==6 and all(r['command'] is None for r in shots)
+    assert visual.tick == len(rows) == 16
+    assert visual.agency.beliefs[2].hits == 3
 
 
 def test_ambiguity_and_contradiction_do_not_fabricate_provisional_self():
     visual, points, rows, actions = discovery(two_responsive=True)
     assert visual.player is None and rows[-1]['identity_status'] == 'unknown'
     visual, points, rows, actions = discovery()
+    points[0]=(points[0][0]-1,points[0][1])
     pairs = [(Detection('unknown',p,(0,0,10,20),100),{}) for p in points]
-    result = visual.observe(pairs,'E',observed_at=visual.tracker.last_update['observed_at']+.3)  # no commanded response
+    result = visual.observe(pairs,'E',observed_at=visual.tracker.last_update['observed_at']+.3)  # contradict commanded direction
     assert result['identity_status'] == 'unknown' and visual.player is None
 
 

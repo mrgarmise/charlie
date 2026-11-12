@@ -220,25 +220,25 @@ class SupervisedController:
     def __getattr__(self, name):
         return getattr(self.controller, name)
 
-    def _call(self, name, *args):
+    def _call(self, name, *args, **kwargs):
         previous = self.progress.data['phase']
         self.progress.enter('controller')
         try:
-            return getattr(self.controller, name)(*args)
+            return getattr(self.controller, name)(*args, **kwargs)
         except Exception:
             self.progress.update(failure_kind='controller_failure')
             raise
         finally:
             self.progress.enter(previous if previous == 'finalizing' else 'perception')
 
-    def execute(self, *args):
-        return self._call('execute', *args)
+    def execute(self, *args, **kwargs):
+        return self._call('execute', *args, **kwargs)
 
-    def _command(self, *args):
-        return self._call('_command', *args)
+    def _command(self, *args, **kwargs):
+        return self._call('_command', *args, **kwargs)
 
-    def close(self):
-        return self._call('close')
+    def close(self, *args, **kwargs):
+        return self._call('close', *args, **kwargs)
 
 
 class ObservationFailure(RuntimeError):

@@ -168,3 +168,65 @@ def test_signed_review_cannot_be_reused_for_changed_manifest_or_ci_bundle(tmp_pa
     m['version']='fixture-only';r[0]['artifact_sha256']='0'*64
     with pytest.raises(Refusal,match='CI bundle'):
         validate(m,i,r,stage='master',approval=approval,key_path=key,key_sha256=pin,now=1001)
+
+
+def test_interrupted_inventory_and_restart_preserve_original_state_and_rollback(tmp_path):
+    import sys
+    import shutil
+    root=Path(__file__).resolve().parents[1]
+    repo=tmp_path/'source';repo.mkdir()
+    from tools.runtime_adoption.inventory import GUARD_FILES
+    for name in (*GUARD_FILES,'learning/consultation_activation.py'):
+        p=repo/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/name,p)
+    subprocess.run(['git','init','-q',str(repo)],check=True)
+    subprocess.run(['git','-C',str(repo),'add','.'],check=True)
+    subprocess.run(['git','-C',str(repo),'-c','user.name=fixture','-c','user.email=fixture@example.invalid',
+                    'commit','-qm','isolated rollback fixture'],check=True)
+    sha=subprocess.check_output(['git','-C',str(repo),'rev-parse','HEAD'],text=True).strip()
+    ops=tmp_path/'ops';ops.mkdir();(ops/'approved.sha').write_text(sha+'\n')
+    state=tmp_path/'original-state';state.write_bytes(b'original journal fixture\0never migrate')
+    backup=tmp_path/'backup';backup.mkdir();shutil.copyfile(state,backup/'state')
+    manifest=backup/'backup-manifest.json';manifest.write_text(json.dumps({'state_sha256':hashlib.sha256(state.read_bytes()).hexdigest()}))
+    originals={p:p.read_bytes() for directory in (repo,ops,backup) for p in directory.rglob('*') if p.is_file()}
+    originals[state]=state.read_bytes()
+    script='''import sys,time
+from tools.runtime_adoption import inventory
+original=inventory.digest
+def pause(path):
+    if str(path)==sys.argv[4]:
+        print('protected-read-reached',flush=True)
+        time.sleep(30)
+    return original(path)
+inventory.digest=pause
+inventory.collect(sys.argv[1],sys.argv[2],sys.argv[3],[sys.argv[4]])
+'''
+    child=subprocess.Popen([sys.executable,'-c',script,str(repo),str(repo),str(ops),str(state)],stdout=subprocess.PIPE,text=True)
+    try:
+        import selectors
+        with selectors.DefaultSelector() as selector:
+            selector.register(child.stdout,selectors.EVENT_READ)
+            assert selector.select(10),'inventory did not reach protected read'
+            assert child.stdout.readline().strip()=='protected-read-reached'
+        child.kill();child.wait(timeout=5)
+    finally:
+        if child.poll() is None:child.kill();child.wait(timeout=5)
+    result=collect(repo,repo,ops,[state,manifest])
+    assert result['approvals']['approval_binding'] and not result['baseline']['dirty']
+    assert all(p.read_bytes()==content for p,content in originals.items())
+    restored=tmp_path/'isolated-restored-state';shutil.copyfile(backup/'state',restored)
+    assert restored.read_bytes()==state.read_bytes()
+    assert hashlib.sha256(restored.read_bytes()).hexdigest()==json.loads(manifest.read_text())['state_sha256']
+
+
+def test_manifest_assembly_cannot_inherit_active_authority_or_native_receipts(qualified):
+    from tools.runtime_adoption.candidate import assemble
+    m,i,r=qualified
+    ledger=dict(schema='charlie-ability-ledger-v2',abilities=[dict(id='stationary',purpose='fixture',source_present=True,
+        dependencies=[],default_enabled=True,prerequisites=['N0'],native_gates={'N0':{'status':'passed'}},
+        touches={'motion':True},owning_prs=[38],native_autonomous_consultation='DISABLED')])
+    proposal=assemble(ledger,i,r,rollback_sha='e'*40,backup_manifests=['/fixture/backup-manifest.json'])
+    a=proposal['abilities'][0]
+    assert a['enabled'] is False and a['native_gates']=={} and not a['physical_stop_verified']
+    assert proposal['approved'] is False and proposal['installed'] is False
+    with pytest.raises(Refusal,match='not inventoried'):
+        assemble(ledger,i,r,rollback_sha='e'*40,backup_manifests=['/missing'])

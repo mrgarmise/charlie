@@ -1,0 +1,401 @@
+{
+  "scope": "Native ARM64 device-free software checks; no physical acceptance",
+  "full_run": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "36",
+    "skipped": "26",
+    "tests": "1527",
+    "time": "744.693",
+    "timestamp": "2026-10-21T00:08:37.791414+01:00",
+    "hostname": "charlie",
+    "passed": 1465,
+    "failed_cases": [
+      {
+        "test": "tests.test_buffered_recording::test_flush_timeout_cannot_become_completion_when_writer_later_finishes",
+        "message": "TimeoutError"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RT]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[rt]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RT_DOWN]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RT_UP]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[RIGHT_TRIGGER_DOWN]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[R2]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[ABS_RZ]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[QUIT]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[PLAYER_ALEX]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[GUIDE+BACK]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[GUIDE BACK]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[A\\nRT]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_forbidden_commands_never_reach_wire[A\\rRT]",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_repeated_buttons_combinations_and_release",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_controller_sandbox::test_stopped_caller_hold_lease_neutralizes",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_deferred_measurement_review::test_real_http_shared_operator_server",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_connection_failure_leaves_pending",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_corrected_memory_is_filtered_from_recall",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_failure_survives_restart_then_recovers",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_partial_semantic_success_is_not_retried",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_persist_deliver_scope_and_no_resend",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_marm.MarmTests::test_recall_uses_charlie_project_and_session",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_passive_eyes::test_http_reuses_frames_without_camera_or_tracking_pass",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_passive_eyes::test_eof_shuts_down_remote_server_without_systemd",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_ppal_arcade_transport.ArcadeTransportTests::test_current_absolute_position_protocol_and_neutral",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_ppal_arcade_transport.ArcadeTransportTests::test_independent_sticks_and_held_direction_changes",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_ppal_arcade_transport.ArcadeTransportTests::test_rejected_command_stops_and_releases",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_ppal_hands.HandsTests::test_tcp_round_trip_ack_and_release",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_robotron.RobotronTests::test_camera_failure_releases_controls",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_robotron.RobotronTests::test_ppal_action_maps_to_confirmed_protocol",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_robotron.RobotronTests::test_rejection_disconnects_and_cannot_be_reused",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_robotron.RobotronTests::test_reset_is_not_fabricated",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      },
+      {
+        "test": "tests.test_robotron_agency_integration::test_real_player_loop_has_no_default_duration_limit",
+        "message": "experiments.ppal.progress_supervision.ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained"
+      },
+      {
+        "test": "tests.test_score_review_queue::test_http_batch_review_preserves_originals_and_restart",
+        "message": "PermissionError: [Errno 1] Operation not permitted"
+      }
+    ],
+    "skipped_cases": [
+      {
+        "test": "::tests.test_ala_foundry",
+        "message": "collection skipped"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_evidence_originated_cycle_resolution_memory_and_restart",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_multiple_offline_projects_share_evidence_without_physical_credit",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_productive_worker_deferred_not_resolved",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_checkpointed_resolution_recovery_does_not_retest",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_new_evidence_releases_wait_without_independent_confirmation",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_cycle::test_mutated_chooser_plan_cannot_execute",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_operational::test_evidence_cycle_deployment_operational_decision_and_rollback",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_operational::test_autonomous_candidate_return_under_preexisting_bounded_authority",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_operational::test_recovery_after_resolution_before_shadow_does_not_retest",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_portable_tensor_math_matches_existing_model[channels0-3-relu]",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_portable_tensor_math_matches_existing_model[channels1-5-relu]",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_portable_tensor_math_matches_existing_model[channels2-3-gelu]",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_export_relocates_without_torch_and_keeps_rollback_authority",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_exported_weights_and_linkage_cannot_be_substituted",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_portable::test_training_data_extension_cannot_recertify_reused_final_games",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_refinement::test_retrieved_failure_generates_intervention_without_reopening_test",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_refinement::test_cnn_unknown_clock_preserves_checkpoint_without_false_resolution",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_ala_refinement::test_cnn_forecast_isolated_from_old_host_timestamps",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_episode_identity::test_actual_october1_collision_normal_discovery",
+        "message": "original October 1 artifacts required; use documented acceptance environment"
+      },
+      {
+        "test": "tests.test_neural_score::test_real_optimizer_export_and_resume",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_robotron_geometry_replay::test_full_original_archive_when_supplied",
+        "message": "Optional full 119-original archive replay; retained nine originals always run"
+      },
+      {
+        "test": "tests.test_score_crop_diagnostics::test_actual_export_opset_and_profile_resume_guard",
+        "message": "could not import 'torch': No module named 'torch'"
+      },
+      {
+        "test": "tests.test_score_review_frontend::test_batch_navigation_correction_filters_and_keyboard",
+        "message": "Node unavailable; browser logic test requires JavaScript runtime"
+      },
+      {
+        "test": "tests.test_score_review_frontend::test_measurement_review_marking_and_abstention",
+        "message": "Node unavailable; browser logic test requires JavaScript runtime"
+      },
+      {
+        "test": "tests.test_score_review_navigation::test_stale_photo_guard_saved_review_and_acknowledged_advance",
+        "message": "Node unavailable"
+      }
+    ],
+    "xml_sha256": "08f511e0388814b1df61e8cd0e0a7ba1c90279138c5ab7e047bafa3addb1c2ec"
+  },
+  "focused_runs": {
+    "agency-fixture-final": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "32",
+      "time": "197.694",
+      "timestamp": "2026-10-21T00:16:10.430807+01:00",
+      "hostname": "charlie",
+      "passed": 32,
+      "failed_cases": [],
+      "skipped_cases": [],
+      "xml_sha256": "2f7dae7ef7bfe85d72dadc0c8232af8bc16d178c872247bef1ea804ed1dfbf1b"
+    },
+    "recording-final": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "18",
+      "time": "4.608",
+      "timestamp": "2026-10-21T00:13:20.864981+01:00",
+      "hostname": "charlie",
+      "passed": 18,
+      "failed_cases": [],
+      "skipped_cases": [],
+      "xml_sha256": "c715aea89ccb6cbccd87c5f2e4366305e5b7f20119e2c24bf20b04d45185a167"
+    },
+    "lifecycle-isolated": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "3",
+      "skipped": "0",
+      "tests": "222",
+      "time": "249.246",
+      "timestamp": "2026-10-21T00:09:53.445469+01:00",
+      "hostname": "charlie",
+      "passed": 219,
+      "failed_cases": [
+        {
+          "test": "tests.test_robotron_agency_integration::test_armed_runner_uses_generic_agency_and_always_releases[False-False-False-False-False-False-True-False]",
+          "message": "experiments.ppal.progress_supervision.ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained"
+        },
+        {
+          "test": "tests.test_robotron_agency_integration::test_real_player_loop_has_no_default_duration_limit",
+          "message": "experiments.ppal.progress_supervision.ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained"
+        },
+        {
+          "test": "tests.test_robotron_agency_integration::test_real_player_confirmed_terminal_completion",
+          "message": "experiments.ppal.progress_supervision.ObservationFailure: evidence writer saturated or failed; controls must pause; emergency item retained"
+        }
+      ],
+      "skipped_cases": [],
+      "xml_sha256": "8f202608235d144a8729900cef74a05589b814e87f4a9e6ddfe3bfc246649120"
+    },
+    "pre-freeze-focused": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "1",
+      "tests": "123",
+      "time": "38.113",
+      "timestamp": "2026-10-21T00:07:59.371871+01:00",
+      "hostname": "charlie",
+      "passed": 122,
+      "failed_cases": [],
+      "skipped_cases": [
+        {
+          "test": "tests.test_neural_score::test_real_optimizer_export_and_resume",
+          "message": "could not import 'torch': No module named 'torch'"
+        }
+      ],
+      "xml_sha256": "d02fee23971de5716d9f13db4cbe685c891536261fba56bb49ed18931b65cb15"
+    },
+    "shared-admission-final": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "2",
+      "tests": "132",
+      "time": "6.141",
+      "timestamp": "2026-10-21T00:06:09.383441+01:00",
+      "hostname": "charlie",
+      "passed": 130,
+      "failed_cases": [],
+      "skipped_cases": [
+        {
+          "test": "tests.test_neural_score::test_real_optimizer_export_and_resume",
+          "message": "could not import 'torch': No module named 'torch'"
+        },
+        {
+          "test": "tests.test_score_crop_diagnostics::test_actual_export_opset_and_profile_resume_guard",
+          "message": "could not import 'torch': No module named 'torch'"
+        }
+      ],
+      "xml_sha256": "1f5d8cae7952d9000f5d6401dade8e4b68c21e72088d851f2e5b9c6cca657108"
+    },
+    "score-integrated": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "1",
+      "tests": "93",
+      "time": "3.592",
+      "timestamp": "2026-10-21T00:01:27.697181+01:00",
+      "hostname": "charlie",
+      "passed": 92,
+      "failed_cases": [],
+      "skipped_cases": [
+        {
+          "test": "tests.test_neural_score::test_real_optimizer_export_and_resume",
+          "message": "could not import 'torch': No module named 'torch'"
+        }
+      ],
+      "xml_sha256": "595529f0f3046345f06f14af9690cd7325087473ec10d2803bfa9a548e12e5e5"
+    },
+    "resume-recording": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "12",
+      "time": "2.134",
+      "timestamp": "2026-10-21T22:15:48.413679+01:00",
+      "hostname": "charlie",
+      "passed": 12,
+      "failed_cases": [],
+      "skipped_cases": [],
+      "xml_sha256": "d1bbb19e4338a60cc85875e93b6a6059a106420c2c58dca34538db7d853af5a2"
+    }
+  },
+  "remaining_failures": "34 sandbox-denied socket tests; hardware and authentic acceptance remain unqualified",
+  "full_suite_repeated": false
+}

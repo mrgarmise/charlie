@@ -40,9 +40,8 @@ class HailoObjects:
         from experiments.ppal.detector_bridge import Frame
         rgb = Image.fromarray(frame.image[:,:,::-1])
         wrapped=Frame(frame.id, rgb, frame.received_at, 'decode receipt', frame.metadata())
-        if self.backend.persistent:rows=self.backend.infer(wrapped)
-        else:
-            with hailo_lease(self.lock):rows=self.backend.infer(wrapped)
+        # Backend owns the same cross-process lease in both session modes.
+        rows=self.backend.infer(wrapped)
         return [r for r in rows if self.include_all or r['label'] in ('cat','dog','person')]
 
     def close(self):self.backend.close()

@@ -75,3 +75,15 @@ uncommitted behavior from being counted as published integration.
 Approval records now bind the complete manifest digest, and that manifest binds
 the canonical CI bundle digest; changed evidence cannot reuse a signed review.
 All review tools remain read-only, with Git hooks/fsmonitor disabled for inventory.
+
+## Candidate proposal and interruption validation
+
+Added a versioned candidate-manifest assembly command, with all abilities forced
+disabled and native gate receipts empty. Input ledger acceptance cannot become
+active authority. Review validation still requires exact independent CI and a
+separate evidence-bound signature for master/release/enablement.
+A fixture-only inventory process was killed at a protected read and restarted;
+source, Git metadata, original state, approval and backup bytes remained intact.
+Isolated restore matched the original state hash. See promotion-interruption.xml
+and promotion-proposal.xml. Real runtime/state/firmware rollback remains an
+operator qualification, not inferred from these software tests.

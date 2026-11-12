@@ -1,0 +1,19 @@
+........................................................................ [  2%]
+.........................................................ss.ss.ss....... [  5%]
+..........s..sssss.ss..ssssE
+==================================== ERRORS ====================================
+_ ERROR at setup of test_each_progressing_action_renews_even_when_positions_unchanged _
+tests/test_arcade_controller_lease_client.py:13: in server
+    with LegacyServer(('127.0.0.1', 0)) as instance:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_ppal_arcade_transport.py:23: in __init__
+    super().__init__(address, LegacyHandler)
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+/usr/lib/python3.13/socket.py:233: in __init__
+    _socket.socket.__init__(self, family, type, proto, fileno)
+E   PermissionError: [Errno 1] Operation not permitted
+=========================== short test summary info ============================
+ERROR tests/test_arcade_controller_lease_client.py::test_each_progressing_action_renews_even_when_positions_unchanged
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+153 passed, 20 skipped, 2 deselected, 1 error in 71.10s (0:01:11)

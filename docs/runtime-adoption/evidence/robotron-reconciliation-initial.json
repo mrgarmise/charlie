@@ -1,0 +1,550 @@
+{
+  "actions": [
+    {
+      "path": "config/robotron/screen-labels/game-over-oct24-anchor.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/comparison/robotron.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/arcade_transport.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/benchmark_detector_candidates.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/camera_session.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/compile_hailo_lab.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/eyes/active_vision.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/eyes/settle.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/eyes/visual_readiness.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/hindbrain.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/inspect_robotron_score.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/inventory_robotron.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/live_view.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/marathon_robotron.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/neural_score/__init__.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/attest_reviews.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/backends.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/benchmark.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/cli.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/compile.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/contract.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/corpus.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/diagnose.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/evaluate.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/export_reviews.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/model.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/reader.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/sample.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/neural_score/train.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/observation_stream.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/play_robotron.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/preflight.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/progress_supervision.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/qualified_policy.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/replay_detectors.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/robotron_agency.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/robotron_hud.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/robotron_score_system.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/robotron_screen_state.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/score-review.html",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/score_digits.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/score_feedback.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/score_observer.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "experiments/ppal/score_review_attestation.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/shot_capture.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/tactical_memory.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "learning/campaign.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "learning/cycle.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "learning/diagnostic_feedback.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "learning/policy.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "learning/tactical_recovery.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "memory/learning_projects.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "requirements-neural-score.txt",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-border-20261022/exposure-ev-3.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-border-20261022/provenance.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-border-20261022/sensory-failed.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-border-20261022/sensory-preflight.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-causal-overflow-20261024/provenance.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-causal-overflow-20261024/report.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-geometry-20261024/provenance.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-geometry-20261024/report.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-geometry-20261024/sensory-failed.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-geometry-20261024/sensory-preflight.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-self-20261024/provenance.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-self-20261024/report.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-self-20261024/sensory-final.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/native-self-20261024/sensory-preflight.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/agency.jsonl.gz",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/calibration.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/events.jsonl",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/provenance.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/raw-0001.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/raw-0047.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/raw-0067.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/raw-0086.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/raw-0087.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/report.json",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/score-raw-0047.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/score-raw-0087.png",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/fixtures/robotron-marathon-20261024/score.jsonl",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_agency_recovery_boundaries.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "tests/test_agency_stream_engine.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_arcade_controller_lease_client.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_buffered_recording.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "tests/test_causal_window_capacity.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_detector_bridge.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_diagnostic_feedback.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_final_image_recovery.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_native_integration_contracts.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_native_preflight.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_native_robotron_trial.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_neural_score.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_neural_score_sampler.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_original_marathon_campaign.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_projectile_agency.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_qualified_ppal_policy.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "tests/test_recovery_entrypoint.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_robotron_agency_integration.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "tests/test_robotron_oct24_marathon.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_robotron_qualified_comparison.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "tests/test_score_archive_recovery.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_score_crop_diagnostics.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_score_feedback_recovery.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "tests/test_score_review_frontend.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "tests/test_score_review_navigation.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "tests/test_sensory_recording.py",
+      "method": "three-way reconcile against common bcf8082"
+    },
+    {
+      "path": "tests/test_spawn_prior_evidence_serialization.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_supervised_controller.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_tactical_diagnostic_memory.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_tactical_recovery.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_tactical_recovery_cli.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_visual_readiness.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/bundle_score_crop_diagnostics.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/native_preflight.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/native_robotron_trial.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/recover_score_review_evidence.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/recover_tactical_feedback.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/replay_experience_action.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/replay_retained_tactics.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/score_alignment_experiment.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/train_score_to_hef.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/acquisition_profile.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/benchmark_agency_engine.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/controller_overlap.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/gameplay_engine.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/projectile_agency.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "experiments/ppal/reserve_life_evidence.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "memory/investigation_learning.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_e1_decision_probe.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_e1_information_yield_shadow.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_gameplay_campaign.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_native_stream_integrity.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tests/test_reserve_life_evidence.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/e1_decision_probe.py",
+      "method": "new exact donor blob"
+    },
+    {
+      "path": "tools/e1_information_yield_probe.py",
+      "method": "new exact donor blob"
+    }
+  ],
+  "conflicts": [
+    {
+      "path": "experiments/ppal/detector_bridge.py",
+      "reason": "independently added on both branches; manual reconciliation required"
+    }
+  ]
+}

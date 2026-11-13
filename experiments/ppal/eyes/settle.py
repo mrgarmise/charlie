@@ -8,6 +8,53 @@ from PIL import ImageDraw
 from .calibration import Calibration
 
 
+def edge_support(rgb, points):
+    """Existing four-edge and endpoint photometry, shared with continuity checks."""
+    height, width = rgb.shape[:2]
+    support=[]
+    endpoint_support=[]
+    colors=[]
+    for start,end in zip(points,np.roll(points,-1,axis=0)):
+        samples = np.linspace(start, end, 100).astype(int)
+        normal = np.array([-(end-start)[1], (end-start)[0]])
+        normal = normal/max(np.linalg.norm(normal), 1)*12
+        sides = samples[:, None, :] + np.array([normal, -normal])
+        valid = ((sides[:, :, 0] >= 0) & (sides[:, :, 0] < width)
+                 & (sides[:, :, 1] >= 0) & (sides[:, :, 1] < height)).all(axis=1)
+        if not valid.any():
+            support.append(0.)
+            colors.append(np.zeros(3))
+            continue
+        # A thick/soft camera border can put the Hough line several
+        # pixels off its bright ridge. Inspect a bounded neighbourhood.
+        samples = samples[valid]
+        sides = sides[valid].astype(int)
+        offsets = np.arange(-5, 6)
+        xs = np.clip(samples[:, 0, None, None] + offsets[None, None, :], 0, width-1)
+        ys = np.clip(samples[:, 1, None, None] + offsets[None, :, None], 0, height-1)
+        patches = rgb[ys, xs].reshape(-1, 121, 3)
+        peaks = patches.sum(axis=2, dtype=np.int32)
+        pixels = patches[np.arange(len(patches)), peaks.argmax(axis=1)].astype(float)
+        side_pixels = rgb[sides[:, :, 1], sides[:, :, 0]].astype(float)
+        # White and saturated blue can have identical HSV value.
+        # Require positive RGB contrast against BOTH sides, without
+        # discarding the channels that distinguish the border.
+        contrast = (pixels[:, None, :]-side_pixels).max(axis=2).min(axis=1)
+        hits = (pixels.max(axis=1) > 100) & (contrast > 35)
+        support.append(float(hits.sum())/100)
+        # A long line may be extrapolated well beyond its physical end.
+        # Total support cannot establish the four claimed corners.
+        full_hits=np.zeros(100,dtype=bool)
+        full_hits[valid]=hits
+        endpoint_support.append(min(float(full_hits[:10].mean()),float(full_hits[-10:].mean())))
+        colors.append(np.median(pixels/np.maximum(pixels.sum(axis=1, keepdims=True), 1), axis=0))
+        # A failed edge already disqualifies this rectangle. Avoid
+        # spending bounded preflight time measuring its other sides.
+        if support[-1]<.65 or endpoint_support[-1]<.65:
+            break
+    return support, endpoint_support, colors
+
+
 def _border_candidates(frame, require_uniform_border=True, *, diagnostics=None):
     diagnostics = diagnostics if diagnostics is not None else {}
     diagnostics.update(rejections={}, candidate_checks=0, accepted=0)
@@ -77,47 +124,7 @@ def _border_candidates(frame, require_uniform_border=True, *, diagnostics=None):
             if not .15*width*height<area<.90*width*height:
                 reject('area')
                 continue
-            support=[]
-            endpoint_support=[]
-            colors=[]
-            for start,end in zip(points,np.roll(points,-1,axis=0)):
-                samples = np.linspace(start, end, 100).astype(int)
-                normal = np.array([-(end-start)[1], (end-start)[0]])
-                normal = normal/max(np.linalg.norm(normal), 1)*12
-                sides = samples[:, None, :] + np.array([normal, -normal])
-                valid = ((sides[:, :, 0] >= 0) & (sides[:, :, 0] < width)
-                         & (sides[:, :, 1] >= 0) & (sides[:, :, 1] < height)).all(axis=1)
-                if not valid.any():
-                    support.append(0.)
-                    colors.append(np.zeros(3))
-                    continue
-                # A thick/soft camera border can put the Hough line several
-                # pixels off its bright ridge. Inspect a bounded neighbourhood.
-                samples = samples[valid]
-                sides = sides[valid].astype(int)
-                offsets = np.arange(-5, 6)
-                xs = np.clip(samples[:, 0, None, None] + offsets[None, None, :], 0, width-1)
-                ys = np.clip(samples[:, 1, None, None] + offsets[None, :, None], 0, height-1)
-                patches = rgb[ys, xs].reshape(-1, 121, 3)
-                peaks = patches.sum(axis=2, dtype=np.int32)
-                pixels = patches[np.arange(len(patches)), peaks.argmax(axis=1)].astype(float)
-                side_pixels = rgb[sides[:, :, 1], sides[:, :, 0]].astype(float)
-                # White and saturated blue can have identical HSV value.
-                # Require positive RGB contrast against BOTH sides, without
-                # discarding the channels that distinguish the border.
-                contrast = (pixels[:, None, :]-side_pixels).max(axis=2).min(axis=1)
-                hits = (pixels.max(axis=1) > 100) & (contrast > 35)
-                support.append(float(hits.sum())/100)
-                # A long line may be extrapolated well beyond its physical end.
-                # Total support cannot establish the four claimed corners.
-                full_hits=np.zeros(100,dtype=bool)
-                full_hits[valid]=hits
-                endpoint_support.append(min(float(full_hits[:10].mean()),float(full_hits[-10:].mean())))
-                colors.append(np.median(pixels/np.maximum(pixels.sum(axis=1, keepdims=True), 1), axis=0))
-                # A failed edge already disqualifies this rectangle. Avoid
-                # spending bounded preflight time measuring its other sides.
-                if support[-1]<.65 or endpoint_support[-1]<.65:
-                    break
+            support, endpoint_support, colors = edge_support(rgb, points)
             quality = (min(support), min(endpoint_support) if len(endpoint_support)==4 else 0.)
             if len(support)==4 and quality > tuple(diagnostics.get('best_candidate_support', (-1.,-1.))):
                 diagnostics['best_candidate_support'] = list(quality)
@@ -142,6 +149,27 @@ def _border_candidates(frame, require_uniform_border=True, *, diagnostics=None):
         raise ValueError('No complete game border found; include all corners and aim more squarely at TV')
     candidates.sort(key=lambda item:item[0],reverse=True)
     return candidates
+
+
+def verify_supported_border(frame, points):
+    """Measure a candidate on current pixels; saved corners alone prove nothing.
+
+    Uses exactly the discovery detector's clipping, area, edge and endpoint gates.
+    No Hough candidate enumeration or color/gameplay requirement is needed.
+    """
+    rgb = np.asarray(frame.convert('RGB'))
+    height, width = rgb.shape[:2]
+    points = np.asarray(points, dtype=float)
+    if (points.shape != (4, 2) or not np.isfinite(points).all()
+            or np.any(points[:, 0] < 3) or np.any(points[:, 0] > width-4)
+            or np.any(points[:, 1] < 3) or np.any(points[:, 1] > height-4)
+            or not cv2.isContourConvex(points.astype(np.float32))
+            or not .15*width*height < cv2.contourArea(points.astype(np.float32)) < .90*width*height):
+        raise ValueError('incomplete or invalid current field of view')
+    support, endpoints, _ = edge_support(rgb, points)
+    if len(endpoints) != 4 or min(support) < .65 or min(endpoints) < .65:
+        raise ValueError('fresh four-edge/endpoint evidence unavailable')
+    return dict(edge_support=support, endpoint_support=endpoints)
 
 
 def locate(frame, require_uniform_border=True, *, previous=None, max_jitter_pixels=8., diagnostics=None):

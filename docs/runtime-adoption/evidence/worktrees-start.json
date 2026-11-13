@@ -1,0 +1,311 @@
+[
+  {
+    "path": "/home/five/Projects/charlie",
+    "sha": "bb40d02d3a128706e204cfd8e636fb1a9c5fd21b",
+    "tree": "f7a95d62406e64248c07b9c4879d06f45dc8b7f4",
+    "dirty": true,
+    "status": "?? head2_sessions/\n?? robotron-evidence/",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-agency-recovery",
+    "sha": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+    "tree": "04f27dccaed509b9626e2061eac33b52561338de",
+    "dirty": true,
+    "status": "M experiments/ppal/play_robotron.py\n M experiments/ppal/preflight.py\n M experiments/ppal/robotron_agency.py\n M tests/test_ppal_agency.py\n M tests/test_robotron_agency_integration.py\n?? tests/test_agency_recovery_boundaries.py",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-ala2-bae659f60b0e",
+    "sha": "6ba21fb9b56e492a85bf3b7fc2e9b5fb63ab9789",
+    "tree": "b71f2efa21f0bbbc50ff85afa8722484ae9e60f4",
+    "dirty": true,
+    "status": "?? ala2-readiness.json\n?? ala2-regression.txt",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-ala2-recovery-20261019",
+    "sha": "365bc84ca7f2b02cde94a3f604b2f957bb66a6f9",
+    "tree": "93846db3ac9641414396724b567effb480211fb4",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 8,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-best-of-v0.1.0",
+    "sha": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+    "tree": "1378a325ad5395ae6f9dbc95b51e8d7b776c1712",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-calibration-baseline",
+    "sha": "f3304c588a893a953e34e5c4d00bd5f9bfb18f19",
+    "tree": "3b0ccc30ad68475f06b0ebc54b40933182fea1dd",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 1,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-camera-calibration",
+    "sha": "54292982ce7e0f8c408dadbc7f8da79645d194d8",
+    "tree": "04f27dccaed509b9626e2061eac33b52561338de",
+    "dirty": true,
+    "status": "M experiments/ppal/preflight.py\n?? experiments/ppal/preflight.py.before-fixed-focus",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-closed-loop-validation",
+    "sha": "d74d7a620c39104ce58fb2c9551381543a66b5f2",
+    "tree": "1ee29c9bd21381d76d7fc20ed302b45f9ca9d1aa",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-consultation",
+    "sha": "b0c04ad4c5c6e1f0b2b9fd2e6316af286c36c01f",
+    "tree": "04e93dc9175f34d67820b40f15885de1ccaa01cc",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-consultation-base-control",
+    "sha": "3d8591d8126bf9bc8c49bdddfb80fd7ea5487b98",
+    "tree": "b2eea13b0a795819f5c90d319cd33ee6bb793ef8",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-consultation-candidate",
+    "sha": "b26f1ce0d1765299fe44755d2e5f3988b1fe6d9f",
+    "tree": "96930e1712c84f6f6e8f2e597c8ec0419538f3b9",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-e1-probe",
+    "sha": "9152ee0c71df95f8aaeafe34cc923f5372681dcd",
+    "tree": "16f07ef4a15d2bff2cff9744e0e7705d08b853f9",
+    "dirty": true,
+    "status": "?? audit/",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-fast-self-validation",
+    "sha": "73169db9ad2648ca7e4088979d22905900052c6a",
+    "tree": "07cd49fa43acedfc3db3ccf99d6e1718b66df8c6",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 1,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-learning-loop-validation",
+    "sha": "72b3ce5a42f74fa41d8e25a50805636efeca7ea9",
+    "tree": "a634369337c68169f380d409efacc32ec31cab05",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-llm-qualification",
+    "sha": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+    "tree": "72cd9e4eba5939c181ae88d6ed03d5bbc50527c4",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 3,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-manual-drive",
+    "sha": "169cc36d8a34891b41caedc6ab7ebcad0ada7731",
+    "tree": "3f245f14b79482f51954d83d793f2536b8666bc5",
+    "dirty": true,
+    "status": "M experiments/ppal/camera_session.py\n M main.py\n M ui/mobile.py\n?? README-APPLY.md\n?? apply_increment02.py\n?? apply_increment03.py\n?? charlie-manual-drive-01-policy.tar.gz\n?? charlie-manual-drive-02-gateway.tar.gz\n?? charlie-manual-drive-03-hardening.tar.gz\n?? charlie_camera_drive.py\n?? charlie_camera_drive_v2.py\n?? charlie_camera_drive_v3.py\n?? charlie_camera_drive_v4.py\n?? charlie_control_loss_session.py\n?? charlie_drive_now.py\n?? charlie_go.sh\n?? charlie_manual_drive_increment05.py\n?? charlie_manual_floor_retry.py\n?? charlie_manual_floor_session.py\n?? charlie_manual_stop_ack_update.py\n?? charlie_power_cutoff_resume.py\n?? charlie_start_camera_only.sh\n?? charlie_supervised_stop_session.py\n?? charlie_v4_patch_camera.py\n?? patch03/\n?? patch_charlie_shared_manual_qualification.py",
+    "locally_unpublished_count": 6,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-marathon-audit-20261020",
+    "sha": "f43bb2be17d8d687683f35edda86d0b8734f7f59",
+    "tree": "e22bef8d4106b7fb560d8482aebea42990aa167f",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 3,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-marathon-camera-lifecycle",
+    "sha": "9eeba7ca2ed69a412ab39b7f03c292842103edc6",
+    "tree": "559eeb81b96a985a8ddbed4807529df9f410d64e",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-meditation-questions",
+    "sha": "1d14a3e510586e6a1518d31a9ceacdcc7a785149",
+    "tree": "56d71274708e0a85d91d71ac31058d4f0fb93883",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 12,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-mobile-console",
+    "sha": "6aa55ab42da1f33b9b7289c8b36bd682e53ed25c",
+    "tree": "04cfe0f3d0898e9756be1544bf9a76639956e13f",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 9,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-model-learning",
+    "sha": "fb22d7484ea1837d32d8d81ee95fcd27bd55caa0",
+    "tree": "258fb4de194ff2441664ba2a667ea9bdc90b4209",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 6,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-native-foreground-20261021",
+    "sha": "71892612069018998de98fe4b303f0ed202472cc",
+    "tree": "9ce102a4f94757d983440f0feb66f567e4d0969b",
+    "dirty": true,
+    "status": "M experiments/ppal/arcade_transport.py\n M tests/test_native_robotron_trial.py\n M tools/native_robotron_trial.py\n?? arcade-inspection.txt\n?? docs/validation/controller-deadman-20261022/\n?? tests/test_arcade_controller_lease_client.py",
+    "locally_unpublished_count": 7,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-native-integration-20261020",
+    "sha": "71892612069018998de98fe4b303f0ed202472cc",
+    "tree": "9ce102a4f94757d983440f0feb66f567e4d0969b",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 7,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-native-meditation-notice",
+    "sha": "5eae293cd068e45c918249f2d340c791c0b34592",
+    "tree": "a46f530ee90cd5e34485c94bfd0e727a14146f41",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 19,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-pr13-acceptance",
+    "sha": "8f3b98804dfe9d8a7b69b0cf7030438fb45d0ca1",
+    "tree": "395adfb0d6a8ee950a89dbf05cf3fd1e1fd4c394",
+    "dirty": true,
+    "status": "?? \"ion differs from verified target. STOP.\\\"\"\n?? \"ion: $FOUND\\\"\"",
+    "locally_unpublished_count": 5,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-pr13-stationary-20261031",
+    "sha": "097f110fd0c6d321d24024c399d79f0a427bf23c",
+    "tree": "6523dc59f4392cca16434f0a3c67ac1b041f4266",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-pr13-stop-ack-20261029",
+    "sha": "4132be08958d08b0ae7589c406545bbcd5615a54",
+    "tree": "89604f55e8e6b56389696454f413052bc927167e",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 2,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-progress-watchdog",
+    "sha": "3723132e0a7643d24b7670c202aba0f4a1acee12",
+    "tree": "9d587a707e44ab15f036581bf16ec0dbe449cc62",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-restart-recovery",
+    "sha": "a785c9f745bd0645dd01ac70af3beb5a8d44d37b",
+    "tree": "34e06b7cac8fa16442255d067d84585fb59dc2e0",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-runtime",
+    "sha": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+    "tree": "72cd9e4eba5939c181ae88d6ed03d5bbc50527c4",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 3,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-runtime-adoption-v2",
+    "sha": "e83b7d469e403559c68025b92120da27dc342dc9",
+    "tree": "a46f530ee90cd5e34485c94bfd0e727a14146f41",
+    "dirty": true,
+    "status": "?? docs/runtime-adoption/\n?? tests/test_runtime_adoption.py\n?? tools/runtime_adoption/",
+    "locally_unpublished_count": 16,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/home/five/charlie-terminal-restart",
+    "sha": "9e423e982a2f9b9a244c7126543fb4b04debb465",
+    "tree": "551aaa07bcca5bce1a35fe67c8813d61f6a53f96",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 0,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  },
+  {
+    "path": "/tmp/charlie-meditation-baseline",
+    "availability": "unavailable/prunable; left untouched"
+  },
+  {
+    "path": "/tmp/charlie-model-learning-baseline",
+    "availability": "unavailable/prunable; left untouched"
+  },
+  {
+    "path": "/tmp/charlie-pr15-progress-baseline",
+    "availability": "unavailable/prunable; left untouched"
+  },
+  {
+    "path": "/tmp/charlie-pr36-regression",
+    "sha": "1d14a3e510586e6a1518d31a9ceacdcc7a785149",
+    "tree": "56d71274708e0a85d91d71ac31058d4f0fb93883",
+    "dirty": false,
+    "status": "",
+    "locally_unpublished_count": 12,
+    "warning": "unpublished is relative to local fetched refs, not a claim that GitHub lacks source; no cleanup authorized"
+  }
+]

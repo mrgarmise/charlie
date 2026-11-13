@@ -74,14 +74,14 @@ def test_response_window_preserves_phase_for_fresh_and_one_frame_queue():
     # The explicit two-endpoint response window also tolerates this one-frame
     # synthetic queue. Armed production still requires fresh capture metadata.
     assert stale == points[0]
-    assert old.agency.beliefs[1].contradictions == 0
+    assert old.agency.beliefs[old.agency.self_id].contradictions == 0
     fresh, visual = experiment(True)
     assert fresh == points[0]
-    assert visual.agency.self_id == 1
+    assert visual.agency.self_id == 2
     assert visual.tracker.next_id == 3  # One association pass preserves the same IDs.
-    assert visual.agency.beliefs[1].hits >= 3
-    assert visual.agency.beliefs[1].stops >= 2
-    assert visual.agency.beliefs[1].reversed
+    assert visual.agency.beliefs[visual.agency.self_id].hits >= 3
+    assert visual.agency.beliefs[visual.agency.self_id].stops >= 2
+    assert visual.agency.beliefs[visual.agency.self_id].reversed
 
 
 def test_second_pi_run_is_phase_limited_without_player_track_fragmentation():

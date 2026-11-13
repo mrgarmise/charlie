@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer"><title>ELEGOO network setup</title>
+<h1>ELEGOO network setup</h1>
+<p>Use your physically verified device HTTPS address and enrollment token. Charlie must independently confirm the target LAN before this change is saved. Recovery access stays available.</p>
+<form id="setup">
+<label>Enrollment token <input id="token" type="password" autocomplete="off" required></label><br>
+<label>2.4 GHz network name <input id="ssid" autocomplete="off" required></label><br>
+<label>Network password <input id="password" type="password" autocomplete="off" minlength="8" required></label><br>
+<button>Try network for 90 seconds</button>
+</form><p id="status" role="status">Waiting for authorized setup.</p>
+<script src="/setup.js" defer></script></html>

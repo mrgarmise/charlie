@@ -1,0 +1,17 @@
+{
+  "archive_sha256": "12f9c05c17a54ae1dec25aaedcf1f968551f27c10ab78e25db757884e3d76b48",
+  "members": {
+    "SmartRobotCarV4.0_V0_20210104/SmartRobotCarV4.0_V0_20210104/ApplicationFunctionSet_xxx0.cpp": "bbca3edc708fa225292dc820a4b75c9a0200a625eab9a71ee5585d40b3241b64",
+    "SmartRobotCarV4.0_V0_20210104/SmartRobotCarV4.0_V0_20210104/DeviceDriverSet_xxx0.cpp": "0c1ae9f01d77de41b710bcf797cee88d93833021aba4b7e09fbe0fd7eec0c253",
+    "SmartRobotCarV4.0_V0_20210104/SmartRobotCarV4.0_V0_20210104/DeviceDriverSet_xxx0.h": "24e897b5b93537d61cb5ac0d74c236b46d648762dae91c52c0fbc3b84293e32d"
+  },
+  "fixtures": {
+    "owner_uno_timer.inc": "b285f7c31d23ba14b8d8c66d1f81e626a4f94e5383ae59a3c25f8894015d4e28",
+    "owner_uno_ultrasonic.inc": "4b189c774dd96a477699aa96ffda23763670dc6e5c14cb0014b4740cc2c21512",
+    "owner_uno_servo.inc": "57a50d3c92d6225de4c529d65ce31e38917dfa1df4ae71b8033856a2d12a34e8",
+    "owner_uno_servo_driver.inc": "6d6f3b191fdf768646b2b414162d43063ce585efc86f9124a3a888cc817c89e2",
+    "owner_uno_yaw.inc": "dfa7c46e82c1550aab4b2c6e9376646ba62146e74469b1593b5ba4c81c54e743",
+    "owner_uno_servo_dispatch.inc": "1f451ec0e2285e302fc0930a6a785af39bba70976e3d81e5e496df4a5bcf609e",
+    "owner_uno_delay.inc": "e221beffab609b5d1119bf86ddddb7e61bc0c7533580ee1a56e8920fade7a460"
+  }
+}

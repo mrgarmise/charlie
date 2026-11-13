@@ -282,11 +282,20 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
         remaining=budget_seconds-(time.monotonic()-started)
         if remaining<1: break
         available = {'model-diagnostics','meditation-motion'} | ({'evidence-review'} if review_questions else set()) | ({'cnn-reconstruction','cnn-classification','cnn-validation-extension'} if not diagnostics_only and torch_available else set())
+        if not refinement_only:
+            from .mobile_review import labeled_pairs
+            if labeled_pairs(dataset.journal):available.add('mobile-evidence-review')
         if refinement_only:available={'cnn-validation-extension'} if torch_available else set()
         selection=executive.select(methods=available,
-            resources={'offline-slot','RGB-examples','torch','model-evaluation','context-evidence','meditation-evidence'},authorized_methods=available)
+            resources={'offline-slot','RGB-examples','torch','model-evaluation','context-evidence','meditation-evidence'} | ({'native-labeled-mobile-evidence'} if 'mobile-evidence-review' in available else set()),authorized_methods=available)
         if not selection['project']: break
         project=selection['project']; context=executive.chooser_context(project['id'])
+        if project['method']=='mobile-evidence-review':
+            from .mobile_review import execute_review
+            reviewed=execute_review(executive,project,dataset.journal,gateway)
+            reviewed['selection']=selection
+            results.append(reviewed)
+            continue
         plan=select_offline_experiment(gateway,dataset.journal,context,budget_seconds=remaining)
         if plan is None:
             executive.transition(project['id'],'blocked','Evaluator/chooser has no justified executable investigation under current evidence',
@@ -319,8 +328,15 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
             if result['status']=='already_resolved':
                 payload=result['resolution']; result.update(result=payload['result'],reason=payload['reason'])
             executive.record_result(project['id'],plan,result,dataset.journal,episode=SCOPE)
-            gateway.assess_decision('offline:'+plan['prediction_id'],'helpful' if result['result']=='supported' else 'harmful',
-                result['resolution_id'],'diagnostic prediction usefulness only; no score reward attribution')
+            # Evidence about a prediction's truth is not automatically
+            # evidence about the usefulness of the investigation method.
+            # Crucially, unresolved/missing evidence is not negative feedback.
+            from .diagnostic_feedback import prediction_feedback
+            diagnostic_feedback = prediction_feedback(result['result'])
+            if diagnostic_feedback is not None:
+                verdict, rationale = diagnostic_feedback
+                gateway.assess_decision('offline:'+plan['prediction_id'], verdict,
+                    result['resolution_id'], rationale)
             gateway.remember(Experience(kind='outcome',summary='Offline '+project['method']+' experiment: '+result['result'],
                 source='learning:foundry-resolution',subject=project['id'],goal=project['goal'],
                 outcome=json.dumps(result.get('metrics',{})),significant=True,
@@ -356,7 +372,7 @@ def investigate(dataset, gateway, *, budget_seconds=60., max_jobs=2, driver=None
     for item in results:
         result=item['result']
         lines.extend([f"Project {item['project_id'][:12]}: {item['selection']['project']['goal']}",
-            'Selection: '+item['plan']['reason'],
+            'Selection: '+item['plan'].get('reason','resumed preserved investigation'),
             f"Prediction {item['plan']['prediction_id'][:12]}: {item['plan']['expected']}",
             'Resolution: '+result.get('result',result['status']),
             'Diagnostic metrics: '+json.dumps(result.get('metrics',{})),

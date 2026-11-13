@@ -34,7 +34,9 @@ def test_resource_pressure_preserves_work_and_recovers(tmp_path,monkeypatch,limi
     import learning.resources as resources
     root=experience(tmp_path);life=DevelopmentLifecycle(tmp_path/'state',[root])
     hot=[True]
-    monkeypatch.setattr(resources,'resident_bytes',lambda:900*1024**2 if hot[0] and limitation=='memory' else 40*1024**2)
+    # Inject the complete owned-memory sample: Python's spawn resource tracker
+    # may be a persistent child after transport tests. Keep production accounting.
+    monkeypatch.setattr(resources,'owned_resident_bytes',lambda:(900*1024**2 if hot[0] and limitation=='memory' else 40*1024**2,0))
     monkeypatch.setattr(resources,'temperature',lambda:76. if hot[0] and limitation=='temperature' else 60.)
     before=[r.id for r in life.journal.records()]
     for _ in range(4):life.turn()

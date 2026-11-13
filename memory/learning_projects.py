@@ -87,6 +87,30 @@ class LearningExecutive:
         self.journal, self.gateway = journal, gateway
         self.consolidate()
 
+    def consider_human_question(self, service, evidence_id, *, reason, consequence,
+                                priority, alternative_available=False):
+        """Opt-in evidence-derived uncertainty review, never actuator authority."""
+        from .human_interaction import detect_need
+        if service.journal is not self.journal:
+            raise ValueError('Executive and gateway must share evidence ownership')
+        need = detect_need(self.journal, evidence_id, now=service.clock(), reason=reason,
+            consequence=consequence, priority=priority, alternative_available=alternative_available)
+        return service.consider(need) if need else dict(asked=False, reason='no_supported_information_need')
+
+    def consider_consultation(self, service, evidence_id):
+        """General observation advice from authentic retained uncertainty only."""
+        if service.journal is not self.journal:
+            raise ValueError('consultant must share Executive journal')
+        references=[evidence_id,str(self.journal.path.resolve())+'#'+evidence_id]
+        retained=self.gateway.evaluator.for_evidence(references)
+        return service.consider(evidence_id,retained=retained[:20])
+
+    def receive_human_answers(self, service, owner):
+        """Existing Executive receives fallible evidence, never activates policy."""
+        if service.journal is not self.journal:
+            raise ValueError('Executive and gateway must share evidence ownership')
+        return service.receive(owner)
+
     def request_neck_calibration(self, service, reason, evidence, *, profile_id=None):
         """Evidence-backed request only; this has no actuator/qualification API."""
         return service.request(reason, evidence, profile_id=profile_id)
@@ -434,6 +458,14 @@ class LearningExecutive:
                 experience_basis=dict(independent_units=resolved,
                     resolution_ids=[h['resolution_id'] for h in p.get('experiment_history', [])
                                     if h['result'] != 'unresolved'],
+                    contemporaneous_ablation=dict(
+                        # Freeze the exact opportunity, eligibility, declared
+                        # costs and other terms of this actual decision.
+                        without_diagnostic_units_score=score + p.get('uncertainty', .5)
+                            - terms['remaining_uncertainty'],
+                        retained_unit_score_effect=terms['remaining_uncertainty']
+                            - p.get('uncertainty', .5),
+                        scope='diagnostic recurrence only; causal truth and method utility unqualified'),
                     interpretation='retained diagnostic outcomes; independence accounting is not authenticity or score qualification'),
                 missing_resources=missing, unmet_dependencies=unmet,
                 method_available=p['method'] in methods, authorized=p['method'] in authorized_methods,
@@ -453,18 +485,51 @@ class LearningExecutive:
         # Resuming an interrupted undertaking precedes starting a fresh one.
         resume = [a for a in eligible if projects[a['project_id']].get('interrupted_by')
                   and projects.get(projects[a['project_id']]['interrupted_by'], {}).get('status') in FINAL]
-        chosen = max(urgent or active or resume or eligible, key=lambda a: (a['score'], a['project_id']))
+        eligible_tier = urgent or active or resume or eligible
+        chosen = max(eligible_tier, key=lambda a: (a['score'], a['project_id']))
+        ablated = max(eligible_tier, key=lambda a: (
+            a['experience_basis']['contemporaneous_ablation']['without_diagnostic_units_score'],
+            a['project_id']))
+        ablation = dict(
+            baseline_project_id=ablated['project_id'],
+            retained_project_id=chosen['project_id'],
+            changed_winner=ablated['project_id'] != chosen['project_id'],
+            opportunity_tier=[a['project_id'] for a in eligible_tier],
+            attribution='same-decision heuristic counterfactual; not an authentic second decision or E1 proof')
         reason = ('evidenced interruption' if urgent else 'continue active project' if active
                   else 'resume interrupted project' if resume else 'generic value/uncertainty minus cost/risk policy')
-        if inspect:return dict(project=projects[chosen['project_id']],alternatives=alternatives)
+        if inspect:return dict(project=projects[chosen['project_id']],alternatives=alternatives,
+                              ablation=ablation)
         interrupted = [p['id'] for p in projects.values()
                        if p['status'] == 'active' and p['id'] != chosen['project_id']]
         resume_from=next((r.id for r in reversed(self.journal.records('event'))
             if r.data['payload'].get('project_id')==chosen['project_id']
             and r.data['payload'].get('op') in ('lifecycle','assessment')),None)
         self._event(dict(op='selected', project_id=chosen['project_id'], resume_from=resume_from, alternatives=alternatives,
+                         contemporaneous_ablation=ablation,
                          interrupted_projects=interrupted, reason=reason))
         return dict(project=self.projects()[chosen['project_id']], alternatives=alternatives, reason=reason)
+
+    def consider_mobile_attention(self, observation_id, *, primary_priority=0, resources=(),
+                                  methods=(), authorized_methods=()):
+        """Use this Executive's existing portfolio, never a pet-only chooser.
+
+        Attention and physical deployment authority remain independent. No frame
+        creates a selected goal. Existing projects/experience supply interests.
+        """
+        row=self.journal.get(observation_id);o=row.data['payload']['observation']
+        if not o['frame']['authentic']:
+            return dict(intent='decline',reason='fixture cannot commission an authentic interest',project_id=None)
+        if primary_priority>40:
+            return dict(intent='yield',reason='higher-priority primary activity',project_id=None)
+        selected=self.select(methods=set(methods),resources=set(resources),authorized_methods=set(authorized_methods))
+        project=selected['project']
+        intent=('follow' if project and project['method']=='pet_follow' else
+                'observe' if project and project['method'] in ('mobile-observe','pet_observe') else 'decline')
+        return dict(intent=intent,project_id=project['id'] if project else None,
+                    reason=selected.get('reason','existing portfolio selected another activity'),
+                    alternatives=selected['alternatives'],originator='LearningExecutive',
+                    policy='existing rule-based portfolio; not learned preference or motion authority')
 
     def chooser_context(self, project_id):
         project = self.projects()[project_id]
@@ -804,6 +869,10 @@ class LearningExecutive:
             execution='staged only; existing physical gates must receive separate experiment-specific authorization'),
             [self._reference(self.journal,i).id for i in (search.id,evaluation.id,finding.id,project['developmental_bookmark']['evidence_id'])])
 
+    def consider_model_learning(self, service, *, on_progress=None):
+        """Use the shared portfolio for evidence-backed perception investigations."""
+        return service.consider(self,on_progress=on_progress)
+
     def develop(self, lifecycle):
         """One normal-operation turn, owned by this Executive, no second scheduler.
 
@@ -816,17 +885,25 @@ class LearningExecutive:
         if gameplay_active():
             lifecycle._phase('experiencing')
             return
+        model_progress=False
+        if getattr(lifecycle,"model_learning",None) is not None:
+            before_model=len(lifecycle.model_learning.data.events("model_turn"))
+            lifecycle.model_learning_result=self.consider_model_learning(
+                lifecycle.model_learning,on_progress=lifecycle.yield_for_primary)
+            model_progress=len(lifecycle.model_learning.data.events("model_turn"))>before_model
         self.commission_evidence_searches()
         changed=lifecycle.acquire()
+        if getattr(lifecycle,"consultation",None) is not None:
+            from learning.consultation import review_consultations
+            review_consultations(lifecycle)
         self.receive_evidence_searches()
         self.stage_evidence_experiment()
         self.reconcile_agenda()
         # The Executive chooses eligible new experience for bounded reflection.
         # A completed result is a durable checkpoint, not another experience.
-        contexts=[r for r in self.journal.records('observation') if
-            r.data['payload'].get('category')=='learning_context_reference' and r.data['payload'].get('source_episode') and lifecycle.evidence_eligible(r.data['payload'])]
-        results=[r.data['payload'] for r in self.journal.records('observation') if
-            r.data['payload'].get('category')=='normal_meditation_result']
+        contexts=[r for r in self.journal.category_records('observation','learning_context_reference') if
+            r.data['payload'].get('source_episode') and lifecycle.evidence_eligible(r.data['payload'])]
+        results=[r.data['payload'] for r in self.journal.category_records('observation','normal_meditation_result')]
         completed_episodes={r['source_episode'] for r in results if r['status']=='completed'}
         unavailable={r['context_id'] for r in results if r['status']=='unavailable'}
         meditation_advanced=False
@@ -869,7 +946,9 @@ class LearningExecutive:
             if r.data['payload'].get('op')=='developmental_wait'),None)
         if previous and previous['inputs']==signature and not lifecycle.pending_work():
             lifecycle.operational_feedback()
-            lifecycle.last_turn=dict(progress_occurred=False,runnable_work_remaining=False,reason='No eligible work; retained dependencies unchanged',next_direction=previous['next_direction'],meditation=meditation_outcome)
+            lifecycle.last_turn=dict(progress_occurred=model_progress,runnable_work_remaining=False,
+                reason='Perception investigation checkpoint retained; other dependencies unchanged' if model_progress else 'No eligible work; retained dependencies unchanged',
+                next_direction=previous['next_direction'],meditation=meditation_outcome)
             lifecycle.current_activity=dict(kind='waiting',reason=lifecycle.last_turn['reason'])
             lifecycle._phase('waiting for evidence')
             return
@@ -885,7 +964,7 @@ class LearningExecutive:
         lifecycle.operational_feedback()
         projects=self.projects()
         pending=lifecycle.pending_work()
-        progressed=meditation_advanced or any(r['result']['status'] in ('resolved','already_resolved') or r['result'].get('developmental_progress',{}).get('progress_occurred',False) for r in report['results'])
+        progressed=model_progress or meditation_advanced or any(r['result']['status'] in ('resolved','already_resolved') or r['result'].get('developmental_progress',{}).get('progress_occurred',False) for r in report['results'])
         lifecycle.last_turn=dict(progress_occurred=progressed,runnable_work_remaining=pending,
             reason='Committed developmental checkpoint or conclusion advanced' if progressed else 'No justified executable investigation under current evidence and capabilities',
             next_direction='Resume checkpointed work' if pending else 'Await qualified evidence or capability/dependency change',

@@ -1,0 +1,20 @@
+{
+  "system-units": {
+    "returncode": 1,
+    "observed": [],
+    "error": "Failed to connect to system scope bus via local transport: Operation not permitted (consider using --machine=<user>@.host --user to connect to bus of other user)\n",
+    "scope": "current namespace only, never native idle evidence"
+  },
+  "user-units": {
+    "returncode": 1,
+    "observed": [],
+    "error": "Failed to connect to user scope bus via local transport: Operation not permitted (consider using --machine=<user>@.host --user to connect to bus of other user)\n",
+    "scope": "current namespace only, never native idle evidence"
+  },
+  "tcp-listeners": {
+    "returncode": 0,
+    "observed": [],
+    "error": "Cannot open netlink socket: Operation not permitted\n",
+    "scope": "current namespace only, never native idle evidence"
+  }
+}

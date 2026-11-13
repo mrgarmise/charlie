@@ -1,0 +1,860 @@
+F....................................................................... [ 45%]
+..........s..................................FFFFFFFFFFF..FF...........F [ 90%]
+.....FFF..F.F...                                                         [100%]
+=================================== FAILURES ===================================
+__________________ test_schema_timestamp_geometry_and_no_self __________________
+
+    def test_schema_timestamp_geometry_and_no_self():
+        packet=bridge().observe(frame()); row=packet['objects'][0]
+        assert packet['exposure_at']==1 and packet['timestamp_basis']=='sensor monotonic exposure'
+        assert row['bbox_board']==[20,20,30,40] and row['legacy_kind']=='unknown'
+        assert row['class_scores'] is None and packet['self_authorization'] is False
+>       agency=VisualAgency();agency.observe(tracking_pairs(packet),observed_at=1)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_detector_bridge.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.robotron_agency.VisualAgency object at 0x7fff0f74e900>
+pairs = [(Detection(kind='unknown', center=(25.0, 30.0), box=(40, 20, 60, 40), pixels=400), {'label': 'player', 'legacy_kind': 'unknown', 'bbox_pixels': (40, 20, 60, 40), 'bbox_board': [20.0, 20.0, 30.0, 40.0], ...})]
+move = None, interval_seconds = None, observed_at = 1
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) <= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+>       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError
+_____ test_passing_review_preserves_timestamp_hashes_and_launcher_validity _____
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_passing_review_preserves_0')
+
+    def test_passing_review_preserves_timestamp_hashes_and_launcher_validity(tmp_path):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+_____________ test_missing_and_stale_proofs_never_refresh[missing] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_0')
+change = 'missing'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+______________ test_missing_and_stale_proofs_never_refresh[stale] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_1')
+change = 'stale'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+______________ test_missing_and_stale_proofs_never_refresh[boot] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_2')
+change = 'boot'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+____________ test_missing_and_stale_proofs_never_refresh[revision] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_3')
+change = 'revision'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+_____________ test_missing_and_stale_proofs_never_refresh[future] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_4')
+change = 'future'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+_______________ test_missing_and_stale_proofs_never_refresh[nan] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_and_stale_proofs_5')
+change = 'nan'
+
+    @pytest.mark.parametrize('change', ['missing', 'stale', 'boot', 'revision', 'future', 'nan'])
+    def test_missing_and_stale_proofs_never_refresh(tmp_path, change):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+______________ test_changed_and_conflicting_evidence_fail_closed _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_changed_and_conflicting_e0')
+
+    def test_changed_and_conflicting_evidence_fail_closed(tmp_path):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+________ test_independent_parts_assemble_with_oldest_actual_review_time ________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_independent_parts_assembl0')
+
+    def test_independent_parts_assemble_with_oldest_actual_review_time(tmp_path):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+___________ test_historical_xml_keeps_scope_and_cannot_certify_host ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_historical_xml_keeps_scop0')
+
+    def test_historical_xml_keeps_scope_and_cannot_certify_host(tmp_path):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+______________ test_missing_lease_cases_and_suite_error_rejected _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_missing_lease_cases_and_s0')
+
+    def test_missing_lease_cases_and_suite_error_rejected(tmp_path):
+        import xml.etree.ElementTree as ET
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+_________ test_full_pass_writes_exact_review_without_issuing_authority _________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_full_pass_writes_exact_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffef24a3a80>
+
+    def test_full_pass_writes_exact_review_without_issuing_authority(tmp_path, monkeypatch):
+        from learning import campaign
+        evidence = tmp_path/'evidence'; evidence.mkdir()
+>       path, doc = review(evidence)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+________________ test_malformed_xml_is_a_diagnostic_not_a_crash ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_malformed_xml_is_a_diagno0')
+
+    def test_malformed_xml_is_a_diagnostic_not_a_crash(tmp_path):
+>       path, doc = review(tmp_path)
+                    ^^^^^^^^^^^^^^^^
+
+tests/test_native_preflight.py:163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_native_robotron_trial.py:29: in review
+    prior=json.loads((runner.ROOT/'docs/validation/native-integration-20261021/test-report.json').read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_local.py:548: in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.13/pathlib/_abc.py:632: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/five/charlie-adoption-robotron-review/docs/validation/native-integration-20261021/test-report.json'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+________ test_newest_frame_selection_and_no_duplicate_evidence_delivery ________
+
+    def test_newest_frame_selection_and_no_duplicate_evidence_delivery():
+        s=ObservationStream(None)
+        for at in (1.,2.,3.):append(s,at)
+        observed=ObservedCamera(SimpleNamespace(stream=s))
+        observed.stream_sequence=0
+>       assert observed.read().size==(20,20) and observed.timestamp==3.
+               ^^^^^^^^^^^^^^^
+
+tests/test_agency_stream_engine.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.observation_camera.ObservedCamera object at 0x7fff11145160>
+
+    def read(self):
+        if self.progress: self.progress.enter('camera')
+        read = getattr(self.source, 'read_fresh', None) if self.require_fresh else None
+        for attempt in range(3):
+            try:
+>               self.raw = read() if read is not None else self.source.read()
+                                                           ^^^^^^^^^^^^^^^^
+E               AttributeError: 'types.SimpleNamespace' object has no attribute 'read'
+
+experiments/ppal/observation_camera.py:37: AttributeError
+__________ test_start_ack_alone_and_attract_cannot_seed_expected_self __________
+
+    def test_start_ack_alone_and_attract_cannot_seed_expected_self():
+        v=VisualAgency();receipt=dict(command='START',accepted=True,ack_at=1.)
+        assert not v.seed_new_game(receipt,[])
+        assert not v.seed_new_game(receipt,[dict(phase='title',capture_timestamp=t) for t in (2.,3.,4.)])
+        assert not v.seed_new_game(receipt,[dict(phase='gameplay',capture_timestamp=2.)]*3)
+        assert v.expected_self is None and v.player is None
+        assert v.seed_new_game(receipt,[dict(phase='gameplay',capture_timestamp=t) for t in (2.,3.,4.)])
+        assert v.expected_self['status']=='expected' and v.agency.self_id is None
+        pairs=[(Detection('unknown',p,(1,1,10,20),100),{}) for p in ((10,10),(50,50))]
+>       row=v.observe(pairs,observed_at=5.)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agency_stream_engine.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.robotron_agency.VisualAgency object at 0x7ffef17fad50>
+pairs = [(Detection(kind='unknown', center=(10, 10), box=(1, 1, 10, 20), pixels=100), {}), (Detection(kind='unknown', center=(50, 50), box=(1, 1, 10, 20), pixels=100), {})]
+move = None, interval_seconds = None, observed_at = 5.0
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) <= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+>       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError
+___ test_brief_occlusion_retains_identity_without_predicted_position_control ___
+
+    def test_brief_occlusion_retains_identity_without_predicted_position_control():
+        v=VisualAgency();clock=[1.];p=[20.,20.]
+        def read():clock[0]+=.01;return [(Detection('unknown',tuple(p),(1,1,10,20),100),{})]
+        class C:
+            last_execution=None
+            def execute(self,a,ms):
+                u=VECTORS[a.move];p[0]+=u[0];p[1]+=u[1]
+>       v.discover(read,C(),observation_time=lambda:clock[0],fire_first=False)
+
+tests/test_agency_stream_engine.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/robotron_agency.py:179: in discover
+    initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.robotron_agency.VisualAgency object at 0x7ffef17fa5d0>
+pairs = [(Detection(kind='unknown', center=(20.0, 20.0), box=(1, 1, 10, 20), pixels=100), {})]
+move = None, interval_seconds = None, observed_at = 1.01
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) <= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+>       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError
+__________ test_integer_weight_repair_survives_durable_journal_commit __________
+
+tmp_path = PosixPath('/tmp/pytest-of-five/pytest-3/test_integer_weight_repair_sur0')
+
+    def test_integer_weight_repair_survives_durable_journal_commit(tmp_path):
+        from experiments.ppal.progress_evidence import CaptureEvidence
+        from memory.evidence import EvidenceJournal
+>       v=VisualAgency();row=v.observe([(Detection('unknown',(50,50),(1,1,10,20),100),{})],observed_at=1.)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_agency_stream_engine.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.robotron_agency.VisualAgency object at 0x7ffef1857360>
+pairs = [(Detection(kind='unknown', center=(50, 50), box=(1, 1, 10, 20), pixels=100), {})]
+move = None, interval_seconds = None, observed_at = 1.0
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) <= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+>       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError
+_______ test_two_direction_buffer_replay_completes_existing_shot_handoff _______
+
+    def test_two_direction_buffer_replay_completes_existing_shot_handoff():
+        v=VisualAgency(projectile_confirmation=True);clock=[1.];rows=[];seq=[0];calls=[]
+        def read():return [(Detection('unknown',(50,50),(1,1,10,20),100),{})]
+        def accept(p):
+            clock[0]=p.at
+            accept.projectiles=p.capture['dots']
+            return read()
+        read.accept_exposure=accept
+        def capture(c,a,duration,deadline,stop):
+            calls.append(a.fire);start=1.1 if a.fire=='E' else 1.5;u=VECTORS[a.fire]
+            frames=[]
+            for at,dist in ((start-.05,None),(start+.05,1),(start+.1,2),(start+.15,3)):
+                seq[0]+=1;p=packet(at,seq[0]);p.capture['dots']=[] if dist is None else [(50+u[0]*dist,50+u[1]*dist)]
+                frames.append(p)
+            return dict(move='STAY',fire=a.fire,controls_ready_at=start,pulse_finished_at=start+.1),frames,{'fixture':'synthetic buffer'}
+>       v.discover(read,object(),capture_shots=capture,observation_time=lambda:clock[0],record=rows.append)
+
+tests/test_agency_stream_engine.py:227: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/robotron_agency.py:179: in discover
+    initial = self.observe(pairs, observed_at=observation_time() if observation_time else time.monotonic())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.robotron_agency.VisualAgency object at 0x7ffef18668b0>
+pairs = [(Detection(kind='unknown', center=(50, 50), box=(1, 1, 10, 20), pixels=100), {})]
+move = None, interval_seconds = None, observed_at = 1.0
+reference_positions = None
+
+    def observe(self, pairs, move=None, interval_seconds=None, *, observed_at=None, reference_positions=None):
+        self.pairs = pairs
+        tracking_started = time.perf_counter()
+        assignments = self.tracker.update(self.tick, [d for d, _ in pairs], observed_at=observed_at)
+        self.tracker.last_update["processing_seconds"] = time.perf_counter()-tracking_started
+        self.assignments = assignments
+        self.tick += 1
+        self.positions = {track: tuple(pairs[index][0].center) for index, track in assignments.items()}
+        lineage = []
+        prior_id = self.agency.last_confirmed_id
+        if prior_id is not None and prior_id not in self.positions:
+            prior = next((row for row in self.tracker.last_update["predictions"]
+                          if row["track_id"] == prior_id), None)
+            if prior:
+                created = [event["track_id"] for event in self.tracker.last_update["events"]
+                           if event["kind"] == "created"]
+                nearby = [track_id for track_id in created
+                          if sum((self.positions[track_id][i]-prior["predicted"][i])**2
+                                 for i in (0,1)) <= self.tracker.max_distance**2]
+                if len(nearby) == 1 and self.agency.propose_successor(prior_id,nearby[0]):
+                    lineage.append({"from_track_id":prior_id, "to_track_id":nearby[0],
+                                    "status":"proposal_requires_new_direct_response"})
+        if move is not None:self.spawn_prior=False
+        prior={key:math.exp(-sum((v-50.)**2 for v in p)/(2*15.**2))
+               for key,p in self.positions.items()} if self.spawn_prior else {}
+        previous_self = self.agency.self_id
+>       snapshot = self.agency.observe(self.positions, VECTORS[move] if move is not None else None,
+                                   interval_seconds=interval_seconds, reference_positions=reference_positions, candidate_prior=prior)
+E       TypeError: AgencyTracker.observe() got an unexpected keyword argument 'candidate_prior'
+
+experiments/ppal/robotron_agency.py:56: TypeError
+__________ test_one_producer_is_reused_across_three_episode_borrowers __________
+
+    def test_one_producer_is_reused_across_three_episode_borrowers():
+        from experiments.ppal.camera_session import CameraSession
+        owners=[];closed=[]
+        class Camera:
+            def __init__(self):self.stream=None;owners.append(self)
+            def start_stream(self):
+                if self.stream is None:
+                    def acquire():
+                        self.stream.stop_event.wait(.005)
+                        p=packet(time.monotonic());return p.image,p.capture
+                    self.stream=ObservationStream(acquire)
+                    self.stream.start()
+                return self.stream
+            def close(self):self.stream.close();closed.append(True)
+        session=CameraSession(Camera);sequences=[]
+        try:
+            for _ in range(3):
+>               observed=ObservedCamera(session.borrow());observed.start_stream();observed.read()
+                                                                                  ^^^^^^^^^^^^^^^
+
+tests/test_agency_stream_engine.py:262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+experiments/ppal/observation_camera.py:37: in read
+    self.raw = read() if read is not None else self.source.read()
+                                               ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <experiments.ppal.camera_session._BorrowedCamera object at 0x7ffef1829400>
+name = 'read'
+
+    def __getattr__(self, name):
+>       return getattr(self.owner.source, name)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'Camera' object has no attribute 'read'
+
+experiments/ppal/camera_session.py:73: AttributeError
+=============================== warnings summary ===============================
+tests/test_neural_score.py::test_hailo_sdk_stream_contract[returned-dtype-FormatOrder.FCR]
+tests/test_neural_score.py::test_hailo_sdk_stream_contract[returned-dtype-FormatOrder.NHWC]
+  /home/five/charlie-adoption-robotron-review/tests/test_neural_score.py:244: RuntimeWarning: invalid value encountered in cast
+    if defect=='returned-dtype':value=value.astype(np.uint8)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_detector_bridge.py::test_schema_timestamp_geometry_and_no_self
+FAILED tests/test_native_preflight.py::test_passing_review_preserves_timestamp_hashes_and_launcher_validity
+FAILED tests/test_native_preflight.py::test_missing_and_stale_proofs_never_refresh[missing]
+FAILED tests/test_native_preflight.py::test_missing_and_stale_proofs_never_refresh[stale]
+FAILED tests/test_native_preflight.py::test_missing_and_stale_proofs_never_refresh[boot]
+FAILED tests/test_native_preflight.py::test_missing_and_stale_proofs_never_refresh[revision]
+FAILED tests/test_native_preflight.py::test_missing_and_stale_proofs_never_refresh[future]
+FAILED tests/test_native_preflight.py::test_missing_and_stale_proofs_never_refresh[nan]
+FAILED tests/test_native_preflight.py::test_changed_and_conflicting_evidence_fail_closed
+FAILED tests/test_native_preflight.py::test_independent_parts_assemble_with_oldest_actual_review_time
+FAILED tests/test_native_preflight.py::test_historical_xml_keeps_scope_and_cannot_certify_host
+FAILED tests/test_native_preflight.py::test_missing_lease_cases_and_suite_error_rejected
+FAILED tests/test_native_preflight.py::test_full_pass_writes_exact_review_without_issuing_authority
+FAILED tests/test_native_preflight.py::test_malformed_xml_is_a_diagnostic_not_a_crash
+FAILED tests/test_agency_stream_engine.py::test_newest_frame_selection_and_no_duplicate_evidence_delivery
+FAILED tests/test_agency_stream_engine.py::test_start_ack_alone_and_attract_cannot_seed_expected_self
+FAILED tests/test_agency_stream_engine.py::test_brief_occlusion_retains_identity_without_predicted_position_control
+FAILED tests/test_agency_stream_engine.py::test_integer_weight_repair_survives_durable_journal_commit
+FAILED tests/test_agency_stream_engine.py::test_two_direction_buffer_replay_completes_existing_shot_handoff
+FAILED tests/test_agency_stream_engine.py::test_one_producer_is_reused_across_three_episode_borrowers
+20 failed, 139 passed, 1 skipped, 2 warnings in 4.96s

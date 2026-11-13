@@ -155,11 +155,22 @@ def test_real_player_starts_two_simulated_playable_games_on_one_camera(tmp_path,
     from test_experiment_return import gateway
     from test_marathon_deferred import args
     real_sleep=time.sleep
+    # This accelerated, synthetic clock tests episode transitions, not writer
+    # throughput. Finish prior durable work before advancing an exposure so
+    # host scheduling cannot randomly turn it into a backpressure test. Real
+    # recorder limits/fail-closed overflow have separate dedicated regressions.
+    from experiments.ppal import progress_evidence
+    real_recorder=progress_evidence.CaptureEvidence
+    recorders=[]
+    def recorder(*values,**options):
+        value=real_recorder(*values,**options);recorders.append(value);return value
+    monkeypatch.setattr(progress_evidence,'CaptureEvidence',recorder)
     clock=[0.];starts=[];preflights=[];closed=[];points=[(25.,25.),(50.,50.)]
     world={'game':0,'reads':0}
     class Camera:
         def __init__(self):closed.append('opened')
         def read(self):
+            if recorders and not recorders[-1]._closed:recorders[-1].flush()
             real_sleep(.01);clock[0]+=.05
             if world['game']:world['reads']+=1
             if terminal_delay and world['reads']==102:clock[0]+=25.

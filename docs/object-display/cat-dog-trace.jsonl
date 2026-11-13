@@ -1,0 +1,7 @@
+{"at": 1.0, "selected": null, "outgoing": [], "mode": "no-device dry-run"}
+{"at": 1.11, "selected": null, "outgoing": [], "mode": "no-device dry-run"}
+{"at": 1.22, "selected": ["offline-fixture", "CAT"], "outgoing": ["DISPLAY_CAPS", "OBJECT_LABEL 4500 100 CAT"], "mode": "no-device dry-run"}
+{"at": 3.5, "selected": null, "outgoing": ["OBJECT_CLEAR"], "mode": "no-device dry-run"}
+{"at": 3.61, "selected": null, "outgoing": [], "mode": "no-device dry-run"}
+{"at": 3.72, "selected": ["offline-fixture", "DOG"], "outgoing": ["OBJECT_LABEL 4500 100 DOG"], "mode": "no-device dry-run"}
+{"outgoing": ["OBJECT_CLEAR"], "mode": "no-device dry-run", "expired": true}

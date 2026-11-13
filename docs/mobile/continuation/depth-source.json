@@ -1,0 +1,17 @@
+{
+  "model":"fast_depth",
+  "zoo":"v2.19.0",
+  "artifact_url":"https://hailo-model-zoo.s3.eu-west-2.amazonaws.com/ModelZoo/Compiled/v2.19.0/hailo8l/fast_depth.hef",
+  "artifact_sha256":"625c8d6a236d8f305454d28ae43bab129ca65025c4be0dbcd6cf6d3e41983c79",
+  "artifact_bytes":4635184,
+  "source_config":"https://github.com/hailo-ai/hailo_model_zoo/blob/v2.19.0/hailo_model_zoo/cfg/networks/fast_depth.yaml",
+  "source_preprocessing":"https://github.com/hailo-ai/hailo_model_zoo/blob/v2.19.0/hailo_model_zoo/core/preprocessing/depth_estimation_preprocessing.py",
+  "source_postprocessing":"https://github.com/hailo-ai/hailo_model_zoo/blob/v2.19.0/hailo_model_zoo/core/postprocessing/depth_estimation_postprocessing.py",
+  "license":"MIT per model configuration; source dwofk/fast-depth/LICENSE; Hailo Model Zoo LICENSE also MIT",
+  "documented_input_shape":[224,224,3],
+  "documented_output_shape":[224,224,1],
+  "preprocessing":"RGB float32 0..255; resize 250x332, central crop .91, resize 224x224; normalization /255 folded into exported network",
+  "postprocessing":"identity depth head; interpreted only as relative ordering on this installation; larger depth means farther",
+  "qualification":"download and hash verified on host, NOT parsed or executed on HailoRT 4.23.0",
+  "blockers":["No native HailoRT/device access here","Need parse-hef input/output/architecture verification","OpenCV vs TensorFlow preprocessing parity unmeasured","No calibrated indoor depth/pose/ranging or floor/edge qualification"]
+}

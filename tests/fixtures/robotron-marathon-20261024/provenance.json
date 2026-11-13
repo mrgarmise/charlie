@@ -1,0 +1,34 @@
+{
+  "source": "/home/five/charlie-native-trials/causal-window-20261024-wPgSCbwb/development-20261024-232840/game-01",
+  "files": {
+    "calibration.json": "29f2e8fe480bec30701dc31106c79580fde9a6703a5c8cec0a1f2d358d3f7384",
+    "report.json": "7c6afa5791239dfa5ed02202a8cfcf480b2fb6822e87fc1a90773268de23a1d0",
+    "score.jsonl": "1f6edb22f769d94864ff5bd64c9007576faacd0d25f14f0ca3306a77076e25a7",
+    "events.jsonl": "d9b94541a212f22f2c31b77e6d5fdeec08cf9a3d9724bca1469df292bb8aa0e4",
+    "raw-0001.png": "0f602308a96a9392b73ebdd15c8dbf1764f708a096113ba190755fd0a118a30c",
+    "raw-0047.png": "c6a2c8c27f625b6e9a33240cb62da418e642cf41cd12fbf5050f8900d8a7e360",
+    "raw-0067.png": "d7796c0d96ecf8fff3463263453d16b114837de0ae6b0fd9a78f396c98d24178",
+    "raw-0086.png": "641c33a673ee16b386c4ca24c92403f4302c1a8b228653c6d745c36e72f9867f",
+    "raw-0087.png": "309d90b88582a66d17ccdffec688ecd90e2a3369769507aafbdd66b8a06a320c",
+    "score-raw-0047.png": "aa5d5b7a90839a630b7d641f752656cf8d6aad276953e6ea7592080a7ed7ed12",
+    "score-raw-0087.png": "f2919d9127a9e61c5d170ea3071dbcee55568aa7f704180df6b9af4d76ea7331"
+  },
+  "anchor_training": "raw-0087.png",
+  "holdouts": [
+    "raw-0047.png",
+    "raw-0067.png",
+    "raw-0086.png"
+  ],
+  "operator_observation": {
+    "final_score": 500,
+    "game_over": true
+  },
+  "independent_complete_game": false,
+  "compressed_originals": {
+    "agency.jsonl.gz": {
+      "original_name": "agency.jsonl",
+      "original_sha256": "828362ff92dde1f52a77a93b3e09010c7e8127ba19c2936f8e981e29d4279c2c",
+      "sha256": "0e8b8c699f1e9d080ff2843ddfd80caaab9a5c7eea118209e310b34eaddc7450"
+    }
+  }
+}

@@ -49,8 +49,12 @@ def main():
     from hardware.rp2040_controller import RP2040Controller
     from .sources import PiCameraSource
     from .passive import PassivePublisher
+    from contextlib import ExitStack
+    from types import SimpleNamespace
+    feeders = ExitStack()
     controller = RP2040Controller(port=args.port)
     neck = None
+    gateway = None
     handlers = {}
     try:
         from hardware.calibration_service import CalibrationService
@@ -64,19 +68,36 @@ def main():
             if time.monotonic()>=deadline:
                 raise RuntimeError('RP2040 is DISARMED; Pi authorization cannot physically arm it')
             time.sleep(.1)
-        optimizer = ActiveVision(lambda:PiCameraSource(role='active_vision'), controller, args.output,
+        # Application root owns the feeder. ActiveVision gets only its existing
+        # source facade/subscription and retains the actual role/firmware gates.
+        from main import application_camera_feeders
+        frame_bus = feeders.enter_context(application_camera_feeders(SimpleNamespace(elegoo_stream_url=None,
+            mobile_observe=False,mobile_manifest=None,object_model_manifest=None),
+            selected=('pi',),pi_role='active_vision'))
+        from motion.rp2040_requests import RP2040Requests
+        gateway = RP2040Requests(controller,neck,frame_bus,
+            fault_path=args.neck_state_directory/'rp2040-uncertain-motion.lock')
+        issued_at=time.monotonic()
+        adapter = gateway.active_vision_adapter(authorization=dict(source='explicit --authorize-head-motion',
+            execution='physical',purpose='active-vision',session=controller.link_session,
+            issued_at=issued_at,expires_at=issued_at+600))
+        optimizer = ActiveVision(lambda:PiCameraSource(role='active_vision'), adapter, args.output,
             initial_pose=(status['pan'],status['tilt']), authorized=True,
             detector=robotron_target if args.target=='robotron' else discover,
             publisher_factory=PassivePublisher, config=cfg,
             journal=neck.journal, calibration_service=neck)
+        adapter.frame_provider=lambda:getattr(getattr(optimizer.source,'camera',None),'_last_frame',None)
         def interrupt(signum, frame):
             optimizer.interrupt()
             raise InterruptedError(f'interrupted by signal {signum}')
         for number in (signal.SIGINT, signal.SIGTERM):
             handlers[number] = signal.signal(number, interrupt)
         result = optimizer.run()
+        feeders.close()
         print(f"{result['state']}: validated configuration at {args.output/'view.json'}; camera released")
     finally:
+        if gateway is not None:gateway.close()
+        feeders.close()
         for number, handler in handlers.items():
             signal.signal(number, handler)
         try:

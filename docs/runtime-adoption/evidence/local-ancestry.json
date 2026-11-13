@@ -1,0 +1,192 @@
+{
+  "38": {
+    "tree": "a46f530ee90cd5e34485c94bfd0e727a14146f41",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": false
+  },
+  "37": {
+    "tree": null,
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "36": {
+    "tree": "56d71274708e0a85d91d71ac31058d4f0fb93883",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": false
+  },
+  "35": {
+    "tree": null,
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "34": {
+    "tree": null,
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "33": {
+    "tree": "96930e1712c84f6f6e8f2e597c8ec0419538f3b9",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "32": {
+    "tree": "3aa503a9359fe4838f39b51c48288ae31420d2b2",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "31": {
+    "tree": "b10baa98d0fb71f37d50f9ed89ac50256106c278",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "30": {
+    "tree": "83d3cb227ae71ea8275abdc0754d92da5b657594",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "29": {
+    "tree": "2cdb4259c9b6a4e3f3778b157222ab17f2ad948d",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "28": {
+    "tree": "3c2bcef80200e0a71acc10e1fe4b81cafb6a99e4",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "27": {
+    "tree": "8cdc145afb9a729e251f8dd704b2c3ee85e87b7e",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "26": {
+    "tree": "b2eea13b0a795819f5c90d319cd33ee6bb793ef8",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "25": {
+    "tree": "1ecbdb068bec0a6bd25c468457082af236d5a665",
+    "in_candidate_ancestry": false,
+    "in_approved_ancestry": false
+  },
+  "24": {
+    "tree": null,
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "23": {
+    "tree": "eb8ea26b8460a3b2f3d6f6dfee93dd9cc347a8de",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "22": {
+    "tree": "71fab47fb62ba1b39e12e804cc83b56e9df9944d",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "21": {
+    "tree": "95705eede18cca4e4634a4b9589c3dcc1485869c",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "20": {
+    "tree": "44aa5f7ede2dc1f27096405fc83f8c7636cbfdd5",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "19": {
+    "tree": "6c5d8206b1bd258118ea19a9ada3d86d864ebd94",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "18": {
+    "tree": "63330e711fc5a2322d7c23844a296957722823be",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "17": {
+    "tree": "98ec4f1dda9a46b4803245c9caf8b5fabec70bd2",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "16": {
+    "tree": "04cfe0f3d0898e9756be1544bf9a76639956e13f",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "15": {
+    "tree": "258fb4de194ff2441664ba2a667ea9bdc90b4209",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "14": {
+    "tree": "3657ef2354ef4af31bfdb54a8c842421b9519f2e",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "13": {
+    "tree": "6523dc59f4392cca16434f0a3c67ac1b041f4266",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "12": {
+    "tree": "1596c50700936285c72fbb25870a5a5e4e743401",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "11": {
+    "tree": "e3a7a0682149df0dc6cb8144686e70afdbc2c91b",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "10": {
+    "tree": "8a14e48b9d23ede92a0bc2a3a93550182c40af26",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "9": {
+    "tree": "6dd4632c525d87027f917f55a05cfe61cd680412",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "8": {
+    "tree": "495ed7a126ed917c6d41800f63070c59f42858a0",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "7": {
+    "tree": "93846db3ac9641414396724b567effb480211fb4",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "6": {
+    "tree": "0adf6ea3fec25da666a53ffc507519d0836bce12",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "5": {
+    "tree": "fe445569ec7cb7e64cc2a294cd42fdfb8b750b45",
+    "in_candidate_ancestry": null,
+    "in_approved_ancestry": null
+  },
+  "4": {
+    "tree": "1378a325ad5395ae6f9dbc95b51e8d7b776c1712",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "3": {
+    "tree": "3a26a169986787421655b1291f4916523835802c",
+    "in_candidate_ancestry": false,
+    "in_approved_ancestry": false
+  },
+  "2": {
+    "tree": "3603e2d73ac8548a262250c865b99eb25efe1e4c",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  },
+  "1": {
+    "tree": "4802085f59c3d261ec16b2897385bfdaa52a1488",
+    "in_candidate_ancestry": true,
+    "in_approved_ancestry": true
+  }
+}

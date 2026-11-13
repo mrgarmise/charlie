@@ -31,7 +31,7 @@ def motion_policy(tmp_path):
     return ds,g,deployment,path
 
 
-def parameter_policy(tmp_path, parameters):
+def parameter_policy(tmp_path, parameters, *, retained_spec=None):
     """Explicit fabricated contract to isolate interface, NOT learner success.
 
     Reuse an independently exercised fixture investigation identity; never
@@ -41,7 +41,7 @@ def parameter_policy(tmp_path, parameters):
     original=deployment.active('offline-shadow')
     p=ds.journal.get(original['proposal_id']).data['payload']
     previous=ds.journal.get(p['evaluation_id']).data['payload']['candidate']
-    spec=dict(adapter=DECISION_ADAPTER,parameters=parameters)
+    spec=retained_spec or dict(adapter=DECISION_ADAPTER,parameters=parameters)
     checkpoint=tmp_path/'parameters.json';checkpoint.write_text(json.dumps(spec))
     candidate=dict(previous,identifier=digest(spec),checkpoint=str(checkpoint),
                    checkpoint_sha256=sha(checkpoint),spec=spec)
@@ -258,3 +258,57 @@ def test_normal_main_autonomously_exports_and_uses_policy_then_exact_restart(tmp
     assert any(r.data['payload'].get('op')=='operational_feedback' for r in original)
     again=startup(state,[root]);assert again.returncode==0,again.stderr
     assert [(r.id,r.document,r.committed_at) for r in rows(state)]==[(r.id,r.document,r.committed_at) for r in original]
+
+
+def test_retained_response_candidate_reaches_actual_policy_and_rollback(tmp_path):
+    from experiments.ppal.tactical_memory import TacticalDiagnosticMemory, positioning_spec
+    from test_tactical_diagnostic_memory import eligible_outcome
+    memory = TacticalDiagnosticMemory(tmp_path/'retained.json')
+    for number in range(2):
+        memory.record(eligible_outcome(str(number), move='E'),
+                      episode=f'fixture-{number}', evidence_id=f'fixture-evidence-{number}')
+    spec = positioning_spec(TacticalDiagnosticMemory(memory.path))
+    ds,g,deployment,path = parameter_policy(tmp_path, spec['parameters'], retained_spec=spec)
+    policy = load_policy(path)
+    w = WorldState(1, Position(50,50), (), ())
+    plain = decide(w)[2]
+    learned = decide(w, policy)[2]
+    assert plain.move != 'E' and learned.move == 'E'
+    assert policy.identity['learning_state_sha256'] == spec['retained_tactics']['sha256']
+    assert load_policy(path).tactical_memory.rows == memory.rows
+    # Even a passing offline fixture cannot gain physical authority.
+    with pytest.raises(ValueError, match='physical'):
+        load_policy(path, physical=True)
+    unsafe = replace(w, observation_safe=False)
+    assert decide(unsafe, policy)[2].move == 'STAY'
+    danger = replace(w, threats=(Object('enemy',Position(52,50)),))
+    assert decide(danger, policy)[2] == decide(danger)[2]
+    deployment.rollback('ppal-policy', reason='fixture revocation', to_baseline=True,
+                        authorization=dict(target='ppal-policy',source='software test'))
+    with pytest.raises(ValueError, match='current qualified'):
+        load_policy(path)
+    from experiments.ppal.policy_loading import load_startup_policy
+    restored, error = load_startup_policy(path)
+    assert restored is None and error and decide(w, restored)[2] == plain
+
+
+def test_retained_values_cannot_be_replaced_or_duplicated(tmp_path):
+    import copy
+    from experiments.ppal.tactical_memory import TacticalDiagnosticMemory, positioning_spec, _canonical
+    from experiments.ppal.qualified_policy import validate_spec
+    from test_tactical_diagnostic_memory import eligible_outcome
+    from hashlib import sha256
+    memory = TacticalDiagnosticMemory(tmp_path/'retained.json')
+    for number in range(2):
+        memory.record(eligible_outcome(str(number), move='E'),
+                      episode=f'fixture-{number}', evidence_id=f'e-{number}')
+    spec = positioning_spec(memory)
+    changed = copy.deepcopy(spec)
+    changed['parameters']['positioning_preference']['E'] = -1
+    with pytest.raises(ValueError, match='differ'):
+        validate_spec(changed)
+    changed = copy.deepcopy(spec)
+    changed['retained_tactics']['evidence']['outcomes'] *= 2
+    changed['retained_tactics']['sha256'] = sha256(_canonical(changed['retained_tactics']['evidence']).encode()).hexdigest()
+    with pytest.raises(ValueError, match='duplicate'):
+        validate_spec(changed)

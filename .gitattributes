@@ -1,0 +1,19 @@
+
+# Preserve downloaded test evidence verbatim, including terminal whitespace.
+docs/consultation/native-notice/evidence/*.txt -whitespace
+
+# Preserve the authoritative mission and terminal receipts as published.
+docs/runtime-adoption/UNIFIED_RUNTIME_ADOPTION_CODEX_MISSION_20261110.md -whitespace
+docs/runtime-adoption/evidence/*.txt -whitespace
+
+# Preserve original donor documentation/source whitespace.
+docs/elegoo-network/** -whitespace
+docs/validation/pr31-owner-uno-20261110/** -whitespace
+firmware/elegoo-s3-camera/ElegooS3Camera/camera_index.h -whitespace
+firmware/elegoo-s3-camera/ElegooS3Camera/camera_index.html -whitespace
+firmware/elegoo-s3-camera/ElegooS3Camera/StockCameraIndex.h -whitespace
+firmware/elegoo-s3-camera/MISSION.md -whitespace
+firmware/elegoo-s3-camera/tests/stubs/mbedtls/md.h -whitespace
+# Preserve raw JUnit failure tracebacks verbatim.
+docs/runtime-adoption/evidence/*.xml -whitespace
+docs/runtime-adoption/evidence/*.log -whitespace

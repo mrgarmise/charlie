@@ -1,0 +1,297 @@
+﻿2026-10-26T01:03:48.3031591Z Current runner version: '2.338.0'
+2026-10-26T01:03:48.3051836Z ##[group]Runner Image Provisioner
+2026-10-26T01:03:48.3052589Z Hosted Compute Agent
+2026-10-26T01:03:48.3053087Z Version: 20261021.618
+2026-10-26T01:03:48.3053658Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+2026-10-26T01:03:48.3054243Z Build Date: 2026-10-21T00:45:21Z
+2026-10-26T01:03:48.3054827Z Worker ID: {6b890776-c037-4c49-98ce-4adc056a7a75}
+2026-10-26T01:03:48.3055410Z Region: westus3
+2026-10-26T01:03:48.3055898Z Cloud: Azure
+2026-10-26T01:03:48.3056370Z ##[endgroup]
+2026-10-26T01:03:48.3057729Z ##[group]Operating System
+2026-10-26T01:03:48.3058332Z Ubuntu
+2026-10-26T01:03:48.3058776Z 26.04.1
+2026-10-26T01:03:48.3059234Z LTS
+2026-10-26T01:03:48.3059697Z ##[endgroup]
+2026-10-26T01:03:48.3060158Z ##[group]Runner Image
+2026-10-26T01:03:48.3060635Z Image: ubuntu-26.04
+2026-10-26T01:03:48.3061151Z Version: 20261012.163.1
+2026-10-26T01:03:48.3062181Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261012.163/images/ubuntu/Ubuntu2604-Readme.md
+2026-10-26T01:03:48.3063460Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261012.163
+2026-10-26T01:03:48.3064218Z ##[endgroup]
+2026-10-26T01:03:48.3065172Z ##[group]GITHUB_TOKEN Permissions
+2026-10-26T01:03:48.3067269Z Contents: read
+2026-10-26T01:03:48.3067831Z Metadata: read
+2026-10-26T01:03:48.3068302Z ##[endgroup]
+2026-10-26T01:03:48.3070051Z Secret source: Actions
+2026-10-26T01:03:48.3070822Z Cache mode: write
+2026-10-26T01:03:48.3071446Z Prepare workflow directory
+2026-10-26T01:03:48.3324873Z Prepare all required actions
+2026-10-26T01:03:48.3373698Z Getting action download info
+2026-10-26T01:03:48.6591413Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-26T01:03:48.9004008Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-10-26T01:03:49.1955028Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-26T01:03:49.8881677Z Complete job name: software
+2026-10-26T01:03:49.9740656Z ##[group]Run actions/checkout@v4
+2026-10-26T01:03:49.9742361Z with:
+2026-10-26T01:03:49.9743236Z   fetch-depth: 0
+2026-10-26T01:03:49.9743982Z   repository: mrgarmise/charlie
+2026-10-26T01:03:49.9750800Z   token: ***
+2026-10-26T01:03:49.9751504Z   ssh-strict: true
+2026-10-26T01:03:49.9752220Z   ssh-user: git
+2026-10-26T01:03:49.9753007Z   persist-credentials: true
+2026-10-26T01:03:49.9753813Z   clean: true
+2026-10-26T01:03:49.9754550Z   sparse-checkout-cone-mode: true
+2026-10-26T01:03:49.9755940Z   fetch-tags: false
+2026-10-26T01:03:49.9756888Z   show-progress: true
+2026-10-26T01:03:49.9757833Z   lfs: false
+2026-10-26T01:03:49.9758543Z   submodules: false
+2026-10-26T01:03:49.9759285Z   set-safe-directory: true
+2026-10-26T01:03:49.9760129Z   allow-unsafe-pr-checkout: false
+2026-10-26T01:03:49.9761354Z ##[endgroup]
+2026-10-26T01:03:50.0604201Z Syncing repository: mrgarmise/charlie
+2026-10-26T01:03:50.0606835Z ##[group]Getting Git version info
+2026-10-26T01:03:50.0608195Z Working directory is '/home/runner/work/charlie/charlie'
+2026-10-26T01:03:50.0609877Z [command]/usr/bin/git version
+2026-10-26T01:03:50.0611105Z git version 2.55.0
+2026-10-26T01:03:50.0614443Z ##[endgroup]
+2026-10-26T01:03:50.0626347Z Temporarily overriding HOME='/home/runner/work/_temp/1a3b2a43-c137-44b3-abe0-f7e96df1f512' before making global git config changes
+2026-10-26T01:03:50.0629006Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-26T01:03:50.0631251Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/charlie/charlie
+2026-10-26T01:03:50.1128439Z Deleting the contents of '/home/runner/work/charlie/charlie'
+2026-10-26T01:03:50.1131149Z ##[group]Initializing the repository
+2026-10-26T01:03:50.1132955Z [command]/usr/bin/git init /home/runner/work/charlie/charlie
+2026-10-26T01:03:50.2397971Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-26T01:03:50.2401194Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-26T01:03:50.2403104Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-26T01:03:50.2404482Z hint: call:
+2026-10-26T01:03:50.2405762Z hint:
+2026-10-26T01:03:50.2407475Z hint: 	git config --global init.defaultBranch <name>
+2026-10-26T01:03:50.2409198Z hint:
+2026-10-26T01:03:50.2410697Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-26T01:03:50.2412988Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-26T01:03:50.2414846Z hint:
+2026-10-26T01:03:50.2415940Z hint: 	git branch -m <name>
+2026-10-26T01:03:50.2417940Z hint:
+2026-10-26T01:03:50.2419157Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-26T01:03:50.2421228Z Initialized empty Git repository in /home/runner/work/charlie/charlie/.git/
+2026-10-26T01:03:50.2424649Z [command]/usr/bin/git remote add origin https://github.com/mrgarmise/charlie
+2026-10-26T01:03:50.2995985Z ##[endgroup]
+2026-10-26T01:03:50.2998051Z ##[group]Disabling automatic garbage collection
+2026-10-26T01:03:50.2999957Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-26T01:03:50.3050767Z ##[endgroup]
+2026-10-26T01:03:50.3052019Z ##[group]Setting up auth
+2026-10-26T01:03:50.3057556Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-26T01:03:50.3086099Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-26T01:03:50.3420423Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-26T01:03:50.3450177Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-26T01:03:50.3688345Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-26T01:03:50.3719892Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-26T01:03:50.3963175Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-26T01:03:50.3997340Z ##[endgroup]
+2026-10-26T01:03:50.3999257Z ##[group]Fetching the repository
+2026-10-26T01:03:50.4006913Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-10-26T01:03:52.3228678Z From https://github.com/mrgarmise/charlie
+2026-10-26T01:03:52.3229394Z  * [new branch]      feature/active-vision  -> origin/feature/active-vision
+2026-10-26T01:03:52.3230083Z  * [new branch]      feature/agency-first-self -> origin/feature/agency-first-self
+2026-10-26T01:03:52.3230778Z  * [new branch]      feature/ala2-causal-acceptance -> origin/feature/ala2-causal-acceptance
+2026-10-26T01:03:52.3231692Z  * [new branch]      feature/ala2-experience-to-decision-recovery -> origin/feature/ala2-experience-to-decision-recovery
+2026-10-26T01:03:52.3232456Z  * [new branch]      feature/ala2-thermal-recovery -> origin/feature/ala2-thermal-recovery
+2026-10-26T01:03:52.3233194Z  * [new branch]      feature/autonomous-camera-calibration -> origin/feature/autonomous-camera-calibration
+2026-10-26T01:03:52.3234077Z  * [new branch]      feature/best-of-charlie-consolidation -> origin/feature/best-of-charlie-consolidation
+2026-10-26T01:03:52.3234846Z  * [new branch]      feature/charlie-memory -> origin/feature/charlie-memory
+2026-10-26T01:03:52.3235501Z  * [new branch]      feature/charlie-vision-lab -> origin/feature/charlie-vision-lab
+2026-10-26T01:03:52.3236173Z  * [new branch]      feature/closed-loop-gameplay -> origin/feature/closed-loop-gameplay
+2026-10-26T01:03:52.3237204Z  * [new branch]      feature/e1-information-yield-shadow -> origin/feature/e1-information-yield-shadow
+2026-10-26T01:03:52.3238347Z  * [new branch]      feature/e1-native-causal-probe -> origin/feature/e1-native-causal-probe
+2026-10-26T01:03:52.3239132Z  * [new branch]      feature/fast-projectile-self -> origin/feature/fast-projectile-self
+2026-10-26T01:03:52.3240002Z  * [new branch]      feature/hailo-observation-bridge -> origin/feature/hailo-observation-bridge
+2026-10-26T01:03:52.3240841Z  * [new branch]      feature/hailo-score-reader -> origin/feature/hailo-score-reader
+2026-10-26T01:03:52.3241633Z  * [new branch]      feature/marathon-boundary-recovery -> origin/feature/marathon-boundary-recovery
+2026-10-26T01:03:52.3242522Z  * [new branch]      feature/marathon-camera-lifecycle -> origin/feature/marathon-camera-lifecycle
+2026-10-26T01:03:52.3243545Z  * [new branch]      feature/mobile-perception-pet-following -> origin/feature/mobile-perception-pet-following
+2026-10-26T01:03:52.3244461Z  * [new branch]      feature/native-marathon-restart -> origin/feature/native-marathon-restart
+2026-10-26T01:03:52.3245233Z  * [new branch]      feature/native-terminal-forensics -> origin/feature/native-terminal-forensics
+2026-10-26T01:03:52.3246027Z  * [new branch]      feature/object-label-picoed-display -> origin/feature/object-label-picoed-display
+2026-10-26T01:03:52.3246862Z  * [new branch]      feature/persistent-agency-recovery -> origin/feature/persistent-agency-recovery
+2026-10-26T01:03:52.3247961Z  * [new branch]      feature/ppal-integration -> origin/feature/ppal-integration
+2026-10-26T01:03:52.3248589Z  * [new branch]      feature/ppal-vision-focus -> origin/feature/ppal-vision-focus
+2026-10-26T01:03:52.3249375Z  * [new branch]      feature/progress-aware-marathon-watchdog -> origin/feature/progress-aware-marathon-watchdog
+2026-10-26T01:03:52.3250353Z  * [new branch]      feature/prompt-terminal-restart -> origin/feature/prompt-terminal-restart
+2026-10-26T01:03:52.3251036Z  * [new branch]      feature/robotron-score-tracker -> origin/feature/robotron-score-tracker
+2026-10-26T01:03:52.3251873Z  * [new branch]      feature/score-feedback-master-integration -> origin/feature/score-feedback-master-integration
+2026-10-26T01:03:52.3252545Z  * [new branch]      fix/robotron-learning-readiness -> origin/fix/robotron-learning-readiness
+2026-10-26T01:03:52.3253305Z  * [new branch]      integration/native-marathon-20261020 -> origin/integration/native-marathon-20261020
+2026-10-26T01:03:52.3253726Z  * [new branch]      master                 -> origin/master
+2026-10-26T01:03:52.3254047Z  * [new tag]         best-of-charlie-v0.1.0 -> best-of-charlie-v0.1.0
+2026-10-26T01:03:52.3255296Z [command]/usr/bin/git branch --list --remote origin/feature/object-label-picoed-display
+2026-10-26T01:03:52.3269889Z   origin/feature/object-label-picoed-display
+2026-10-26T01:03:52.3277326Z [command]/usr/bin/git rev-parse refs/remotes/origin/feature/object-label-picoed-display
+2026-10-26T01:03:52.3297307Z 217a329fc8850dac92ccbd38387b65a644eb8abb
+2026-10-26T01:03:52.3300783Z ##[endgroup]
+2026-10-26T01:03:52.3301194Z ##[group]Determining the checkout info
+2026-10-26T01:03:52.3301928Z ##[endgroup]
+2026-10-26T01:03:52.3305754Z [command]/usr/bin/git sparse-checkout disable
+2026-10-26T01:03:52.3408006Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-26T01:03:52.3434484Z ##[group]Checking out the ref
+2026-10-26T01:03:52.3437884Z [command]/usr/bin/git checkout --progress --force -B feature/object-label-picoed-display refs/remotes/origin/feature/object-label-picoed-display
+2026-10-26T01:03:52.4936165Z Switched to a new branch 'feature/object-label-picoed-display'
+2026-10-26T01:03:52.4949146Z branch 'feature/object-label-picoed-display' set up to track 'origin/feature/object-label-picoed-display'.
+2026-10-26T01:03:52.4950538Z ##[endgroup]
+2026-10-26T01:03:52.4995473Z [command]/usr/bin/git log -1 --format=%H
+2026-10-26T01:03:52.5017354Z 217a329fc8850dac92ccbd38387b65a644eb8abb
+2026-10-26T01:03:52.5303827Z ##[group]Run actions/setup-python@v5
+2026-10-26T01:03:52.5304195Z with:
+2026-10-26T01:03:52.5304363Z   python-version: 3.12
+2026-10-26T01:03:52.5304548Z   check-latest: false
+2026-10-26T01:03:52.5306380Z   token: ***
+2026-10-26T01:03:52.5306558Z   update-environment: true
+2026-10-26T01:03:52.5306759Z   allow-prereleases: false
+2026-10-26T01:03:52.5307188Z   freethreaded: false
+2026-10-26T01:03:52.5307367Z ##[endgroup]
+2026-10-26T01:03:52.6362879Z ##[group]Installed versions
+2026-10-26T01:03:52.7011282Z (node:2141) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-26T01:03:52.7012025Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-26T01:03:52.7012481Z Successfully set up CPython (3.12.15)
+2026-10-26T01:03:52.7013069Z ##[endgroup]
+2026-10-26T01:03:52.7177994Z ##[group]Run python -m pip install -r requirements.txt pytest
+2026-10-26T01:03:52.7178403Z [36;1mpython -m pip install -r requirements.txt pytest[0m
+2026-10-26T01:03:52.9012583Z shell: /usr/bin/bash -e {0}
+2026-10-26T01:03:52.9012845Z env:
+2026-10-26T01:03:52.9013084Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:03:52.9013448Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-26T01:03:52.9013786Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:03:52.9014086Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:03:52.9014389Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:03:52.9014679Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-26T01:03:52.9014931Z ##[endgroup]
+2026-10-26T01:03:57.9835263Z Collecting pytest
+2026-10-26T01:03:58.0043164Z   Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+2026-10-26T01:03:58.0350604Z Collecting pyserial==3.5 (from -r requirements.txt (line 2))
+2026-10-26T01:03:58.0377228Z   Downloading pyserial-3.5-py2.py3-none-any.whl.metadata (1.6 kB)
+2026-10-26T01:03:58.2059317Z Collecting numpy<3,>=1.26 (from -r requirements.txt (line 3))
+2026-10-26T01:03:58.2090641Z   Downloading numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+2026-10-26T01:03:58.3313453Z Collecting Pillow<13,>=10 (from -r requirements.txt (line 4))
+2026-10-26T01:03:58.3343960Z   Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.1 kB)
+2026-10-26T01:03:58.3775839Z Collecting opencv-python-headless<6,>=4.8 (from -r requirements.txt (line 5))
+2026-10-26T01:03:58.3804001Z   Downloading opencv_python_headless-5.0.0.93-cp37-abi3-manylinux_2_28_x86_64.whl.metadata (19 kB)
+2026-10-26T01:03:58.5834306Z Collecting mpremote<2,>=1.24 (from -r requirements.txt (line 7))
+2026-10-26T01:03:58.5881512Z   Downloading mpremote-1.29.0-py3-none-any.whl.metadata (4.3 kB)
+2026-10-26T01:03:58.6242977Z Collecting platformdirs>=4.3.7 (from mpremote<2,>=1.24->-r requirements.txt (line 7))
+2026-10-26T01:03:58.6273639Z   Downloading platformdirs-4.13.5-py3-none-any.whl.metadata (5.5 kB)
+2026-10-26T01:03:58.6450414Z Collecting iniconfig>=1.0.1 (from pytest)
+2026-10-26T01:03:58.6478510Z   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+2026-10-26T01:03:58.6659385Z Collecting packaging>=22 (from pytest)
+2026-10-26T01:03:58.6690341Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-26T01:03:58.6854690Z Collecting pluggy<2,>=1.5 (from pytest)
+2026-10-26T01:03:58.6880807Z   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+2026-10-26T01:03:58.7080332Z Collecting pygments>=2.7.2 (from pytest)
+2026-10-26T01:03:58.7107290Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-10-26T01:03:58.7173948Z Downloading pyserial-3.5-py2.py3-none-any.whl (90 kB)
+2026-10-26T01:03:58.7231382Z Downloading numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+2026-10-26T01:03:58.8708308Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 113.8 MB/s  0:00:00
+2026-10-26T01:03:58.8759516Z Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.9 MB)
+2026-10-26T01:03:58.9278305Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.9/6.9 MB 134.4 MB/s  0:00:00
+2026-10-26T01:03:58.9311667Z Downloading opencv_python_headless-5.0.0.93-cp37-abi3-manylinux_2_28_x86_64.whl (61.2 MB)
+2026-10-26T01:03:59.3963185Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.2/61.2 MB 131.6 MB/s  0:00:00
+2026-10-26T01:03:59.3996240Z Downloading mpremote-1.29.0-py3-none-any.whl (38 kB)
+2026-10-26T01:03:59.4049382Z Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+2026-10-26T01:03:59.4118629Z Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+2026-10-26T01:03:59.4161845Z Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+2026-10-26T01:03:59.4265403Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-26T01:03:59.4311404Z Downloading platformdirs-4.13.5-py3-none-any.whl (32 kB)
+2026-10-26T01:03:59.4352300Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-10-26T01:03:59.4459256Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 113.1 MB/s  0:00:00
+2026-10-26T01:03:59.6644164Z Installing collected packages: pyserial, pygments, pluggy, platformdirs, Pillow, packaging, numpy, iniconfig, pytest, opencv-python-headless, mpremote
+2026-10-26T01:04:03.2714944Z 
+2026-10-26T01:04:03.2727697Z Successfully installed Pillow-12.3.0 iniconfig-2.3.1 mpremote-1.29.0 numpy-2.5.4 opencv-python-headless-5.0.0.93 packaging-26.3 platformdirs-4.13.5 pluggy-1.7.0 pygments-2.21.0 pyserial-3.5 pytest-9.1.1
+2026-10-26T01:04:03.2734232Z 
+2026-10-26T01:04:03.2734448Z [notice] A new release of pip is available: 26.2.1 -> 26.2.2
+2026-10-26T01:04:03.2734846Z [notice] To update, run: pip install --upgrade pip
+2026-10-26T01:04:03.3386166Z ##[group]Run python -m pytest tests -q --junitxml=object-label-tests.xml
+2026-10-26T01:04:03.3386599Z [36;1mpython -m pytest tests -q --junitxml=object-label-tests.xml[0m
+2026-10-26T01:04:03.3441726Z shell: /usr/bin/bash -e {0}
+2026-10-26T01:04:03.3441936Z env:
+2026-10-26T01:04:03.3442161Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:04:03.3442529Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-26T01:04:03.3442864Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:04:03.3443155Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:04:03.3443440Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:04:03.3443727Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-26T01:04:03.3443980Z ##[endgroup]
+2026-10-26T01:04:35.8647839Z ........................................................................ [  5%]
+2026-10-26T01:04:41.2883515Z .........................ss.ss.ss................s..sssss.ss..ssss...... [ 10%]
+2026-10-26T01:04:44.4788582Z ........................................................................ [ 15%]
+2026-10-26T01:04:54.4066414Z ........................................................................ [ 20%]
+2026-10-26T01:04:55.9112682Z ........................................................................ [ 25%]
+2026-10-26T01:05:42.3223520Z ...............................................................s........ [ 31%]
+2026-10-26T01:05:55.0162310Z ........................................................................ [ 36%]
+2026-10-26T01:06:03.4801104Z ........................................................................ [ 41%]
+2026-10-26T01:06:03.7159243Z ........................................................................ [ 46%]
+2026-10-26T01:06:15.1546827Z ........................................................................ [ 51%]
+2026-10-26T01:06:32.5660718Z ........................................................................ [ 56%]
+2026-10-26T01:06:38.2193239Z ........................................................................ [ 62%]
+2026-10-26T01:06:44.3535689Z ........................................................................ [ 67%]
+2026-10-26T01:06:56.1716239Z ........................................................................ [ 72%]
+2026-10-26T01:07:06.9275744Z ........................................................................ [ 77%]
+2026-10-26T01:08:39.4274858Z ........................................................................ [ 82%]
+2026-10-26T01:09:02.3449798Z .................................................s...................... [ 88%]
+2026-10-26T01:09:05.9598752Z ........................................................................ [ 93%]
+2026-10-26T01:09:10.0625900Z ........................................................................ [ 98%]
+2026-10-26T01:09:10.7130487Z ......................                                                   [100%]
+2026-10-26T01:09:10.7131163Z =============================== warnings summary ===============================
+2026-10-26T01:09:10.7132035Z tests/test_thermal_recovery.py::test_restart_retains_same_investigation_checkpoint_and_no_duplicates
+2026-10-26T01:09:10.7133048Z   tests/test_thermal_recovery.py:127: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+2026-10-26T01:09:10.7134126Z     def test_restart_retains_same_investigation_checkpoint_and_no_duplicates(tmp_path,monkeypatch,record_property):
+2026-10-26T01:09:10.7134715Z 
+2026-10-26T01:09:10.7135221Z -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2026-10-26T01:09:10.7136838Z 1370 passed, 21 skipped, 1 warning in 306.31s (0:05:06)
+2026-10-26T01:09:10.8227588Z ##[group]Run actions/upload-artifact@v4
+2026-10-26T01:09:10.8227839Z with:
+2026-10-26T01:09:10.8228019Z   name: object-label-software-tests
+2026-10-26T01:09:10.8228246Z   path: object-label-tests.xml
+2026-10-26T01:09:10.8228456Z   if-no-files-found: warn
+2026-10-26T01:09:10.8228650Z   compression-level: 6
+2026-10-26T01:09:10.8228828Z   overwrite: false
+2026-10-26T01:09:10.8229011Z   include-hidden-files: false
+2026-10-26T01:09:10.8229206Z env:
+2026-10-26T01:09:10.8229410Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:09:10.8229745Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+2026-10-26T01:09:10.8230096Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:09:10.8230393Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:09:10.8230688Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+2026-10-26T01:09:10.8230985Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+2026-10-26T01:09:10.8231267Z ##[endgroup]
+2026-10-26T01:09:10.9576575Z (node:4108) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-26T01:09:10.9577323Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-26T01:09:10.9613799Z With the provided path, there will be 1 file uploaded
+2026-10-26T01:09:10.9618752Z Artifact name is valid!
+2026-10-26T01:09:10.9619153Z Root directory input is valid!
+2026-10-26T01:09:11.2797162Z Beginning upload of artifact content to blob storage
+2026-10-26T01:09:11.2980315Z (node:4108) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-26T01:09:11.5473247Z Uploaded bytes 30510
+2026-10-26T01:09:11.6043671Z Finished uploading artifact content to blob storage!
+2026-10-26T01:09:11.6044269Z SHA256 digest of uploaded artifact zip is 6bb1a6e13fc60b96196522cd74d9f7b76f1bd83038702d0fcc7ced49fd031fb5
+2026-10-26T01:09:11.6045199Z Finalizing artifact upload
+2026-10-26T01:09:12.0416589Z Artifact object-label-software-tests.zip successfully finalized. Artifact ID 12620294978
+2026-10-26T01:09:12.0417625Z Artifact object-label-software-tests has been successfully uploaded! Final size is 30510 bytes. Artifact ID is 12620294978
+2026-10-26T01:09:12.0422957Z Artifact download URL: https://github.com/mrgarmise/charlie/actions/runs/40252336655/artifacts/12620294978
+2026-10-26T01:09:12.0592137Z Post job cleanup.
+2026-10-26T01:09:12.1537911Z (node:4120) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-26T01:09:12.1538752Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-26T01:09:12.1727751Z Post job cleanup.
+2026-10-26T01:09:12.2637995Z [command]/usr/bin/git version
+2026-10-26T01:09:12.2670605Z git version 2.55.0
+2026-10-26T01:09:12.2700125Z Temporarily overriding HOME='/home/runner/work/_temp/f91d4cd2-7047-4710-8b72-28d012a00bce' before making global git config changes
+2026-10-26T01:09:12.2701301Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-26T01:09:12.2704853Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/charlie/charlie
+2026-10-26T01:09:12.2744753Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-26T01:09:12.2778526Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-26T01:09:12.3069043Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-26T01:09:12.3093870Z http.https://github.com/.extraheader
+2026-10-26T01:09:12.3104245Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-26T01:09:12.3162592Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-26T01:09:12.3481219Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-26T01:09:12.3522095Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-26T01:09:12.3910772Z Cleaning up orphan processes
+2026-10-26T01:09:12.4241070Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

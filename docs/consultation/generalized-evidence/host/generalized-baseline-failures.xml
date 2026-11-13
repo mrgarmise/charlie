@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="1.779" timestamp="2026-11-10T18:53:02.898999+00:00" hostname="charlie"><testcase classname="tests.test_brain_calibration" name="test_actual_normal_main_runs_calibration_and_resumes_tracking" time="0.395"><failure message="Failed: normal application failed to complete calibration">integrated = namespace(host=&lt;hardware.rp2040_controller.RP2040Controller object at 0x7fff051357f0&gt;, a=&lt;authority_test.ServoControll...0, 90], 'powered_initialization_verified': True, 'reviewer': 'reviewer_001', 'evidence': 'FAKE_powered_start_review'}})
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fff05293bb0&gt;
+
+    def test_actual_normal_main_runs_calibration_and_resumes_tracking(integrated, monkeypatch):
+        import runpy
+        import hardware.rp2040_controller
+        import motion.controller
+        import vision.detector
+        f = integrated
+        import main
+        class Worker:
+            def __init__(self, **kwargs): self.alive = True
+            def start(self): pass
+            def is_alive(self): return self.alive
+            def terminate(self): self.alive = False
+            def join(self, **kwargs): pass
+        monkeypatch.setattr(main.multiprocessing, 'get_context', lambda *a: SimpleNamespace(Process=Worker))
+        camera = SimpleNamespace(read=f.frame, close=lambda: None)
+        f.s.request('uncertain', dict(reason='simulated normal-brain calibration request'))
+        monkeypatch.setitem(sys.modules, 'vision.camera', SimpleNamespace(Camera=lambda: camera))
+        from camera_application_fixture import install
+        install(monkeypatch,main,camera)
+        monkeypatch.setattr(hardware.rp2040_controller, 'RP2040Controller', lambda: f.host)
+        monkeypatch.setattr(motion.controller, 'RP2040Controller', lambda: f.host)
+        f.host.close = lambda: None
+        monkeypatch.setattr(CalibrationService, 'open', classmethod(lambda cls, *args: f.s))
+        attach = f.s.attach_brain
+        monkeypatch.setattr(f.s, 'attach_brain', lambda **options: attach(**options, simulated=True, maximum_steps=8))
+        bus_ref = []
+        monkeypatch.setitem(sys.modules, 'stimulus.keyboard', SimpleNamespace(KeyboardStimulus=lambda bus, **kwargs: (bus_ref.append(bus) or SimpleNamespace(close=lambda:None))))
+        monkeypatch.setattr(vision.detector, 'ColorDetector', lambda **options:
+            SimpleNamespace(detect=lambda frame: dict(x=460, y=180, width=10, height=10)
+                            if f.s.brain.session is None and f.s.brain.responses else None))
+        monkeypatch.setenv('CHARLIE_NECK_MOTION_AUTHORIZED', '1')
+        monkeypatch.setenv('CHARLIE_NECK_SUPERVISED', '1')
+        ticks = [0]
+        class EndApplication(BaseException): pass
+        def sleep(_):
+            ticks[0] += 1
+            brain = f.s.brain
+            if brain.last_state == 'VERIFY_INITIAL': bus_ref[0].emit('confirm_neck_start')
+            state = f.a.calibration.state
+            # One supervised contact at the first prepared increment only.
+            f.b.pressed[0] = state == 'PREPARED' and ticks[0] &lt; 9
+            for _ in range(5): f.b.now[0] += 20; f.a.update()
+            if brain.tracking_pending is not None and brain.session is None:
+                raise EndApplication()
+            if ticks[0] &gt; 150: pytest.fail('normal application failed to complete calibration')
+        monkeypatch.setattr('time.sleep', sleep)
+        with pytest.raises(EndApplication):
+            import main
+&gt;           main.main(['--hardware','--learning-state',str(f.root/'application-state')])
+
+tests/test_brain_calibration.py:259: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+main.py:378: in main
+    time.sleep(.02)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+_ = 4
+
+    def sleep(_):
+        ticks[0] += 1
+        brain = f.s.brain
+        if brain.last_state == 'VERIFY_INITIAL': bus_ref[0].emit('confirm_neck_start')
+        state = f.a.calibration.state
+        # One supervised contact at the first prepared increment only.
+        f.b.pressed[0] = state == 'PREPARED' and ticks[0] &lt; 9
+        for _ in range(5): f.b.now[0] += 20; f.a.update()
+        if brain.tracking_pending is not None and brain.session is None:
+            raise EndApplication()
+&gt;       if ticks[0] &gt; 150: pytest.fail('normal application failed to complete calibration')
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: normal application failed to complete calibration
+
+tests/test_brain_calibration.py:255: Failed</failure></testcase><testcase classname="tests.test_consultation_activation" name="test_operational_protocol_over_real_loopback[False]" time="0.001"><failure message="PermissionError: [Errno 1] Operation not permitted">native_fakes = namespace(path=PosixPath('/tmp/pytest-of-five/pytest-39/test_operational_protocol_over0/private/approval.json'), mode=...a0&gt;, marker=PosixPath('/tmp/pytest-of-five/pytest-39/test_operational_protocol_over0/private/completion-unknown.json'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fff05292ea0&gt;
+ready = False
+
+    @pytest.mark.parametrize('ready', [False,True])
+    def test_operational_protocol_over_real_loopback(native_fakes,monkeypatch,ready):
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+        from threading import Thread
+        from learning.consultation import _http
+        state={'loaded':ready,'requests':[]}
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self,*args):pass
+            def reply(self,value):
+                raw=json.dumps(value).encode();self.send_response(200)
+                self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)
+            def do_GET(self):
+                if self.path=='/api/version':return self.reply({'version':'fixture'})
+                assert self.path=='/api/ps'
+                self.reply(resident(approval()) if state['loaded'] else {'models':[]})
+            def do_POST(self):
+                assert self.path=='/api/chat'
+                value=json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+                state['requests'].append(value);state['loaded']=False
+                self.reply(dict(model=activation.MODEL,done=True,message=dict(content='Unverified loopback fixture.')))
+&gt;       server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_consultation_activation.py:351: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</failure></testcase><testcase classname="tests.test_consultation_activation" name="test_operational_protocol_over_real_loopback[True]" time="0.001"><failure message="PermissionError: [Errno 1] Operation not permitted">native_fakes = namespace(path=PosixPath('/tmp/pytest-of-five/pytest-39/test_operational_protocol_over1/private/approval.json'), mode=...c0&gt;, marker=PosixPath('/tmp/pytest-of-five/pytest-39/test_operational_protocol_over1/private/completion-unknown.json'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fff04cec3b0&gt;
+ready = True
+
+    @pytest.mark.parametrize('ready', [False,True])
+    def test_operational_protocol_over_real_loopback(native_fakes,monkeypatch,ready):
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+        from threading import Thread
+        from learning.consultation import _http
+        state={'loaded':ready,'requests':[]}
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self,*args):pass
+            def reply(self,value):
+                raw=json.dumps(value).encode();self.send_response(200)
+                self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)
+            def do_GET(self):
+                if self.path=='/api/version':return self.reply({'version':'fixture'})
+                assert self.path=='/api/ps'
+                self.reply(resident(approval()) if state['loaded'] else {'models':[]})
+            def do_POST(self):
+                assert self.path=='/api/chat'
+                value=json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+                state['requests'].append(value);state['loaded']=False
+                self.reply(dict(model=activation.MODEL,done=True,message=dict(content='Unverified loopback fixture.')))
+&gt;       server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_consultation_activation.py:351: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.13/socketserver.py:453: in __init__
+    self.socket = socket.socket(self.address_family,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;socket.socket fd=-1, family=0, type=0, proto=0&gt;
+family = &lt;AddressFamily.AF_INET: 2&gt;, type = &lt;SocketKind.SOCK_STREAM: 1&gt;
+proto = 0, fileno = None
+
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        # For user code address family and type values are IntEnum members, but
+        # for the underlying _socket.socket they're just integers. The
+        # constructor of _socket.socket converts the given argument to an
+        # integer automatically.
+        if fileno is None:
+            if family == -1:
+                family = AF_INET
+            if type == -1:
+                type = SOCK_STREAM
+            if proto == -1:
+                proto = 0
+&gt;       _socket.socket.__init__(self, family, type, proto, fileno)
+E       PermissionError: [Errno 1] Operation not permitted
+
+/usr/lib/python3.13/socket.py:233: PermissionError</failure></testcase></testsuite></testsuites>

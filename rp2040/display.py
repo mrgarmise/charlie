@@ -36,6 +36,29 @@ except ImportError:
     DISPLAY_AVAILABLE = False
 
 
+# Object labels only: columns of five bits, least-significant bit at the top.
+# Ordinary messages continue to use the vendor font and three-character pages.
+_OBJECT_FONT = {
+    'A': (30, 5, 30), 'B': (31, 21, 10), 'C': (14, 17, 17),
+    'D': (31, 17, 14), 'E': (31, 21, 17), 'F': (31, 5, 1),
+    'G': (14, 17, 29), 'H': (31, 4, 31), 'I': (31,),
+    'J': (8, 16, 15), 'K': (31, 4, 27), 'L': (31, 16, 16),
+    'M': (31, 6, 31), 'N': (31, 14, 31), 'O': (14, 17, 14),
+    'P': (31, 5, 2), 'Q': (14, 25, 30), 'R': (31, 5, 26),
+    'S': (18, 21, 9), 'T': (1, 31, 1), 'U': (31, 16, 31),
+    'V': (15, 16, 15), 'W': (31, 12, 31), 'X': (27, 4, 27),
+    'Y': (3, 28, 3), 'Z': (25, 21, 19),
+    '0': (31, 17, 31), '1': (2, 31), '2': (25, 21, 18),
+    '3': (17, 21, 10), '4': (7, 4, 31), '5': (23, 21, 9),
+    '6': (30, 21, 29), '7': (1, 29, 3), '8': (31, 21, 31),
+    '9': (23, 21, 15), ' ': (0,),
+}
+
+
+def _object_label_width(text):
+    return sum(len(_OBJECT_FONT[char]) for char in text) + max(0, len(text) - 1)
+
+
 class Display:
 
     WIDTH = 17
@@ -55,6 +78,11 @@ class Display:
 
     def __init__(self):
 
+        try:from meditation_notice import Notice
+        except ImportError:from rp2040.meditation_notice import Notice
+        self.meditation = Notice(time)
+        self.meditation_offset=0
+        self.meditation_step=0
         self.state = self.IDLE
 
         self.feedback_state = None
@@ -70,6 +98,11 @@ class Display:
 
         self.progress = None
         self.capability_message = None
+        self.object_label = None
+        self.object_until = 0
+        self.object_offset = self.WIDTH
+        self.object_step_ms = 100
+        self.last_object_step = 0
 
 
         if DISPLAY_AVAILABLE:
@@ -112,10 +145,13 @@ class Display:
     def status(self, state):
 
         self.state = str(state).upper()
+        if self.state in (self.NO_BRAIN,self.ERROR,self.SLEEP):self.meditation.cancel()
+        if self.state in (self.NO_BRAIN,self.ERROR,self.SLEEP):self.clear_object_label()
         self.frame = 0
 
     def capability_status(self, text):
         """Persistent capability notice below existing text/feedback priorities."""
+        if text:self.meditation.cancel()
         if text != self.capability_message:
             self.capability_message = text
             self.message_page = 0
@@ -128,6 +164,7 @@ class Display:
     def feedback(self, state, duration_ms=1500):
 
         self.feedback_state = str(state).upper()
+        if self.feedback_state==self.ERROR:self.meditation.cancel()
 
         self.feedback_until = time.ticks_add(
             time.ticks_ms(),
@@ -161,6 +198,77 @@ class Display:
 
     def queue_text(self, text):
         self.show_text(text)
+
+    def show_object_label(self, text, ttl_ms=4500, step_ms=100):
+        try:from object_label import label_request
+        except ImportError:from rp2040.object_label import label_request
+        label_request(text,ttl_ms,step_ms)
+        now=time.ticks_ms()
+        if text!=self.object_label:
+            self.object_offset=self.WIDTH
+            self.last_object_step=now
+        self.object_label=text
+        self.object_step_ms=step_ms
+        self.object_until=time.ticks_add(now,ttl_ms)
+
+    def clear_object_label(self):
+        self.object_label=None
+        self.object_until=0
+        self.object_offset=self.WIDTH
+
+    def _draw_object_label(self, now):
+        # One replaceable slot, no queue/sleep or vendor long-string show().
+        width = _object_label_width(self.object_label)
+        if width <= self.WIDTH:
+            origin = (self.WIDTH - width) // 2
+        else:
+            if time.ticks_diff(now,self.last_object_step)>=self.object_step_ms:
+                self.object_offset-=1
+                if self.object_offset < -width:self.object_offset=self.WIDTH
+                self.last_object_step=now
+            origin = self.object_offset
+        for char in self.object_label:
+            columns = _OBJECT_FONT[char]
+            if origin < self.WIDTH and origin + len(columns) > 0:
+                for x, column in enumerate(columns):
+                    for y in range(5):
+                        if column & (1 << y):
+                            self._pixel(origin+x, y+1, 40)
+            origin += len(columns) + 1
+
+    def meditation_status(self):
+        visible=bool(DISPLAY_AVAILABLE and self.state not in (self.NO_BRAIN,self.ERROR,self.SLEEP)
+                     and not self.capability_message and self.feedback_state!=self.ERROR)
+        result=self.meditation.status(visible)
+        result['available']=bool(DISPLAY_AVAILABLE)
+        return result
+
+    def show_meditation(self, session, slot, sequence, ttl_ms, phase):
+        if phase!='CLEAR' and (not DISPLAY_AVAILABLE or self.state in (self.NO_BRAIN,self.ERROR,self.SLEEP)
+                or self.capability_message or self.feedback_state==self.ERROR):
+            raise ValueError('MEDITATION_DISPLAY_PREEMPTED')
+        was=self.meditation.slot
+        changed=self.meditation.apply(session,slot,sequence,ttl_ms,phase)
+        if changed and not was:
+            self.meditation_offset=0;self.meditation_step=time.ticks_ms()
+        # Render before acknowledging; pixel visibility still needs native acceptance.
+        self.clear()
+        if self.meditation.slot:self._draw_meditation(time.ticks_ms())
+        return self.meditation_status()
+
+    def _draw_meditation(self, now):
+        text='MEDITATING PLEASE WAIT'
+        width=_object_label_width(text)
+        if time.ticks_diff(now,self.meditation_step)>=150:
+            self.meditation_offset-=1
+            if self.meditation_offset < -width:self.meditation_offset=self.WIDTH
+            self.meditation_step=now
+        origin=self.meditation_offset
+        for char in text:
+            for x,column in enumerate(_OBJECT_FONT[char]):
+                for y in range(5):
+                    if column & (1<<y):self._pixel(origin+x,y+1,40)
+            origin+=len(_OBJECT_FONT[char])+1
 
     def rx_activity(self):
         self.show_text("RX", 600)
@@ -606,6 +714,16 @@ class Display:
         self.frame += 1
 
         self.clear()
+        if self.object_label and time.ticks_diff(self.object_until,now)<=0:self.clear_object_label()
+        # Safety/watchdog states always outrank observational labels.
+        if self.state in (self.NO_BRAIN,self.ERROR):
+            self._draw_named_state(self.state)
+            return
+
+        # Reserved meditation outranks ordinary messages/labels, never safety.
+        if self.meditation_status()['visible']:
+            self._draw_meditation(now)
+            return
 
         # Temporary text has highest priority.
 
@@ -658,6 +776,10 @@ class Display:
             self.message = self.capability_message
             self._draw_message()
             self.message = temporary
+            return
+
+        if self.object_label and self.state!=self.SLEEP and self.progress is None:
+            self._draw_object_label(now)
             return
 
         self._draw_named_state(

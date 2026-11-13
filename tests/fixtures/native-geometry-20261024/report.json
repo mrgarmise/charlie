@@ -1,0 +1,230 @@
+{
+  "performance": {
+    "schema": "charlie-gameplay-performance-v1",
+    "meaningful_updates": 0,
+    "meaningful_definition": "one distinct exposure at most 250ms old with supported SELF used for an existing Forebrain/Hindbrain decision",
+    "sustained_hz": null,
+    "sample_retention": "last 2048 samples; sustained counter spans the whole run",
+    "camera_to_decision_seconds": {
+      "samples": 0,
+      "median": null,
+      "p95": null,
+      "worst": null
+    },
+    "interruptions_seconds": {
+      "samples": 0,
+      "median": null,
+      "p95": null,
+      "worst": null
+    },
+    "stage_seconds": {},
+    "controller_visual_feedback_seconds": {
+      "samples": 0,
+      "median": null,
+      "p95": null,
+      "worst": null
+    },
+    "feedback_status": "only independently resolved command-to-visual attribution may populate this metric; otherwise unmeasured",
+    "self_identity_changes": 0,
+    "stream": null,
+    "full_screen_calls": 0,
+    "fast_screen_calls": 0,
+    "recording": null,
+    "process_cpu_seconds": 54.443584,
+    "maximum_rss_kib": 253440,
+    "temperature_c": 53.45,
+    "native_target_hz": [
+      8,
+      12
+    ],
+    "native_target_qualification": "requires authentic sustained native run; host replay is not acceptance"
+  },
+  "session_timing": {
+    "clock": "monotonic",
+    "gameplay_timer_boundary": "after SELF discovery; includes reacquisition",
+    "first_life_lost_at": null,
+    "life_tracking": "unmeasured; SELF loss is not a life boundary",
+    "camera_initialization_started": 1584.029152837,
+    "evidence_recording_started": 1584.28140316,
+    "calibration_started": 1585.270419961,
+    "stopped_at": 1625.529180155
+  },
+  "session_transitions": [
+    {
+      "at": 1625.529192321,
+      "old": "unknown",
+      "new": "stopped",
+      "reason": "ERROR: ValueError: No complete game border found; include all corners and aim more squarely at TV; preflight could not establish stable Robotron geometry"
+    }
+  ],
+  "session_events": "events.jsonl",
+  "provenance": {
+    "git_commit": "00458579b0fdb5dd81fe5bf6ccaa7d93d8308dbc",
+    "dirty_worktree": false,
+    "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8"
+  },
+  "review_frames": [],
+  "result": "ERROR: ValueError: No complete game border found; include all corners and aim more squarely at TV; preflight could not establish stable Robotron geometry",
+  "armed": true,
+  "seconds": null,
+  "failure_kind": "player_failure",
+  "cal_recovery": null,
+  "progress": {
+    "pid": 3833,
+    "phase": "finalizing",
+    "phase_started_at": 1625.722169157,
+    "updated_at": 1625.722170417,
+    "fresh_at": 1624.610450362,
+    "sensor_at": 1624.580228,
+    "perception_at": 1584.028880836,
+    "cycle_at": 1584.028880836,
+    "cycles": 0,
+    "operation": "episode_writer_finalize",
+    "operation_started_at": 1625.528991746,
+    "work_sequence": 650,
+    "work_completed_at": 1625.71667887,
+    "last_work": {
+      "operation": "artifact_hash_complete",
+      "path": "/home/five/charlie-native-trials/controller-interface-20261024-44CFZyS9/development-20261024-221647/game-01/session-evidence.sqlite3",
+      "bytes_hashed": 413696
+    },
+    "publication_seconds": 0.37364506100016115
+  },
+  "partial_action_evidence": "steps.jsonl",
+  "pulse_ms": 80,
+  "ticks": 0,
+  "episode_end": {
+    "state": "unknown",
+    "confirmed": false,
+    "evidence": null
+  },
+  "score": null,
+  "score_status": "unmeasured",
+  "score_summary": {
+    "status": "unmeasured",
+    "self_score": null
+  },
+  "learning_mode": "session_tactical_feedback_with_guarded_persistent_policy",
+  "auto_start": false,
+  "start_decision": null,
+  "exploratory_startup": null,
+  "sensory_preflight": null,
+  "session_evidence": "session-evidence.sqlite3",
+  "recording_error": null,
+  "recording_pipeline": {
+    "accepted": 84,
+    "written": 84,
+    "captures_written": 84,
+    "max_occupancy": 6,
+    "max_bytes": 16596023,
+    "backpressure": 0,
+    "enqueue_ns": 104091662,
+    "encode_ns": 7113631819,
+    "write_ns": 3562483344,
+    "occupancy": 0,
+    "frame_occupancy": 0,
+    "buffered_bytes": 0,
+    "record_capacity": 512,
+    "frame_capacity": 16,
+    "byte_capacity": 134217728,
+    "emergency_slots": 1,
+    "schema": "charlie-buffered-recording-v1",
+    "worker_encoding_allowance_bytes": 5529600,
+    "emergency_byte_allowance": 2764800,
+    "throughput_records_per_second": 2.025209229669024,
+    "writer_error": null,
+    "paused": false,
+    "recovery": {
+      "previous_status": null,
+      "interrupted_flush": false,
+      "uncommitted_tail": null
+    },
+    "writer_alive": false,
+    "visual_contract": "strict-full-frame-v1",
+    "visual_hz": null,
+    "retention_counts": {
+      "selected": 84,
+      "not_selected": 0,
+      "unavailable": 0
+    },
+    "rolling": {
+      "seconds": 0.0,
+      "capacity_frames": 60,
+      "capacity_bytes": 33554432,
+      "frames": 0,
+      "bytes": 0,
+      "peak_bytes": 0,
+      "evictions": 0
+    },
+    "incidents": {
+      "requests": 0,
+      "active": 0,
+      "extra_frames": 0
+    },
+    "total_accounted_snapshot_bytes": 0
+  },
+  "prediction_commitment_mode": "buffered_live_prospective",
+  "calibration_mode": null,
+  "exposure_preflight": null,
+  "calibration": {
+    "corners": null,
+    "output_size": null
+  },
+  "acquisition": null,
+  "gameplay_visual_frame": null,
+  "startup_watch": [],
+  "diagnostic_buffer_bytes": 0,
+  "agency_frames": [],
+  "raw_frames": [],
+  "tracking_log": "agency.jsonl",
+  "tracking_schema": "sprite-tracking-v3",
+  "capture_mode": "fresh_exposure",
+  "passive_observer": {
+    "offers": 84,
+    "dropped": 83,
+    "published": 0,
+    "errors": 0,
+    "submit_seconds": 0.001279802999306412,
+    "encode_seconds": 0.0,
+    "max_pending": 1,
+    "fps_limit": 3.0,
+    "attached": false,
+    "demand_checked_at": 1625.714110616
+  },
+  "camera_lease_handoff_seconds": 0.0001528159998542833,
+  "agency_acquisition_protocol": "two_fresh_endpoints_then_independent_neutral",
+  "planning_mode": "rescue_with_open_space_fallback",
+  "learned_semantics": {
+    "status": "baseline",
+    "error": null
+  },
+  "bootstrap_body_fire": true,
+  "fire_agency_status": "exploratory evidence only; projectile/origin interpretation unvalidated",
+  "experiment_status": {
+    "status": "not_requested",
+    "attempted": false,
+    "reason": null
+  },
+  "tracks": "tracks.json",
+  "agency_samples": 0,
+  "agency_log": "agency.jsonl",
+  "steps": [],
+  "policy_identity": {
+    "kind": "baseline",
+    "code_revision": "00458579b0fdb5dd81fe5bf6ccaa7d93d8308dbc",
+    "knowledge_sha256": "7a6bbb354574c285d45157060ff46c551a4099c95c5abed1e7e4c9aa2a0470f8",
+    "bootstrap_body_fire": true
+  },
+  "deferred_score_review": {
+    "schema": "deferred-score-review-v1",
+    "status": "pending",
+    "artifact": null,
+    "timestamp": null,
+    "camera_observation_id": null,
+    "proposed_score": null,
+    "confidence": null,
+    "qualification": "pending original-image inspection; no complete-game score certificate",
+    "journal_delivery": "existing marathon diary or normal evidence acquisition",
+    "physical_authorization": false
+  }
+}

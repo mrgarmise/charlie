@@ -1,7 +1,7 @@
 {
   "schema": "charlie.master-campaign.v1",
-  "observed_utc": "2026-10-31T17:26:49.282246+00:00",
-  "master": "bcf8082f6319c63c4bd6bcceeab5faea37241654",
+  "observed_utc": "2026-11-01",
+  "master": "c53c7e662ececbd8d90c8945f04cddbdf909ace4",
   "mission": {
     "filename": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
     "sha256": "efc4ab2600c9f68b3ffc4a60e60aa2d678bdec1a32ee1ac9ed1d438a444e855f",
@@ -45,7 +45,15 @@
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/3"
       ],
-      "ancestor_of_pr13": false
+      "ancestor_of_pr13": false,
+      "availability_update": {
+        "date": "2026-11-01",
+        "journal_sha256": "ee612110302b40d89b977fc7dbb57ae2dc3a2ac09f7482bd78aa83d682464d21",
+        "bytes": 15142912,
+        "score_human_annotations": 8,
+        "score_review_status": 16,
+        "scope": "Read-only availability; original hold and photograph/benefit qualification remain"
+      }
     },
     {
       "id": "charlie-pr-5",
@@ -77,7 +85,7 @@
       "owner": "Charlie maintainers/operator",
       "date": "2026-10-31",
       "blockers": [
-        "Native 8\u201312 meaningful updates/s, camera/controller/display latency, projectile shape discrimination, individual-life sensing and complete-game tactical success remain NOT YET DEMONSTRATED. The original archive/notebook are unchanged; no new gameplay or learning evidence is fabricated. No physical gameplay, controller activation, servos, firmware deployment or learned-policy activation was performed. E1, P1 and I1 remain independently open. Keep this PR draft; no merge to main is authorized."
+        "Native 8–12 meaningful updates/s, camera/controller/display latency, projectile shape discrimination, individual-life sensing and complete-game tactical success remain NOT YET DEMONSTRATED. The original archive/notebook are unchanged; no new gameplay or learning evidence is fabricated. No physical gameplay, controller activation, servos, firmware deployment or learned-policy activation was performed. E1, P1 and I1 remain independently open. Keep this PR draft; no merge to main is authorized."
       ],
       "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
       "evidence": [
@@ -151,7 +159,7 @@
       "owner": "Charlie maintainers/operator",
       "date": "2026-10-31",
       "blockers": [],
-      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "safe_next_action": "Only receipt/index slice transferred to campaign stage; review remaining E1/P1/diagnostic mechanisms separately; do not claim full inclusion or I1",
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/7"
       ],
@@ -263,7 +271,7 @@
       "owner": "Charlie maintainers/operator",
       "date": "2026-10-31",
       "blockers": [
-        "[Current native audit, failures and exact remaining requirements](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/REPORT.md) \u00b7 [Artifact hashes and machine audit](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/audit.json) \u00b7 [Existing staged acceptance interfaces](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/completion/RUNBOOK.md). The older runbook's native-file access limitation is superseded by the new file audit only; hardware remains inaccessible. Original evidence, acceptance checkout, main Robotron checkout and separate motivational work are preserved. No merge or installation overwrite. Tracks CHA-15."
+        "[Current native audit, failures and exact remaining requirements](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/REPORT.md) · [Artifact hashes and machine audit](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/physical-20261026/audit.json) · [Existing staged acceptance interfaces](https://github.com/mrgarmise/charlie/blob/9c1319d2800749d19cd5086f34ba4643276d90a7/docs/mobile/completion/RUNBOOK.md). The older runbook's native-file access limitation is superseded by the new file audit only; hardware remains inaccessible. Original evidence, acceptance checkout, main Robotron checkout and separate motivational work are preserved. No merge or installation overwrite. Tracks CHA-15."
       ],
       "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
       "evidence": [
@@ -418,7 +426,7 @@
         "Keep draft. Normal live producer/consumer attachment is pending: PR #13's MobileEvidenceAdapter.opportunities needs an opt-in Executive call with actual decision context; Robotron source journals need reviewed lineage/freshness-preserving consolidation to the application notebook. Callable APIs and deterministic E2E are implemented, not a deployed autonomous loop. Pi service access, approved phone tunnel, physical Safari and image-preview authorization remain pending.",
         "No original evidence, active PR head, deployment, firmware, GPIO, camera ownership, controller or motor restriction changed. No merge/rebase, Pi access, motion or live policy activation."
       ],
-      "safe_next_action": "Prepare and test isolated integration; retain original draft/merge holds",
+      "safe_next_action": "Validate additive normal-runtime review stage; original draft and native holds remain",
       "evidence": [
         "https://github.com/mrgarmise/charlie/pull/14"
       ],
@@ -499,6 +507,224 @@
         "https://github.com/mrgarmise/charlie/pull/16"
       ],
       "ancestor_of_pr13": false
+    },
+    {
+      "id": "charlie-pr-18",
+      "description": "Selective demonstration evidence without repeated full-store encoding",
+      "priority": 1,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/18",
+      "linear_url": null,
+      "base": "097f110fd0c6d321d24024c399d79f0a427bf23c",
+      "head": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+      "target": "integration/unified-sensory-motion-20261026",
+      "source_tree": "63330e711fc5a2322d7c23844a296957722823be",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "Attempt 2: 1603 passed / 21 skipped; original attempt 1 retained (1602 passed / 21 skipped / one marathon failure)",
+        "integrated": "normal-runtime staging; inherited holds",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+      "dependencies": [
+        "charlie-pr-13"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Inherited draft/no-merge holds; no deployment or physical authority",
+        "Native/authentic-data acceptance remains separate"
+      ],
+      "safe_next_action": "Review exact tested staging tree; resolve inherited holds before any master promotion",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41323688078"
+      ]
+    },
+    {
+      "id": "charlie-pr-19",
+      "description": "Opt-in human interpretation review in the normal Executive",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/19",
+      "linear_url": null,
+      "base": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+      "head": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+      "target": "campaign/selective-demo-evidence-20261031",
+      "source_tree": "6c5d8206b1bd258118ea19a9ada3d86d864ebd94",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "Independent full: 1632 passed / 23 skipped; independent browser/security passed",
+        "integrated": "normal-runtime staging; inherited holds",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+      "dependencies": [
+        "charlie-pr-18",
+        "charlie-pr-14"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Inherited draft/no-merge holds; no deployment or physical authority",
+        "Native/authentic-data acceptance remains separate"
+      ],
+      "safe_next_action": "Review exact tested staging tree; resolve inherited holds before any master promotion",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41324201298",
+        "https://github.com/mrgarmise/charlie/actions/runs/41324201202"
+      ]
+    },
+    {
+      "id": "charlie-pr-20",
+      "description": "Guarded model learning with shared Executive and human review",
+      "priority": 3,
+      "origin_chat": {
+        "title": "UNKNOWN/PENDING EXPORT",
+        "url": null
+      },
+      "library_mission": "Charlie_Master_Integration_Campaign_Work_or_Codex_Mission.md",
+      "pr_url": "https://github.com/mrgarmise/charlie/pull/20",
+      "linear_url": null,
+      "base": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+      "head": "be9e259781c09d9b56c065111aa2c0341c8187d6",
+      "target": "campaign/executive-human-review-20261101",
+      "source_tree": "44aa5f7ede2dc1f27096405fc83f8c7636cbfdd5",
+      "status": {
+        "implemented": "published source",
+        "independently_tested": "Independent focused and full passed; 1677 passed / 26 skipped",
+        "integrated": "normal-runtime staging; inherited holds",
+        "published_to_master": "pending",
+        "installed": "UNKNOWN",
+        "operating": "UNKNOWN",
+        "physically_qualified": "pending",
+        "autonomous_benefit": "not established"
+      },
+      "last_tested_revision": "be9e259781c09d9b56c065111aa2c0341c8187d6",
+      "dependencies": [
+        "charlie-pr-19",
+        "charlie-pr-15"
+      ],
+      "owner": "Charlie maintainers/operator",
+      "date": "2026-11-01",
+      "blockers": [
+        "Inherited draft/no-merge holds; no deployment or physical authority",
+        "Native/authentic-data acceptance remains separate"
+      ],
+      "safe_next_action": "Review exact tested staging tree; resolve inherited holds before any master promotion",
+      "evidence": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41324698128",
+        "https://github.com/mrgarmise/charlie/actions/runs/41324698124"
+      ]
     }
-  ]
+  ],
+  "checkpoint": {
+    "prior_pr17": "merged",
+    "pr18_head": "86dd54936e0385dd3b7d43e5286a3dc4047a1e05",
+    "pr18_tree": "63330e711fc5a2322d7c23844a296957722823be",
+    "independent_ci": "https://github.com/mrgarmise/charlie/actions/runs/41323688078",
+    "integration_stage": "Mobile entrypoint now preserves both review opt-ins; 13 focused passed; full CI pending",
+    "pr19_head": "c783b4002aa5ded2a092b4799e291a844ca67d26",
+    "pr19_browser_ci": "https://github.com/mrgarmise/charlie/actions/runs/41324201202",
+    "pr18_ci": "Attempt 2: 1603 passed / 21 skipped; original attempt 1 retained (1602 passed / 21 skipped / one marathon failure)",
+    "pr19_full_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41324201298",
+      "result": "1632 passed / 23 skipped"
+    },
+    "pr20_head": "be9e259781c09d9b56c065111aa2c0341c8187d6",
+    "pr20_focused_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41324698128",
+      "result": "success"
+    },
+    "pr21_head": "9a1fee83ca518a4d106021e918263a4bafdd0620",
+    "pr21_browser_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41324964308",
+      "result": "36 browser/HTTP passed; full regression pending"
+    },
+    "pr20_full_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41324698124",
+      "result": "1677 passed / 26 skipped"
+    },
+    "pr21_full_ci": {
+      "urls": [
+        "https://github.com/mrgarmise/charlie/actions/runs/41324964421",
+        "https://github.com/mrgarmise/charlie/actions/runs/41324960647"
+      ],
+      "result": "1711 passed / 27 skipped each"
+    },
+    "pr22_head": "fa7d5d5db5726e8e251000d79e9cc009fa912ae8",
+    "pr22_focused_ci": {
+      "url": "https://github.com/mrgarmise/charlie/actions/runs/41325251230",
+      "result": "success"
+    }
+  },
+  "objective_a_continuation": {
+    "mission": "docs/objective-a/Charlie_Mobile_Body_Objective_A_Codex_Handoff_v2.md",
+    "mission_sha256": "d2343c82a486962423672ebb344529fc32a91fba3dda2a6817ac4a53558db31d",
+    "report": "docs/objective-a/REPORT-20261101.md",
+    "pr_url": "https://github.com/mrgarmise/charlie/pull/26",
+    "base_pr": 23,
+    "base_head": "3b364f9b3eca8ae3348fb5f9eb4eaeb315f32b27",
+    "runtime_revision": "28c3cef8756801de7009ccd85238fc3687a66a2d",
+    "runtime_tree": "81f7cf826ecc60436f2d3eb763fc17b159c5409d",
+    "mobile_only_split": "removed; existing normal primary loop owns monitoring",
+    "status": {
+      "code_integrated": "draft continuation; independent full 1723 passed / 27 skipped; conformance 131; browser/HTTP 36",
+      "installed": "BLOCKED: host service/device/socket access",
+      "operating": "UNKNOWN",
+      "hosted_published": "PENDING: Node and DNS source workflow unavailable",
+      "physically_qualified": "not claimed; Cleared Room required",
+      "autonomous_ready": "not claimed; Objective B deferred"
+    },
+    "barriers": {
+      "1": "deferred Objective B",
+      "2": "blocked authentic native telemetry admission",
+      "3": "unknown safety feeds, fail closed",
+      "4": "prepared monitoring-only 0600 config; not installed",
+      "5": "blocked actual existing service inventory/cutover",
+      "6": "blocked socket/systemd/device access",
+      "7": "pending actual Site source publication"
+    },
+    "ci_url": "https://github.com/mrgarmise/charlie/actions/runs/41329211878",
+    "preservation": "all inherited PR/draft/merge/safety holds and original evidence retained",
+    "last_tested_revision": "28c3cef8756801de7009ccd85238fc3687a66a2d",
+    "tests": {
+      "independent_full": {
+        "passed": 1723,
+        "skipped": 27,
+        "seconds": 409.42
+      },
+      "conformance_passed": 131,
+      "browser_http_passed": 36,
+      "local_focused": {
+        "passed": 123,
+        "failed": 1,
+        "reason": "socket denied"
+      },
+      "unchanged_pr23_control": "four new tests fail before fix",
+      "restricted_host_full": {
+        "passed": 1673,
+        "skipped": 34,
+        "failed": 36,
+        "errors": 7,
+        "socket_denials": 42,
+        "other_failure": "existing normal calibration completion failure preserved in PR24 checkpoint"
+      }
+    }
+  }
 }

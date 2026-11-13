@@ -504,6 +504,8 @@ class ActiveVision:
                         if self.source:self.source.close()
                 if result is not None:
                     result['resources_released'] = True
+                    if getattr(getattr(self.source,'camera',None),'is_subscription',False):
+                        result['camera_lifecycle_scope']='consumer subscription released; physical capture remains application feeder-owned'
                     atomic_json(self.output/'view.json', result)
             except BaseException:
                 self.state = State.FAILED
@@ -574,10 +576,7 @@ def apply_validated_view(source, record):
     No servo movement, discovery, or optimization. A fresh geometry check remains
     the primary task's responsibility following camera restart.
     """
-    if record.get('schema') != 'charlie-active-vision-v1' or record.get('state') != 'LOCKED' or not record.get('resources_released'):
-        raise ValueError('validated Active Vision configuration required')
-    if record.get('simulated'):
-        raise ValueError('simulation cannot authorize a physical task')
-    source.set_manual_focus(record['focus']['lens_position'])
-    c = record['calibration']
-    return Calibration(tuple(tuple(p) for p in c['corners']), tuple(c['output_size']))
+    from .visual_readiness import calibration_from_record
+    calibration, lens = calibration_from_record(record)
+    source.set_manual_focus(lens)
+    return calibration

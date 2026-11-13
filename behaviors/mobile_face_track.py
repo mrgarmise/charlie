@@ -1,7 +1,7 @@
 import time
 from collections import deque
 
-from motion.mobile_base import MobileBase
+from motion.mobile_requests import MobileRequests as MobileBase
 
 
 class MobileFaceTrackBehavior:
@@ -96,8 +96,8 @@ class MobileFaceTrackBehavior:
     PREDICT_STEP_FAST = 30
     PREDICT_COOLDOWN = 0.70
 
-    def __init__(self, search_preference=None):
-        self.mobile = MobileBase()
+    def __init__(self, search_preference=None, *, mobile=None):
+        self.mobile = mobile if mobile is not None else MobileBase()
         self.search_preference = search_preference if search_preference in ("LEFT", "RIGHT") else None
 
         self.pan = self.PAN_CENTER
@@ -167,14 +167,6 @@ class MobileFaceTrackBehavior:
 
         try:
             self.mobile.stop()
-        except Exception:
-            pass
-
-        try:
-            self.mobile.pan(
-                self.PAN_CENTER
-            )
-            self.pan = self.PAN_CENTER
         except Exception:
             pass
 
@@ -401,6 +393,9 @@ class MobileFaceTrackBehavior:
         )
 
         if abs(delta_needed) < 3.0:
+            if getattr(self, "_sentry_turn_state", None) is not None:
+                self.mobile.stop()
+                self._sentry_turn_state = None
             direction = (
                 "RIGHT"
                 if delta_needed >= 0
@@ -427,47 +422,28 @@ class MobileFaceTrackBehavior:
                 flush=True,
             )
 
-            turn_start_yaw = yaw_now
-            self.mobile.pivot(direction)
-            started = time.monotonic()
-            progress = 0.0
-
-            try:
-                while (
-                    time.monotonic() - started
-                    < self.SENTRY_TURN_TIMEOUT
-                ):
-                    time.sleep(0.04)
-
-                    try:
-                        yaw_now = self.mobile.yaw()
-                    except Exception:
-                        continue
-
-                    current_offset = (
-                        yaw_now - self.sentry_origin_yaw
-                    )
-
-                    # Stop on reaching/passing the desired world-space
-                    # offset, rather than blindly adding another 30°.
-                    if direction == "RIGHT":
-                        reached = (
-                            current_offset >= target_offset
-                        )
-                    else:
-                        reached = (
-                            current_offset <= target_offset
-                        )
-
-                    progress = (
-                        (yaw_now - turn_start_yaw)
-                        * yaw_sign
-                    )
-
-                    if reached:
-                        break
-            finally:
-                self.mobile.stop()
+            pending = getattr(self, '_sentry_turn_state', None)
+            if pending is None:
+                pending = (yaw_now, now, direction)
+                self._sentry_turn_state = pending
+            turn_start_yaw, started, direction = pending
+            yaw_sign = +1 if direction == "RIGHT" else -1
+            progress = (yaw_now-turn_start_yaw)*yaw_sign
+            reached = current_offset >= target_offset if direction == "RIGHT" else current_offset <= target_offset
+            if not reached and now-started < self.SENTRY_TURN_TIMEOUT:
+                # One bounded bite; return to detection before renewing. This
+                # preserves sector targets while allowing reacquisition/STOP.
+                try:
+                    self.mobile.pivot(direction)
+                except BaseException:
+                    self._sentry_turn_state = None
+                    self.mobile.stop()
+                    raise
+                self.sentry_active = True
+                self.sentry_last_turn = progress
+                return True
+            self.mobile.stop()
+            self._sentry_turn_state = None
 
         self.sentry_active = True
         self.sentry_sector += 1
@@ -756,6 +732,10 @@ class MobileFaceTrackBehavior:
             return {
                 "state": "LOST"
             }
+
+        if getattr(self, "_sentry_turn_state", None) is not None:
+            self.mobile.stop()
+            self._sentry_turn_state = None
 
         normalized_x = face[
             "normalized_x"

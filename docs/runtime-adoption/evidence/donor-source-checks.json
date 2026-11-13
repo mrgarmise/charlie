@@ -1,0 +1,5134 @@
+[
+  {
+    "n": 3,
+    "sha": "b1d1ef14fd9100a34a94519305db802c2b75d66e",
+    "tree": "3a26a169986787421655b1291f4916523835802c",
+    "parents": [
+      "721af8c0ea838e1f759594a9424ca030e3ebdf2e"
+    ],
+    "checks": [],
+    "files": [
+      {
+        "path": "config/robotron/playfield-latest.json",
+        "status": "added",
+        "additions": 24,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/REPORT.md",
+        "status": "added",
+        "additions": 72,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/authentic-camera-regression.json",
+        "status": "added",
+        "additions": 90,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/integration-audit.json",
+        "status": "added",
+        "additions": 580,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/native-recovery.md",
+        "status": "added",
+        "additions": 107,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/publication.json",
+        "status": "added",
+        "additions": 20,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/recovery-ledger.json",
+        "status": "added",
+        "additions": 38,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/validation/published.txt",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/validation/published.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/validation/results.json",
+        "status": "added",
+        "additions": 29,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/validation/score-compatibility-final.txt",
+        "status": "added",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/validation/score-compatibility-final.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/validation/score-targeted-final.txt",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/score-feedback/validation/score-targeted-final.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/eyes/__init__.py",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/eyes/calibration.py",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/eyes/hud.py",
+        "status": "added",
+        "additions": 95,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/inspect_robotron_score.py",
+        "status": "added",
+        "additions": 524,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/robotron_hud.py",
+        "status": "added",
+        "additions": 243,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/robotron_score_corpus.py",
+        "status": "added",
+        "additions": 34,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/robotron_score_system.py",
+        "status": "added",
+        "additions": 45,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/score-review.html",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/score_events.py",
+        "status": "added",
+        "additions": 36,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/score_feedback.py",
+        "status": "added",
+        "additions": 177,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/score_observer.py",
+        "status": "added",
+        "additions": 452,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/score_tracker.py",
+        "status": "added",
+        "additions": 188,
+        "deletions": 0
+      },
+      {
+        "path": "memory/__init__.py",
+        "status": "added",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "memory/episode_identity.py",
+        "status": "added",
+        "additions": 246,
+        "deletions": 0
+      },
+      {
+        "path": "memory/evaluator.py",
+        "status": "added",
+        "additions": 568,
+        "deletions": 0
+      },
+      {
+        "path": "memory/evidence.py",
+        "status": "added",
+        "additions": 346,
+        "deletions": 0
+      },
+      {
+        "path": "memory/former.py",
+        "status": "added",
+        "additions": 92,
+        "deletions": 0
+      },
+      {
+        "path": "memory/marm.py",
+        "status": "added",
+        "additions": 140,
+        "deletions": 0
+      },
+      {
+        "path": "requirements-score-review.txt",
+        "status": "added",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-developmental/003511-review-000-0-gameplay.jpg",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-developmental/provenance.json",
+        "status": "added",
+        "additions": 850,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-tracking-score/camera-100.jpg",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-tracking-score/camera-zero.jpg",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-tracking-score/labels.json",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_robotron_hud.py",
+        "status": "added",
+        "additions": 91,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_feedback_recovery.py",
+        "status": "added",
+        "additions": 182,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_human_review.py",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_observer.py",
+        "status": "added",
+        "additions": 59,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_review_navigation.py",
+        "status": "added",
+        "additions": 41,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_review_queue.py",
+        "status": "added",
+        "additions": 183,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_tracker.py",
+        "status": "added",
+        "additions": 174,
+        "deletions": 0
+      },
+      {
+        "path": "tools/recover_score_reviews.py",
+        "status": "added",
+        "additions": 67,
+        "deletions": 0
+      },
+      {
+        "path": "tools/score_feedback_candidate.py",
+        "status": "added",
+        "additions": 39,
+        "deletions": 0
+      },
+      {
+        "path": "tools/validate_score_camera_regression.py",
+        "status": "added",
+        "additions": 33,
+        "deletions": 0
+      }
+    ]
+  },
+  {
+    "n": 5,
+    "sha": "7dcea80cd6a6448a7c13f8b83179435c049d7b3c",
+    "tree": "fe445569ec7cb7e64cc2a294cd42fdfb8b750b45",
+    "parents": [
+      "716212cdc1831f5fdbb905af7db07b52b9e6d9df"
+    ],
+    "checks": [],
+    "files": [
+      {
+        "path": "docs/validation/agency-first-stream/README.md",
+        "status": "added",
+        "additions": 253,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/agency.jsonl.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/audit.json",
+        "status": "added",
+        "additions": 24,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/manifest.json",
+        "status": "added",
+        "additions": 17,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/raw-0003.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/raw-0004.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/raw-0005.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/raw-0006.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/raw-0007.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/raw-0008.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/baseline/report.json.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/host-tests/environment.json",
+        "status": "added",
+        "additions": 11,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/host-tests/focused-final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/host-tests/full.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/host-tests/full.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/host-tests/integration.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/host-tests/interrupted.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/host-tests/respawn.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/host-tests/result.json",
+        "status": "added",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/replay-benchmark.json",
+        "status": "added",
+        "additions": 73,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/agency-first-stream/tested-source-sha256.json",
+        "status": "added",
+        "additions": 18,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/README.md",
+        "status": "added",
+        "additions": 186,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/collection.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/collection.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/earlier-runs.json",
+        "status": "added",
+        "additions": 30,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/environment.json",
+        "status": "added",
+        "additions": 12,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/final-result.json",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/final.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/focused.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/interrupted.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/pre-final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/pre-final.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/source-sha256.json",
+        "status": "added",
+        "additions": 17,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/host-tests/targeted.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/originals/charlie-first-game-diagnostics.tar.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/originals/charlie-first-three.log",
+        "status": "added",
+        "additions": 62,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/originals/sha256.json",
+        "status": "added",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/timing.json",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020.md",
+        "status": "added",
+        "additions": 289,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/archive-report-inventory.json",
+        "status": "added",
+        "additions": 178,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/archive-session-summary.json",
+        "status": "added",
+        "additions": 251,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/before.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/focused.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/full.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/learning-audit-summary.json",
+        "status": "added",
+        "additions": 24,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/native-replay-cost.json",
+        "status": "added",
+        "additions": 73,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/notebook-audit.json",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/preservation-check.json",
+        "status": "added",
+        "additions": 77,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/python-environments.json",
+        "status": "added",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/qualification.json",
+        "status": "added",
+        "additions": 327,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/replay-sandbox.sh.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/sandbox.sh.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/socket-capability.json",
+        "status": "added",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/starting-inventory.json",
+        "status": "added",
+        "additions": 52,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-marathon-20261020/tested-source.json",
+        "status": "added",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/session-recovery-20261020.md",
+        "status": "added",
+        "additions": 109,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/acquisition_profile.py",
+        "status": "added",
+        "additions": 49,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/agency.py",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 2
+      },
+      {
+        "path": "experiments/ppal/arcade_transport.py",
+        "status": "modified",
+        "additions": 26,
+        "deletions": 3
+      },
+      {
+        "path": "experiments/ppal/benchmark_agency_engine.py",
+        "status": "added",
+        "additions": 68,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/controller_overlap.py",
+        "status": "added",
+        "additions": 42,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/eyes/sources.py",
+        "status": "modified",
+        "additions": 36,
+        "deletions": 3
+      },
+      {
+        "path": "experiments/ppal/eyes/taught_recognizer.py",
+        "status": "modified",
+        "additions": 16,
+        "deletions": 2
+      },
+      {
+        "path": "experiments/ppal/gameplay_engine.py",
+        "status": "added",
+        "additions": 101,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/marathon_robotron.py",
+        "status": "modified",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/observation_camera.py",
+        "status": "modified",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/observation_stream.py",
+        "status": "added",
+        "additions": 111,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/play_robotron.py",
+        "status": "modified",
+        "additions": 99,
+        "deletions": 17
+      },
+      {
+        "path": "experiments/ppal/projectile_agency.py",
+        "status": "added",
+        "additions": 153,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/reserve_life_evidence.py",
+        "status": "added",
+        "additions": 67,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/robotron_agency.py",
+        "status": "modified",
+        "additions": 130,
+        "deletions": 21
+      },
+      {
+        "path": "experiments/ppal/shot_capture.py",
+        "status": "added",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_agency_stream_engine.py",
+        "status": "added",
+        "additions": 303,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_native_stream_integrity.py",
+        "status": "added",
+        "additions": 29,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_ppal_agency.py",
+        "status": "modified",
+        "additions": 7,
+        "deletions": 5
+      },
+      {
+        "path": "tests/test_projectile_agency.py",
+        "status": "added",
+        "additions": 243,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_reserve_life_evidence.py",
+        "status": "added",
+        "additions": 44,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_restart_discovery_evidence.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "tests/test_robotron_actuator_bootstrap.py",
+        "status": "modified",
+        "additions": 13,
+        "deletions": 17
+      },
+      {
+        "path": "tests/test_robotron_agency_integration.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "tests/test_robotron_capture_timing.py",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 5
+      },
+      {
+        "path": "tests/test_robotron_new_run_regressions.py",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 4
+      },
+      {
+        "path": "tests/test_robotron_response_window.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 1
+      },
+      {
+        "path": "vision/camera.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      }
+    ]
+  },
+  {
+    "n": 6,
+    "sha": "ab58a3d3d3f83a44e77184d329f0e28c1f9cbda8",
+    "tree": "0adf6ea3fec25da666a53ffc507519d0836bce12",
+    "parents": [
+      "8c96db003b87246ee6b0f9dc9918cb42af726370"
+    ],
+    "checks": [],
+    "files": [
+      {
+        "path": "docs/hailo-observations/README.md",
+        "status": "added",
+        "additions": 256,
+        "deletions": 0
+      },
+      {
+        "path": "docs/hailo-observations/data-inventory.json",
+        "status": "added",
+        "additions": 91,
+        "deletions": 0
+      },
+      {
+        "path": "docs/hailo-observations/focused.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/hailo-observations/focused.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/hailo-observations/full.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/hailo-observations/full.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/hailo-observations/host-baseline-cost.json",
+        "status": "added",
+        "additions": 236,
+        "deletions": 0
+      },
+      {
+        "path": "docs/hailo-observations/host-tests.json",
+        "status": "added",
+        "additions": 66,
+        "deletions": 0
+      },
+      {
+        "path": "docs/hailo-observations/tested-source-sha256.json",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/benchmark_detector_candidates.py",
+        "status": "added",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/compile_hailo_lab.py",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/detector_bridge.py",
+        "status": "added",
+        "additions": 230,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/inventory_robotron.py",
+        "status": "added",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/replay_detectors.py",
+        "status": "added",
+        "additions": 58,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_detector_bridge.py",
+        "status": "added",
+        "additions": 194,
+        "deletions": 0
+      }
+    ]
+  },
+  {
+    "n": 7,
+    "sha": "83112b4b9d20f97178a6494f09f48713d4210344",
+    "tree": "93846db3ac9641414396724b567effb480211fb4",
+    "parents": [
+      "5c8db51021165d1322309ac4869ecdbcc9c2c16a"
+    ],
+    "checks": [
+      {
+        "name": "tag",
+        "conclusion": "skipped",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/39330564431/job/118329913327"
+      },
+      {
+        "name": "software",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/39330564431/job/118327387146"
+      }
+    ],
+    "files": [
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/README.md",
+        "status": "added",
+        "additions": 145,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/COMMANDS.md",
+        "status": "added",
+        "additions": 58,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/ISSUE-READY.md",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/README.md",
+        "status": "added",
+        "additions": 192,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/acceptance.json",
+        "status": "added",
+        "additions": 83,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/artifact-hashes.json",
+        "status": "added",
+        "additions": 51,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/checkpoint-completion.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/checkpoint-recovery.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/checkpoint-resume-category-index.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/checkpoint-resume-indexed.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/checkpoint-resume.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/checkpoint_recovery.py",
+        "status": "added",
+        "additions": 55,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/e1-authentic-chain.json.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/e1-fresh-process.json.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/e1-fresh-process.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/e1_reload.py",
+        "status": "added",
+        "additions": 58,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/executive-controls.jsonl.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/existing-targeted.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/final-targeted.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/frozen-recovery.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/frozen_recovery.py",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/full-suite-final-native.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/full-suite-final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/full-suite-release.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/full-suite.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/global-store-preservation.json",
+        "status": "added",
+        "additions": 23,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/native-index-targeted.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/native-operational-status.json",
+        "status": "added",
+        "additions": 115,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/native-readiness.json",
+        "status": "added",
+        "additions": 18,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/native-recovery.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/native-summary.json.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/overnight-summary.json",
+        "status": "added",
+        "additions": 13,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/ppal-summary.json",
+        "status": "added",
+        "additions": 19,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/ppal-valuations-1.json.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/prepare.py",
+        "status": "added",
+        "additions": 24,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/preservation-final.json",
+        "status": "added",
+        "additions": 20,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/qualification-targeted.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/query-equivalence.json",
+        "status": "added",
+        "additions": 16,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/query-equivalence.json.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/resume_checkpoint.py",
+        "status": "added",
+        "additions": 39,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/run_recovery.py",
+        "status": "added",
+        "additions": 70,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/score-reconciliation.json",
+        "status": "added",
+        "additions": 122,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/session-import-final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/seven-meditations.json",
+        "status": "added",
+        "additions": 92,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/summarize.py",
+        "status": "added",
+        "additions": 44,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/tactical-diagnostics.json",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/tactical-link-validation.json.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/tactical-recovery-strict.json",
+        "status": "added",
+        "additions": 174,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/tactical-recovery.json",
+        "status": "added",
+        "additions": 312,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/targeted.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/ppal/ala2-experience-recovery-20261018/native-20261019/validate_links.py",
+        "status": "added",
+        "additions": 38,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/originals/charlie-first-game-diagnostics.tar.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/originals/charlie-first-three.log",
+        "status": "added",
+        "additions": 62,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/fast-projectile-self/originals/sha256.json",
+        "status": "added",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/acquisition_profile.py",
+        "status": "added",
+        "additions": 49,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/agency.py",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 2
+      },
+      {
+        "path": "experiments/ppal/arcade_transport.py",
+        "status": "modified",
+        "additions": 26,
+        "deletions": 3
+      },
+      {
+        "path": "experiments/ppal/benchmark_agency_engine.py",
+        "status": "added",
+        "additions": 68,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/controller_overlap.py",
+        "status": "added",
+        "additions": 42,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/eyes/sources.py",
+        "status": "modified",
+        "additions": 34,
+        "deletions": 3
+      },
+      {
+        "path": "experiments/ppal/eyes/taught_recognizer.py",
+        "status": "modified",
+        "additions": 16,
+        "deletions": 2
+      },
+      {
+        "path": "experiments/ppal/gameplay_engine.py",
+        "status": "added",
+        "additions": 97,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/hindbrain.py",
+        "status": "modified",
+        "additions": 28,
+        "deletions": 3
+      },
+      {
+        "path": "experiments/ppal/inspect_robotron_score.py",
+        "status": "modified",
+        "additions": 18,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/marathon_robotron.py",
+        "status": "modified",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/observation_camera.py",
+        "status": "modified",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/observation_stream.py",
+        "status": "added",
+        "additions": 111,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/play_robotron.py",
+        "status": "modified",
+        "additions": 99,
+        "deletions": 17
+      },
+      {
+        "path": "experiments/ppal/projectile_agency.py",
+        "status": "added",
+        "additions": 153,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/robotron_agency.py",
+        "status": "modified",
+        "additions": 130,
+        "deletions": 21
+      },
+      {
+        "path": "experiments/ppal/shot_capture.py",
+        "status": "added",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/tactical_memory.py",
+        "status": "added",
+        "additions": 124,
+        "deletions": 0
+      },
+      {
+        "path": "learning/cycle.py",
+        "status": "modified",
+        "additions": 9,
+        "deletions": 2
+      },
+      {
+        "path": "learning/diagnostic_feedback.py",
+        "status": "added",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "learning/tactical_recovery.py",
+        "status": "added",
+        "additions": 109,
+        "deletions": 0
+      },
+      {
+        "path": "memory/evidence.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "memory/learning_projects.py",
+        "status": "modified",
+        "additions": 25,
+        "deletions": 6
+      },
+      {
+        "path": "tests/test_agency_stream_engine.py",
+        "status": "added",
+        "additions": 303,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_diagnostic_feedback.py",
+        "status": "added",
+        "additions": 30,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_evidence_category_index.py",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_ppal_agency.py",
+        "status": "modified",
+        "additions": 7,
+        "deletions": 5
+      },
+      {
+        "path": "tests/test_projectile_agency.py",
+        "status": "added",
+        "additions": 243,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_restart_discovery_evidence.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "tests/test_robotron_actuator_bootstrap.py",
+        "status": "modified",
+        "additions": 13,
+        "deletions": 17
+      },
+      {
+        "path": "tests/test_robotron_agency_integration.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "tests/test_robotron_capture_timing.py",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 5
+      },
+      {
+        "path": "tests/test_robotron_new_run_regressions.py",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 4
+      },
+      {
+        "path": "tests/test_robotron_response_window.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 1
+      },
+      {
+        "path": "tests/test_session_import_receipts.py",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_spawn_prior_evidence_serialization.py",
+        "status": "added",
+        "additions": 43,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_tactical_diagnostic_memory.py",
+        "status": "added",
+        "additions": 75,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_tactical_recovery.py",
+        "status": "added",
+        "additions": 93,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_tactical_recovery_cli.py",
+        "status": "added",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "path": "tools/recover_tactical_feedback.py",
+        "status": "added",
+        "additions": 98,
+        "deletions": 0
+      },
+      {
+        "path": "tools/replay_retained_tactics.py",
+        "status": "added",
+        "additions": 109,
+        "deletions": 0
+      },
+      {
+        "path": "vision/camera.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      }
+    ]
+  },
+  {
+    "n": 8,
+    "sha": "b4f258853964edbc3e442f9332675d5ebd7007e9",
+    "tree": "495ed7a126ed917c6d41800f63070c59f42858a0",
+    "parents": [
+      "d45cce134e10d342f64a4d33f8baf9fcc1a41b01"
+    ],
+    "checks": [
+      {
+        "name": "tag",
+        "conclusion": "skipped",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/39507649377/job/118923062589"
+      },
+      {
+        "name": "software",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/39507649377/job/118920498640"
+      },
+      {
+        "name": "focused",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/39507648900/job/118920493053"
+      },
+      {
+        "name": "focused",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/39507642208/job/118920472242"
+      }
+    ],
+    "files": [
+      {
+        "path": ".github/workflows/neural-score-sampler.yml",
+        "status": "added",
+        "additions": 33,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/CROP-DIAGNOSTICS-20261020.md",
+        "status": "added",
+        "additions": 261,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/NATIVE-FINDINGS-20261018.md",
+        "status": "added",
+        "additions": 228,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/README.md",
+        "status": "added",
+        "additions": 406,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/SAMPLING-TO-HEF.md",
+        "status": "added",
+        "additions": 346,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/SYNTHETIC_ONLY/fixture-corpus.zip",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/SYNTHETIC_ONLY/score.onnx",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/SYNTHETIC_ONLY/score.pt",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/SYNTHETIC_ONLY/training.json",
+        "status": "added",
+        "additions": 250,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/accessible-archive-inventory.json",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/artifacts-sha256.json",
+        "status": "added",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/audit-reconciliation.json",
+        "status": "added",
+        "additions": 71,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/authentic-recovery-20261019.json",
+        "status": "added",
+        "additions": 428,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/baseline-ledger.json",
+        "status": "added",
+        "additions": 51,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/compiler-blocker.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/environment-and-source.json",
+        "status": "added",
+        "additions": 34,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-examples.json",
+        "status": "added",
+        "additions": 76,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/00-remove-top-bezel-bottom-border.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/00-score-rgb-channel-resize-224x28-pad16x2-v2.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/00-score-rgb-channel-resize-256x32-v1.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/00-widen-inner-margin-and-trim.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/01-remove-top-bezel-bottom-border.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/01-score-rgb-channel-resize-224x28-pad16x2-v2.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/01-score-rgb-channel-resize-256x32-v1.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/01-widen-inner-margin-and-trim.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/audit.json",
+        "status": "added",
+        "additions": 420,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/historical-geometry/contact-sheet.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/host-tests/development-concurrent-1.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/host-tests/development-concurrent-1.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/host-tests/development-concurrent-2.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/host-tests/development-concurrent-2.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/host-tests/focused.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/host-tests/focused.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/host-tests/full.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/host-tests/full.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/host-validation.json",
+        "status": "added",
+        "additions": 118,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/operator-model-002-baseline.json",
+        "status": "added",
+        "additions": 53,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/crop-diagnostics/synthetic-alignment-control.json",
+        "status": "added",
+        "additions": 574,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/development-admission-test.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/development-failed-full.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/development-failed-full.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/development-start-source-sha256.json",
+        "status": "added",
+        "additions": 16,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/environment.json",
+        "status": "added",
+        "additions": 11,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-development-full.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-development-full.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-environment-and-source.json",
+        "status": "added",
+        "additions": 90,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-focused-final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-focused-final.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-focused.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-focused.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-full.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-full.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-host-tests.json",
+        "status": "added",
+        "additions": 78,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-original-archives.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fcr-original-archives.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/fixed-regression.json",
+        "status": "added",
+        "additions": 90,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/focused.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/focused.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/full.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/full.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/host-benchmark.json.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/host-package-license-metadata.json",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/host-tests.json",
+        "status": "added",
+        "additions": 65,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/operator-synthetic-parity-20261018.json",
+        "status": "added",
+        "additions": 50,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/portable-fixture-check.json",
+        "status": "added",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/synthetic-initial-150-step-validation.json.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/synthetic-test.json",
+        "status": "added",
+        "additions": 284,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/synthetic-test.jsonl.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/synthetic-training.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/synthetic-validation.json",
+        "status": "added",
+        "additions": 284,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/synthetic-validation.jsonl.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/neural-score/tested-source-sha256.json",
+        "status": "added",
+        "additions": 16,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/inspect_robotron_score.py",
+        "status": "modified",
+        "additions": 18,
+        "deletions": 7
+      },
+      {
+        "path": "experiments/ppal/neural_score/__init__.py",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/attest_reviews.py",
+        "status": "added",
+        "additions": 187,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/backends.py",
+        "status": "added",
+        "additions": 136,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/benchmark.py",
+        "status": "added",
+        "additions": 49,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/cli.py",
+        "status": "added",
+        "additions": 67,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/compile.py",
+        "status": "added",
+        "additions": 80,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/contract.py",
+        "status": "added",
+        "additions": 83,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/corpus.py",
+        "status": "added",
+        "additions": 165,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/diagnose.py",
+        "status": "added",
+        "additions": 263,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/evaluate.py",
+        "status": "added",
+        "additions": 69,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/export_reviews.py",
+        "status": "added",
+        "additions": 100,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/model.py",
+        "status": "added",
+        "additions": 80,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/reader.py",
+        "status": "added",
+        "additions": 69,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/sample.py",
+        "status": "added",
+        "additions": 595,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/train.py",
+        "status": "added",
+        "additions": 110,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/robotron_score_system.py",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 3
+      },
+      {
+        "path": "experiments/ppal/score-review.html",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 5
+      },
+      {
+        "path": "experiments/ppal/score_digits.py",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/score_feedback.py",
+        "status": "modified",
+        "additions": 28,
+        "deletions": 3
+      },
+      {
+        "path": "experiments/ppal/score_observer.py",
+        "status": "modified",
+        "additions": 39,
+        "deletions": 14
+      },
+      {
+        "path": "experiments/ppal/score_review_attestation.py",
+        "status": "added",
+        "additions": 43,
+        "deletions": 0
+      },
+      {
+        "path": "requirements-neural-score.txt",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_neural_score.py",
+        "status": "added",
+        "additions": 357,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_neural_score_sampler.py",
+        "status": "added",
+        "additions": 339,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_archive_recovery.py",
+        "status": "added",
+        "additions": 56,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_crop_diagnostics.py",
+        "status": "added",
+        "additions": 174,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_feedback_recovery.py",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 1
+      },
+      {
+        "path": "tests/test_score_review_frontend.py",
+        "status": "modified",
+        "additions": 17,
+        "deletions": 2
+      },
+      {
+        "path": "tests/test_score_review_navigation.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 1
+      },
+      {
+        "path": "tools/bundle_score_crop_diagnostics.py",
+        "status": "added",
+        "additions": 73,
+        "deletions": 0
+      },
+      {
+        "path": "tools/recover_score_review_evidence.py",
+        "status": "added",
+        "additions": 102,
+        "deletions": 0
+      },
+      {
+        "path": "tools/score_alignment_experiment.py",
+        "status": "added",
+        "additions": 39,
+        "deletions": 0
+      },
+      {
+        "path": "tools/train_score_to_hef.py",
+        "status": "added",
+        "additions": 124,
+        "deletions": 0
+      }
+    ]
+  },
+  {
+    "n": 9,
+    "sha": "9ba60e2e9c645c43f71072de413118dd5373e8c6",
+    "tree": "6dd4632c525d87027f917f55a05cfe61cd680412",
+    "parents": [
+      "28abb7be9b2ee0c76367ff598bede7cd70a8433d"
+    ],
+    "checks": [],
+    "files": [
+      {
+        "path": "config/robotron/screen-labels/game-over-oct24-anchor.json",
+        "status": "added",
+        "additions": 21,
+        "deletions": 0
+      },
+      {
+        "path": "docs/OPERATOR_GAMEPLAY_AUTHORIZATION.md",
+        "status": "added",
+        "additions": 59,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/causal-window-20261024/README.md",
+        "status": "added",
+        "additions": 156,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/causal-window-20261024/capacity-tests.txt",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/causal-window-20261024/initial-integration.txt",
+        "status": "added",
+        "additions": 59,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/causal-window-20261024/initial-per-frame-fsync.txt",
+        "status": "added",
+        "additions": 263,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/causal-window-20261024/install.sh",
+        "status": "added",
+        "additions": 13,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/causal-window-20261024/launch.sh",
+        "status": "added",
+        "additions": 15,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/causal-window-20261024/tests.txt",
+        "status": "added",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/consolidated-native-preflight-20261025/README.md",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/consolidated-native-preflight-20261025/final-offline-regressions.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/consolidated-native-preflight-20261025/native-device-free-regressions.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/consolidated-native-preflight-20261025/sandbox-regressions.xml",
+        "status": "added",
+        "additions": 129,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/consolidated-native-preflight-20261025/validation.json",
+        "status": "added",
+        "additions": 18,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/NATIVE-OPERATOR.md",
+        "status": "added",
+        "additions": 137,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/README.md",
+        "status": "added",
+        "additions": 225,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/arcade-initial-sandbox-failures.xml",
+        "status": "added",
+        "additions": 592,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/arcade-inspection.txt",
+        "status": "added",
+        "additions": 2908,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/arcade-tests-final.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/arcade-tests-native-sockets.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/arcade-tests-release.xml",
+        "status": "added",
+        "additions": 92,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/arcade-tests.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/arcade-unittest-final.txt",
+        "status": "added",
+        "additions": 401,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/baseline-qualification.patch",
+        "status": "added",
+        "additions": 91,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/charlie-arcade.patch",
+        "status": "added",
+        "additions": 614,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/charlie-native-prerequisites.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/charlie-tests-native-sockets.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/charlie-tests-release.xml",
+        "status": "added",
+        "additions": 767,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/charlie-tests.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/check-physical-neutral.py",
+        "status": "added",
+        "additions": 26,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/inspect-arcade.sh",
+        "status": "added",
+        "additions": 30,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/lease-hold-probe.py",
+        "status": "added",
+        "additions": 32,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/manifest.json",
+        "status": "added",
+        "additions": 134,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-deadman-20261022/reconciliation.json",
+        "status": "added",
+        "additions": 26,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-interface-20261024/README.md",
+        "status": "added",
+        "additions": 140,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-interface-20261024/after.txt",
+        "status": "added",
+        "additions": 865,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-interface-20261024/before.txt",
+        "status": "added",
+        "additions": 512,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-interface-20261024/eligible.txt",
+        "status": "added",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-interface-20261024/install.sh",
+        "status": "added",
+        "additions": 16,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/controller-interface-20261024/launch.sh",
+        "status": "added",
+        "additions": 15,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/NATIVE-OPERATOR.md",
+        "status": "added",
+        "additions": 225,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/README.md",
+        "status": "added",
+        "additions": 182,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/baseline-verification.json",
+        "status": "added",
+        "additions": 90,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/experience-action-final.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/experience-action-fixtures-final.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/experience-action-policy.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/experience-action-readiness.xml",
+        "status": "added",
+        "additions": 1124,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/experience-action-recording-contracts-final.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/host-mechanisms.json",
+        "status": "added",
+        "additions": 37,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/native-host-wrapper-source-final.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/native-readiness.json",
+        "status": "added",
+        "additions": 23,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/replay-summary.json",
+        "status": "added",
+        "additions": 53,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/source-manifest.json",
+        "status": "added",
+        "additions": 21,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/test-summary.json",
+        "status": "added",
+        "additions": 245,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/experience-action-20261021/worktree-inspection.json",
+        "status": "added",
+        "additions": 112,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/OPERATOR.md",
+        "status": "added",
+        "additions": 193,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/README.md",
+        "status": "added",
+        "additions": 252,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/agency-fixture-final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/agency-fixture-final.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/e1-summary.json",
+        "status": "added",
+        "additions": 16,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/full-native-final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/full-native-final.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/historical-examples.json",
+        "status": "added",
+        "additions": 77,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/host-readonly-probes.json",
+        "status": "added",
+        "additions": 23,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/integrated-native-replay-cost.json",
+        "status": "added",
+        "additions": 73,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/learning-summary.json",
+        "status": "added",
+        "additions": 13,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/lifecycle-isolated.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/lifecycle-isolated.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/pre-freeze-focused.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/pre-freeze-focused.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/preservation.json",
+        "status": "added",
+        "additions": 50,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/query-benchmark.json",
+        "status": "added",
+        "additions": 21,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/query_benchmark.py.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/receipt-index.json",
+        "status": "added",
+        "additions": 158,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/recording-final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/recording-final.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/remote-source-verification.json",
+        "status": "added",
+        "additions": 206,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/replay-sandbox.sh.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/reserve-audit.json",
+        "status": "added",
+        "additions": 95,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/reserve_audit.py.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/resume-recording.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/resume-recording.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/runtime-final.json",
+        "status": "added",
+        "additions": 14,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/sandbox.sh.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/score-benchmark.json",
+        "status": "added",
+        "additions": 49,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/score-integrated.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/score-integrated.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/shared-admission-final.log.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/shared-admission-final.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/terminal-sandbox.sh.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/terminal-summary.json",
+        "status": "added",
+        "additions": 16,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/test-report.json",
+        "status": "added",
+        "additions": 401,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/tested-source-final.json",
+        "status": "added",
+        "additions": 379,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/tested-source-resumed.json",
+        "status": "added",
+        "additions": 380,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-integration-20261021/thermal-during-unarmed-tests.jsonl.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-recovery-20261022/README.md",
+        "status": "added",
+        "additions": 130,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-recovery-20261022/focused.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-recovery-20261022/related.xml",
+        "status": "added",
+        "additions": 129,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-recovery-20261022/validation.json",
+        "status": "added",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-resume-20261024/README.md",
+        "status": "added",
+        "additions": 115,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-resume-20261024/controller-fetch-explicit-config.exit",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-resume-20261024/controller-fetch-explicit-config.stderr",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-resume-20261024/controller-fetch-explicit-config.stdout",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-resume-20261024/controller-fetch.exit",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-resume-20261024/controller-fetch.stderr",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-resume-20261024/controller-fetch.stdout",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-resume-20261024/evidence.json",
+        "status": "added",
+        "additions": 80,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/native-resume-20261024/resume-20261024-focused.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/OPERATOR.md",
+        "status": "added",
+        "additions": 104,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/README.md",
+        "status": "added",
+        "additions": 70,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/campaign.txt",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/campaign.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/concurrent-regressions.txt.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/concurrent-regressions.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/corrections.txt",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/corrections.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/final-regressions.txt",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/final-regressions.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/initial-regressions.txt.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/initial-regressions.xml.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/new-game-boundary.txt",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/new-game-boundary.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/pr9-description-before.md",
+        "status": "added",
+        "additions": 45,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/retained-executive-audit.json",
+        "status": "added",
+        "additions": 4216,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/run-regressions.sh",
+        "status": "added",
+        "additions": 46,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/synthetic-readiness-cache-preserved.json",
+        "status": "added",
+        "additions": 272,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/original-marathon-20261025/verification.json",
+        "status": "added",
+        "additions": 44,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/visual-readiness-20261024/README.md",
+        "status": "added",
+        "additions": 165,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/visual-readiness-20261024/discovery-active-vision.txt",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/visual-readiness-20261024/final-tests.txt",
+        "status": "added",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/visual-readiness-20261024/handoff-tests.txt",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/visual-readiness-20261024/initial-integration.txt",
+        "status": "added",
+        "additions": 354,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/visual-readiness-20261024/install-smoke.txt",
+        "status": "added",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/visual-readiness-20261024/install.sh",
+        "status": "added",
+        "additions": 13,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/visual-readiness-20261024/launch.sh",
+        "status": "added",
+        "additions": 15,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/comparison/robotron.py",
+        "status": "modified",
+        "additions": 55,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/arcade_transport.py",
+        "status": "modified",
+        "additions": 36,
+        "deletions": 6
+      },
+      {
+        "path": "experiments/ppal/benchmark_detector_candidates.py",
+        "status": "added",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/camera_session.py",
+        "status": "modified",
+        "additions": 17,
+        "deletions": 1
+      },
+      {
+        "path": "experiments/ppal/compile_hailo_lab.py",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/detector_bridge.py",
+        "status": "added",
+        "additions": 234,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/eyes/active_vision.py",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 7
+      },
+      {
+        "path": "experiments/ppal/eyes/settle.py",
+        "status": "modified",
+        "additions": 69,
+        "deletions": 41
+      },
+      {
+        "path": "experiments/ppal/eyes/visual_readiness.py",
+        "status": "added",
+        "additions": 139,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/hindbrain.py",
+        "status": "modified",
+        "additions": 30,
+        "deletions": 3
+      },
+      {
+        "path": "experiments/ppal/inspect_robotron_score.py",
+        "status": "modified",
+        "additions": 36,
+        "deletions": 7
+      },
+      {
+        "path": "experiments/ppal/inventory_robotron.py",
+        "status": "added",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/live_view.py",
+        "status": "modified",
+        "additions": 26,
+        "deletions": 1
+      },
+      {
+        "path": "experiments/ppal/marathon_robotron.py",
+        "status": "modified",
+        "additions": 91,
+        "deletions": 4
+      },
+      {
+        "path": "experiments/ppal/neural_score/__init__.py",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/attest_reviews.py",
+        "status": "added",
+        "additions": 187,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/backends.py",
+        "status": "added",
+        "additions": 149,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/benchmark.py",
+        "status": "added",
+        "additions": 49,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/cli.py",
+        "status": "added",
+        "additions": 67,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/compile.py",
+        "status": "added",
+        "additions": 80,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/contract.py",
+        "status": "added",
+        "additions": 83,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/corpus.py",
+        "status": "added",
+        "additions": 165,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/diagnose.py",
+        "status": "added",
+        "additions": 263,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/evaluate.py",
+        "status": "added",
+        "additions": 69,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/export_reviews.py",
+        "status": "added",
+        "additions": 100,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/model.py",
+        "status": "added",
+        "additions": 80,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/reader.py",
+        "status": "added",
+        "additions": 69,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/sample.py",
+        "status": "added",
+        "additions": 595,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/neural_score/train.py",
+        "status": "added",
+        "additions": 110,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/observation_stream.py",
+        "status": "modified",
+        "additions": 79,
+        "deletions": 10
+      },
+      {
+        "path": "experiments/ppal/play_robotron.py",
+        "status": "modified",
+        "additions": 37,
+        "deletions": 20
+      },
+      {
+        "path": "experiments/ppal/preflight.py",
+        "status": "modified",
+        "additions": 129,
+        "deletions": 19
+      },
+      {
+        "path": "experiments/ppal/progress_supervision.py",
+        "status": "modified",
+        "additions": 8,
+        "deletions": 8
+      },
+      {
+        "path": "experiments/ppal/qualified_policy.py",
+        "status": "modified",
+        "additions": 12,
+        "deletions": 2
+      },
+      {
+        "path": "experiments/ppal/replay_detectors.py",
+        "status": "added",
+        "additions": 58,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/robotron_agency.py",
+        "status": "modified",
+        "additions": 23,
+        "deletions": 13
+      },
+      {
+        "path": "experiments/ppal/robotron_hud.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "experiments/ppal/robotron_score_system.py",
+        "status": "modified",
+        "additions": 12,
+        "deletions": 4
+      },
+      {
+        "path": "experiments/ppal/robotron_screen_state.py",
+        "status": "modified",
+        "additions": 16,
+        "deletions": 10
+      },
+      {
+        "path": "experiments/ppal/score-review.html",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 5
+      },
+      {
+        "path": "experiments/ppal/score_digits.py",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/score_feedback.py",
+        "status": "modified",
+        "additions": 28,
+        "deletions": 3
+      },
+      {
+        "path": "experiments/ppal/score_observer.py",
+        "status": "modified",
+        "additions": 55,
+        "deletions": 20
+      },
+      {
+        "path": "experiments/ppal/score_review_attestation.py",
+        "status": "added",
+        "additions": 43,
+        "deletions": 0
+      },
+      {
+        "path": "experiments/ppal/shot_capture.py",
+        "status": "modified",
+        "additions": 221,
+        "deletions": 21
+      },
+      {
+        "path": "experiments/ppal/tactical_memory.py",
+        "status": "added",
+        "additions": 173,
+        "deletions": 0
+      },
+      {
+        "path": "learning/campaign.py",
+        "status": "modified",
+        "additions": 184,
+        "deletions": 21
+      },
+      {
+        "path": "learning/cycle.py",
+        "status": "modified",
+        "additions": 9,
+        "deletions": 5
+      },
+      {
+        "path": "learning/diagnostic_feedback.py",
+        "status": "added",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "learning/policy.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "learning/tactical_recovery.py",
+        "status": "added",
+        "additions": 109,
+        "deletions": 0
+      },
+      {
+        "path": "memory/evidence.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "memory/learning_projects.py",
+        "status": "modified",
+        "additions": 25,
+        "deletions": 6
+      },
+      {
+        "path": "requirements-neural-score.txt",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-border-20261022/exposure-ev-3.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-border-20261022/provenance.json",
+        "status": "added",
+        "additions": 9,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-border-20261022/sensory-failed.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-border-20261022/sensory-preflight.json",
+        "status": "added",
+        "additions": 1596,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-causal-overflow-20261024/provenance.json",
+        "status": "added",
+        "additions": 16,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-causal-overflow-20261024/report.json",
+        "status": "added",
+        "additions": 5906,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-geometry-20261024/provenance.json",
+        "status": "added",
+        "additions": 9,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-geometry-20261024/report.json",
+        "status": "added",
+        "additions": 230,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-geometry-20261024/sensory-failed.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-geometry-20261024/sensory-preflight.json",
+        "status": "added",
+        "additions": 1727,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-self-20261024/provenance.json",
+        "status": "added",
+        "additions": 9,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-self-20261024/report.json",
+        "status": "added",
+        "additions": 5039,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-self-20261024/sensory-final.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/native-self-20261024/sensory-preflight.json",
+        "status": "added",
+        "additions": 1683,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/agency.jsonl.gz",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/calibration.json",
+        "status": "added",
+        "additions": 24,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/events.jsonl",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/provenance.json",
+        "status": "added",
+        "additions": 34,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/raw-0001.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/raw-0047.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/raw-0067.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/raw-0086.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/raw-0087.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/report.json",
+        "status": "added",
+        "additions": 16784,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/score-raw-0047.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/score-raw-0087.png",
+        "status": "added",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "tests/fixtures/robotron-marathon-20261024/score.jsonl",
+        "status": "added",
+        "additions": 87,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_agency_recovery_boundaries.py",
+        "status": "modified",
+        "additions": 26,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_agency_stream_engine.py",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_arcade_controller_lease_client.py",
+        "status": "added",
+        "additions": 69,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_buffered_recording.py",
+        "status": "modified",
+        "additions": 3,
+        "deletions": 1
+      },
+      {
+        "path": "tests/test_causal_window_capacity.py",
+        "status": "added",
+        "additions": 276,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_detector_bridge.py",
+        "status": "added",
+        "additions": 198,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_diagnostic_feedback.py",
+        "status": "added",
+        "additions": 30,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_evidence_category_index.py",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_final_image_recovery.py",
+        "status": "added",
+        "additions": 64,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_native_integration_contracts.py",
+        "status": "added",
+        "additions": 64,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_native_preflight.py",
+        "status": "added",
+        "additions": 170,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_native_robotron_trial.py",
+        "status": "added",
+        "additions": 97,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_neural_score.py",
+        "status": "added",
+        "additions": 357,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_neural_score_sampler.py",
+        "status": "added",
+        "additions": 339,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_original_marathon_campaign.py",
+        "status": "added",
+        "additions": 124,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_projectile_agency.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_qualified_ppal_policy.py",
+        "status": "modified",
+        "additions": 56,
+        "deletions": 2
+      },
+      {
+        "path": "tests/test_recovery_entrypoint.py",
+        "status": "added",
+        "additions": 152,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_robotron_agency_integration.py",
+        "status": "modified",
+        "additions": 13,
+        "deletions": 2
+      },
+      {
+        "path": "tests/test_robotron_oct24_marathon.py",
+        "status": "added",
+        "additions": 63,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_robotron_qualified_comparison.py",
+        "status": "modified",
+        "additions": 33,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_archive_recovery.py",
+        "status": "added",
+        "additions": 56,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_crop_diagnostics.py",
+        "status": "added",
+        "additions": 174,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_score_feedback_recovery.py",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 1
+      },
+      {
+        "path": "tests/test_score_review_frontend.py",
+        "status": "modified",
+        "additions": 17,
+        "deletions": 2
+      },
+      {
+        "path": "tests/test_score_review_navigation.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 1
+      },
+      {
+        "path": "tests/test_sensory_recording.py",
+        "status": "modified",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_session_import_receipts.py",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_spawn_prior_evidence_serialization.py",
+        "status": "added",
+        "additions": 43,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_supervised_controller.py",
+        "status": "added",
+        "additions": 189,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_tactical_diagnostic_memory.py",
+        "status": "added",
+        "additions": 75,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_tactical_recovery.py",
+        "status": "added",
+        "additions": 93,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_tactical_recovery_cli.py",
+        "status": "added",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_visual_readiness.py",
+        "status": "added",
+        "additions": 301,
+        "deletions": 0
+      },
+      {
+        "path": "tools/bundle_score_crop_diagnostics.py",
+        "status": "added",
+        "additions": 73,
+        "deletions": 0
+      },
+      {
+        "path": "tools/native_preflight.py",
+        "status": "added",
+        "additions": 244,
+        "deletions": 0
+      },
+      {
+        "path": "tools/native_robotron_trial.py",
+        "status": "added",
+        "additions": 230,
+        "deletions": 0
+      },
+      {
+        "path": "tools/recover_score_review_evidence.py",
+        "status": "added",
+        "additions": 102,
+        "deletions": 0
+      },
+      {
+        "path": "tools/recover_tactical_feedback.py",
+        "status": "added",
+        "additions": 98,
+        "deletions": 0
+      },
+      {
+        "path": "tools/replay_experience_action.py",
+        "status": "added",
+        "additions": 74,
+        "deletions": 0
+      },
+      {
+        "path": "tools/replay_retained_tactics.py",
+        "status": "added",
+        "additions": 109,
+        "deletions": 0
+      },
+      {
+        "path": "tools/score_alignment_experiment.py",
+        "status": "added",
+        "additions": 39,
+        "deletions": 0
+      },
+      {
+        "path": "tools/train_score_to_hef.py",
+        "status": "added",
+        "additions": 124,
+        "deletions": 0
+      }
+    ]
+  },
+  {
+    "n": 28,
+    "sha": "c8a7a8d471130e40d9a5ecf827870118f3757b8f",
+    "tree": "3c2bcef80200e0a71acc10e1fe4b81cafb6a99e4",
+    "parents": [
+      "92c3923ada193864c0d7ff00090dd0b397cffce0"
+    ],
+    "checks": [
+      {
+        "name": "browser",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42675984504/job/129357363189"
+      },
+      {
+        "name": "regression",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42675984504/job/129357362513"
+      },
+      {
+        "name": "software",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42675983789/job/129357354550"
+      },
+      {
+        "name": "software",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42675976777/job/129357328905"
+      }
+    ],
+    "files": [
+      {
+        "path": ".github/workflows/elegoo-network.yml",
+        "status": "added",
+        "additions": 29,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/DESIGN.md",
+        "status": "added",
+        "additions": 95,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/MISSION.md",
+        "status": "added",
+        "additions": 55,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/OPERATOR.md",
+        "status": "added",
+        "additions": 95,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/VALIDATION.md",
+        "status": "added",
+        "additions": 64,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/offline-backup-layout.json",
+        "status": "added",
+        "additions": 51,
+        "deletions": 0
+      },
+      {
+        "path": "networking/__init__.py",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "networking/adapters.py",
+        "status": "added",
+        "additions": 150,
+        "deletions": 0
+      },
+      {
+        "path": "networking/provisioning.py",
+        "status": "added",
+        "additions": 209,
+        "deletions": 0
+      },
+      {
+        "path": "networking/service.py",
+        "status": "added",
+        "additions": 49,
+        "deletions": 0
+      },
+      {
+        "path": "networking/transport.py",
+        "status": "added",
+        "additions": 199,
+        "deletions": 0
+      },
+      {
+        "path": "tests/networking/test_dashboard.py",
+        "status": "added",
+        "additions": 37,
+        "deletions": 0
+      },
+      {
+        "path": "tests/networking/test_provisioning.py",
+        "status": "added",
+        "additions": 213,
+        "deletions": 0
+      },
+      {
+        "path": "tests/networking/test_tls_integration.py",
+        "status": "added",
+        "additions": 89,
+        "deletions": 0
+      },
+      {
+        "path": "tests/networking/test_transport.py",
+        "status": "added",
+        "additions": 138,
+        "deletions": 0
+      },
+      {
+        "path": "ui/dashboard.py",
+        "status": "modified",
+        "additions": 25,
+        "deletions": 1
+      }
+    ]
+  },
+  {
+    "n": 29,
+    "sha": "b71cd3dd917b83aff3b643795a76dab3ac5b42ed",
+    "tree": "2cdb4259c9b6a4e3f3778b157222ab17f2ad948d",
+    "parents": [
+      "669f93e45065dda7aae852c69e298ee1b4672a1d"
+    ],
+    "checks": [
+      {
+        "name": "core",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42674879599/job/129353465983"
+      },
+      {
+        "name": "core",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42674865583/job/129353415536"
+      }
+    ],
+    "files": [
+      {
+        "path": ".github/workflows/elegoo-firmware.yml",
+        "status": "added",
+        "additions": 18,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/ArduinoPlatform.h",
+        "status": "added",
+        "additions": 59,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/NetworkCore.h",
+        "status": "added",
+        "additions": 118,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/README.md",
+        "status": "added",
+        "additions": 120,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/check_image.py",
+        "status": "added",
+        "additions": 18,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/partitions.csv",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/setup.html",
+        "status": "added",
+        "additions": 12,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/setup.js",
+        "status": "added",
+        "additions": 34,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/tests/core.cpp",
+        "status": "added",
+        "additions": 67,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/tests/platform.cpp",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/tests/stubs/Preferences.h",
+        "status": "added",
+        "additions": 19,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/tests/stubs/WiFi.h",
+        "status": "added",
+        "additions": 20,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-network/tests/test_image.py",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      }
+    ]
+  },
+  {
+    "n": 30,
+    "sha": "ea2172ae84f16e7efe9d661301ce649672da69b3",
+    "tree": "83d3cb227ae71ea8275abdc0754d92da5b657594",
+    "parents": [
+      "93a3aa7d03d55ac53e2bad766d40506459317615"
+    ],
+    "checks": [
+      {
+        "name": "host",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42710178357/job/129477319931"
+      },
+      {
+        "name": "native-build",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42710178357/job/129477319329"
+      },
+      {
+        "name": "host",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42710169294/job/129477289536"
+      },
+      {
+        "name": "native-build",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42710169294/job/129477289100"
+      }
+    ],
+    "files": [
+      {
+        "path": ".github/workflows/elegoo-s3-integration.yml",
+        "status": "added",
+        "additions": 62,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/.gitignore",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ACCEPTANCE.md",
+        "status": "added",
+        "additions": 121,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/ArduinoPlatform.h",
+        "status": "added",
+        "additions": 59,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/AuthPolicy.h",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/CameraWebServer_AP.cpp",
+        "status": "added",
+        "additions": 143,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/CameraWebServer_AP.h",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/ElegooS3Camera.ino",
+        "status": "added",
+        "additions": 52,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/FrameParser.h",
+        "status": "added",
+        "additions": 39,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/Identity.cpp",
+        "status": "added",
+        "additions": 60,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/Identity.h",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/MotorBridge.cpp",
+        "status": "added",
+        "additions": 85,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/MotorBridge.h",
+        "status": "added",
+        "additions": 29,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/NetworkCore.h",
+        "status": "added",
+        "additions": 118,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/NetworkRuntime.cpp",
+        "status": "added",
+        "additions": 63,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/NetworkRuntime.h",
+        "status": "added",
+        "additions": 41,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/ProvisioningServer.cpp",
+        "status": "added",
+        "additions": 140,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/ProvisioningServer.h",
+        "status": "added",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/SetupAssets.h",
+        "status": "added",
+        "additions": 55,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/app_httpd.cpp",
+        "status": "added",
+        "additions": 1473,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/camera_index.h",
+        "status": "added",
+        "additions": 1342,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/camera_index.html",
+        "status": "added",
+        "additions": 2271,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/camera_pins.h",
+        "status": "added",
+        "additions": 175,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/partitions.csv",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/MISSION.md",
+        "status": "added",
+        "additions": 58,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/PROVENANCE.md",
+        "status": "added",
+        "additions": 59,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/README.md",
+        "status": "added",
+        "additions": 136,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/REPORT.md",
+        "status": "added",
+        "additions": 155,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/licenses/Apache-2.0.txt",
+        "status": "added",
+        "additions": 202,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/licenses/MPL-2.0.txt",
+        "status": "added",
+        "additions": 373,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/auth.cpp",
+        "status": "added",
+        "additions": 15,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/bridge.cpp",
+        "status": "added",
+        "additions": 37,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/conftest.py",
+        "status": "added",
+        "additions": 64,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/framing.cpp",
+        "status": "added",
+        "additions": 14,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/power_loss.cpp",
+        "status": "added",
+        "additions": 25,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/stubs/Arduino.h",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/stubs/WiFi.h",
+        "status": "added",
+        "additions": 36,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/test_browser.py",
+        "status": "added",
+        "additions": 34,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/test_build_gate.py",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/test_contracts.py",
+        "status": "added",
+        "additions": 51,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/test_enrollment_ticket.py",
+        "status": "added",
+        "additions": 71,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/test_peer_tls.py",
+        "status": "added",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tools/build.py",
+        "status": "added",
+        "additions": 75,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tools/embed_assets.py",
+        "status": "added",
+        "additions": 9,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tools/host_tests.py",
+        "status": "added",
+        "additions": 18,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tools/make_enrollment.py",
+        "status": "added",
+        "additions": 65,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/upstream-manifest.json",
+        "status": "added",
+        "additions": 16,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/verify_ticket.py",
+        "status": "added",
+        "additions": 71,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/web/setup.html",
+        "status": "added",
+        "additions": 11,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/web/setup.js",
+        "status": "added",
+        "additions": 40,
+        "deletions": 0
+      }
+    ]
+  },
+  {
+    "n": 31,
+    "sha": "cab7babcae913cb33c15aa3115867ca31fe0ecf6",
+    "tree": "b10baa98d0fb71f37d50f9ed89ac50256106c278",
+    "parents": [
+      "4390d27963bf871cb50a09de478b7a1594faa27a"
+    ],
+    "checks": [
+      {
+        "name": "regression",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42858656786/job/129978503116"
+      },
+      {
+        "name": "host",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42858656628/job/129978502840"
+      },
+      {
+        "name": "browser",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42858656786/job/129978502633"
+      },
+      {
+        "name": "native-build",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42858656628/job/129978501824"
+      },
+      {
+        "name": "native-build",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42858650348/job/129978478863"
+      },
+      {
+        "name": "host",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42858650348/job/129978478294"
+      }
+    ],
+    "files": [
+      {
+        "path": ".github/workflows/elegoo-s3-integration.yml",
+        "status": "modified",
+        "additions": 9,
+        "deletions": 1
+      },
+      {
+        "path": "docs/validation/pr31-owner-uno-20261110/baseline-regressions.txt",
+        "status": "added",
+        "additions": 192,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/pr31-owner-uno-20261110/contracts.txt",
+        "status": "added",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/pr31-owner-uno-20261110/host-sanitizers.txt",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/pr31-owner-uno-20261110/python.txt",
+        "status": "added",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "docs/validation/pr31-owner-uno-20261110/socket-limitation.txt",
+        "status": "added",
+        "additions": 12,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/CommandGate.h",
+        "status": "added",
+        "additions": 57,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/ElegooS3Camera.ino",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/Identity.cpp",
+        "status": "modified",
+        "additions": 7,
+        "deletions": 4
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/Identity.h",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/MotorBridge.cpp",
+        "status": "modified",
+        "additions": 46,
+        "deletions": 12
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/MotorBridge.h",
+        "status": "modified",
+        "additions": 10,
+        "deletions": 4
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/StockCameraIndex.h",
+        "status": "added",
+        "additions": 1571,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/ElegooS3Camera/app_httpd.cpp",
+        "status": "modified",
+        "additions": 14,
+        "deletions": 28
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/QUALIFIED_CONTROL.md",
+        "status": "added",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/README.md",
+        "status": "modified",
+        "additions": 3,
+        "deletions": 1
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/UNO_ACK_REVIEW.md",
+        "status": "added",
+        "additions": 104,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/VALIDATION_STOCK_PARITY.md",
+        "status": "added",
+        "additions": 17,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/stock-parity-evidence/qualified-opi-build.json",
+        "status": "added",
+        "additions": 54,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/stock-parity-evidence/qualified-qspi-build.json",
+        "status": "added",
+        "additions": 54,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/bridge.cpp",
+        "status": "modified",
+        "additions": 15,
+        "deletions": 9
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/bridge_timing.cpp",
+        "status": "added",
+        "additions": 60,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/command_gate.cpp",
+        "status": "added",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/fixtures/owner_uno_delay.inc",
+        "status": "added",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/fixtures/owner_uno_provenance.json",
+        "status": "added",
+        "additions": 17,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/fixtures/owner_uno_servo.inc",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/fixtures/owner_uno_servo_dispatch.inc",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/fixtures/owner_uno_servo_driver.inc",
+        "status": "added",
+        "additions": 33,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/fixtures/owner_uno_timer.inc",
+        "status": "added",
+        "additions": 46,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/fixtures/owner_uno_ultrasonic.inc",
+        "status": "added",
+        "additions": 28,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/fixtures/owner_uno_yaw.inc",
+        "status": "added",
+        "additions": 12,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/fixtures/vendor_uno_timer.inc",
+        "status": "added",
+        "additions": 46,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/owner_uno_protocol.cpp",
+        "status": "added",
+        "additions": 72,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/owner_uno_timer.cpp",
+        "status": "added",
+        "additions": 38,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/stubs-memory/WiFi.h",
+        "status": "added",
+        "additions": 37,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/stubs/driver/uart.h",
+        "status": "added",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/stubs/esp_system.h",
+        "status": "added",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/stubs/mbedtls/md.h",
+        "status": "added",
+        "additions": 8,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/test_contracts.py",
+        "status": "modified",
+        "additions": 10,
+        "deletions": 1
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/test_enrollment_ticket.py",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tests/vendor_uno_timer.cpp",
+        "status": "added",
+        "additions": 38,
+        "deletions": 0
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tools/build.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 1
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tools/host_tests.py",
+        "status": "modified",
+        "additions": 12,
+        "deletions": 2
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tools/make_enrollment.py",
+        "status": "modified",
+        "additions": 5,
+        "deletions": 1
+      },
+      {
+        "path": "firmware/elegoo-s3-camera/tools/verify_owner_uno.py",
+        "status": "added",
+        "additions": 32,
+        "deletions": 0
+      },
+      {
+        "path": "hardware/elegoo_command_auth.py",
+        "status": "added",
+        "additions": 67,
+        "deletions": 0
+      },
+      {
+        "path": "hardware/elegoo_mobile.py",
+        "status": "modified",
+        "additions": 50,
+        "deletions": 10
+      },
+      {
+        "path": "motion/elegoo_executor.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_elegoo_command_auth.py",
+        "status": "added",
+        "additions": 91,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_elegoo_timed_pulse.py",
+        "status": "modified",
+        "additions": 32,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_face_trial_preparation.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "tests/test_owner_uno_compatibility.py",
+        "status": "added",
+        "additions": 55,
+        "deletions": 0
+      }
+    ]
+  },
+  {
+    "n": 32,
+    "sha": "dba27aaf987c8ff3f3724bd90c5aad2589aeb871",
+    "tree": "3aa503a9359fe4838f39b51c48288ae31420d2b2",
+    "parents": [
+      "86961b269bad01d6e2596cd798f07ba9ec2ee15c"
+    ],
+    "checks": [
+      {
+        "name": "offline-audit",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/42735734595/job/129564380945"
+      }
+    ],
+    "files": [
+      {
+        "path": ".github/workflows/elegoo-stock-audit.yml",
+        "status": "added",
+        "additions": 22,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-evidence/backup-metadata.json",
+        "status": "added",
+        "additions": 82,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-evidence/herrsergio-comparison.json",
+        "status": "added",
+        "additions": 83,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-evidence/owner-package-manifest.json",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-evidence/qualified-opi-build.json",
+        "status": "added",
+        "additions": 54,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-evidence/qualified-qspi-build.json",
+        "status": "added",
+        "additions": 54,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-evidence/stock-image-comparison.json",
+        "status": "added",
+        "additions": 48,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-ledger.md",
+        "status": "added",
+        "additions": 17,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-review.md",
+        "status": "added",
+        "additions": 69,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-validation.md",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "docs/elegoo-network/stock-parity-worksheet.md",
+        "status": "added",
+        "additions": 26,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_elegoo_stock_audit.py",
+        "status": "added",
+        "additions": 15,
+        "deletions": 0
+      },
+      {
+        "path": "tools/audit_elegoo_stock.py",
+        "status": "added",
+        "additions": 51,
+        "deletions": 0
+      }
+    ]
+  },
+  {
+    "n": 38,
+    "sha": "e83b7d469e403559c68025b92120da27dc342dc9",
+    "tree": "a46f530ee90cd5e34485c94bfd0e727a14146f41",
+    "parents": [
+      "4c9ebc1ce4c7f99ed8a92b4ece529957890e77b4"
+    ],
+    "checks": [
+      {
+        "name": "browser",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/43131288231/job/130895787256"
+      },
+      {
+        "name": "regression",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/43131288231/job/130895787089"
+      },
+      {
+        "name": "software",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/43131288135/job/130895787035"
+      },
+      {
+        "name": "software",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/43131288124/job/130895786822"
+      },
+      {
+        "name": "software",
+        "conclusion": "success",
+        "status": "completed",
+        "url": "https://github.com/mrgarmise/charlie/actions/runs/43131277921/job/130895753764"
+      }
+    ],
+    "files": [
+      {
+        "path": ".gitattributes",
+        "status": "added",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": ".github/workflows/native-meditation.yml",
+        "status": "added",
+        "additions": 29,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/MEDITATION_NATIVE_NOTICE_HANDOFF.md",
+        "status": "added",
+        "additions": 86,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/ARCHITECTURE.md",
+        "status": "added",
+        "additions": 67,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/PI_NATIVE_QUALIFICATION.md",
+        "status": "added",
+        "additions": 146,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/VALIDATION.md",
+        "status": "added",
+        "additions": 153,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/config/charlie-meditation-broker.service.example",
+        "status": "added",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/config/inventory.example.json",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/config/policy.example.json",
+        "status": "added",
+        "additions": 30,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/config/qualification.example.json",
+        "status": "added",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/SHA256SUMS",
+        "status": "added",
+        "additions": 11,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/candidate-shared-state-calibration-failure.txt",
+        "status": "added",
+        "additions": 85,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/final-browser-first-attempt-failure.txt",
+        "status": "added",
+        "additions": 597,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/host-contracts.txt",
+        "status": "added",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/host-focused.txt",
+        "status": "added",
+        "additions": 14,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/host-focused.xml",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/implementation-full-success.txt",
+        "status": "added",
+        "additions": 395,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/pr36-baseline-calibration-failure.txt",
+        "status": "added",
+        "additions": 85,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/scheduler-calibration-failure.txt",
+        "status": "added",
+        "additions": 478,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/scheduler-full-success.txt",
+        "status": "added",
+        "additions": 369,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/source-manifest.json",
+        "status": "added",
+        "additions": 39,
+        "deletions": 0
+      },
+      {
+        "path": "docs/consultation/native-notice/evidence/unprivileged-issuer-refusal.txt",
+        "status": "added",
+        "additions": 14,
+        "deletions": 0
+      },
+      {
+        "path": "hardware/rp2040_controller.py",
+        "status": "modified",
+        "additions": 27,
+        "deletions": 0
+      },
+      {
+        "path": "learning/consultation_activation.py",
+        "status": "modified",
+        "additions": 45,
+        "deletions": 12
+      },
+      {
+        "path": "learning/lifecycle.py",
+        "status": "modified",
+        "additions": 25,
+        "deletions": 12
+      },
+      {
+        "path": "learning/native_meditation/__init__.py",
+        "status": "added",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/client.py",
+        "status": "added",
+        "additions": 42,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/coordinator.py",
+        "status": "added",
+        "additions": 93,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/daemon.py",
+        "status": "added",
+        "additions": 151,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/display_bridge.py",
+        "status": "added",
+        "additions": 59,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/engine.py",
+        "status": "added",
+        "additions": 171,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/guard.py",
+        "status": "added",
+        "additions": 82,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/linux.py",
+        "status": "added",
+        "additions": 386,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/ns_http.py",
+        "status": "added",
+        "additions": 33,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/profile.py",
+        "status": "added",
+        "additions": 25,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/runner.py",
+        "status": "added",
+        "additions": 53,
+        "deletions": 0
+      },
+      {
+        "path": "learning/native_meditation/security.py",
+        "status": "added",
+        "additions": 81,
+        "deletions": 0
+      },
+      {
+        "path": "learning/standing_consultation_policy.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 1
+      },
+      {
+        "path": "main.py",
+        "status": "modified",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "rp2040/commands.py",
+        "status": "modified",
+        "additions": 13,
+        "deletions": 0
+      },
+      {
+        "path": "rp2040/display.py",
+        "status": "modified",
+        "additions": 47,
+        "deletions": 0
+      },
+      {
+        "path": "rp2040/main.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "rp2040/meditation_notice.py",
+        "status": "added",
+        "additions": 50,
+        "deletions": 0
+      },
+      {
+        "path": "rp2040/object_label.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "rp2040/protocol.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 0
+      },
+      {
+        "path": "tests/camera_application_fixture.py",
+        "status": "modified",
+        "additions": 4,
+        "deletions": 1
+      },
+      {
+        "path": "tests/test_brain_calibration.py",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "tests/test_calibration_integration.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "tests/test_meditation_notice.py",
+        "status": "added",
+        "additions": 82,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_native_meditation.py",
+        "status": "added",
+        "additions": 536,
+        "deletions": 0
+      },
+      {
+        "path": "tests/test_normal_learning_lifecycle.py",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      }
+    ]
+  }
+]

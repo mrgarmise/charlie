@@ -3,6 +3,7 @@
 One supervised child keeps SQLite and bounded investigations away from vision's
 real-time loop. It has no camera, motion or controller transport.
 """
+from contextlib import nullcontext
 from pathlib import Path
 import json
 import time
@@ -23,7 +24,7 @@ class MeditationYield(Exception):
 
 
 class DevelopmentLifecycle:
-    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None, resource_guard=None):
+    def __init__(self, output, roots, *, budget_seconds=10., offline_authority=None, history_roots=(), resources=None, resource_guard=None, human_questions=False, model_learning=False, llm_consultation=False):
         from .resources import ResourceGuard
         self.resources=resource_guard or ResourceGuard(resources)
         self._stage_cache={}
@@ -62,6 +63,19 @@ class DevelopmentLifecycle:
         self.gateway = MemoryGateway(store=JsonlStore(self.output/'memory.jsonl'),
             evaluator=MemoryEvaluator(self.output/'evaluator.sqlite3'))
         self.executive = LearningExecutive(self.journal, self.gateway)
+        self.meditation_consultations = None  # separately configured trusted-slot adapter; default off
+        self.consultation = None
+        if llm_consultation:
+            from .consultation import ConsultationService
+            self.consultation = ConsultationService(self.journal)  # shadow; no transport
+        self.model_learning = None
+        if model_learning:
+            from .model_learning.service import ModelLearningService
+            self.model_learning=ModelLearningService(self.journal,self.output/"model-learning",wall_seconds=budget_seconds)
+        self.human_questions = None
+        if human_questions:
+            from memory.human_interaction import HumanInteractionGateway
+            self.human_questions = HumanInteractionGateway(self.journal)
         self.budget = budget_seconds
         self.authority = offline_authority
         import subprocess
@@ -135,6 +149,9 @@ class DevelopmentLifecycle:
             current_activity=getattr(self,'current_activity',None),
             evidence_requests=requests+[r.data['payload'] for r in rows if r.data['payload'].get('category')=='learning_evidence_request'
                 and r.id not in satisfied and work.get(r.data['payload'].get('work_id'),{}).get('status')!='completed'], identity_conflicts=current_conflicts(self.journal), activation=active,
+            model_learning=self.model_learning.status() if self.model_learning else None,
+            consultations=self.consultation.status() if self.consultation else None,
+            model_learning_result=getattr(self,'model_learning_result',None),
             physical_authorization=False, physical_score_improvement='UNKNOWN', error=self.error,
             provenance=self.provenance,
             resources=self.resources.sample,operational=self.operational,
@@ -155,7 +172,8 @@ class DevelopmentLifecycle:
         from .meditation import qualify_corpus
         from .acquisition import maintain_episode_identity
         from .episode_identity import verified_tracks
-        changed = False
+        from .mobile_runtime import import_mobile_evidence
+        changed = import_mobile_evidence(self)
         self.available_tracks = {}
         roots=list(self.roots)
         # A marathon relinquishes primary resources and hands evidence to this
@@ -251,6 +269,9 @@ class DevelopmentLifecycle:
         expose_score_review_contexts(self.dataset)
         expose_measurement_review_contexts(self.dataset)
         changed |= len(self.journal.records())!=before
+        if self.human_questions is not None:
+            from learning.human_runtime import review_information
+            changed |= review_information(self)
         self.acquisition_roots=roots
         changed |= bool(self.respond_to_requests())
         return changed
@@ -338,16 +359,30 @@ class DevelopmentLifecycle:
                 document['state_digest']=digest(document)
                 atomic_json(checkpoint,document,compact=True)
             try:
-                # A stable saved iteration is already complete, even if the
-                # process stopped between its checkpoint and result publication.
-                while len(history)<6 and (not history or history[-1]['merges']):
-                    progress()
-                    tracks, step, additions=meditate(tracks,iterations=1,
-                        on_progress=progress,resume_state=reconstruction)
-                    iteration=len(history)+1
-                    history.extend(dict(h,iteration=iteration) for h in step)
-                    merges.extend(dict(m,iteration=iteration) for m in additions)
-                    save_checkpoint()
+                # Consult only at a resumable boundary after Executive commission.
+                # The independent authority, never meditation state, admits a slot.
+                save_checkpoint()
+                coordinator = self.meditation_consultations
+                native_window=coordinator is not None and hasattr(coordinator,'window')
+                if coordinator is not None and not native_window:
+                    coordinator.on_meditation(commission_id, progress, client_deadline=deadline)
+                context=(coordinator.window(commission_id,progress,client_deadline=deadline)
+                         if native_window else nullcontext(None))
+                with context as native_check:
+                    original_progress=progress
+                    if native_check is not None:progress=native_check
+                    try:
+                        # A stable saved iteration is already complete, even if the
+                        # process stopped between its checkpoint and result publication.
+                        while len(history)<6 and (not history or history[-1]['merges']):
+                            progress()
+                            tracks, step, additions=meditate(tracks,iterations=1,
+                                on_progress=progress,resume_state=reconstruction)
+                            iteration=len(history)+1
+                            history.extend(dict(h,iteration=iteration) for h in step)
+                            merges.extend(dict(m,iteration=iteration) for m in additions)
+                            save_checkpoint()
+                    finally:progress=original_progress
             except MeditationYield as exc:
                 if sha(source)!=source_hash:
                     raise ValueError('meditation source changed during computation')
@@ -633,7 +668,10 @@ class DevelopmentLifecycle:
         self._operational('running','Executive developmental attempt')
         self.reflection_dependency_blocked=False
         self.reflection_dependency=None
-        try:self.executive.develop(self)
+        try:
+            if self.meditation_consultations is not None:
+                self.meditation_consultations.refresh(self.yield_for_primary)
+            self.executive.develop(self)
         except InterruptedError as exc:
             from .resources import DevelopmentInterrupted
             if not isinstance(exc,(ResourceUnavailable,DevelopmentInterrupted)) and exc is not self.resources.blockage:
@@ -644,17 +682,21 @@ class DevelopmentLifecycle:
 
     def close(self):
         self.last_activity=self.phase
+        if self.consultation and hasattr(self.consultation.provider, 'close'):
+            self.consultation.provider.close()
         try:
             self._operational('clean shutdown',self.operational.get('termination_reason','Executive closed'))
             self._phase('stopped')
         finally:
+            if getattr(self,'native_decision_journal',None) is not None:self.native_decision_journal.close()
             self.journal.close()
             self.lock.close()
 
 
 def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None,
         history_roots=(), resources=None, wall_seconds=None, cooldown_seconds=None,
-        clock=None, sleep=None, lifecycle_factory=None):
+        clock=None, sleep=None, lifecycle_factory=None, human_questions=False, model_learning=False, llm_consultation=False,
+        llm_consultation_approval=None, native_meditation=False):
     """One existing Executive, with resource polling rather than a second scheduler.
 
     ``turns`` bounds nonthermal attempt slots (including other resource refusals),
@@ -672,6 +714,8 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
     cooldown_seconds=120. if cooldown_seconds is None and turns is not None else cooldown_seconds
     if any(v is not None and (not math.isfinite(v) or v<=0) for v in (wall_seconds,cooldown_seconds)):
         raise ValueError('positive finite wall/cooldown deadlines required')
+    if llm_consultation_approval is not None and not llm_consultation:
+        raise ValueError('real consultation requires explicit queue opt-in')
     resources=resources or DevelopmentResources()
     resources.apply()
     os.nice(10)  # Vision/control retain host CPU priority.
@@ -693,8 +737,18 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
         if termination:raise DevelopmentInterrupted(termination)
     try:
         factory=lifecycle_factory or DevelopmentLifecycle
+        options = dict(human_questions=True) if human_questions else {}
         lifecycle=factory(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,
-            history_roots=history_roots,resources=resources)
+            history_roots=history_roots,resources=resources,**options)
+        if llm_consultation:
+            from .consultation_activation import make_service
+            lifecycle.consultation=make_service(lifecycle.journal, llm_consultation_approval)
+        if model_learning:
+            from .model_learning.service import ModelLearningService
+            lifecycle.model_learning=ModelLearningService(lifecycle.journal,lifecycle.output/"model-learning",wall_seconds=budget_seconds)
+        if native_meditation:
+            from .native_meditation.profile import attach
+            attach(lifecycle)
         lifecycle.resources.interruption_check=interrupt
         while turns is None or counters['nonthermal_attempt_slots']<turns:
             try:interrupt()

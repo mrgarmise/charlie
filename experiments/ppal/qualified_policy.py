@@ -19,8 +19,12 @@ def validate_spec(spec):
         from learning.meditation import PlanningCandidate
         PlanningCandidate(spec)
         return ('action_effect_prediction',)
-    if spec.get('adapter') != DECISION_ADAPTER or set(spec) != {'adapter', 'parameters'}:
+    if spec.get('adapter') != DECISION_ADAPTER or set(spec) not in (
+            {'adapter', 'parameters'}, {'adapter', 'parameters', 'retained_tactics'}):
         raise ValueError('unsupported policy version/adapter')
+    if 'retained_tactics' in spec:
+        from .tactical_memory import memory_from_spec
+        memory_from_spec(spec)
     parameters = spec['parameters']
     if not isinstance(parameters, dict) or not parameters or not set(parameters) <= DOMAINS-{'action_effect_prediction'}:
         raise ValueError('unsupported decision domains')
@@ -45,6 +49,7 @@ class QualifiedPolicy:
     identity: object
     parameters: object
     predictor: object = None
+    tactical_memory: object = None
 
     @classmethod
     def from_payload(cls, payload):
@@ -59,7 +64,12 @@ class QualifiedPolicy:
         identity = {k: payload[k] for k in ('candidate_id', 'investigation_id', 'evaluation_id',
                     'activation_key', 'rollback_identity', 'code_revision', 'provenance_kind')}
         identity.update(policy_version=VERSION, domains=domains)
-        return cls(MappingProxyType(identity), MappingProxyType(params), predictor)
+        memory = None
+        if 'retained_tactics' in spec:
+            from .tactical_memory import memory_from_spec
+            memory = memory_from_spec(spec)
+            identity['learning_state_sha256'] = spec['retained_tactics']['sha256']
+        return cls(MappingProxyType(identity), MappingProxyType(params), predictor, memory)
 
     def values(self, domain):
         return self.parameters.get(domain, {})

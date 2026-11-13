@@ -1,0 +1,57 @@
+{
+  "schema": "charlie.sensory-audit.validation.v1",
+  "published_runtime_commit": "ed37a3ac1dd863342b9cce30a60fe98258c4a5e5",
+  "tested_initial_tree": "6ddb926da7fcbbe06bd594e72f2516ccaa6b71ab",
+  "initial_local_commit": "d25faed",
+  "pull_request": "https://github.com/mrgarmise/charlie/pull/12",
+  "base_pr11": "a19c90822687739f79f69587302006a1bd6364d4",
+  "pr10_head": "cafe21aa3f6c68080c12a1a5613a92516fdb7167",
+  "host_full": {
+    "passed": 1373,
+    "skipped": 21,
+    "failures": 0,
+    "seconds": 327.8,
+    "receipt": "full-tests.xml.gz",
+    "console": "full-tests.txt",
+    "runtime_unchanged_since": true
+  },
+  "focused": {
+    "passed": 29,
+    "failures": 0,
+    "seconds": 2.37,
+    "receipt": "focused-tests.xml"
+  },
+  "final_history_assertions": {
+    "passed": 3,
+    "failures": 0,
+    "seconds": 0.1,
+    "receipt": "history-final.xml"
+  },
+  "hashes": {
+    "stimulus/bus.py": "c3d3bdf987fc968d52533690648ad44775f79e7ece14190e0ece9d75e656ec85",
+    "tests/test_sensory_history.py": "be6129d23d41a6c45a748cae81f3e97248a9f3e414bba35e1d23d2cad68f9492"
+  },
+  "ci": {
+    "run_id": 40254634149,
+    "job_id": 121353734168,
+    "status": "completed",
+    "conclusion": "success",
+    "tested_runtime_commit": "ed37a3ac1dd863342b9cce30a60fe98258c4a5e5",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/40254634149",
+    "passed": 1373,
+    "skipped": 21,
+    "failures": 0,
+    "seconds": 354.64,
+    "receipt": "github-ci.txt.gz"
+  },
+  "hardware_actions": [],
+  "native_acceptance": "pending; see CONFORMANCE.md",
+  "protected_paths_unchanged": [
+    "rp2040/",
+    "hardware/",
+    "motion/",
+    "tests/fixtures/",
+    "docs/mobile/",
+    "docs/object-display/"
+  ]
+}

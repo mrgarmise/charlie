@@ -1,0 +1,80 @@
+..............................F                                          [100%]
+=================================== FAILURES ===================================
+____ test_normal_object_application_repeats_demo_with_same_inference_owner _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_normal_object_application0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f26ec90f9b0>
+
+    def test_normal_object_application_repeats_demo_with_same_inference_owner(tmp_path,monkeypatch):
+        import time
+        from main import parser
+        from learning.object_runtime import run_objects
+        from vision.mobile_models import FixtureModel
+        import learning.demonstration as demo_module
+        import ui.dashboard as dashboard
+        now=[1.];services=[];models=[]
+        original=demo_module.Demonstration
+        def create_service(*args,**kwargs):
+            service=original(*args,**kwargs,clock=lambda:now[0]);services.append(service);return service
+        monkeypatch.setattr(demo_module,'Demonstration',create_service)
+        monkeypatch.setattr('time.monotonic',lambda:now[0])
+        monkeypatch.setattr('time.sleep',lambda seconds:None)
+        monkeypatch.setattr('stimulus.keyboard.KeyboardStimulus',lambda *a,**kw:SimpleNamespace(close=lambda:None))
+        monkeypatch.setattr('learning.resources.ResourceGuard',lambda *a:SimpleNamespace(check=lambda **kw:None))
+        monkeypatch.setenv('CHARLIE_OPERATOR_TOKEN','fixture-test-token-not-real-secret-123456789')
+        monkeypatch.setattr(dashboard,'start_dashboard',lambda *a,**kw:SimpleNamespace(address=('127.0.0.1',8768),close=lambda:None))
+        def detector(**kwargs):
+            model=FixtureModel([dict(label='chair',confidence=.95,box=[1,1,15,15])])
+            model.metadata['classes']=['chair'];models.append(model);return model
+        monkeypatch.setattr('vision.mobile_models.HailoObjects',detector)
+        manifest=tmp_path/'models.json';manifest.write_text(json.dumps({'schema':'charlie.mobile.models.v1','objects':{}}))
+        args=parser().parse_args(['--hardware','--object-recognition','--abilities-dashboard',
+            '--object-label-display','dry-run','--object-model-manifest',str(manifest),'--object-seconds','34',
+            '--learning-state',str(tmp_path/'state')])
+        frames=StimulusBus();owner=object();frames.claim_frames('pi-primary',owner)
+        requests=[];sequence=[0]
+        def supervise():
+            now[0]+=.2;sequence[0]+=1
+            frames.publish_frame('pi-primary',owner,packet(now[0],sequence=sequence[0]))
+            if services and len(requests)<2 and services[0].active is None:
+                requests.append(services[0].submit(request(services[0]))['id'])
+>       run_objects(args,None,frames,supervise=supervise)
+
+tests/test_operator_demonstration.py:303: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = Namespace(offline=False, learning_state=PosixPath('/tmp/pytest-of-root/pytest-6/test_normal_object_application0/state'...dashboard=True, abilities_port=8768, abilities_origin='https://charlie-project-dashboard.garmiseprojects.chatgpt.site')
+resources = None
+frame_bus = <stimulus.bus.StimulusBus object at 0x7f26ec90f8f0>
+supervise = <function test_normal_object_application_repeats_demo_with_same_inference_owner.<locals>.supervise at 0x7f26ec955120>
+actuator_executor = None, telemetry = None
+
+    def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_executor=None, telemetry=None):
+        from attention.object_display_runtime import attach
+        from learning.mobile import MobileEvidenceAdapter
+        from learning.resources import ResourceGuard
+        from memory.evidence import EvidenceJournal
+        from stimulus.bus import StimulusBus
+        from stimulus.keyboard import KeyboardStimulus
+        from vision.mobile_models import HailoObjects, UnavailableDepth
+        from vision.mobile_perception import MobilePerception
+        from vision.object_recognition import ObjectRecognition
+    
+        config = json.loads(args.object_model_manifest.read_text())
+        if config.get('schema') != 'charlie.mobile.models.v1':
+            raise ValueError('existing hash-bound Hailo object manifest required')
+        objects = dict(config['objects'], include_all=True)
+        revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'],
+            cwd=Path(__file__).resolve().parents[1], text=True).strip()
+        state = args.learning_state.resolve()
+        state.mkdir(parents=True, exist_ok=True)
+        with ExitStack() as lifecycle:
+            detector = HailoObjects(**objects)
+>           lifecycle.callback(detector.close)
+                               ^^^^^^^^^^^^^^
+E           AttributeError: 'FixtureModel' object has no attribute 'close'
+
+learning/object_runtime.py:31: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_operator_demonstration.py::test_normal_object_application_repeats_demo_with_same_inference_owner
+1 failed, 30 passed in 1.51s

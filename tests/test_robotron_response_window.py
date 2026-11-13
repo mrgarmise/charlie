@@ -34,6 +34,7 @@ def test_actual_live_pairs_confirm_same_track_via_explicit_response_window():
                 for d in row['tracking']['detections']]
     for row in rows[:8]:
         visual.observe(pairs(row), observed_at=row['capture_timestamp'])
+    # Replay only the recorded movement protocol; these frames contain no new firing experiment.
     remaining = iter(rows[8:]); current = [None]; recorded = []
     def read():
         current[0] = next(remaining)
@@ -44,7 +45,7 @@ def test_actual_live_pairs_confirm_same_track_via_explicit_response_window():
             self.moves.append(action.move)
     controller = Controller()
     player = visual.discover(read, controller, observation_time=lambda:current[0]['capture_timestamp'],
-                             record=recorded.append)
+                             record=recorded.append,fire_first=False,center_spawn=False)
     assert player is not None and visual.agency.self_id == 117
     assert controller.moves == ['E','STAY','W','STAY','S','STAY']
     assert visual.agency.beliefs[117].hits == visual.agency.beliefs[117].stops == 3

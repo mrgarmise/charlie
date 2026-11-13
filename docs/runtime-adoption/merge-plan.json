@@ -1,0 +1,119 @@
+{
+  "schema": "charlie-proposed-merge-order-v2",
+  "mission": "e15ba2ee9416106c4ba25bda6f97403f145acfbe",
+  "authorization": "proposal only; no merge/deploy/flash/enable",
+  "master_sequence": [
+    {
+      "position": 1,
+      "pr": 39,
+      "url": "https://github.com/mrgarmise/charlie/pull/39",
+      "exact_pin": "final independent CI head/tree recorded in PR39; never floating branch",
+      "prerequisites": [
+        "all applicable exact-head software jobs green",
+        "complete provenance and baseline preservation",
+        "human source-only merge approval"
+      ],
+      "effect": "source inclusion only; hardware and autonomous abilities dormant"
+    }
+  ],
+  "do_not_double_merge": [
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    36,
+    38
+  ],
+  "internal_source_order": [
+    [
+      13
+    ],
+    [
+      18
+    ],
+    [
+      19
+    ],
+    [
+      20
+    ],
+    [
+      21
+    ],
+    [
+      22
+    ],
+    [
+      23
+    ],
+    [
+      26,
+      25
+    ],
+    [
+      27
+    ],
+    [
+      33
+    ],
+    [
+      36
+    ],
+    [
+      38
+    ],
+    [
+      "39-core"
+    ],
+    [
+      28,
+      29
+    ],
+    [
+      30,
+      31
+    ],
+    [
+      "32-audit-only"
+    ],
+    [
+      "9-compatible-5-6-7-8"
+    ]
+  ],
+  "separate_decisions": [
+    "master source approval",
+    "native stationary qualification",
+    "applicable supervised physical qualification",
+    "fresh backup and isolated restore",
+    "release staging approval",
+    "maintenance cutover approval",
+    "one-ability enablement approval",
+    "post-install observation and benefit"
+  ],
+  "operational_runtime_preserved": "d3dca9059233b5f054c4f6f9979085b1422f9674",
+  "rollback_preserved": "f3304c588a893a953e34e5c4d00bd5f9bfb18f19"
+}

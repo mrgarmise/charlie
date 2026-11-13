@@ -57,3 +57,29 @@ def test_unsupported_response_window_is_rejected_without_commands():
     controller=Mock()
     with pytest.raises(ValueError):VisualAgency().discover(lambda:[],controller,response_frames=100)
     controller.execute.assert_not_called()
+
+
+def test_body_recovery_reaches_commands_after_expensive_observation(monkeypatch):
+    """A spent three-second slot must not prevent the existing BODY experiment.
+
+    Model 3.2 seconds spent delivering/classifying a fresh recovery observation.
+    The total uncertainty deadline remains twenty seconds; no policy decisions
+    are made while SELF is unknown, and terminal suspicion stops all probes.
+    """
+    from experiments.ppal import robotron_agency as module
+    clock=[3.2];actions=[]
+    monkeypatch.setattr(module.time,'monotonic',lambda:clock[0])
+    def read():clock[0]+=.35;return []
+    class Controller:
+        def execute(self,action,duration):
+            assert clock[0]<12. and duration<=240
+            actions.append(action);clock[0]+=duration/1000
+    agency=VisualAgency()
+    agency.discover(read,Controller(),fire_first=False,deadline=12.,response_frames=2)
+    assert actions and actions[0].move=='E'
+    assert any(a.move=='STAY' for a in actions)
+    assert agency.agency.self_id is None
+    assert clock[0]<20.
+    before=len(actions)
+    agency.discover(read,Controller(),fire_first=False,deadline=12.,should_stop=lambda:True)
+    assert len(actions)==before

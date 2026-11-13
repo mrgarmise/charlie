@@ -218,11 +218,29 @@ def import_queue(journal, root):
             source_sha256=content,reason=str(exc),physical_authorization=False),
             episode='score-review-acquisition',producer='existing-acquisition-capability',version='score-feedback-v1')
     # Existing session diary includes attempts without report.json.
+    receipts=journal.category_records('event','preserved_session_history_import')
     for path in sorted(set(root.rglob('experiment-evidence.sqlite3')) | set(root.rglob('session-evidence.sqlite3'))):
         if path.resolve()==journal.path.resolve():continue
         import sqlite3
         try:
+            if any(Path(str(path)+suffix).exists() for suffix in ('-wal','-shm','-journal')):
+                raise ValueError('quiesced session snapshot required; SQLite sidecars present')
             source_hash=hashlib.sha256(path.read_bytes()).hexdigest()
+            previous=next((r for r in reversed(receipts)
+                if r.data['payload'].get('source_path')==str(path.resolve())
+                and r.data['payload'].get('source_sha256')==source_hash),None)
+            if previous is not None:
+                # The original graph was already verified on import. Immutable
+                # target records were verified when this journal was opened.
+                # Rewalking a large unchanged session on every learning turn
+                # adds no evidence; still check the receipt's complete delivery.
+                identifiers=previous.data['payload']['record_ids']
+                present={r[0] for r in journal.conn.execute('SELECT id FROM records')}
+                if not set(identifiers)<=present:
+                    raise ValueError('retained session receipt has missing records')
+                if hashlib.sha256(path.read_bytes()).hexdigest()!=source_hash:
+                    raise ValueError('original session journal changed during receipt verification')
+                continue
             source=EvidenceJournal(path,read_only=True)
             try:
                 identifiers=[r.id for r in source.records()]
@@ -250,8 +268,9 @@ def import_queue(journal, root):
 def queue_rows(journal):
     """Project immutable history; changing a review never rewrites a prediction."""
     games={}
-    for r in journal.category_records('observation','score_game_record'):
-        p=r.data['payload'];games[p['attempt_id']]=dict(p,id=r.id)
+    for category in ('score_game_record', 'score_review_sample'):
+        for r in journal.category_records('observation',category):
+            p=r.data['payload'];games[p['attempt_id']]=dict(p,id=r.id)
     unique={}
     for p in games.values():
         key=p['capture_key']
@@ -277,30 +296,40 @@ def queue_rows(journal):
     return sorted(result,key=lambda p:(p['session'],str(p['number']).zfill(5)))
 
 
-def review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
+def review_game(journal, identifier, *, annotator, verdict, value=None, visible_digits=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
     if (journal.path.parent/'capture-manifest.json').is_file():
         raise ValueError('review must use consolidated notebook; sealed original diary is immutable')
     with journal.batch():
         return _review_game(journal,identifier,annotator=annotator,verdict=verdict,
-            value=value,reason=reason,independent=independent,not_final_score=not_final_score,finality_unknown=finality_unknown)
+            value=value,visible_digits=visible_digits,reason=reason,independent=independent,not_final_score=not_final_score,finality_unknown=finality_unknown)
 
 
-def _review_game(journal, identifier, *, annotator, verdict, value=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
+def _review_game(journal, identifier, *, annotator, verdict, value=None, visible_digits=None, reason='', independent=False,not_final_score=False,finality_unknown=False):
     from .score_observer import ScoreObserver
     from datetime import datetime,timezone
     if type(not_final_score) is not bool or type(finality_unknown) is not bool:raise ValueError('finality controls must be explicit booleans')
     if type(independent) is not bool:raise ValueError('independence attestation must be explicit boolean')
     row=journal.get(identifier);p=row.data['payload']
-    if p.get('category')!='score_game_record' or not isinstance(annotator,str) or not annotator.strip():raise ValueError('game and reviewer identity required')
+    if p.get('category') not in ('score_game_record','score_review_sample') or not isinstance(annotator,str) or not annotator.strip():raise ValueError('game/sample and reviewer identity required')
     statuses={'confirm':'confirmed','correct':'corrected','unreadable':'unreadable',
               'insufficient':'insufficient','defer':'pending','disagree':'disputed'}
     if verdict not in statuses:raise ValueError('unsupported review verdict')
+    if p.get('category')=='score_review_sample':
+        if verdict=='insufficient':
+            raise ValueError('mid-game score is not insufficient; enter exact visible digits or mark unreadable')
+        if verdict=='correct':
+            if (not isinstance(visible_digits,str) or not visible_digits.isascii() or
+                    not visible_digits.isdigit() or not 1<=len(visible_digits)<=7 or
+                    type(value) is not int or int(visible_digits)!=value):
+                raise ValueError('sample correction requires exact 1–7 visible digits matching numeric score')
+        if verdict=='confirm':
+            raise ValueError('score-training samples require explicit visible-digit transcription, not inferred score confirmation')
     annotation=None
     if verdict in ('confirm','correct','unreadable') and p.get('proposal_id'):
         previous=next((r for r in reversed(journal.category_records('observation','score_human_annotation'))
             if r.data['payload']['proposal_id']==p['proposal_id'] and r.data['payload']['annotator']==annotator),None)
         annotation=ScoreObserver.annotate_review(journal,p['proposal_id'],annotator=annotator,verdict=verdict,
-            value=value,reason=reason or 'Reviewer inspected the original photograph',independent=independent,
+            value=value,visible_digits=visible_digits,reason=reason or 'Reviewer inspected the original photograph',independent=independent,
             supersedes=previous.id if previous else None)
     elif verdict in ('confirm','correct'):raise ValueError('original score photograph unavailable')
     return journal.append('observation',dict(category='score_review_status',attempt_id=p['attempt_id'],

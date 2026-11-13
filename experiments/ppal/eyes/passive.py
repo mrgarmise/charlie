@@ -105,6 +105,13 @@ class PassivePublisher:
                 packet = dict(producer_pid=os.getpid(), capture_timestamp=timestamp,
                     published_at=time.monotonic(), raw=self.jpeg(raw),
                     playfield=self.jpeg(crop) if crop is not None else None, evidence=state)
+                if metadata.get('frame_subscription'):
+                    # Lossless full-resolution extension of the existing passive
+                    # publication, encoded on this worker, never by a subscriber.
+                    stream = BytesIO()
+                    raw.save(stream, 'PNG')
+                    packet['subscription_frame'] = dict(metadata['frame_subscription'],
+                        png=base64.b64encode(stream.getvalue()).decode())
                 atomic_json(self.directory/'latest.json', packet)
                 self.published += 1
             except Exception:
@@ -119,3 +126,77 @@ class PassivePublisher:
 
     def close(self):
         self.stop.set(); self.thread.join(timeout=.5)
+
+
+class PublishedFrameSubscription:
+    """Cross-process subscriber to existing passive publication; never a preview owner."""
+    def __init__(self, source, *, max_age=.5, clock=time.monotonic, directory=None):
+        self.source, self.max_age, self.clock = source, max_age, clock
+        self.directory = directory or runtime_dir()
+        if source == 'elegoo-v4' and directory is None:
+            self.directory = self.directory/'elegoo-v4'
+        if source not in ('pi-primary', 'elegoo-v4') or not 0 < max_age <= 5:
+            raise ValueError('known source and bounded age required')
+        self.closed = False
+        self.last_id = None
+        self.last_demand = None
+
+    def read(self):
+        if self.closed:
+            raise InterruptedError('frame subscription closed')
+        now = self.clock()
+        if self.last_demand is None or now-self.last_demand >= .5:
+            if self.directory.is_dir():
+                atomic_json(self.directory/'demand.json', dict(at=now))
+            self.last_demand = now
+        path = self.directory/'latest.json'
+        if not path.is_file():
+            return None
+        if path.stat().st_size > 32*1024*1024:
+            raise ValueError('published frame exceeds bounded snapshot')
+        packet = read_json(path) or {}
+        data = packet.get('subscription_frame')
+        if not data:
+            return None  # Legacy preview JPEG cannot invent full-resolution provenance.
+        if data.get('source') != self.source:
+            raise ValueError('published source identity mismatch')
+        if data.get('host_boot_id') != Path('/proc/sys/kernel/random/boot_id').read_text().strip():
+            raise ValueError('published frame from another boot')
+        if not 0 <= now-data['received_at'] <= self.max_age:
+            raise TimeoutError('stale published frame')
+        if data['id'] == self.last_id:
+            return None
+        from PIL import Image
+        import numpy as np
+        import hashlib
+        from vision.camera_source import CameraFrame
+        raw = base64.b64decode(data['png'], validate=True)
+        with Image.open(BytesIO(raw)) as image:
+            if image.width*image.height > 4096*4096:
+                raise ValueError('published frame geometry exceeds bound')
+            bgr = np.asarray(image.convert('RGB'))[:, :, ::-1].copy()
+        if hashlib.sha256(bgr.tobytes()).hexdigest() != data['sha256']:
+            raise ValueError('published pixels changed')
+        pixels = np.frombuffer(bgr.tobytes(), dtype=np.uint8).reshape(bgr.shape)
+        from dataclasses import fields
+        values = {f.name:data[f.name] for f in fields(CameraFrame) if f.name in data and f.name != 'image'}
+        frame = CameraFrame(image=pixels, **values)
+        frame.validate()
+        if not 0 <= self.clock()-frame.received_at <= self.max_age:
+            raise TimeoutError('published frame became stale during decode')
+        self.last_id = frame.id
+        return frame
+
+    def wait(self, timeout=2., *, captured_after=None):
+        deadline = time.monotonic()+timeout
+        while time.monotonic() < deadline:
+            frame = self.read()
+            if frame is not None and (captured_after is None or
+                    getattr(frame, 'capture_requested_at', None) is not None and
+                    frame.capture_requested_at >= captured_after):
+                return frame
+            time.sleep(.01)
+        raise TimeoutError('waiting for an authoritative camera feeder')
+
+    def close(self):
+        self.closed = True

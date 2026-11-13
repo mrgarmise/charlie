@@ -3,6 +3,10 @@ import socket
 import threading
 import time
 import itertools
+import math
+import hashlib
+from collections import deque
+from copy import deepcopy
 from dataclasses import dataclass
 
 
@@ -53,7 +57,11 @@ class ElegooMobileBase:
         turn_speed=55,
         max_align_seconds=3.0,
         min_pan_step=2,
+        command_key=None,
     ):
+        from hardware.elegoo_command_auth import CommandAuthenticator
+        self._command_auth = CommandAuthenticator(command_key) if command_key is not None else None
+        self._qualified_owner = None
         self.host = host
         self.port = port
         self.timeout = timeout
@@ -63,6 +71,7 @@ class ElegooMobileBase:
         self.min_pan_step = min_pan_step
 
         self.sock = None
+        self._body_lease = None
         self._rx_buffer = ""
         self._counter = itertools.count(1)
 
@@ -73,13 +82,29 @@ class ElegooMobileBase:
         self._pending_lock = threading.Lock()
         self._pending = {}
 
+        self._wire_history = deque(maxlen=512)
+        self._wire_history_lock = threading.Lock()
+        self._wire_sequence = 0
         self.align = AttentionAlignState()
 
     # --------------------------------------------------
     # CONNECTION
     # --------------------------------------------------
 
+    def bind_qualified_executor(self, executor):
+        from motion.elegoo_executor import QualifiedElegooExecutor
+        if not isinstance(executor, QualifiedElegooExecutor) or executor.base.car is not self:
+            raise PermissionError("existing qualified executor required")
+        if self._qualified_owner is not None and self._qualified_owner is not executor:
+            raise PermissionError("transport already bound")
+        self._qualified_owner = executor
+
     def connect(self):
+        # Normal application consumers cannot create a parallel command owner.
+        # Standalone calibration tools retain their explicit native workflow.
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None and _application_executor.base.car is not self:
+            raise PermissionError('ELEGOO transport belongs to the application executor')
         if (
             self.sock is not None
             and self._running
@@ -88,10 +113,15 @@ class ElegooMobileBase:
 
         self.close()
 
-        self.sock = socket.create_connection(
-            (self.host, self.port),
-            timeout=5,
-        )
+        from hardware.hailo_session import accelerator_lease
+        key=hashlib.sha256(f'{self.host}:{self.port}'.encode()).hexdigest()[:16]
+        lease=accelerator_lease(f'/tmp/charlie-elegoo-body-{key}.lock')
+        lease.__enter__()
+        self._body_lease=lease
+        try:
+            self.sock = socket.create_connection((self.host,self.port),timeout=5)
+        except BaseException:
+            self.close();raise
         self.sock.settimeout(0.25)
 
         self._running = True
@@ -135,6 +165,9 @@ class ElegooMobileBase:
             self._pending.clear()
 
         self._rx_buffer = ""
+        if self._command_auth is not None:self._command_auth.reset()
+        lease,self._body_lease=self._body_lease,None
+        if lease is not None:lease.__exit__(None,None,None)
 
     def __enter__(self):
         self.connect()
@@ -152,6 +185,19 @@ class ElegooMobileBase:
     # BACKGROUND RECEIVE / HEARTBEAT
     # --------------------------------------------------
 
+    def _wire_event(self, kind, **details):
+        # In-memory diagnostics only. Never disk I/O on the RX/send-lock path.
+        with self._wire_history_lock:
+            self._wire_sequence += 1
+            self._wire_history.append(dict(sequence=self._wire_sequence,
+                at=time.monotonic(), kind=kind, **details))
+
+    def wire_history(self, after=0):
+        with self._wire_history_lock:
+            rows = [deepcopy(r) for r in self._wire_history if r['sequence'] > after]
+            lost = bool(self._wire_history and after < self._wire_history[0]['sequence']-1)
+            return dict(events=rows, evicted=lost, latest=self._wire_sequence)
+
     def _receive_loop(self):
         while (
             self._running
@@ -161,6 +207,7 @@ class ElegooMobileBase:
                 data = self.sock.recv(4096)
 
                 if not data:
+                    self._wire_event('rx_eof')
                     break
 
                 self._rx_buffer += (
@@ -174,7 +221,8 @@ class ElegooMobileBase:
             except socket.timeout:
                 continue
 
-            except OSError:
+            except OSError as exc:
+                self._wire_event('rx_error',error=type(exc).__name__,message=str(exc)[:256])
                 break
 
         self._running = False
@@ -215,6 +263,9 @@ class ElegooMobileBase:
             self._handle_frame(frame)
 
     def _handle_frame(self, frame):
+        self._wire_event("rx", frame=frame[:512], truncated=len(frame)>512)
+        if self._command_auth is not None and self._command_auth.challenge(frame):
+            return
         if frame == "{Heartbeat}":
             try:
                 self._send_raw(
@@ -238,6 +289,9 @@ class ElegooMobileBase:
                         self._pending[ident]
                     )
 
+                    # Qualified motion/STOP require their exact tagged reply.
+                    if item.get("expected_response") is not None:
+                        return
                     item["response"] = (
                         frame
                     )
@@ -262,6 +316,8 @@ class ElegooMobileBase:
             )
 
             if item is not None:
+                if item.get("expected_response") not in (None, frame):
+                    return
                 item["response"] = (
                     frame
                 )
@@ -272,7 +328,7 @@ class ElegooMobileBase:
     # COMMAND TRANSPORT
     # --------------------------------------------------
 
-    def _send_raw(self, raw):
+    def _send_raw(self, raw, *, preflight=None):
         sock = self.sock
 
         if (
@@ -284,7 +340,18 @@ class ElegooMobileBase:
             )
 
         with self._send_lock:
-            sock.sendall(raw)
+            wire = raw
+            if self._command_auth is not None:
+                wire = self._command_auth.wrap(raw, qualified=self._qualified_owner is not None and preflight is not None)
+            if preflight is not None and preflight() is not True:
+                raise InterruptedError("command cancelled before wire dispatch")
+            self._wire_event('tx_attempt', raw=raw[:512].decode(errors='replace'), bytes=len(raw))
+            try:
+                sock.sendall(wire)
+            except BaseException as exc:
+                self._wire_event('tx_error', error=type(exc).__name__, delivery='unknown')
+                raise
+            self._wire_event('tx_complete', bytes=len(raw))
 
     def _next_id(self, prefix="cmd"):
         return (
@@ -297,8 +364,13 @@ class ElegooMobileBase:
         payload,
         expected_id=None,
         timeout=None,
+        retry=True,
+        preflight=None,
+        expected_response=None,
+        wait_check=None,
     ):
-        self.connect()
+        if retry:self.connect()
+        elif not self.connected:raise ConnectionError("qualified command requires existing live connection")
 
         pending = None
 
@@ -307,6 +379,7 @@ class ElegooMobileBase:
                 "event": threading.Event(),
                 "response": None,
                 "value": None,
+                "expected_response": expected_response,
             }
 
             with self._pending_lock:
@@ -321,7 +394,10 @@ class ElegooMobileBase:
             ).encode()
 
             try:
-                self._send_raw(raw)
+                if preflight is None:
+                    self._send_raw(raw)
+                else:
+                    self._send_raw(raw, preflight=preflight)
 
             except (
                 OSError,
@@ -329,9 +405,13 @@ class ElegooMobileBase:
             ):
                 # One reconnect/retry is useful because the
                 # ESP32 may close an idle TCP connection.
+                if not retry:raise  # Never replay an ambiguous motor start.
                 self.close()
                 self.connect()
-                self._send_raw(raw)
+                if preflight is None:
+                    self._send_raw(raw)
+                else:
+                    self._send_raw(raw, preflight=preflight)
 
             if pending is None:
                 return {
@@ -346,13 +426,28 @@ class ElegooMobileBase:
                 else self.timeout
             )
 
-            if not pending[
-                "event"
-            ].wait(wait_time):
-                raise TimeoutError(
-                    f"timeout waiting for "
-                    f"{expected_id}"
-                )
+            if wait_check is None:
+                ready = pending["event"].wait(wait_time)
+            else:
+                # Only qualified timed commands opt in. Legacy sensor/servo
+                # response semantics remain unchanged. Never hold the send lock
+                # while checking independent safety or awaiting completion.
+                deadline = time.monotonic() + wait_time
+                while True:
+                    wait_check()
+                    if pending["event"].is_set():
+                        ready = True
+                        break
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        ready = False
+                        break
+                    pending["event"].wait(min(.02, remaining))
+                wait_check()  # Cancellation/expiry wins a simultaneous ACK race.
+            if not ready:
+                self._wire_event('ack_timeout', expected_id=expected_id,
+                    expected_response=expected_response, wait_seconds=wait_time)
+                raise TimeoutError(f"timeout waiting for {expected_id}")
 
             return {
                 "ok": (
@@ -401,7 +496,10 @@ class ElegooMobileBase:
             )
 
         try:
-            return float(value)
+            yaw = float(value)
+            if not math.isfinite(yaw):
+                raise ValueError("non-finite yaw")
+            return yaw
 
         except ValueError as exc:
             raise ValueError(
@@ -410,6 +508,9 @@ class ElegooMobileBase:
             ) from exc
 
     def pan(self, degrees):
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None:
+            raise PermissionError('legacy pan cannot bypass the application executor')
         degrees = max(
             self.PAN_MIN,
             min(
@@ -418,6 +519,8 @@ class ElegooMobileBase:
             ),
         )
 
+        # Owner UNO divides D2 by ten, then writes ten times that integer.
+        degrees = degrees // 10 * 10
         ident = self._next_id(
             "pan"
         )
@@ -449,6 +552,9 @@ class ElegooMobileBase:
         direction,
         speed=None,
     ):
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None:
+            raise PermissionError('legacy pivot cannot bypass the application executor')
         speed = (
             speed
             if speed is not None
@@ -525,6 +631,149 @@ class ElegooMobileBase:
                 pass
 
         self.align.active = False
+
+    def stop_verified(self):
+        """No reconnect/concealed fallback; even an ACK is not measured stopping."""
+        ident=self._next_id('safestop')
+        started=time.monotonic()
+        command={'N':1,'H':ident,'D1':0,'D2':0,'D3':0}
+        expected='{'+ident+'_ok}'
+        receipt=None;error_message=None
+        try:
+            result=self._send(command,expected_id=ident,timeout=.150,retry=False,expected_response=expected)
+            receipt=dict(sent=True,acknowledged=result['ok'] is True and result.get('response')==expected,
+                         response=result.get('response'),physically_stopped=None)
+        except Exception as exc:
+            receipt=dict(sent=None,acknowledged=False,physically_stopped=None,error=type(exc).__name__)
+            error_message=str(exc)[:256]
+        finally:
+            self.align.active=False
+            # Preserve the established receipt API; diagnostics are a separate
+            # observation, never an extra physical claim or a repaired outcome.
+            diagnostic=dict(command=command,expected_response=expected,
+                ack_timeout_seconds=.150,elapsed_seconds=time.monotonic()-started,
+                error_message=error_message,result=deepcopy(receipt))
+            self.last_stop_diagnostic=diagnostic
+            self._wire_event('stop_result',**diagnostic)
+        return receipt
+
+    def pulse(self, direction, *, pwm, seconds, lease, boot_id, envelope, safety_check,
+              cancel=None, clock=time.monotonic, wait=time.sleep, _executor=None):
+        """N2 milliseconds, completion ACK after firmware requests local STOP.
+
+        The callback is protocol evidence, never measured physical stopping.
+        No retry/reconnect; safety checks continue while awaiting completion.
+        Every attempted pulse exits through an independent explicit STOP.
+        """
+        self.last_pulse = None
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None and _executor is not _application_executor:
+            raise PermissionError('chassis pulse requires application executor')
+        if (direction not in ('LEFT','RIGHT','FORWARD','REVERSE') or type(pwm) is not int
+                or not 1<=pwm<=min(35,envelope['max_pwm']) or type(seconds) not in (int,float)
+                or not math.isfinite(seconds) or not 0<seconds<=min(.2,envelope['max_duration'])
+                or not lease.valid(clock(),boot_id) or clock()+seconds>lease.expires_at):
+            raise ValueError('finite qualified direction/speed/duration/lease required')
+        milliseconds = int(seconds * 1000)  # Round DOWN; never extend the grant.
+        if not 1 <= milliseconds <= 200:
+            raise ValueError('timed motion requires at least one whole millisecond')
+        duration = milliseconds / 1000.
+        result=dict(sent=False,acknowledged=False,executed=None,physically_observed=None,
+                    timed_completion=False)
+        ident=self._next_id('pulse')
+        expected='{'+ident+'_ok}'
+        # The candidate's sole UART owner runs at9600baud (10 bits per byte).
+        # Bound command+ACK serialization and scheduling in the existing deadline;
+        # this is transport latency, not an extension of requested motor duration.
+        candidate_frame={'N':2,'H':ident,'D1':{'LEFT':1,'RIGHT':2,'FORWARD':3,'REVERSE':4}[direction],
+                         'D2':pwm,'T':milliseconds}
+        command_wire_seconds=len(json.dumps(candidate_frame,separators=(',',':')).encode())/960
+        wire_budget=max(command_wire_seconds,.100)+len(expected)/960+.04 if self._command_auth is not None else .05
+        # Include the independent ESP32 fallback: up to100ms TX confirmation,
+        # T+80ms completion slack, N100 serialization, and40ms scheduling.
+        # Do not dispatch if that finite fail-safe horizon exceeds the lease.
+        fallback_budget=.100+.080+len(b'{"N":100}')/960+.040
+        lease_budget=max(wire_budget,fallback_budget) if self._command_auth is not None else 0
+        def check():
+            if (not self.connected or not lease.valid(clock(),boot_id)
+                    or (cancel is not None and cancel.is_set()) or safety_check() is not True):
+                raise InterruptedError('pulse safety condition changed')
+            if result.get('wire_started_at') is not None and clock()>result['wire_started_at']+duration+wire_budget:
+                raise TimeoutError('timed completion deadline exceeded')
+        def preflight():
+            # Cheap cancellation/horizon check under the existing wire lock;
+            # independent safety I/O is checked outside that lock.
+            now=clock()
+            if ((cancel is not None and cancel.is_set()) or not lease.valid(now,boot_id)
+                    or now+duration+lease_budget>lease.expires_at):
+                return False
+            result['wire_started_at']=now
+            return True
+        def awaiting_completion():
+            result['sent']=True  # _send has returned from its single sendall.
+            check()
+        try:
+            check()
+            payload=candidate_frame
+            result['command']=payload
+            result['sent']=None  # Delivery stays ambiguous if the write fails.
+            response=self._send(payload,expected_id=ident,timeout=duration+wire_budget,retry=False,
+                preflight=preflight,expected_response=expected,wait_check=awaiting_completion)
+            result['completion_response']=response.get('response')
+            check()
+            if (response.get('ok') is not True or response.get('response')!=expected
+                    or result.get('wire_started_at') is None
+                    or clock()-result['wire_started_at'] < duration-1e-9):
+                raise TimeoutError('missing, invalid or premature timed completion ACK')
+            result.update(sent=True,acknowledged=True,timed_completion=True)
+        except BaseException as exc:
+            result.update(error=type(exc).__name__,reason=str(exc))
+            raise
+        finally:
+            # Preserve the attempted wire command even if STOP itself raises.
+            result['stop']=dict(sent=None,acknowledged=False,physically_stopped=None)
+            self.last_pulse=result
+            result['stop']=self.stop_verified()
+        return result
+
+    def pan_qualified(self, degrees, *, safety_check, wire_guard=None, _executor=None):
+        # Same proven N5 position command, with no reconnect/replay. Independent
+        # authority must verify physical servo bounds and cancellation behavior.
+        from motion.elegoo_executor import _application_executor
+        if _application_executor is not None and _executor is not _application_executor:
+            raise PermissionError('pan requires application executor')
+        if type(degrees) not in (int, float) or not math.isfinite(degrees) or not 20 <= degrees <= 160:
+            raise ValueError('bounded pan position required')
+        # Reject unsupported positions before sending or changing the request.
+        # The owner UNO truncates to ten-degree steps, which can escape a lease
+        # or envelope approved for a different position.
+        if degrees % 10 != 0:
+            raise ValueError('UNO pan requires a ten-degree position')
+        degrees = int(degrees)
+        if safety_check() is not True:
+            raise InterruptedError('independent pan safety veto')
+        ident = self._next_id('qualifiedpan')
+        def check():
+            if safety_check() is not True or (wire_guard is not None and wire_guard() is not True):
+                raise InterruptedError('pan safety or lease changed while awaiting ACK')
+        response = self._send({'N':5,'H':ident,'D1':1,'D2':degrees},
+            expected_id=ident,timeout=.05,retry=False,preflight=wire_guard,
+            expected_response='{'+ident+'_ok}',wait_check=check)
+        if response.get('ok') is not True:
+            raise TimeoutError('pan acknowledgement unknown')
+        return degrees
+
+    def read_ultrasonic(self, *, protocol, clock=time.monotonic):
+        """Only an installed-source-verified query; does not prove target range/FOV."""
+        if protocol.get('ultrasonic_read_only') is not True or protocol.get('ultrasonic')!={'N':21,'D1':2}:
+            raise ValueError('installed query side effects/reply not verified')
+        ident=self._next_id('range');started=clock()
+        response=self._send(dict(protocol['ultrasonic'],H=ident),expected_id=ident,timeout=.1,retry=False)
+        value=float(response['value'])
+        if not math.isfinite(value) or not value.is_integer() or not 0<value<=150:raise ValueError('invalid ultrasonic cm')
+        return dict(meters=value/100,at=started,received_at=clock(),valid=True,source='car-qualified',
+                    kind='obstacle-only',field_of_view_verified=False,target_association=False,
+                    saturated=value == 150)
 
     # --------------------------------------------------
     # COORDINATED ATTENTION ALIGNMENT

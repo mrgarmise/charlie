@@ -1,0 +1,27 @@
+# Reviewable example only. Not installed, enabled or started by this mission.
+# No [Install] section: initial acceptance is a finite manual foreground campaign.
+[Unit]
+Description=Independent finite Charlie meditation issuer
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/charlie-native
+ExecStart=/opt/charlie-native-venv/bin/python -m learning.native_meditation.daemon serve
+Environment=PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 PATH=/usr/bin:/bin
+RuntimeMaxSec=1h
+Restart=no
+KillMode=control-group
+TimeoutStopSec=10
+NoNewPrivileges=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/run/charlie-meditation /var/lib/charlie-meditation /home/five/charlie-ops/runtime.lock
+# Must be reviewed/verified for proc inspection, setns, helper UID drop and unit control.
+CapabilityBoundingSet=CAP_SYS_ADMIN CAP_SYS_PTRACE CAP_DAC_OVERRIDE CAP_SETUID CAP_SETGID CAP_KILL
+MemoryMax=512M
+MemorySwapMax=0
+CPUQuota=50%
+Nice=-5
+UMask=0027

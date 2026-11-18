@@ -1,0 +1,3 @@
+# Register a simulated profile
+
+Serialize a bundled simulator's Profile with dataclasses.asdict and JSON as a starting point. Provide all profile fields and the adapter's exact channel ordering. Review the exported manifest and record its SHA-256 in local trusted configuration. Call manifest.load_manifest with the bytes and that pinned digest, then give the resulting Profile to the custom simulation adapter. Reject manifests whose declared channel mapping disagrees with the adapter implementation. A digest supplied alongside an untrusted proposal carries no authority. The digest pins a simulation description and cannot authorize physical actuation.

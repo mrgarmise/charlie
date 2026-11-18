@@ -1,0 +1,3 @@
+# Benchmark plan
+
+Freeze this plan before running the final benchmark. Use seeds 100–119 for training policy comparisons and disjoint holdout commands generated with each seed plus 10,000. Give active and random strategies eight probes from the same 25-point grid per setting. Use equal noise seeds per trial. Compare zero-response and random-probe baselines. Require at least 20% lower held-out MAE than zero response in both coupled and scalar twins. For active probing require lower mean MAE on the coupled twin. Report paired 95% intervals and regression counts even if the interval crosses zero. Report sign recovery, RMSE and marginal prediction coverage. The nominal interval is approximate and assumes independent homoscedastic residuals.

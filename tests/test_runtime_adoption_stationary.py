@@ -117,7 +117,7 @@ def test_log_import_reads_observations(tmp_path, fault):
 
 
 
-@pytest.mark.parametrize('exit_bytes', [b'0', b'0\\n'])
+@pytest.mark.parametrize('exit_bytes', [b'0', b'0\n'])
 def test_historical_qualification_accepts_separate_zero_exit(tmp_path, monkeypatch, exit_bytes):
     """The old foreground launcher did not append END to session.log."""
     log = tmp_path / 'session.log'
@@ -132,7 +132,7 @@ def test_historical_qualification_accepts_separate_zero_exit(tmp_path, monkeypat
         entries.append(json.dumps(observation))
     entries.extend(['Development operational: clean shutdown | shutdown requested',
                     'Development: stopped | no project'])
-    log.write_text('\\n'.join(entries) + '\\n')
+    log.write_text('\n'.join(entries) + '\n')
     monkeypatch.setattr(s, 'FIRST', s.sha(log))
     result = s.evidence(log, 229, 'a'*64, historical_exit=exit_file)
     assert result['observations'] == 229
@@ -153,26 +153,26 @@ def test_historical_exit_rejects_invalid_evidence(tmp_path, monkeypatch, fault):
     if fault != 'no_shutdown':
         entries.append('Development operational: clean shutdown | shutdown requested')
     log = tmp_path / 'session.log'
-    log.write_text('\\n'.join(entries) + '\\n')
+    log.write_text('\n'.join(entries) + '\n')
     monkeypatch.setattr(s, 'FIRST', s.sha(log))
     exit_file = tmp_path / 'exit-code.txt'
     if fault == 'symlink':
         actual = tmp_path / 'real-exit.txt'
-        actual.write_text('0\\n')
+        actual.write_text('0\n')
         exit_file.symlink_to(actual)
     elif fault != 'missing':
-        exit_file.write_text('1\\n' if fault == 'nonzero' else '0\\n')
+        exit_file.write_text('1\n' if fault == 'nonzero' else '0\n')
     if fault == 'modified_log':
-        log.write_text(log.read_text() + 'Modified\\n')
+        log.write_text(log.read_text() + 'Modified\n')
     with pytest.raises((ValueError, FileNotFoundError)):
         s.evidence(log, 229, 'a'*64, historical_exit=exit_file)
 
 
 def test_no_historical_exit_override_on_operational_log(tmp_path, monkeypatch):
     log = tmp_path / 'session.log'
-    log.write_text(json.dumps(row()) + '\\nDevelopment operational: clean shutdown\\n')
+    log.write_text(json.dumps(row()) + '\nDevelopment operational: clean shutdown\n')
     exit_file = tmp_path / 'exit-code.txt'
-    exit_file.write_text('0\\n')
+    exit_file.write_text('0\n')
     monkeypatch.setattr(s, 'FIRST', 'f'*64)
     with pytest.raises(ValueError, match='historical exit record is only valid'):
         s.evidence(log, 1, 'a'*64, historical_exit=exit_file)

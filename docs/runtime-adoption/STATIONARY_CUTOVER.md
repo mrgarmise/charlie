@@ -43,7 +43,13 @@ Place inputs under `~/charlie-ops/stationary-review/`:
 
 ### Switch and verification
 
-After completing review and receiving separate operational cutover authorization, run `ctl enable "$A"`. This is the only installation transaction. It checks both signed reviews, source and controller identities, controls, logs, model, notebook lineage, backup/CI and device exclusion under the existing runtime lock. A single atomic rename selects the signed capability set in the normal launcher. The launch command remains **`~/charlie-ops/start-stationary.sh`**. The launcher rejects all arguments and starts the qualified venv in a clean environment. Keep the terminal in the foreground. On the Pi, run one supervised session, then `ctl verify`. Verification checks the normal entry, boot, controller, post-switch session identity, distinct authentic observations, clean Executive shutdown, residual same-user workers and device release. Any failure holds acceptance.
+After completing review and receiving separate operational cutover authorization, execute the single supervised transaction in a foreground terminal:
+
+```bash
+ctl enable "$A" && ~/charlie-ops/start-stationary.sh && ctl verify
+```
+
+The enable step is the only installation transaction. It checks both signed reviews, source and controller identities, controls, logs, model, notebook lineage, backup/CI and device exclusion under the existing runtime lock. A single atomic rename selects the signed capability set in the normal launcher. The launch command remains **`~/charlie-ops/start-stationary.sh`**. The launcher rejects all arguments and starts the qualified venv in a clean environment. Keep the terminal in the foreground. On the Pi, run one supervised session, then `ctl verify`. Verification checks the normal entry, boot, controller, post-switch session identity, distinct authentic observations, clean Executive shutdown, residual same-user workers and device release. Each physical session creates an exclusive pending record bound to the current launcher and signed grants. A failed or interrupted session retains the record and refuses another launch under the same decisions. Roll back or collect new independent review after diagnosis.
 
 `ctl status` reports selected versus reviewed; `ctl verify` supplies the measured normal-session result. `ctl disable "$B"` retains A. `ctl rollback` restores the original launcher bytes. If the controller, candidate or active registry is damaged, use the independent recovery script from the separately preserved reviewed controller source: `bash ~/charlie-activation-control/tools/stationary_rollback.sh`. Preserve a copy alongside the approved operational controls before cutover. It needs neither candidate code nor review files. Neither rollback runs hardware or changes the pin, either notebook, manual consultation or a service.
 

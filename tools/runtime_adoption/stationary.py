@@ -301,7 +301,7 @@ class Stationary:
             try:
                 value = fn()
                 checks[label] = dict(status='PASS', evidence=value)
-            except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError) as exc:
+            except (ValueError, KeyError, TypeError, OSError, sqlite3.Error, subprocess.SubprocessError) as exc:
                 checks[label] = dict(status='PENDING', reason=str(exc))
         try:
             active = sorted(selection(self.normal))
@@ -326,6 +326,21 @@ class Stationary:
         return dict(canonical=str(self.normal), selected=active, checks=checks, abilities=statuses,
                     candidate=CANDIDATE, baseline=BASELINE, state_migration=False,
                     launch_verified=False, other_capabilities='default denied')
+
+
+@contextmanager
+def session_guard(ctl, selected):
+    # An interrupted controller cannot silently retry a failed physical profile.
+    # A new independent signed ability decision gives a new attempt identity.
+    grants = [sha(ctl.review / (sid + '.json')) for sid in sorted(selected)]
+    key = hashlib.sha256((''.join(grants) + sha(ctl.normal)).encode()).hexdigest()
+    hold = ctl.ops / 'logs' / ('stationary-incomplete-' + key)
+    with hold.open('x') as f:
+        f.write('Pending supervised health verification. Preserve on interruption.\n')
+        f.flush()
+        os.fsync(f.fileno())
+    yield
+    hold.unlink()
 
 
 def idle_guard():
@@ -433,25 +448,27 @@ def main(argv=None):
         elif action == 'launch':
             idle_guard()
             device_guard()
-            log = ctl.ops / 'logs' / ('stationary-session-%d.log' % time.time_ns())
-            with log.open('xb') as out:
-                # Preserve controlling terminal and stdin; duplicate output only.
-                with subprocess.Popen(['/usr/bin/tee', '/proc/self/fd/' + str(out.fileno())],
-                                      stdin=subprocess.PIPE, pass_fds=(out.fileno(),)) as tee:
-                    saved = [os.dup(n) for n in (1, 2)]
-                    try:
-                        for fd in (1, 2):
-                            os.dup2(tee.stdin.fileno(), fd)
-                        print(ctl.session_identity(before), flush=True)
-                        run_foreground()
-                        print('END stationary exit=0', flush=True)
-                    finally:
-                        sys.stdout.flush()
-                        sys.stderr.flush()
-                        for fd, original in zip((1, 2), saved):
-                            os.dup2(original, fd)
-                            os.close(original)
-                        tee.stdin.close()
-                require(tee.returncode == 0, 'session log failed')
+            with session_guard(ctl, before):
+                log = ctl.ops / 'logs' / ('stationary-session-%d.log' % time.time_ns())
+                with log.open('xb') as out:
+                    # Preserve controlling terminal and stdin; duplicate output only.
+                    with subprocess.Popen(['/usr/bin/tee', '/proc/self/fd/' + str(out.fileno())],
+                                          stdin=subprocess.PIPE, pass_fds=(out.fileno(),)) as tee:
+                        saved = [os.dup(n) for n in (1, 2)]
+                        try:
+                            for fd in (1, 2):
+                                os.dup2(tee.stdin.fileno(), fd)
+                            print(ctl.session_identity(before), flush=True)
+                            run_foreground()
+                            print('END stationary exit=0', flush=True)
+                        finally:
+                            sys.stdout.flush()
+                            sys.stderr.flush()
+                            for fd, original in zip((1, 2), saved):
+                                os.dup2(original, fd)
+                                os.close(original)
+                            tee.stdin.close()
+                    require(tee.returncode == 0, 'session log failed')
+                print(json.dumps(ctl.health(before), indent=2))
         else:
             print(json.dumps(ctl.health(before), indent=2))

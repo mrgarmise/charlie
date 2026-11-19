@@ -180,3 +180,27 @@ def test_no_control_endpoint_redirect_listener_or_worker_network():
             guard(event, args)
     with pytest.raises(PermissionError):
         transport_policy(None)('socket.connect', (sock, ('127.0.0.1', 81)))
+
+
+def test_interrupted_native_session_requires_review_and_keeps_rollback_available(host):
+    host.review.mkdir()
+    grant = host.review / (s.A + '.json')
+    grant.write_text('offline fixture')
+    host.switch(set(), {s.A})
+    with pytest.raises(InterruptedError):
+        with s.session_guard(host, {s.A}):
+            raise InterruptedError('injected interruption')
+    with pytest.raises(FileExistsError):
+        with s.session_guard(host, {s.A}):
+            pytest.fail('same decision admitted a second session')
+    host.switch({s.A}, set())
+    assert s.selection(host.normal) == set()
+
+
+def test_completed_health_check_releases_session_hold(host):
+    host.review.mkdir()
+    (host.review / (s.A + '.json')).write_text('offline fixture')
+    for _ in range(2):
+        with s.session_guard(host, {s.A}):
+            assert len(list((host.ops / 'logs').glob('stationary-incomplete-*'))) == 1
+    assert not list((host.ops / 'logs').glob('stationary-incomplete-*'))

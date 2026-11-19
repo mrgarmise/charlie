@@ -79,10 +79,23 @@ def evidence(path, expected, model):
 def template(selected):
     require(A in selected and set(selected) <= SCOPES.keys(), 'unsupported stationary composition')
     call = ' '.join(shlex.quote(x) for x in sorted(selected))
+    controller = shlex.quote(str(ROOT))
+    pin = git(ROOT, 'rev-parse', 'HEAD')
+    # Check the reviewed checkout outside Python, before importing any controller source.
+    script = (
+        'set -eu\n'
+        f'cd {controller}\n'
+        'revision=$(/usr/bin/git rev-parse HEAD)\n'
+        f'[ "$revision" = {shlex.quote(pin)} ]\n'
+        'dirty=$(/usr/bin/git -c core.fsmonitor=false status --porcelain --untracked-files=all)\n'
+        '[ -z "$dirty" ]\n'
+        'exec /home/five/Projects/charlie/.venv/bin/python -IB '
+        + shlex.quote(str(ROOT / 'tools/stationary_ctl.py')) + ' launch ' + call
+    )
     return ('#!/bin/sh\nset -eu\n[ "$#" -eq 0 ] || exit 64\n'
-            'exec /usr/bin/env -i HOME=/home/five PATH=/usr/bin:/bin '
-            '/home/five/Projects/charlie/.venv/bin/python -IB ' + shlex.quote(str(ROOT / 'tools/stationary_ctl.py')) +
-            ' launch ' + call + '\n').encode()
+            'exec /usr/bin/env -i HOME=/home/five PATH=/usr/bin:/bin /bin/sh -c '
+            + shlex.quote(script) + '\n').encode()
+
 
 
 def selection(normal):

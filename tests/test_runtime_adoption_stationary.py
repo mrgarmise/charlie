@@ -274,3 +274,25 @@ def test_request_and_two_stage_validation_bind_every_original_artifact(host, mon
     with pytest.raises(ValueError, match='altered or missing protected evidence'):
         host.validate({s.A})
     assert s.selection(host.normal) == set()
+
+
+def test_bootstrap_checks_pinned_controller_before_loading_python(tmp_path, monkeypatch):
+    root = tmp_path / 'reviewed-controller'
+    root.mkdir()
+    def git(*args):
+        subprocess.run(['git', '-C', str(root), '-c', 'user.name=Fixture',
+                        '-c', 'user.email=fixture@example.invalid', *args], check=True, capture_output=True)
+    git('init')
+    file = root / 'source'
+    file.write_text('reviewed')
+    git('add', 'source')
+    git('commit', '-m', 'fixture')
+    monkeypatch.setattr(s, 'ROOT', root)
+    launcher = tmp_path / 'start'
+    launcher.write_bytes(s.template({s.A}))
+    file.write_text('changed')
+    failed = subprocess.run(['sh', str(launcher)], capture_output=True)
+    assert failed.returncode == 1 and not failed.stderr
+    git('commit', '-am', 'different controller')
+    failed = subprocess.run(['sh', str(launcher)], capture_output=True)
+    assert failed.returncode == 1 and not failed.stderr

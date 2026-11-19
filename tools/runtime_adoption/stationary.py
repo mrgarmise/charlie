@@ -72,6 +72,7 @@ def evidence(path, expected, model):
             'missing or repeated observations')
     require(last.startswith('END ') and last.endswith(' exit=0'), 'missing successful session end')
     return dict(observations=count, sha256=sha(path), clean_shutdown_logged=stopped,
+                source='elegoo-v4', software_revision=CANDIDATE['sha'], hef_sha256=model,
                 residual_process_check='requires separate host evidence', pico_ack='unverified')
 
 
@@ -187,12 +188,7 @@ class Stationary:
 
     def validate(self, selected):
         self.preserved()
-        trust_file = Path('/etc/charlie/stationary-reviewer.json')
-        for path in (trust_file.parent, trust_file, trust_file.with_suffix('.pem')):
-            info = path.lstat()
-            require(info.st_uid == 0 and not info.st_mode & 0o022 and not path.is_symlink(),
-                    'untrusted reviewer configuration')
-        trust = load(trust_file)
+        trust, key = trusted_reviewer()
         require(not selected - SCOPES.keys() and A in selected, 'Batch A required')
         state = self.ops / 'batch-a-state'
         require(state.is_dir() and state.resolve() == state and any(state.iterdir()),
@@ -201,6 +197,8 @@ class Stationary:
                 'unexpected operational host or home')
         release = load(self.review / 'manifest.json')
         bindings = self.bindings()
+        require(bindings['logs']['guarded_session']['clean_shutdown_logged'] is True,
+                'guarded session lacks clean Executive shutdown')
         receipts = load(self.review / 'ci.json')
         for stage, scope, name in [('release', [], 'release')] + [
                 ('enablement', [sid], sid) for sid in sorted(selected)]:
@@ -228,7 +226,7 @@ class Stationary:
             approval = load(self.review / (name + '.json'))
             require(approval['record']['reviewer'] == trust['reviewer'], 'unknown reviewer')
             validate(manifest, observed, receipts, stage=stage, selected=scope, approval=approval,
-                     key_path='/etc/charlie/stationary-reviewer.pem', key_sha256=trust['sha256'],
+                     key_path=key, key_sha256=trust['sha256'],
                      source_root=self.new)
             require(approval['record']['expires_at'] > time.time() + 180, 'review expires during session')
 
@@ -247,7 +245,7 @@ class Stationary:
     def bindings(self):
         require(not git(ROOT, 'status', '--porcelain', '--untracked-files=all'), 'controller drift')
         model = load(self.models)['objects']
-        require(sha(Path(model['path'])) == model['sha256'], 'model artifact changed')
+        require(sha(self.new / model['path']) == model['sha256'], 'model artifact changed')
         return dict(controller_sha=git(ROOT, 'rev-parse', 'HEAD'),
                     controller_tree=git(ROOT, 'rev-parse', 'HEAD^{tree}'),
                     models_sha256=sha(self.models), hef_sha256=model['sha256'],
@@ -323,7 +321,29 @@ class Stationary:
                                  post_switch_verified='run verify')
         checks['native_owners'] = dict(status='PENDING', reason='requires native owner reconciliation')
         checks['post_switch_session'] = dict(status='PENDING', reason='use verify after supervised launch')
-        return dict(canonical=str(self.normal), selected=active, checks=checks, abilities=statuses,
+        native = {}
+        if socket.gethostname() == 'charlie' and self.home == Path('/home/five'):
+            from .inventory import observed_processes, resources
+            native = dict(resources=resources(), processes=observed_processes(), devices={})
+            for dev in ('/dev/hailo0', '/dev/ttyACM0'):
+                try:
+                    f = subprocess.run(['/usr/bin/fuser', dev], capture_output=True, text=True, timeout=3)
+                    native['devices'][dev] = dict(character_device=Path(dev).is_char_device(),
+                        owner_pids=[int(word) for word in f.stdout.split() if word.isdecimal()],
+                        probe_exit=f.returncode, diagnostic=bool(f.stderr.strip()))
+                except (OSError, subprocess.SubprocessError) as exc:
+                    native['devices'][dev] = dict(error=str(exc))
+            for name in ('QUALIFICATION.md', 'start-stationary-batch-a.sh', 'batch-a-operator-pin.sha',
+                         'run-historical-consultation.py', 'approved.sha'):
+                path = self.ops / name
+                native[name] = sha(path) if path.is_file() and not path.is_symlink() else None
+            try:
+                service = subprocess.run(['systemctl', 'show', 'charlie.service',
+                    '--property=LoadState,ActiveState,SubState,MainPID'], capture_output=True, text=True, timeout=5)
+                native['service'] = service.stdout.splitlines() if service.returncode == 0 else 'unknown'
+            except (OSError, subprocess.SubprocessError):
+                native['service'] = 'unknown'
+        return dict(native_inventory=native, canonical=str(self.normal), selected=active, checks=checks, abilities=statuses,
                     candidate=CANDIDATE, baseline=BASELINE, state_migration=False,
                     launch_verified=False, other_capabilities='default denied')
 
@@ -355,6 +375,16 @@ def idle_guard():
                         'residual same-user spawn worker')
         except FileNotFoundError:
             continue
+
+
+def trusted_reviewer():
+    trust_file = Path('/etc/charlie/stationary-reviewer.json')
+    for path in (trust_file.parent, trust_file, trust_file.with_suffix('.pem')):
+        info = path.lstat()
+        require(info.st_uid == 0 and not info.st_mode & 0o022 and not path.is_symlink(),
+                'untrusted reviewer configuration')
+    trust = load(trust_file)
+    return trust, trust_file.with_suffix('.pem')
 
 
 def device_guard():

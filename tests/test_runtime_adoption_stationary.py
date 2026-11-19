@@ -204,3 +204,73 @@ def test_completed_health_check_releases_session_hold(host):
         with s.session_guard(host, {s.A}):
             assert len(list((host.ops / 'logs').glob('stationary-incomplete-*'))) == 1
     assert not list((host.ops / 'logs').glob('stationary-incomplete-*'))
+
+
+def test_request_and_two_stage_validation_bind_every_original_artifact(host, monkeypatch):
+    """Exercise packet generation and validation together, substituting only host and trust services."""
+    import time
+    from tools.runtime_adoption import promotion, stationary_packet as packet
+    from tools.runtime_adoption.inventory import digest, manual_guards
+    host.review.mkdir()
+    # All operational paths captured by the fixture remain in tmp_path.
+    host.home = s.Path('/home/five')
+    host.new = s.ROOT
+    binding = dict(controller_sha='1'*40, controller_tree='2'*40,
+                   logs={'guarded_session': {'clean_shutdown_logged': True}})
+    monkeypatch.setattr(host, 'preserved', lambda: None)
+    monkeypatch.setattr(host, 'bindings', lambda: binding)
+    monkeypatch.setattr(s.socket, 'gethostname', lambda: 'charlie')
+    monkeypatch.setattr(packet, 'git', lambda *args: binding['controller_sha'])
+    guard = manual_guards(s.ROOT)
+
+    def inventory(old, new, ops, protected):
+        return dict(candidate={**s.CANDIDATE, 'dirty': False}, baseline={**s.BASELINE, 'dirty': False},
+                    approvals={'approval_binding': True}, manual_llm_guards=dict(baseline=guard, candidate=guard),
+                    protected=[digest(p) for p in protected])
+
+    monkeypatch.setattr(packet, 'collect', inventory)
+    monkeypatch.setattr(s, 'collect', inventory)
+    monkeypatch.setattr(s, 'trusted_reviewer', lambda: ({'reviewer': 'fixture', 'sha256': '0'*64}, None))
+    def inspect_review(approval, *, stage, abilities, candidate, **kwargs):
+        record = approval['record']
+        assert record['stage'] == stage and record['abilities'] == abilities
+        assert candidate == s.CANDIDATE
+        return record
+    monkeypatch.setattr(promotion, 'verify_record', inspect_review)
+
+    def save(path, data):
+        path.write_text(json.dumps(data))
+        return str(path)
+
+    def output(name, data):
+        return save(host.review / name, data)
+
+    for name in ('approved.sha', 'QUALIFICATION.md', 'run-historical-consultation.py'):
+        (host.ops / name).write_text('offline test')
+    backup = s.Path(output('fixture-backup.json', {'files': []}))
+    restore = output('restore.json', dict(status='passed', complete_scope_verified=True,
+                     isolated_restore_verified=True, state_compatible=True, independent_review=True,
+                     candidate=s.CANDIDATE, backup_manifests={str(backup): s.sha(backup)}, completed_at=time.time()))
+    url = 'https://github.com/mrgarmise/charlie/actions/runs/1'
+    output('controller-ci.json', dict(sha=binding['controller_sha'], tree=binding['controller_tree'],
+           conclusion='success', url=url, completed_at=time.time()))
+    suites = ['full', 'contracts', 'baseline-llm', 'browser', 'firmware-host', 'firmware-build', 'neural-cpu']
+    output('ci.json', [dict(candidate=s.CANDIDATE, suite=suite, passed=1, failed=0, completed_at=time.time(),
+           conclusion='success', artifact_sha256='1'*64, url=url) for suite in suites])
+    measurement = s.Path(output('measurements.json', {'synthetic': True}))
+    native = {}
+    for gate in s.SCOPES[s.A]:
+        native[gate] = output(gate + '.json', dict(ability=s.A, gate=gate, status='passed', candidate=s.CANDIDATE,
+             controller_sha=binding['controller_sha'], independent_review=True, artifacts={str(measurement): s.sha(measurement)}))
+    output('inputs.json', dict(restore_receipt=restore, backup_manifests=[str(backup)], gate_receipts={s.A: native}))
+    for stage, sid in [('release', None), ('enablement', s.A)]:
+        manifest = packet.proposal(host, sid)
+        output(sid + '.manifest.json' if sid else 'manifest.json', manifest)
+        output((sid or 'release') + '.json', dict(record=dict(stage=stage, abilities=[sid] if sid else [],
+               reviewer='fixture', expires_at=time.time()+600,
+               manifest_sha256=hashlib.sha256(promotion.canonical(manifest)).hexdigest())))
+    host.validate({s.A})
+    measurement.write_text('altered')
+    with pytest.raises(ValueError, match='altered or missing protected evidence'):
+        host.validate({s.A})
+    assert s.selection(host.normal) == set()

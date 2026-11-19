@@ -37,7 +37,7 @@ def sha(path):
     return digest(path)['sha256']
 
 
-def evidence(path, expected, model):
+def evidence(path, expected, model, *, historical_exit=None):
     """Read every JSON observation; refuse partial or mixed identity logs."""
     count = 0
     frames = set()
@@ -70,10 +70,25 @@ def evidence(path, expected, model):
             count += 1
     require(count == len(frames) and count > 0 and (expected is None or count == expected),
             'missing or repeated observations')
-    require(last.startswith('END ') and last.endswith(' exit=0'), 'missing successful session end')
-    return dict(observations=count, sha256=sha(path), clean_shutdown_logged=stopped,
-                source='elegoo-v4', software_revision=CANDIDATE['sha'], hef_sha256=model,
-                residual_process_check='requires separate host evidence', pico_ack='unverified')
+    if historical_exit is None:
+        require(last.startswith('END ') and last.endswith(' exit=0'), 'missing successful session end')
+    else:
+        # Older qualification launchers recorded the exit status in a separate
+        # file, not a session.log footer. Only the pinned original log may use
+        # this format; newer operational sessions must keep their inline footer.
+        require(expected == 229 and sha(path) == FIRST,
+                'historical exit record is only valid for pinned qualification log')
+        require(stopped, 'historical session did not record clean Executive shutdown')
+        require(historical_exit.read_bytes() in (b'0', b'0\n'),
+                'historical qualification exit code is not zero')
+        exit_digest = sha(historical_exit)  # Refuses symlinks and missing files.
+    result = dict(observations=count, sha256=sha(path), clean_shutdown_logged=stopped,
+                  source='elegoo-v4', software_revision=CANDIDATE['sha'], hef_sha256=model,
+                  residual_process_check='requires separate host evidence', pico_ack='unverified')
+    if historical_exit is not None:
+        result['exit_code_sha256'] = exit_digest
+        result['exit_code_path'] = str(historical_exit)
+    return result
 
 
 def template(selected):
@@ -149,24 +164,21 @@ class Stationary:
 
     def logs(self):
         record = self.ops / 'promotion-evidence/batch-a-native-recognition.json'
-        first = [p for p in (self.ops / 'logs').glob('*20261116T160554Z*') if sha(p) == FIRST]
+        first_dir = self.home / 'charlie-candidate-acceptance/20261116T160554Z'
+        first = first_dir / 'session.log'
+        first_exit = first_dir / 'exit-code.txt'
         second = self.ops / 'logs/20261119T222200Z-batch-a-stationary.log'
-        if not first:
-            # The independent qualification launcher may have used a different log directory.
-            first = [p for p in self.home.glob('*/*20261116T160554Z*.log') if sha(p) == FIRST]
-        if not first:
-            for value in load(record).values():
-                if isinstance(value, str) and value.endswith('.log'):
-                    path = Path(value).expanduser()
-                    if path.is_absolute() and self.home in path.resolve().parents and path.is_file() and sha(path) == FIRST:
-                        first = [path]
-                        break
-        require(len(first) == 1, 'original 229-observation log missing or changed')
+        require(sha(first) == FIRST, 'original 229-observation log missing or changed')
         model = load(self.models)['objects']['sha256']
         qualification = load(record)
-        require(FIRST in json.dumps(qualification) and CANDIDATE['sha'] in json.dumps(qualification),
-                'qualification record does not bind original log and candidate')
-        return {'qualification_record': sha(record), 'qualification': evidence(first[0], 229, model),
+        native = qualification['native_recognition']
+        require(qualification['candidate'] == CANDIDATE['sha'] and
+                native['path'] == str(first_dir) and native['log_sha256'] == FIRST and
+                native['observations'] == 229 and native['exit_code'] == 0 and
+                native['motion_authorized'] is False,
+                'qualification record does not bind original session and candidate')
+        return {'qualification_record': sha(record),
+                'qualification': evidence(first, 229, model, historical_exit=first_exit),
                 'guarded_session': evidence(second, 354, model)}
 
     def health(self, selected):

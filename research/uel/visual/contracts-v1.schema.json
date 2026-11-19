@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "BodyDescription": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "joints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "marker": {
+          "type": "string"
+        },
+        "baseline": {
+          "type": "string"
+        },
+        "units": {
+          "const": "m"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "name",
+        "joints",
+        "marker",
+        "baseline",
+        "units",
+        "version"
+      ]
+    },
+    "CameraSource": {
+      "type": "object",
+      "properties": {
+        "camera_id": {
+          "type": "string"
+        },
+        "backend": {
+          "enum": [
+            "synthetic",
+            "recording",
+            "imx708",
+            "elegoo_optional"
+          ]
+        }
+      },
+      "required": [
+        "camera_id",
+        "backend"
+      ]
+    },
+    "ObservationBatch": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/CameraSource"
+              },
+              "frames": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "time_s": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "time_s"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "source",
+              "frames"
+            ]
+          }
+        }
+      },
+      "required": [
+        "version",
+        "sources"
+      ]
+    },
+    "ExperimentProposal": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "objective": {
+          "type": "string"
+        },
+        "prediction": {
+          "type": "string"
+        },
+        "epistemic_status": {
+          "type": "string"
+        },
+        "command_timeline": {
+          "type": "array",
+          "items": {}
+        },
+        "hardware_accepted": {
+          "const": false
+        },
+        "authorization": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "objective",
+        "prediction",
+        "epistemic_status",
+        "command_timeline",
+        "hardware_accepted",
+        "authorization"
+      ]
+    },
+    "TwinCandidate": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "baseline": {
+          "type": "string"
+        },
+        "parameter": {
+          "const": "response_delay_ticks"
+        },
+        "bounds": {
+          "const": [
+            0,
+            4
+          ]
+        },
+        "optimizer": {
+          "type": "string"
+        },
+        "training": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {}
+          }
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "loss": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "plausible": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          }
+        },
+        "status": {
+          "enum": [
+            "inferred",
+            "unidentifiable"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "baseline",
+        "parameter",
+        "bounds",
+        "optimizer",
+        "training",
+        "seed",
+        "loss",
+        "plausible",
+        "status"
+      ]
+    },
+    "ValidationReport": {
+      "type": "object",
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "candidate": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "passed",
+        "candidate"
+      ]
+    },
+    "MotionSkillCandidate": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "qualification": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "hardware_accepted": {
+          "const": false
+        },
+        "simulation_accepted": {
+          "type": "boolean"
+        },
+        "rollouts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "seed": {
+                "type": "integer"
+              },
+              "delay": {
+                "type": "integer"
+              },
+              "steps": {
+                "type": "integer"
+              },
+              "accepted": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "seed",
+              "delay",
+              "steps",
+              "accepted"
+            ]
+          }
+        }
+      },
+      "required": [
+        "version",
+        "qualification",
+        "hardware_accepted",
+        "simulation_accepted",
+        "rollouts"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/BodyDescription"
+    },
+    {
+      "$ref": "#/$defs/CameraSource"
+    },
+    {
+      "$ref": "#/$defs/ObservationBatch"
+    },
+    {
+      "$ref": "#/$defs/ExperimentProposal"
+    },
+    {
+      "$ref": "#/$defs/TwinCandidate"
+    },
+    {
+      "$ref": "#/$defs/ValidationReport"
+    },
+    {
+      "$ref": "#/$defs/MotionSkillCandidate"
+    }
+  ]
+}

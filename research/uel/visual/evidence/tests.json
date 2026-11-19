@@ -1,0 +1,85 @@
+{
+  "learner": {
+    "tests": 42,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1.387,
+    "failed_cases": []
+  },
+  "dog": {
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 4.822,
+    "failed_cases": []
+  },
+  "charlie_broader_during_implementation": {
+    "tests": 2590,
+    "failures": 5,
+    "errors": 0,
+    "skipped": 29,
+    "seconds": 394.23,
+    "failed_cases": [
+      "tests.test_active_vision_firmware::test_rollback_boots_recovery_without_pwm",
+      "tests.test_mobile_browser::test_missions_page_reads_checkpoint_with_monitor_credential_only",
+      "tests.test_mobile_browser::test_browser_hold_release_touch_focus_disconnect_emergency_and_monitoring[viewport0]",
+      "tests.test_mobile_browser::test_browser_hold_release_touch_focus_disconnect_emergency_and_monitoring[viewport1]",
+      "tests.test_mobile_browser::test_display_expiry_includes_original_frame_age_not_only_time_since_browser_receive"
+    ]
+  },
+  "unchanged_parent_failed_cases": {
+    "tests": 5,
+    "failures": 5,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 3.019,
+    "failed_cases": [
+      "tests.test_active_vision_firmware::test_rollback_boots_recovery_without_pwm",
+      "tests.test_mobile_browser::test_missions_page_reads_checkpoint_with_monitor_credential_only",
+      "tests.test_mobile_browser::test_browser_hold_release_touch_focus_disconnect_emergency_and_monitoring[viewport0]",
+      "tests.test_mobile_browser::test_browser_hold_release_touch_focus_disconnect_emergency_and_monitoring[viewport1]",
+      "tests.test_mobile_browser::test_display_expiry_includes_original_frame_age_not_only_time_since_browser_receive"
+    ]
+  },
+  "firmware_recheck": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 0.066,
+    "failed_cases": []
+  },
+  "browser_recheck": {
+    "tests": 4,
+    "failures": 4,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 4.293,
+    "failed_cases": [
+      "tests.test_mobile_browser::test_missions_page_reads_checkpoint_with_monitor_credential_only",
+      "tests.test_mobile_browser::test_browser_hold_release_touch_focus_disconnect_emergency_and_monitoring[viewport0]",
+      "tests.test_mobile_browser::test_browser_hold_release_touch_focus_disconnect_emergency_and_monitoring[viewport1]",
+      "tests.test_mobile_browser::test_display_expiry_includes_original_frame_age_not_only_time_since_browser_receive"
+    ]
+  },
+  "unified_contracts": {
+    "passed": 134,
+    "failed": 0
+  },
+  "stage_suite": [
+    "test_no_motion_authority",
+    "test_invalid_units_and_optimizer_inputs",
+    "test_stereo",
+    "test_perception",
+    "test_board_calibration",
+    "test_cycle_resume_and_holdout",
+    "test_ingest_uncalibrated_optional",
+    "test_recorded_train_holdout",
+    "test_cli_review",
+    "test_stereo_world_and_uncertainty",
+    "test_core_has_no_device_transport",
+    "test_dual_recorded_session_end_to_end"
+  ]
+}

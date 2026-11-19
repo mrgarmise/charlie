@@ -1,0 +1,11 @@
+{
+  "board_views": 12,
+  "measured_rms_px": 0.04315585368856461,
+  "recovered_focal_px": [
+    603.2943790433804,
+    603.2139720030834
+  ],
+  "true_focal_px": 600,
+  "mujoco": "4.0.1",
+  "gymnasium": "1.4.0"
+}

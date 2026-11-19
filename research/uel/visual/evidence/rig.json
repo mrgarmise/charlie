@@ -1,0 +1,93 @@
+{
+  "body": {
+    "name": "pan-tilt",
+    "joints": [
+      "pan",
+      "tilt"
+    ],
+    "marker": "tip",
+    "baseline": "analytic-arm-v1",
+    "units": "m",
+    "version": 1
+  },
+  "candidate": "23059c35b0d539a3d5c4cc0f0cc28d6369919e8a2f2105642b93f3705a54942e",
+  "qualification": "c87e911707c84d2aacc02712b4a3749d71dce20add7d50a6f3726b3ca04b289e",
+  "delay": 3,
+  "passed": true,
+  "ambiguous": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "rms_px": 0.20577645961343563,
+  "ci95": [
+    0.20233013379353326,
+    0.20988530747251602
+  ],
+  "fixed_rms_px": 70.58997187351623,
+  "random_rms_px": 35.86675328409692,
+  "proposal": {
+    "objective": "observe a stationary metric reference board",
+    "authorization": "operator review pending",
+    "hardware_accepted": false
+  },
+  "host": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "opencv": "5.1.0",
+  "session_bytes": 548864,
+  "raw_png_bytes": 38182,
+  "wall_s": 0.20915890900005252,
+  "process_cpu_s": 0.5545859639999999,
+  "max_rss_kib": 55316,
+  "frames": 512,
+  "retained": 464,
+  "visible_recall": 1.0,
+  "visible_wilson95": [
+    0.9917886737733455,
+    1.0
+  ],
+  "hidden_false_positives": 0,
+  "hidden_total": 32,
+  "drops": 16,
+  "localization_rms_px": 0.20157135313079924,
+  "fixture_fov_x_deg": 25.75000311922495,
+  "scale_mm_per_px_range": [
+    0.8018800837059863,
+    0.8571428571428571
+  ],
+  "noise_stereo_median_error_mm": 2.9653306692310415,
+  "delay_ms": 60,
+  "injected_ms": 60,
+  "old_linear_response_rms_px": 27.534377046887585,
+  "pixels_and_commands_share_sim_clock": true,
+  "temperature_c": null,
+  "power_w": null,
+  "hailo_fps": null,
+  "sim_ground_truth_comparison": {
+    "fixed": {
+      "mean_distance_mm": 53.90426098725013,
+      "mean_link_angle_error_deg": 31.705654764913533
+    },
+    "fitted": {
+      "mean_distance_mm": 0.0,
+      "mean_link_angle_error_deg": 4.6850344320087046e-07
+    }
+  },
+  "heldout_mean_interval_coverage": 1.0,
+  "false_visibility_wilson95": [
+    0.0,
+    0.1071827150573635
+  ],
+  "correct_delay_trials": 15,
+  "delay_trials": 15,
+  "correct_wilson95": [
+    0.7961107336956521,
+    1.0
+  ],
+  "random_question_correct": 10,
+  "detector_median_ms": 0.06551900003159972,
+  "detector_fps": 12734.579493889714
+}

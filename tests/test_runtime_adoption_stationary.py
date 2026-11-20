@@ -111,6 +111,47 @@ def test_native_qualification_refuses_existing_approval_or_arguments(host, monke
     assert s.selection(host.normal) == set()
 
 
+def test_prepare_review_creates_only_unsigned_pending_drafts(host, monkeypatch):
+    from tools.runtime_adoption import stationary_packet_prepare as drafts
+    monkeypatch.setattr(host, 'preserved', lambda: None)
+    monkeypatch.setattr(drafts, 'ORIGINAL', s.sha(host.normal))
+    monkeypatch.setattr(drafts, 'git', lambda *a: '' if 'status' in a else 'a' * 40)
+    host.models.parent.mkdir(parents=True)
+    host.models.write_text(json.dumps({'objects': {'sha256': 'f' * 64}}))
+    approved = host.normal.read_bytes()
+    result = drafts.prepare(host)
+    assert result['status'] == 'UNSIGNED_DRAFT_ONLY'
+    assert result['normal_runtime_changed'] is False
+    assert result['approval_issued'] is False
+    assert result['validated_native_sessions'] == 0
+    assert host.normal.read_bytes() == approved
+    assert not (host.review / 'inputs.json').exists()
+    assert not (host.review / 'ci.json').exists()
+    assert not (host.review / 'release.json').exists()
+    parent = s.Path(result['directory'])
+    assert all((parent / ('draft-' + name + '.json')).is_file() for name in s.SCOPES[s.A])
+    assert all(json.loads((parent / ('draft-' + name + '.json')).read_text())['status'] == 'pending'
+               for name in s.SCOPES[s.A])
+    assert all(json.loads((parent / ('draft-' + name + '.json')).read_text())['independent_review'] is False
+               for name in s.SCOPES[s.A])
+
+
+def test_prepare_review_refuses_after_cutover_without_packet(host, monkeypatch):
+    from tools.runtime_adoption import stationary_packet_prepare as drafts
+    monkeypatch.setattr(host, 'preserved', lambda: None)
+    host.normal.write_bytes(s.template({s.A}))
+    with pytest.raises(ValueError, match='unchanged original normal launcher'):
+        drafts.prepare(host)
+    assert not (host.review / 'drafts').exists()
+
+
+def test_prepare_review_cli_rejects_capability_arguments(host, monkeypatch):
+    monkeypatch.setattr(s.Path, 'home', lambda: host.home)
+    with pytest.raises(ValueError, match='review preparation takes no ability arguments'):
+        s.main(['prepare-review', s.A])
+    assert not (host.review / 'drafts').exists()
+
+
 def test_bounded_logger_normal_shutdown(tmp_path):
     log = tmp_path / 'session.log'
     with log.open('wb') as out:

@@ -77,6 +77,37 @@ def test_candidate_or_review_absent_cannot_enable(host, monkeypatch):
     assert s.selection(host.normal) == set()
 
 
+@pytest.mark.parametrize('selected', [set(), {s.A}, {s.A, s.B}])
+def test_native_qualification_requires_original_launcher(host, monkeypatch, selected):
+    """The unsigned qualification path must never run after a cutover."""
+    monkeypatch.setattr(host, 'preserved', lambda: None)
+    monkeypatch.setattr(s.socket, 'gethostname', lambda: 'charlie')
+    if selected:
+        host.normal.write_bytes(s.template(selected))
+    monkeypatch.setattr(s, 'idle_guard', lambda: None)
+    monkeypatch.setattr(s, 'device_guard', lambda: None)
+    monkeypatch.setattr(host, 'lineage', lambda: 'existing-history')
+    host.models.parent.mkdir(exist_ok=True)
+    host.models.write_text(json.dumps({'objects': {'path': 'test-model.hef', 'sha256': '0'*64}}))
+    if selected:
+        with pytest.raises(ValueError, match='unchanged original normal launcher'):
+            s.qualification_preflight(host, selected)
+    else:
+        # Refuse a mismatched model before any hardware activity.
+        monkeypatch.setattr(host, 'preserved', lambda: None)
+        monkeypatch.setattr(s, 'sha', lambda path: s.ORIGINAL if path == host.normal else '1'*64)
+        with pytest.raises(ValueError, match='reviewed Hailo model changed'):
+            s.qualification_preflight(host, set())
+
+
+def test_native_qualification_refuses_existing_approval_or_arguments(host, monkeypatch):
+    monkeypatch.setattr(s.Path, 'home', lambda: host.home)
+    # The CLI cannot select any ability during unsigned native qualification.
+    with pytest.raises(ValueError, match='qualification takes no ability selection'):
+        s.main(['qualify-native', s.A])
+    assert s.selection(host.normal) == set()
+
+
 def test_offline_status_reports_unknown_host_without_mutation(tmp_path):
     ctl = s.Stationary(tmp_path)
     result = ctl.inspect()

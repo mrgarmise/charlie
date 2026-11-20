@@ -491,6 +491,9 @@ def main(argv=None):
         install(stream)
         import main as app
         require(Path(app.__file__).resolve() == ctl.new / 'main.py', 'wrong application')
+        from stimulus.keyboard import KeyboardStimulus
+        from .stationary_boundary import install_stationary_stop
+        restore_stop = install_stationary_stop(KeyboardStimulus)
         app.application_camera_feeders = partial(app.application_camera_feeders, selected=('elegoo',))
         def deadline(signum, frame):
             raise SystemExit('stationary wall deadline exceeded')
@@ -503,6 +506,7 @@ def main(argv=None):
         finally:
             signal.alarm(0)
             signal.signal(signal.SIGALRM, previous_handler)
+            restore_stop()
 
     action = args.action
     if action == 'restore-rehearsal':

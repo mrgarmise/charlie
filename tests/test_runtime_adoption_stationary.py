@@ -82,6 +82,7 @@ def test_native_qualification_requires_original_launcher(host, monkeypatch, sele
     """The unsigned qualification path must never run after a cutover."""
     monkeypatch.setattr(host, 'preserved', lambda: None)
     monkeypatch.setattr(s.socket, 'gethostname', lambda: 'charlie')
+    host.home = s.Path('/home/five')
     if selected:
         host.normal.write_bytes(s.template(selected))
     monkeypatch.setattr(s, 'idle_guard', lambda: None)

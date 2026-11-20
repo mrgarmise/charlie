@@ -111,6 +111,48 @@ def test_native_qualification_refuses_existing_approval_or_arguments(host, monke
     assert s.selection(host.normal) == set()
 
 
+def test_bounded_logger_normal_shutdown(tmp_path):
+    log = tmp_path / 'session.log'
+    with log.open('wb') as out:
+        with s.bounded_log_tee(out) as tee:
+            tee.stdin.write(b'hello qualifying log\\n')
+            tee.stdin.flush()
+            tee.stdin.close()
+        assert tee.returncode == 0
+    assert log.read_bytes() == b'hello qualifying log\\n'
+
+
+def test_bounded_logger_kills_stuck_tee_without_indefinite_wait(tmp_path, monkeypatch):
+    """An inherited writer must not permanently block qualification cleanup."""
+    import subprocess as sp
+    events = []
+    class FakeInput:
+        closed = False
+        def close(self):
+            self.closed = True
+            events.append('close')
+    class FakeTee:
+        def __init__(self):
+            self.stdin = FakeInput()
+            self.returncode = None
+        def wait(self, timeout):
+            events.append(('wait', timeout))
+            if self.returncode is None:
+                raise sp.TimeoutExpired('tee', timeout)
+            return self.returncode
+        def terminate(self):
+            events.append('terminate')
+            self.returncode = -15
+        def kill(self):
+            raise AssertionError('terminate should suffice')
+    fake = FakeTee()
+    monkeypatch.setattr(s.subprocess, 'Popen', lambda *a, **k: fake)
+    with (tmp_path / 'log').open('wb') as out:
+        with s.bounded_log_tee(out):
+            pass
+    assert events == ['close', ('wait', 5), 'terminate', ('wait', 2)]
+
+
 def test_offline_status_reports_unknown_host_without_mutation(tmp_path):
     ctl = s.Stationary(tmp_path)
     result = ctl.inspect()

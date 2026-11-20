@@ -64,6 +64,19 @@ the original unchanged launcher. In particular, a success footer and
 object observations alone do **not** establish RP2040 ACK or comprehensive
 host-level privilege isolation.
 
+The operator's first targeted `x` test showed no visible response; `q`
+ended recognition normally. The candidate's observational keyboard
+originally delivered an `emergency_stop` event to attention without
+stopping its inference loop. The guarded controller now installs a scoped
+`x` handler that emits `object_recognition_stop` after the emergency
+event and prints `STATIONARY STOP REQUESTED`; normal app cleanup
+must release Hailo and RP2040 and clear the label. A successful terminal
+print by itself is **not** a validated physical STOP or Pico ACK.
+A supervised native x-stop retest, log review, device release and operator
+observation are required before N1 signoff. The handler restores the
+candidate's original keyboard method after the session, and does not
+change the approved worktree or authorize any physical motion.
+
 The command runs without signed release approval precisely because it is
 a manual qualification measurement, not normal operational enablement.
 There is no unattended restart, persistent authorization, or service

@@ -152,6 +152,7 @@ def bounded_log_tee(out):
         try:
             tee.wait(timeout=5)
         except subprocess.TimeoutExpired:
+            tee.charlie_forced_cleanup = True
             tee.terminate()
             try:
                 tee.wait(timeout=2)
@@ -160,6 +161,24 @@ def bounded_log_tee(out):
                 tee.wait(timeout=2)
 
 
+
+def verified_log_exit(tee, path, model):
+    """Accept a forced tee shutdown ONLY with a complete, validated log.
+
+    Children occasionally retain inherited output pipe FDs after the app
+    exits. The bounded logger must still be stopped, and no incomplete log
+    may be treated as a successful session.
+    """
+    orderly = tee.returncode == 0
+    forced = (getattr(tee, 'charlie_forced_cleanup', False)
+              and tee.returncode in (-signal.SIGTERM, -signal.SIGKILL))
+    require(orderly or forced, 'evidence logger exited unexpectedly')
+    result = evidence(path, None, model)
+    require(result['clean_shutdown_logged'], 'missing clean Executive shutdown')
+    if forced:
+        print('WARNING: inherited logger pipe required bounded termination; '
+              'complete session log independently validated', file=sys.stderr, flush=True)
+    return result
 
 
 def replace(path, data):
@@ -570,10 +589,7 @@ def main(argv=None):
                             os.dup2(original, fd)
                             os.close(original)
                         tee.stdin.close()
-                require(tee.returncode == 0, 'qualification evidence log failed')
-            report = evidence(log, None, load(ctl.models)['objects']['sha256'])
-            require(report['clean_shutdown_logged'],
-                    'qualification did not record clean Executive shutdown')
+            report = verified_log_exit(tee, log, load(ctl.models)['objects']['sha256'])
             idle_guard()
             device_guard()
             require(selection(ctl.normal) == set() and sha(ctl.normal) == ORIGINAL,
@@ -628,7 +644,7 @@ def main(argv=None):
                                 os.dup2(original, fd)
                                 os.close(original)
                             tee.stdin.close()
-                    require(tee.returncode == 0, 'session log failed')
+                verified_log_exit(tee, log, load(ctl.models)['objects']['sha256'])
                 print(json.dumps(ctl.health(before), indent=2))
         else:
             print(json.dumps(ctl.health(before), indent=2))

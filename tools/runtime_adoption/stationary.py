@@ -134,6 +134,34 @@ def locked(ops):
         os.close(fd)
 
 
+@contextmanager
+def bounded_log_tee(out):
+    """Log to file and foreground terminal; never wait indefinitely on inherited pipe FDs.
+
+    A spawned worker may inherit a copy of stdout/stderr and keep the tee pipe
+    open after the Executive completes. Such a leak must not hang the operator
+    indefinitely or silently turn a failed cleanup into a qualification pass.
+    """
+    tee = subprocess.Popen(['/usr/bin/tee', '/proc/self/fd/' + str(out.fileno())],
+                           stdin=subprocess.PIPE, pass_fds=(out.fileno(),))
+    try:
+        yield tee
+    finally:
+        if tee.stdin is not None and not tee.stdin.closed:
+            tee.stdin.close()
+        try:
+            tee.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            tee.terminate()
+            try:
+                tee.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                tee.kill()
+                tee.wait(timeout=2)
+
+
+
+
 def replace(path, data):
     with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as f:
         temp = Path(f.name)
@@ -511,8 +539,7 @@ def main(argv=None):
                     'redirected qualification notebook')
             log = ctl.ops / 'logs' / ('stationary-qualification-%d.log' % time.time_ns())
             with log.open('xb') as out:
-                with subprocess.Popen(['/usr/bin/tee', '/proc/self/fd/' + str(out.fileno())],
-                                      stdin=subprocess.PIPE, pass_fds=(out.fileno(),)) as tee:
+                with bounded_log_tee(out) as tee:
                     saved = [os.dup(n) for n in (1, 2)]
                     try:
                         for fd in (1, 2):
@@ -576,8 +603,7 @@ def main(argv=None):
                 log = ctl.ops / 'logs' / ('stationary-session-%d.log' % time.time_ns())
                 with log.open('xb') as out:
                     # Preserve controlling terminal and stdin; duplicate output only.
-                    with subprocess.Popen(['/usr/bin/tee', '/proc/self/fd/' + str(out.fileno())],
-                                          stdin=subprocess.PIPE, pass_fds=(out.fileno(),)) as tee:
+                    with bounded_log_tee(out) as tee:
                         saved = [os.dup(n) for n in (1, 2)]
                         try:
                             for fd in (1, 2):

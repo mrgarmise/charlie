@@ -5,6 +5,7 @@ import fcntl
 import hashlib
 import json
 import os
+import shutil
 from pathlib import Path
 import shlex
 import signal
@@ -412,6 +413,23 @@ def trusted_reviewer():
     return trust, trust_file.with_suffix('.pem')
 
 
+def qualification_preflight(ctl, before):
+    """No signed grant is issued and the canonical launcher must remain original."""
+    require(before == set() and sha(ctl.normal) == ORIGINAL,
+            'qualification requires unchanged original normal launcher')
+    ctl.preserved()
+    require(socket.gethostname() == 'charlie' and ctl.home == Path('/home/five'),
+            'native qualification must run on Charlie')
+    require(not (ctl.ops / 'batch-a-state').is_symlink(),
+            'qualification source state cannot be redirected')
+    require(ctl.lineage(), 'approved historical state not preserved')
+    model = load(ctl.models)['objects']
+    require(sha(ctl.new / model['path']) == model['sha256'],
+            'reviewed Hailo model changed')
+    idle_guard()
+    device_guard()
+
+
 def device_guard():
     for device in ('/dev/hailo0', '/dev/ttyACM0'):
         require(Path(device).is_char_device(), 'required device unavailable: ' + device)
@@ -423,13 +441,13 @@ def device_guard():
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('action', choices=('restore-rehearsal', 'request', 'status', 'plan', 'dry-run', 'qualify-evidence', 'review',
-                        'enable', 'disable', 'verify', 'rollback', 'launch', 'executive-status'))
+                        'enable', 'disable', 'verify', 'rollback', 'launch', 'executive-status', 'qualify-native'))
     parser.add_argument('abilities', nargs='*', choices=None)
     args = parser.parse_args(argv)
     ctl = Stationary(Path.home())
     args_ids = set(args.abilities)
     require(len(args_ids) == len(args.abilities) and args_ids <= SCOPES.keys(), 'unsupported arguments')
-    def run_foreground():
+    def run_foreground(state_override=None):
         """Enter only the fixed normal object branch, on the foreground terminal."""
         require(sys.stdin.isatty() and os.tcgetpgrp(0) == os.getpgrp(), 'foreground operator required')
         require(Path(sys.executable).samefile(ctl.home / 'Projects/charlie/.venv/bin/python') and
@@ -453,7 +471,7 @@ def main(argv=None):
         try:
             app.main(['--hardware', '--object-recognition', '--camera-source', 'elegoo',
                   '--elegoo-stream-url', stream, '--object-label-display', 'rp2040', '--object-seconds', '90', '--learning-require-thermal',
-                  '--learning-state', str(ctl.ops / 'batch-a-state')])
+                  '--learning-state', str(state_override or ctl.ops / 'batch-a-state')])
         finally:
             signal.alarm(0)
             signal.signal(signal.SIGALRM, previous_handler)
@@ -478,6 +496,57 @@ def main(argv=None):
         return
     with locked(ctl.ops):
         before = selection(ctl.normal)
+        if action == 'qualify-native':
+            require(not args_ids, 'qualification takes no ability selection')
+            qualification_preflight(ctl, before)
+            require(sys.stdin.isatty() and os.tcgetpgrp(0) == os.getpgrp(),
+                    'supervised foreground terminal required')
+            # Copy under the same runtime lock. Never mutate either operational notebook.
+            destination = Path(tempfile.mkdtemp(
+                prefix='stationary-native-qualification-',
+                dir=ctl.ops / 'promotion-backups'))
+            isolated_state = destination / 'state'
+            shutil.copytree(ctl.ops / 'batch-a-state', isolated_state, symlinks=False)
+            require(not (isolated_state / 'learning-evidence.sqlite3').is_symlink(),
+                    'redirected qualification notebook')
+            log = ctl.ops / 'logs' / ('stationary-qualification-%d.log' % time.time_ns())
+            with log.open('xb') as out:
+                with subprocess.Popen(['/usr/bin/tee', '/proc/self/fd/' + str(out.fileno())],
+                                      stdin=subprocess.PIPE, pass_fds=(out.fileno(),)) as tee:
+                    saved = [os.dup(n) for n in (1, 2)]
+                    try:
+                        for fd in (1, 2):
+                            os.dup2(tee.stdin.fileno(), fd)
+                        print('BEGIN QUALIFICATION ' + json.dumps(dict(
+                            candidate=CANDIDATE, controller_sha=git(ROOT, 'rev-parse', 'HEAD'),
+                            controller_tree=git(ROOT, 'rev-parse', 'HEAD^{tree}'),
+                            original_launcher=sha(ctl.normal), boot=Path(
+                                '/proc/sys/kernel/random/boot_id').read_text().strip(),
+                            isolated_state=str(isolated_state), motion_authorized=False
+                        ), sort_keys=True), flush=True)
+                        run_foreground(isolated_state)
+                        print('END stationary exit=0', flush=True)
+                    finally:
+                        sys.stdout.flush()
+                        sys.stderr.flush()
+                        for fd, original in zip((1, 2), saved):
+                            os.dup2(original, fd)
+                            os.close(original)
+                        tee.stdin.close()
+                require(tee.returncode == 0, 'qualification evidence log failed')
+            report = evidence(log, None, load(ctl.models)['objects']['sha256'])
+            require(report['clean_shutdown_logged'],
+                    'qualification did not record clean Executive shutdown')
+            idle_guard()
+            device_guard()
+            require(selection(ctl.normal) == set() and sha(ctl.normal) == ORIGINAL,
+                    'normal launcher changed during qualification')
+            print(json.dumps(dict(status='native-measurement-complete',
+                                  approval_issued=False, normal_runtime_changed=False,
+                                  log=str(log), isolated_state=str(isolated_state),
+                                  controller=git(ROOT, 'rev-parse', 'HEAD'),
+                                  evidence=report), indent=2))
+            return
         if action in ('disable', 'rollback'):
             require((action == 'rollback' and not args_ids) or
                     (action == 'disable' and len(args_ids) == 1), 'select one ability')

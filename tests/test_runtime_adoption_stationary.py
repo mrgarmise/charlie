@@ -232,6 +232,40 @@ def test_bounded_logger_kills_stuck_tee_without_indefinite_wait(tmp_path, monkey
     assert events == ['close', ('wait', 5), 'terminate', ('wait', 2)]
 
 
+def test_complete_log_allows_bounded_tee_cleanup(tmp_path, monkeypatch, capsys):
+    import signal
+    from types import SimpleNamespace
+    model = 'a' * 64
+    log = tmp_path / 'complete.log'
+    log.write_text('Development operational: clean shutdown | shutdown requested\\n'
+                   'END stationary exit=0\\n')
+    monkeypatch.setattr(s, 'evidence', lambda path, expected, digest: {
+        'clean_shutdown_logged': True, 'observations': 32
+    } if path == log and expected is None and digest == model else None)
+    tee = SimpleNamespace(returncode=-signal.SIGTERM, charlie_forced_cleanup=True)
+    assert s.verified_log_exit(tee, log, model)['observations'] == 32
+    assert 'bounded termination' in capsys.readouterr().err
+
+
+def test_incomplete_log_never_passes_even_after_forced_cleanup(tmp_path):
+    import signal
+    from types import SimpleNamespace
+    log = tmp_path / 'incomplete.log'
+    log.write_text('Development operational: clean shutdown\\n')
+    tee = SimpleNamespace(returncode=-signal.SIGTERM, charlie_forced_cleanup=True)
+    import pytest
+    with pytest.raises(Exception):
+        s.verified_log_exit(tee, log, 'a' * 64)
+
+
+def test_unexpected_logger_failure_never_passes(tmp_path):
+    from types import SimpleNamespace
+    import pytest
+    tee = SimpleNamespace(returncode=1, charlie_forced_cleanup=False)
+    with pytest.raises(Exception):
+        s.verified_log_exit(tee, tmp_path / 'absent.log', 'a' * 64)
+
+
 def test_offline_status_reports_unknown_host_without_mutation(tmp_path):
     ctl = s.Stationary(tmp_path)
     result = ctl.inspect()

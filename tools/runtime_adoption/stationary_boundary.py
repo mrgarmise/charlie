@@ -66,3 +66,28 @@ def install(stream=None):
 
     serial.Serial = StationarySerial
     sys.addaudithook(policy)
+
+
+def install_stationary_stop(keyboard_class):
+    """Make x a visible, latched stop of the *observational* object session.
+
+    The candidate's default keyboard emergency event latches attention but
+    does not stop its observational inference loop. The reviewed stationary
+    profile must stop that loop and close the label display as well. No
+    actuator STOP acknowledgement is claimed by this wrapper.
+    """
+    original = keyboard_class.emergency_stop
+
+    def stop(self):
+        original(self)
+        if self.object_mode:
+            self.bus.emit('object_recognition_stop')
+            print('STATIONARY STOP REQUESTED: recognition shutdown; motion not authorized',
+                  flush=True)
+
+    keyboard_class.emergency_stop = stop
+
+    def restore():
+        keyboard_class.emergency_stop = original
+
+    return restore

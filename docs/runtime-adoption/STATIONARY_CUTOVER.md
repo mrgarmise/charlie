@@ -70,6 +70,36 @@ There is no unattended restart, persistent authorization, or service
 installation. An untrusted checkout or uncontrolled actor must not be
 given the ability to execute arbitrary Python with device privileges.
 
+### Unsigned review preparation
+
+After source/host qualification, run `ctl prepare-review` on Charlie from a
+clean controller checkout **before** switching the normal launcher. This
+operation takes the existing runtime lock; reads the original/candidate
+identities, camera/Hailo observation logs, native pre-review measurements,
+backup manifests, restore report, protected consultation source and trusted
+public reviewer key; and writes a fresh `stationary-review/drafts/unsigned-*/`
+directory containing `evidence-report.json` and **PENDING** N0/N1/N2/N5
+review templates. Its result includes SHA-256 hashes of the produced files
+and a gap list.
+
+It does **not** fetch authenticated CI artifacts or assert their pass status.
+The reviewer must independently verify the exact-head GitHub Actions runs,
+artifact digests and candidate suite mapping before preparing the real
+`ci.json` and `controller-ci.json`. The generated drafts deliberately leave
+`status=pending`, `independent_review=false`, and `artifacts={}`. They are
+*not* valid gate receipts. Missing firmware, host ownership, Pico ACK, thermal
+STOP, state compatibility or manual-consultation evidence must not be
+auto-filled. In particular, an observed clean Executive shutdown and a
+successful later logger unit test do not erase the previously interrupted
+`tee` cleanup.
+
+The command does not create active `inputs.json`, `ci.json`,
+`controller-ci.json`, `manifest.json`, `release.json`, any signed record,
+or an operational selection. Production review records should be derived
+only from inspected immutable measurements and authentic explicit reviewer
+decisions. Re-running preparation creates a separate draft; it never
+overwrites prior evidence.
+
 ### Review packet
 
 Use the existing eligible release reviewer and pinned Ed25519 public key. Have the host administrator bind that identity in root-owned `/etc/charlie/stationary-reviewer.pem` and `stationary-reviewer.json` (fields `reviewer` and `sha256`). Only the public key belongs on this path. Preserve review versions outside the active packet directory.

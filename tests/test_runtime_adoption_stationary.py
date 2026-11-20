@@ -152,6 +152,44 @@ def test_prepare_review_cli_rejects_capability_arguments(host, monkeypatch):
     assert not (host.review / 'drafts').exists()
 
 
+def test_stationary_x_emits_stop_and_reports_it(capsys):
+    from tools.runtime_adoption.stationary_boundary import install_stationary_stop
+    from stimulus.keyboard import KeyboardStimulus
+    from stimulus.bus import StimulusBus
+    original = KeyboardStimulus.emergency_stop
+    restore = install_stationary_stop(KeyboardStimulus)
+    try:
+        bus = StimulusBus()
+        keyboard = KeyboardStimulus.__new__(KeyboardStimulus)
+        keyboard.object_mode = True
+        keyboard.bus = bus
+        keyboard.on_emergency = None
+        keyboard.emergency_stop()
+        assert [event for event, _ in bus.get_all()] == [
+            'emergency_stop', 'object_recognition_stop']
+        assert 'STATIONARY STOP REQUESTED' in capsys.readouterr().out
+    finally:
+        restore()
+    assert KeyboardStimulus.emergency_stop is original
+
+
+def test_stationary_stop_wrapper_does_not_change_other_keyboard_modes():
+    from tools.runtime_adoption.stationary_boundary import install_stationary_stop
+    from stimulus.keyboard import KeyboardStimulus
+    from stimulus.bus import StimulusBus
+    restore = install_stationary_stop(KeyboardStimulus)
+    try:
+        bus = StimulusBus()
+        keyboard = KeyboardStimulus.__new__(KeyboardStimulus)
+        keyboard.object_mode = False
+        keyboard.bus = bus
+        keyboard.on_emergency = None
+        keyboard.emergency_stop()
+        assert [event for event, _ in bus.get_all()] == ['emergency_stop']
+    finally:
+        restore()
+
+
 def test_bounded_logger_normal_shutdown(tmp_path):
     log = tmp_path / 'session.log'
     with log.open('wb') as out:

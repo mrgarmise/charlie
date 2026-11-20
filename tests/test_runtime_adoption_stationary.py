@@ -90,6 +90,8 @@ def test_native_qualification_requires_original_launcher(host, monkeypatch, sele
     monkeypatch.setattr(host, 'lineage', lambda: 'existing-history')
     host.models.parent.mkdir(exist_ok=True)
     host.models.write_text(json.dumps({'objects': {'path': 'test-model.hef', 'sha256': '0'*64}}))
+    host.new.mkdir()
+    (host.new / 'test-model.hef').write_bytes(b'offline test model')
     if selected:
         with pytest.raises(ValueError, match='unchanged original normal launcher'):
             s.qualification_preflight(host, selected)

@@ -1,0 +1,172 @@
+[
+  {
+    "suite": "full",
+    "candidate": {
+      "sha": "d7cabfc65b6c25d5d71af7ce5141ab5de828ba4f",
+      "tree": "53f0d945aed1eff2c147612d054917e83dcb1d4f"
+    },
+    "conclusion": "success",
+    "passed": 2526,
+    "failed": 0,
+    "skipped": 30,
+    "completed_at": 1795174680,
+    "artifact_sha256": "4d3c27a6c0ba745bc724503a408d3e7bad63412581d07e3c34ba7081788840b0",
+    "artifact_id": 14624743270,
+    "artifact_name": "adoption-software",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/43330973560",
+    "attempt": 2,
+    "job_url": "https://github.com/mrgarmise/charlie/actions/runs/43330973560/job/136261008319",
+    "archive_members": [
+      "adoption-full.xml"
+    ]
+  },
+  {
+    "suite": "contracts",
+    "candidate": {
+      "sha": "d7cabfc65b6c25d5d71af7ce5141ab5de828ba4f",
+      "tree": "53f0d945aed1eff2c147612d054917e83dcb1d4f"
+    },
+    "conclusion": "success",
+    "passed": 134,
+    "failed": 0,
+    "skipped": 0,
+    "completed_at": 1795174680,
+    "artifact_sha256": "4d3c27a6c0ba745bc724503a408d3e7bad63412581d07e3c34ba7081788840b0",
+    "artifact_id": 14624743270,
+    "artifact_name": "adoption-software",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/43330973560",
+    "attempt": 2,
+    "job_url": "https://github.com/mrgarmise/charlie/actions/runs/43330973560/job/136261008319",
+    "archive_members": [],
+    "job_log_evidence": [
+      "2026-11-20T11:31:35.8923592Z ##[group]Run python tools/check_unified_contracts.py",
+      "2026-11-20T11:31:38.3717388Z 134 passed in 2.30s"
+    ],
+    "binding_note": "The software archive identifies the same job. The exact command and count are recorded in its GitHub job log."
+  },
+  {
+    "suite": "baseline-llm",
+    "candidate": {
+      "sha": "d7cabfc65b6c25d5d71af7ce5141ab5de828ba4f",
+      "tree": "53f0d945aed1eff2c147612d054917e83dcb1d4f"
+    },
+    "conclusion": "success",
+    "passed": 235,
+    "failed": 0,
+    "skipped": 1,
+    "completed_at": 1795174680,
+    "artifact_sha256": "4d3c27a6c0ba745bc724503a408d3e7bad63412581d07e3c34ba7081788840b0",
+    "artifact_id": 14624743270,
+    "artifact_name": "adoption-software",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/43330973560",
+    "attempt": 2,
+    "job_url": "https://github.com/mrgarmise/charlie/actions/runs/43330973560/job/136261008319",
+    "archive_members": [
+      "adoption-focused.xml"
+    ]
+  },
+  {
+    "suite": "browser",
+    "candidate": {
+      "sha": "d7cabfc65b6c25d5d71af7ce5141ab5de828ba4f",
+      "tree": "53f0d945aed1eff2c147612d054917e83dcb1d4f"
+    },
+    "conclusion": "success",
+    "passed": 36,
+    "failed": 0,
+    "skipped": 0,
+    "completed_at": 1795174369,
+    "artifact_sha256": "067cb2d2ad6a343fea9e076ddf962b0e9b59cdd09c2c1c1b1122ecc78b70876a",
+    "artifact_id": 14624797545,
+    "artifact_name": "adoption-browser",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/43330963169",
+    "attempt": 2,
+    "job_url": "https://github.com/mrgarmise/charlie/actions/runs/43330963169/job/136261270618",
+    "archive_members": [
+      "adoption-browser.xml"
+    ]
+  },
+  {
+    "suite": "neural-cpu",
+    "candidate": {
+      "sha": "d7cabfc65b6c25d5d71af7ce5141ab5de828ba4f",
+      "tree": "53f0d945aed1eff2c147612d054917e83dcb1d4f"
+    },
+    "conclusion": "success",
+    "passed": 84,
+    "failed": 0,
+    "skipped": 0,
+    "completed_at": 1795174462,
+    "artifact_sha256": "2cef677f4da69d6c0abfeed5df0635585ae0d13a551cbd84fad30ba2d612cfb1",
+    "artifact_id": 14624414316,
+    "artifact_name": "adoption-neural-cpu-engineering",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/43330963169",
+    "attempt": 3,
+    "job_url": "https://github.com/mrgarmise/charlie/actions/runs/43330963169/job/136262204407",
+    "archive_members": [
+      "adoption-neural-cpu.xml"
+    ]
+  },
+  {
+    "suite": "firmware-host",
+    "candidate": {
+      "sha": "d7cabfc65b6c25d5d71af7ce5141ab5de828ba4f",
+      "tree": "53f0d945aed1eff2c147612d054917e83dcb1d4f"
+    },
+    "conclusion": "success",
+    "passed": 183,
+    "failed": 0,
+    "skipped": 0,
+    "completed_at": 1795174318,
+    "artifact_sha256": "390e1db2850ccf113eedc79256c2fb55acb956d9fad34759502f462577078311",
+    "artifact_id": 14624119702,
+    "artifact_name": "s3-host-validation",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/43330973186",
+    "attempt": 2,
+    "job_url": "https://github.com/mrgarmise/charlie/actions/runs/43330973186/job/136261016111",
+    "archive_members": [
+      "s3-integration-host.xml",
+      "owner-uno-compatibility.xml"
+    ]
+  },
+  {
+    "suite": "firmware-build",
+    "candidate": {
+      "sha": "d7cabfc65b6c25d5d71af7ce5141ab5de828ba4f",
+      "tree": "53f0d945aed1eff2c147612d054917e83dcb1d4f"
+    },
+    "conclusion": "success",
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "completed_at": 1795174451,
+    "artifact_sha256": "829334f28c5694bcda9ba22270f7765fdb302dc9b9c9cf315f95469a4f4b24c7",
+    "artifact_id": 14625865372,
+    "artifact_name": "BUILD-ONLY-NOT-HARDWARE-QUALIFIED-reports",
+    "url": "https://github.com/mrgarmise/charlie/actions/runs/43330973186",
+    "attempt": 3,
+    "job_url": "https://github.com/mrgarmise/charlie/actions/runs/43330973186/job/136261816392",
+    "archive_members": [
+      "s3-opi/build-report.json",
+      "s3-qspi/build-report.json"
+    ],
+    "builds": {
+      "s3-opi/build-report.json": {
+        "image_sha256": "c5e01abdaeb2fe5be05a02b1a11bd9510ec68186b90cf6112382e0f9ed4d68c0",
+        "psram_candidate": "opi",
+        "deployed": false,
+        "not_hardware_qualified": true,
+        "motor_forwarding_default": "closed-without-authenticated-command",
+        "image_bytes": 3153984
+      },
+      "s3-qspi/build-report.json": {
+        "image_sha256": "d71e3a0f15c02a3842383cb63bba271095aedc90466c7ceecd9e1afcd9b01dfb",
+        "psram_candidate": "qspi",
+        "deployed": false,
+        "not_hardware_qualified": true,
+        "motor_forwarding_default": "closed-without-authenticated-command",
+        "image_bytes": 3152624
+      }
+    }
+  }
+]

@@ -1,0 +1,66 @@
+{
+  "sha": "5732d34f49db9b08ff8bb2f90c7eab10cfc0ae76",
+  "tree": "f58c8fc400ee3d78aff3178d264077b144ee8a29",
+  "conclusion": "success",
+  "completed_at": 1795138089,
+  "url": "https://github.com/mrgarmise/charlie/actions/runs/44652539389",
+  "artifacts": [
+    {
+      "name": "adoption-software",
+      "artifact_id": 14592076812,
+      "sha256": "ecb4e1ab1374703f02f10e81bc1aaccfef8a65f422c0b9e3d9e16951957d995e",
+      "job_url": "https://github.com/mrgarmise/charlie/actions/runs/44652539389/job/136010702392",
+      "completed_at": "2026-11-20T01:28:09Z",
+      "xml": {
+        "adoption-focused.xml": {
+          "tests": 236,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        },
+        "adoption-full.xml": {
+          "tests": 2621,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 30
+        }
+      }
+    },
+    {
+      "name": "adoption-neural-cpu-engineering",
+      "artifact_id": 14591647153,
+      "sha256": "005110ecd742c5d65548449c1753285389e4260631720c52d8006b7c9404e42f",
+      "job_url": "https://github.com/mrgarmise/charlie/actions/runs/44652539389/job/136010702222",
+      "completed_at": "2026-11-20T01:18:45Z",
+      "xml": {
+        "adoption-neural-cpu.xml": {
+          "tests": 84,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "adoption-learning-cpu.xml": {
+          "tests": 49,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "name": "adoption-browser",
+      "artifact_id": 14591213760,
+      "sha256": "d74e68b572f9adbd6d4243de85be40779661044754e38123e09c102235a23c1d",
+      "job_url": "https://github.com/mrgarmise/charlie/actions/runs/44652539389/job/136010701763",
+      "completed_at": "2026-11-20T01:18:35Z",
+      "xml": {
+        "adoption-browser.xml": {
+          "tests": 36,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    }
+  ]
+}

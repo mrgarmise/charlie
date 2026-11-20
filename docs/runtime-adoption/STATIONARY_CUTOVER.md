@@ -28,6 +28,48 @@ ctl plan
 
 While stopped, `ctl restore-rehearsal` takes the original ops lock, creates unique backups of both notebooks and operational controls, restores into an isolated directory, and checks SQLite and file identities. It never restores into a working state. The original release archive stays intact. An independent reviewer adds any other applicable scoped backups, including calibration, models, firmware identity, service/environment constraints and manual-consultation policy. Reconcile diverged history before release. The controller checks every original Executive record is present in the separate Batch A notebook.
 
+### Qualification-only native session before release approval
+
+The controller also exposes an **unsigned, supervised N1 measurement command**.
+This command does not bypass any release gates: it requires the normal launcher
+to be exactly its preserved original bytes, validates source/model and state
+lineage, enforces idle ownership and device exclusion under the same runtime
+lock, and runs exactly the candidate single-ELEGOO feeder with the same
+process-local transport and serial allowlists as the proposed normal launcher.
+It writes into a new **copied** Batch A state under `promotion-backups/`,
+not either live notebook. It leaves `start-stationary.sh` and `approved.sha`
+unchanged and does not issue an approval. Keep all other software and physical
+motion disabled; keep hands clear of moving parts, and terminate with Ctrl+C
+if unexpected behavior occurs.
+
+Check out the exact reviewed controller commit in a clean
+`~/charlie-activation-control` worktree first and rerun its focused tests.
+On the Pi's foreground SSH terminal, after positively authorizing this
+stationary camera/Hailo/Pico qualification, run:
+
+```bash
+env -i HOME=/home/five PATH=/usr/bin:/bin \
+  /home/five/Projects/charlie/.venv/bin/python -IB \
+  /home/five/charlie-activation-control/tools/stationary_ctl.py qualify-native
+```
+
+Expect one bounded 90-second recognition session, automatic 150-second
+wall deadline, a new `stationary-qualification-*.log`, a distinct
+qualifying state directory, a success footer and a JSON evidence summary.
+If the program refuses, fails, or is interrupted, **do not sign an N1
+receipt**. Preserve the log and assess the failure. For successful output,
+an independent reviewer must examine the bounded profile, the live Pico
+display, process/thermal/STOP observations, network/serial restrictions and
+the original unchanged launcher. In particular, a success footer and
+object observations alone do **not** establish RP2040 ACK or comprehensive
+host-level privilege isolation.
+
+The command runs without signed release approval precisely because it is
+a manual qualification measurement, not normal operational enablement.
+There is no unattended restart, persistent authorization, or service
+installation. An untrusted checkout or uncontrolled actor must not be
+given the ability to execute arbitrary Python with device privileges.
+
 ### Review packet
 
 Use the existing eligible release reviewer and pinned Ed25519 public key. Have the host administrator bind that identity in root-owned `/etc/charlie/stationary-reviewer.pem` and `stationary-reviewer.json` (fields `reviewer` and `sha256`). Only the public key belongs on this path. Preserve review versions outside the active packet directory.

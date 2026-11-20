@@ -469,7 +469,7 @@ def device_guard():
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('action', choices=('restore-rehearsal', 'request', 'status', 'plan', 'dry-run', 'qualify-evidence', 'review',
-                        'enable', 'disable', 'verify', 'rollback', 'launch', 'executive-status', 'qualify-native'))
+                        'enable', 'disable', 'verify', 'rollback', 'launch', 'executive-status', 'qualify-native', 'prepare-review'))
     parser.add_argument('abilities', nargs='*', choices=None)
     args = parser.parse_args(argv)
     ctl = Stationary(Path.home())
@@ -511,6 +511,12 @@ def main(argv=None):
         with locked(ctl.ops):
             destination = ctl.ops / 'promotion-backups' / ('stationary-' + str(time.time_ns()))
             print(json.dumps(rehearse(ctl, destination), indent=2))
+        return
+    if action == 'prepare-review':
+        require(not args_ids, 'review preparation takes no ability arguments')
+        from .stationary_packet_prepare import prepare
+        with locked(ctl.ops):
+            print(json.dumps(prepare(ctl), indent=2, sort_keys=True))
         return
     if action == 'request':
         require(len(args_ids) <= 1, 'one ability per request')

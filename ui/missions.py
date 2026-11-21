@@ -37,7 +37,7 @@ def read_development_organization(path):
             or not isinstance(view.get("nodes"), list) or len(view["nodes"]) > 12
             or not isinstance(view.get("tasks"), dict)):
         raise ValueError("development snapshot is invalid")
-    result = {key: view.get(key) for key in ("goal", "state", "deadline", "seconds", "decision")}
+    result = {key: view.get(key) for key in ("goal", "state", "deadline", "seconds", "decision", "work_budget", "consumed_work_units")}
     result["assignments"] = []
     for node in view["nodes"]:
         if not isinstance(node, dict) or not isinstance(node.get("name"), str):

@@ -31,3 +31,29 @@ class SandboxLearningExecutive(LearningExecutive):
             factory, mission, goal, templates[selected], context=context, template=selected,
             decision=decision)
         return decision
+
+    def retain_sandbox_outcome(self, factory, mission):
+        """Retain a stable, source-linked terminal outcome in the evidence journal."""
+        view = factory.inspect(mission)
+        if view["state"] not in {"completed", "failed", "cancelled", "expired"}:
+            return None
+        episode = f"sandbox-organization:{mission}"
+        references = {}
+        with self.journal.batch():
+            for assignment in view["nodes"]:
+                task = view["tasks"][assignment["name"]]
+                item = task["evidence"]
+                if item is None:
+                    continue
+                payload = item["payload"]
+                sources = [references[digest] for digest in payload["inputs"].values()]
+                record = self.journal.append(
+                    "observation", payload, episode=episode, sources=sources,
+                    producer=assignment["capability"], version=assignment["version"],
+                    provenance={"sandbox_digest": item["digest"]})
+                references[item["digest"]] = record.id
+            return self.journal.append(
+                "event", dict(category="sandbox_organization_outcome",
+                              goal=view["goal"], state=view["state"], decision=view.get("decision")),
+                episode=episode, sources=references.values(),
+                producer="LearningExecutive", version="sandbox-organization-v1")

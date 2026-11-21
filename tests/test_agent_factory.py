@@ -183,3 +183,34 @@ def test_untrusted_json_has_no_tool_or_path_grants(tmp_path, registry):
         parse_assignments(dumps(graph))
     with pytest.raises(ValueError, match="size"):
         parse_assignments(" " * 65_537)
+
+
+def test_existing_mission_dashboard_reads_opt_in_snapshot(tmp_path, registry, monkeypatch):
+    from json import dumps
+    from ui.missions import mission_status
+
+    factory = Factory(tmp_path / "mission.sqlite", registry)
+    factory.commission("display", "Display synthetic evidence", (Assignment("a", "worker"),))
+    factory.step("display")
+    snapshot = tmp_path / "snapshot.json"
+    snapshot.write_text(dumps(factory.inspect("display")))
+    monkeypatch.setenv("CHARLIE_DEV_FACTORY_VIEW", str(snapshot))
+    view = mission_status()["development_organization"]
+    assert view["goal"] == "Display synthetic evidence"
+    assert view["assignments"][0]["attempts"] == 1
+    assert view["assignments"][0]["evidence"]["digest"]
+    from json import loads
+    from tests.test_mobile_http import call
+    from ui.dashboard import start_dashboard
+
+    server = start_dashboard(None, "m" * 40, port=0)
+    try:
+        assert call(server, "/api/missions", token="bad")[0] == 401
+        code, body = call(server, "/api/missions")
+        assert code == 200
+        assert loads(body)["development_organization"] == view
+        assert call(server, "/api/missions", method="POST", body={})[0] == 404
+    finally:
+        server.close()
+    snapshot.write_bytes(b"a" * (128 * 1024 + 1))
+    assert mission_status()["development_organization"]["state"] == "snapshot unavailable"

@@ -338,3 +338,22 @@ def test_delegation_cannot_reset_root_budget(tmp_path):
     assert reopened.inspect("activity")["state"] == "failed"
     assert reopened.inspect("activity")["consumed_work_units"] == 1
     assert reopened.events("activity")[-1]["kind"] == "budget-exhausted"
+
+
+def test_normal_development_scheduler_drives_factory(tmp_path):
+    from subprocess import run
+    from sys import executable
+    import json
+
+    output = tmp_path / "development"
+    path = output / "learning-evidence.sqlite3"
+    result = run([executable, "-m", "tools.agent_factory_demo", str(path),
+                  "offset-demo", "offset", "--scheduled"], capture_output=True, text=True,
+                 check=True, timeout=20)
+    mission = json.loads(result.stdout)
+    assert mission["state"] == "completed"
+    assert mission["tasks"]["assessment"]["evidence"]["payload"]["result"]["held_out_residual"] == 0
+    operational = json.loads((output / "development-operational-status.json").read_text())
+    assert operational["run_counters"]["productive_turns"] == 2
+    assert operational["physical_authorization"] is False
+    assert operational["controller_writes"] == 0

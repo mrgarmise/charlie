@@ -390,13 +390,18 @@ class Factory:
                     AND task.revoked=0 AND org.state='running' AND org.deadline>?
             """, (mission, name, attempt, self.clock(), self.clock())).fetchone() is not None
 
-    def step(self, mission):
+    def step(self, mission, *, guard=None):
         """Run one registered synchronous development algorithm, if ready."""
         claim = self.claim(mission)
         if claim is None:
             return False
         capability, name, attempt, goal, inputs = claim
-        token = _lease_check.set(lambda: self.lease_is_active(mission, name, attempt))
+        def check():
+            if guard is not None:
+                guard()
+            return self.lease_is_active(mission, name, attempt)
+
+        token = _lease_check.set(check)
         try:
             result = capability.run(goal, inputs)
             if type(result) is not dict:

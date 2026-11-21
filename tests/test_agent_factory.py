@@ -357,3 +357,17 @@ def test_normal_development_scheduler_drives_factory(tmp_path):
     assert operational["run_counters"]["productive_turns"] == 2
     assert operational["physical_authorization"] is False
     assert operational["controller_writes"] == 0
+
+
+def test_cli_rejects_existing_unmarked_lifecycle_notebook(tmp_path):
+    from subprocess import run
+    from sys import executable
+
+    path = tmp_path / "learning-evidence.sqlite3"
+    original = b"untouched preexisting notebook"
+    path.write_bytes(original)
+    for action in (["status"], ["offset", "--scheduled"]):
+        result = run([executable, "-m", "tools.agent_factory_demo", str(path),
+                      "mission", *action], capture_output=True, timeout=10, check=False)
+        assert result.returncode == 2
+        assert path.read_bytes() == original

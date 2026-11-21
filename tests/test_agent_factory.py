@@ -92,7 +92,7 @@ def test_attempt_ceiling_survives_restart_and_kill_switch(tmp_path, registry):
 
 def test_retention_changes_ranking_after_restart_with_frozen_control(tmp_path):
     from memory.evidence import EvidenceJournal
-    from memory.learning_projects import LearningExecutive
+    from learning.sandbox_executive import SandboxLearningExecutive
 
     def baseline(goal, inputs):
         return {"prediction": 0}
@@ -115,7 +115,7 @@ def test_retention_changes_ranking_after_restart_with_frozen_control(tmp_path):
     }
     with closing(EvidenceJournal(tmp_path / "evidence.sqlite")) as journal:
         factory = Factory(path, registry)
-        executive = LearningExecutive(journal, None)
+        executive = SandboxLearningExecutive(journal, None)
         for mission in ("initial", "duplicate"):
             decision = executive.select_sandbox_organization(factory, mission, "offset", "sensor",
                                                                templates, frozen=True)
@@ -152,3 +152,34 @@ Factory(sys.argv[1], [Capability('worker', 'v1', 'worker', crash)],
     restarted = Factory(path, registry, clock=lambda: 131)
     assert restarted.step("test")
     assert restarted.inspect("test")["tasks"]["a"]["attempts"] == 2
+
+
+def test_synthetic_transfer_validates_timebase_and_missingness():
+    from tools.agent_factory_demo import compare_replay, synthetic_transfer
+
+    result = synthetic_transfer("fixture", {})
+    assert result["mode"] == "synthetic"
+    assert result["lag_seconds"] == pytest.approx(.04)
+    assert result["heldout_fitted_squared_error"] == 0
+    assert result["heldout_no_lag_squared_error"] > 0
+    annotated = dict(mode="synthetic", clock="first", unit="rad", frame="model_world",
+                     period_seconds=.02, samples=[0] * 12)
+    with pytest.raises(ValueError, match="calibration"):
+        compare_replay(annotated, dict(annotated, clock="second"))
+    with pytest.raises(ValueError, match="missing"):
+        compare_replay(annotated, dict(annotated, samples=[None] * 12))
+    with pytest.raises(ValueError, match="ambiguous"):
+        compare_replay(annotated, annotated)
+
+
+def test_untrusted_json_has_no_tool_or_path_grants(tmp_path, registry):
+    from json import dumps
+    from learning.agent_factory import parse_assignments
+
+    graph = dict(schema=1, assignments=[dict(name="a", capability="worker")])
+    assert parse_assignments(dumps(graph)) == (Assignment("a", "worker"),)
+    graph["assignments"][0]["tool"] = "serial"
+    with pytest.raises(ValueError, match="assignment"):
+        parse_assignments(dumps(graph))
+    with pytest.raises(ValueError, match="size"):
+        parse_assignments(" " * 65_537)

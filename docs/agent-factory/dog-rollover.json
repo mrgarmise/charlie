@@ -2,7 +2,7 @@
   "goal": "Search for a continuous Dog roll ending in stable support in simulation",
   "nodes": [
     {
-      "capability": "observation",
+      "capability": "visual-replay",
       "depends_on": [],
       "name": "observation",
       "supervisor": null,
@@ -41,19 +41,19 @@
   "schema": 1,
   "seconds": 120,
   "state": "completed",
-  "deadline": 1795274417.3355196,
+  "deadline": 1795274722.6140695,
   "tasks": {
     "assessment": {
       "attempts": 1,
       "evidence": {
-        "digest": "9061d2ba8d77d387a9b94b67a389734cb0845db4aacfa35b01a6118055af3aae",
+        "digest": "cb32e78cfd09aa63e6a4410c711ccfbf828498b406d886be7d7c57f6879e6de4",
         "payload": {
           "attempt": 1,
           "capability": "transfer-review",
           "inputs": {
-            "observation": "82cc63fa5f211cb0d78ab1a844ce8583a2e43e016aca02c08bcc67e8ff2d0d04",
-            "search": "8c8986c25726b6bd36d3944ed79f15fd4bda854a6be253ad23d4b3f7a8e18d34",
-            "transfer": "9b715e0ad574f15297e3fba5a8d8f2d6373b2e4c55e7bedcdf1e686f9ac75669"
+            "observation": "29f83a1bf74863ea979f8b76f1bb2efe9c61a41cdd7a27b4f4cf1f5b1dbbf437",
+            "search": "cb0b8648d7232e7327a20b6134bf0091014bca8c2b8c9faa8bdd93ea0da171d4",
+            "transfer": "ed5f1673f894d57a7dd6ade5753e141c18a11f993b25713feb33de3e6c99e642"
           },
           "mission": "rollout",
           "mode": "simulation_or_synthetic",
@@ -65,7 +65,7 @@
             "physical_transfer": "unverified",
             "skill_qualification": "none",
             "source": "unavailable",
-            "synthetic_transfer": "9b715e0ad574f15297e3fba5a8d8f2d6373b2e4c55e7bedcdf1e686f9ac75669"
+            "synthetic_transfer": "ed5f1673f894d57a7dd6ade5753e141c18a11f993b25713feb33de3e6c99e642"
           },
           "task": "assessment",
           "version": "v1"
@@ -75,20 +75,26 @@
     "observation": {
       "attempts": 1,
       "evidence": {
-        "digest": "82cc63fa5f211cb0d78ab1a844ce8583a2e43e016aca02c08bcc67e8ff2d0d04",
+        "digest": "29f83a1bf74863ea979f8b76f1bb2efe9c61a41cdd7a27b4f4cf1f5b1dbbf437",
         "payload": {
           "attempt": 1,
-          "capability": "observation",
+          "capability": "visual-replay",
           "inputs": {},
           "mission": "rollout",
           "mode": "simulation_or_synthetic",
           "result": {
-            "clock": "model_time",
-            "frame": "model_world",
-            "initial_roll": 0,
+            "example_point": null,
+            "manifest_sha256": "ab6eeaa0e6d11021c0d5d8c92494a1ad8427df162a5219b412f44ec2171f81b8",
             "mode": "synthetic",
             "physical_replay": "unavailable",
-            "unit": "rad"
+            "reconstructed_points": 0,
+            "replay_status": "independent 2D",
+            "sources": {
+              "primary": {
+                "missing": 1,
+                "samples": 3
+              }
+            }
           },
           "task": "observation",
           "version": "v1"
@@ -98,12 +104,12 @@
     "search": {
       "attempts": 1,
       "evidence": {
-        "digest": "8c8986c25726b6bd36d3944ed79f15fd4bda854a6be253ad23d4b3f7a8e18d34",
+        "digest": "cb0b8648d7232e7327a20b6134bf0091014bca8c2b8c9faa8bdd93ea0da171d4",
         "payload": {
           "attempt": 1,
           "capability": "rollover-search",
           "inputs": {
-            "observation": "82cc63fa5f211cb0d78ab1a844ce8583a2e43e016aca02c08bcc67e8ff2d0d04"
+            "observation": "29f83a1bf74863ea979f8b76f1bb2efe9c61a41cdd7a27b4f4cf1f5b1dbbf437"
           },
           "mission": "rollout",
           "mode": "simulation_or_synthetic",
@@ -202,12 +208,12 @@
     "transfer": {
       "attempts": 1,
       "evidence": {
-        "digest": "9b715e0ad574f15297e3fba5a8d8f2d6373b2e4c55e7bedcdf1e686f9ac75669",
+        "digest": "ed5f1673f894d57a7dd6ade5753e141c18a11f993b25713feb33de3e6c99e642",
         "payload": {
           "attempt": 1,
           "capability": "synthetic-transfer",
           "inputs": {
-            "observation": "82cc63fa5f211cb0d78ab1a844ce8583a2e43e016aca02c08bcc67e8ff2d0d04"
+            "observation": "29f83a1bf74863ea979f8b76f1bb2efe9c61a41cdd7a27b4f4cf1f5b1dbbf437"
           },
           "mission": "rollout",
           "mode": "simulation_or_synthetic",

@@ -240,3 +240,101 @@ def test_terminal_outcome_reuses_immutable_journal_and_is_idempotent(tmp_path, r
         reopened = SandboxLearningExecutive(journal, None)
         assert reopened.retain_sandbox_outcome(factory, "test").id == first.id
         assert len(journal.records()) == 3
+
+
+def test_dynamic_delegation_and_lifecycle_publication(tmp_path):
+    from learning.sandbox_events import LifecyclePublication
+    from stimulus.bus import StimulusBus
+
+    def supervise(goal, inputs):
+        return {"organization_proposal": '{"schema":1,"assignments":[{"name":"child","capability":"worker"}]}'}
+
+    registry = [Capability("manager", "v1", "supervisor", supervise, ("worker",)),
+                Capability("worker", "v1", "worker", outcome)]
+    path = tmp_path / "factory.sqlite"
+    factory = Factory(path, registry)
+    plan = (Assignment("parent", "manager"),)
+    factory.commission("activity", "observe", plan)
+    assert factory.step("activity")
+    reopened = Factory(path, registry)
+    reopened.commission("activity", "observe", plan)
+    assert reopened.step("activity")
+    view = reopened.inspect("activity")
+    assert view["state"] == "completed"
+    assert view["nodes"][1]["supervisor"] == "parent"
+    assert view["tasks"]["child"]["evidence"]["payload"]["inputs"] == {
+        "parent": view["tasks"]["parent"]["evidence"]["digest"]}
+    bus = StimulusBus()
+    with LifecyclePublication(bus, reopened, "activity") as publication:
+        subscription = bus.subscribe_observations(publication.source)
+        publication.flush()
+        item = subscription.read()
+        assert item.values["state"] == "completed"
+        assert [event.values["kind"] for event in bus.recent_observations(publication.source)] == [
+            "mission", "assignment", "claim", "mission", "result", "assignment", "claim",
+            "result", "mission"]
+        publication.flush()
+        assert subscription.read() is None
+        subscription.close()
+
+
+def test_worker_cannot_expand_or_commit_partial_delegation(tmp_path):
+    def counterfeit(goal, inputs):
+        return {"organization_proposal": '{"schema":1,"assignments":[{"name":"child","capability":"worker"}]}'}
+
+    factory = Factory(tmp_path / "factory.sqlite", [Capability("worker", "v1", "worker", counterfeit)])
+    factory.commission("activity", "observe", (Assignment("parent", "worker"),))
+    with pytest.raises(ValueError, match="allowlist"):
+        factory.step("activity")
+    view = factory.inspect("activity")
+    assert list(view["tasks"]) == ["parent"]
+    assert view["tasks"]["parent"] == {"attempts": 1, "evidence": None}
+
+
+def test_pause_and_resume_fence_the_prior_attempt(tmp_path, registry):
+    factory = Factory(tmp_path / "factory.sqlite", registry)
+    factory.commission("activity", "observe", (Assignment("first", "worker"),))
+    assert factory.claim("activity")[2] == 1
+    factory.pause("activity")
+    assert factory.inspect("activity")["state"] == "paused"
+    assert not factory.lease_is_active("activity", "first", 1)
+    assert factory.claim("activity") is None
+    factory.resume("activity")
+    assert factory.claim("activity") is None
+    factory._finish("activity", "first", 1, "{}")
+    assert factory.claim("activity")[2] == 2
+    factory._finish("activity", "first", 1, "{}")
+    assert factory.inspect("activity")["tasks"]["first"]["evidence"] is None
+
+
+def test_oversized_delegation_never_changes_the_graph(tmp_path):
+    import json
+
+    def proposed(goal, inputs):
+        return {"organization_proposal": json.dumps({"schema": 1, "assignments": [
+            {"name": f"child-{i}", "capability": "worker"} for i in range(12)]})}
+
+    factory = Factory(tmp_path / "factory.sqlite", [
+        Capability("manager", "v1", "supervisor", proposed, ("worker",)),
+        Capability("worker", "v1", "worker", outcome)])
+    factory.commission("activity", "observe", (Assignment("root", "manager"),))
+    with pytest.raises(ValueError, match="1–12"):
+        factory.step("activity")
+    assert list(factory.inspect("activity")["tasks"]) == ["root"]
+
+
+def test_delegation_cannot_reset_root_budget(tmp_path):
+    def supervise(goal, inputs):
+        return {"organization_proposal": '{"schema":1,"assignments":[{"name":"child","capability":"worker"}]}'}
+
+    path = tmp_path / "factory.sqlite"
+    registry = [Capability("manager", "v1", "supervisor", supervise, ("worker",)),
+                Capability("worker", "v1", "worker", outcome, work_units=3)]
+    factory = Factory(path, registry)
+    factory.commission("activity", "observe", (Assignment("parent", "manager"),), work_budget=3)
+    assert factory.step("activity")
+    reopened = Factory(path, registry)
+    assert not reopened.step("activity")
+    assert reopened.inspect("activity")["state"] == "failed"
+    assert reopened.inspect("activity")["consumed_work_units"] == 1
+    assert reopened.events("activity")[-1]["kind"] == "budget-exhausted"

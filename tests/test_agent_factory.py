@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 
 import pytest
 
@@ -87,3 +88,67 @@ def test_attempt_ceiling_survives_restart_and_kill_switch(tmp_path, registry):
     factory.stop()
     with pytest.raises(RuntimeError):
         reopened.commission("new", "test", (Assignment("a", "worker"),))
+
+
+def test_retention_changes_ranking_after_restart_with_frozen_control(tmp_path):
+    from memory.evidence import EvidenceJournal
+    from memory.learning_projects import LearningExecutive
+
+    def baseline(goal, inputs):
+        return {"prediction": 0}
+
+    def calibrated(goal, inputs):
+        return {"prediction": 2}
+
+    def evaluate(goal, inputs):
+        prediction = inputs["estimate"]["payload"]["result"]["prediction"]
+        residual = abs(32 - 30 - prediction)
+        return {"organization_score": float(residual == 0), "evaluation_case": "fixture-offset-2"}
+
+    path = tmp_path / "mission.sqlite"
+    registry = [Capability("baseline", "v1", "worker", baseline),
+                Capability("calibrated", "v1", "worker", calibrated),
+                Capability("validation", "v1", "evaluator", evaluate)]
+    templates = {
+        worker: (Assignment("estimate", worker), Assignment("evaluate", "validation", ("estimate",)))
+        for worker in ("baseline", "calibrated")
+    }
+    with closing(EvidenceJournal(tmp_path / "evidence.sqlite")) as journal:
+        factory = Factory(path, registry)
+        executive = LearningExecutive(journal, None)
+        for mission in ("initial", "duplicate"):
+            decision = executive.select_sandbox_organization(factory, mission, "offset", "sensor",
+                                                               templates, frozen=True)
+            assert decision[0]["template"] == "baseline"
+            assert factory.step(mission)
+            assert factory.step(mission)
+        restarted = Factory(path, registry)
+        decision = executive.select_sandbox_organization(restarted, "next", "offset", "sensor", templates)
+        assert decision[0]["template"] == "calibrated"
+        assert decision[1]["samples"] == 1
+        assert restarted.inspect("next")["decision"] == decision
+        assert restarted.rank("sensor", templates, frozen=True)[0]["template"] == "baseline"
+
+
+def test_hard_exit_preserves_precharged_attempt(tmp_path, registry):
+    from subprocess import run
+    from sys import executable
+
+    path = tmp_path / "mission.sqlite"
+    parent = Factory(path, registry, clock=lambda: 100)
+    parent.commission("test", "test", (Assignment("a", "worker"),), seconds=200)
+    program = """
+import os
+import sys
+from learning.agent_factory import Capability, Factory
+def crash(goal, inputs):
+    os._exit(17)
+Factory(sys.argv[1], [Capability('worker', 'v1', 'worker', crash)],
+        clock=lambda: 100).step('test')
+"""
+    child = run([executable, "-c", program, str(path)], timeout=10, check=False)
+    assert child.returncode == 17
+    assert parent.inspect("test")["tasks"]["a"] == {"attempts": 1, "evidence": None}
+    restarted = Factory(path, registry, clock=lambda: 131)
+    assert restarted.step("test")
+    assert restarted.inspect("test")["tasks"]["a"]["attempts"] == 2

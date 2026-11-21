@@ -7,10 +7,12 @@ import os
 from math import atan2, isfinite
 from pathlib import Path
 from random import Random
+import signal
 import subprocess
 import sys
+from time import monotonic
 
-from learning.agent_factory import Assignment, Capability, Factory
+from learning.agent_factory import Assignment, Capability, Factory, check_worker_lease
 from learning.sandbox_executive import SandboxLearningExecutive
 from memory.evidence import EvidenceJournal
 
@@ -80,24 +82,49 @@ def assess_dog(goal, inputs):
             "next_question": "Can a separately validated simulator mode continue through supported floor contact?"}
 
 
-def search_rollover(goal, inputs):
+def search_rollover(goal, inputs, *, attempts=128):
     # The child command is fixed by this trusted adapter. Proposal data never
     # enters the environment, imports, arguments, or filesystem configuration.
+    if type(attempts) is not int or attempts not in {8, 16, 128}:
+        raise ValueError("unsupported development trial budget")
     command = """
-from hashlib import sha256
 import json
 import resource
+import sys
 resource.setrlimit(resource.RLIMIT_CPU, (18, 19))
 resource.setrlimit(resource.RLIMIT_AS, (536870912, 536870912))
 resource.setrlimit(resource.RLIMIT_FSIZE, (0, 0))
 from rollover import run_search
-print(json.dumps(run_search(128), allow_nan=False))
+print(json.dumps(run_search(int(sys.argv[1])), allow_nan=False))
 """
     environment = {key: os.environ[key] for key in ("PATH", "PYTHONPATH") if key in os.environ}
     environment.update(PYTHONDONTWRITEBYTECODE="1", OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1")
-    process = subprocess.run([sys.executable, "-c", command], check=True, timeout=20,
-                             capture_output=True, env=environment)
-    return {"mode": "simulation", **json.loads(process.stdout)}
+    argv = [sys.executable, "-c", command, str(attempts)]
+    check_worker_lease()
+    with subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          env=environment, start_new_session=True) as process:
+        deadline = monotonic() + 20
+        try:
+            while True:
+                check_worker_lease()
+                remaining = deadline - monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("simulator exceeded its development lease")
+                try:
+                    stdout, stderr = process.communicate(timeout=min(.2, remaining))
+                    break
+                except subprocess.TimeoutExpired:
+                    continue
+        except BaseException:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.communicate()
+            raise
+        if process.returncode:
+            raise subprocess.CalledProcessError(process.returncode, argv, stdout, stderr)
+    return {"mode": "simulation", **json.loads(stdout)}
 
 
 def compare_replay(reference, observation):
@@ -178,13 +205,84 @@ def explain(view):
     return "\n".join(lines)
 
 
+def proposal(result, *assignments):
+    return {**result, "organization_proposal": json.dumps(
+        {"schema": 1, "assignments": list(assignments)})}
+
+
+def start_rollover(goal, inputs):
+    return proposal({"mode": "simulation"},
+                    {"name": "replay", "capability": "visual-replay"},
+                    {"name": "transfer", "capability": "transfer-supervisor", "depends_on": ["replay"]},
+                    {"name": "search", "capability": "search-supervisor", "depends_on": ["transfer"]})
+
+
+def plan_transfer(goal, inputs):
+    estimate = synthetic_transfer(goal, inputs)
+    return estimate
+
+
+def plan_search(goal, inputs):
+    # A synthetic lag estimate prioritizes checking the simulated delay range.
+    # It never changes the physical twin or motion controls.
+    transfer = inputs["transfer"]["payload"]["result"]
+    attempts = 16 if transfer["heldout_fitted_squared_error"] < transfer["heldout_no_lag_squared_error"] else 8
+    result = search_rollover(goal, inputs, attempts=attempts)
+    return proposal({**result, "priority": "actuation-delay robustness",
+                     "synthetic_lag_seconds": transfer["lag_seconds"]},
+                    {"name": "qualification", "capability": "rollover-evaluator"})
+
+
+def qualify_search(goal, inputs):
+    result = inputs["search"]["payload"]["result"]
+    return {"mode": "simulation", "goal_achieved": result["accepted"],
+            "attempts": result["attempts"], "physical_transfer": "unverified",
+            "skill_qualification": "none"}
+
+
+def investigate_rig(goal, inputs):
+    from tempfile import TemporaryDirectory
+    from research.uel.visual.experiment import run
+    from research.uel.visual.rig import Rig
+
+    with TemporaryDirectory(prefix="charlie-rig-") as folder:
+        return {"mode": "simulation", **run(Rig(), folder, seconds=10)}
+
+
+def evaluate_rig(goal, inputs, *, calibrated):
+    result = inputs["rig"]["payload"]["result"]
+    baseline = result["fixed_rms_px"]
+    observed = result["rms_px"] if calibrated else baseline
+    return {"mode": "simulation", "evaluation_case": result["qualification"],
+            "goal_achieved": observed < 1.0, "heldout_rms_px": observed,
+            "organization_score": max(0.0, min(1.0, 1.0 - observed / baseline)),
+            "skill_qualification": "none"}
+
+
+def evaluate_calibrated(goal, inputs):
+    return evaluate_rig(goal, inputs, calibrated=True)
+
+
+def evaluate_baseline(goal, inputs):
+    return evaluate_rig(goal, inputs, calibrated=False)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("database", type=Path)
     parser.add_argument("mission")
-    parser.add_argument("action", choices=("dog", "rollover", "offset", "status", "explain", "cancel", "stop"))
+    parser.add_argument("action", choices=("dog", "rollover", "dynamic-rollover", "rig", "offset", "status", "explain", "cancel", "pause", "resume", "stop"))
+    parser.add_argument("--frozen", action="store_true", help="disable organization experience updates in selection")
     args = parser.parse_args()
     factory = Factory(args.database, [
+        Capability("rollover-root", "v1", "supervisor", start_rollover,
+                   ("visual-replay", "transfer-supervisor", "search-supervisor")),
+        Capability("transfer-supervisor", "v1", "supervisor", plan_transfer),
+        Capability("search-supervisor", "v1", "supervisor", plan_search, ("rollover-evaluator",), 24),
+        Capability("rollover-evaluator", "v1", "evaluator", qualify_search),
+        Capability("visual-rig", "v1", "worker", investigate_rig),
+        Capability("rig-calibrated", "v1", "evaluator", evaluate_calibrated),
+        Capability("rig-baseline", "v1", "evaluator", evaluate_baseline),
         Capability("observation", "v1", "supervisor", synthesize_observation),
         Capability("visual-replay", "v1", "supervisor", inspect_visual_replay),
         Capability("simulator", "v1", "worker", simulate),
@@ -198,29 +296,54 @@ def main():
     if args.action == "stop":
         factory.stop()
         return
-    if args.action == "cancel":
-        factory.cancel(args.mission)
-    if args.action in {"dog", "offset", "rollover"}:
+    if args.action in {"cancel", "pause", "resume"}:
+        {"cancel": factory.cancel, "pause": factory.pause,
+         "resume": factory.resume}[args.action](args.mission)
+    if args.action in {"dog", "offset", "rollover", "dynamic-rollover", "rig"}:
         if args.action == "dog":
             goal = "Evaluate the existing Dog simulator as a baseline for roll-over research"
             plan = (Assignment("observation", "observation"),
                     Assignment("batch", "simulator", ("observation",), "observation"),
                     Assignment("assessment", "dog-review", ("batch", "observation")))
+        elif args.action == "dynamic-rollover":
+            goal = "Investigate Dog rollover with scoped simulation and replay supervisors"
+            plan = (Assignment("root", "rollover-root"),)
         elif args.action == "rollover":
             goal = "Search for a continuous Dog roll ending in stable support in simulation"
             plan = (Assignment("observation", "visual-replay"),
                     Assignment("search", "rollover-search", ("observation",), "observation"),
                     Assignment("transfer", "synthetic-transfer", ("observation",)),
                     Assignment("assessment", "transfer-review", ("search", "observation", "transfer")))
+        elif args.action == "rig":
+            goal = "Estimate visual delay on the existing simulated pan and tilt rig"
+            templates = {
+                method: (Assignment("rig", "visual-rig"),
+                         Assignment("evaluation", f"rig-{method}", ("rig",)))
+                for method in ("baseline", "calibrated")
+            }
         else:
             goal = "Investigate a synthetic sensor offset"
             plan = (Assignment("estimate", "offset"),
                     Assignment("assessment", "offset-review", ("estimate",)))
         with closing(EvidenceJournal(args.database)) as journal:
             executive = SandboxLearningExecutive(journal, None)
-            executive.commission_sandbox_organization(factory, args.mission, goal, plan)
-            while factory.step(args.mission):
-                pass
+            if args.action == "rig":
+                executive.select_sandbox_organization(factory, args.mission, goal, "rig", templates, frozen=args.frozen)
+            else:
+                limits = {"work_budget": 32} if args.action == "dynamic-rollover" else {}
+                executive.commission_sandbox_organization(factory, args.mission, goal, plan, **limits)
+            from learning.sandbox_events import LifecyclePublication
+            from stimulus.bus import StimulusBus
+
+            with LifecyclePublication(StimulusBus(), factory, args.mission) as publication:
+                publication.flush()
+                try:
+                    while factory.step(args.mission):
+                        publication.flush()
+                except InterruptedError:
+                    if factory.inspect(args.mission)["state"] not in {"paused", "cancelled", "expired"}:
+                        raise
+                publication.flush()
             executive.retain_sandbox_outcome(factory, args.mission)
     view = factory.inspect(args.mission)
     print(explain(view) if args.action == "explain" else json.dumps(view, indent=2))

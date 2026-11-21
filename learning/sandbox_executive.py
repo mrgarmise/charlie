@@ -20,7 +20,7 @@ class SandboxLearningExecutive(LearningExecutive):
             template = retained.get("template")
             if (retained["goal"] != goal or retained.get("context") != context
                     or template not in templates
-                    or retained["nodes"] != factory.describe(factory.validate(templates[template]))):
+                    or retained.get("initial_nodes", retained["nodes"]) != factory.describe(factory.validate(templates[template]))):
                 raise ValueError("mission identity already bound to another selection")
             return retained["decision"]
         decision = factory.rank(context, templates, frozen=frozen)

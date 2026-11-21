@@ -183,6 +183,8 @@ def test_untrusted_json_has_no_tool_or_path_grants(tmp_path, registry):
         parse_assignments(dumps(graph))
     with pytest.raises(ValueError, match="size"):
         parse_assignments(" " * 65_537)
+    with pytest.raises(ValueError, match="duplicate"):
+        parse_assignments('{"schema": 1, "schema": 1, "assignments": []}')
 
 
 def test_existing_mission_dashboard_reads_opt_in_snapshot(tmp_path, registry, monkeypatch):
@@ -214,3 +216,27 @@ def test_existing_mission_dashboard_reads_opt_in_snapshot(tmp_path, registry, mo
         server.close()
     snapshot.write_bytes(b"a" * (128 * 1024 + 1))
     assert mission_status()["development_organization"]["state"] == "snapshot unavailable"
+
+
+def test_terminal_outcome_reuses_immutable_journal_and_is_idempotent(tmp_path, registry):
+    from learning.sandbox_executive import SandboxLearningExecutive
+    from memory.evidence import EvidenceJournal
+
+    path = tmp_path / "ledger.sqlite"
+    factory = Factory(path, registry)
+    with closing(EvidenceJournal(path)) as journal:
+        executive = SandboxLearningExecutive(journal, None)
+        nodes = (Assignment("parent", "worker"), Assignment("child", "worker", ("parent",)))
+        executive.commission_sandbox_organization(factory, "test", "observe", nodes)
+        assert executive.retain_sandbox_outcome(factory, "test") is None
+        assert factory.step("test")
+        assert factory.step("test")
+        first = executive.retain_sandbox_outcome(factory, "test")
+        parent, child, terminal = journal.records()
+        assert child.data["sources"] == [parent.id]
+        assert terminal.data["sources"] == [parent.id, child.id]
+        assert first.id == terminal.id
+    with closing(EvidenceJournal(path)) as journal:
+        reopened = SandboxLearningExecutive(journal, None)
+        assert reopened.retain_sandbox_outcome(factory, "test").id == first.id
+        assert len(journal.records()) == 3

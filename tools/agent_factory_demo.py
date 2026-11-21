@@ -275,13 +275,17 @@ def main():
     parser.add_argument("--scheduled", action="store_true", help="use Charlie's existing developmental turn scheduler")
     parser.add_argument("--frozen", action="store_true", help="disable organization experience updates in selection")
     args = parser.parse_args()
-    if args.scheduled:
-        if args.database.name != "learning-evidence.sqlite3":
-            parser.error("scheduled missions require a development learning-evidence.sqlite3 path")
+    args.database = args.database.resolve()
+    lifecycle_notebook = args.database.name == "learning-evidence.sqlite3"
+    if args.scheduled and not lifecycle_notebook:
+        parser.error("scheduled missions require a development learning-evidence.sqlite3 path")
+    if lifecycle_notebook:
         output = args.database.parent
-        output.mkdir(parents=True, exist_ok=True)
         marker = output / ".agent-factory-development"
         if not marker.is_file():
+            if not args.scheduled:
+                parser.error("this lifecycle notebook is not a dedicated Agent Factory development directory")
+            output.mkdir(parents=True, exist_ok=True)
             if any(output.iterdir()):
                 parser.error("scheduled missions require a new, empty development directory")
             marker.touch(exist_ok=False)

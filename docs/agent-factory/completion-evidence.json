@@ -1,0 +1,613 @@
+{
+  "rollover": {
+    "goal": "Investigate Dog rollover with scoped simulation and replay supervisors",
+    "state": "completed",
+    "nodes": [
+      {
+        "capability": "rollover-root",
+        "depends_on": [],
+        "name": "root",
+        "supervisor": null,
+        "version": "v1"
+      },
+      {
+        "capability": "visual-replay",
+        "depends_on": [
+          "root"
+        ],
+        "name": "replay",
+        "supervisor": "root",
+        "version": "v1"
+      },
+      {
+        "capability": "transfer-supervisor",
+        "depends_on": [
+          "root",
+          "replay"
+        ],
+        "name": "transfer",
+        "supervisor": "root",
+        "version": "v1"
+      },
+      {
+        "capability": "search-supervisor",
+        "depends_on": [
+          "root",
+          "transfer"
+        ],
+        "name": "search",
+        "supervisor": "root",
+        "version": "v1",
+        "work_units": 24
+      },
+      {
+        "capability": "rollover-evaluator",
+        "depends_on": [
+          "search"
+        ],
+        "name": "qualification",
+        "supervisor": "search",
+        "version": "v1"
+      }
+    ],
+    "consumed_work_units": 28,
+    "tasks": {
+      "qualification": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "43f2e9deefae9a433ebf099cc5acb4dc34fb4250ba7730a1f618673dc9223b70",
+          "payload": {
+            "attempt": 1,
+            "capability": "rollover-evaluator",
+            "inputs": {
+              "search": "04698efa99b925b6d0bcb926e80c0f80c288ae9d8869dde4b6a1f16a0f0e6c7f"
+            },
+            "mission": "rollover",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "attempts": 24,
+              "goal_achieved": false,
+              "mode": "simulation",
+              "physical_transfer": "unverified",
+              "skill_qualification": "none"
+            },
+            "task": "qualification",
+            "version": "v1"
+          }
+        }
+      },
+      "replay": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "af84f63f7ca9ae53f71256456cd30c67dcfef398409f143ae37b1dc41b6aeb94",
+          "payload": {
+            "attempt": 1,
+            "capability": "visual-replay",
+            "inputs": {
+              "root": "968a7394eae34a5762022e3643c632f9a56a59946b1b0700f9407eb6a384d7d3"
+            },
+            "mission": "rollover",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "example_point": null,
+              "manifest_sha256": "ab6eeaa0e6d11021c0d5d8c92494a1ad8427df162a5219b412f44ec2171f81b8",
+              "mode": "synthetic",
+              "physical_replay": "unavailable",
+              "reconstructed_points": 0,
+              "replay_status": "independent 2D",
+              "sources": {
+                "primary": {
+                  "missing": 1,
+                  "samples": 3
+                }
+              }
+            },
+            "task": "replay",
+            "version": "v1"
+          }
+        }
+      },
+      "root": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "968a7394eae34a5762022e3643c632f9a56a59946b1b0700f9407eb6a384d7d3",
+          "payload": {
+            "attempt": 1,
+            "capability": "rollover-root",
+            "inputs": {},
+            "mission": "rollover",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "mode": "simulation",
+              "organization_proposal": "{\"schema\": 1, \"assignments\": [{\"name\": \"replay\", \"capability\": \"visual-replay\"}, {\"name\": \"transfer\", \"capability\": \"transfer-supervisor\", \"depends_on\": [\"replay\"]}, {\"name\": \"search\", \"capability\": \"search-supervisor\", \"depends_on\": [\"transfer\"]}]}"
+            },
+            "task": "root",
+            "version": "v1"
+          }
+        }
+      },
+      "search": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "04698efa99b925b6d0bcb926e80c0f80c288ae9d8869dde4b6a1f16a0f0e6c7f",
+          "payload": {
+            "attempt": 1,
+            "capability": "search-supervisor",
+            "inputs": {
+              "root": "968a7394eae34a5762022e3643c632f9a56a59946b1b0700f9407eb6a384d7d3",
+              "transfer": "0ce92161b7983872339f5dda88f15e33f8ae10239aab3e49ba05530dac37033f"
+            },
+            "mission": "rollover",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "accepted": false,
+              "attempts": 24,
+              "best_candidate": [
+                0.5555160281871134,
+                -0.30787750176897644,
+                0.110173705709335,
+                -0.06413836912215035,
+                -0.14579009323437117,
+                -0.6251739637666766,
+                -0.15978281392532395,
+                -0.17491929060536632,
+                0.032462522356516574,
+                0.18181960758569926,
+                0.19472710900577647,
+                0.20607514517674477
+              ],
+              "holdout": [
+                {
+                  "accepted": false,
+                  "peak_force_n": 4.197072359588363,
+                  "reason": "incomplete_roll",
+                  "roll_rad": -0.036900992588695385,
+                  "seed": 500
+                },
+                {
+                  "accepted": false,
+                  "peak_force_n": 4.516121575625625,
+                  "reason": "incomplete_roll",
+                  "roll_rad": -0.036829075181882755,
+                  "seed": 501
+                },
+                {
+                  "accepted": false,
+                  "peak_force_n": 4.50906624765873,
+                  "reason": "incomplete_roll",
+                  "roll_rad": -0.010159917246269147,
+                  "seed": 502
+                },
+                {
+                  "accepted": false,
+                  "peak_force_n": 4.586182197265016,
+                  "reason": "incomplete_roll",
+                  "roll_rad": -0.01967069927878972,
+                  "seed": 503
+                },
+                {
+                  "accepted": false,
+                  "peak_force_n": 4.119969086065349,
+                  "reason": "incomplete_roll",
+                  "roll_rad": 0.00034793395548442035,
+                  "seed": 504
+                },
+                {
+                  "accepted": false,
+                  "peak_force_n": 4.288141392136646,
+                  "reason": "incomplete_roll",
+                  "roll_rad": -0.039175131556266674,
+                  "seed": 505
+                },
+                {
+                  "accepted": false,
+                  "peak_force_n": 4.330254201396616,
+                  "reason": "incomplete_roll",
+                  "roll_rad": -0.01712006869010947,
+                  "seed": 506
+                },
+                {
+                  "accepted": false,
+                  "peak_force_n": 4.4027100965175645,
+                  "reason": "incomplete_roll",
+                  "roll_rad": -0.014817910187944866,
+                  "seed": 507
+                }
+              ],
+              "max_training_roll_rad": 0.03812432285885787,
+              "mode": "simulation",
+              "organization_proposal": "{\"schema\": 1, \"assignments\": [{\"name\": \"qualification\", \"capability\": \"rollover-evaluator\"}]}",
+              "priority": "actuation-delay robustness",
+              "synthetic_lag_seconds": 0.04,
+              "training_outcomes": {
+                "command_envelope": 6,
+                "incomplete_roll": 10
+              },
+              "training_seed": 100,
+              "version": "fnk0050-roll-v1"
+            },
+            "task": "search",
+            "version": "v1"
+          }
+        }
+      },
+      "transfer": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "0ce92161b7983872339f5dda88f15e33f8ae10239aab3e49ba05530dac37033f",
+          "payload": {
+            "attempt": 1,
+            "capability": "transfer-supervisor",
+            "inputs": {
+              "replay": "af84f63f7ca9ae53f71256456cd30c67dcfef398409f143ae37b1dc41b6aeb94",
+              "root": "968a7394eae34a5762022e3643c632f9a56a59946b1b0700f9407eb6a384d7d3"
+            },
+            "mission": "rollover",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "clock": "fixture",
+              "frame": "model_world",
+              "heldout_fitted_squared_error": 0.0,
+              "heldout_no_lag_squared_error": 1.875,
+              "lag_seconds": 0.04,
+              "mode": "synthetic",
+              "period_seconds": 0.02,
+              "twin_update": "fixture only",
+              "unit": "rad"
+            },
+            "task": "transfer",
+            "version": "v1"
+          }
+        }
+      }
+    }
+  },
+  "baseline": {
+    "goal": "Estimate visual delay on the existing simulated pan and tilt rig",
+    "state": "completed",
+    "nodes": [
+      {
+        "capability": "visual-rig",
+        "depends_on": [],
+        "name": "rig",
+        "supervisor": null,
+        "version": "v1"
+      },
+      {
+        "capability": "rig-baseline",
+        "depends_on": [
+          "rig"
+        ],
+        "name": "evaluation",
+        "supervisor": null,
+        "version": "v1"
+      }
+    ],
+    "consumed_work_units": 2,
+    "tasks": {
+      "evaluation": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "29b6e755fb3a98abf409513fc2ef47e7e0bc55d61ac16a015f6dc07a7b7c65cc",
+          "payload": {
+            "attempt": 1,
+            "capability": "rig-baseline",
+            "inputs": {
+              "rig": "ccaecd97b38a26cdc83dede154e257e3fcbcc744acbe516525ef557109a0c2d4"
+            },
+            "mission": "baseline",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "evaluation_case": "c87e911707c84d2aacc02712b4a3749d71dce20add7d50a6f3726b3ca04b289e",
+              "goal_achieved": false,
+              "heldout_rms_px": 70.58997187351623,
+              "mode": "simulation",
+              "organization_score": 0.0,
+              "skill_qualification": "none"
+            },
+            "task": "evaluation",
+            "version": "v1"
+          }
+        }
+      },
+      "rig": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "ccaecd97b38a26cdc83dede154e257e3fcbcc744acbe516525ef557109a0c2d4",
+          "payload": {
+            "attempt": 1,
+            "capability": "visual-rig",
+            "inputs": {},
+            "mission": "baseline",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "ambiguous": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "body": {
+                "baseline": "analytic-arm-v1",
+                "joints": [
+                  "pan",
+                  "tilt"
+                ],
+                "marker": "tip",
+                "name": "pan-tilt",
+                "units": "m",
+                "version": 1
+              },
+              "candidate": "23059c35b0d539a3d5c4cc0f0cc28d6369919e8a2f2105642b93f3705a54942e",
+              "ci95": [
+                0.20233013379353326,
+                0.20988530747251602
+              ],
+              "delay": 3,
+              "fixed_rms_px": 70.58997187351623,
+              "mode": "simulation",
+              "passed": true,
+              "proposal": {
+                "authorization": "operator review pending",
+                "hardware_accepted": false,
+                "objective": "observe a stationary metric reference board"
+              },
+              "qualification": "c87e911707c84d2aacc02712b4a3749d71dce20add7d50a6f3726b3ca04b289e",
+              "random_rms_px": 35.86675328409692,
+              "rms_px": 0.20577645961343563
+            },
+            "task": "rig",
+            "version": "v1"
+          }
+        }
+      }
+    },
+    "decision": [
+      {
+        "samples": 0,
+        "template": "baseline",
+        "value": 0.5,
+        "workers": 2
+      },
+      {
+        "samples": 0,
+        "template": "calibrated",
+        "value": 0.5,
+        "workers": 2
+      }
+    ]
+  },
+  "learned": {
+    "goal": "Estimate visual delay on the existing simulated pan and tilt rig",
+    "state": "completed",
+    "nodes": [
+      {
+        "capability": "visual-rig",
+        "depends_on": [],
+        "name": "rig",
+        "supervisor": null,
+        "version": "v1"
+      },
+      {
+        "capability": "rig-calibrated",
+        "depends_on": [
+          "rig"
+        ],
+        "name": "evaluation",
+        "supervisor": null,
+        "version": "v1"
+      }
+    ],
+    "consumed_work_units": 2,
+    "tasks": {
+      "evaluation": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "df82483a529f45f7bca822988154fd7330dbdac81ffae4f981c21158011c04fc",
+          "payload": {
+            "attempt": 1,
+            "capability": "rig-calibrated",
+            "inputs": {
+              "rig": "66544d0704a155444db41e184010ce6328ddc248ced385c96727b8b1d457d5d6"
+            },
+            "mission": "learned",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "evaluation_case": "c87e911707c84d2aacc02712b4a3749d71dce20add7d50a6f3726b3ca04b289e",
+              "goal_achieved": true,
+              "heldout_rms_px": 0.20577645961343563,
+              "mode": "simulation",
+              "organization_score": 0.9970849052046352,
+              "skill_qualification": "none"
+            },
+            "task": "evaluation",
+            "version": "v1"
+          }
+        }
+      },
+      "rig": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "66544d0704a155444db41e184010ce6328ddc248ced385c96727b8b1d457d5d6",
+          "payload": {
+            "attempt": 1,
+            "capability": "visual-rig",
+            "inputs": {},
+            "mission": "learned",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "ambiguous": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "body": {
+                "baseline": "analytic-arm-v1",
+                "joints": [
+                  "pan",
+                  "tilt"
+                ],
+                "marker": "tip",
+                "name": "pan-tilt",
+                "units": "m",
+                "version": 1
+              },
+              "candidate": "23059c35b0d539a3d5c4cc0f0cc28d6369919e8a2f2105642b93f3705a54942e",
+              "ci95": [
+                0.20233013379353326,
+                0.20988530747251602
+              ],
+              "delay": 3,
+              "fixed_rms_px": 70.58997187351623,
+              "mode": "simulation",
+              "passed": true,
+              "proposal": {
+                "authorization": "operator review pending",
+                "hardware_accepted": false,
+                "objective": "observe a stationary metric reference board"
+              },
+              "qualification": "c87e911707c84d2aacc02712b4a3749d71dce20add7d50a6f3726b3ca04b289e",
+              "random_rms_px": 35.86675328409692,
+              "rms_px": 0.20577645961343563
+            },
+            "task": "rig",
+            "version": "v1"
+          }
+        }
+      }
+    },
+    "decision": [
+      {
+        "samples": 0,
+        "template": "calibrated",
+        "value": 0.5,
+        "workers": 2
+      },
+      {
+        "samples": 1,
+        "template": "baseline",
+        "value": 0.3333333333333333,
+        "workers": 2
+      }
+    ]
+  },
+  "frozen": {
+    "goal": "Estimate visual delay on the existing simulated pan and tilt rig",
+    "state": "completed",
+    "nodes": [
+      {
+        "capability": "visual-rig",
+        "depends_on": [],
+        "name": "rig",
+        "supervisor": null,
+        "version": "v1"
+      },
+      {
+        "capability": "rig-baseline",
+        "depends_on": [
+          "rig"
+        ],
+        "name": "evaluation",
+        "supervisor": null,
+        "version": "v1"
+      }
+    ],
+    "consumed_work_units": 2,
+    "tasks": {
+      "evaluation": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "afc610478e3c2af90f0ef9cf044d7aa1aae4093cb3d7254fd35c734c8438cb0d",
+          "payload": {
+            "attempt": 1,
+            "capability": "rig-baseline",
+            "inputs": {
+              "rig": "9b85730982ad70b97bbd443b1d38b3ea94ef3b89a24151de38006d2f10d2e46a"
+            },
+            "mission": "frozen",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "evaluation_case": "c87e911707c84d2aacc02712b4a3749d71dce20add7d50a6f3726b3ca04b289e",
+              "goal_achieved": false,
+              "heldout_rms_px": 70.58997187351623,
+              "mode": "simulation",
+              "organization_score": 0.0,
+              "skill_qualification": "none"
+            },
+            "task": "evaluation",
+            "version": "v1"
+          }
+        }
+      },
+      "rig": {
+        "attempts": 1,
+        "evidence": {
+          "digest": "9b85730982ad70b97bbd443b1d38b3ea94ef3b89a24151de38006d2f10d2e46a",
+          "payload": {
+            "attempt": 1,
+            "capability": "visual-rig",
+            "inputs": {},
+            "mission": "frozen",
+            "mode": "simulation_or_synthetic",
+            "result": {
+              "ambiguous": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "body": {
+                "baseline": "analytic-arm-v1",
+                "joints": [
+                  "pan",
+                  "tilt"
+                ],
+                "marker": "tip",
+                "name": "pan-tilt",
+                "units": "m",
+                "version": 1
+              },
+              "candidate": "23059c35b0d539a3d5c4cc0f0cc28d6369919e8a2f2105642b93f3705a54942e",
+              "ci95": [
+                0.20233013379353326,
+                0.20988530747251602
+              ],
+              "delay": 3,
+              "fixed_rms_px": 70.58997187351623,
+              "mode": "simulation",
+              "passed": true,
+              "proposal": {
+                "authorization": "operator review pending",
+                "hardware_accepted": false,
+                "objective": "observe a stationary metric reference board"
+              },
+              "qualification": "c87e911707c84d2aacc02712b4a3749d71dce20add7d50a6f3726b3ca04b289e",
+              "random_rms_px": 35.86675328409692,
+              "rms_px": 0.20577645961343563
+            },
+            "task": "rig",
+            "version": "v1"
+          }
+        }
+      }
+    },
+    "decision": [
+      {
+        "samples": 0,
+        "template": "baseline",
+        "value": 0.5,
+        "workers": 2
+      },
+      {
+        "samples": 0,
+        "template": "calibrated",
+        "value": 0.5,
+        "workers": 2
+      }
+    ]
+  }
+}

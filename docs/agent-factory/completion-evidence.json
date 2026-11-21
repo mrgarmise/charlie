@@ -260,6 +260,12 @@
           }
         }
       }
+    },
+    "scheduler": {
+      "developmental_attempts": 5,
+      "nonthermal_attempt_slots": 14,
+      "productive_turns": 5,
+      "thermal_wait_polls": 0
     }
   },
   "baseline": {
@@ -376,7 +382,13 @@
         "value": 0.5,
         "workers": 2
       }
-    ]
+    ],
+    "scheduler": {
+      "developmental_attempts": 2,
+      "nonthermal_attempt_slots": 14,
+      "productive_turns": 2,
+      "thermal_wait_polls": 0
+    }
   },
   "learned": {
     "goal": "Estimate visual delay on the existing simulated pan and tilt rig",
@@ -492,7 +504,13 @@
         "value": 0.3333333333333333,
         "workers": 2
       }
-    ]
+    ],
+    "scheduler": {
+      "developmental_attempts": 2,
+      "nonthermal_attempt_slots": 14,
+      "productive_turns": 2,
+      "thermal_wait_polls": 0
+    }
   },
   "frozen": {
     "goal": "Estimate visual delay on the existing simulated pan and tilt rig",
@@ -608,6 +626,12 @@
         "value": 0.5,
         "workers": 2
       }
-    ]
+    ],
+    "scheduler": {
+      "developmental_attempts": 2,
+      "nonthermal_attempt_slots": 14,
+      "productive_turns": 2,
+      "thermal_wait_polls": 0
+    }
   }
 }

@@ -1,9 +1,13 @@
 """Development-only LE organization demonstrations."""
 import argparse
+from hashlib import sha256
 import json
+import os
 from math import atan2, isfinite
 from pathlib import Path
 from random import Random
+import subprocess
+import sys
 
 from learning.agent_factory import Assignment, Capability, Factory
 from learning.sandbox_executive import SandboxLearningExecutive
@@ -12,6 +16,27 @@ from learning.sandbox_executive import SandboxLearningExecutive
 def synthesize_observation(goal, inputs):
     return {"mode": "synthetic", "unit": "rad", "frame": "model_world",
             "clock": "model_time", "initial_roll": 0, "physical_replay": "unavailable"}
+
+
+def inspect_visual_replay(goal, inputs):
+    try:
+        from research.uel.visual import recording
+    except ModuleNotFoundError as exc:
+        if exc.name not in {"research", "research.uel", "research.uel.visual"}:
+            raise
+        return synthesize_observation(goal, inputs)
+
+    manifest = Path(recording.__file__).with_name("evidence") / "recording.json"
+    views, points, status = recording.ingest(manifest)
+    return {
+        "mode": "synthetic", "physical_replay": "unavailable",
+        "manifest_sha256": sha256(manifest.read_bytes()).hexdigest(),
+        "sources": {camera: {"samples": len(features),
+                             "missing": sum(feature is None for feature in features)}
+                    for camera, (_, _, features) in views.items()},
+        "reconstructed_points": len(points), "replay_status": status,
+        "example_point": points[0] if points else None,
+    }
 
 
 def simulate(goal, inputs):
@@ -54,9 +79,23 @@ def assess_dog(goal, inputs):
 
 
 def search_rollover(goal, inputs):
-    from rollover import run_search
-
-    return {"mode": "simulation", **run_search(128)}
+    # The child command is fixed by this trusted adapter. Proposal data never
+    # enters the environment, imports, arguments, or filesystem configuration.
+    command = """
+from hashlib import sha256
+import json
+import resource
+resource.setrlimit(resource.RLIMIT_CPU, (18, 19))
+resource.setrlimit(resource.RLIMIT_AS, (536870912, 536870912))
+resource.setrlimit(resource.RLIMIT_FSIZE, (0, 0))
+from rollover import run_search
+print(json.dumps(run_search(128), allow_nan=False))
+"""
+    environment = {key: os.environ[key] for key in ("PATH", "PYTHONPATH") if key in os.environ}
+    environment.update(PYTHONDONTWRITEBYTECODE="1", OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1")
+    process = subprocess.run([sys.executable, "-c", command], check=True, timeout=20,
+                             capture_output=True, env=environment)
+    return {"mode": "simulation", **json.loads(process.stdout)}
 
 
 def compare_replay(reference, observation):
@@ -116,14 +155,36 @@ def assess_offset(goal, inputs):
     return {"mode": "synthetic", "held_out_residual": abs(32 - offset - 30)}
 
 
+def explain(view):
+    lines = [f"Goal: {view['goal']}", f"State: {view['state']}"]
+    if view.get("decision"):
+        choice = view["decision"][0]
+        lines.append(f"Selected {choice['template']} with rank {choice['value']:.2f} "
+                     f"from {choice['samples']} distinct evaluation cases.")
+    for assignment in view["nodes"]:
+        name = assignment["name"]
+        task = view["tasks"][name]
+        dependencies = ", ".join(assignment["depends_on"]) or "none"
+        lines.append(f"{name} uses {assignment['capability']} and depends on {dependencies}. "
+                     f"Attempts: {task['attempts']}.")
+        if task["evidence"]:
+            result = task["evidence"]["payload"]["result"]
+            if "next_question" in result:
+                lines.append(result["next_question"])
+            if result.get("physical_transfer") == "unverified":
+                lines.append("Physical transfer remains unverified.")
+    return "\n".join(lines)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("database", type=Path)
     parser.add_argument("mission")
-    parser.add_argument("action", choices=("dog", "rollover", "offset", "status", "cancel", "stop"))
+    parser.add_argument("action", choices=("dog", "rollover", "offset", "status", "explain", "cancel", "stop"))
     args = parser.parse_args()
     factory = Factory(args.database, [
         Capability("observation", "v1", "supervisor", synthesize_observation),
+        Capability("visual-replay", "v1", "supervisor", inspect_visual_replay),
         Capability("simulator", "v1", "worker", simulate),
         Capability("rollover-search", "v1", "supervisor", search_rollover),
         Capability("synthetic-transfer", "v1", "worker", synthetic_transfer),
@@ -145,7 +206,7 @@ def main():
                     Assignment("assessment", "dog-review", ("batch", "observation")))
         elif args.action == "rollover":
             goal = "Search for a continuous Dog roll ending in stable support in simulation"
-            plan = (Assignment("observation", "observation"),
+            plan = (Assignment("observation", "visual-replay"),
                     Assignment("search", "rollover-search", ("observation",), "observation"),
                     Assignment("transfer", "synthetic-transfer", ("observation",)),
                     Assignment("assessment", "transfer-review", ("search", "observation", "transfer")))
@@ -159,7 +220,8 @@ def main():
         executive.commission_sandbox_organization(factory, args.mission, goal, plan)
         while factory.step(args.mission):
             pass
-    print(json.dumps(factory.inspect(args.mission), indent=2))
+    view = factory.inspect(args.mission)
+    print(explain(view) if args.action == "explain" else json.dumps(view, indent=2))
 
 
 if __name__ == "__main__":

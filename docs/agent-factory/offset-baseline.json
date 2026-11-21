@@ -1,0 +1,67 @@
+{
+  "goal": "Investigate a synthetic sensor offset",
+  "nodes": [
+    {
+      "capability": "offset",
+      "depends_on": [],
+      "name": "estimate",
+      "supervisor": null,
+      "version": "v1"
+    },
+    {
+      "capability": "offset-review",
+      "depends_on": [
+        "estimate"
+      ],
+      "name": "assessment",
+      "supervisor": null,
+      "version": "v1"
+    }
+  ],
+  "schema": 1,
+  "seconds": 120,
+  "state": "completed",
+  "deadline": 1795274085.794698,
+  "tasks": {
+    "assessment": {
+      "attempts": 1,
+      "evidence": {
+        "digest": "650a3caa01b72ba398f83d17961ac7dc555d1b791a71b864ad8904413b3ab100",
+        "payload": {
+          "attempt": 1,
+          "capability": "offset-review",
+          "inputs": {
+            "estimate": "5480a0a81411922a48156f653db1f266ef10b0b88c8335a2bd21bd1ea38ff3b0"
+          },
+          "mission": "offset-baseline",
+          "mode": "simulation_or_synthetic",
+          "result": {
+            "held_out_residual": 0.0,
+            "mode": "synthetic"
+          },
+          "task": "assessment",
+          "version": "v1"
+        }
+      }
+    },
+    "estimate": {
+      "attempts": 1,
+      "evidence": {
+        "digest": "5480a0a81411922a48156f653db1f266ef10b0b88c8335a2bd21bd1ea38ff3b0",
+        "payload": {
+          "attempt": 1,
+          "capability": "offset",
+          "inputs": {},
+          "mission": "offset-baseline",
+          "mode": "simulation_or_synthetic",
+          "result": {
+            "estimated_offset": 2.0,
+            "mode": "synthetic"
+          },
+          "task": "estimate",
+          "version": "v1"
+        }
+      }
+    }
+  }
+}

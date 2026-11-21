@@ -114,15 +114,65 @@ class Factory:
             done.update(node.name for node in ready)
         return ordered
 
-    def commission(self, mission, goal, assignments, *, seconds=120):
+    def rank(self, context, templates, *, frozen=False):
+        """Rank validated alternatives using completed, independently scored runs."""
+        identifier(context)
+        with self.connect() as db:
+            rows = [] if frozen else db.execute("""
+                SELECT specification, evidence FROM sandbox_organization
+                JOIN sandbox_assignment ON sandbox_assignment.mission=sandbox_organization.id
+                WHERE state='completed' AND evidence IS NOT NULL
+            """).fetchall()
+        ranked = []
+        for template, assignments in templates.items():
+            identifier(template)
+            ordered = self.validate(assignments)
+            nodes = self.describe(ordered)
+            evaluators = {node.name for node in ordered
+                          if self.capabilities[node.capability].role == "evaluator"}
+            if len(evaluators) != 1:
+                raise ValueError("template requires one evaluator")
+            samples = {}
+            for spec, evidence in rows:
+                plan = json.loads(spec)
+                item = json.loads(evidence)
+                payload = item["payload"]
+                if (plan.get("context") != context or plan.get("template") != template
+                        or plan.get("nodes") != nodes or payload["task"] not in evaluators
+                        or item["digest"] != sha256(encode(payload).encode()).hexdigest()):
+                    continue
+                result = payload["result"]
+                score = result.get("organization_score")
+                case = result.get("evaluation_case")
+                if (type(score) in {int, float} and 0 <= score <= 1
+                        and type(case) is str and case):
+                    # Replaying identical controlled evidence contributes one sample.
+                    samples.setdefault(case, []).append(score)
+            means = [sum(scores) / len(scores) for scores in samples.values()]
+            # Two neutral prior observations limit the impact of the first result.
+            value = (1 + sum(means)) / (2 + len(means))
+            ranked.append(dict(template=template, value=value, samples=len(means),
+                               workers=len(ordered)))
+        return sorted(ranked, key=lambda item: (-item["value"], item["workers"], item["template"]))
+
+    def describe(self, nodes):
+        return [dict(asdict(node), depends_on=list(node.depends_on),
+                     version=self.capabilities[node.capability].version) for node in nodes]
+
+    def commission(self, mission, goal, assignments, *, seconds=120, context=None, template=None, decision=None):
         identifier(mission)
         if type(goal) is not str or not goal.strip() or len(goal) > 1000:
             raise ValueError("invalid goal")
         if type(seconds) is not int or not 1 <= seconds <= 3600:
             raise ValueError("invalid deadline")
         nodes = self.validate(assignments)
-        specification = encode(dict(schema=1, goal=goal, seconds=seconds, nodes=[
-            dict(asdict(node), version=self.capabilities[node.capability].version) for node in nodes]))
+        if context is not None or template is not None:
+            identifier(context)
+            identifier(template)
+        plan = dict(schema=1, goal=goal, seconds=seconds, nodes=self.describe(nodes))
+        if context is not None:
+            plan.update(context=context, template=template, decision=decision)
+        specification = encode(plan)
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             self.expire(db)

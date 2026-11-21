@@ -1,6 +1,6 @@
 """Development-only LE organization demonstrations."""
 import argparse
-from contextlib import closing
+from contextlib import closing, redirect_stdout
 from hashlib import sha256
 import json
 import os
@@ -272,8 +272,19 @@ def main():
     parser.add_argument("database", type=Path)
     parser.add_argument("mission")
     parser.add_argument("action", choices=("dog", "rollover", "dynamic-rollover", "rig", "offset", "status", "explain", "cancel", "pause", "resume", "stop"))
+    parser.add_argument("--scheduled", action="store_true", help="use Charlie's existing developmental turn scheduler")
     parser.add_argument("--frozen", action="store_true", help="disable organization experience updates in selection")
     args = parser.parse_args()
+    if args.scheduled:
+        if args.database.name != "learning-evidence.sqlite3":
+            parser.error("scheduled missions require a development learning-evidence.sqlite3 path")
+        output = args.database.parent
+        output.mkdir(parents=True, exist_ok=True)
+        marker = output / ".agent-factory-development"
+        if not marker.is_file():
+            if any(output.iterdir()):
+                parser.error("scheduled missions require a new, empty development directory")
+            marker.touch(exist_ok=False)
     factory = Factory(args.database, [
         Capability("rollover-root", "v1", "supervisor", start_rollover,
                    ("visual-replay", "transfer-supervisor", "search-supervisor")),
@@ -325,26 +336,35 @@ def main():
             goal = "Investigate a synthetic sensor offset"
             plan = (Assignment("estimate", "offset"),
                     Assignment("assessment", "offset-review", ("estimate",)))
-        with closing(EvidenceJournal(args.database)) as journal:
-            executive = SandboxLearningExecutive(journal, None)
+        def commission(executive):
             if args.action == "rig":
                 executive.select_sandbox_organization(factory, args.mission, goal, "rig", templates, frozen=args.frozen)
             else:
                 limits = {"work_budget": 32} if args.action == "dynamic-rollover" else {}
                 executive.commission_sandbox_organization(factory, args.mission, goal, plan, **limits)
-            from learning.sandbox_events import LifecyclePublication
-            from stimulus.bus import StimulusBus
 
-            with LifecyclePublication(StimulusBus(), factory, args.mission) as publication:
-                publication.flush()
-                try:
-                    while factory.step(args.mission):
-                        publication.flush()
-                except InterruptedError:
-                    if factory.inspect(args.mission)["state"] not in {"paused", "cancelled", "expired"}:
-                        raise
-                publication.flush()
-            executive.retain_sandbox_outcome(factory, args.mission)
+        if args.scheduled:
+            from learning.sandbox_lifecycle import run_organization
+
+            with redirect_stdout(sys.stderr):
+                run_organization(args.database, factory, args.mission, commission)
+        else:
+            with closing(EvidenceJournal(args.database)) as journal:
+                executive = SandboxLearningExecutive(journal, None)
+                commission(executive)
+                from learning.sandbox_events import LifecyclePublication
+                from stimulus.bus import StimulusBus
+
+                with LifecyclePublication(StimulusBus(), factory, args.mission) as publication:
+                    publication.flush()
+                    try:
+                        while factory.step(args.mission):
+                            publication.flush()
+                    except InterruptedError:
+                        if factory.inspect(args.mission)["state"] not in {"paused", "cancelled", "expired"}:
+                            raise
+                    publication.flush()
+                executive.retain_sandbox_outcome(factory, args.mission)
     view = factory.inspect(args.mission)
     print(explain(view) if args.action == "explain" else json.dumps(view, indent=2))
 

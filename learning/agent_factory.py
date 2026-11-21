@@ -37,7 +37,18 @@ def parse_assignments(data):
     """Convert a size-bounded JSON proposal into inert assignment records."""
     if type(data) is not str or len(data.encode()) > 65_536:
         raise ValueError("invalid proposal size")
-    proposal = json.loads(data)
+    def unique_fields(pairs):
+        obj = {}
+        for name, value in pairs:
+            if name in obj:
+                raise ValueError("duplicate proposal field")
+            obj[name] = value
+        return obj
+
+    try:
+        proposal = json.loads(data, object_pairs_hook=unique_fields)
+    except RecursionError as exc:
+        raise ValueError("proposal nesting exceeds parser limit") from exc
     if type(proposal) is not dict or set(proposal) != {"schema", "assignments"}:
         raise ValueError("unknown proposal fields")
     if type(proposal["schema"]) is not int or proposal["schema"] != 1:

@@ -1,0 +1,231 @@
+{
+  "goal": "Search for a continuous Dog roll ending in stable support in simulation",
+  "nodes": [
+    {
+      "capability": "observation",
+      "depends_on": [],
+      "name": "observation",
+      "supervisor": null,
+      "version": "v1"
+    },
+    {
+      "capability": "rollover-search",
+      "depends_on": [
+        "observation"
+      ],
+      "name": "search",
+      "supervisor": "observation",
+      "version": "v1"
+    },
+    {
+      "capability": "synthetic-transfer",
+      "depends_on": [
+        "observation"
+      ],
+      "name": "transfer",
+      "supervisor": null,
+      "version": "v1"
+    },
+    {
+      "capability": "transfer-review",
+      "depends_on": [
+        "search",
+        "observation",
+        "transfer"
+      ],
+      "name": "assessment",
+      "supervisor": null,
+      "version": "v1"
+    }
+  ],
+  "schema": 1,
+  "seconds": 120,
+  "state": "completed",
+  "deadline": 1795274417.3355196,
+  "tasks": {
+    "assessment": {
+      "attempts": 1,
+      "evidence": {
+        "digest": "9061d2ba8d77d387a9b94b67a389734cb0845db4aacfa35b01a6118055af3aae",
+        "payload": {
+          "attempt": 1,
+          "capability": "transfer-review",
+          "inputs": {
+            "observation": "82cc63fa5f211cb0d78ab1a844ce8583a2e43e016aca02c08bcc67e8ff2d0d04",
+            "search": "8c8986c25726b6bd36d3944ed79f15fd4bda854a6be253ad23d4b3f7a8e18d34",
+            "transfer": "9b715e0ad574f15297e3fba5a8d8f2d6373b2e4c55e7bedcdf1e686f9ac75669"
+          },
+          "mission": "rollout",
+          "mode": "simulation_or_synthetic",
+          "result": {
+            "attempts": 136,
+            "goal_achieved": false,
+            "mode": "simulation",
+            "next_question": "Which contact conditions distinguish a half roll from a stable recovery?",
+            "physical_transfer": "unverified",
+            "skill_qualification": "none",
+            "source": "unavailable",
+            "synthetic_transfer": "9b715e0ad574f15297e3fba5a8d8f2d6373b2e4c55e7bedcdf1e686f9ac75669"
+          },
+          "task": "assessment",
+          "version": "v1"
+        }
+      }
+    },
+    "observation": {
+      "attempts": 1,
+      "evidence": {
+        "digest": "82cc63fa5f211cb0d78ab1a844ce8583a2e43e016aca02c08bcc67e8ff2d0d04",
+        "payload": {
+          "attempt": 1,
+          "capability": "observation",
+          "inputs": {},
+          "mission": "rollout",
+          "mode": "simulation_or_synthetic",
+          "result": {
+            "clock": "model_time",
+            "frame": "model_world",
+            "initial_roll": 0,
+            "mode": "synthetic",
+            "physical_replay": "unavailable",
+            "unit": "rad"
+          },
+          "task": "observation",
+          "version": "v1"
+        }
+      }
+    },
+    "search": {
+      "attempts": 1,
+      "evidence": {
+        "digest": "8c8986c25726b6bd36d3944ed79f15fd4bda854a6be253ad23d4b3f7a8e18d34",
+        "payload": {
+          "attempt": 1,
+          "capability": "rollover-search",
+          "inputs": {
+            "observation": "82cc63fa5f211cb0d78ab1a844ce8583a2e43e016aca02c08bcc67e8ff2d0d04"
+          },
+          "mission": "rollout",
+          "mode": "simulation_or_synthetic",
+          "result": {
+            "accepted": false,
+            "attempts": 136,
+            "best_candidate": [
+              0.23827634178883378,
+              0.10816473135191831,
+              0.815281397543879,
+              -0.9325536854445505,
+              0.25918949440697914,
+              -1.2231470482081652,
+              0.8710879027202519,
+              0.7652369737837612,
+              0.46177892764718226,
+              0.6687756355552074,
+              1.1358116152294304,
+              0.26054248238441147
+            ],
+            "holdout": [
+              {
+                "accepted": false,
+                "peak_force_n": 22.84521458191773,
+                "reason": "unstable_finish,incomplete_roll",
+                "roll_rad": 3.1869166881100304,
+                "seed": 500
+              },
+              {
+                "accepted": false,
+                "peak_force_n": 19.391132191655792,
+                "reason": "unstable_finish,incomplete_roll",
+                "roll_rad": 3.1918029371329024,
+                "seed": 501
+              },
+              {
+                "accepted": false,
+                "peak_force_n": 17.682601080342167,
+                "reason": "unstable_finish,incomplete_roll",
+                "roll_rad": 3.2025093537827694,
+                "seed": 502
+              },
+              {
+                "accepted": false,
+                "peak_force_n": 24.1736598038948,
+                "reason": "unstable_finish,incomplete_roll",
+                "roll_rad": 3.204553136121132,
+                "seed": 503
+              },
+              {
+                "accepted": false,
+                "peak_force_n": 18.81331717256552,
+                "reason": "unstable_finish,incomplete_roll",
+                "roll_rad": 3.205522361863961,
+                "seed": 504
+              },
+              {
+                "accepted": false,
+                "peak_force_n": 18.620500532459832,
+                "reason": "unstable_finish,incomplete_roll",
+                "roll_rad": 1.7207081451880364,
+                "seed": 505
+              },
+              {
+                "accepted": false,
+                "peak_force_n": 17.520944225721443,
+                "reason": "unstable_finish,incomplete_roll",
+                "roll_rad": 3.19946319973497,
+                "seed": 506
+              },
+              {
+                "accepted": false,
+                "peak_force_n": 23.207566474770427,
+                "reason": "unstable_finish,incomplete_roll",
+                "roll_rad": 3.214527168169841,
+                "seed": 507
+              }
+            ],
+            "max_training_roll_rad": 3.1892178933094244,
+            "mode": "simulation",
+            "training_outcomes": {
+              "command_envelope": 29,
+              "incomplete_roll": 12,
+              "physics_limits,incomplete_roll": 1,
+              "unstable_finish,incomplete_roll": 85,
+              "unstable_finish,physics_limits,incomplete_roll": 1
+            },
+            "training_seed": 100,
+            "version": "fnk0050-roll-v1"
+          },
+          "task": "search",
+          "version": "v1"
+        }
+      }
+    },
+    "transfer": {
+      "attempts": 1,
+      "evidence": {
+        "digest": "9b715e0ad574f15297e3fba5a8d8f2d6373b2e4c55e7bedcdf1e686f9ac75669",
+        "payload": {
+          "attempt": 1,
+          "capability": "synthetic-transfer",
+          "inputs": {
+            "observation": "82cc63fa5f211cb0d78ab1a844ce8583a2e43e016aca02c08bcc67e8ff2d0d04"
+          },
+          "mission": "rollout",
+          "mode": "simulation_or_synthetic",
+          "result": {
+            "clock": "fixture",
+            "frame": "model_world",
+            "heldout_fitted_squared_error": 0.0,
+            "heldout_no_lag_squared_error": 1.875,
+            "lag_seconds": 0.04,
+            "mode": "synthetic",
+            "period_seconds": 0.02,
+            "twin_update": "fixture only",
+            "unit": "rad"
+          },
+          "task": "transfer",
+          "version": "v1"
+        }
+      }
+    }
+  }
+}

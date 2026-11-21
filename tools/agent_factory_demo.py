@@ -1,5 +1,6 @@
 """Development-only LE organization demonstrations."""
 import argparse
+from contextlib import closing
 from hashlib import sha256
 import json
 import os
@@ -11,6 +12,7 @@ import sys
 
 from learning.agent_factory import Assignment, Capability, Factory
 from learning.sandbox_executive import SandboxLearningExecutive
+from memory.evidence import EvidenceJournal
 
 
 def synthesize_observation(goal, inputs):
@@ -214,12 +216,12 @@ def main():
             goal = "Investigate a synthetic sensor offset"
             plan = (Assignment("estimate", "offset"),
                     Assignment("assessment", "offset-review", ("estimate",)))
-        # Use an isolated journal and real Executive in the CLI.
-        from memory.evidence import EvidenceJournal
-        executive = SandboxLearningExecutive(EvidenceJournal(args.database.with_suffix(".jsonl")), None)
-        executive.commission_sandbox_organization(factory, args.mission, goal, plan)
-        while factory.step(args.mission):
-            pass
+        with closing(EvidenceJournal(args.database)) as journal:
+            executive = SandboxLearningExecutive(journal, None)
+            executive.commission_sandbox_organization(factory, args.mission, goal, plan)
+            while factory.step(args.mission):
+                pass
+            executive.retain_sandbox_outcome(factory, args.mission)
     view = factory.inspect(args.mission)
     print(explain(view) if args.action == "explain" else json.dumps(view, indent=2))
 

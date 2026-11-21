@@ -33,6 +33,33 @@ class Assignment:
     supervisor: str | None = None
 
 
+def parse_assignments(data):
+    """Convert a size-bounded JSON proposal into inert assignment records."""
+    if type(data) is not str or len(data.encode()) > 65_536:
+        raise ValueError("invalid proposal size")
+    proposal = json.loads(data)
+    if type(proposal) is not dict or set(proposal) != {"schema", "assignments"}:
+        raise ValueError("unknown proposal fields")
+    if type(proposal["schema"]) is not int or proposal["schema"] != 1:
+        raise ValueError("unsupported organization proposal schema")
+    rows = proposal["assignments"]
+    if type(rows) is not list or not 1 <= len(rows) <= 12:
+        raise ValueError("organization requires 1–12 assignments")
+    assignments = []
+    for row in rows:
+        if (type(row) is not dict or not {"name", "capability"} <= row.keys()
+                or row.keys() - {"name", "capability", "depends_on", "supervisor"}):
+            raise ValueError("unknown or missing assignment fields")
+        dependencies = row.get("depends_on", [])
+        supervisor = row.get("supervisor")
+        if type(dependencies) is not list or len(dependencies) > 11:
+            raise ValueError("invalid dependencies")
+        assignments.append(Assignment(identifier(row["name"]), identifier(row["capability"]),
+                                      tuple(map(identifier, dependencies)),
+                                      identifier(supervisor) if supervisor is not None else None))
+    return tuple(assignments)
+
+
 @dataclass(frozen=True)
 class Capability:
     name: str
@@ -95,6 +122,7 @@ class Factory:
                 raise ValueError("invalid dependencies")
             parent, seen = node.supervisor, {node.name}
             while parent is not None:
+                identifier(parent)
                 if parent in seen or len(seen) > 3:
                     raise ValueError("supervisor cycle or depth exceeded")
                 supervisor = by_name.get(identifier(parent))

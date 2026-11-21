@@ -20,6 +20,26 @@ document.querySelector('#mission-connect').addEventListener('submit', async even
         const a=document.createElement('a');a.textContent=label+' ';a.href=url.href;a.rel='noopener noreferrer';parent.append(a);
       }catch(_){}
     }
+    const development=data.development_organization;
+    if(development){
+      const card=document.createElement('section');card.className='mobile-panel';
+      const title=document.createElement('h2');title.textContent='Development organization';card.append(title);
+      const fields=document.createElement('dl');
+      field(fields,'Goal',development.goal);
+      field(fields,'State',development.state);
+      if(development.seconds!=null)field(fields,'Deadline budget (seconds)',development.seconds);
+      if(development.decision)field(fields,'Organization selection',development.decision);
+      for(const assignment of development.assignments??[]){
+        const evidence=assignment.evidence, result=evidence?.payload?.result;
+        field(fields,assignment.name,{
+          capability:assignment.capability,supervisor:assignment.supervisor,
+          dependencies:assignment.depends_on,attempts:assignment.attempts,
+          evidence:evidence?.digest,mode:result?.mode??evidence?.payload?.mode,
+          outcome:result?.outcome??result?.goal_achieved,follow_up:result?.next_question
+        });
+      }
+      card.append(fields);list.append(card);
+    }
     for(const item of [...register.capabilities].sort((a,b)=>(a.priority??99)-(b.priority??99))){
       const card=document.createElement('section');card.className='mobile-panel';
       const title=document.createElement('h2');title.textContent=item.description;card.append(title);

@@ -28,6 +28,7 @@ document.querySelector('#mission-connect').addEventListener('submit', async even
       field(fields,'Goal',development.goal);
       field(fields,'State',development.state);
       if(development.seconds!=null)field(fields,'Deadline budget (seconds)',development.seconds);
+      if(development.work_budget!=null)field(fields,'Work units',development.consumed_work_units+' / '+development.work_budget);
       if(development.decision)field(fields,'Organization selection',development.decision);
       for(const assignment of development.assignments??[]){
         const evidence=assignment.evidence, result=evidence?.payload?.result;

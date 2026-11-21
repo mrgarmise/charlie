@@ -1,11 +1,12 @@
 """Development-only LE organization demonstrations."""
 import argparse
 import json
+from math import atan2, isfinite
 from pathlib import Path
 from random import Random
 
 from learning.agent_factory import Assignment, Capability, Factory
-from memory.learning_projects import LearningExecutive
+from learning.sandbox_executive import SandboxLearningExecutive
 
 
 def synthesize_observation(goal, inputs):
@@ -35,7 +36,6 @@ def simulate(goal, inputs):
                     stop = "environment_terminated"
                     break
                 matrix = trial.env.data.xmat[1].reshape(3, 3)
-                from math import atan2
                 peak = max(peak, abs(atan2(matrix[2, 1], matrix[2, 2])))
             results.append(dict(seed=seed, peak_roll_rad=peak, stop=stop))
     finally:
@@ -53,6 +53,58 @@ def assess_dog(goal, inputs):
             "next_question": "Can a separately validated simulator mode continue through supported floor contact?"}
 
 
+def search_rollover(goal, inputs):
+    from rollover import run_search
+
+    return {"mode": "simulation", **run_search(128)}
+
+
+def compare_replay(reference, observation):
+    """Estimate an integer sample lag on a labeled synthetic fixture."""
+    fields = ("mode", "unit", "frame", "clock", "period_seconds")
+    if (any(field not in reference or reference[field] != observation.get(field) for field in fields)
+            or reference["mode"] != "synthetic" or reference["period_seconds"] != .02):
+        raise ValueError("replay provenance or calibration mismatch")
+    expected, measured = reference["samples"], observation["samples"]
+    if (len(expected) != len(measured) or len(expected) < 10
+            or any(type(value) not in {int, float} or not isfinite(value)
+                   for value in expected + measured)):
+        raise ValueError("missing aligned replay samples")
+    # All hypotheses use the same comparison window.
+    errors = [sum((expected[i - lag] - measured[i]) ** 2 for i in range(4, len(expected)))
+              for lag in range(5)]
+    lag = min(range(5), key=errors.__getitem__)
+    if errors.count(errors[lag]) != 1:
+        raise ValueError("lag is ambiguous")
+    return lag
+
+
+def synthetic_transfer(goal, inputs):
+    meta = dict(mode="synthetic", unit="rad", frame="model_world", clock="fixture",
+                period_seconds=.02)
+    reference = [0, 0, 1, 0, 0, .5, 0, .25, 0, 0, 0, 0]
+    measured = [0, 0] + reference[:-2]
+    lag = compare_replay(dict(meta, samples=reference), dict(meta, samples=measured))
+    holdout = [0, 0, 0, .5, 0, 0, 1, 0, .75, 0, 0, 0]
+    observed = [0, 0] + holdout[:-2]
+    original = sum((holdout[i] - observed[i]) ** 2 for i in range(4, len(holdout)))
+    fitted = sum((holdout[i - lag] - observed[i]) ** 2 for i in range(4, len(holdout)))
+    return {**meta, "lag_seconds": lag * meta["period_seconds"],
+            "heldout_no_lag_squared_error": original,
+            "heldout_fitted_squared_error": fitted,
+            "twin_update": "fixture only"}
+
+
+def review_transfer(goal, inputs):
+    result = inputs["search"]["payload"]["result"]
+    replay = inputs["observation"]["payload"]["result"]
+    return {"mode": "simulation", "goal_achieved": result["accepted"],
+            "source": replay["physical_replay"], "physical_transfer": "unverified",
+            "skill_qualification": "none", "attempts": result["attempts"],
+            "synthetic_transfer": inputs["transfer"]["digest"],
+            "next_question": "Which contact conditions distinguish a half roll from a stable recovery?"}
+
+
 def investigate(goal, inputs):
     # Synthetic sensor observations of an offset with a held-out measurement.
     calibration = [(0, 2), (10, 12), (20, 22)]
@@ -68,11 +120,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("database", type=Path)
     parser.add_argument("mission")
-    parser.add_argument("action", choices=("dog", "offset", "status", "cancel", "stop"))
+    parser.add_argument("action", choices=("dog", "rollover", "offset", "status", "cancel", "stop"))
     args = parser.parse_args()
     factory = Factory(args.database, [
         Capability("observation", "v1", "supervisor", synthesize_observation),
         Capability("simulator", "v1", "worker", simulate),
+        Capability("rollover-search", "v1", "supervisor", search_rollover),
+        Capability("synthetic-transfer", "v1", "worker", synthetic_transfer),
+        Capability("transfer-review", "v1", "evaluator", review_transfer),
         Capability("dog-review", "v1", "evaluator", assess_dog),
         Capability("offset", "v1", "worker", investigate),
         Capability("offset-review", "v1", "evaluator", assess_offset),
@@ -82,19 +137,25 @@ def main():
         return
     if args.action == "cancel":
         factory.cancel(args.mission)
-    if args.action in {"dog", "offset"}:
+    if args.action in {"dog", "offset", "rollover"}:
         if args.action == "dog":
             goal = "Evaluate the existing Dog simulator as a baseline for roll-over research"
             plan = (Assignment("observation", "observation"),
                     Assignment("batch", "simulator", ("observation",), "observation"),
                     Assignment("assessment", "dog-review", ("batch", "observation")))
+        elif args.action == "rollover":
+            goal = "Search for a continuous Dog roll ending in stable support in simulation"
+            plan = (Assignment("observation", "observation"),
+                    Assignment("search", "rollover-search", ("observation",), "observation"),
+                    Assignment("transfer", "synthetic-transfer", ("observation",)),
+                    Assignment("assessment", "transfer-review", ("search", "observation", "transfer")))
         else:
             goal = "Investigate a synthetic sensor offset"
             plan = (Assignment("estimate", "offset"),
                     Assignment("assessment", "offset-review", ("estimate",)))
         # Use an isolated journal and real Executive in the CLI.
         from memory.evidence import EvidenceJournal
-        executive = LearningExecutive(EvidenceJournal(args.database.with_suffix(".jsonl")), None)
+        executive = SandboxLearningExecutive(EvidenceJournal(args.database.with_suffix(".jsonl")), None)
         executive.commission_sandbox_organization(factory, args.mission, goal, plan)
         while factory.step(args.mission):
             pass

@@ -87,6 +87,10 @@ class LearningExecutive:
         self.journal, self.gateway = journal, gateway
         self.consolidate()
 
+    def commission_sandbox_organization(self, factory, mission, goal, assignments, **limits):
+        """Commission a development organization without runtime or actuator authority."""
+        return factory.commission(mission, goal, assignments, **limits)
+
     def consider_human_question(self, service, evidence_id, *, reason, consequence,
                                 priority, alternative_available=False):
         """Opt-in evidence-derived uncertainty review, never actuator authority."""

@@ -289,6 +289,16 @@ class LinuxDriver:
         return json.loads(result.stdout)
 
     def question(self, prompt):
+        if prompt.startswith('Discovery pass D. '):
+            from learning.discovery.native import catalog_from_policy
+            settings = self.p.get('discovery', {})
+            if settings.get('enabled') is not True:
+                raise PermissionError('discovery disabled')
+            key = hashlib.sha256(prompt.encode()).hexdigest()
+            qid = catalog_from_policy(settings).get(key)
+            if qid is None:
+                raise PermissionError('discovery prompt is outside reviewed catalog')
+            return 'discovery:' + qid
         from learning.question_selection import discover,context_for
         def progress():
             if self.pending or time.monotonic()>=self.slot['mono_end']-5 or not self.client_alive():
@@ -309,10 +319,13 @@ class LinuxDriver:
         from memory.evidence import EvidenceJournal
         journal=EvidenceJournal(self.p['answer_journal'],read_only=True)
         try:
+            categories = ['generalized_question']
+            if self.p.get('discovery', {}).get('enabled') is True:
+                categories.append('discovery_consultation')
             if not any(r.data['payload'].get('state')=='answer-durable'
                        and r.data['payload'].get('trust')=='unverified_hypothesis'
                        and r.data['payload'].get('result',{}).get('identity',{}).get('approval_digest')==approval_digest
-                       for r in journal.category_records('event','generalized_question')):
+                       for category in categories for r in journal.category_records('event',category)):
                 raise PermissionError('independent durable answer receipt not found')
         finally:journal.close()
         # Preserve the independent unknown marker; audited ledger retention is not

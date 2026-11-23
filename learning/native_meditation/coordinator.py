@@ -6,7 +6,8 @@ from .client import NativeBackend
 
 
 class NativeMeditationCoordinator:
-    def __init__(self, consultation, backend=None):
+    def __init__(self, consultation, backend=None, *, inquiry=None):
+        self.inquiry = inquiry
         self.consultation=consultation;self.backend=backend or NativeBackend();self.lease=None
         self.journal=consultation.queue.journal;self.interactions=[]
         pending={}
@@ -47,18 +48,22 @@ class NativeMeditationCoordinator:
                 guard()
                 yield guard
                 # One optional eligible question, same root reservation and notice.
-                previous=self.consultation.authority
-                coordinator=self
-                class Borrowed:
-                    @contextmanager
-                    def reserve(self, *, commission_id, seconds):
-                        lease.reserve_budget(commission_id,coordinator.consultation.daily_limit,coordinator.consultation.cooldown)
-                        path=lease.prepare(model='qwen3:1.7b',digest='8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7',ends_at=lease.ends_at)
-                        coordinator.event('consulting',ends_at=lease.ends_at)
-                        yield Slot(lease.id,path,lease.ends_at,lease.inspect)
-                self.consultation.authority=Borrowed()
-                try:self.consultation.on_meditation(commission_id,guard,client_deadline=client_deadline)
-                finally:self.consultation.authority=previous
+                if self.inquiry is not None:
+                    guard()
+                    self.inquiry.on_reserved_window(commission_id, lease, guard, client_deadline)
+                else:
+                    previous=self.consultation.authority
+                    coordinator=self
+                    class Borrowed:
+                        @contextmanager
+                        def reserve(self, *, commission_id, seconds):
+                            lease.reserve_budget(commission_id,coordinator.consultation.daily_limit,coordinator.consultation.cooldown)
+                            path=lease.prepare(model='qwen3:1.7b',digest='8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7',ends_at=lease.ends_at)
+                            coordinator.event('consulting',ends_at=lease.ends_at)
+                            yield Slot(lease.id,path,lease.ends_at,lease.inspect)
+                    self.consultation.authority=Borrowed()
+                    try:self.consultation.on_meditation(commission_id,guard,client_deadline=client_deadline)
+                    finally:self.consultation.authority=previous
             cleaned=True
         except BaseException as exc:
             self.event('cancelled/error',reason=type(exc).__name__)

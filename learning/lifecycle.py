@@ -688,6 +688,9 @@ class DevelopmentLifecycle:
             self._operational('clean shutdown',self.operational.get('termination_reason','Executive closed'))
             self._phase('stopped')
         finally:
+            inquiry = getattr(self.meditation_consultations, 'inquiry', None)
+            if inquiry is not None:
+                inquiry.close()
             if getattr(self,'native_decision_journal',None) is not None:self.native_decision_journal.close()
             self.journal.close()
             self.lock.close()

@@ -20,6 +20,10 @@ def attach(lifecycle):
     try:
         consultation=MeditationConsultations(QuestionQueue(journal),sources,enabled=True,
             daily_limit=config['daily_limit'],cooldown=config['cooldown'],slot_seconds=config['max_seconds'])
-        lifecycle.meditation_consultations=NativeMeditationCoordinator(consultation,backend)
+        inquiry = None
+        if config.get('discovery'):
+            from learning.discovery.native import NativeInquiry
+            inquiry = NativeInquiry(config['discovery'], consultation, sources, path)
+        lifecycle.meditation_consultations=NativeMeditationCoordinator(consultation,backend,inquiry=inquiry)
         lifecycle.native_decision_journal=journal
     except BaseException:journal.close();raise

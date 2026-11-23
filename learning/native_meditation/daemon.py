@@ -59,7 +59,11 @@ class Broker:
             if op=='status':return dict(available=e.active is None and e.driver.model_empty(),recovery_blocked=e.recovery_blocked)
             if op=='configuration':
                 p=e.policy()
-                return {k:p[k] for k in ('question_sources','answer_journal','max_seconds','daily_limit','cooldown')}
+                config = {k:p[k] for k in ('question_sources','answer_journal','max_seconds','daily_limit','cooldown')}
+                if p.get('discovery'):
+                    from learning.discovery.native import public_settings
+                    config['discovery'] = public_settings(p)
+                return config
             if op=='reserve':return e.reserve(request.get('commission'),request.get('seconds'),pid)
             a=e.active
             if op=='finish' and a is None:

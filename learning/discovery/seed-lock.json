@@ -1,0 +1,38 @@
+{
+  "Charlie_Offline_Reconstruction_Archive_v1.zip": {
+    "library_file_id": "libfile_6ffea90626a88191922921e0937d2624",
+    "sha256": "771af5df9122fa3f349e7d4a9f8efef7f62a2d0b1358d4095a7bb2c22d2e56ce",
+    "bytes": 434607,
+    "rights": "owner-supplied private research seed; redistribution license not established"
+  },
+  "Charlie_Offline_Knowledge_Library_v2.zip": {
+    "library_file_id": "libfile_37dc3af832748191be0ee85db0b270ab",
+    "sha256": "2d8971767afebffb08489e88f31b7ba310d1da2a47bb41d2b6f46bcf96809b7d",
+    "bytes": 58450,
+    "rights": "owner-supplied private research seed; redistribution license not established"
+  },
+  "Charlie_Starter_Questions_v1.zip": {
+    "library_file_id": "libfile_84ad1860741081919c92aa768fb3b3c7",
+    "sha256": "9ba11887cd518bd01b07b13a22198d4e48aa5ebcee6aabf69e0720f6bfe17414",
+    "bytes": 18039,
+    "rights": "owner-supplied private research seed; redistribution license not established"
+  },
+  "Charlie_Civilization_Inference_Gap_Supplement_v1.zip": {
+    "library_file_id": "libfile_494d7e49026c8191a09f7420b9e5a9bd",
+    "sha256": "7404d57b96942fcac32360dd7654112a4a6c921c03e2d296b2f62f9737bfdd28",
+    "bytes": 24183,
+    "rights": "owner-supplied private research seed; redistribution license not established"
+  },
+  "Charlie_Meditation_Protocol_v1.md": {
+    "library_file_id": "libfile_8123c09ff8a481919020a46ce46bcd30",
+    "sha256": "8ff77cad90f575c1e48dd7cf9adf4b0540ae883541d0e523f9a09c58feddde4f",
+    "bytes": 18966,
+    "rights": "owner-supplied private research seed; redistribution license not established"
+  },
+  "Charlie_First_Principles_Foundation_v1.md": {
+    "library_file_id": "libfile_9e6c44a1824081918b496265a9d971c8",
+    "sha256": "2ae3bf99f4fbdf84ae9d909b1c9c8971f92f9e1e4f8989e36e2282ebeabfeea6",
+    "bytes": 35589,
+    "rights": "owner-supplied private research seed; redistribution license not established"
+  }
+}

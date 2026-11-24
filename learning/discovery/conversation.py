@@ -30,6 +30,9 @@ def respond(journal, text, *, now=None, owner=False, question_id=None, session_i
     topic = None
     if keep:
         intent = "queue"
+    elif lower in {"what have you learned", "what did the researcher find", "what disagreed",
+                   "what can we do with it", "what is left to investigate"}:
+        intent = "collaborative"
     elif "changed your mind" in lower or "correction" in lower:
         intent = "changes"
     elif "evidence" in lower or "show details" in lower:
@@ -71,6 +74,34 @@ def respond(journal, text, *, now=None, owner=False, question_id=None, session_i
     messages = []
     if intent == "queue":
         messages.append(f"Queued for owner-directed inquiry: {qid}.")
+    elif intent == "collaborative":
+        selected = next((journal.session(row["id"]) for row in rows
+                         if journal.session(row["id"])["record"].get("collaborative")), None)
+        if selected is None:
+            messages.append("There is no matching committed collaborative meditation.")
+        else:
+            record = selected["record"]
+            detail = record["collaborative"]
+            turns = {turn["payload"]["task"]: turn["payload"]["result"] for turn in detail["turns"]}
+            messages.append(f"Recorded session {selected['id']} · {detail['stop_reason']}.")
+            if lower == "what did the researcher find":
+                for source in turns["researcher"]["sources"]:
+                    messages.append(f"{source['id']} ({source['locator']}): {source['excerpt']}")
+                if not turns["researcher"]["sources"]:
+                    messages.append("The Researcher retained no source excerpts.")
+            elif lower == "what disagreed":
+                conflicts = detail["evaluation"]["conflicts"]
+                messages.append("Conflicting sources: " + ", ".join(conflicts) if conflicts
+                                else "There were no confirmed source conflicts in this session.")
+            elif lower == "what can we do with it":
+                actions = turns["implementer"]["actions"]
+                messages.extend(f"{horizon} · proposal only · {action}" for horizon, action in actions.items())
+                if not actions:
+                    messages.append("The session recorded no specific application proposals.")
+            elif lower == "what is left to investigate":
+                messages.extend(record["followups"])
+            else:
+                messages.extend(record["findings"])
     elif intent == "changes":
         for row in rows:
             for correction in row["corrections"]:

@@ -1,0 +1,232 @@
+{
+  "schema": "CollaborativeResearchDemo/v1",
+  "measurement": {
+    "elapsed_seconds": 5.24,
+    "child_peak_rss_kib": 35448,
+    "sandbox_file_bytes": 832121
+  },
+  "sessions": [
+    {
+      "id": "initial",
+      "question_id": "study-1",
+      "prior": null,
+      "archive_manifest": "018cfdb8b38542075f710e7adbfeee9e4970ab5b6f50fb8e1fcd4359ea79a6e9",
+      "template": "broad",
+      "decision": [
+        {
+          "samples": 0,
+          "template": "broad",
+          "value": 0.5,
+          "workers": 1
+        },
+        {
+          "samples": 0,
+          "template": "scoped",
+          "value": 0.5,
+          "workers": 1
+        }
+      ],
+      "charged_turns": 8,
+      "budget": 12,
+      "verdict": {
+        "comparisons": [],
+        "conflicts": [],
+        "evaluation_case": "8dd1da5bc4ef005dfb5ca1e74d74dfd5375954c40eb6bf7570be237a03c22d47",
+        "kind": "CLAIM",
+        "organization_score": 0.0,
+        "recipient": "brief",
+        "schema": "CollaborativeResearch/v1",
+        "status": "inconclusive"
+      },
+      "sources": [
+        {
+          "id": "CODATA22-L116",
+          "sha256": "11b905c963b323108c1576d4148ec9151b70a1b6d9d97722f62dd9a671448083"
+        }
+      ],
+      "next_question": "Which available source directly addresses this question? How much energy in joules does one electron gain across one volt?",
+      "role_order": [
+        "archivist",
+        "brief",
+        "implementer",
+        "inventor",
+        "researcher",
+        "review",
+        "scientist",
+        "supervisor"
+      ]
+    },
+    {
+      "id": "retained",
+      "question_id": "study-1",
+      "prior": "initial",
+      "archive_manifest": "018cfdb8b38542075f710e7adbfeee9e4970ab5b6f50fb8e1fcd4359ea79a6e9",
+      "template": "scoped",
+      "decision": [
+        {
+          "samples": 0,
+          "template": "scoped",
+          "value": 0.5,
+          "workers": 1
+        },
+        {
+          "samples": 1,
+          "template": "broad",
+          "value": 0.3333333333333333,
+          "workers": 1
+        }
+      ],
+      "charged_turns": 9,
+      "budget": 12,
+      "verdict": {
+        "comparisons": [
+          {
+            "agrees": true,
+            "id": "CODATA22-L113",
+            "normalized_value": "801088317/5000000000000000000000000000"
+          },
+          {
+            "agrees": true,
+            "id": "CODATA22-L118",
+            "normalized_value": "801088317/5000000000000000000000000000"
+          }
+        ],
+        "conflicts": [],
+        "evaluation_case": "8dd1da5bc4ef005dfb5ca1e74d74dfd5375954c40eb6bf7570be237a03c22d47",
+        "kind": "CLAIM",
+        "organization_score": 1.0,
+        "recipient": "brief",
+        "schema": "CollaborativeResearch/v1",
+        "status": "reconciled"
+      },
+      "sources": [
+        {
+          "id": "CODATA22-L113",
+          "sha256": "1336c985b6ac15cff7221c31b360aa84a6e06ac2134a1d205b90a2f56508904a"
+        },
+        {
+          "id": "CODATA22-L118",
+          "sha256": "5d404e5d377257137ec2e5b9dfa71e862cba5d3c7cc7e21d0d162a79c20ad0a3"
+        }
+      ],
+      "next_question": "How does uncertainty in the accelerating voltage propagate into an electron energy estimate?",
+      "role_order": [
+        "archivist",
+        "brief",
+        "implementer",
+        "inventor",
+        "prior-art-review",
+        "researcher",
+        "review",
+        "scientist",
+        "supervisor"
+      ]
+    },
+    {
+      "id": "frozen",
+      "question_id": "study-1",
+      "prior": "retained",
+      "archive_manifest": "018cfdb8b38542075f710e7adbfeee9e4970ab5b6f50fb8e1fcd4359ea79a6e9",
+      "template": "broad",
+      "decision": [
+        {
+          "samples": 0,
+          "template": "broad",
+          "value": 0.5,
+          "workers": 1
+        },
+        {
+          "samples": 0,
+          "template": "scoped",
+          "value": 0.5,
+          "workers": 1
+        }
+      ],
+      "charged_turns": 8,
+      "budget": 12,
+      "verdict": {
+        "comparisons": [],
+        "conflicts": [],
+        "evaluation_case": "8dd1da5bc4ef005dfb5ca1e74d74dfd5375954c40eb6bf7570be237a03c22d47",
+        "kind": "CLAIM",
+        "organization_score": 0.0,
+        "recipient": "brief",
+        "schema": "CollaborativeResearch/v1",
+        "status": "inconclusive"
+      },
+      "sources": [
+        {
+          "id": "CODATA22-L116",
+          "sha256": "11b905c963b323108c1576d4148ec9151b70a1b6d9d97722f62dd9a671448083"
+        }
+      ],
+      "next_question": "Which available source directly addresses this question? How much energy in joules does one electron gain across one volt?",
+      "role_order": [
+        "archivist",
+        "brief",
+        "implementer",
+        "inventor",
+        "researcher",
+        "review",
+        "scientist",
+        "supervisor"
+      ]
+    },
+    {
+      "id": "timing",
+      "question_id": "study-2",
+      "prior": null,
+      "archive_manifest": "018cfdb8b38542075f710e7adbfeee9e4970ab5b6f50fb8e1fcd4359ea79a6e9",
+      "template": "broad",
+      "decision": [
+        {
+          "samples": 0,
+          "template": "broad",
+          "value": 0.5,
+          "workers": 1
+        },
+        {
+          "samples": 0,
+          "template": "scoped",
+          "value": 0.5,
+          "workers": 1
+        }
+      ],
+      "charged_turns": 8,
+      "budget": 12,
+      "verdict": {
+        "comparisons": [
+          {
+            "agrees": true,
+            "id": "CODATA22-L319",
+            "normalized_value": "149896229/500000"
+          }
+        ],
+        "conflicts": [],
+        "evaluation_case": "28b62f5ee3db0ec5bde3c638b57f116bde8fc6f7210a3cc415d4c97d686bb61a",
+        "kind": "CLAIM",
+        "organization_score": 1.0,
+        "recipient": "brief",
+        "schema": "CollaborativeResearch/v1",
+        "status": "reconciled"
+      },
+      "sources": [
+        {
+          "id": "CODATA22-L319",
+          "sha256": "4bcbd287b7e4a49819f60f4ec6e372c4f7e31de95f26bdb921bf7f31dd467c7d"
+        }
+      ],
+      "next_question": "How do refractive index and two-way travel affect the delay of a fiber link?",
+      "role_order": [
+        "archivist",
+        "brief",
+        "implementer",
+        "inventor",
+        "researcher",
+        "review",
+        "scientist",
+        "supervisor"
+      ]
+    }
+  ]
+}

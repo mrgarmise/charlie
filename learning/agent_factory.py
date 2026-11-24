@@ -213,15 +213,23 @@ class Factory:
             nodes = self.describe(ordered)
             evaluators = {node.name for node in ordered
                           if self.capabilities[node.capability].role == "evaluator"}
-            if len(evaluators) != 1:
+            if len(evaluators) > 1 or (not evaluators and not any(
+                    self.capabilities[node.capability].children for node in ordered)):
                 raise ValueError("template requires one evaluator")
             samples = {}
             for spec, evidence in rows:
                 plan = json.loads(spec)
                 item = json.loads(evidence)
                 payload = item["payload"]
+                # A bounded root may delegate its evaluator. The final plan is
+                # factory-validated and evaluation still requires a registered role.
+                selected_evaluators = evaluators or {
+                    node["name"] for node in plan["nodes"]
+                    if (capability := self.capabilities.get(node["capability"]))
+                    and capability.role == "evaluator" and capability.version == node["version"]
+                }
                 if (plan.get("context") != context or plan.get("template") != template
-                        or plan.get("initial_nodes", plan.get("nodes")) != nodes or payload["task"] not in evaluators
+                        or plan.get("initial_nodes", plan.get("nodes")) != nodes or len(selected_evaluators) != 1 or payload["task"] not in selected_evaluators
                         or item["digest"] != sha256(encode(payload).encode()).hexdigest()):
                     continue
                 result = payload["result"]

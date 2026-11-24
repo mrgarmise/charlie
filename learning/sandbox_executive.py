@@ -10,7 +10,7 @@ class SandboxLearningExecutive(LearningExecutive):
         """Commission a development organization without runtime or actuator authority."""
         return factory.commission(mission, goal, assignments, **limits)
 
-    def select_sandbox_organization(self, factory, mission, goal, context, templates, *, frozen=False):
+    def select_sandbox_organization(self, factory, mission, goal, context, templates, *, frozen=False, work_budget=None):
         """Use evaluated sandbox outcomes to choose among permitted organizations."""
         try:
             retained = factory.inspect(mission)
@@ -19,6 +19,7 @@ class SandboxLearningExecutive(LearningExecutive):
         if retained is not None:
             template = retained.get("template")
             if (retained["goal"] != goal or retained.get("context") != context
+                    or retained.get("work_budget") != work_budget
                     or template not in templates
                     or retained.get("initial_nodes", retained["nodes"]) != factory.describe(factory.validate(templates[template]))):
                 raise ValueError("mission identity already bound to another selection")
@@ -29,7 +30,7 @@ class SandboxLearningExecutive(LearningExecutive):
         selected = decision[0]["template"]
         self.commission_sandbox_organization(
             factory, mission, goal, templates[selected], context=context, template=selected,
-            decision=decision)
+            decision=decision, work_budget=work_budget)
         return decision
 
     def retain_sandbox_outcome(self, factory, mission):

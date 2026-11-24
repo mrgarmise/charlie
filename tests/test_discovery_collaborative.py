@@ -202,3 +202,26 @@ def test_https_boundary_does_not_follow_redirect_or_parse_other_formats(monkeypa
     with pytest.raises(ValueError, match="unexpected research response"):
         research_acquisition._https(pin(), 5)
     assert opened == [("1.1.1.1", 443)]
+
+
+def test_alternate_archive_uses_realistic_curriculum_ids_and_dashboard(tmp_path, monkeypatch):
+    from learning.discovery.archive import build_fixture_archive
+    from ui.missions import mission_status
+
+    archive = tmp_path / "alternate"
+    manifest = build_fixture_archive(
+        archive, [dict(id="calc-1", text="Exact arithmetic in this offline fixture.",
+                      kind="fixture", source="test", locator="fixture#1", tags="arithmetic")],
+        [dict(id="CIV-001", question="What is 5 * 7?", track="arithmetic")])
+    root = tmp_path / "sandbox"
+    output = command("tools.discovery_collaborative", "--sandbox", root, "run", "curriculum",
+                     "--archive", archive, "--archive-sha256", manifest["manifest_sha256"])
+    assert output["session"]["question_id"] == "CIV-001"
+    assert output["organization"]["context"].startswith("discovery-")
+    assert output["session"]["record"]["checks"][0]["detail"] == "5 * 7 = 35"
+    status_path = tmp_path / "organization.json"
+    status_path.write_text(json.dumps(output["organization"]))
+    monkeypatch.setenv("CHARLIE_DEV_FACTORY_VIEW", str(status_path))
+    projection = mission_status()["development_organization"]
+    assert projection["state"] == "completed"
+    assert {row["name"] for row in projection["assignments"]} >= {"researcher", "scientist", "implementer"}

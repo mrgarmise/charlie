@@ -232,7 +232,7 @@ def brief(question, inputs):
         followup = f"Which available source directly addresses this question? {question}"
     prior_art = (result(inputs, "prior-art-review", "PRIOR_ART_REVIEW")
                  if "prior-art-review" in inputs else None)
-    return message("SUMMARY", prior_art=prior_art, assessment=assessment["status"], next_question=plain(followup),
+    return message("SUMMARY", prior_art=prior_art, assessment=assessment["status"], next_question=plain(followup.encode()[:640].decode(errors="ignore")),
                    stop_reason="completed" if assessment["status"] == "reconciled" else
                    "conflict unresolved" if assessment["conflicts"] else "new evidence needed",
                    recipient="discovery-journal")

@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 from contextlib import redirect_stdout
 import fcntl
+from hashlib import sha256
 import json
 import os
 from pathlib import Path
@@ -110,8 +111,15 @@ def conduct(root, archive, factory, mission, question_id=None, frozen=False, man
             return dict(session=session, organization=factory.inspect(mission))
 
         def commission(executive):
+            # Discovery IDs can carry uppercase letters and punctuation, and
+            # Factory contexts are restricted to a different identifier grammar.
+            question_id = session["question_id"]
+            try:
+                context = identifier(question_id)
+            except ValueError:
+                context = "discovery-" + sha256(question_id.encode()).hexdigest()[:48]
             executive.select_sandbox_organization(factory, mission, meta["goal"],
-                                                  session["question_id"], templates(),
+                                                  context, templates(),
                                                   frozen=meta["frozen"], work_budget=12)
 
         database = root / "learning-evidence.sqlite3"

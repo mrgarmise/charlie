@@ -1,0 +1,270 @@
+{
+  "goal": "Evaluate the existing Dog simulator as a baseline for roll-over research",
+  "nodes": [
+    {
+      "capability": "observation",
+      "depends_on": [],
+      "name": "observation",
+      "supervisor": null,
+      "version": "v1"
+    },
+    {
+      "capability": "simulator",
+      "depends_on": [
+        "observation"
+      ],
+      "name": "batch",
+      "supervisor": "observation",
+      "version": "v1"
+    },
+    {
+      "capability": "dog-review",
+      "depends_on": [
+        "batch",
+        "observation"
+      ],
+      "name": "assessment",
+      "supervisor": null,
+      "version": "v1"
+    }
+  ],
+  "schema": 1,
+  "seconds": 120,
+  "state": "completed",
+  "deadline": 1795274053.1253486,
+  "tasks": {
+    "assessment": {
+      "attempts": 1,
+      "evidence": {
+        "digest": "e60b9ca48d8bcc8bbb4cdd571baa5a8b6dde912a1f37f4fff36eb0735095f90d",
+        "payload": {
+          "attempt": 1,
+          "capability": "dog-review",
+          "inputs": {
+            "batch": "339dc4e74e9c0ee07f64a4aecf23e22e5113716f2889e4e1194851d08f62aad5",
+            "observation": "9a00c51a163f55340c9c91f9fee859bf2e417b15bbeac1a5a03da24a400bfd4b"
+          },
+          "mission": "dog-baseline",
+          "mode": "simulation_or_synthetic",
+          "result": {
+            "maximum_observed_roll_rad": 0.02138071969006565,
+            "next_question": "Can a separately validated simulator mode continue through supported floor contact?",
+            "outcome": "inconclusive",
+            "physical_transfer": "unverified",
+            "skill_qualification": "none",
+            "terminated": 0,
+            "trials": 32
+          },
+          "task": "assessment",
+          "version": "v1"
+        }
+      }
+    },
+    "batch": {
+      "attempts": 1,
+      "evidence": {
+        "digest": "339dc4e74e9c0ee07f64a4aecf23e22e5113716f2889e4e1194851d08f62aad5",
+        "payload": {
+          "attempt": 1,
+          "capability": "simulator",
+          "inputs": {
+            "observation": "9a00c51a163f55340c9c91f9fee859bf2e417b15bbeac1a5a03da24a400bfd4b"
+          },
+          "mission": "dog-baseline",
+          "mode": "simulation_or_synthetic",
+          "result": {
+            "criterion": "diagnostic only: DogEnv terminates above 0.7 rad roll or pitch",
+            "mode": "simulation",
+            "trials": [
+              {
+                "peak_roll_rad": 7.081069777193068e-17,
+                "seed": 0,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.0031545654559378103,
+                "seed": 1,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.005866422053331013,
+                "seed": 2,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.006611859981373928,
+                "seed": 3,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.003187749421091045,
+                "seed": 4,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.013175898350461209,
+                "seed": 5,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.013155015186224585,
+                "seed": 6,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.00538771701237165,
+                "seed": 7,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.007148764970649592,
+                "seed": 8,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.009641859932376798,
+                "seed": 9,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.014431128071949179,
+                "seed": 10,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.003203751113841362,
+                "seed": 11,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.001177932664753342,
+                "seed": 12,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.012571527937089207,
+                "seed": 13,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.006139185719243298,
+                "seed": 14,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.007183775906229968,
+                "seed": 15,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.004440638916934424,
+                "seed": 16,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.009219709886562346,
+                "seed": 17,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.0034829271522090932,
+                "seed": 18,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.006109174847957942,
+                "seed": 19,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.006589325676256336,
+                "seed": 20,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.0028419354155934566,
+                "seed": 21,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.02138071969006565,
+                "seed": 22,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.0062056844142662345,
+                "seed": 23,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.008810369315351865,
+                "seed": 24,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.0122700241257675,
+                "seed": 25,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.006620222672997176,
+                "seed": 26,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.005110766899335218,
+                "seed": 27,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.006252593687501868,
+                "seed": 28,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.007184220599121636,
+                "seed": 29,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.005452423041994236,
+                "seed": 30,
+                "stop": "duration"
+              },
+              {
+                "peak_roll_rad": 0.009664376865913938,
+                "seed": 31,
+                "stop": "duration"
+              }
+            ]
+          },
+          "task": "batch",
+          "version": "v1"
+        }
+      }
+    },
+    "observation": {
+      "attempts": 1,
+      "evidence": {
+        "digest": "9a00c51a163f55340c9c91f9fee859bf2e417b15bbeac1a5a03da24a400bfd4b",
+        "payload": {
+          "attempt": 1,
+          "capability": "observation",
+          "inputs": {},
+          "mission": "dog-baseline",
+          "mode": "simulation_or_synthetic",
+          "result": {
+            "clock": "model_time",
+            "frame": "model_world",
+            "initial_roll": 0,
+            "mode": "synthetic",
+            "physical_replay": "unavailable",
+            "unit": "rad"
+          },
+          "task": "observation",
+          "version": "v1"
+        }
+      }
+    }
+  }
+}

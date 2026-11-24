@@ -38,7 +38,7 @@ def main():
             charged_turns=run["organization"]["consumed_work_units"],
             budget=run["organization"]["work_budget"], verdict=details["evaluation"],
             sources=record["citations"], next_question=record["followups"][0],
-            role_order=list(record["collaborative"]["attempts"]),
+            role_order=[turn["payload"]["task"] for turn in details["turns"]],
         ))
     print(json.dumps(dict(schema="CollaborativeResearchDemo/v1",
                           measurement=dict(elapsed_seconds=round(perf_counter() - start, 3),

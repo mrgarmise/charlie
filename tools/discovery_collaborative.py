@@ -46,13 +46,26 @@ def initialize_archive(path):
     return audit_archive(path)
 
 
-def finish_record(view):
+def result_order(factory, mission):
+    cursor = 0
+    order = []
+    while page := factory.events(mission, after=cursor):
+        order.extend(event["task"] for event in page if event["kind"] == "result")
+        cursor = page[-1]["sequence"]
+    return order
+
+
+def finish_record(view, order):
     turns = {name: task["evidence"] for name, task in view["tasks"].items() if task["evidence"]}
     science = result(turns, "scientist", "CHALLENGE")
     references = result(turns, "researcher", "SOURCE_FINDING")["sources"]
     review_kind = turns["review"]["payload"]["result"]["kind"]
+    if review_kind not in {"CLAIM", "CONTRADICTION"}:
+        raise ValueError("unexpected evaluator evidence")
     summary = result(turns, "brief", "SUMMARY")
     evaluation = result(turns, "review", review_kind)
+    if set(order) != set(turns) or len(order) != len(turns):
+        raise ValueError("factory result sequence does not match terminal evidence")
     return dict(status="contradicted" if summary["assessment"] == "contradicted" else "hypothesis",
                 findings=[science["check"]["detail"],
                           f"Source comparison status: {summary['assessment']}."],
@@ -63,7 +76,7 @@ def finish_record(view):
                                    decision=view["decision"], deadline=view["deadline"],
                                    organization_state=view["state"],
                                    attempts={n: t["attempts"] for n, t in view["tasks"].items()},
-                                   evaluation=evaluation, turns=list(turns.values())))
+                                   evaluation=evaluation, turns=[turns[name] for name in order]))
 
 
 def conduct(root, archive, factory, mission, question_id=None, frozen=False, manifest_sha256=None):
@@ -94,7 +107,7 @@ def conduct(root, archive, factory, mission, question_id=None, frozen=False, man
                 or (question_id and session["question_id"] != question_id)):
             raise ValueError("session identity does not match this development invocation")
         if session["state"] != "in_progress":
-            return session
+            return dict(session=session, organization=factory.inspect(mission))
 
         def commission(executive):
             executive.select_sandbox_organization(factory, mission, meta["goal"],
@@ -106,7 +119,7 @@ def conduct(root, archive, factory, mission, question_id=None, frozen=False, man
             run_organization(database, factory, mission, commission)
         view = factory.inspect(mission)
         if view["state"] == "completed":
-            journal.finish(mission, finish_record(view))
+            journal.finish(mission, finish_record(view, result_order(factory, mission)))
         elif view["state"] in {"failed", "cancelled", "expired"}:
             journal.defer(mission, view["state"])
         return dict(session=journal.session(mission), organization=view)
@@ -115,7 +128,7 @@ def conduct(root, archive, factory, mission, question_id=None, frozen=False, man
 def main(argv=None):
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("--sandbox", type=Path, required=True)
-    parser.add_argument("action", choices=("run", "inspect", "pause", "resume", "cancel"))
+    parser.add_argument("action", choices=("run", "inspect", "status", "pause", "resume", "cancel"))
     parser.add_argument("mission")
     parser.add_argument("--question")
     parser.add_argument("--archive", type=Path, help="read-only alternate Discovery archive")
@@ -155,8 +168,9 @@ def main(argv=None):
                     raise OverflowError("development ledger has reached its byte budget")
         with Archive(archive_path) as archive:
             factory = Factory(root / "organization.sqlite3", capabilities(archive, provenance))
-            if args.action in {"pause", "cancel"}:
-                getattr(factory, args.action)(args.mission)
+            if args.action in {"pause", "cancel", "status"}:
+                if args.action != "status":
+                    getattr(factory, args.action)(args.mission)
                 view = factory.inspect(args.mission)
             else:
                 if args.action == "resume":

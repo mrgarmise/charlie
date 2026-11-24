@@ -1,9 +1,9 @@
 {
   "schema": "CollaborativeResearchDemo/v1",
   "measurement": {
-    "elapsed_seconds": 5.24,
-    "child_peak_rss_kib": 35448,
-    "sandbox_file_bytes": 832121
+    "elapsed_seconds": 5.194,
+    "child_peak_rss_kib": 35196,
+    "sandbox_file_bytes": 832117
   },
   "sessions": [
     {
@@ -46,14 +46,14 @@
       ],
       "next_question": "Which available source directly addresses this question? How much energy in joules does one electron gain across one volt?",
       "role_order": [
-        "archivist",
-        "brief",
-        "implementer",
+        "supervisor",
         "inventor",
-        "researcher",
-        "review",
+        "archivist",
         "scientist",
-        "supervisor"
+        "researcher",
+        "implementer",
+        "review",
+        "brief"
       ]
     },
     {
@@ -111,15 +111,15 @@
       ],
       "next_question": "How does uncertainty in the accelerating voltage propagate into an electron energy estimate?",
       "role_order": [
-        "archivist",
-        "brief",
-        "implementer",
+        "supervisor",
         "inventor",
-        "prior-art-review",
-        "researcher",
-        "review",
+        "archivist",
         "scientist",
-        "supervisor"
+        "researcher",
+        "implementer",
+        "prior-art-review",
+        "review",
+        "brief"
       ]
     },
     {
@@ -162,14 +162,14 @@
       ],
       "next_question": "Which available source directly addresses this question? How much energy in joules does one electron gain across one volt?",
       "role_order": [
-        "archivist",
-        "brief",
-        "implementer",
+        "supervisor",
         "inventor",
-        "researcher",
-        "review",
+        "archivist",
         "scientist",
-        "supervisor"
+        "researcher",
+        "implementer",
+        "review",
+        "brief"
       ]
     },
     {
@@ -218,14 +218,14 @@
       ],
       "next_question": "How do refractive index and two-way travel affect the delay of a fiber link?",
       "role_order": [
-        "archivist",
-        "brief",
-        "implementer",
+        "supervisor",
         "inventor",
-        "researcher",
-        "review",
+        "archivist",
         "scientist",
-        "supervisor"
+        "researcher",
+        "implementer",
+        "review",
+        "brief"
       ]
     }
   ]

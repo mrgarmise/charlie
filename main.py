@@ -63,6 +63,10 @@ def parser():
     p.add_argument('--mobile-retain',choices=['none','events','all'],default='events')
     p.add_argument('--mobile-captures',type=int,default=100)
     p.add_argument('--object-recognition',action='store_true',help='normal stationary Hailo object mode; explicit --hardware required; no motion/navigation')
+    p.add_argument('--shared-recognition-directory', type=Path,
+                   help='development-only private directory for bounded local recognition IPC')
+    p.add_argument('--executive-recognition', action='store_true',
+                   help='permit the Executive to request fresh observational evidence')
     p.add_argument('--camera-source',choices=['pi','elegoo'],default='pi',help='camera identity; Pi IMX708 by default')
     p.add_argument('--object-model-manifest',type=Path,default=Path.home()/'charlie-mobile-models/mobile-models.json')
     p.add_argument('--elegoo-stream-url',help='override only the ELEGOO video endpoint')
@@ -155,6 +159,16 @@ def application_mobile_actuators(frame_bus, *, state=None, hardware_id='unverifi
 def main(argv=None):
     arguments = list(sys.argv[1:] if argv is None else argv)
     args=parser().parse_args(arguments)
+    if args.shared_recognition_directory is not None:
+        from tools.runtime_adoption.stationary import device_guard, locked
+        with locked(Path.home() / 'charlie-ops'):
+            device_guard(('/dev/hailo0', '/dev/ttyACM0') if args.object_label_display == 'rp2040'
+                         else ('/dev/hailo0',))
+            return run_application(args, arguments)
+    return run_application(args, arguments)
+
+
+def run_application(args, arguments):
     if args.native_meditation and (not args.offline or args.llm_consultation_approval is not None
             or args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow
             or args.object_label_replay or args.mobile_dashboard):
@@ -205,7 +219,7 @@ def main(argv=None):
                 or args.object_seconds is not None and (not math.isfinite(args.object_seconds) or not 0<args.object_seconds<=3600)):
             raise ValueError('bounded object session limits required')
         if not any(a == '--object-label-display' or a.startswith('--object-label-display=') for a in arguments):
-            args.object_label_display = 'rp2040'
+            args.object_label_display = 'off' if args.shared_recognition_directory else 'rp2040'
 
     if args.learning_turns and not args.offline:
         raise ValueError('bounded acceptance runs must be offline')
@@ -221,6 +235,34 @@ def main(argv=None):
         raise ValueError('fixture replay cannot activate a physical display')
     if args.object_label_display!='off' and args.offline and not (args.mobile_replay or args.mobile_observe):
         raise ValueError('object label display requires an existing observation source')
+    args.shared_recognition = None
+    if args.executive_recognition and args.shared_recognition_directory is None:
+        raise ValueError('Executive requests require the shared recognition profile')
+    if args.shared_recognition_directory is not None:
+        if (not args.object_recognition or args.camera_source != 'elegoo' or
+                args.object_label_port != '/dev/ttyACM0' or
+                args.object_label_display not in ('off', 'rp2040') or
+                not 0 < (args.object_seconds or 0) <= 90 or
+                any((args.mobile_replay, args.mobile_observe, args.pet_abilities, args.pet_follow,
+                     args.primary_vision, args.elegoo_face_track, args.abilities_dashboard,
+                     args.mobile_dashboard, args.native_meditation, args.llm_consultation))):
+            raise ValueError('shared recognition requires the bounded non-actuating ELEGOO profile')
+        from tools.runtime_adoption.stationary_boundary import install, install_stationary_stop
+        from learning.recognition_transport import channel
+        from stimulus.keyboard import KeyboardStimulus
+        if not sys.stdin.isatty() or os.tcgetpgrp(0) != os.getpgrp():
+            raise ValueError('on-site foreground operator required')
+        confirmation = 'AUTHORIZE ISOLATED SHARED RECOGNITION QUALIFICATION'
+        if input(f'On-site owner, isolate all actuator power and type {confirmation}: ') != confirmation:
+            raise ValueError('supervised qualification and physical isolation not confirmed')
+        stream = args.elegoo_stream_url or json.loads(args.object_model_manifest.read_text()).get('stream_url')
+        args.elegoo_stream_url = stream or 'http://192.168.4.1:81/stream'
+        endpoint, credentials = channel(args.shared_recognition_directory)
+        args.learning_state = args.shared_recognition_directory / 'state'
+        args.learning_state.mkdir(mode=0o700)
+        args.shared_recognition = (endpoint, credentials)
+        install(args.elegoo_stream_url, recognition_bind=endpoint)
+        install_stationary_stop(KeyboardStimulus)
     roots=args.episode_root or [Path(__file__).resolve().parent/'robotron-runs']
     from learning.lifecycle import run
     from learning.resources import DevelopmentResources
@@ -233,6 +275,8 @@ def main(argv=None):
     kwargs=dict(budget_seconds=args.learning_budget,interval=args.learning_interval,
                 turns=args.learning_turns,offline_authority=authority,history_roots=args.history_root,resources=resources,
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
+    if args.executive_recognition:
+        kwargs['recognition_client'] = (endpoint, credentials['executive'])
     if args.native_meditation:kwargs['native_meditation']=True
     if args.llm_consultation:
         kwargs['llm_consultation'] = True
@@ -289,7 +333,8 @@ def main(argv=None):
             return
         if args.object_recognition:
             from learning.object_runtime import run_objects
-            with application_camera_feeders(args) as frame_bus:
+            with (application_camera_feeders(args, selected=('elegoo',)) if args.shared_recognition
+                  else application_camera_feeders(args)) as frame_bus:
                 if args.elegoo_face_track or args.mobile_dashboard:
                     with application_mobile_actuators(frame_bus,state=args.learning_state,hardware_id=args.mobile_hardware_id,
                             zone=args.mobile_zone,feed=args.actuator_safety_feed) as (executor,telemetry):

@@ -6,7 +6,7 @@ from vision.object_observation import object_observation
 
 
 class ObjectRecognition:
-    def __init__(self, frame_bus, perception, evidence, bus, labels=None, *, attention=None):
+    def __init__(self, frame_bus, perception, evidence, bus, labels=None, *, attention=None, fixed_source=False):
         from vision.detection_publication import DetectionPublication
         self.publication=DetectionPublication(frame_bus)
         self.perception, self.evidence, self.bus = perception, evidence, bus
@@ -17,6 +17,7 @@ class ObjectRecognition:
         self.tracker = PetTracker()
         self.sources = CameraSubscription(frame_bus, on_change=self._source_changed, clock=perception.clock)
         self.stopped = self.closed = False
+        self.fixed_source = fixed_source
         self.generation = None
 
     def invalidate(self, reason):
@@ -46,7 +47,8 @@ class ObjectRecognition:
         # events are never forwarded to AttentionManager in this mode.
         for event, data in self.bus.get_all():
             if event == 'camera_source':
-                self.select_camera(data)
+                if not self.fixed_source:
+                    self.select_camera(data)
             elif event == 'object_recognition_stop':
                 self.stopped = True
             elif event in ('object_attention','emergency_stop'):

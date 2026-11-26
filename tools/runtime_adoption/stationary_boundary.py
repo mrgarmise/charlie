@@ -22,7 +22,7 @@ def display_write(raw):
     return False
 
 
-def transport_policy(stream):
+def transport_policy(stream, *, recognition_bind=None, recognition_connect=None):
     endpoint = urlsplit(stream) if stream else None
     allowed = set()
     if endpoint:
@@ -34,8 +34,15 @@ def transport_policy(stream):
             allowed.add((str(ipaddress.ip_address(address[0])), port))
 
     def audit(event, args):
+        if event == 'socket.bind' and recognition_bind is not None:
+            sock, address = args
+            if sock.family == socket.AF_UNIX and sock.type == socket.SOCK_STREAM and address == recognition_bind:
+                return
         if event == 'socket.connect':
             sock, address = args
+            if (recognition_connect is not None and sock.family == socket.AF_UNIX
+                    and sock.type == socket.SOCK_STREAM and address == recognition_connect):
+                return
             if (sock.family not in (socket.AF_INET, socket.AF_INET6) or
                     tuple(address[:2]) not in allowed or sock.type != socket.SOCK_STREAM):
                 raise PermissionError('stationary network destination denied')
@@ -48,9 +55,9 @@ def transport_policy(stream):
     return audit
 
 
-def install(stream=None):
+def install(stream=None, *, recognition_bind=None, recognition_connect=None):
     import serial
-    policy = transport_policy(stream)
+    policy = transport_policy(stream, recognition_bind=recognition_bind, recognition_connect=recognition_connect)
     original = serial.Serial
 
     class StationarySerial(original):

@@ -49,6 +49,7 @@ class RecognitionServer:
         self.slots = BoundedSemaphore(8)
         self.lock = Lock()
         self.clients = {}
+        self.delivered = {'recognize': 0, 'executive': 0, 'display': 0}
         self.peers = set()
         self.stopped = False
         self.listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -102,7 +103,7 @@ class RecognitionServer:
                         raise RuntimeError('one active request per peer process')
                     self.peers.add(pid)
                     admitted_peer = pid
-                self._dispatch(sock, request)
+                self._dispatch(sock, request, pid)
         except (ValueError, TypeError, OSError, RuntimeError) as exc:
             try:
                 _reply(sock, {'error': type(exc).__name__})
@@ -110,8 +111,6 @@ class RecognitionServer:
                 pass
         finally:
             self.inference.cancel(sock)
-            if self.display is not None:
-                self.display.cancel(sock)
             sock.close()
             with self.lock:
                 self.clients.pop(sock, None)
@@ -119,7 +118,7 @@ class RecognitionServer:
                     self.peers.discard(admitted_peer)
                 self.slots.release()
 
-    def _dispatch(self, sock, request):
+    def _dispatch(self, sock, request, pid):
         role = request.get('role')
         token = request.get('token')
         if (not isinstance(role, str) or role not in self.credentials or not isinstance(token, str)
@@ -139,11 +138,21 @@ class RecognitionServer:
                 if not self.inference.fresh(result):
                     raise TimeoutError('recognition result expired or source changed')
                 _reply(sock, {'result': result})
+                with self.lock:
+                    self.delivered[role] += 1
         elif self.display is not None:
-            if set(request) != {'role', 'token', 'timeout', 'text'} or not isinstance(request['text'], str):
+            if set(request) != {'role', 'token', 'timeout', 'text'} or not (request['text'] is None or isinstance(request['text'], str)):
                 raise ValueError('display label required')
-            receipt = self.display.submit(sock, request['text'], deadline)
-            _reply(sock, {'acknowledged': self._consume(sock, receipt, deadline)})
+            # Reconnects from a producer can explicitly clear only its own accepted label.
+            receipt = self.display.submit(pid, request['text'], deadline)
+            try:
+                accepted = self._consume(sock, receipt, deadline)
+                _reply(sock, {'acknowledged': accepted})
+                if accepted:
+                    with self.lock:
+                        self.delivered['display'] += 1
+            finally:
+                self.display.cancel(pid)
         else:
             raise PermissionError('display unavailable')
 

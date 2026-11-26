@@ -96,3 +96,69 @@ def test_shared_control_queue_preserves_both_stops_when_full():
     events = bus.get_all()
     assert len(events) == 8
     assert events[-2:] == [('emergency_stop', None), ('object_recognition_stop', None)]
+
+
+def test_count_native_dispatch_even_if_transport_fails():
+    import threading
+    from types import SimpleNamespace
+    from hardware.hailo_session import HailoSession, measure_inferences
+
+    session = HailoSession('/unused', sha256='fixture', input_shape=(1,))
+    session.open = lambda: None
+    session.owner = threading.get_ident()
+    session.input_name = 'input'
+    session.pipeline = SimpleNamespace(infer=lambda inputs: inputs['input'])
+    with measure_inferences() as counts:
+        assert session.infer('first') == 'first'
+        def failure(inputs):
+            raise TimeoutError()
+        session.pipeline.infer = failure
+        with pytest.raises(TimeoutError):
+            session.infer('second')
+    assert counts == dict(submitted=2, completed=1)
+
+
+def test_inflight_serial_timeout_during_stop_has_no_late_ack():
+    from threading import Event, Thread
+    from learning.shared_recognition import DisplayBroker
+    entered, resume = Event(), Event()
+    class SlowSerial:
+        def show_object_label(self, *args):
+            entered.set()
+            assert resume.wait(2)
+            raise TimeoutError()
+        def clear_object_label(self):
+            return True
+    broker = DisplayBroker(SlowSerial())
+    first = broker.submit('first', 'DOG', time.monotonic() + 2)
+    queued = broker.submit('second', 'CAT', time.monotonic() + 2)
+    thread = Thread(target=broker.step)
+    thread.start()
+    try:
+        assert entered.wait(1)
+        broker.latch()
+        assert queued.get(timeout=1) is False
+    finally:
+        resume.set()
+        thread.join(2)
+    assert not thread.is_alive()
+    assert first.get(timeout=1) is False
+    broker.stop()
+
+
+def test_executive_optionally_displays_new_confident_class(monkeypatch):
+    from learning.lifecycle import DevelopmentLifecycle
+    from learning import recognition_transport
+    worker = object.__new__(DevelopmentLifecycle)
+    worker.recognition_client = '/local', 'read'
+    messages = []
+    def show(endpoint, token, label, *, timeout):
+        messages.append((endpoint, token, label))
+        return True
+    monkeypatch.setattr(recognition_transport, 'display_label', show)
+    result = dict(observation=dict(objects=[dict(label='chair', confidence=.9)]))
+    worker.display_recognition(result)
+    worker.recognition_display_token = 'display'
+    worker.display_recognition(result)
+    worker.display_recognition(result)
+    assert messages == [('/local', 'display', 'CHAIR')]

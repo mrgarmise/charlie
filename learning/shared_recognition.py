@@ -134,10 +134,13 @@ class DisplayBroker:
         if self.clock() > deadline:
             receipt.put_nowait(False)
             return
-        if text is None:
-            accepted = owns_display and self.transport.clear_object_label()
-        else:
-            accepted = self.transport.show_object_label(text, 4500, 100)
+        try:
+            if text is None:
+                accepted = owns_display and self.transport.clear_object_label()
+            else:
+                accepted = self.transport.show_object_label(text, 4500, 100)
+        except OSError:
+            accepted = False
         with self.lock:
             if accepted:
                 self.displayed = producer if text is not None else None

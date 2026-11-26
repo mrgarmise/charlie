@@ -34,3 +34,23 @@ def test_signed_scope_rejects_historical_candidate_and_missing_native(tmp_path):
     with pytest.raises(ValueError):
         ctl.check_manifest(dict(candidate=r.s.CANDIDATE, baseline=r.s.BASELINE), {r.SHARED})
     assert ctl.candidate != r.s.CANDIDATE and set(ctl.scopes) == {r.SHARED}
+
+
+def test_smoke_requires_matching_native_identities_and_optional_display(tmp_path):
+    import json
+    path = tmp_path / 'witness'
+    def peer(pid):
+        return dict(event='recognition-peer', value=dict(pid=pid, exit=0, results=[
+            dict(source='elegoo-v4', generation='g', frame_id=str(i), model_sha256='hef') for i in (1, 2)]))
+    rows = [peer(1), peer(2), dict(event='passive-frames', value=[{'frame':'1'}]),
+            dict(event='socket-released', value=True)]
+    def write():
+        path.write_text('\n'.join(json.dumps(row) for row in rows))
+    write()
+    r.verify_witness(path, False)
+    with pytest.raises(ValueError):
+        r.verify_witness(path, True)
+    rows[1]['value']['results'][0]['generation'] = 'different'
+    write()
+    with pytest.raises(ValueError):
+        r.verify_witness(path, False)

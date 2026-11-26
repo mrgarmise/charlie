@@ -58,8 +58,8 @@ or unattended approval is requested.
 
 ## Candidate-specific release controller
 
-This controller pins application commit 50b31fe50238618d6b910b66d91184b74cd72038
-and tree d288b5caed49fd3ae8ceefda6b14de4577ad6212 in a separate clean
+This controller pins application commit 77eb7b180688e6c2bb3aa850a0c685f305a973ae
+and tree e089a68b8be1896da8c6d3a5c10c0e84668e8b51 in a separate clean
 /home/five/charlie-shared-candidate checkout. Keep the controller in a separate
 clean checkout. Its entry point is tools/shared_stationary_ctl.py. Invoke using
 the same sanitized isolated interpreter as the qualification command. Each
@@ -98,3 +98,20 @@ sessions and autostart are outside the controller's scope.
 5. For explicit rollback use rollback, or the standalone verified
    tools/stationary_rollback.sh on Charlie. Compare the restored SHA-256 to the
    captured original. New recognition observations require no separate approval.
+
+In a second terminal, before qualification or enable, run the controller
+checkout's witness. Use a fresh private receipt path. It samples initial owners,
+waits for the admission socket, runs two independent client processes and a
+passive frame reader, then records under-load and final snapshots. Add --display
+only for the admitted display trial to measure label/precedence/clear ACKs.
+The physical observer must still verify what the Pico actually shows. Treat
+missing owners, inaccessible processes or inconclusive snapshots as gaps.
+Compare the shared frame IDs with the native owner summary and Executive evidence.
+
+    /home/five/Projects/charlie/.venv/bin/python -IB tools/shared_trial_probe.py --receipt /home/five/charlie-ops/logs/shared-witness-01.jsonl
+
+The enable action starts its own witness for the canonical smoke session. Use
+the separate witness command for pre-cutover qualification. The smoke controller
+requires two matching observations in each of two processes, a fresh passive
+frame, a guarded Executive delivery, native Hailo work, configured display ACKs
+and socket release before accepting the physical operator's observations.

@@ -16,8 +16,8 @@ from .promotion import require, load
 from .supervised_release import foreground, confirm_isolation
 
 SHARED = 'stationary.shared_recognition.elegoo'
-CANDIDATE = dict(sha='50b31fe50238618d6b910b66d91184b74cd72038',
-                 tree='d288b5caed49fd3ae8ceefda6b14de4577ad6212')
+CANDIDATE = dict(sha='77eb7b180688e6c2bb3aa850a0c685f305a973ae',
+                 tree='e089a68b8be1896da8c6d3a5c10c0e84668e8b51')
 
 
 class SharedRelease(s.Stationary):
@@ -88,6 +88,22 @@ class SharedRelease(s.Stationary):
         if before != s.ORIGINAL:
             require(before == hashlib.sha256(self.launcher()).hexdigest(), 'unrecognized launcher')
             self.transition(before, self.fallback.read_bytes())
+
+
+def verify_witness(path, display):
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    peers = [r['value'] for r in rows if r['event'] == 'recognition-peer']
+    require(len(peers) == 2 and len({p['pid'] for p in peers}) == 2, 'two independent witnesses required')
+    ids = []
+    for peer in peers:
+        require(peer['exit'] == 0 and len(peer['results']) == 2, 'client did not receive two frames')
+        ids.append({(v['source'], v['generation'], v['frame_id'], v['model_sha256']) for v in peer['results']})
+    require(len(ids[0] & ids[1]) == 2, 'client observations were not shared')
+    require(any(r['value'] for r in rows if r['event'] == 'passive-frames'), 'missing passive frames')
+    labels = [r['value'] for r in rows if r['event'] == 'display']
+    require(labels == ([dict(intent=t, acknowledged=True) for t in ('CHAIR', 'CAT', None)]
+                       if display else []), 'display witness failed')
+    require(any(r['value'] is True for r in rows if r['event'] == 'socket-released'), 'socket release missing')
 
 
 def process_start(pid):
@@ -169,7 +185,9 @@ def main():
                     run(ctl.state, ctl.models, stream,
                         display=ctl.display() == 'rp2040', summary=summary)
                     if summary is not None:
-                        require(load(summary)['hailort_completed'] > 0, 'smoke recorded no Hailo work')
+                        owner = load(summary)
+                        require(owner['hailort_completed'] > 0 and owner['delivered']['executive'] >= 1
+                                and owner['delivered']['recognize'] >= 4, 'shared smoke lacks native deliveries')
                         with (ctl.review / 'smoke-owner.json').open('x') as out:
                             json.dump(dict(path=str(summary), sha256=s.sha(summary)), out)
                     s.idle_guard()
@@ -182,7 +200,20 @@ def main():
 
     # Exercise the exact installed entry point. Child takes the same admission lock.
     try:
-        subprocess.run([str(ctl.normal)], check=True, timeout=210)
+        witness = ctl.ops / 'logs' / f'shared-witness-{time.time_ns()}.jsonl'
+        command = [sys.executable, '-IB', str(s.ROOT / 'tools/shared_trial_probe.py'), '--receipt', str(witness)]
+        display = ctl.display() == 'rp2040'
+        if display:
+            command.append('--display')
+        observer = subprocess.Popen(command)
+        try:
+            subprocess.run([str(ctl.normal)], check=True, timeout=210)
+            require(observer.wait(timeout=12) == 0, 'smoke witness failed')
+        finally:
+            if observer.poll() is None:
+                observer.kill()
+                observer.wait()
+        verify_witness(witness, display)
         foreground()
         require(input('Verify shared Executive/client results, frame reader, quiet output, STOP and release. '
                       'Type SHARED SMOKE PASSED: ') == 'SHARED SMOKE PASSED', 'smoke unconfirmed')
@@ -192,7 +223,7 @@ def main():
             require(s.sha(Path(receipt['path'])) == receipt['sha256'], 'owner receipt changed')
             with (ctl.ops / 'logs' / f'shared-accepted-{time.time_ns()}.json').open('x') as out:
                 json.dump(dict(before=s.ORIGINAL, after=active, candidate=ctl.candidate,
-                               owner_receipt=receipt, operator_smoke_confirmed=True), out)
+                               owner_receipt=receipt, witness_sha256=s.sha(witness), operator_smoke_confirmed=True), out)
             (ctl.review / 'smoke-owner.json').unlink()
             pending.unlink()
     except BaseException:

@@ -175,6 +175,24 @@ class DevelopmentLifecycle:
         with closing(recognize(*client, role='executive', timeout=1)) as observations:
             return next(observations)
 
+    def display_recognition(self, result):
+        from .recognition_transport import display_label
+        from rp2040.object_label import normalize_label
+        token = getattr(self, 'recognition_display_token', None)
+        if token is None:
+            return
+        objects = result['observation']['objects']
+        best = max(objects, key=lambda obj: obj['confidence'], default=None)
+        if best is None or best['confidence'] < .8:
+            return
+        label = normalize_label(best['label'])
+        if label != getattr(self, 'last_recognition_label', None):
+            try:
+                if display_label(self.recognition_client[0], token, label, timeout=1):
+                    self.last_recognition_label = label
+            except OSError:
+                pass  # An optional display failure cannot discard visual evidence.
+
     def acquire(self):
         from .retrospective import discover_episodes, merge_history
         from .cycle import ingest_episode
@@ -188,6 +206,7 @@ class DevelopmentLifecycle:
             self.next_recognition_at = time.monotonic() + 10
             try:
                 self.latest_recognition = self.request_recognition()
+                self.display_recognition(self.latest_recognition)
             except (OSError, ValueError):
                 self.latest_recognition = None
         changed = import_mobile_evidence(self)
@@ -713,7 +732,7 @@ class DevelopmentLifecycle:
 def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None,
         history_roots=(), resources=None, wall_seconds=None, cooldown_seconds=None,
         clock=None, sleep=None, lifecycle_factory=None, human_questions=False, model_learning=False, llm_consultation=False,
-        llm_consultation_approval=None, native_meditation=False, recognition_client=None):
+        llm_consultation_approval=None, native_meditation=False, recognition_client=None, recognition_display_token=None):
     """One existing Executive, with resource polling rather than a second scheduler.
 
     ``turns`` bounds nonthermal attempt slots (including other resource refusals),
@@ -762,6 +781,7 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
             history_roots=history_roots,resources=resources,**options)
         if recognition_client is not None:
             lifecycle.recognition_client = recognition_client
+            lifecycle.recognition_display_token = recognition_display_token
         if llm_consultation:
             from .consultation_activation import make_service
             lifecycle.consultation=make_service(lifecycle.journal, llm_consultation_approval)

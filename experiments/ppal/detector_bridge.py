@@ -109,7 +109,6 @@ class HailoBackend:
         self.input_name=inputs[0].name
         self.sha256,self.persistent,self.lock=sha256,persistent,lock
         self._session=None
-        self.completed_inferences = 0
         from .neural_score.backends import HAILO_ADMISSION
         self.admission=HAILO_ADMISSION if admission is None else admission
 
@@ -154,7 +153,6 @@ class HailoBackend:
                 with group.activate(group.create_params()):
                     with InferVStreams(group,inp,out) as pipeline:
                         results=pipeline.infer({self.input_name:np.asarray(canvas,dtype=np.float32)[None]})
-        self.completed_inferences = getattr(self, "completed_inferences", 0) + 1
         classes=next(iter(results.values()))[0]
         if len(classes)!=len(self.classes): raise ValueError('HEF NMS class count mismatch')
         rows=[]

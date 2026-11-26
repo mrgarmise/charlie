@@ -281,6 +281,8 @@ def run_application(args, arguments, *, admitted_channel=None):
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
     if args.executive_recognition:
         kwargs['recognition_client'] = (endpoint, credentials['executive'])
+        if admitted_channel and args.object_label_display == 'rp2040':
+            kwargs['recognition_display_token'] = credentials['display']
     if args.native_meditation:kwargs['native_meditation']=True
     if args.llm_consultation:
         kwargs['llm_consultation'] = True

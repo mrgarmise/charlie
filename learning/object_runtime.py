@@ -38,8 +38,12 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
         bus = StimulusBus(event_limit=64) if shared else StimulusBus()
         summary = getattr(args, 'recognition_summary', None)
         if summary is not None:
+            from hardware.hailo_session import measure_inferences
+            if not objects.get('persistent', True):
+                raise ValueError('shared qualification requires the persistent Hailo owner')
+            calls = lifecycle.enter_context(measure_inferences())
             def write_summary():
-                receipt = dict(hailort_completed=detector.backend.completed_inferences,
+                receipt = dict(hailort_completed=calls['completed'], hailort_submitted=calls['submitted'],
                                perception=dict(perception.stats),
                                resources=dict(perception.resources.sample),
                                peak_owned_rss_bytes=perception.resources.peak_owned_resident_bytes,

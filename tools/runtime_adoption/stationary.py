@@ -1,6 +1,6 @@
 """Operator-controlled stationary worktree cutover. Importing this module does no I/O."""
 import argparse
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 import fcntl
 import hashlib
 import json
@@ -422,10 +422,11 @@ class Stationary:
 
 
 @contextmanager
-def session_guard(ctl, selected):
+def session_guard(ctl, selected, *, owner_approval=None):
     # An interrupted controller cannot silently retry a failed physical profile.
-    # A new independent signed ability decision gives a new attempt identity.
-    grants = [sha(ctl.review / (sid + '.json')) for sid in sorted(selected)]
+    # Each signed scope or local owner approval has a separate attempt identity.
+    grants = ([owner_approval] if owner_approval is not None else
+              [sha(ctl.review / (sid + '.json')) for sid in sorted(selected)])
     key = hashlib.sha256((''.join(grants) + sha(ctl.normal)).encode()).hexdigest()
     hold = ctl.ops / 'logs' / ('stationary-incomplete-' + key)
     with hold.open('x') as f:
@@ -488,9 +489,13 @@ def device_guard():
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('action', choices=('restore-rehearsal', 'request', 'status', 'plan', 'dry-run', 'qualify-evidence', 'review',
-                        'enable', 'disable', 'verify', 'rollback', 'launch', 'executive-status', 'qualify-native', 'prepare-review'))
+                        'enable', 'disable', 'verify', 'rollback', 'launch', 'executive-status', 'qualify-native', 'prepare-review',
+                        'supervised-qualify', 'supervised-approve', 'supervised-launch'))
     parser.add_argument('abilities', nargs='*', choices=None)
+    parser.add_argument('--qualification-log', type=Path)
     args = parser.parse_args(argv)
+    require((args.qualification_log is not None) == (args.action == 'supervised-approve'),
+            '--qualification-log is required only for supervised approval')
     ctl = Stationary(Path.home())
     args_ids = set(args.abilities)
     require(len(args_ids) == len(args.abilities) and args_ids <= SCOPES.keys(), 'unsupported arguments')
@@ -527,6 +532,60 @@ def main(argv=None):
             signal.signal(signal.SIGALRM, previous_handler)
             restore_stop()
 
+    def run_isolated(owner_approval=None, *, supervised_qualification=False):
+        require(sys.stdin.isatty() and os.tcgetpgrp(0) == os.getpgrp(),
+                'supervised foreground terminal required')
+        # Copy under the same runtime lock. Never mutate either operational notebook.
+        destination = Path(tempfile.mkdtemp(
+            prefix='stationary-native-qualification-',
+            dir=ctl.ops / 'promotion-backups'))
+        isolated_state = destination / 'state'
+        shutil.copytree(ctl.ops / 'batch-a-state', isolated_state, symlinks=False)
+        require(not (isolated_state / 'learning-evidence.sqlite3').is_symlink(),
+                'redirected qualification notebook')
+        profile = 'supervised' if owner_approval else 'qualification'
+        log = ctl.ops / 'logs' / (f'stationary-{profile}-{time.time_ns()}.log')
+        with log.open('xb') as out:
+            with bounded_log_tee(out) as tee:
+                saved = [os.dup(n) for n in (1, 2)]
+                try:
+                    for fd in (1, 2):
+                        os.dup2(tee.stdin.fileno(), fd)
+                    prefix = 'BEGIN SUPERVISED ' if owner_approval else 'BEGIN QUALIFICATION '
+                    print(prefix + json.dumps(dict(
+                        candidate=CANDIDATE, controller_sha=git(ROOT, 'rev-parse', 'HEAD'),
+                        controller_tree=git(ROOT, 'rev-parse', 'HEAD^{tree}'),
+                        original_launcher=sha(ctl.normal), boot=Path(
+                            '/proc/sys/kernel/random/boot_id').read_text().strip(),
+                        isolated_state=str(isolated_state), motion_authorized=False,
+                        **(dict(owner_approval_sha256=owner_approval) if owner_approval else {})
+                    ), sort_keys=True), flush=True)
+                    if owner_approval:
+                        idle_guard()
+                        device_guard()
+                    run_foreground(isolated_state)
+                    print('END stationary exit=0', flush=True)
+                finally:
+                    sys.stdout.flush()
+                    sys.stderr.flush()
+                    for fd, original in zip((1, 2), saved):
+                        os.dup2(original, fd)
+                        os.close(original)
+                    tee.stdin.close()
+        report = verified_log_exit(tee, log, load(ctl.models)['objects']['sha256'])
+        idle_guard()
+        device_guard()
+        require(selection(ctl.normal) == set() and sha(ctl.normal) == ORIGINAL,
+                'normal launcher changed during qualification')
+        if supervised_qualification:
+            with log.with_suffix('.cleanup.json').open('x') as receipt:
+                json.dump(dict(log_sha256=report['sha256'], idle_and_device_guards_passed=True), receipt)
+        print(json.dumps(dict(status='native-measurement-complete',
+                              approval_issued=False, normal_runtime_changed=False,
+                              log=str(log), isolated_state=str(isolated_state),
+                              controller=git(ROOT, 'rev-parse', 'HEAD'),
+                              evidence=report), indent=2))
+
     action = args.action
     if action == 'restore-rehearsal':
         require(not args_ids, 'restore rehearsal takes no ability flags')
@@ -556,49 +615,27 @@ def main(argv=None):
         if action == 'qualify-native':
             require(not args_ids, 'qualification takes no ability selection')
             qualification_preflight(ctl, before)
-            require(sys.stdin.isatty() and os.tcgetpgrp(0) == os.getpgrp(),
-                    'supervised foreground terminal required')
-            # Copy under the same runtime lock. Never mutate either operational notebook.
-            destination = Path(tempfile.mkdtemp(
-                prefix='stationary-native-qualification-',
-                dir=ctl.ops / 'promotion-backups'))
-            isolated_state = destination / 'state'
-            shutil.copytree(ctl.ops / 'batch-a-state', isolated_state, symlinks=False)
-            require(not (isolated_state / 'learning-evidence.sqlite3').is_symlink(),
-                    'redirected qualification notebook')
-            log = ctl.ops / 'logs' / ('stationary-qualification-%d.log' % time.time_ns())
-            with log.open('xb') as out:
-                with bounded_log_tee(out) as tee:
-                    saved = [os.dup(n) for n in (1, 2)]
-                    try:
-                        for fd in (1, 2):
-                            os.dup2(tee.stdin.fileno(), fd)
-                        print('BEGIN QUALIFICATION ' + json.dumps(dict(
-                            candidate=CANDIDATE, controller_sha=git(ROOT, 'rev-parse', 'HEAD'),
-                            controller_tree=git(ROOT, 'rev-parse', 'HEAD^{tree}'),
-                            original_launcher=sha(ctl.normal), boot=Path(
-                                '/proc/sys/kernel/random/boot_id').read_text().strip(),
-                            isolated_state=str(isolated_state), motion_authorized=False
-                        ), sort_keys=True), flush=True)
-                        run_foreground(isolated_state)
-                        print('END stationary exit=0', flush=True)
-                    finally:
-                        sys.stdout.flush()
-                        sys.stderr.flush()
-                        for fd, original in zip((1, 2), saved):
-                            os.dup2(original, fd)
-                            os.close(original)
-                        tee.stdin.close()
-            report = verified_log_exit(tee, log, load(ctl.models)['objects']['sha256'])
-            idle_guard()
-            device_guard()
-            require(selection(ctl.normal) == set() and sha(ctl.normal) == ORIGINAL,
-                    'normal launcher changed during qualification')
-            print(json.dumps(dict(status='native-measurement-complete',
-                                  approval_issued=False, normal_runtime_changed=False,
-                                  log=str(log), isolated_state=str(isolated_state),
-                                  controller=git(ROOT, 'rev-parse', 'HEAD'),
-                                  evidence=report), indent=2))
+            run_isolated()
+            return
+        if action == 'supervised-qualify':
+            require(not args_ids, 'foreground qualification takes no ability selection')
+            from .supervised_release import confirm_isolation, foreground
+            foreground()
+            confirm_isolation()
+            qualification_preflight(ctl, before)
+            run_isolated(supervised_qualification=True)
+            return
+        if action == 'supervised-approve':
+            require(not args_ids, 'supervised approval is limited to Batch A recognition')
+            from .supervised_release import approve
+            approve(ctl, args.qualification_log)
+            return
+        if action == 'supervised-launch':
+            require(not args_ids, 'supervised launch is limited to Batch A recognition')
+            from .supervised_release import admit
+            owner_approval = admit(ctl)
+            with session_guard(ctl, {A}, owner_approval=owner_approval):
+                run_isolated(owner_approval)
             return
         if action in ('disable', 'rollback'):
             require((action == 'rollback' and not args_ids) or

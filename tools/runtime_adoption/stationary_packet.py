@@ -19,13 +19,13 @@ def proposal(ctl, scope):
                             str(ctl.ops / 'approved.sha'), str(ctl.ops / 'QUALIFICATION.md'),
                             str(ctl.ops / 'run-historical-consultation.py')}
     rows = []
-    for sid, gates in SCOPES.items():
+    for sid, gates in getattr(ctl, "scopes", SCOPES).items():
         evidence = {}
         for gate in gates if sid == scope else ():
             path = Path(inputs['gate_receipts'][sid][gate]).resolve(strict=True)
             receipt = load(path)
             require(receipt['ability'] == sid and receipt['gate'] == gate and
-                    receipt['candidate'] == CANDIDATE and
+                    receipt['candidate'] == getattr(ctl, 'candidate', CANDIDATE) and
                     receipt['controller_sha'] == git(ROOT, 'rev-parse', 'HEAD'), 'wrong native receipt')
             require(receipt['artifacts'] and all(sha(Path(p)) == h for p, h in receipt['artifacts'].items()),
                     'missing or changed native measurement')
@@ -41,6 +41,10 @@ def proposal(ctl, scope):
                          else 'operator local read of existing Executive status',
                          stop_conditions=['review expiry', 'owner or identity change', 'STOP', 'thermal veto'],
                          rollback='restore pinned normal launcher' if sid == A else 'disable local status'))
+    if getattr(ctl, 'primary', A) != A:
+        rows[0].update(provenance=['pr-44', 'pr-49', 'pr-50'], dependencies_present=[],
+                       dependencies_active_if_needed=[], authority_envelope='shared ELEGOO camera and Hailo; signed display selection; no motion',
+                       rollback='restore original pinned normal launcher')
     inv = collect(ctl.old, ctl.new, ctl.ops, sorted(paths))
     ledger = load(ROOT / 'docs/runtime-adoption/abilities.json')
     manifest = assemble(ledger, inv, receipts, rollback_sha=BASELINE['sha'], backup_manifests=backups)

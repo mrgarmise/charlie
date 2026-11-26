@@ -45,7 +45,7 @@ def rehearse(ctl, destination):
     manifest = controls / 'manifest.json'
     manifest.write_text(json.dumps(controls_manifest, indent=2))
     manifests[str(manifest)] = sha(manifest)
-    result = dict(candidate=CANDIDATE, backup_manifests=manifests, completed_at=time.time(),
+    result = dict(candidate=getattr(ctl, 'candidate', CANDIDATE), backup_manifests=manifests, completed_at=time.time(),
                   isolated_restore_verified=True, state_compatible=False, complete_scope_verified=False,
                   independent_review=False, status='pending', preserved_working_state=True,
                   remaining='review host-specific scope, state lineage, firmware, calibration and model identities')

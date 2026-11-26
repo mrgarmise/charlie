@@ -200,6 +200,10 @@ def replace(path, data):
 
 
 class Stationary:
+    candidate = CANDIDATE
+    scopes = SCOPES
+    primary = A
+
     def __init__(self, home):
         self.home = home
         self.ops = home / 'charlie-ops'
@@ -262,7 +266,7 @@ class Stationary:
     def validate(self, selected):
         self.preserved()
         trust, key = trusted_reviewer()
-        require(not selected - SCOPES.keys() and A in selected, 'Batch A required')
+        require(not selected - self.scopes.keys() and self.primary in selected, 'Batch A required')
         state = self.ops / 'batch-a-state'
         require(state.is_dir() and state.resolve() == state and any(state.iterdir()),
                 'reviewed existing state required')
@@ -326,19 +330,19 @@ class Stationary:
                     machine_id=sha(Path('/etc/machine-id')), logs=self.logs(),
                     state_path=str(self.ops / 'batch-a-state'), notebook_anchor=self.lineage())
 
-    @staticmethod
-    def check_manifest(m, selected):
-        require(m['candidate'] == CANDIDATE and m['baseline'] == BASELINE and
+    @classmethod
+    def check_manifest(cls, m, selected):
+        require(m['candidate'] == cls.candidate and m['baseline'] == BASELINE and
                 m['rollback']['sha'] == BASELINE['sha'], 'wrong release identity')
-        require(set(selected) <= SCOPES.keys(), 'unsupported ability')
+        require(set(selected) <= cls.scopes.keys(), 'unsupported ability')
         rows = {a['id']: a for a in m['abilities']}
-        require(set(rows) == set(SCOPES), 'granular capability manifest required')
+        require(set(rows) == set(cls.scopes), 'granular capability manifest required')
         protected = set(m['protected'].values())
         require(m['backup_qualification']['evidence_sha256'] in protected, 'restore evidence missing')
         require(m['default_authority'] == 'deny' and
                 {'full', 'contracts', 'baseline-llm', 'browser', 'firmware-host', 'firmware-build',
                  'neural-cpu'} <= set(m['required_ci']), 'incomplete review contract')
-        for sid, gates in SCOPES.items():
+        for sid, gates in cls.scopes.items():
             a = rows[sid]
             require(a['enabled'] is False and a['source_present'] is True and a['dependencies'] == []
                     and set(a['required_native_gates']) == set(gates), 'invalid capability contract')

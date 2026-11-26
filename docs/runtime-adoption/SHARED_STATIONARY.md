@@ -55,3 +55,46 @@ Retain the verified standalone tools/stationary_rollback.sh and original
 fallback. For a future switch, rehearse restoration before promotion and test
 the complete normal entry point immediately afterwards. No persistent service
 or unattended approval is requested.
+
+## Candidate-specific release controller
+
+This controller pins application commit 50b31fe50238618d6b910b66d91184b74cd72038
+and tree d288b5caed49fd3ae8ceefda6b14de4577ad6212 in a separate clean
+/home/five/charlie-shared-candidate checkout. Keep the controller in a separate
+clean checkout. Its entry point is tools/shared_stationary_ctl.py. Invoke using
+the same sanitized isolated interpreter as the qualification command. Each
+checkout has its own CI and review binding.
+
+The existing independent release and per-ability signature validation, seven
+required CI suites, protected native receipts, fallback and atomic replacement
+apply. The candidate uses a separately copied stationary notebook. Rollback
+selects the original launcher and preserves both notebook histories. Long-lived
+sessions and autostart are outside the controller's scope.
+
+1. On the Pi, record the canonical launcher digest, native census and current
+   release state. Run prepare-state once and restore-rehearsal. Retain both
+   worktrees, state copies and all original receipts. Review the full restore
+   scope including the new notebook. An interrupted stage is preserved.
+2. Use charlie-ops/shared-stationary-review for this release, with the same
+   inputs.json, ci.json, controller-ci.json, protected restore and native receipt
+   formats as the Batch A packet. Set inputs.display to off or rp2040. Bind
+   N0/N1/N2/N5 receipts to this controller revision, the application SHA/tree
+   above and ability stationary.shared_recognition.elegoo. Attach original
+   checksummed captures for both hardware profiles. Review relative HEF path,
+   passive frame consumption, Executive child and latency under concurrent load.
+3. Save release-request output as manifest.json and ability-request output as
+   stationary.shared_recognition.elegoo.manifest.json. An independent trusted
+   reviewer signs the corresponding release.json and
+   stationary.shared_recognition.elegoo.json with the existing provisioned key.
+   Sign the canonical manifest digest, selected scope and expiry. Run review.
+4. With actuator power isolated and the physical operator present, enable
+   performs an atomic switch and launches the canonical entry point. Exercise
+   the Executive, separate clients, passive camera reader and optional display,
+   then STOP. The trial requires a positive Hailo count, post-run idle/device
+   guards and the operator's smoke acceptance. Failure restores the original
+   launcher. An interrupted smoke leaves a pending record that prevents normal
+   admission and triggers fallback on the next launch. Preserve interrupt
+   evidence before staging a subsequent attempt.
+5. For explicit rollback use rollback, or the standalone verified
+   tools/stationary_rollback.sh on Charlie. Compare the restored SHA-256 to the
+   captured original. New recognition observations require no separate approval.

@@ -38,7 +38,7 @@ class InferenceScheduler:
             return demand
 
     def fresh(self, result):
-        return (0 <= self.clock() - result['at'] <= .5 and
+        return (not self.closed and 0 <= self.clock() - result['at'] <= .5 and
                 (self.current is None or self.current(result)))
 
     def cancel(self, client):

@@ -54,6 +54,7 @@ class RecognitionServer:
         self.listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
             self.listener.bind(endpoint)
+            os.chmod(endpoint, 0o600)
             self.listener.listen(8)
             self.listener.settimeout(.1)
         except BaseException:
@@ -203,13 +204,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('directory', type=Path)
     parser.add_argument('--frames', type=int, default=1)
-    parser.add_argument('--label')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--label')
+    mode.add_argument('--ask', choices=['what do you see?'],
+                      help='describe one fresh observation on demand')
     args = parser.parse_args()
+    if args.ask and args.frames != 1:
+        parser.error('--ask describes one observation')
     endpoint = str(args.directory / 'recognition.sock')
     if args.label is None:
         token = (args.directory / 'recognize.token').read_text().strip()
         for result in recognize(endpoint, token, frames=args.frames):
-            print(json.dumps(result))
+            if args.ask:
+                objects = result['observation']['objects']
+                labels = ', '.join(f"{row['label']} ({row['confidence']:.0%})" for row in objects)
+                print(f"Camera {result['source']}: {labels or 'no objects detected'}.")
+            else:
+                print(json.dumps(result))
     else:
         token = (args.directory / 'display.token').read_text().strip()
         print(json.dumps({'acknowledged': display_label(endpoint, token, args.label)}))

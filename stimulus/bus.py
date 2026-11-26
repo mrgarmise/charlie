@@ -102,7 +102,7 @@ class ObservationSubscription(FrameSubscription):
 
 
 class StimulusBus:
-    def __init__(self, *, history_frames=4, history_bytes=32*1024*1024):
+    def __init__(self, *, history_frames=4, history_bytes=32*1024*1024, event_limit=None):
         # Per-source RAM caps, deliberately conservative host defaults; native
         # retention/cadence must be measured rather than inferred from these.
         if (type(history_frames) is not int or not 1 <= history_frames <= 64
@@ -113,6 +113,9 @@ class StimulusBus:
         self.frame_order = {}
         self.frame_health = {}
         self.frame_evictions = {}
+        if event_limit is not None and (type(event_limit) is not int or event_limit < 2):
+            raise ValueError('event capacity must allow both STOP events')
+        self.event_limit = event_limit
         self.events = []
         self.lock = threading.RLock()
         self.subscribers = set()
@@ -235,6 +238,17 @@ class StimulusBus:
 
     def emit(self, event_type, data=None):
         with self.lock:
+            if self.event_limit and len(self.events) >= self.event_limit:
+                stops = ('emergency_stop', 'object_recognition_stop')
+                if event_type not in stops or any(key == event_type for key, _ in self.events):
+                    return
+                for idx, (key, _) in enumerate(self.events):
+                    if key not in stops:
+                        self.events.pop(idx)
+                        break
+                else:
+                    # All entries are STOP. Make room for the distinct STOP kind.
+                    self.events.pop(0)
             self.events.append((event_type, data))
 
     def get_all(self):

@@ -36,6 +36,7 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
                                       revision=revision, clock=time.monotonic)
         shared = getattr(args, 'shared_recognition', None)
         bus = StimulusBus(event_limit=64) if shared else StimulusBus()
+        server = None
         summary = getattr(args, 'recognition_summary', None)
         if summary is not None:
             from hardware.hailo_session import measure_inferences
@@ -44,6 +45,7 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
             calls = lifecycle.enter_context(measure_inferences())
             def write_summary():
                 receipt = dict(hailort_completed=calls['completed'], hailort_submitted=calls['submitted'],
+                               delivered=dict(server.delivered) if server is not None else {},
                                perception=dict(perception.stats),
                                resources=dict(perception.resources.sample),
                                peak_owned_rss_bytes=perception.resources.peak_owned_resident_bytes,

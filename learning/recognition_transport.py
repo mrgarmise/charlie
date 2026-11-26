@@ -49,6 +49,7 @@ class RecognitionServer:
         self.slots = BoundedSemaphore(8)
         self.lock = Lock()
         self.clients = {}
+        self.delivered = {'recognize': 0, 'executive': 0, 'display': 0}
         self.peers = set()
         self.stopped = False
         self.listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -137,13 +138,19 @@ class RecognitionServer:
                 if not self.inference.fresh(result):
                     raise TimeoutError('recognition result expired or source changed')
                 _reply(sock, {'result': result})
+                with self.lock:
+                    self.delivered[role] += 1
         elif self.display is not None:
             if set(request) != {'role', 'token', 'timeout', 'text'} or not (request['text'] is None or isinstance(request['text'], str)):
                 raise ValueError('display label required')
             # Reconnects from a producer can explicitly clear only its own accepted label.
             receipt = self.display.submit(pid, request['text'], deadline)
             try:
-                _reply(sock, {'acknowledged': self._consume(sock, receipt, deadline)})
+                accepted = self._consume(sock, receipt, deadline)
+                _reply(sock, {'acknowledged': accepted})
+                if accepted:
+                    with self.lock:
+                        self.delivered['display'] += 1
             finally:
                 self.display.cancel(pid)
         else:

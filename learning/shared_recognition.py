@@ -38,7 +38,7 @@ class InferenceScheduler:
             return demand
 
     def fresh(self, result):
-        return (0 <= self.clock() - result['at'] <= .5 and
+        return (not self.closed and 0 <= self.clock() - result['at'] <= .5 and
                 (self.current is None or self.current(result)))
 
     def cancel(self, client):
@@ -134,10 +134,13 @@ class DisplayBroker:
         if self.clock() > deadline:
             receipt.put_nowait(False)
             return
-        if text is None:
-            accepted = owns_display and self.transport.clear_object_label()
-        else:
-            accepted = self.transport.show_object_label(text, 4500, 100)
+        try:
+            if text is None:
+                accepted = owns_display and self.transport.clear_object_label()
+            else:
+                accepted = self.transport.show_object_label(text, 4500, 100)
+        except OSError:
+            accepted = False
         with self.lock:
             if accepted:
                 self.displayed = producer if text is not None else None

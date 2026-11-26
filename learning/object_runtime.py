@@ -34,8 +34,25 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
         evidence = MobileEvidenceAdapter(journal, episode='objects:'+uuid4().hex, revision=revision)
         perception = MobilePerception(detector, UnavailableDepth(), resources=ResourceGuard(resources),
                                       revision=revision, clock=time.monotonic)
-        bus = StimulusBus()
         shared = getattr(args, 'shared_recognition', None)
+        bus = StimulusBus(event_limit=64) if shared else StimulusBus()
+        server = None
+        summary = getattr(args, 'recognition_summary', None)
+        if summary is not None:
+            from hardware.hailo_session import measure_inferences
+            if not objects.get('persistent', True):
+                raise ValueError('shared qualification requires the persistent Hailo owner')
+            calls = lifecycle.enter_context(measure_inferences())
+            def write_summary():
+                receipt = dict(hailort_completed=calls['completed'], hailort_submitted=calls['submitted'],
+                               delivered=dict(server.delivered) if server is not None else {},
+                               perception=dict(perception.stats),
+                               resources=dict(perception.resources.sample),
+                               peak_owned_rss_bytes=perception.resources.peak_owned_resident_bytes,
+                               motion_authorized=False)
+                with summary.open('x') as output:
+                    json.dump(receipt, output, allow_nan=False)
+            lifecycle.callback(write_summary)
         scheduler = broker = None
         if shared:
             from learning.shared_recognition import DisplayBroker, InferenceScheduler
@@ -100,7 +117,7 @@ def run_objects(args, resources, frame_bus, *, supervise=lambda: None, actuator_
             from ui.dashboard import attach_mobile
             attach_mobile(args,frame_bus,lifecycle,executor=actuator_executor)
         telemetry_at = 0.
-        keyboard = KeyboardStimulus(bus, object_mode=True,
+        keyboard = KeyboardStimulus(bus, object_mode=True, stop_on_eof=bool(shared),
             on_emergency=(stop_shared if shared else
                           actuator_executor.emergency_stop if actuator_executor is not None else None))
         lifecycle.callback(keyboard.close)

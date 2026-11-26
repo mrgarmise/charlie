@@ -5,6 +5,21 @@ import fcntl
 import hashlib
 import os
 import threading
+from contextvars import ContextVar
+
+# Only the qualification owner's synchronous inference thread records calls.
+_inference_measurement = ContextVar('hailo_inference_measurement', default=None)
+
+
+@contextmanager
+def measure_inferences():
+    counts = dict(submitted=0, completed=0)
+    token = _inference_measurement.set(counts)
+    try:
+        yield counts
+    finally:
+        _inference_measurement.reset(token)
+
 
 
 @contextmanager
@@ -57,7 +72,13 @@ class HailoSession:
         try:
             self.open()
             if self.owner!=threading.get_ident():raise RuntimeError('Hailo session may not cross worker threads')
-            return self.pipeline.infer({self.input_name:tensor})
+            counts = _inference_measurement.get()
+            if counts is not None:
+                counts['submitted'] += 1
+            result = self.pipeline.infer({self.input_name:tensor})
+            if counts is not None:
+                counts['completed'] += 1
+            return result
         except BaseException:
             self.close();raise
 

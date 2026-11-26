@@ -168,7 +168,7 @@ def main(argv=None):
     return run_application(args, arguments)
 
 
-def run_application(args, arguments):
+def run_application(args, arguments, *, admitted_channel=None):
     if args.native_meditation and (not args.offline or args.llm_consultation_approval is not None
             or args.mobile_replay or args.mobile_observe or args.pet_abilities or args.pet_follow
             or args.object_label_replay or args.mobile_dashboard):
@@ -235,8 +235,12 @@ def run_application(args, arguments):
         raise ValueError('fixture replay cannot activate a physical display')
     if args.object_label_display!='off' and args.offline and not (args.mobile_replay or args.mobile_observe):
         raise ValueError('object label display requires an existing observation source')
-    args.shared_recognition = None
-    if args.executive_recognition and args.shared_recognition_directory is None:
+    args.shared_recognition = admitted_channel
+    if admitted_channel is not None:
+        if args.shared_recognition_directory is not None:
+            raise ValueError('development and stationary sessions cannot share credentials')
+        endpoint, credentials = admitted_channel
+    if args.executive_recognition and not (admitted_channel or args.shared_recognition_directory):
         raise ValueError('Executive requests require the shared recognition profile')
     if args.shared_recognition_directory is not None:
         if (not args.object_recognition or args.camera_source != 'elegoo' or
@@ -277,6 +281,8 @@ def run_application(args, arguments):
                 wall_seconds=args.learning_wall_seconds,cooldown_seconds=args.learning_cooldown_seconds)
     if args.executive_recognition:
         kwargs['recognition_client'] = (endpoint, credentials['executive'])
+        if admitted_channel and args.object_label_display == 'rp2040':
+            kwargs['recognition_display_token'] = credentials['display']
     if args.native_meditation:kwargs['native_meditation']=True
     if args.llm_consultation:
         kwargs['llm_consultation'] = True

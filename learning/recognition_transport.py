@@ -49,11 +49,13 @@ class RecognitionServer:
         self.slots = BoundedSemaphore(8)
         self.lock = Lock()
         self.clients = {}
+        self.delivered = {'recognize': 0, 'executive': 0, 'display': 0}
         self.peers = set()
         self.stopped = False
         self.listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
             self.listener.bind(endpoint)
+            os.chmod(endpoint, 0o600)
             self.listener.listen(8)
             self.listener.settimeout(.1)
         except BaseException:
@@ -101,7 +103,7 @@ class RecognitionServer:
                         raise RuntimeError('one active request per peer process')
                     self.peers.add(pid)
                     admitted_peer = pid
-                self._dispatch(sock, request)
+                self._dispatch(sock, request, pid)
         except (ValueError, TypeError, OSError, RuntimeError) as exc:
             try:
                 _reply(sock, {'error': type(exc).__name__})
@@ -109,8 +111,6 @@ class RecognitionServer:
                 pass
         finally:
             self.inference.cancel(sock)
-            if self.display is not None:
-                self.display.cancel(sock)
             sock.close()
             with self.lock:
                 self.clients.pop(sock, None)
@@ -118,7 +118,7 @@ class RecognitionServer:
                     self.peers.discard(admitted_peer)
                 self.slots.release()
 
-    def _dispatch(self, sock, request):
+    def _dispatch(self, sock, request, pid):
         role = request.get('role')
         token = request.get('token')
         if (not isinstance(role, str) or role not in self.credentials or not isinstance(token, str)
@@ -138,11 +138,21 @@ class RecognitionServer:
                 if not self.inference.fresh(result):
                     raise TimeoutError('recognition result expired or source changed')
                 _reply(sock, {'result': result})
+                with self.lock:
+                    self.delivered[role] += 1
         elif self.display is not None:
-            if set(request) != {'role', 'token', 'timeout', 'text'} or not isinstance(request['text'], str):
+            if set(request) != {'role', 'token', 'timeout', 'text'} or not (request['text'] is None or isinstance(request['text'], str)):
                 raise ValueError('display label required')
-            receipt = self.display.submit(sock, request['text'], deadline)
-            _reply(sock, {'acknowledged': self._consume(sock, receipt, deadline)})
+            # Reconnects from a producer can explicitly clear only its own accepted label.
+            receipt = self.display.submit(pid, request['text'], deadline)
+            try:
+                accepted = self._consume(sock, receipt, deadline)
+                _reply(sock, {'acknowledged': accepted})
+                if accepted:
+                    with self.lock:
+                        self.delivered['display'] += 1
+            finally:
+                self.display.cancel(pid)
         else:
             raise PermissionError('display unavailable')
 
@@ -203,13 +213,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument('directory', type=Path)
     parser.add_argument('--frames', type=int, default=1)
-    parser.add_argument('--label')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--label')
+    mode.add_argument('--ask', choices=['what do you see?'],
+                      help='describe one fresh observation on demand')
     args = parser.parse_args()
+    if args.ask and args.frames != 1:
+        parser.error('--ask describes one observation')
     endpoint = str(args.directory / 'recognition.sock')
     if args.label is None:
         token = (args.directory / 'recognize.token').read_text().strip()
         for result in recognize(endpoint, token, frames=args.frames):
-            print(json.dumps(result))
+            if args.ask:
+                objects = result['observation']['objects']
+                labels = ', '.join(f"{row['label']} ({row['confidence']:.0%})" for row in objects)
+                print(f"Camera {result['source']}: {labels or 'no objects detected'}.")
+            else:
+                print(json.dumps(result))
     else:
         token = (args.directory / 'display.token').read_text().strip()
         print(json.dumps({'acknowledged': display_label(endpoint, token, args.label)}))

@@ -165,6 +165,16 @@ class DevelopmentLifecycle:
         self.phase = phase
         self._status()
 
+    def request_recognition(self):
+        from contextlib import closing
+        from .recognition_transport import recognize
+        client = getattr(self, 'recognition_client', None)
+        if client is None:
+            raise PermissionError('live recognition is not admitted')
+        self.yield_for_primary()
+        with closing(recognize(*client, role='executive', timeout=1)) as observations:
+            return next(observations)
+
     def acquire(self):
         from .retrospective import discover_episodes, merge_history
         from .cycle import ingest_episode
@@ -173,6 +183,13 @@ class DevelopmentLifecycle:
         from .acquisition import maintain_episode_identity
         from .episode_identity import verified_tracks
         from .mobile_runtime import import_mobile_evidence
+        if (getattr(self, 'recognition_client', None) is not None and
+                time.monotonic() >= getattr(self, 'next_recognition_at', 0)):
+            self.next_recognition_at = time.monotonic() + 10
+            try:
+                self.latest_recognition = self.request_recognition()
+            except (OSError, ValueError):
+                self.latest_recognition = None
         changed = import_mobile_evidence(self)
         self.available_tracks = {}
         roots=list(self.roots)
@@ -696,7 +713,7 @@ class DevelopmentLifecycle:
 def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_authority=None,
         history_roots=(), resources=None, wall_seconds=None, cooldown_seconds=None,
         clock=None, sleep=None, lifecycle_factory=None, human_questions=False, model_learning=False, llm_consultation=False,
-        llm_consultation_approval=None, native_meditation=False):
+        llm_consultation_approval=None, native_meditation=False, recognition_client=None):
     """One existing Executive, with resource polling rather than a second scheduler.
 
     ``turns`` bounds nonthermal attempt slots (including other resource refusals),
@@ -717,6 +734,9 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
     if llm_consultation_approval is not None and not llm_consultation:
         raise ValueError('real consultation requires explicit queue opt-in')
     resources=resources or DevelopmentResources()
+    if recognition_client is not None:
+        from tools.runtime_adoption.stationary_boundary import install
+        install(recognition_connect=recognition_client[0])
     resources.apply()
     os.nice(10)  # Vision/control retain host CPU priority.
     clock=clock or time.monotonic;sleep=sleep or time.sleep
@@ -740,6 +760,8 @@ def run(output, roots, *, budget_seconds=10., interval=5., turns=None, offline_a
         options = dict(human_questions=True) if human_questions else {}
         lifecycle=factory(output,roots,budget_seconds=budget_seconds,offline_authority=offline_authority,
             history_roots=history_roots,resources=resources,**options)
+        if recognition_client is not None:
+            lifecycle.recognition_client = recognition_client
         if llm_consultation:
             from .consultation_activation import make_service
             lifecycle.consultation=make_service(lifecycle.journal, llm_consultation_approval)

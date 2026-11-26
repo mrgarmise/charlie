@@ -478,8 +478,8 @@ def qualification_preflight(ctl, before):
     device_guard()
 
 
-def device_guard():
-    for device in ('/dev/hailo0', '/dev/ttyACM0'):
+def device_guard(devices=('/dev/hailo0', '/dev/ttyACM0')):
+    for device in devices:
         require(Path(device).is_char_device(), 'required device unavailable: ' + device)
         probe = subprocess.run(['/usr/bin/fuser', device], capture_output=True, timeout=5)
         require(probe.returncode == 1 and not probe.stdout and not probe.stderr,

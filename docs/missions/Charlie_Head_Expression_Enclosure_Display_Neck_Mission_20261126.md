@@ -1,0 +1,87 @@
+# Charlie — Expression, Enclosure, Display, and Modular Neck Integration
+
+**Codex implementation mission | 2026-11-26 | continuation of verified integrated head**
+
+## Mission mandate
+
+Continue from the **latest verified integrated, neck-free Charlie head assembly** shown in the `107_assembled`, `107_cutaway`, `107_face_off`, and `107_gaze_and_blink` views and documented by its `RESUME.md`, BOM, and audits. **Do not restart the head from original pieces.** Preserve the approved original/source meshes, source hashes, v23, and all existing checkpoints. Make new, numbered, reversible Blender checkpoints and keep a verified rollback baseline.
+
+The user authorizes engineering modifications to working-copy printable geometry, supports, brackets, face, rear skull, cable routes, and interfaces to accomplish the following: a compelling **radical-amazement facial expression**, clean hidden mounting and seams, a visible Pico display in a left-temple speech bubble, and a **mechanically researched modular neck mounting interface**. Do not change Charlie's operational runtime, energize/actuate any device, deploy to a robot, or initiate printing. All hardware changes are CAD-only pending separate fabrication and physical qualification. Do not silently discard proven eye-function and clearance results.
+
+**Core standard:** deliver one coherent printable-and-assemblable *virtual* head design with explicit mechanical attachments, safe range-of-motion, realistic electronics and wire paths, and prioritized physical checks. Retain an honest distinction between CAD verification and hardware proof.
+
+## First: establish and protect baseline
+
+1. Read current `RESUME.md`, project engineering documentation, current Blender assembly, manifest and source model locations; identify the precise integrated checkpoint that produced the 144 independent end-stop / 100 assembled motion pose evidence and nine sampled full closures. Record exact filenames and source hashes.
+2. Open a duplicate, never edit the sole baseline. Save a new initial checkpoint. Preserve the existing eyelid/eye kinematic relationships, servo mapping, collision scripts, cable-release/service paths, electronics cassette and separable skull.
+3. Produce a concise **baseline-versus-new** comparison with the known minimum sampled carrier-to-lid gap of approximately **0.145 mm**; treat that as a fragile tolerance, not fabrication-approved clearance. Identify critical geometry/parts that must not move without full retesting.
+4. Use dedicated Blender MCP for the live GUI, ordinary scene operations, and staged visual updates; never use Blender factory-reset operations. Use background scripts where beneficial and reopen the results in the live viewport. Save and update `RESUME.md` frequently; interruption is expected.
+
+## A. Face/chassis interface: hidden attachments and closed unused slots
+
+The supplied views appear to show temple-edge slots that are no longer used and mounting pins/rods visibly protruding through the face. **Inspect actual geometry**, don't assume every visible feature has the suspected function.
+
+- Compare original slot/clip design, current head attachment and frame studs. Determine exactly why original slots weren't used and whether they could provide a better attachment. Favor proven original mating geometry *if mechanically advantageous*; otherwise retain the newer secure mounting design and close unused exterior slots with integrated outer skin or printable plugs engineered to be flush, durable and unobtrusive.
+- **No exposed face-side mounting pegs, screw tips, or rods.** Redesign face mounting as **blind, internal receptacles or bosses**, with short internal locating studs and positive but serviceable retention (e.g., rear-access screws into heat-set inserts, captive screws, removable clip features, or appropriate combination). Do not rely on simple friction press-fit alone without considering tolerance, wear, and removal. Restrict protrusion within the outer cosmetic skin; dimension blind-hole depth, shell wall thickness, and fastener insertion limits. Avoid creating visible dimples or holes in the forehead or cheeks.
+- Preserve removable access and avoid trapping hardware behind the mask. Make the assembly order explicit. Verify attachments under the mask's own weight and anticipated handling, and check that fasteners do not enter eye/eyelid motion envelopes.
+- Re-test printed-part dimensional compatibility and A1 mini orientation/supports. For blind pegs or printed snap features, state assumed PLA/PETG tolerances and recommend a small fit coupon before full printing.
+
+## B. Vertical face split and subtle seamless appearance
+
+- Determine *why* the face was split vertically: measured A1 mini 180×180×180 mm bed constraints, original geometry, front service access, or another reason. Report actual face dimensions and a slicer-tested orientation; do not assume the split is required.
+- If a split is needed or beneficial, retain it with a **concealed alignment/overlap interface**: stepped lap joint, interior tongue-and-groove, staggered scarf or keyed rabbet, controlled clearance, structural alignment pins, and inside-access joining fasteners or serviceable clips. Avoid exterior raised lips, gaps, or mismatched surfaces. Do not create undercuts that cannot be printed/assembled.
+- If single-piece face printing fits and improves cosmetics, compare it fairly with split construction; retain the split only for a clear benefit. If split, validate that assembly can close accurately without stress and that cosmetic finish can conceal the seam. Include close-up seam render and actual dimensioned seam detail.
+- **Future mouth motion:** retain a feasible future **separation along the natural lip line** for a small articulated puppet-like lower jaw. This is an architectural reservation, *not* authorization to compromise current face, eyes, or mounting geometry. Reserve potential cheek-side pivots, servo/linkage volume, stops and a hidden seam where possible. Do not implement a moving jaw at the expense of current scope; document if incompatible.
+
+## C. Radical amazement expression — a friendlier, more natural Charlie
+
+The current Doorman/Watchman-derived polygonal face reads stern and angular. Create a **youthful, open, curious, delighted, slightly grinning 'radical amazement'** resting face. Realistic or smooth sculpting is welcome; polygon-heavy appearance is **not** a design constraint. The expression should suggest intelligence, wonder, warmth and engagement, *not* exaggerated shock, terror, clownishness or a static grin.
+
+- Explore 2–3 controlled facial variations in separate non-destructive collections/scenes or checkpoints; choose a coherent default with justification. Smooth contours in brows, cheeks, temples, mouth, jaw, and nose. Prefer subtle raised brows, relaxed non-threatening eye surrounds, slight asymmetric or symmetric amused smile, and natural volume transitions. Do not use fake pupils, camera angles or surface tricks to simulate proper anatomical positions. Actual eyeballs and functional lids remain physically located in credible sockets.
+- Eye apertures and eyelid margins must match the real, existing articulated eyes through the verified gaze and blink envelope. Do not visually narrow the sockets so the motion only works from the frontal camera. Assess front, three-quarter, profile, above and below, including both gaze extremes and full blink.
+- Preserve/engineer the Arducam aperture and true optical line-of-sight; keep camera visually integrated and not accidentally blocked by brow or decorative skin. Confirm the actual camera/ribbon envelope as provisional where hardware measurements aren't available.
+- **The front face and rear skull must be the same color** in the design/material assignments and print plan (matching base filament/material/color specification). This does not require the separate Pico display speech bubble, small technical details, eye mechanism and eye spheres to be identical. Keep color seam and finish consistency in mind; avoid needlessly filament-change-heavy multicolor prints.
+- Respect the existing removable rear and face access. Revalidate all geometry, moving clearances, ventilation, service access and printability after sculpting.
+- Save clear, comparable orthographic and perspective views, well-lit neutral beauty views, and closeups of the sockets/mouth/seam.
+
+## D. Pico:ed / RP2040 visible external display, left-temple speech bubble
+
+The user's Pico:ed display must be **visible from outside** the completed head. It also serves as the controller for the eye servos. Design a **speech-bubble-shaped accessory emerging near Charlie's left temple**. Clarify and label anatomical left (Charlie's left, viewer's right in frontal view) so location is deliberate.
+
+- Inspect actual Pico:ed Keyestudio shield/breakout and display hardware models/documentation. Use measured or sourced dimensional drawings and connector positions; model screen/LED-matrix window, display orientation, board retention, cable exit and service access. Distinguish Pico:ed from a generic bare Pico: it is an assembly with an onboard visible matrix and a mating board. Verify the specific installed variant.
+- Design a tasteful, compact, removable speech-bubble housing with a visible screen from normal viewing angles, clear unobstructed sightline, enough opening/bezel/appropriate diffuser if needed, and optional protective transparent window only if optically practical. It should look intentionally part of Charlie rather than a loose electronics box. Provide a sturdy strain-relieved arm or mount at the **left temple**; no hardware rods protruding through cosmetic skin. If mounting in the skull is better than a face seam, design to preserve face/removable rear.
+- **Servo signal paths:** establish a real routed path from Pico/Keyestudio to each of the six eye servos with connector footprints, pin mapping, cable lengths/bend allowances, tie points and strain relief. Avoid crossings of moving lids, rotating carriers, tilt/yaw rods, removable face/back paths and mechanical fasteners. Include provisions for disconnecting the bubble for servicing. Do not assume GPIO can power servos. Design separate servo power distribution, common ground and appropriate supply protection based on sourced servo current requirements; no energization or firmware changes in this mission.
+- The Pico/display is allowed to be inside the speech bubble *if* it is firmly secured, the display is actually visible, connector access and wiring can reach all servos, and moving display assembly mass/cable drag remain acceptable. Alternatively mount the controller internally with a display relocation only if the actual hardware electrically supports that arrangement; do not invent detachable display connectivity.
+- Add serviceable routes for Pi 5/Hailo/SSD connections and the eight-inch Arducam ribbon; confirm ribbon bend radius and connector engagement at modelled positions. Keep existing usable USB/SSD clearances and accessible plugs preferably hidden. Don't assume the earlier apparent empty volume is free of motion, connector or thermal constraints.
+- Add exterior and interior closeup views of the bubble, wiring, six-servo route, connector/service access and the exposed display.
+
+## E. Neck interface now permitted, but research the standard first
+
+The original neck from prior project files has a **modular top coupling**. Identify its exact maker, model, file set, interface specification, mating counterpart, and assembly documentation. The user wants the **matching modular receiving half integrated on the head**. Do not guess that a commonly shaped flange is a standard, or invent a compatible dimension without evidence.
+
+- Locate and inspect the original neck project, source CAD/STLs, assembly guides and online documentation, including any named standard/quick-change interface, keying features, locking mechanism, bolt circles, shaft interface, mechanical stop, shear and axial retention, cable pass-through, and clocking orientation.
+- Design the **corresponding mating half on Charlie's head chassis** (possibly a new adapter), with a clear load path into the head frame rather than into the cosmetic mask. Include positive retention, anti-rotation features if appropriate, robust fastener engagement, and a pass-through for power/data/servo wiring if practical. Account for installed electronics and realistic center-of-mass placement.
+- **Scope boundary:** model the necessary head-side adapter and a reference neck-top mating interface/fit check. The pre-existing neck may be shown as a reference, but do **not** silently redesign or certify the entire moving neck, or actuate it. If source specifications disagree, document discrepancies and select/validate an interface variant based on the real CAD geometry and manufacturer evidence.
+- Recompute approximate head mass/center of gravity and neck moments with the new face, bubble and cable harness; flag required structural and servo qualification. Identify how the mating mount can be disconnected and how cables are separated. Preserve a neck-free display mode if practical.
+
+## F. Verification and manufacturing deliverables
+
+1. Produce a **complete editable Blender assembly** with named semantic collections, logical assembly constraints/datums, non-destructive source preservation, and useful front/profile/rear/three-quarter/cutaway/exploded views. Keep left/right correctly identified.
+2. Rerun the original **144 independent end-stop combinations, 100 assembled motion poses, blink tests and plug/withdrawal tests** where applicable. Add tests for new bubble/wiring/neck adapter and blind face mounts. Test full independent yaw/pitch/lid coordinate bounds; use continuous sweeps or denser sampling on minimum-clearance regions, not just favorable poses.
+3. Explicitly classify intentional contact versus interference; don't eliminate deliberate locating interfaces. Flag all *actual* unexpected collisions and fix those that can be fixed in CAD. Document the previous 0.145 mm gap and new minimum measurement. Avoid claiming guaranteed real-world clearance from sampled Blender meshes.
+4. Audit all fastener/bearing/servo mounts, Pi 5 with Hailo and SSD, actual physical USB plugs, Pico:ed + Keyestudio, Arducam with 8-inch ribbon, cooling/ventilation, clearances and cable service/withdrawal sequences; state which are modeled from verified hardware vs. nominal envelopes.
+5. Generate printable part plan and a Bambu Studio software-only **A1 mini 180 mm build-volume** check for each separate exterior part and critical mounts, with supports, orientation, wall thickness, tolerances and estimated filament/time. Do not start the printer. Prefer avoiding excessive AMS filament swaps. Surface treatment and visual seam finishing may be documented.
+6. Produce a concise **assembly guide** with order, hidden fixings, cable harness branches, 6-servo map/power distribution, speech-bubble removal procedure, neck adapter coupling, and rear service access. Add a BOM for fasteners, inserts, actual mount types, and parts needing purchase/measurement.
+7. Save evidence: face evolution comparisons, close-up seam/hidden mount details, bubble display mockup, neck mating interface fit study, eye gaze/blink/motion and mechanical audit receipts. Update `RESUME.md` with final paths and exact restart/audit commands.
+
+## Autonomous execution / stopping criteria
+
+Treat routine geometry obstacles as engineering work: investigate, redesign, retest, and continue. If a candidate makes a clearance worse, try alternative packaging, routing or mount designs rather than stopping after a revert. Use public online research freely and cite exact manufacturer sources. Use working-copy modifications without asking permission. Do not pause after each checkpoint or issue a premature 'finished' report merely because some physical fit tests remain.
+
+A **genuine external measurement need** does not have to prevent the rest of the virtual work: use explicit parametric assumptions, indicate fit coupons or measurements, and continue independently on unaffected parts. The acceptable final distinction is: (1) virtual engineering requirements completed and evidence archived; (2) physical fabrication/measurement qualification still outstanding. If an actual tool/session resource limit interrupts, save a usable `.blend` and `RESUME.md` containing next three concrete actions and all verification paths.
+
+**Never:** overwrite v23/sources, destroy the integrated verified baseline, reset Blender via factory settings, change Charlie's approved runtime, actuate servos or neck, contact or command printer hardware, or represent CAD simulation as actual hardware validation.
+
+## User-facing handoff
+
+At completion, report: chosen facial-expression variant and why; hidden mounting design; seam/one-piece decision and size; color-matched shell plan; exact Pico/bubble visibility and wiring design; identified modular neck interface and head-side counterpart; revised clearance and motion evidence; STL/3MF readiness; any remaining real hardware measurements and fit tests. Provide final assembly/checkpoint paths and **one prioritized next fabrication action**.
